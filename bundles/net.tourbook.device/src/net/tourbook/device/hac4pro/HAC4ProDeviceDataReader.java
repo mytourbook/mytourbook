@@ -549,7 +549,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
                newlyImportedTours.put(tourId, tourData);
 
                // create additional data
-               tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
+               tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
                tourData.computeTourMovingTime();
                tourData.computeComputedValues();
                computeTourAltitudeUpDown(tourData);

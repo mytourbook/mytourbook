@@ -1263,10 +1263,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final TVICollatedTour item = (TVICollatedTour) element;
 
             final long dbPausedTime = item.colBreakTime;
-            final long dbRecordingTime = item.colElapsedTime;
+            final long dbElapsedTime = item.colElapsedTime;
 
-            final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-                  / dbRecordingTime
+            final float relativePausedTime = dbElapsedTime == 0 ? 0 : (float) dbPausedTime
+                  / dbElapsedTime
                   * 100;
 
             cell.setText(_nf1.format(relativePausedTime));

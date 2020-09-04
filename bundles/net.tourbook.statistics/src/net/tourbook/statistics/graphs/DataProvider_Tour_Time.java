@@ -112,7 +112,7 @@ public class DataProvider_Tour_Time extends DataProvider {
             + "StartWeek," //				4 //$NON-NLS-1$
             + "TourStartTime," //			5 //$NON-NLS-1$
             + "TimeZoneId, "//				6 //$NON-NLS-1$
-            + "TourRecordingTime," //		7 //$NON-NLS-1$
+            + "TourDeviceTime_Elapsed," //7 //$NON-NLS-1$
             + "TourDrivingTime,"//			8 //$NON-NLS-1$
 
             + "TourDistance," //			9 //$NON-NLS-1$
@@ -150,7 +150,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
-         final TIntArrayList allTourRecordingTime = new TIntArrayList();
+         final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
          final TIntArrayList allTourDrivingTime = new TIntArrayList();
 
          final TIntArrayList allDistance = new TIntArrayList();
@@ -197,7 +197,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                final long dbStartTimeMilli = result.getLong(5);
                final String dbTimeZoneId = result.getString(6);
-               final int dbRecordingTime = result.getInt(7);
+               final int dbElapsedTime = result.getInt(7);
                final int dbDrivingTime = result.getInt(8);
 
                final float dbDistance = result.getFloat(9);
@@ -225,8 +225,8 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourStartDateTime.add(zonedStartDateTime);
                allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
                allTourStartTime.add(startDayTime);
-               allTourEndTime.add((startDayTime + dbRecordingTime));
-               allTourRecordingTime.add(dbRecordingTime);
+               allTourEndTime.add((startDayTime + dbElapsedTime));
+               allTourDeviceTime_Elapsed.add(dbElapsedTime);
                allTourDrivingTime.add(dbDrivingTime);
 
                allDistance.add((int) (dbDistance / UI.UNIT_VALUE_DISTANCE));
@@ -304,7 +304,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          _tourDataTime.tourDistanceValues = allDistance.toArray();
          _tourDataTime.tourAltitudeValues = allAltitudeUp.toArray();
 
-         _tourDataTime.tourRecordingTimeValues = allTourRecordingTime.toArray();
+         _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
          _tourDataTime.tourDrivingTimeValues = allTourDrivingTime.toArray();
 
          _tourDataTime.tourTitle = allTourTitle;

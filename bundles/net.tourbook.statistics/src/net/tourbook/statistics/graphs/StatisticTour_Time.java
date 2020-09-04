@@ -247,13 +247,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int[] startValue = _tourTimeData.tourTimeStartValues;
       final int[] endValue = _tourTimeData.tourTimeEndValues;
 
-      //TODO FB
-      final int recordingTime = _tourTimeData.tourRecordingTimeValues[valueIndex];
+      final int elapsedTime = _tourTimeData.tourDeviceTime_ElapsedValues[valueIndex];
       final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final int breakTime = elapsedTime - drivingTime;
 
       final ZonedDateTime zdtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourTimeData.tourDistanceValues[valueIndex];
       final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
@@ -331,9 +330,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
             zdtTourStart.getZone().getId(),
             tourTimeZoneOffset,
             //
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
-            (recordingTime % 3600) % 60,
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
+            (elapsedTime % 3600) % 60,
             //
             drivingTime / 3600,
             (drivingTime % 3600) / 60,

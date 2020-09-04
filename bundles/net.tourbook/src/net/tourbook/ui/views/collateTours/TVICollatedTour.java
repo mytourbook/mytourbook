@@ -37,7 +37,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
             //
             + "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
-            + "SUM(TOURRECORDINGTIME)," //							1	//$NON-NLS-1$
+            + "SUM(tourDeviceTime_Elapsed)," //					1	//$NON-NLS-1$
             + "SUM(TOURDRIVINGTIME)," //							2	//$NON-NLS-1$
             + "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
             + "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$

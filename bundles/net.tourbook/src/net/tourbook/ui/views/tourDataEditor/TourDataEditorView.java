@@ -1496,11 +1496,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tab1Container.setRedraw(true);
       }
 
-      public void setTime(final int recordingTime) {
+      public void setTime(final int elapsedTime) {
 
-         final int hours = recordingTime / 3600;
-         final int minutes = (recordingTime % 3600) / 60;
-         final int seconds = (recordingTime % 3600) % 60;
+         final int hours = elapsedTime / 3600;
+         final int minutes = (elapsedTime % 3600) / 60;
+         final int seconds = (elapsedTime % 3600) % 60;
 
          _txtTime.setText(String.format(timeFormat, hours, minutes, seconds));
 
@@ -6697,9 +6697,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is imported
 
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourElapsedTime(0);
+            _tourData.setTourDeviceTime_Elapsed(0);
          } else {
-            _tourData.setTourElapsedTime(_serieTime[_serieTime.length - 1]);
+            _tourData.setTourDeviceTime_Elapsed(_serieTime[_serieTime.length - 1]);
          }
          _tourData.computeTourMovingTime();
 
@@ -8468,7 +8468,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            _tourData.setTourElapsedTime(_timeElapsed.getTime());
+            _tourData.setTourDeviceTime_Elapsed(_timeElapsed.getTime());
             _tourData.setTourDeviceTime_Recorded(_timeRecorded.getTime());
             _tourData.setTourPausedTime(_timePaused.getTime());
             _tourData.setTourMovingTime(_timeMoving.getTime());
@@ -8927,7 +8927,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
       // tour times
-      final int elapsedTime = (int) _tourData.getTourElapsedTime();
+      final int elapsedTime = (int) _tourData.getTourDeviceTime_Elapsed();
       final int movingTime = (int) _tourData.getTourMovingTime();
       final int recordedTime = (int) _tourData.getTourDeviceTime_Recorded();
       final int pausedTime = (int) _tourData.getTourPausedTime();

@@ -945,7 +945,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          @Override
          public boolean computeTourValues(final TourData oldTourData) {
 
-            final int tourElapsedTime = (int) oldTourData.getTourElapsedTime();
+            final int tourElapsedTime = (int) oldTourData.getTourDeviceTime_Elapsed();
 
             // get old break time
             final int tourMovingTime = (int) oldTourData.getTourMovingTime();
@@ -978,7 +978,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             if (savedTourData != null) {
 
                // get new value
-               final int tourElapsedTime = (int) savedTourData.getTourElapsedTime();
+               final int tourElapsedTime = (int) savedTourData.getTourDeviceTime_Elapsed();
 
                // get old break time
                final int tourMovingTime = (int) savedTourData.getTourMovingTime();

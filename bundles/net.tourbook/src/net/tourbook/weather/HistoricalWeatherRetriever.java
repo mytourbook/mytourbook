@@ -139,7 +139,7 @@ public class HistoricalWeatherRetriever {
 
       if (_isLogWeatherData) {
 
-         final long elapsedTime = tour.getTourElapsedTime();
+         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
          final ZonedDateTime zdtTourStart = tour.getTourStartTime();
          final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
          final String tourTitle = tour.getTourTitle();

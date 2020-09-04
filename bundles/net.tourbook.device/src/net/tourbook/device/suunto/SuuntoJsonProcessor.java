@@ -469,7 +469,7 @@ public class SuuntoJsonProcessor {
          tourData.setTourPausedTime(pausedTime);
       }
 
-      tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime() - pausedTime);
+      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - pausedTime);
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 

@@ -2568,7 +2568,7 @@ public class Messages extends NLS {
    public static String Tour_Filter_Field_DrivingTime;
    public static String Tour_Filter_Field_ManualTour;
    public static String Tour_Filter_Field_Photos;
-   public static String Tour_Filter_Field_RecordingTime;
+   public static String Tour_Filter_Field_DeviceTime_Elapsed;
    public static String Tour_Filter_Field_Season;
    public static String Tour_Filter_Field_Temperature;
    public static String Tour_Filter_Field_TourDate;

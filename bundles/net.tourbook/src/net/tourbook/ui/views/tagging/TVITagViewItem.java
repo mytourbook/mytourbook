@@ -36,7 +36,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
             + "SUM(tourDistance)," //              0   //$NON-NLS-1$
-            + "SUM(tourRecordingTime)," //         1   //$NON-NLS-1$
+            + "SUM(TourDeviceTime_Elapsed)," //    1   //$NON-NLS-1$
             + "SUM(tourDrivingTime)," //           2   //$NON-NLS-1$
             + "SUM(tourAltUp)," //                 3   //$NON-NLS-1$
             + "SUM(tourAltDown)," //               4   //$NON-NLS-1$
@@ -56,7 +56,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
 
             + "tourDistance," //             0   //$NON-NLS-1$
-            + "tourRecordingTime," //        1   //$NON-NLS-1$
+            + "TourDeviceTime_Elapsed," //   1   //$NON-NLS-1$
             + "tourDrivingTime," //          2   //$NON-NLS-1$
             + "tourAltUp," //                3   //$NON-NLS-1$
             + "tourAltDown," //              4   //$NON-NLS-1$
@@ -78,7 +78,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
    long   colDistance;
 
-   long   colRecordingTime;
+   long   colElapsedTime;
    long   colDrivingTime;
    long   colPausedTime;
 
@@ -153,9 +153,9 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       colDistance = result.getLong(startIndex + 0);
 
-      colRecordingTime = result.getLong(startIndex + 1);
+      colElapsedTime = result.getLong(startIndex + 1);
       colDrivingTime = result.getLong(startIndex + 2);
-      colPausedTime = colRecordingTime - colDrivingTime;
+      colPausedTime = colElapsedTime - colDrivingTime;
 
       colAltitudeUp = result.getLong(startIndex + 3);
       colAltitudeDown = result.getLong(startIndex + 4);
@@ -177,7 +177,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
          colDistance = UI.scrambleNumbers(colDistance);
 
-         colRecordingTime = UI.scrambleNumbers(colRecordingTime);
+         colElapsedTime = UI.scrambleNumbers(colElapsedTime);
          colDrivingTime = UI.scrambleNumbers(colDrivingTime);
          colPausedTime = UI.scrambleNumbers(colPausedTime);
 

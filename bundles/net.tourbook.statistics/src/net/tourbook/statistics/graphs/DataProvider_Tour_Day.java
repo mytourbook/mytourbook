@@ -265,7 +265,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + " TimeZoneId,"                          + NL //  5     //$NON-NLS-1$
 
             + " TourDrivingTime,"                     + NL //  6     //$NON-NLS-1$
-            + " TourRecordingTime,"                   + NL //  7     //$NON-NLS-1$
+            + " TourDeviceTime_Elapsed,"              + NL //  7     //$NON-NLS-1$
 
             + " TourDistance,"                        + NL //  8     //$NON-NLS-1$
             + " TourAltUp,"                           + NL //  9     //$NON-NLS-1$

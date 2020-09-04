@@ -98,7 +98,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    /**
     * A tour id will be created with recording time when <code>true</code>.
     */
-   public boolean isCreateTourIdWithRecordingTime;
+   public boolean isCreateTourIdWithElapsedTime;
 
    /**
     * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
@@ -129,7 +129,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead, to
     * create recording time.
     * <p>
-    * Recording time is added to the tour id when {@link #isCreateTourIdWithRecordingTime} is
+    * Recording time is added to the tour id when {@link #isCreateTourIdWithElapsedTime} is
     * <code>true</code>.
     *
     * @param tourData
@@ -154,14 +154,14 @@ public abstract class TourbookDevice implements IRawDataReader {
       String uniqueKey;
       final float[] distanceSerie = tourData.getMetricDistanceSerie();
 
-      if (isCreateTourIdWithRecordingTime) {
+      if (isCreateTourIdWithElapsedTime) {
 
          /*
           * 25.5.2009: added recording time to the tour distance for the unique key because tour
           * export and import found a wrong tour when exporting was done with camouflage speed ->
           * this resulted in a NEW tour
           */
-         final int tourElapsedTime = (int) tourData.getTourElapsedTime();
+         final int tourElapsedTime = (int) tourData.getTourDeviceTime_Elapsed();
 
          if (distanceSerie == null) {
             uniqueKey = Integer.toString(tourElapsedTime);
@@ -200,9 +200,9 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       String uniqueKey;
 
-      if (isCreateTourIdWithRecordingTime) {
+      if (isCreateTourIdWithElapsedTime) {
 
-         uniqueKey = Long.toString(tourDistance + tourData.getTourElapsedTime());
+         uniqueKey = Long.toString(tourDistance + tourData.getTourDeviceTime_Elapsed());
 
       } else {
 
@@ -310,7 +310,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    }
 
    public void setCreateTourIdWithTime(final boolean isCreateTourIdWithTime) {
-      this.isCreateTourIdWithRecordingTime = isCreateTourIdWithTime;
+      this.isCreateTourIdWithElapsedTime = isCreateTourIdWithTime;
    }
 
    public void setImportYear(final int importYear) {

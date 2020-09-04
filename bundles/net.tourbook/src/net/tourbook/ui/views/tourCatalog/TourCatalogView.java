@@ -477,7 +477,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setTourSpeed(compareTourProperty.speed);
-                     comparedTour.setTourRecordingTime(compareTourProperty.recordingTime);
+                     comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
 
                      // update the viewer
                      _tourViewer.update(comparedTour, null);
@@ -890,7 +890,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             final Object element = cell.getElement();
             if (element instanceof TVICatalogComparedTour) {
 
-               final long value = ((TVICatalogComparedTour) element).tourRecordingTime;
+               final long value = ((TVICatalogComparedTour) element).tourDeviceTime_Elapsed;
 
                colDef.printLongValue(cell, value, true);
             }

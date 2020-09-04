@@ -235,9 +235,9 @@ public class GeoCompareManager {
 
          comparerItem.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
 
-         final int recordingTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
-         final int drivingTime = Math.max(0, recordingTime - tourData.getBreakTime(origStartIndex, origEndIndex));
-         comparerItem.recordingTime = recordingTime;
+         final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
+         final int drivingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));
+         comparerItem.elapsedTime = elapsedTime;
          comparerItem.movingTime = drivingTime;
          comparerItem.distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
       }

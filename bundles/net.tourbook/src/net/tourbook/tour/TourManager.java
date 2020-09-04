@@ -664,9 +664,9 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the recording time
+    * @return Returns the elapsed time
     */
-   public static int computeTourRecordingTime(final TourData tourData, final int startIndex, final int endIndex) {
+   public static int computeTourDeviceTime_Elapsed(final TourData tourData, final int startIndex, final int endIndex) {
 
       final float[] distanceSerie = tourData.getMetricDistanceSerie();
       final int[] timeSerie = tourData.timeSerie;
@@ -1179,7 +1179,7 @@ public class TourManager {
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
       joinedTourData.setTourStartTime(tourStartTime);
-      joinedTourData.setTourElapsedTime(tourElapsedTime);
+      joinedTourData.setTourDeviceTime_Elapsed(tourElapsedTime);
       joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
       joinedTourData.setTourPausedTime(tourPausedTime);
       joinedTourData.setTourDistance(tourDistance);

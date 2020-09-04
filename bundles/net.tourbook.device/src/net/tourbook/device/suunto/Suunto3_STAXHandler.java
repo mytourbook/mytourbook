@@ -309,7 +309,7 @@ public class Suunto3_STAXHandler {
 
       //TODO FB this function is duplicated, where to put it to be a shared function ?
       if (_tourTimerPauses.size() == 0) {
-         tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
          return;
       }
 
@@ -325,7 +325,7 @@ public class Suunto3_STAXHandler {
       tourData.setTourTimerPauses(tourTimerPauses);
       final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
 
-      tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime() - totalTourTimerPauses);
+      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
       tourData.setTourPausedTime(totalTourTimerPauses);
    }
 

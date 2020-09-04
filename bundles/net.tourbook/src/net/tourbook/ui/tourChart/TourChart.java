@@ -1894,7 +1894,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       int nextTourSerieIndex = 0;
       long firstTourStartTime = 0;
       long tourStartTime = 0;
-      long tourRecordingTime = 0;
+      long tourElapsedTime = 0;
 
       // setup first multiple tour
       if (isMultipleTours) {
@@ -1934,7 +1934,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   // setup next tour
 
                   final int tourDuration = timeSerie[nextTourSerieIndex - 1];
-                  tourRecordingTime = tourDuration;
+                  tourElapsedTime = tourDuration;
 
                   tourStartTime = multipleStartTime[nextTourIndex];
 
@@ -1946,7 +1946,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                }
 
                final long tourTimeOffset = tourStartTime - firstTourStartTime;
-               final long xAxisOffset = tourRecordingTime * 1000;
+               final long xAxisOffset = tourElapsedTime * 1000;
 
                final long timeOffset = tourTimeOffset - xAxisOffset;
 

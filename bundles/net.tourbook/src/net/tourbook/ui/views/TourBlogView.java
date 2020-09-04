@@ -358,7 +358,7 @@ public class TourBlogView extends ViewPart {
       /*
        * Date/Time header
        */
-      final long elapsedTime = _tourData.getTourElapsedTime();
+      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
 
       final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
       final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(elapsedTime);

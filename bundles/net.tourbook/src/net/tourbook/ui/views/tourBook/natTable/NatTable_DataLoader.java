@@ -843,7 +843,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.TIME_BREAK_TIME_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_RECORDED_TIME_ID:                 return "tourDeviceTime_Recorded";                 //$NON-NLS-1$
       case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_ELAPSED_TIME_ID:                  return "tourRecordingTime";               //$NON-NLS-1$
+      case TableColumnFactory.TIME_ELAPSED_TIME_ID:                  return "tourDeviceTime_Elapsed";               //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields

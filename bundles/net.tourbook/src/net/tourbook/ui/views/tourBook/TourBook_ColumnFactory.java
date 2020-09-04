@@ -2417,11 +2417,11 @@ public class TourBook_ColumnFactory {
             final TVITourBookItem item = (TVITourBookItem) element;
 
             final long dbPausedTime = item.colBreakTime;
-            final long dbRecordingTime = item.colTourElapsedTime;
+            final long dbElapsedTime = item.colTourElapsedTime;
 
-            final double relativePausedTime = dbRecordingTime == 0
+            final double relativePausedTime = dbElapsedTime == 0
                   ? 0
-                  : (double) dbPausedTime / dbRecordingTime * 100;
+                  : (double) dbPausedTime / dbElapsedTime * 100;
 
             return _nf1.format(relativePausedTime);
          }
@@ -2433,18 +2433,18 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();
             final TVITourBookItem item = (TVITourBookItem) element;
 
             final long dbPausedTime = item.colBreakTime;
-            final long dbRecordingTime = item.colTourElapsedTime;
+            final long dbElapsedTime = item.colTourElapsedTime;
 
-            final double relativePausedTime = dbRecordingTime == 0
+            final double relativePausedTime = dbElapsedTime == 0
                   ? 0
-                  : (double) dbPausedTime / dbRecordingTime * 100;
+                  : (double) dbPausedTime / dbElapsedTime * 100;
 
             cell.setText(_nf1.format(relativePausedTime));
 

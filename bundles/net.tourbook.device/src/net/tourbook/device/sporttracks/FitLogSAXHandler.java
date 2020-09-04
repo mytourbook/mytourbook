@@ -419,7 +419,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDistance(_currentActivity.distance);
 
-         tourData.setTourElapsedTime(_currentActivity.duration);
+         tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
          tourData.setTourDeviceTime_Recorded(_currentActivity.duration);
          tourData.setTourMovingTime(_currentActivity.duration);
          isComputeDrivingTime = false;
@@ -514,7 +514,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
          tourData.setTourPausedTime(totalTourTimerPauses);
-         tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime() - totalTourTimerPauses);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();
 

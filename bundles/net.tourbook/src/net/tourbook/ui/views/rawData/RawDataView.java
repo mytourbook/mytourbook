@@ -3039,7 +3039,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourElapsedTime();
+            final long value = ((TourData) cell.getElement()).getTourDeviceTime_Elapsed();
 
             colDef.printDetailValue(cell, value);
          }

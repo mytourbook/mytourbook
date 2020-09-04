@@ -283,7 +283,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                         compareTourItem.dbEndIndex = compareTourProperty.endIndex;
 
                         compareTourItem.dbSpeed = compareTourProperty.speed;
-                        compareTourItem.dbRecordingTime = compareTourProperty.recordingTime;
+                        compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
 
                      } else {
 
@@ -752,7 +752,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             final Object element = cell.getElement();
             if (element instanceof TVICompareResultComparedTour) {
 
-               cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+               cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeInterval));
                setCellColor(cell, element);
             }
          }
@@ -1568,7 +1568,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          removedTourItem.dbStartIndex = -1;
          removedTourItem.dbEndIndex = -1;
          removedTourItem.dbSpeed = 0;
-         removedTourItem.dbRecordingTime = 0;
+         removedTourItem.dbElapsedTime = 0;
 
 //         removedTourItem.movedStartIndex = -1;
 //         removedTourItem.movedEndIndex = -1;

@@ -57,7 +57,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "startMonth, " //                                   3     //$NON-NLS-1$
             + "startDay, " //                                     4     //$NON-NLS-1$
             + "tourDistance, " //                                 5     //$NON-NLS-1$
-            + "tourRecordingTime, " //                            6     //$NON-NLS-1$
+            + "tourDeviceTime_Elapsed, " //                       6     //$NON-NLS-1$
             + "tourDrivingTime, " //                              7     //$NON-NLS-1$
             + "tourAltUp, " //                                    8     //$NON-NLS-1$
             + "tourAltDown, " //                                  9     //$NON-NLS-1$
@@ -200,7 +200,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       SQL_SUM_FIELDS = UI.EMPTY_STRING
 
             + "TourDistance,                " + NL //$NON-NLS-1$
-            + "TourRecordingTime,           " + NL //$NON-NLS-1$
+            + "TourDeviceTime_Elapsed,      " + NL //$NON-NLS-1$
             + "TourDrivingTime,             " + NL //$NON-NLS-1$
             + "TourAltUp,                   " + NL //$NON-NLS-1$
             + "TourAltDown,                 " + NL //$NON-NLS-1$
@@ -242,7 +242,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
             + "SUM( CAST(TourDistance AS BIGINT)),          " + NL // 0    //$NON-NLS-1$
-            + "SUM( CAST(TourRecordingTime AS BIGINT)),     " + NL // 1    //$NON-NLS-1$
+            + "SUM( CAST(TourDeviceTime_Elapsed AS BIGINT))," + NL // 1    //$NON-NLS-1$
             + "SUM( CAST(TourDrivingTime AS BIGINT)),       " + NL // 2    //$NON-NLS-1$
             + "SUM( CAST(TourAltUp AS BIGINT)),             " + NL // 3    //$NON-NLS-1$
             + "SUM( CAST(TourAltDown AS BIGINT)),           " + NL // 4    //$NON-NLS-1$

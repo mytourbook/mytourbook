@@ -572,6 +572,24 @@ public class TourDatabase {
 
          exec(stmt, sql);
       }
+
+      /**
+       * @param stmt
+       * @param table
+       * @param columnName
+       * @param newColumnName
+       * @throws SQLException
+       */
+      private static void RenameCol(final Statement stmt,
+                                        final String table,
+                                        final String columnName,
+                                        final String newColumnName) throws SQLException {
+
+         final String sql = UI.EMPTY_STRING//
+               + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$
+
+         exec(stmt, sql);
+      }
    }
 
    private TourDatabase() {
@@ -2793,7 +2811,7 @@ public class TourDatabase {
             //
             // version 40 start
             //
-            + "   tourRecordingTime  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
+            + "   tourDeviceTime_Elapsed  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
             //
             // version 40 end ---------
             //
@@ -2984,7 +3002,7 @@ public class TourDatabase {
             + " TourStartTime          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             + " TourEndTime            BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
 
-            + " TourRecordingTime      BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + " TourDeviceTime_Elapsed BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             + " TourDrivingTime        BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             //
             // version 22 end ---------
@@ -7456,7 +7474,7 @@ public class TourDatabase {
 
          } else {
 
-            final int tourRecordingTime = TourManager.computeTourRecordingTime(tourData, startIndex, endIndex);
+            final int tourRecordingTime = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
 
             // update tour recording time for the compared tour
             stmtUpdate.setInt(1, tourRecordingTime);
@@ -7519,8 +7537,11 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded", DEFAULT_0);                            //$NON-NLS-1$
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourPausedTime",          DEFAULT_0);                            //$NON-NLS-1$
+
+            //rename tourRecordingTime to tourDeviceTime_Elapsed
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "tourDeviceTime_Elapsed");
 
 // SET_FORMATTING_ON
          }
@@ -7651,7 +7672,7 @@ public class TourDatabase {
             //
                   + " SET" //                     //$NON-NLS-1$
                   //
-                  + " tourDeviceTime_Recorded=tourRecordingTime"); //$NON-NLS-1$
+                  + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
 
       stmtUpdate.executeUpdate();
 

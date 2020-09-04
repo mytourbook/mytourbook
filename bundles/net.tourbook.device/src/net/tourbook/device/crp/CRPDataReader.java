@@ -159,7 +159,7 @@ public class CRPDataReader extends TourbookDevice {
 
          // recording time
          final String tourRecTimeSt = tokenLine.nextToken();
-         final int tourRecordingTime = Integer.parseInt(tourRecTimeSt.substring(0, 2))
+         final int tourDeviceTime_Elapsed = Integer.parseInt(tourRecTimeSt.substring(0, 2))
                * 3600
                + Integer.parseInt(tourRecTimeSt.substring(3, 5))
                      * 60
@@ -294,7 +294,7 @@ public class CRPDataReader extends TourbookDevice {
                timeData.time = 0;
             } else if (tpIndex == trackPoints.size() - 1) {
                // last track point
-               timeData.time = tourRecordingTime - tourTime;
+               timeData.time = tourDeviceTime_Elapsed - tourTime;
             } else {
                timeData.time = interval;
             }
@@ -377,7 +377,7 @@ public class CRPDataReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
             tourData.computeTourMovingTime();
             tourData.computeComputedValues();
 

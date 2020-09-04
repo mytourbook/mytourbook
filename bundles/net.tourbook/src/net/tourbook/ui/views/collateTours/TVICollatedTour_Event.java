@@ -68,7 +68,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
             + "TourStartTime, " //									6	//$NON-NLS-1$
             + "tourDistance, " //									7	//$NON-NLS-1$
-            + "tourRecordingTime, " //								8	//$NON-NLS-1$
+            + "TourDeviceTime_Elapsed, " //						8	//$NON-NLS-1$
             + "tourDrivingTime, " //								9	//$NON-NLS-1$
             + "tourAltUp, " //										10	//$NON-NLS-1$
             + "tourAltDown, " //									11	//$NON-NLS-1$

@@ -261,10 +261,10 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
    private void createUI_32_Time(final Composite container) {
 
       /*
-       * recording time
+       * elapsed time
        */
       {
-         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_RecordingTime);
+         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_DeviceTime_Elapsed);
          _firstColumnControls.add(label);
 
          _lblTime_Elapsed = createUI_LabelValue(container, SWT.TRAIL);

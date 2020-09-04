@@ -360,7 +360,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             break;
 
          case TableColumnFactory.TIME_ELAPSED_TIME_ID:
-            rc = item1.recordingTime - item2.recordingTime;
+            rc = item1.elapsedTime - item2.elapsedTime;
             break;
 
          default:
@@ -1518,7 +1518,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
-            final long value = item.recordingTime;
+            final long value = item.elapsedTime;
 
             colDef.printLongValue(cell, value, true);
          }

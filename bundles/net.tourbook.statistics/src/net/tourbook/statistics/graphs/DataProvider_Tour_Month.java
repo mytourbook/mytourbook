@@ -95,7 +95,7 @@ public class DataProvider_Tour_Month extends DataProvider {
                + "  StartMonth,					" + NL //$NON-NLS-1$
                + "  TourDistance,				" + NL //$NON-NLS-1$
                + "  TourAltUp,					" + NL //$NON-NLS-1$
-               + "  TourRecordingTime,			" + NL //$NON-NLS-1$
+               + "  TourDeviceTime_Elapsed,	" + NL //$NON-NLS-1$
                + "  TourDrivingTime,			" + NL //$NON-NLS-1$
 
                + "  TourType_TypeId 			" + NL //$NON-NLS-1$
@@ -131,12 +131,12 @@ public class DataProvider_Tour_Month extends DataProvider {
       switch (durationTime) {
       case BREAK:
 
-         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourDrivingTime),"; //$NON-NLS-1$
          break;
 
       case ELAPSED:
 
-         sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
          break;
 
       case PAUSED:
@@ -152,7 +152,7 @@ public class DataProvider_Tour_Month extends DataProvider {
       case MOVING:
       default:
          // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
          break;
       }
 
@@ -165,7 +165,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             + " SUM(TourDistance),			" + NL //       3 //$NON-NLS-1$
             + " SUM(TourAltUp),				" + NL //       4 //$NON-NLS-1$
             + sqlDurationTime + "         " + NL //       5 //$NON-NLS-1$
-            + " SUM(TourRecordingTime),	" + NL //       6 //$NON-NLS-1$
+            + " SUM(TourDeviceTime_Elapsed),	" + NL //       6 //$NON-NLS-1$
             + " SUM(TourDrivingTime),		" + NL //       7 //$NON-NLS-1$
             + " SUM(1),                   " + NL //       8 //$NON-NLS-1$
             + " TourType_TypeId,          " + NL //       9 //$NON-NLS-1$

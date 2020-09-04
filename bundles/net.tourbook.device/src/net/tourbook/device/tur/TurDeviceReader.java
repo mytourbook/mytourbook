@@ -334,7 +334,7 @@ public class TurDeviceReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
             tourData.computeComputedValues();
             tourData.computeTourMovingTime();
 

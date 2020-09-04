@@ -413,7 +413,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
