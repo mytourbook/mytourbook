@@ -121,7 +121,9 @@ public class DataProvider_Tour_Time extends DataProvider {
             + "TourDescription," // 		12 //$NON-NLS-1$
 
             + "TourType_typeId,"//			13 //$NON-NLS-1$
-            + "jTdataTtag.TourTag_tagId"//	14 //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId,"//	14 //$NON-NLS-1$
+
+            + "TourDeviceTime_Recorded" //15 //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -151,6 +153,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
          final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
+         final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
          final TIntArrayList allTourDrivingTime = new TIntArrayList();
 
          final TIntArrayList allDistance = new TIntArrayList();
@@ -198,6 +201,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                final long dbStartTimeMilli = result.getLong(5);
                final String dbTimeZoneId = result.getString(6);
                final int dbElapsedTime = result.getInt(7);
+               final int dbRecordedTime = result.getInt(15);
                final int dbDrivingTime = result.getInt(8);
 
                final float dbDistance = result.getFloat(9);
@@ -227,6 +231,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourStartTime.add(startDayTime);
                allTourEndTime.add((startDayTime + dbElapsedTime));
                allTourDeviceTime_Elapsed.add(dbElapsedTime);
+               allTourDeviceTime_Recorded.add(dbRecordedTime);
                allTourDrivingTime.add(dbDrivingTime);
 
                allDistance.add((int) (dbDistance / UI.UNIT_VALUE_DISTANCE));
@@ -305,6 +310,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          _tourDataTime.tourAltitudeValues = allAltitudeUp.toArray();
 
          _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
+         _tourDataTime.tourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
          _tourDataTime.tourDrivingTimeValues = allTourDrivingTime.toArray();
 
          _tourDataTime.tourTitle = allTourTitle;

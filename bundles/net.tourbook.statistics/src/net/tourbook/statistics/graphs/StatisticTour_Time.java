@@ -248,6 +248,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int[] endValue = _tourTimeData.tourTimeEndValues;
 
       final int elapsedTime = _tourTimeData.tourDeviceTime_ElapsedValues[valueIndex];
+      final int recordedTime = _tourTimeData.tourDeviceTime_RecordedValues[valueIndex];
+      final int pausedTime = elapsedTime - recordedTime;
       final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
       final int breakTime = elapsedTime - drivingTime;
 
@@ -333,6 +335,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
             elapsedTime / 3600,
             (elapsedTime % 3600) / 60,
             (elapsedTime % 3600) % 60,
+            //
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            (recordedTime % 3600) % 60,
+            //
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            (pausedTime % 3600) % 60,
             //
             drivingTime / 3600,
             (drivingTime % 3600) / 60,

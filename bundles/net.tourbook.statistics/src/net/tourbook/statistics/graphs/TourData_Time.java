@@ -48,6 +48,7 @@ public class TourData_Time {
    int[]                          tourDistanceValues;
 
    int[]                          tourDeviceTime_ElapsedValues;
+   int[]                          tourDeviceTime_RecordedValues;
    int[]                          tourDrivingTimeValues;
 
    ArrayList<String>              tourTitle;
