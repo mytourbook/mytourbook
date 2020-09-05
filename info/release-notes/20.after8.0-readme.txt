@@ -3,8 +3,8 @@
 
 TODO's
 ======  
-* Do not autodelete "Selected Tags" in tour tag filter when they are not checked 
-* Statistics: Add first year-1 to year combo box, e.g. 1. January 2016 is in weekyear 2015 and it is not displayed when tour filter is set to show tours in year 2016
+* Tour tag filter: Do not autodelete "Selected Tags" in tour tag filter when they are not checked 
+
 
 New
 ===
