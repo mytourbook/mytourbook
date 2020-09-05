@@ -645,13 +645,16 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _comboNumberOfYears.setItems(yearsToDisplayList);
 
          if (yearsToDisplayList.length > 0) {
+
             int newComboIndex = currentNumberOfYearsIndexSelected;
 
             if (currentNumberOfYearsIndexSelected == -1) {
+
                newComboIndex = 0;
+
             } else if (currentNumberOfYearsIndexSelected >= yearsToDisplayList.length) {
-               newComboIndex =
-                     yearsToDisplayList.length - 1;
+
+               newComboIndex = yearsToDisplayList.length - 1;
             }
 
             _comboNumberOfYears.select(newComboIndex);
@@ -950,6 +953,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       refreshYearCombobox();
       selectYear(-1);
+
+      // update number of years is _comboNumberOfYears
+      onSelectYear();
 
       // tell all existing statistics the data have changed
       for (final TourbookStatistic statistic : getAvailableStatistics()) {
