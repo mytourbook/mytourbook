@@ -705,14 +705,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-      String fromTourData;
+      String sqlFromTourData;
 
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      if (sqlAppFilter.isTagFilterActive()) {
 
          // with tag filter
 
-         fromTourData = NL
+         sqlFromTourData = NL
 
                + "FROM (         " + NL //$NON-NLS-1$
 
@@ -727,7 +727,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
                + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
 
                + "  WHERE 1=1    " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause()
+               + sqlAppFilter.getWhereClause()
 
                + ") td           " + NL//$NON-NLS-1$
          ;
@@ -736,21 +736,21 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          // without tag filter
 
-         fromTourData = NL
+         sqlFromTourData = NL
 
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
 
                + " WHERE 1=1        " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause() + NL;
+               + sqlAppFilter.getWhereClause() + NL;
       }
 
-      final String sqlString = NL +
+      final String sql = NL +
 
             "SELECT                 " + NL //$NON-NLS-1$
 
             + " StartYear           " + NL //$NON-NLS-1$
 
-            + fromTourData
+            + sqlFromTourData
 
             + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
             + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
@@ -758,7 +758,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _availableYears = new TIntArrayList();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         final PreparedStatement statement = conn.prepareStatement(sql);
          filter.setParameters(statement, 1);
 
          final ResultSet result = statement.executeQuery();
@@ -794,6 +794,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _availableYears.add(thisYear);
          _comboYear.add(Integer.toString(thisYear));
       }
+
+      /*
+       * Add first year -1 to be able to see values from weeks view where the first days of a year
+       * are in a week of the previous year, e.g. 1. Jan 2016 is in a week in year 2015
+       */
+// THIS DO NOT YET WORK CORRECTLY
+//      final int firstYear = _availableYears.get(0);
+//      _comboYear.add(Integer.toString(firstYear - 1), 0);
    }
 
    /**

@@ -54,8 +54,7 @@ public class TourTagFilterSqlJoinBuilder {
 
       final SQLData sqlJoinPartForAndOperator = createSQL_JoinPartForAndOperator();
 
-
-      final String sqlTourTags = UI.SPACE1
+      final String sqlTourTags = UI.EMPTY_STRING
 
             + "      SELECT *" + NL //                                                             //$NON-NLS-1$
             + "      FROM TOURDATA_TOURTAG" + NL //                                                //$NON-NLS-1$
@@ -66,7 +65,7 @@ public class TourTagFilterSqlJoinBuilder {
             + "            TOURDATA_TOURID AS Count_TourId," + NL //                               //$NON-NLS-1$
             + "            COUNT(*) AS NumTagIds" + NL //                                          //$NON-NLS-1$
             + "         FROM TOURDATA_TOURTAG" + NL //                                             //$NON-NLS-1$
-            + "         WHERE " + sqlJoinPartForAndOperator.getSqlString() + NL //                 //$NON-NLS-1$
+            + "         WHERE " + sqlJoinPartForAndOperator.getSqlString() //                      //$NON-NLS-1$
             + "         GROUP BY TOURDATA_TOURID" + NL //                                          //$NON-NLS-1$
             + "         HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                 //$NON-NLS-1$
             + "      )" + NL //                                                                    //$NON-NLS-1$
@@ -78,7 +77,7 @@ public class TourTagFilterSqlJoinBuilder {
 
       if (isDistinctTourId) {
 
-         sql = NL
+         sql = UI.EMPTY_STRING
 
                + "   INNER JOIN" + NL //                                                           //$NON-NLS-1$
                + "   (" + NL //                                                                    //$NON-NLS-1$
@@ -86,18 +85,18 @@ public class TourTagFilterSqlJoinBuilder {
                + "         DISTINCT TourData_TourId" + NL //                                       //$NON-NLS-1$
                + "      FROM " + NL //                                                             //$NON-NLS-1$
                + "      (" + NL //                                                                 //$NON-NLS-1$
-               + "      " + sqlTourTags
-               + "      ) jTdataTtag" + NL //                                     //$NON-NLS-1$
+               + sqlTourTags
+               + "      ) jTdataTtag" + NL //                                                      //$NON-NLS-1$
                + "   )" + NL //                                                                    //$NON-NLS-1$
          ;
 
       } else {
 
-         sql = NL
+         sql = UI.EMPTY_STRING
 
                + "   INNER JOIN" + NL //                                                           //$NON-NLS-1$
                + "   (" + NL //                                                                    //$NON-NLS-1$
-               + "   " + sqlTourTags
+               + sqlTourTags
                + "   )" + NL //                                                                    //$NON-NLS-1$
          ;
       }
