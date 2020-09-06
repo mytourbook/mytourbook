@@ -1262,7 +1262,7 @@ public class EasyImportManager {
             tourTypeCadence = importLauncher.oneTourTypeCadence;
 
             tourData.setTourType(tourType);
-            tourData.setCadenceMultiplier(tourTypeCadence.getValue());
+            tourData.setCadenceMultiplier(tourTypeCadence.getMultiplier());
          }
 
       } else {

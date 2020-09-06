@@ -14,16 +14,16 @@ public enum CadenceMultiplier {
 
       switch (value) {
       case 0:
-         label = Messages.App_Enum_Cadence_None;
+         label = Messages.App_Cadence_None;
          break;
       case 1:
-         label = Messages.App_Enum_Cadence_Rpm;
+         label = Messages.App_Cadence_Rpm;
          break;
       case 2:
-         label = Messages.App_Enum_Cadence_Spm;
+         label = Messages.App_Cadence_Spm;
          break;
       case 255:
-         label = Messages.App_Enum_Cadence_Invalid;
+         label = Messages.App_Cadence_Invalid;
          break;
       }
 
@@ -46,10 +46,6 @@ public enum CadenceMultiplier {
 
    public String getNlsLabel() {
       return label;
-   }
-
-   public int getValue() {
-      return value;
    }
 }
 

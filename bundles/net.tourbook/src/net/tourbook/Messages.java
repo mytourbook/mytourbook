@@ -835,10 +835,10 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
-   public static String        App_Enum_Cadence_None;
-   public static String        App_Enum_Cadence_Rpm;
-   public static String        App_Enum_Cadence_Spm;
-   public static String        App_Enum_Cadence_Invalid;
+   public static String        App_Cadence_None;
+   public static String        App_Cadence_Rpm;
+   public static String        App_Cadence_Spm;
+   public static String        App_Cadence_Invalid;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
