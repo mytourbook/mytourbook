@@ -1620,7 +1620,7 @@ public class Util {
     *
     * @param memento
     * @param listKeyName
-    * @return
+    * @return Returns an array with long values or an empty array when values are not available
     */
    public static long[] getXmlLongArray(final XMLMemento memento, final String listKeyName) {
 
