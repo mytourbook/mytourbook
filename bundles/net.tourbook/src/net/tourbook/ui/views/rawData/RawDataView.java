@@ -91,7 +91,7 @@ import net.tourbook.preferences.PrefPageImport;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -251,7 +251,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                        //$NON-NLS-1$
    public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
    public static final String  STATE_DEFAULT_CADENCE                      = "defaultCadence";                         //$NON-NLS-1$
-   public static final Cadence STATE_DEFAULT_CADENCE_DEFAULT              = Cadence.RPM;
+   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_DEFAULT              = CadenceMultiplier.RPM;
    //
    private static final String HREF_TOKEN                                 = "#";                                      //$NON-NLS-1$
    private static final String PAGE_ABOUT_BLANK                           = "about:blank";                            //$NON-NLS-1$
@@ -1869,7 +1869,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          if (oneTourType != null) {
 
             final String ttName = oneTourType.getName();
-            final Cadence ttCadence = importLauncher.oneTourTypeCadence;
+            final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
 
             // show this text only when the name is different
             if (!tileName.equals(ttName)) {
@@ -4612,7 +4612,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
 
-      final Cadence defaultCadence = (Cadence) Util.getStateEnum(_state, STATE_DEFAULT_CADENCE, STATE_DEFAULT_CADENCE_DEFAULT);
+      final CadenceMultiplier defaultCadence = (CadenceMultiplier) Util.getStateEnum(_state, STATE_DEFAULT_CADENCE, STATE_DEFAULT_CADENCE_DEFAULT);
       _rawDataMgr.setState_DefaultCadence(defaultCadence);
 
       // auto open import log view

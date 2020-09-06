@@ -2,14 +2,14 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 
-public enum Cadence {
+public enum CadenceMultiplier {
 
    NONE(0), RPM(1), SPM(2), INVALID(255);
 
    protected int value;
    private String label; // This field offers NLS support
 
-   private Cadence(final int value) {
+   private CadenceMultiplier(final int value) {
       this.value = value;
 
       switch (value) {
@@ -29,15 +29,15 @@ public enum Cadence {
 
    }
 
-   public static Cadence getByValue(final int value) {
+   public static CadenceMultiplier getByValue(final int value) {
 
-      for (final Cadence type : Cadence.values()) {
+      for (final CadenceMultiplier type : CadenceMultiplier.values()) {
          if (value == type.value) {
             return type;
          }
       }
 
-      return Cadence.INVALID;
+      return CadenceMultiplier.INVALID;
    }
 
    public float getMultiplier() {

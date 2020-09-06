@@ -86,7 +86,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.DialogEditTimeSlicesValues;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourSaveListener;
@@ -8921,7 +8921,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
-      final Cadence cadence = Cadence.getByValue((int)_tourData.getCadenceMultiplier());
+      final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int)_tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
 
       /*

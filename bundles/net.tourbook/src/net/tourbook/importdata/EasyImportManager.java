@@ -54,7 +54,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -823,7 +823,7 @@ public class EasyImportManager {
                      EasyConfig.TOUR_TYPE_AVG_SPEED_DEFAULT,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
-               speedVertex.cadence = (Cadence) Util.getXmlEnum(xmlSpeed, ATTR_IL_TOUR_TYPE_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+               speedVertex.cadence = (CadenceMultiplier) Util.getXmlEnum(xmlSpeed, ATTR_IL_TOUR_TYPE_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
                speedVertices.add(speedVertex);
             }
          }
@@ -833,7 +833,7 @@ public class EasyImportManager {
          final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
          importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
-         importLauncher.oneTourTypeCadence = (Cadence) Util.getXmlEnum(xmlConfig,
+         importLauncher.oneTourTypeCadence = (CadenceMultiplier) Util.getXmlEnum(xmlConfig,
                ATTR_IL_TOUR_TYPE_CADENCE,
                RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
       } else {
@@ -1210,7 +1210,7 @@ public class EasyImportManager {
    private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
       String tourTypeName = UI.EMPTY_STRING;
-      Cadence tourTypeCadence = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
+      CadenceMultiplier tourTypeCadence = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
 
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 

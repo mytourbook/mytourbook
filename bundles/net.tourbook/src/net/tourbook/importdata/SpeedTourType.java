@@ -17,7 +17,7 @@ package net.tourbook.importdata;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 
 public class SpeedTourType implements Comparable<Object>, Cloneable {
 
@@ -26,11 +26,11 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 	 */
    public float  avgSpeed;
    public long   tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-   public Cadence cadence;
+   public CadenceMultiplier cadence;
 
 	public SpeedTourType() {}
 
-   public SpeedTourType(final int value, final Cadence cadence) {
+   public SpeedTourType(final int value, final CadenceMultiplier cadence) {
 		this.avgSpeed = value;
       this.cadence = cadence;
 	}

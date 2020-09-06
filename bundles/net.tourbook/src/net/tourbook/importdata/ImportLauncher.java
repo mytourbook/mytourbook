@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 
 public class ImportLauncher implements Cloneable {
 
@@ -35,7 +35,7 @@ public class ImportLauncher implements Cloneable {
    public Enum<TourTypeConfig>     tourTypeConfig;
 
    public TourType                 oneTourType;
-   public Cadence                  oneTourTypeCadence;
+   public CadenceMultiplier                  oneTourTypeCadence;
 
    public ArrayList<SpeedTourType> speedTourTypes                = new ArrayList<>();
 

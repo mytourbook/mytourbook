@@ -19,7 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -306,7 +306,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
 
-      final Cadence defaultCadence = (Cadence) Util.getStateEnum(_state,
+      final CadenceMultiplier defaultCadence = (CadenceMultiplier) Util.getStateEnum(_state,
             RawDataView.STATE_DEFAULT_CADENCE,
             RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
 
@@ -319,7 +319,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
-      final Cadence defaultCadence = _comboDefaultCadence.getSelectedCadence();
+      final CadenceMultiplier defaultCadence = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);

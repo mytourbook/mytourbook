@@ -50,7 +50,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
@@ -124,7 +124,7 @@ public class RawDataManager {
    private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static Cadence           _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
+   private static CadenceMultiplier           _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -226,7 +226,7 @@ public class RawDataManager {
 
    private RawDataManager() {}
 
-   public static Cadence DefaultCadence() {
+   public static CadenceMultiplier DefaultCadence() {
       return _importState_DefaultCadence;
    }
 
@@ -2034,7 +2034,7 @@ public class RawDataManager {
       _importState_IsCreateTourIdWithTime = isActionChecked;
    }
 
-   public void setState_DefaultCadence(final Cadence defaultCadence) {
+   public void setState_DefaultCadence(final CadenceMultiplier defaultCadence) {
       _importState_DefaultCadence = defaultCadence;
    }
 
