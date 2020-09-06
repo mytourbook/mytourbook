@@ -2297,7 +2297,6 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip;
-   public static String Slideout_TourTagFilter_Column_Properties_Tooltip;
    public static String Slideout_TourTagFilter_Column_CombineTags;
    public static String Slideout_TourTagFilter_Column_CombineTags_Tooltip;
    public static String Slideout_TourTagFilter_Column_Tags_Checked;
