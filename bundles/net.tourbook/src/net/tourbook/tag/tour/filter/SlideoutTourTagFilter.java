@@ -674,7 +674,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
       }
       {
-         // Column: Combine tags
+         // Column: Combine tags with OR or AND
 
          tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
          tc = tvc.getColumn();
@@ -685,12 +685,18 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             public void update(final ViewerCell cell) {
 
                final TourTagFilterProfile profile = (TourTagFilterProfile) cell.getElement();
+               final int numTags = profile.tagFilterIds.size();
 
                final String combineTags = profile.isOrOperator
                      ? Messages.Slideout_TourTagFilter_CombineTags_With_OR
                      : Messages.Slideout_TourTagFilter_CombineTags_With_AND;
 
-               cell.setText(combineTags);
+               cell.setText(numTags > 1
+
+                     // combine tags requires at least 2 tags
+                     ? combineTags
+
+                     : UI.EMPTY_STRING);
             }
          });
          tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), false));
@@ -1193,6 +1199,15 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          createUI_810_ProfileActions(container);
          createUI_820_FilterActions(container);
       }
+
+      /**
+       * Sometimes (but not always) the action buttons are more than 200px wide, this layout request
+       * may help to force the correct size.
+       * <p>
+       * It's difficult to debug because sometimes it occures and sometimes not
+       */
+      container.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
    }
 
    private void createUI_810_ProfileActions(final Composite parent) {
