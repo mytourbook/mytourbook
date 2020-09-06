@@ -129,7 +129,15 @@ public class ColumnManager {
    /**
     * Minimum column width, when the column width is 0, there was a bug that this happened.
     */
-   private static final int    MINIMUM_COLUMN_WIDTH                      = 7;
+   private static final int    COLUMN_WIDTH_MINIMUM                      = 7;
+
+   /**
+    * There was a case when the column width in a NatTable was 393'515'928 which required a computer
+    * restart to kill MT, it got frozen when scrolling horizontally.
+    * <p>
+    * 1000 would be too small on high-dpi displays
+    */
+   static final int            COLUMN_WIDTH_MAXIMUM                      = 5_000;
 
    /*
     * Value formatter
@@ -187,7 +195,7 @@ public class ColumnManager {
     * {@link ColumnManager} is used for a {@link NatTable}, it provides properties from a
     * {@link NatTable}.
     */
-   private INatTable_PropertiesProvider       _natTablePropertiesProvider;
+   private INatTable_PropertiesProvider      _natTablePropertiesProvider;
 
    /**
     * Context menu listener
@@ -716,7 +724,7 @@ public class ColumnManager {
       if (colDef.isColumnHidden()) {
          columnWidth = 0;
       } else {
-         columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH //
+         columnWidth = columnWidth < COLUMN_WIDTH_MINIMUM
                ? colDef.getDefaultColumnWidth()
                : columnWidth;
       }
@@ -1703,7 +1711,7 @@ public class ColumnManager {
       if (colDef.isColumnHidden()) {
          columnWidth = 0;
       } else {
-         columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH //
+         columnWidth = columnWidth < COLUMN_WIDTH_MINIMUM
                ? colDef.getDefaultColumnWidth()
                : columnWidth;
       }
@@ -2435,9 +2443,11 @@ public class ColumnManager {
             // there is somewhere an error that the column width is 0,
 
             columnWidth = colDef.getDefaultColumnWidth();
-            columnWidth = Math.max(MINIMUM_COLUMN_WIDTH, columnWidth);
+            columnWidth = Math.max(COLUMN_WIDTH_MINIMUM, columnWidth);
          }
       }
+
+      columnWidth = Math.min(columnWidth, COLUMN_WIDTH_MAXIMUM);
 
       columnIdsAndWidth.add(columnId);
       columnIdsAndWidth.add(Integer.toString(columnWidth));
