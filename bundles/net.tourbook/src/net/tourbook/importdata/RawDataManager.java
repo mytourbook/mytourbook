@@ -169,25 +169,24 @@ public class RawDataManager {
     */
    private final HashSet<String>           _importedFileNamesChildren          = new HashSet<>();
    private boolean                         _isImported;
-
    private boolean                         _isImportCanceled;
-
    //
    private int                             _importState_ImportYear             = ADJUST_IMPORT_YEAR_IS_DISABLED;
+
    private boolean                         _importState_IsConvertWayPoints     = Util.getStateBoolean(_importState,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-
    private boolean                         _importState_IsCreateTourIdWithTime = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
    private boolean                         _importState_IsChecksumValidation   = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+
    private boolean                         _importState_IsMergeTracks          = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
 
    private List<TourbookDevice>            _devicesBySortPriority;
 
    private HashMap<String, TourbookDevice> _devicesByExtension;
-
    private final ArrayList<TourType>       _tempTourTypes                      = new ArrayList<>();
    private final ArrayList<TourTag>        _tempTourTags                       = new ArrayList<>();
+
    /**
     * Filepath from the previous re-imported tour
     */
