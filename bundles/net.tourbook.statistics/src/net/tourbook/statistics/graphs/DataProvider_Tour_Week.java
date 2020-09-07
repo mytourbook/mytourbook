@@ -114,7 +114,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                   + "   SELECT" + NL //                                                                  //$NON-NLS-1$
 
-                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
                   + "      DISTINCT TourId," + NL //                                                     //$NON-NLS-1$
 
                   + "      StartWeekYear," + NL //                                                       //$NON-NLS-1$
