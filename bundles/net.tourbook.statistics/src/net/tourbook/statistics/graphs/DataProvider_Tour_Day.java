@@ -223,15 +223,25 @@ public class DataProvider_Tour_Day extends DataProvider {
          }
 
          boolean isDurationTime_Break = false;
-         boolean isDurationTime_Recording = false;
+         boolean isDurationTime_Elapsed = false;
+         boolean isDurationTime_Paused = false;
+         boolean isDurationTime_Recorded = false;
 
          switch (durationTime) {
          case BREAK:
             isDurationTime_Break = true;
             break;
 
-         case RECORDING:
-            isDurationTime_Recording = true;
+         case ELAPSED:
+            isDurationTime_Elapsed = true;
+            break;
+
+         case PAUSED:
+            isDurationTime_Paused = true;
+            break;
+
+         case RECORDED:
+            isDurationTime_Recorded = true;
             break;
 
          case MOVING:
@@ -259,8 +269,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   TourStartTime," + NL //                         4  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                            5  //$NON-NLS-1$
 
-               + "   TourDrivingTime," + NL //                       6  //$NON-NLS-1$
-               + "   TourRecordingTime," + NL //                     7  //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //  6     //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //  7     //$NON-NLS-1$
 
                + "   TourDistance," + NL //                          8  //$NON-NLS-1$
                + "   TourAltUp," + NL //                             9  //$NON-NLS-1$
@@ -272,7 +282,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   training_TrainingPerformance," + NL //          14 //$NON-NLS-1$
 
                + "   TourType_typeId," + NL //                       15 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId" + NL //               16 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId," + NL //               16 //$NON-NLS-1$
+
+               + "   TourDeviceTime_Recorded," + NL //  17    //$NON-NLS-1$
+               + "   TourDeviceTime_Paused" + NL //  18    //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -297,8 +310,10 @@ public class DataProvider_Tour_Day extends DataProvider {
          final ArrayList<ZonedDateTime> dbAllTourStartDateTime = new ArrayList<>();
 
          final TIntArrayList dbAllTourDuration = new TIntArrayList();
-         final TIntArrayList dbAllTourRecordingTime = new TIntArrayList();
-         final TIntArrayList dbAllTourDrivingTime = new TIntArrayList();
+         final TIntArrayList dbAllTourElapsedTime = new TIntArrayList();
+         final TIntArrayList dbAllTourMovingTime = new TIntArrayList();
+         final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
+         final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
          final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
@@ -354,8 +369,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                final long dbStartTimeMilli            = result.getLong(4);
                final String dbTimeZoneId              = result.getString(5);
 
-               final int dbDrivingTime                = result.getInt(6);
-               final int dbRecordingTime              = result.getInt(7);
+               final int dbMovingTime = result.getInt(6);
+               final int dbElapsedTime = result.getInt(7);
 
                final float dbDistance                 = result.getFloat(8);
                final int dbAltitudeUp                 = result.getInt(9);
@@ -368,6 +383,9 @@ public class DataProvider_Tour_Day extends DataProvider {
                final float trainingPerformance        = result.getFloat(14);
 
                final Object dbTypeIdObject            = result.getObject(15);
+
+               final int dbRecordedTime = result.getInt(17);
+               final int dbPausedTime = result.getInt(18);
 
 // SET_FORMATTING_ON
 
@@ -385,12 +403,16 @@ public class DataProvider_Tour_Day extends DataProvider {
                int durationTimeValue = 0;
 
                if (isDurationTime_Break) {
-                  durationTimeValue = dbRecordingTime - dbDrivingTime;
-               } else if (isDurationTime_Recording) {
-                  durationTimeValue = dbRecordingTime;
+                  durationTimeValue = dbElapsedTime - dbMovingTime;
+               } else if (isDurationTime_Elapsed) {
+                  durationTimeValue = dbElapsedTime;
+               } else if (isDurationTime_Recorded) {
+                  durationTimeValue = dbRecordedTime;
+               } else if (isDurationTime_Paused) {
+                  durationTimeValue = dbPausedTime;
                } else {
                   // moving time, this is also the old implementation for the duration value
-                  durationTimeValue = dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime;
+                  durationTimeValue = dbMovingTime == 0 ? dbElapsedTime : dbMovingTime;
                }
 
                dbAllTourIds.add(dbTourId);
@@ -402,9 +424,11 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                dbAllTourStartDateTime.add(zonedStartDateTime);
                dbAllTourStartTime.add(startDayTime);
-               dbAllTourEndTime.add((startDayTime + dbRecordingTime));
-               dbAllTourRecordingTime.add(dbRecordingTime);
-               dbAllTourDrivingTime.add(dbDrivingTime);
+               dbAllTourEndTime.add((startDayTime + dbElapsedTime));
+               dbAllTourElapsedTime.add(dbElapsedTime);
+               dbAllTourMovingTime.add(dbMovingTime);
+               dbAllTourDeviceTime_Recorded.add(dbRecordedTime);
+               dbAllTourDeviceTime_Paused.add(dbPausedTime);
 
                dbAllTourDuration.add(durationTimeValue);
 
@@ -414,8 +438,9 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllDistance.add(distance);
                dbAllAltitudeUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
 
-               dbAllAvgPace.add(distance == 0 ? 0 : dbDrivingTime * 1000f / distance / 60.0f);
-               dbAllAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
+               //todo FB propose pace based on RECORDED TIME ?
+               dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
+               dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);
 
                dbAllTrain_Effect_Aerob.add(trainingEffect);
                dbAllTrain_Effect_Anaerob.add(trainingEffect_Anaerobic);
@@ -620,8 +645,10 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTraining_Effect_Anaerobic = dbAllTrain_Effect_Anaerob.toArray();
          _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
 
-         _tourDayData.allRecordingTime = dbAllTourRecordingTime.toArray();
-         _tourDayData.allDrivingTime = dbAllTourDrivingTime.toArray();
+         _tourDayData.allElapsedTime = dbAllTourElapsedTime.toArray();
+         _tourDayData.allMovingTime = dbAllTourMovingTime.toArray();
+         _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
+         _tourDayData.allPausedTime = dbAllTourDeviceTime_Paused.toArray();
 
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;

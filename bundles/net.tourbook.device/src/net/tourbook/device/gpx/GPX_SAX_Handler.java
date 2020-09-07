@@ -610,7 +610,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
+      } else if (name.equals(TAG_MT_TOUR_MOVING_TIME)) {
 
          _tourData.setTourComputedTime_Moving(getIntValue(charData));
          _isInMT_Tour = false;
@@ -1626,7 +1626,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             || name.equals(TAG_MT_TOUR_START_TIME)
             || name.equals(TAG_MT_TOUR_END_TIME)
-            || name.equals(TAG_MT_TOUR_DRIVING_TIME)
+            || name.equals(TAG_MT_TOUR_MOVING_TIME)
             || name.equals(TAG_MT_TOUR_ELAPSED_TIME)
 
             || name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)
