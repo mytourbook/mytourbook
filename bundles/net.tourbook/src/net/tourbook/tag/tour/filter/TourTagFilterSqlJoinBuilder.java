@@ -37,47 +37,69 @@ public class TourTagFilterSqlJoinBuilder {
 
    public TourTagFilterSqlJoinBuilder() {
 
-      _isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
+      setupBuilder(false);
+   }
 
-      if (_isNoTagFilter_Or_CombineTagsWithOr) {
+   public TourTagFilterSqlJoinBuilder(final boolean isDistinctTourId) {
 
-         // combine tags with OR
-
-         _sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-      } else {
-
-         // combine tags with AND
-
-         _sqlCombineTagsWithAnd = createSql_CombineTagsWithAnd();
-         _sqlTagJoinTable = _sqlCombineTagsWithAnd.getSqlString();
-      }
+      setupBuilder(isDistinctTourId);
    }
 
    public static SQLData createSql_CombineTagsWithAnd() {
 
+      return createSql_CombineTagsWithAnd(false);
+   }
+
+   public static SQLData createSql_CombineTagsWithAnd(final boolean isDistinctTourId) {
+
       final SQLData sqlJoinPartForAndOperator = createSQL_JoinPartForAndOperator();
 
-      // the name "Count_TourId" is required to prevent duplicated names !!!
+      final String sqlTourTags = UI.EMPTY_STRING
 
-      final String sql = NL
-
-            + " INNER JOIN" + NL //                                                                      //$NON-NLS-1$
-            + " (" + NL //                                                                               //$NON-NLS-1$
-            + "    SELECT *" + NL //                                                                     //$NON-NLS-1$
-            + "    FROM TOURDATA_TOURTAG" + NL //                                                        //$NON-NLS-1$
-            + "    INNER JOIN" + NL //                                                                   //$NON-NLS-1$
-            + "    (" + NL //                                                                            //$NON-NLS-1$
-            + "       SELECT TOURDATA_TOURID AS Count_TourId, COUNT(*) AS NumTagIds" + NL //             //$NON-NLS-1$
-            + "       FROM TOURDATA_TOURTAG" + NL //                                                     //$NON-NLS-1$
-            + "       WHERE " + sqlJoinPartForAndOperator.getSqlString() + NL //                         //$NON-NLS-1$
-            + "       GROUP BY TOURDATA_TOURID" + NL //                                                  //$NON-NLS-1$
-            + "       HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                         //$NON-NLS-1$
-            + "    )" + NL //                                                                            //$NON-NLS-1$
-            + "    AS jTdataTtag " + NL //                                                               //$NON-NLS-1$
-            + "    ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //                //$NON-NLS-1$
-            + " ) " + NL //                                                                              //$NON-NLS-1$
+            + "      SELECT *" + NL //                                                             //$NON-NLS-1$
+            + "      FROM TOURDATA_TOURTAG" + NL //                                                //$NON-NLS-1$
+            + "      INNER JOIN" + NL //                                                           //$NON-NLS-1$
+            + "      (" + NL //                                                                    //$NON-NLS-1$
+            + "         SELECT" + NL //                                                            //$NON-NLS-1$
+            //             !!! The name "Count_TourId" is required to prevent duplicated names !!!
+            + "            TOURDATA_TOURID AS Count_TourId," + NL //                               //$NON-NLS-1$
+            + "            COUNT(*) AS NumTagIds" + NL //                                          //$NON-NLS-1$
+            + "         FROM TOURDATA_TOURTAG" + NL //                                             //$NON-NLS-1$
+            + "         WHERE " + sqlJoinPartForAndOperator.getSqlString() //                      //$NON-NLS-1$
+            + "         GROUP BY TOURDATA_TOURID" + NL //                                          //$NON-NLS-1$
+            + "         HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                 //$NON-NLS-1$
+            + "      )" + NL //                                                                    //$NON-NLS-1$
+            + "      AS jTdataTtag " + NL //                                                       //$NON-NLS-1$
+            + "      ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //        //$NON-NLS-1$
       ;
+
+      String sql;
+
+      if (isDistinctTourId) {
+
+         sql = UI.EMPTY_STRING
+
+               + "   INNER JOIN" + NL //                                                           //$NON-NLS-1$
+               + "   (" + NL //                                                                    //$NON-NLS-1$
+               + "      SELECT" + NL //                                                            //$NON-NLS-1$
+               + "         DISTINCT TourData_TourId" + NL //                                       //$NON-NLS-1$
+               + "      FROM " + NL //                                                             //$NON-NLS-1$
+               + "      (" + NL //                                                                 //$NON-NLS-1$
+               + sqlTourTags
+               + "      ) jTdataTtag" + NL //                                                      //$NON-NLS-1$
+               + "   )" + NL //                                                                    //$NON-NLS-1$
+         ;
+
+      } else {
+
+         sql = UI.EMPTY_STRING
+
+               + "   INNER JOIN" + NL //                                                           //$NON-NLS-1$
+               + "   (" + NL //                                                                    //$NON-NLS-1$
+               + sqlTourTags
+               + "   )" + NL //                                                                    //$NON-NLS-1$
+         ;
+      }
 
       final ArrayList<Object> sqlParameters = sqlJoinPartForAndOperator.getParameters();
 
@@ -147,6 +169,25 @@ public class TourTagFilterSqlJoinBuilder {
       }
 
       return paramIndex;
+   }
+
+   private void setupBuilder(final boolean isDistinctTourId) {
+
+      _isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
+
+      if (_isNoTagFilter_Or_CombineTagsWithOr) {
+
+         // combine tags with OR
+
+         _sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
+
+      } else {
+
+         // combine tags with AND
+
+         _sqlCombineTagsWithAnd = createSql_CombineTagsWithAnd(isDistinctTourId);
+         _sqlTagJoinTable = _sqlCombineTagsWithAnd.getSqlString();
+      }
    }
 
 }

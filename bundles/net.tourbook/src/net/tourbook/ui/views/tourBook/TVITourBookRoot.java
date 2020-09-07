@@ -77,26 +77,24 @@ public class TVITourBookRoot extends TVITourBookItem {
 
             sqlFromTourData = UI.EMPTY_STRING
 
-                  + "FROM (" + NL //                                                   //$NON-NLS-1$
+                  + "FROM (" + NL //                                                         //$NON-NLS-1$
 
-                  + "   SELECT" + NL //                                                //$NON-NLS-1$
+                  + "   SELECT" + NL //                                                      //$NON-NLS-1$
 
                   // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
-                  + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
+                  + "      DISTINCT TourId," + NL //                                         //$NON-NLS-1$
 
-                  + "      StartYear," + NL //                                         //$NON-NLS-1$
+                  + "      StartYear," + NL //                                               //$NON-NLS-1$
                   + "      " + SQL_SUM_FIELDS
 
-                  + "   FROM TOURDATA" + NL //                                         //$NON-NLS-1$
+                  + "   FROM TOURDATA" + NL //                                               //$NON-NLS-1$
 
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
-
-                  + "   AS jTdataTtag" //                                              //$NON-NLS-1$
-                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //  //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //             //$NON-NLS-1$
 
                   + "   " + sqlWhereClause
 
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                      //$NON-NLS-1$
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                            //$NON-NLS-1$
             ;
 
          } else {

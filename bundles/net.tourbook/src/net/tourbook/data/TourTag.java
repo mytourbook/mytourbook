@@ -145,6 +145,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }

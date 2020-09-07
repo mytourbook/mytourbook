@@ -30,12 +30,13 @@ import java.util.HashMap;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
-import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -204,100 +205,85 @@ public class DataProvider_Tour_Day extends DataProvider {
          return _tourDayData;
       }
 
-      _activePerson = person;
-      _activeTourTypeFilter = tourTypeFilter;
-
-      _lastYear = lastYear;
-      _numberOfYears = numberOfYears;
-
-      initYearNumbers();
-
-      int colorOffset = 0;
-      if (tourTypeFilter.showUndefinedTourTypes()) {
-         colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      boolean isDurationTime_Break = false;
-      boolean isDurationTime_Elapsed = false;
-      boolean isDurationTime_Paused = false;
-      boolean isDurationTime_Recorded = false;
-
-      switch (durationTime) {
-      case BREAK:
-         isDurationTime_Break = true;
-         break;
-
-      case ELAPSED:
-         isDurationTime_Elapsed = true;
-         break;
-
-      case PAUSED:
-         isDurationTime_Paused = true;
-         break;
-
-      case RECORDED:
-         isDurationTime_Recorded = true;
-         break;
-
-      case MOVING:
-      default:
-         // this is also the old implementation for the duration value
-         break;
-      }
-
-      // get the tour types
-      final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-      final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-
-// SET_FORMATTING_OFF
-
-      final String sqlString = NL
-
-            + "SELECT "                               + NL //        //$NON-NLS-1$
-
-            + " TourId,"                              + NL //  1     //$NON-NLS-1$
-
-            + " StartYear,"                           + NL //  2     //$NON-NLS-1$
-            + " StartWeek,"                           + NL //  3     //$NON-NLS-1$
-            + " TourStartTime,"                       + NL //  4     //$NON-NLS-1$
-            + " TimeZoneId,"                          + NL //  5     //$NON-NLS-1$
-
-            + " TourComputedTime_Moving,"             + NL //  6     //$NON-NLS-1$
-            + " TourDeviceTime_Elapsed,"              + NL //  7     //$NON-NLS-1$
-
-            + " TourDistance,"                        + NL //  8     //$NON-NLS-1$
-            + " TourAltUp,"                           + NL //  9     //$NON-NLS-1$
-            + " TourTitle,"                           + NL //  10    //$NON-NLS-1$
-            + " TourDescription,"                     + NL //  11    //$NON-NLS-1$
-
-            + " training_TrainingEffect_Aerob,"       + NL //  12    //$NON-NLS-1$
-            + " training_TrainingEffect_Anaerob,"     + NL //  13    //$NON-NLS-1$
-            + " training_TrainingPerformance,"        + NL //  14    //$NON-NLS-1$
-
-            + " TourType_typeId,"                     + NL //  15    //$NON-NLS-1$
-            + " jTdataTtag.TourTag_tagId,"            + NL //  16    //$NON-NLS-1$
-
-            + " TourDeviceTime_Recorded,"                    + NL //  17    //$NON-NLS-1$
-            + " TourDeviceTime_Paused"                       + NL //  18    //$NON-NLS-1$
-
-            + NL
-
-            + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
-
-            // get tag id's
-            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" ON tourID = jTdataTtag.TourData_tourId" + NL) //$NON-NLS-1$
-
-            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT + NL) //$NON-NLS-1$
-            + sqlFilter.getWhereClause()
-
-            + (" ORDER BY TourStartTime" + NL + NL); //$NON-NLS-1$
-
-// SET_FORMATTING_ON
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         _activePerson = person;
+         _activeTourTypeFilter = tourTypeFilter;
+
+         _lastYear = lastYear;
+         _numberOfYears = numberOfYears;
+
+         initYearNumbers();
+
+         int colorOffset = 0;
+         if (tourTypeFilter.showUndefinedTourTypes()) {
+            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+         }
+
+         boolean isDurationTime_Break = false;
+         boolean isDurationTime_Recording = false;
+
+         switch (durationTime) {
+         case BREAK:
+            isDurationTime_Break = true;
+            break;
+
+         case RECORDING:
+            isDurationTime_Recording = true;
+            break;
+
+         case MOVING:
+         default:
+            // this is also the old implementation for the duration value
+            break;
+         }
+
+         // get the tour types
+         final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+         final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                       //$NON-NLS-1$
+
+               + "   TourId," + NL //                                1  //$NON-NLS-1$
+
+               + "   StartYear," + NL //                             2  //$NON-NLS-1$
+               + "   StartWeek," + NL //                             3  //$NON-NLS-1$
+               + "   TourStartTime," + NL //                         4  //$NON-NLS-1$
+               + "   TimeZoneId," + NL //                            5  //$NON-NLS-1$
+
+               + "   TourDrivingTime," + NL //                       6  //$NON-NLS-1$
+               + "   TourRecordingTime," + NL //                     7  //$NON-NLS-1$
+
+               + "   TourDistance," + NL //                          8  //$NON-NLS-1$
+               + "   TourAltUp," + NL //                             9  //$NON-NLS-1$
+               + "   TourTitle," + NL //                             10 //$NON-NLS-1$
+               + "   TourDescription," + NL //                       11 //$NON-NLS-1$
+
+               + "   training_TrainingEffect_Aerob," + NL //         12 //$NON-NLS-1$
+               + "   training_TrainingEffect_Anaerob," + NL //       13 //$NON-NLS-1$
+               + "   training_TrainingPerformance," + NL //          14 //$NON-NLS-1$
+
+               + "   TourType_typeId," + NL //                       15 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId" + NL //               16 //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
+
+               // get/filter tag id's
+               + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //                //$NON-NLS-1$
+               + " ON TourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
+
+               + "WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+               + "   " + sqlAppFilter.getWhereClause()
+
+               + "ORDER BY TourStartTime" + NL; //                                              //$NON-NLS-1$
 
          final TLongArrayList dbAllTourIds = new TLongArrayList();
 
@@ -311,10 +297,8 @@ public class DataProvider_Tour_Day extends DataProvider {
          final ArrayList<ZonedDateTime> dbAllTourStartDateTime = new ArrayList<>();
 
          final TIntArrayList dbAllTourDuration = new TIntArrayList();
-         final TIntArrayList dbAllTourElapsedTime = new TIntArrayList();
-         final TIntArrayList dbAllTourMovingTime = new TIntArrayList();
-         final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
+         final TIntArrayList dbAllTourRecordingTime = new TIntArrayList();
+         final TIntArrayList dbAllTourDrivingTime = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
          final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
@@ -336,10 +320,14 @@ public class DataProvider_Tour_Day extends DataProvider {
          long lastTourId = -1;
          ArrayList<Long> tagIds = null;
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         sqlFilter.setParameters(statement, 1);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         final ResultSet result = statement.executeQuery();
+         int paramIndex = 1;
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
 
          while (result.next()) {
 
@@ -348,7 +336,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
             if (dbTourId == lastTourId) {
 
-               // get additional tags from outer join
+               // get additional tags from tag join
 
                if (dbTagId instanceof Long) {
                   tagIds.add((Long) dbTagId);
@@ -358,29 +346,30 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                // get first record from a tour
 
-               final int dbTourYear = result.getShort(2);
-               final int dbTourStartWeek = result.getInt(3);
+// SET_FORMATTING_OFF
 
-               final long dbStartTimeMilli = result.getLong(4);
-               final String dbTimeZoneId = result.getString(5);
+               final int dbTourYear                   = result.getShort(2);
+               final int dbTourStartWeek              = result.getInt(3);
 
-               final int dbMovingTime = result.getInt(6);
-               final int dbElapsedTime = result.getInt(7);
+               final long dbStartTimeMilli            = result.getLong(4);
+               final String dbTimeZoneId              = result.getString(5);
 
-               final float dbDistance = result.getFloat(8);
-               final int dbAltitudeUp = result.getInt(9);
+               final int dbDrivingTime                = result.getInt(6);
+               final int dbRecordingTime              = result.getInt(7);
 
-               final String dbTourTitle = result.getString(10);
-               final String dbDescription = result.getString(11);
+               final float dbDistance                 = result.getFloat(8);
+               final int dbAltitudeUp                 = result.getInt(9);
 
-               final float trainingEffect = result.getFloat(12);
-               final float trainingEffect_Anaerobic = result.getFloat(13);
-               final float trainingPerformance = result.getFloat(14);
+               final String dbTourTitle               = result.getString(10);
+               final String dbDescription             = result.getString(11);
 
-               final Object dbTypeIdObject = result.getObject(15);
+               final float trainingEffect             = result.getFloat(12);
+               final float trainingEffect_Anaerobic   = result.getFloat(13);
+               final float trainingPerformance        = result.getFloat(14);
 
-               final int dbRecordedTime = result.getInt(17);
-               final int dbPausedTime = result.getInt(18);
+               final Object dbTypeIdObject            = result.getObject(15);
+
+// SET_FORMATTING_ON
 
                final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
                final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
@@ -396,16 +385,12 @@ public class DataProvider_Tour_Day extends DataProvider {
                int durationTimeValue = 0;
 
                if (isDurationTime_Break) {
-                  durationTimeValue = dbElapsedTime - dbMovingTime;
-               } else if (isDurationTime_Elapsed) {
-                  durationTimeValue = dbElapsedTime;
-               } else if (isDurationTime_Recorded) {
-                  durationTimeValue = dbRecordedTime;
-               } else if (isDurationTime_Paused) {
-                  durationTimeValue = dbPausedTime;
+                  durationTimeValue = dbRecordingTime - dbDrivingTime;
+               } else if (isDurationTime_Recording) {
+                  durationTimeValue = dbRecordingTime;
                } else {
                   // moving time, this is also the old implementation for the duration value
-                  durationTimeValue = dbMovingTime == 0 ? dbElapsedTime : dbMovingTime;
+                  durationTimeValue = dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime;
                }
 
                dbAllTourIds.add(dbTourId);
@@ -417,11 +402,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                dbAllTourStartDateTime.add(zonedStartDateTime);
                dbAllTourStartTime.add(startDayTime);
-               dbAllTourEndTime.add((startDayTime + dbElapsedTime));
-               dbAllTourElapsedTime.add(dbElapsedTime);
-               dbAllTourMovingTime.add(dbMovingTime);
-               dbAllTourDeviceTime_Recorded.add(dbRecordedTime);
-               dbAllTourDeviceTime_Paused.add(dbPausedTime);
+               dbAllTourEndTime.add((startDayTime + dbRecordingTime));
+               dbAllTourRecordingTime.add(dbRecordingTime);
+               dbAllTourDrivingTime.add(dbDrivingTime);
 
                dbAllTourDuration.add(durationTimeValue);
 
@@ -431,9 +414,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllDistance.add(distance);
                dbAllAltitudeUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
 
-               //todo FB propose pace based on RECORDED TIME ?
-               dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
-               dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);
+               dbAllAvgPace.add(distance == 0 ? 0 : dbDrivingTime * 1000f / distance / 60.0f);
+               dbAllAvgSpeed.add(dbDrivingTime == 0 ? 0 : 3.6f * distance / dbDrivingTime);
 
                dbAllTrain_Effect_Aerob.add(trainingEffect);
                dbAllTrain_Effect_Anaerob.add(trainingEffect_Anaerobic);
@@ -638,18 +620,14 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTraining_Effect_Anaerobic = dbAllTrain_Effect_Anaerob.toArray();
          _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
 
-         _tourDayData.allElapsedTime = dbAllTourElapsedTime.toArray();
-         _tourDayData.allMovingTime = dbAllTourMovingTime.toArray();
-         _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
-         _tourDayData.allPausedTime = dbAllTourDeviceTime_Paused.toArray();
+         _tourDayData.allRecordingTime = dbAllTourRecordingTime.toArray();
+         _tourDayData.allDrivingTime = dbAllTourDrivingTime.toArray();
 
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;
 
       } catch (final SQLException e) {
-
-         StatusUtil.log(sqlString);
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       if (isLogStatisticValues) {

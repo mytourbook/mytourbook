@@ -54,6 +54,7 @@ public class TourTagFilterManager {
    private static final String                    ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
    private static final String                    ATTR_NAME                   = "name";                                 //$NON-NLS-1$
    private static final String                    ATTR_TAG_ID                 = "tagIds";                               //$NON-NLS-1$
+   private static final String                    ATTR_TAG_ID_UNCHECKED       = "tagIdsUnchecked";                      //$NON-NLS-1$
 
    private static final String                    PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
    private static final String                    PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
@@ -243,8 +244,10 @@ public class TourTagFilterManager {
                   }
 
                   final long[] tagIds = Util.getXmlLongArray(xmlProfile, ATTR_TAG_ID);
+                  final long[] tagIdsUnchecked = Util.getXmlLongArray(xmlProfile, ATTR_TAG_ID_UNCHECKED);
 
                   tagFilterProfile.tagFilterIds.addAll(tagIds);
+                  tagFilterProfile.tagFilterIds_Unchecked.addAll(tagIdsUnchecked);
                }
             }
 
@@ -320,6 +323,7 @@ public class TourTagFilterManager {
             }
 
             Util.setXmlLongArray(xmlProfile, ATTR_TAG_ID, tagFilterProfile.tagFilterIds.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_TAG_ID_UNCHECKED, tagFilterProfile.tagFilterIds_Unchecked.toArray());
          }
 
       } catch (final Exception e) {
