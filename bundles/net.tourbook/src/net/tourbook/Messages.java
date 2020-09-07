@@ -152,8 +152,8 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
-   public static String        Dialog_AdjustAltitude_Link_AdjustEndToStart;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
+   public static String        Dialog_AdjustAltitude_Link_SetEndToSRTM;
 
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
    public static String        Dialog_AdjustTemperature_Dialog_Message;

@@ -24,6 +24,10 @@ Improvements
   - Unchecked tags in the "Selected Tags" list will also be saved in the tag filter profile, in the previous version they got lost.
     These unchecked tags can be deleted with the DELETE key in the "Selected Tags" or by unchecking it in "Available Tags"
 
+* Dialog Adjust Elevation
+  - Adjustment Type: "Approach elevation with SRMT data"
+    New action: "Set END elevation to SRTM data"
+
 Changes  
 =======
 

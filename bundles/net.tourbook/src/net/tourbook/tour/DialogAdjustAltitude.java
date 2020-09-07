@@ -159,7 +159,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    /**
     * Elevation difference for the 1st time slice between tour elevation and SRTM elevation
     */
-   private float                           _firstTimeSlice_ElevationDiff;
+   private double                          _firstTimeSlice_ElevationDiff;
    private double                          _sliderXAxisValue;
 
    private boolean                         _canDeletePoint;
@@ -763,13 +763,14 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       if (numPoints == 1) {
 
-         final float posX = dev1X == 0 ? 0 : devX / dev1X;
-         final float posY = dev1Y == 0 ? 0 : devY / dev1Y;
+         final float posXRelative = dev1X == 0 ? 0 : devX / dev1X;
+         final float posYRelative = dev1Y == 0 ? 0 : devY / dev1Y;
 
          final int lastIndex = newLength - 1;
+
          newIsPointMovable[lastIndex] = true;
-         newPosXRelative[lastIndex] = posX;
-         newPosYRelative[lastIndex] = posY;
+         newPosXRelative[lastIndex] = posXRelative;
+         newPosYRelative[lastIndex] = posYRelative;
          newXValues[lastIndex] = graphX;
          newYValues[lastIndex] = 0;
          newXMinValues[lastIndex] = graphXMin;
@@ -779,16 +780,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
 
-            final float posX = (1f / (numPoints + 1)) * (pointIndex + 1);
-            final float posY = dev1Y == 0 ? 0 : devY / dev1Y;
+            final float posXRelative = (1f / (numPoints + 1)) * (pointIndex + 1);
+            final float posYRelative = dev1Y == 0 ? 0 : devY / dev1Y;
 
             devX = dev1X / (pointIndex + 1);
             graphX = (float) (devX / scaleX);
 
             final int splineIndex = oldLength + pointIndex;
             newIsPointMovable[splineIndex] = true;
-            newPosXRelative[splineIndex] = posX;
-            newPosYRelative[splineIndex] = posY;
+            newPosXRelative[splineIndex] = posXRelative;
+            newPosYRelative[splineIndex] = posYRelative;
             newXValues[splineIndex] = graphX;
             newYValues[splineIndex] = 0;
             newXMinValues[splineIndex] = graphXMin;
@@ -820,7 +821,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final double scaleY = drawingData.scaleY;
 
       double devX = drawingData.devGraphValueXOffset + mouseEvent.devXMouse;
-      final float devY = drawingData.devY0Spline - mouseEvent.devYMouse;
+      final double devY = drawingData.devY0Spline - mouseEvent.devYMouse;
 
       final double graphXMin = _splineData.graphXMinValues[_pointHitIndex];
       final double graphXMax = _splineData.graphXMaxValues[_pointHitIndex];
@@ -855,10 +856,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       devX = (graphX * scaleX);
 
       final double graph1X = _sliderXAxisValue;
-      final float graph1Y = _firstTimeSlice_ElevationDiff;
+      final double graph1Y = _firstTimeSlice_ElevationDiff;
 
       final double dev1X = scaleX * graph1X;
-      final float dev1Y = (float) (scaleY * graph1Y);
+      final double dev1Y = scaleY * graph1Y;
 
       if (isPointMovable) {
          // horizontal move is allowed
@@ -866,7 +867,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       }
 
       // set vertical position
-      final float devYRelativ = devY / dev1Y;
+      final double devYRelativ = devY / dev1Y;
       _splineData.relativePositionY[_pointHitIndex] = devYRelativ;
 
 // this is not easy to implement, current solution do NOT work
@@ -1489,6 +1490,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          {
             /*
+             * Link: Adjust END to the START elevation
+             */
+            _linkSRTM_AdjustEndToStart = new Link(container, SWT.NONE);
+            _linkSRTM_AdjustEndToStart.setText(Messages.Dialog_AdjustAltitude_Link_SetEndToSRTM);
+            _linkSRTM_AdjustEndToStart.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSpline_SetEndElevationToSRTM();
+               }
+            });
+            GridDataFactory.swtDefaults().span(6, 1).applyTo(_linkSRTM_AdjustEndToStart);
+         }
+         {
+            /*
              * Link: Select whole tour
              */
             _linkSRTM_SelectWholeTour = new Link(container, SWT.NONE);
@@ -1500,20 +1515,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                }
             });
             GridDataFactory.swtDefaults().span(6, 1).applyTo(_linkSRTM_SelectWholeTour);
-         }
-         {
-            /*
-             * Link: Adjust END to the START elevation
-             */
-            _linkSRTM_AdjustEndToStart = new Link(container, SWT.NONE);
-            _linkSRTM_AdjustEndToStart.setText(Messages.Dialog_AdjustAltitude_Link_AdjustEndToStart);
-            _linkSRTM_AdjustEndToStart.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSpline_AdjustEndToStart();
-               }
-            });
-            GridDataFactory.swtDefaults().span(6, 1).applyTo(_linkSRTM_AdjustEndToStart);
          }
       }
    }
@@ -2290,44 +2291,22 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //      _tourChart.update2ndAltiLayer(this, true);
    }
 
-   private void onSpline_AdjustEndToStart() {
-
-      // TODO Auto-generated method stub
+   private void onSpline_SetEndElevationToSRTM() {
 
       final float[] yDataSerie = _tourData.altitudeSerie;
+      final int lastSerieIndex = yDataSerie.length - 1;
 
-      float lastTimeSlice_ElevationDiff = _backupSrtmSerie[0] - yDataSerie[0];
-
-      // ensure that a point can be moved with the mouse
-      lastTimeSlice_ElevationDiff = lastTimeSlice_ElevationDiff == 0 ? 1 : lastTimeSlice_ElevationDiff;
-
-//      final float[] yDataSerie = _tourData.altitudeSerie;
-//
-//      final float eleDiff = yDataSerie[0] - yDataSerie[yDataSerie.length - 1];
-//
       final double[] graphYValues = _splineData.graphYValues;
 
-      final int numSplinePoints = graphYValues.length;
-      final int lastSplineIndex = numSplinePoints - 1;
-//
-//      graphYValues[lastSplineIndex] = eleDiff;
-//
-      final SplineDrawingData drawingData = _chartLayer2ndAltiSerie.getDrawingData();
-      final double scaleY = drawingData.scaleY;
-
-      final float devY = drawingData.devY0Spline; // - mouseEvent.devYMouse;
+      final int lastSplineIndex = graphYValues.length - 1;
 
       /*
-       * set new relative position
+       * Set new relative position
        */
-      final float graph1Y = _firstTimeSlice_ElevationDiff;
-      final float dev1Y = (float) (scaleY * graph1Y);
+      final double lastTimeSlice_ElevationDiff = _backupSrtmSerie[lastSerieIndex] - yDataSerie[lastSerieIndex];
+      final double graphRelative = lastTimeSlice_ElevationDiff / _firstTimeSlice_ElevationDiff;
 
-      // set vertical position
-      final float devYRelativ = devY / dev1Y;
-      _splineData.relativePositionY[lastSplineIndex] = devYRelativ;
-
-//      _splineData.relativePositionY[lastSplineIndex] = lastTimeSlice_ElevationDiff;
+      _splineData.relativePositionY[this is NOT the lastSplineIndex] = graphRelative;
 
       /*
        * Update UI
