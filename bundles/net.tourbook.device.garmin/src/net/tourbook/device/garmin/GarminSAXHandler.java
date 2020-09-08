@@ -145,20 +145,21 @@ public class GarminSAXHandler extends DefaultHandler {
    private String                  _importFilePath;
    private boolean                 _isImported;
 
-   private final List<Long>        _pausedTime_Start = new ArrayList<>();
-   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private final List<Long>        _pausedTime_Start  = new ArrayList<>();
+   private List<Long>              _pausedTime_End    = new ArrayList<>();
+   private int                     _currentPauseIndex = -1;
    private boolean                 _isPreviousLapAPause;
-   private ArrayList<TimeData>     _allTimeData      = new ArrayList<>();
+   private ArrayList<TimeData>     _allTimeData       = new ArrayList<>();
 
    private TimeData                _timeData;
 
-   private int                     _dataVersion      = -1;
+   private int                     _dataVersion       = -1;
    private int                     _lapCounter;
    private int                     _trackPointCounter;
 
    private boolean                 _isSetLapMarker;
    private boolean                 _isSetLapStartTime;
-   private ArrayList<Long>         _allLapStart      = new ArrayList<>();
+   private ArrayList<Long>         _allLapStart       = new ArrayList<>();
 
    private long                    _currentStartTime;
    private long                    _currentTime;
@@ -168,7 +169,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                 _isDistanceFromSensor;
    private boolean                 _isFromStrideSensor;
 
-   private StringBuilder           _characters       = new StringBuilder();
+   private StringBuilder           _characters        = new StringBuilder();
 
    private Sport                   _sport;
    private String                  _tourNotes;
@@ -467,6 +468,24 @@ public class GarminSAXHandler extends DefaultHandler {
       }
    }
 
+   private void cleanTimerPauses() {
+
+      if (_pausedTime_Start.size() == 0) {
+         return;
+      }
+
+      for (int index = 0; index < _pausedTime_Start.size(); ++index) {
+
+         if (_pausedTime_End.get(index) == Long.MIN_VALUE) {
+            _pausedTime_Start.set(index, null);
+            _pausedTime_End.set(index, null);
+         }
+      }
+
+      _pausedTime_Start.removeIf(p -> p == null);
+      _pausedTime_End.removeIf(p -> p == null);
+   }
+
    public void dispose() {
 
       _allLapStart.clear();
@@ -508,6 +527,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
                if (distance == 0) {
                   _pausedTime_Start.add(_currentStartTime);
+                  _pausedTime_End.add(Long.MIN_VALUE);
+                  ++_currentPauseIndex;
 
                   _isPreviousLapAPause = true;
 
@@ -515,12 +536,12 @@ public class GarminSAXHandler extends DefaultHandler {
 
                   if (_pausedTime_Start.size() > 0) {
 
-                     final long currentPause = _pausedTime_Start.get(_pausedTime_Start.size() - 1);
+                     final long currentPause = _pausedTime_Start.get(_currentPauseIndex);
 
                      //In a TCX file, the first lap is always created with a distance of 0 meters.
                      //Hence, we don't consider that a pause.
                      if (currentPause != _currentStartTime) {
-                        _pausedTime_End.add(_currentStartTime);
+                        _pausedTime_End.set(_currentPauseIndex, _currentStartTime);
                      }
                   }
 
@@ -652,6 +673,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
+      cleanTimerPauses();
       tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
 
       // after all data are added, the tour id can be created
