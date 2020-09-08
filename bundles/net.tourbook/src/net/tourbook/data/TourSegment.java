@@ -22,12 +22,12 @@ public class TourSegment {
    public int     serieIndex_Start;
    public int     serieIndex_End;
 
-   public int     time_Elapsed;
+   public int     timeDevice_Elapsed;
 
-   public int     time_Recorded;
-   public int     time_Paused;
-   public int     time_Moving;
-   public int     time_Break;
+   public int     timeDevice_Recorded;
+   public int     timeDevice_Paused;
+   public int     timeComputed_Moving;
+   public int     timeComputed_Break;
    public int     time_Total;
 
    public float   distance_Diff;

@@ -5282,9 +5282,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          final float segmentDrivingTime = segmentElapsedTime - segmentBreakTime;
 
-         segmentSerie_Time_Recording[segmentIndex] = segment.time_Elapsed = segmentElapsedTime;
-         segmentSerie_Time_Driving[segmentIndex] = segment.time_Moving = (int) segmentDrivingTime;
-         segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
+         segmentSerie_Time_Recording[segmentIndex] = segment.timeDevice_Elapsed = segmentElapsedTime;
+         segmentSerie_Time_Driving[segmentIndex] = segment.timeComputed_Moving = (int) segmentDrivingTime;
+         segmentSerie_Time_Break[segmentIndex] = segment.timeComputed_Break = segmentBreakTime;
          segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentElapsedTime;
 
          totalTime_Elapsed += segmentElapsedTime;
@@ -5442,7 +5442,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 
             // stride length with rule of 3
-            final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Elapsed;
+            final float revolutionTotal = segmentAvgCadence / 60 * segment.timeDevice_Elapsed;
             segment.strideLength = segment.distance_Diff / revolutionTotal;
          }
 
@@ -5465,9 +5465,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       totalSegment.isTotal = true;
 
-      totalSegment.time_Elapsed = totalTime_Elapsed;
-      totalSegment.time_Moving = totalTime_Moving;
-      totalSegment.time_Break = totalTime_Break;
+      totalSegment.timeDevice_Elapsed = totalTime_Elapsed;
+      totalSegment.timeComputed_Moving = totalTime_Moving;
+      totalSegment.timeComputed_Break = totalTime_Break;
 
       totalSegment.distance_Diff = totalDistance;
       totalSegment.pace = totalPace;

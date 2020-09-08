@@ -566,7 +566,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.TIME_ELAPSED_TIME_ID:
-            rc = segment1.time_Elapsed - segment2.time_Elapsed;
+            rc = segment1.timeDevice_Elapsed - segment2.timeDevice_Elapsed;
             break;
 
          case TableColumnFactory.DATA_SERIE_START_END_INDEX_ID:
@@ -3222,7 +3222,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final int movingTime = segment.time_Moving;
+            final int movingTime = segment.timeComputed_Moving;
 
             if (movingTime == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3257,7 +3257,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final int movingTime = segment.time_Moving;
+            final int movingTime = segment.timeComputed_Moving;
 
             if (movingTime == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3782,7 +3782,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Elapsed;
+            final int value = segment.timeDevice_Elapsed;
 
             colDef.printDetailValue(cell, value);
 
@@ -3840,7 +3840,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Moving;
+            final int value = segment.timeComputed_Moving;
 
             colDef.printDetailValue(cell, value);
 
@@ -3868,7 +3868,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Break;
+            final int value = segment.timeComputed_Break;
 
             colDef.printDetailValue(cell, value);
 

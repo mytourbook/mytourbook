@@ -713,13 +713,13 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       _lblAltitude_Diff_Unit.setText(UI.UNIT_LABEL_ALTITUDE);
 
       final float altiDown = (tourSegment.altitude_Segment_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
-            / tourSegment.time_Elapsed
+            / tourSegment.timeDevice_Elapsed
             * 3600;
       _lblAltitude_DownHour.setText(_nf_1_0.format(altiDown));
       _lblAltitude_DownHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
 
       final float altiUp = (tourSegment.altitude_Segment_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
-            / tourSegment.time_Elapsed
+            / tourSegment.timeDevice_Elapsed
             * 3600;
       _lblAltitude_UpHour.setText(_nf_1_0.format(altiUp));
       _lblAltitude_UpHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
@@ -762,10 +762,10 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       /*
        * Time
        */
-      _lblTime_Elapsed.setText(FormatManager.formatElapsedTime(tourSegment.time_Elapsed));
-      _lblTime_Recorded.setText(FormatManager.formatRecordedTime(tourSegment.time_Recorded));
-      _lblTime_Paused.setText(FormatManager.formatPausedTime(tourSegment.time_Paused));
-      _lblTime_Moving.setText(FormatManager.formatPausedTime(tourSegment.time_Moving));
-      _lblTime_Break.setText(FormatManager.formatPausedTime(tourSegment.time_Break));
+      _lblTime_Elapsed.setText(FormatManager.formatElapsedTime(tourSegment.timeDevice_Elapsed));
+      _lblTime_Recorded.setText(FormatManager.formatRecordedTime(tourSegment.timeDevice_Recorded));
+      _lblTime_Paused.setText(FormatManager.formatPausedTime(tourSegment.timeDevice_Paused));
+      _lblTime_Moving.setText(FormatManager.formatPausedTime(tourSegment.timeComputed_Moving));
+      _lblTime_Break.setText(FormatManager.formatPausedTime(tourSegment.timeComputed_Break));
    }
 }
