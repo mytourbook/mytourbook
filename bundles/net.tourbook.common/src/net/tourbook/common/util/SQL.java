@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +21,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-
-import net.tourbook.common.UI;
 
 /**
  * SQL utilities.
@@ -151,6 +151,10 @@ public final class SQL {
 
    public static void showException(final SQLException exception, final String sqlStatement) {
 
+      // log without line number that it can be easily copy/pasted into a sql tool
+      System.out.println();
+      System.out.println(sqlStatement);
+
       final String sqlStatementWithNumber = addLineNumbers(sqlStatement);
 
       Display.getDefault().asyncExec(new Runnable() {
@@ -161,7 +165,7 @@ public final class SQL {
                   + sqlStatementWithNumber + UI.NEW_LINE2
                   + Util.getSQLExceptionText(exception);
 
-            MessageDialog.openError(Display.getDefault().getActiveShell(), //
+            SQLMessageDialog.openError(Display.getDefault().getActiveShell(),
                   "SQL Error", //$NON-NLS-1$
                   message);
 

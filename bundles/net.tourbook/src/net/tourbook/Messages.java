@@ -835,10 +835,10 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
-   public static String        Enum_Cadence_None;
-   public static String        Enum_Cadence_Rpm;
-   public static String        Enum_Cadence_Spm;
-   public static String        Enum_Cadence_Invalid;
+   public static String        App_Cadence_None;
+   public static String        App_Cadence_Rpm;
+   public static String        App_Cadence_Spm;
+   public static String        App_Cadence_Invalid;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
@@ -1384,8 +1384,8 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing2;                                     //2, because of refactoring
-   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                             //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2;                                          //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                  //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
@@ -1396,10 +1396,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt2;                                        //2, because of refactoring
-   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2;                                   //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                           //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2;                                             //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                     //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                        //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -2247,7 +2247,6 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Label_Title;
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
-
    public static String Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
    public static String Slideout_TourGeoFilter_Action_Delete_WithoutName;
    public static String Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
@@ -2306,10 +2305,22 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip;
-   public static String Slideout_TourTagFilter_Column_Properties_Tooltip;
+   public static String Slideout_TourTagFilter_Column_CombineTags;
+   public static String Slideout_TourTagFilter_Column_CombineTags_Tooltip;
+   public static String Slideout_TourTagFilter_Column_Tags_Checked;
+   public static String Slideout_TourTagFilter_Column_Tags_Checked_Tooltip;
+   public static String Slideout_TourTagFilter_Column_Tags_Unchecked;
+   public static String Slideout_TourTagFilter_Column_Tags_Unchecked_Tooltip;
+   public static String Slideout_TourTagFilter_CombineTags_With_AND;
+   public static String Slideout_TourTagFilter_CombineTags_With_OR;
    public static String Slideout_TourTagFilter_Label_AllTags;
    public static String Slideout_TourTagFilter_Label_SelectedTags;
+   public static String Slideout_TourTagFilter_Label_TagOperator;
    public static String Slideout_TourTagFilter_Label_Title;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_AND;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_AND_Tooltip;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_OR;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String Slideout_TrainingOptions_Label_Title;
 

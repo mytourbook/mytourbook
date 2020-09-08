@@ -4,11 +4,11 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,7 +17,7 @@ package net.tourbook.importdata;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 
 public class SpeedTourType implements Comparable<Object>, Cloneable {
 
@@ -26,11 +26,11 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 	 */
    public float  avgSpeed;
    public long   tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
-   public Cadence cadence;
+   public CadenceMultiplier cadence;
 
 	public SpeedTourType() {}
 
-   public SpeedTourType(final int value, final Cadence cadence) {
+   public SpeedTourType(final int value, final CadenceMultiplier cadence) {
 		this.avgSpeed = value;
       this.cadence = cadence;
 	}
@@ -42,7 +42,7 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 
 		try {
 
-         clonedObject = (SpeedTourType) super.clone();
+			clonedObject = (SpeedTourType) super.clone();
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -51,10 +51,10 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 		return clonedObject;
 	}
 
-   @Override
+	@Override
 	public int compareTo(final Object anotherObject) throws ClassCastException {
 
-      final float anotherValue = ((SpeedTourType) anotherObject).avgSpeed;
+		final float anotherValue = ((SpeedTourType) anotherObject).avgSpeed;
 
 		return Float.compare(avgSpeed, anotherValue);
 	}
@@ -65,9 +65,7 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
             + ("avgSpeed=" + avgSpeed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("tourTypeId=" + tourTypeId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("cadence=" + cadence + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //
             + "]"; //$NON-NLS-1$
    }
-
 
 }

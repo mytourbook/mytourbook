@@ -40,7 +40,7 @@ import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -2046,7 +2046,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 
-         final Cadence cadence = (Cadence) Util.getStateEnum(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+         final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
          _comboIL_One_TourType_Cadence.setSelection(cadence);
       }
 
@@ -2187,7 +2187,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
             final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
 
-            final Cadence cadence = (Cadence) Util.getStateEnum(_stateRDV,
+            final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRDV,
                   RawDataView.STATE_DEFAULT_CADENCE,
                   RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
             comboCadence.setSelection(cadence);

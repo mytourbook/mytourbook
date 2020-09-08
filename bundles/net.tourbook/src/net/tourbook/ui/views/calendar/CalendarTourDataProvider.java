@@ -38,6 +38,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 
 public class CalendarTourDataProvider {
@@ -108,7 +110,7 @@ public class CalendarTourDataProvider {
 
          // load month data
 
-         final CalendarTourData[][] loadedMonthData = getCalendarMonthData_FromDb(year, month);
+         final CalendarTourData[][] loadedMonthData = loadFromDb_Month(year, month);
 
          _dayCache.get(year)[month - 1] = loadedMonthData;
 
@@ -121,6 +123,267 @@ public class CalendarTourDataProvider {
 
    }
 
+   LocalDateTime getCalendarTourDateTime(final Long tourId) {
+
+      LocalDateTime dt = LocalDateTime.now();
+
+      final String select =
+
+            "SELECT" //                               //$NON-NLS-1$
+
+                  + " StartYear," + NL //          1  //$NON-NLS-1$
+                  + " StartMonth," + NL //         2  //$NON-NLS-1$
+                  + " StartDay," + NL //           3  //$NON-NLS-1$
+                  + " StartHour," + NL //          4  //$NON-NLS-1$
+                  + " StartMinute" //              5  //$NON-NLS-1$
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+                  + " WHERE TourId=?" + NL; //        //$NON-NLS-1$
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final PreparedStatement statement = conn.prepareStatement(select);
+
+         statement.setLong(1, tourId);
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final int year = result.getShort(1);
+            final int month = result.getShort(2);
+            final int day = result.getShort(3);
+            final int hour = result.getShort(4);
+            final int minute = result.getShort(5);
+
+            dt = LocalDateTime.of(year, month, day, hour, minute);
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(select);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      }
+
+      return dt;
+   }
+
+   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay, final CalendarView calendarView) {
+
+      final WeekFields cw = TimeTools.calendarWeek;
+
+      final int year = week1stDay.get(cw.weekBasedYear());
+      final int week = week1stDay.get(cw.weekOfWeekBasedYear());
+
+      if (!_weekCache.containsKey(year)) {
+
+         /*
+          * Create year, weeks are from 1..53; we simply leave array index 0 unused (yes, a year
+          * can have more than 52 weeks)
+          */
+         _weekCache.put(year, new CalendarTourData[54]);
+      }
+
+      CalendarTourData weekData;
+
+      final CalendarTourData cachedWeekData = _weekCache.get(year)[week];
+
+      if (cachedWeekData == null) {
+
+         weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
+
+         _weekCache.get(year)[week] = weekData;
+
+      } else if (cachedWeekData.loadingState == LoadingState.NOT_LOADED) {
+
+         // load again
+
+         weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
+
+         // update cached data otherwise an endless loop occures !!!
+         _weekCache.get(year)[week] = weekData;
+
+      } else {
+
+         weekData = cachedWeekData;
+      }
+
+      return weekData;
+
+   }
+
+   private CalendarTourData getCalendarWeekSummaryData_FromDb(final LocalDate week1stDay,
+                                                              final int year,
+                                                              final int week) {
+
+      final CalendarTourData weekData = new CalendarTourData();
+
+      weekData.loadingState = LoadingState.IS_QUEUED;
+
+      _weekWaitingQueue.add(new WeekLoader(week1stDay, year, week, weekData, _weekExecuterId.get()));
+
+      final Runnable executorTask = new Runnable() {
+         @Override
+         public void run() {
+
+            // get last added loader item
+            final WeekLoader weekLoader = _weekWaitingQueue.pollFirst();
+
+            if (weekLoader == null) {
+               return;
+            }
+
+            if (loadFromDB_Week(weekLoader)) {
+               _calendarGraph.updateUI_AfterDataLoading();
+            }
+         }
+      };
+
+      _weekLoadingExecutor.submit(executorTask);
+
+      return weekData;
+
+   }
+
+   /**
+    * @return Returns the date/time of the first available tour
+    */
+   LocalDateTime getFirstTourDateTime() {
+
+      if (null != _firstTourDateTime) {
+         return _firstTourDateTime;
+      }
+
+      String select = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         long firstTourStartTime = 0;
+
+         /*
+          * Get first tour date/time
+          */
+         select = "SELECT MIN(TourStartTime)" //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
+
+         PreparedStatement statement = conn.prepareStatement(select);
+
+         ResultSet result = statement.executeQuery();
+         while (result.next()) {
+
+            firstTourStartTime = result.getLong(1);
+
+            // this occures when there are 0 tours
+            if (firstTourStartTime != 0) {
+
+               _firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
+
+               break;
+            }
+         }
+
+         /*
+          * Get first tour id
+          */
+         if (_firstTourDateTime != null) {
+
+            select = "SELECT TourId" //$NON-NLS-1$
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
+                  + " WHERE TourStartTime=" + firstTourStartTime; //$NON-NLS-1$
+
+            statement = conn.prepareStatement(select);
+
+            result = statement.executeQuery();
+            while (result.next()) {
+
+               _firstTourId = result.getLong(1);
+
+               break;
+            }
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(select);
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+
+      if (_firstTourDateTime == null) {
+         _firstTourDateTime = LocalDateTime.now().minusMonths(1);
+      }
+
+      return _firstTourDateTime;
+
+   }
+
+   /**
+    * @return Returns first tour ID or <code>null</code> when a tour is not available.
+    */
+   Long getFirstTourId() {
+      return _firstTourId;
+   }
+
+   /**
+    * @return Returns todays tour ID or <code>null</code> when a tour is not available.
+    */
+   Long getTodaysTourId() {
+
+      Long todayTourId = null;
+      String select = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final LocalDate today = LocalDate.now();
+
+         select = NL
+
+               + "SELECT" + NL //                                          //$NON-NLS-1$
+
+               + "   TourId" + NL //                                       //$NON-NLS-1$
+
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //            //$NON-NLS-1$
+
+               + "WHERE  StartYear=" + today.getYear() + NL //             //$NON-NLS-1$
+               + "   AND StartMonth=" + today.getMonthValue() + NL //      //$NON-NLS-1$
+               + "   AND StartDay=" + today.getDayOfMonth() + NL //        //$NON-NLS-1$
+         ;
+
+         final PreparedStatement statement = conn.prepareStatement(select);
+
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
+
+            todayTourId = result.getLong(1);
+
+            break;
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.log(select);
+         net.tourbook.ui.UI.showSQLException(e);
+
+      }
+
+      return todayTourId;
+   }
+
+   synchronized void invalidate() {
+
+      // reset all cached data
+
+      // stop week downloader
+      _weekExecuterId.incrementAndGet();
+
+      _dayCache.clear();
+      _weekCache.clear();
+
+      _firstTourDateTime = null;
+      _firstTourId = null;
+   }
+
    /**
     * Retrieve data for 1 month from the database
     *
@@ -129,135 +392,117 @@ public class CalendarTourDataProvider {
     * @param day
     * @return CalendarTourData
     */
-   private CalendarTourData[][] getCalendarMonthData_FromDb(final int year, final int month) {
+   private CalendarTourData[][] loadFromDb_Month(final int year, final int month) {
 
 //      final long start = System.currentTimeMillis();
 
       CalendarTourData[][] monthData = null;
       CalendarTourData[] dayData = null;
 
-// disabled because dragged tours are not displayed
-//
-//      final LocalDate today = LocalDate.now();
-//      final LocalDate requestedDate = LocalDate.of(year, month, 1);
-//
-//      if (
-//
-//      // requested data are after today -> there should be no data
-//      requestedDate.isAfter(today.plusMonths(1))
-//
-//            // requested data are before first tour
-//            || (_firstTourDateTime != null && requestedDate.isBefore(
-//
-//                  // adjust a month before the last month, otherwise data
-//                  // for the first month are not all loaded
-//                  _firstTourDateTime.toLocalDate().minusMonths(1)
-//
-//            ))) {
-//
-//         /*
-//          * Create dummy data
-//          */
-//
-//         monthData = new CalendarTourData[31][];
-//
-//         for (int day = 0; day < 31; day++) {
-//            monthData[day] = new CalendarTourData[0];
-//         }
-//
-//         return monthData;
-//      }
-
-      final int colorOffset = 1;
-
-      final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
-      final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
-
-      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
-
-      ArrayList<String> dbTourTitle = null;
-      ArrayList<String> dbTourDescription = null;
-
-      ArrayList<Integer> dbTourYear = null;
-      ArrayList<Integer> dbTourMonth = null;
-      ArrayList<Integer> dbTourDay = null;
-
-      ArrayList<Integer> dbTourStartTime = null;
-      ArrayList<Integer> dbTourEndTime = null;
-      ArrayList<Integer> dbTourStartWeek = null;
-
-      ArrayList<Integer> dbDistance = null;
-      ArrayList<Integer> dbElevationGain = null;
-      ArrayList<Integer> dbElevationLoss = null;
-      ArrayList<Integer> dbTourRecordingTime = null;
-      ArrayList<Integer> dbTourDrivingTime = null;
-
-      ArrayList<Integer> dbCalories = null;
-      TFloatArrayList dbPowerAvg = null;
-      TFloatArrayList dbPulseAvg = null;
-
-      ArrayList<Long> dbTypeIds = null;
-      ArrayList<Integer> dbTypeColorIndex = null;
-
-      ArrayList<Long> tourIds = null;
-
-      ArrayList<Boolean> dbIsManualTour = null;
-
-      HashMap<Long, ArrayList<Long>> dbTagIds = null;
-
-      long lastTourId = -1;
-      ArrayList<Long> tagIds = null;
-
-      final String select = NL
-
-            + "SELECT                     " + NL //$NON-NLS-1$
-
-            + " TourId,                   " + NL // 1    //$NON-NLS-1$
-            + " StartYear,                " + NL // 2    //$NON-NLS-1$
-            + " StartMonth,               " + NL // 3    //$NON-NLS-1$
-            + " StartDay,                 " + NL // 4    //$NON-NLS-1$
-            + " StartHour,                " + NL // 5    //$NON-NLS-1$
-            + " StartMinute,              " + NL // 6    //$NON-NLS-1$
-            + " TourDistance,             " + NL // 7    //$NON-NLS-1$
-            + " TourAltUp,                " + NL // 8    //$NON-NLS-1$
-            + " TourRecordingTime,        " + NL // 9    //$NON-NLS-1$
-            + " TourDrivingTime,          " + NL // 10   //$NON-NLS-1$
-            + " TourTitle,                " + NL // 11   //$NON-NLS-1$
-            + " TourType_typeId,          " + NL // 12   //$NON-NLS-1$
-            + " TourDescription,          " + NL // 13   //$NON-NLS-1$
-            + " StartWeek,                " + NL // 14   //$NON-NLS-1$
-            + " DevicePluginId,           " + NL // 15   //$NON-NLS-1$
-            + " Calories,                 " + NL // 16   //$NON-NLS-1$
-
-            + " jTdataTtag.TourTag_tagId, " + NL // 17   //$NON-NLS-1$
-
-            + " TourAltDown,              " + NL // 18   //$NON-NLS-1$
-            + " AvgPulse,                 " + NL // 19   //$NON-NLS-1$
-            + " Power_Avg                 " + NL // 20   //$NON-NLS-1$
-
-            + NL
-
-            + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
-
-            // get tag id's
-            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL) //$NON-NLS-1$ //$NON-NLS-2$
-            + (" ON tourID = jTdataTtag.TourData_tourId" + NL) //$NON-NLS-1$
-
-            + " WHERE StartYear=?         " + NL //$NON-NLS-1$
-            + " AND   StartMonth=?        " + NL //$NON-NLS-1$
-            + " AND   StartDay=?          " + NL //$NON-NLS-1$
-
-            + filter.getWhereClause()
-
-            + (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(select);
+         final int colorOffset = 1;
 
-         statement.setInt(1, year);
-         statement.setInt(2, month);
-         filter.setParameters(statement, 4);
+         final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
+         final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+
+         ArrayList<String> dbTourTitle = null;
+         ArrayList<String> dbTourDescription = null;
+
+         ArrayList<Integer> dbTourYear = null;
+         ArrayList<Integer> dbTourMonth = null;
+         ArrayList<Integer> dbTourDay = null;
+
+         ArrayList<Integer> dbTourStartTime = null;
+         ArrayList<Integer> dbTourEndTime = null;
+         ArrayList<Integer> dbTourStartWeek = null;
+
+         ArrayList<Integer> dbDistance = null;
+         ArrayList<Integer> dbElevationGain = null;
+         ArrayList<Integer> dbElevationLoss = null;
+         ArrayList<Integer> dbTourRecordingTime = null;
+         ArrayList<Integer> dbTourDrivingTime = null;
+
+         ArrayList<Integer> dbCalories = null;
+         TFloatArrayList dbPowerAvg = null;
+         TFloatArrayList dbPulseAvg = null;
+
+         ArrayList<Long> dbTypeIds = null;
+         ArrayList<Integer> dbTypeColorIndex = null;
+
+         ArrayList<Long> tourIds = null;
+
+         ArrayList<Boolean> dbIsManualTour = null;
+
+         HashMap<Long, ArrayList<Long>> dbTagIds = null;
+
+         long lastTourId = -1;
+         ArrayList<Long> tagIds = null;
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
+         sql = NL
+
+               + "SELECT" + NL //                                    //$NON-NLS-1$
+
+               + "   TourId," + NL //                             1  //$NON-NLS-1$
+               + "   StartYear," + NL //                          2  //$NON-NLS-1$
+               + "   StartMonth," + NL //                         3  //$NON-NLS-1$
+               + "   StartDay," + NL //                           4  //$NON-NLS-1$
+               + "   StartHour," + NL //                          5  //$NON-NLS-1$
+               + "   StartMinute," + NL //                        6  //$NON-NLS-1$
+               + "   TourDistance," + NL //                       7  //$NON-NLS-1$
+               + "   TourAltUp," + NL //                          8  //$NON-NLS-1$
+               + "   TourRecordingTime," + NL //                  9  //$NON-NLS-1$
+               + "   TourDrivingTime," + NL //                    10 //$NON-NLS-1$
+               + "   TourTitle," + NL //                          11 //$NON-NLS-1$
+               + "   TourType_typeId," + NL //                    12 //$NON-NLS-1$
+               + "   TourDescription," + NL //                    13 //$NON-NLS-1$
+               + "   StartWeek," + NL //                          14 //$NON-NLS-1$
+               + "   DevicePluginId," + NL //                     15 //$NON-NLS-1$
+               + "   Calories," + NL //                           16 //$NON-NLS-1$
+
+               + "   jTdataTtag.TourTag_tagId," + NL //           17 //$NON-NLS-1$
+
+               + "   TourAltDown," + NL //                        18 //$NON-NLS-1$
+               + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
+               + "   Power_Avg" + NL //                           20 //$NON-NLS-1$
+
+               + NL
+
+               + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
+
+               // get/filter tag's
+               + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
+
+               + " AS jTdataTtag" + NL //                            //$NON-NLS-1$
+               + " ON tourID = jTdataTtag.TourData_tourId" + NL //   //$NON-NLS-1$
+
+               + "WHERE  StartYear=?" + NL //                        //$NON-NLS-1$
+               + "   AND StartMonth=?" + NL //                       //$NON-NLS-1$
+               + "   AND StartDay=?" + NL //                         //$NON-NLS-1$
+
+               + sqlAppFilter.getWhereClause()
+
+               + "ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"; //$NON-NLS-1$
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         int paramIndex = 1;
+
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         // set sql other parameters
+         prepStmt.setInt(paramIndex++, year);
+         prepStmt.setInt(paramIndex++, month);
+
+         final int dayParamIndex = paramIndex++;
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex++);
 
          monthData = new CalendarTourData[31][];
 
@@ -265,9 +510,9 @@ public class CalendarTourDataProvider {
 
          for (int day = 0; day < 31; day++) {
 
-            statement.setInt(3, day + 1);
+            prepStmt.setInt(dayParamIndex, day + 1);
 
-            final ResultSet result = statement.executeQuery();
+            final ResultSet result = prepStmt.executeQuery();
 
             boolean firstTourOfDay = true;
             tourIds = new ArrayList<>();
@@ -465,7 +710,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.log(sql);
          net.tourbook.ui.UI.showSQLException(e);
 
       }
@@ -479,269 +724,7 @@ public class CalendarTourDataProvider {
       return monthData;
    }
 
-   LocalDateTime getCalendarTourDateTime(final Long tourId) {
-
-      LocalDateTime dt = LocalDateTime.now();
-
-      final String select =
-
-            "SELECT" //$NON-NLS-1$
-
-                  + " StartYear," + NL //         1 //$NON-NLS-1$
-                  + " StartMonth," + NL //      2 //$NON-NLS-1$
-                  + " StartDay," + NL //         3 //$NON-NLS-1$
-                  + " StartHour," + NL //         4 //$NON-NLS-1$
-                  + " StartMinute" //            5 //$NON-NLS-1$
-
-                  + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
-
-                  + (" WHERE TourId=?" + NL); //$NON-NLS-1$
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final PreparedStatement statement = conn.prepareStatement(select);
-
-         statement.setLong(1, tourId);
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-
-            final int year = result.getShort(1);
-            final int month = result.getShort(2);
-            final int day = result.getShort(3);
-            final int hour = result.getShort(4);
-            final int minute = result.getShort(5);
-
-            dt = LocalDateTime.of(year, month, day, hour, minute);
-         }
-
-      } catch (final SQLException e) {
-
-         StatusUtil.log(select);
-         net.tourbook.ui.UI.showSQLException(e);
-
-      }
-
-      return dt;
-   }
-
-   public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay, final CalendarView calendarView) {
-
-      final WeekFields cw = TimeTools.calendarWeek;
-
-      final int year = week1stDay.get(cw.weekBasedYear());
-      final int week = week1stDay.get(cw.weekOfWeekBasedYear());
-
-      if (!_weekCache.containsKey(year)) {
-
-         /*
-          * Create year, weeks are from 1..53; we simply leave array index 0 unused (yes, a year
-          * can have more than 52 weeks)
-          */
-         _weekCache.put(year, new CalendarTourData[54]);
-      }
-
-      CalendarTourData weekData;
-
-      final CalendarTourData cachedWeekData = _weekCache.get(year)[week];
-
-      if (cachedWeekData == null) {
-
-         weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
-
-         _weekCache.get(year)[week] = weekData;
-
-      } else if (cachedWeekData.loadingState == LoadingState.NOT_LOADED) {
-
-         // load again
-
-         weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
-
-         // update cached data otherwise an endless loop occures !!!
-         _weekCache.get(year)[week] = weekData;
-
-      } else {
-
-         weekData = cachedWeekData;
-      }
-
-      return weekData;
-
-   }
-
-   private CalendarTourData getCalendarWeekSummaryData_FromDb(final LocalDate week1stDay,
-                                                              final int year,
-                                                              final int week) {
-
-      final CalendarTourData weekData = new CalendarTourData();
-
-      weekData.loadingState = LoadingState.IS_QUEUED;
-
-      _weekWaitingQueue.add(new WeekLoader(week1stDay, year, week, weekData, _weekExecuterId.get()));
-
-      final Runnable executorTask = new Runnable() {
-         @Override
-         public void run() {
-
-            // get last added loader item
-            final WeekLoader weekLoader = _weekWaitingQueue.pollFirst();
-
-            if (weekLoader == null) {
-               return;
-            }
-
-            if (loadWeek_FromDB(weekLoader)) {
-               _calendarGraph.updateUI_AfterDataLoading();
-            }
-         }
-      };
-
-      _weekLoadingExecutor.submit(executorTask);
-
-      return weekData;
-
-   }
-
-   /**
-    * @return Returns the date/time of the first available tour
-    */
-   LocalDateTime getFirstTourDateTime() {
-
-      if (null != _firstTourDateTime) {
-         return _firstTourDateTime;
-      }
-
-      String select = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         long firstTourStartTime = 0;
-
-         /*
-          * Get first tour date/time
-          */
-         select = "SELECT MIN(TourStartTime)" //$NON-NLS-1$
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
-
-         PreparedStatement statement = conn.prepareStatement(select);
-
-         ResultSet result = statement.executeQuery();
-         while (result.next()) {
-
-            firstTourStartTime = result.getLong(1);
-
-            // this occures when there are 0 tours
-            if (firstTourStartTime != 0) {
-
-               _firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
-
-               break;
-            }
-         }
-
-         /*
-          * Get first tour id
-          */
-         if (_firstTourDateTime != null) {
-
-            select = "SELECT TourId" //$NON-NLS-1$
-
-                  + " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
-                  + " WHERE TourStartTime=" + firstTourStartTime; //$NON-NLS-1$
-
-            statement = conn.prepareStatement(select);
-
-            result = statement.executeQuery();
-            while (result.next()) {
-
-               _firstTourId = result.getLong(1);
-
-               break;
-            }
-         }
-
-      } catch (final SQLException e) {
-
-         StatusUtil.log(select);
-         net.tourbook.ui.UI.showSQLException(e);
-      }
-
-      if (_firstTourDateTime == null) {
-         _firstTourDateTime = LocalDateTime.now().minusMonths(1);
-      }
-
-      return _firstTourDateTime;
-
-   }
-
-   /**
-    * @return Returns first tour ID or <code>null</code> when a tour is not available.
-    */
-   Long getFirstTourId() {
-      return _firstTourId;
-   }
-
-   /**
-    * @return Returns todays tour ID or <code>null</code> when a tour is not available.
-    */
-   Long getTodaysTourId() {
-
-      Long todayTourId = null;
-      String select = null;
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final LocalDate today = LocalDate.now();
-
-         select = NL
-
-               + "SELECT   " + NL //$NON-NLS-1$
-
-               + " TourId  " + NL //$NON-NLS-1$
-
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
-
-               + " WHERE StartYear=" + today.getYear() + NL//$NON-NLS-1$
-               + " AND   StartMonth=" + today.getMonthValue() + NL//$NON-NLS-1$
-               + " AND   StartDay=" + today.getDayOfMonth() + NL//$NON-NLS-1$
-
-         ;
-
-         final PreparedStatement statement = conn.prepareStatement(select);
-
-         final ResultSet result = statement.executeQuery();
-         while (result.next()) {
-
-            todayTourId = result.getLong(1);
-
-            break;
-         }
-
-      } catch (final SQLException e) {
-
-         StatusUtil.log(select);
-         net.tourbook.ui.UI.showSQLException(e);
-
-      }
-
-      return todayTourId;
-   }
-
-   synchronized void invalidate() {
-
-      // reset all cached data
-
-      // stop week downloader
-      _weekExecuterId.incrementAndGet();
-
-      _dayCache.clear();
-      _weekCache.clear();
-
-      _firstTourDateTime = null;
-      _firstTourId = null;
-   }
-
-   private boolean loadWeek_FromDB(final WeekLoader weekLoader) {
+   private boolean loadFromDB_Week(final WeekLoader weekLoader) {
 
       if (weekLoader.executorId < _weekExecuterId.get()) {
 
@@ -755,100 +738,117 @@ public class CalendarTourDataProvider {
 
 //      final long start = System.currentTimeMillis();
 
-      final int year = weekLoader.year;
-      final int week = weekLoader.week;
       final CalendarTourData weekData = weekLoader.weekData;
-
-      String select = null;
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         final int year = weekLoader.year;
+         final int week = weekLoader.week;
 
-         String fromTourData;
-         if (sqlFilter.isTagFilterActive()) {
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         String sqlFromTourData;
+
+         final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
+         if (isTourTagFilterEnabled) {
 
             // filter by tag
 
-            fromTourData = NL
+            sqlFromTourData = NL
 
-                  + "FROM (                        " + NL //$NON-NLS-1$
+                  + "FROM (" + NL //                                                   //$NON-NLS-1$
 
-                  + " SELECT                       " + NL //$NON-NLS-1$
+                  + "   SELECT" + NL //                                                //$NON-NLS-1$
 
-                  + "  TourDistance,               " + NL //$NON-NLS-1$
-                  + "  TourAltUp,                  " + NL //$NON-NLS-1$
-                  + "  TourAltDown,                " + NL //$NON-NLS-1$
-                  + "  TourRecordingTime,          " + NL //$NON-NLS-1$
-                  + "  TourDrivingTime,            " + NL //$NON-NLS-1$
-                  + "  calories,                   " + NL //$NON-NLS-1$
-                  + "  jTdataTtag.TourTag_tagId,   " + NL //$NON-NLS-1$
+                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
 
-                  + "  cadenceZone_SlowTime,       " + NL //$NON-NLS-1$
-                  + "  cadenceZone_FastTime        " + NL //$NON-NLS-1$
+                  + "      TourDistance," + NL //                                      //$NON-NLS-1$
+                  + "      TourRecordingTime," + NL //                                 //$NON-NLS-1$
+                  + "      TourDrivingTime," + NL //                                   //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                         //$NON-NLS-1$
+                  + "      TourAltDown," + NL //                                       //$NON-NLS-1$
+                  + "      calories," + NL //                                          //$NON-NLS-1$
+                  + "      cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
+                  + "      cadenceZone_FastTime" + NL //                               //$NON-NLS-1$
 
-                  + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
-                  + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
 
-                  + " WHERE startWeekYear=?        " + NL //$NON-NLS-1$
-                  + " AND   startWeek=?            " + NL //$NON-NLS-1$
-                  + sqlFilter.getWhereClause() + NL
+                  + "   AS jTdataTtag" //                                              //$NON-NLS-1$
+                  + "   ON tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
 
-                  + ") td" //$NON-NLS-1$
+                  + "   WHERE  startWeekYear=?" + NL //                                //$NON-NLS-1$
+                  + "      AND startWeek=?" + NL //                                    //$NON-NLS-1$
+                  + "      " + sqlAppFilter.getWhereClause() + NL
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" //                           //$NON-NLS-1$
 
             ;
 
          } else {
 
-            fromTourData = NL
+            sqlFromTourData = NL
 
-                  + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
+                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
 
-                  + (" WHERE startWeekYear=?" + NL) //$NON-NLS-1$
-                  + (" AND   startWeek=?" + NL) //$NON-NLS-1$
-
-                  + sqlFilter.getWhereClause();
+                  + "   WHERE  startWeekYear=?" + NL //                                //$NON-NLS-1$
+                  + "      AND startWeek=?" + NL //                                    //$NON-NLS-1$
+                  + "      " + sqlAppFilter.getWhereClause();
          }
 
-         select = "SELECT" + NL //           //$NON-NLS-1$
+         sql = "SELECT" + NL //                                                     //$NON-NLS-1$
 
-               + " SUM(TourDistance),              " + NL //   1  //$NON-NLS-1$
-               + " SUM(TourAltUp),                 " + NL //   2  //$NON-NLS-1$
-               + " SUM(TourRecordingTime),         " + NL //   3  //$NON-NLS-1$
-               + " SUM(TourDrivingTime),           " + NL //   4  //$NON-NLS-1$
-               + " SUM(calories),                  " + NL //   5  //$NON-NLS-1$
-               + " SUM(1),                         " + NL //   6  //$NON-NLS-1$
+               + " SUM(1)," + NL //                                                 1  //$NON-NLS-1$
+               + " SUM(TourDistance)," + NL //                                      2  //$NON-NLS-1$
 
-               + " SUM(TourAltDown),               " + NL //   7  //$NON-NLS-1$
-               + " SUM(cadenceZone_SlowTime),      " + NL //   8  //$NON-NLS-1$
-               + " SUM(cadenceZone_FastTime)       " + NL //   9  //$NON-NLS-1$
+               + " SUM(TourRecordingTime)," + NL //                                 3  //$NON-NLS-1$
+               + " SUM(TourDrivingTime)," + NL //                                   4  //$NON-NLS-1$
 
-               + fromTourData;
+               + " SUM(TourAltUp)," + NL //                                         5  //$NON-NLS-1$
+               + " SUM(TourAltDown)," + NL //                                       6  //$NON-NLS-1$
 
-         final PreparedStatement statement = conn.prepareStatement(select);
+               + " SUM(calories)," + NL //                                          7  //$NON-NLS-1$
 
-         statement.setInt(1, year);
-         statement.setInt(2, week);
-         sqlFilter.setParameters(statement, 3);
+               + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
+               + " SUM(cadenceZone_FastTime)" + NL //                               9  //$NON-NLS-1$
 
-         final ResultSet result = statement.executeQuery();
+               + sqlFromTourData;
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         int paramIndex = 1;
+
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         prepStmt.setInt(paramIndex++, year);
+         prepStmt.setInt(paramIndex++, week);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
 
          while (result.next()) {
 
             weekData.year = year;
             weekData.week = week;
 
-            weekData.distance = result.getInt(1);
-            weekData.elevationGain = result.getInt(2);
-            weekData.elevationLoss = result.getInt(7);
+            weekData.numTours = result.getInt(1);
+            weekData.distance = result.getInt(2);
+
             weekData.recordingTime = result.getInt(3);
             weekData.drivingTime = result.getInt(4);
-            weekData.calories = result.getInt(5);
 
-            weekData.numTours = result.getInt(6);
+            weekData.elevationGain = result.getInt(5);
+            weekData.elevationLoss = result.getInt(6);
+
+            weekData.calories = result.getInt(7);
 
             weekData.cadenceZone_SlowTime = result.getInt(8);
             weekData.cadenceZone_FastTime = result.getInt(9);
@@ -868,7 +868,7 @@ public class CalendarTourDataProvider {
 
       } catch (final SQLException e) {
 
-         StatusUtil.log(select);
+         StatusUtil.log(sql);
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {

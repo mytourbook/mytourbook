@@ -1,6 +1,6 @@
 package net.tourbook.ui;
 
-import net.tourbook.tour.Cadence;
+import net.tourbook.tour.CadenceMultiplier;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -29,8 +29,8 @@ public class ComboViewerCadence extends ComboViewer {
       throw new NotImplementedException("This method cannot be called");
    }
 
-   public Cadence getSelectedCadence() {
-      return (Cadence) getStructuredSelection().getFirstElement();
+   public CadenceMultiplier getSelectedCadence() {
+      return (CadenceMultiplier) getStructuredSelection().getFirstElement();
    }
 
    private void init() {
@@ -39,19 +39,19 @@ public class ComboViewerCadence extends ComboViewer {
       setLabelProvider(new LabelProvider() {
          @Override
          public String getText(final Object element) {
-            if (!(element instanceof Cadence)) {
+            if (!(element instanceof CadenceMultiplier)) {
                throw new IllegalStateException("Invalid object type found in ComboViewerCadence: " + element.getClass());
             }
-            return ((Cadence) element).getNlsLabel();
+            return ((CadenceMultiplier) element).getNlsLabel();
          }
       });
 
-      final Cadence[] cadences = new Cadence[] { Cadence.NONE, Cadence.RPM, Cadence.SPM };
+      final CadenceMultiplier[] cadences = new CadenceMultiplier[] { CadenceMultiplier.NONE, CadenceMultiplier.RPM, CadenceMultiplier.SPM };
 
       setInput(cadences);
    }
 
-   public void setSelection(final Cadence selection) {
+   public void setSelection(final CadenceMultiplier selection) {
       super.setSelection(new StructuredSelection(selection));
    }
 }

@@ -576,7 +576,7 @@ public interface ITourbookPreferences {
    /*
     * Tour import
     */
-   public static final String IMPORT_IS_NEW_UI = "IMPORT_IS_NEW_UI";
+   public static final String IMPORT_IS_NEW_UI = "IMPORT_IS_NEW_UI"; //$NON-NLS-1$
 
    /*
     * Adjust temperature
@@ -611,5 +611,4 @@ public interface ITourbookPreferences {
     */
    public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
    public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
-
 }

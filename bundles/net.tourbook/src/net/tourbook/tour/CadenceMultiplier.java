@@ -2,42 +2,42 @@ package net.tourbook.tour;
 
 import net.tourbook.Messages;
 
-public enum Cadence {
+public enum CadenceMultiplier {
 
    NONE(0), RPM(1), SPM(2), INVALID(255);
 
    protected int value;
    private String label; // This field offers NLS support
 
-   private Cadence(final int value) {
+   private CadenceMultiplier(final int value) {
       this.value = value;
 
       switch (value) {
       case 0:
-         label = Messages.Enum_Cadence_None;
+         label = Messages.App_Cadence_None;
          break;
       case 1:
-         label = Messages.Enum_Cadence_Rpm;
+         label = Messages.App_Cadence_Rpm;
          break;
       case 2:
-         label = Messages.Enum_Cadence_Spm;
+         label = Messages.App_Cadence_Spm;
          break;
       case 255:
-         label = Messages.Enum_Cadence_Invalid;
+         label = Messages.App_Cadence_Invalid;
          break;
       }
 
    }
 
-   public static Cadence getByValue(final int value) {
+   public static CadenceMultiplier getByValue(final int value) {
 
-      for (final Cadence type : Cadence.values()) {
+      for (final CadenceMultiplier type : CadenceMultiplier.values()) {
          if (value == type.value) {
             return type;
          }
       }
 
-      return Cadence.INVALID;
+      return CadenceMultiplier.INVALID;
    }
 
    public float getMultiplier() {
@@ -46,10 +46,6 @@ public enum Cadence {
 
    public String getNlsLabel() {
       return label;
-   }
-
-   public int getValue() {
-      return value;
    }
 }
 
