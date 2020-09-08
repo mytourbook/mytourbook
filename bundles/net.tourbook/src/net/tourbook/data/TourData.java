@@ -1669,15 +1669,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean[]     visiblePoints_ForSurfing;
 
    /**
-    * Contains An array of {@link TourTimerPause}
+    * An array containing the start time of each pause (in milliseconds)
     * A timer pause is a device event triggered by the user.
     */
-   @XmlElementWrapper(name = "TimerPausesSeries")
-   @XmlElement(name = "TimerPausesSerie")
+   @XmlElementWrapper(name = "PausedTime_Starts")
+   @XmlElement(name = "PausedTime_Start")
    @Transient
-   public TourTimerPause[]           timerPausesSerie;
+   public long[]           pausedTime_Start;
 
-// SET_FORMATTING_ON
+   /**
+    * An array containing the end time of each pause (in milliseconds)
+    * A timer pause is a device event triggered by the user.
+    */
+   @XmlElementWrapper(name = "PausedTime_Ends")
+   @XmlElement(name = "PausedTime_End")
+   @Transient
+   public long[]           pausedTime_End;
 
    public TourData() {}
 
@@ -6680,6 +6687,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
+                                        final List<Long> pausedTime_End) {
+
+      if (pausedTime_Start == null || pausedTime_Start.size() == 0) {
+         return;
+      }
+
+      pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+
+      setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
+      setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
+
+      final long totalTourTimerPauses = getTotalTourTimerPauses();
+
+      setTourDeviceTime_Recorded(getTourDeviceTime_Elapsed() - totalTourTimerPauses);
+      setTourDeviceTime_Paused(totalTourTimerPauses);
+   }
+
    /**
     * @return Returns the metric or imperial altimeter serie depending on the active measurement
     */
@@ -7519,6 +7544,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public long[] getPausedTime_End() {
+      return pausedTime_End;
+   }
+
+   public long[] getPausedTime_Start() {
+      return pausedTime_Start;
+   }
+
    public int getPhotoTimeAdjustment() {
       return photoTimeAdjustment;
    }
@@ -8290,13 +8323,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public long getTotalTourTimerPauses() {
 
-      if (timerPausesSerie == null || timerPausesSerie.length == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
+            pausedTime_End == null || pausedTime_End.length == 0) {
          return 0;
       }
 
-      final long pausedTime = Arrays.stream(timerPausesSerie).mapToLong(TourTimerPause::getPauseDuration).sum();
+      long totalTourTimerPauses = 0;
+      for (int index = 0; index < pausedTime_Start.length; ++index) {
+         totalTourTimerPauses += pausedTime_End[index] - pausedTime_Start[index];
+      }
 
-      return pausedTime / 1000;
+      return totalTourTimerPauses / 1000;
    }
 
    /**
@@ -8498,10 +8535,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public Set<TourTag> getTourTags() {
       return tourTags;
-   }
-
-   public TourTimerPause[] getTourTimerPauses() {
-      return timerPausesSerie;
    }
 
    /**
@@ -8983,7 +9016,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       temperatureSerie = serieData.temperatureSerie20;
       powerSerie = serieData.powerSerie20;
       speedSerie = serieData.speedSerie20;
-      timerPausesSerie = serieData.timerPausesSerie;
+      pausedTime_Start = serieData.pausedTime_Start;
+      pausedTime_End = serieData.pausedTime_End;
 
       latitudeSerie = serieData.latitude;
       longitudeSerie = serieData.longitude;
@@ -9043,7 +9077,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.distanceSerie20 = distanceSerie;
       serieData.pulseSerie20 = pulseSerie;
       serieData.temperatureSerie20 = temperatureSerie;
-      serieData.timerPausesSerie = timerPausesSerie;
+      serieData.pausedTime_Start = pausedTime_Start;
+      serieData.pausedTime_End = pausedTime_End;
 
       /*
        * don't save computed data series
@@ -9476,6 +9511,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.mergeTargetTourId = mergeTargetTourId;
    }
 
+   public void setPausedTime_End(final long[] pausedTime_End) {
+      this.pausedTime_End = pausedTime_End;
+   }
+
+   public void setPausedTime_Start(final long[] pausedTime_Start) {
+      this.pausedTime_Start = pausedTime_Start;
+   }
+
    public void setPower_Avg(final float avgPower) {
       this.power_Avg = avgPower;
    }
@@ -9897,10 +9940,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourTags(final Set<TourTag> tourTags) {
       this.tourTags = tourTags;
-   }
-
-   public void setTourTimerPauses(final TourTimerPause[] timerPausesSerie) {
-      this.timerPausesSerie = timerPausesSerie;
    }
 
    /**

@@ -20,10 +20,10 @@ import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventMesgListener;
 import com.garmin.fit.EventType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.GearData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
@@ -31,15 +31,18 @@ import net.tourbook.device.garmin.fit.FitData;
  */
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
-   List<GearData>       _gearData;
-   List<TourTimerPause> _timerPauses;
+   List<GearData>     _gearData;
+   private List<Long> _pausedTime_Start = new ArrayList<>();
+   private List<Long> _pausedTime_End   = new ArrayList<>();
 
    public MesgListener_Event(final FitData fitData) {
 
       super(fitData);
 
       _gearData = fitData.getGearData();
-      _timerPauses = fitData.getTourTimerPauses();
+      _pausedTime_Start = fitData.getPausedTime_Start();
+      _pausedTime_End = fitData.getPausedTime_End();
+
    }
 
    @SuppressWarnings("incomplete-switch")
@@ -53,15 +56,15 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          switch (eventType) {
          case STOP:
          case STOP_ALL:
-            final TourTimerPause tourTimerPause = new TourTimerPause();
-            tourTimerPause.setStartTime(mesg.getTimestamp().getTimestamp() * 1000);
-            _timerPauses.add(tourTimerPause);
+            _pausedTime_Start.add(mesg.getTimestamp().getTimestamp() * 1000);
             break;
 
          case START:
-            if (_timerPauses.size() > 0) {
-               _timerPauses.get(_timerPauses.size() - 1).setEndTime(mesg.getTimestamp().getTimestamp() * 1000);
+            if (_pausedTime_Start.size() == 0) {
+               return;
             }
+
+            _pausedTime_End.add(mesg.getTimestamp().getTimestamp() * 1000);
             break;
 
          }

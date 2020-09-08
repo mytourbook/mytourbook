@@ -34,7 +34,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
@@ -110,69 +109,70 @@ public class GarminSAXHandler extends DefaultHandler {
       TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
-   private boolean                   _importState_IsIgnoreSpeedValues;
+   private boolean                 _importState_IsIgnoreSpeedValues;
 
-   private boolean                   _isInActivity;
-   private boolean                   _isInCourse;
-   private boolean                   _isInLap;
+   private boolean                 _isInActivity;
+   private boolean                 _isInCourse;
+   private boolean                 _isInLap;
 
-   private boolean                   _isInAltitude;
-   private boolean                   _isInCalories;
-   private boolean                   _isInCadence;
-   private boolean                   _isInDistance;
-   private boolean                   _isInHeartRate;
-   private boolean                   _isInHeartRateValue;
-   private boolean                   _isInLatitude;
-   private boolean                   _isInLongitude;
-   private boolean                   _isInName;
-   private boolean                   _isInNotes;
-   private boolean                   _isInNs2Speed;
-   private boolean                   _isInNs2Watts;
-   private boolean                   _isInNs3Speed;
-   private boolean                   _isInNs3Watts;
-   private boolean                   _isInRunCadence;
-   private boolean                   _isInSensorState;
-   private boolean                   _isInTime;
-   private boolean                   _isInTrackpoint;
+   private boolean                 _isInAltitude;
+   private boolean                 _isInCalories;
+   private boolean                 _isInCadence;
+   private boolean                 _isInDistance;
+   private boolean                 _isInHeartRate;
+   private boolean                 _isInHeartRateValue;
+   private boolean                 _isInLatitude;
+   private boolean                 _isInLongitude;
+   private boolean                 _isInName;
+   private boolean                 _isInNotes;
+   private boolean                 _isInNs2Speed;
+   private boolean                 _isInNs2Watts;
+   private boolean                 _isInNs3Speed;
+   private boolean                 _isInNs3Watts;
+   private boolean                 _isInRunCadence;
+   private boolean                 _isInSensorState;
+   private boolean                 _isInTime;
+   private boolean                 _isInTrackpoint;
 
-   private boolean                   _isInCreator;
-   private boolean                   _isInCreatorName;
-   private boolean                   _isInCreatorVersionMajor;
-   private boolean                   _isInCreatorVersionMinor;
+   private boolean                 _isInCreator;
+   private boolean                 _isInCreatorName;
+   private boolean                 _isInCreatorVersionMajor;
+   private boolean                 _isInCreatorVersionMinor;
 
-   private HashMap<Long, TourData>   _alreadyImportedTours;
-   private HashMap<Long, TourData>   _newlyImportedTours;
-   private TourbookDevice            _device;
-   private String                    _importFilePath;
-   private boolean                   _isImported;
+   private HashMap<Long, TourData> _alreadyImportedTours;
+   private HashMap<Long, TourData> _newlyImportedTours;
+   private TourbookDevice          _device;
+   private String                  _importFilePath;
+   private boolean                 _isImported;
 
-   private ArrayList<TourTimerPause> _timerPauses = new ArrayList<>();
-   private boolean                   _isPreviousLapAPause;
-   private ArrayList<TimeData>       _allTimeData = new ArrayList<>();
+   private final List<Long>        _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private boolean                 _isPreviousLapAPause;
+   private ArrayList<TimeData>     _allTimeData      = new ArrayList<>();
 
-   private TimeData                  _timeData;
+   private TimeData                _timeData;
 
-   private int                       _dataVersion = -1;
-   private int                       _lapCounter;
-   private int                       _trackPointCounter;
+   private int                     _dataVersion      = -1;
+   private int                     _lapCounter;
+   private int                     _trackPointCounter;
 
-   private boolean                   _isSetLapMarker;
-   private boolean                   _isSetLapStartTime;
-   private ArrayList<Long>           _allLapStart = new ArrayList<>();
+   private boolean                 _isSetLapMarker;
+   private boolean                 _isSetLapStartTime;
+   private ArrayList<Long>         _allLapStart      = new ArrayList<>();
 
-   private long                      _currentStartTime;
-   private long                      _currentTime;
-   private String                    _activitySport;
-   private int                       _tourCalories;
-   private int                       _lapCalories;
-   private boolean                   _isDistanceFromSensor;
-   private boolean                   _isFromStrideSensor;
+   private long                    _currentStartTime;
+   private long                    _currentTime;
+   private String                  _activitySport;
+   private int                     _tourCalories;
+   private int                     _lapCalories;
+   private boolean                 _isDistanceFromSensor;
+   private boolean                 _isFromStrideSensor;
 
-   private StringBuilder             _characters  = new StringBuilder();
+   private StringBuilder           _characters       = new StringBuilder();
 
-   private Sport                     _sport;
-   private String                    _tourNotes;
-   private String                    _tourTitle;
+   private Sport                   _sport;
+   private String                  _tourNotes;
+   private String                  _tourTitle;
 
    private class Sport {
 
@@ -471,7 +471,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
       _allLapStart.clear();
       _allTimeData.clear();
-      _timerPauses.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    @Override
@@ -506,23 +507,20 @@ public class GarminSAXHandler extends DefaultHandler {
                final int distance = Integer.parseInt(_characters.toString());
 
                if (distance == 0) {
-                  final TourTimerPause timerPause = new TourTimerPause(null,
-                        _currentStartTime,
-                        Long.MIN_VALUE);
+                  _pausedTime_Start.add(_currentStartTime);
 
-                  _timerPauses.add(timerPause);
                   _isPreviousLapAPause = true;
 
                } else if (_isPreviousLapAPause) {
 
-                  if (_timerPauses.size() > 0) {
+                  if (_pausedTime_Start.size() > 0) {
 
-                     final TourTimerPause currentPause = _timerPauses.get(_timerPauses.size() - 1);
+                     final long currentPause = _pausedTime_Start.get(_pausedTime_Start.size() - 1);
 
                      //In a TCX file, the first lap is always created with a distance of 0 meters.
                      //Hence, we don't consider that a pause.
-                     if (currentPause.getStartTime() != _currentStartTime) {
-                        _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime);
+                     if (currentPause != _currentStartTime) {
+                        _pausedTime_End.add(_currentStartTime);
                      }
                   }
 
@@ -654,7 +652,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
-      finalizeTour_TimerPauses(tourData);
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
 
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
@@ -702,29 +700,6 @@ public class GarminSAXHandler extends DefaultHandler {
          _isSetLapStartTime = false;
          _allLapStart.add(_currentTime);
       }
-   }
-
-   private void finalizeTour_TimerPauses(final TourData tourData) {
-
-      if (_timerPauses.size() == 0) {
-         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
-         return;
-      }
-
-      final List<TourTimerPause> tourTimerPauses = new ArrayList<>();
-
-      for (final TourTimerPause tourTimerPause : _timerPauses) {
-         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
-            tourTimerPause.setTourData(tourData);
-            tourTimerPauses.add(tourTimerPause);
-         }
-      }
-
-      tourData.setTourTimerPauses(tourTimerPauses.stream().toArray(TourTimerPause[]::new));
-      final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-
-      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
-      tourData.setTourDeviceTime_Paused(totalTourTimerPauses);
    }
 
    private void getData_Creator_10_Start(final String name) {

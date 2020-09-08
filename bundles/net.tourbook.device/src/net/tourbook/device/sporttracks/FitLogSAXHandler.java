@@ -39,7 +39,6 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
@@ -475,12 +474,16 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (_currentActivity.pauses.size() > 0) {
 
-         final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
+         final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
+         final ArrayList<Long> _pausedTime_End = new ArrayList<>();
+
          for (final Pause element : _currentActivity.pauses) {
-            tourTimerPauses.add(new TourTimerPause(tourData, element.startTime, element.endTime));
+            _pausedTime_Start.add(element.startTime);
+            _pausedTime_End.add(element.endTime);
          }
 
-         tourData.setTourTimerPauses(tourTimerPauses.stream().toArray(TourTimerPause[]::new));
+         tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
+         tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done

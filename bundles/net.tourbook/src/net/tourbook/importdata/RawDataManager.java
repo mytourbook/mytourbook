@@ -1303,7 +1303,8 @@ public class RawDataManager {
 
          oldTourData.setTourDeviceTime_Recorded(reimportedTourData.getTourDeviceTime_Recorded());
 
-         oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
+         oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
+         oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
          final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
          oldTourData.setTourDeviceTime_Paused(totalTourTimerPauses);
       }
