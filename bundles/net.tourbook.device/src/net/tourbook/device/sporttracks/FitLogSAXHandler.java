@@ -480,7 +480,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             tourTimerPauses.add(new TourTimerPause(tourData, element.startTime, element.endTime));
          }
 
-         tourData.setTourTimerPauses(tourTimerPauses);
+         tourData.setTourTimerPauses(tourTimerPauses.stream().toArray(TourTimerPause[]::new));
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done

@@ -482,7 +482,7 @@ public class FitData {
          }
       }
 
-      tourData.setTourTimerPauses(_finalTourtimerPauses);
+      tourData.setTourTimerPauses(_finalTourtimerPauses.stream().toArray(TourTimerPause[]::new));
    }
 
    private void finalizeTour_Type(final TourData tourData) {

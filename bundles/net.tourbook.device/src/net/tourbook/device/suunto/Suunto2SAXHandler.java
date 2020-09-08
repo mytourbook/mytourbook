@@ -542,7 +542,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
          }
       }
 
-      tourData.setTourTimerPauses(tourTimerPauses);
+      tourData.setTourTimerPauses(tourTimerPauses.stream().toArray(TourTimerPause[]::new));
       final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
 
       tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);

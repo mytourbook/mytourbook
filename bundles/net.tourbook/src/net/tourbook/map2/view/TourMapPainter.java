@@ -1342,10 +1342,10 @@ public class TourMapPainter extends MapPainter {
                                   final double[] latitudeSerie,
                                   final double[] longitudeSerie) {
 
-      final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
+      final TourTimerPause[] tourTimerPauses = tourData.getTourTimerPauses();
 
       // check if pauses are available
-      if (tourTimerPauses.size() == 0) {
+      if (tourTimerPauses == null || tourTimerPauses.length == 0) {
          return isContentInTile;
       }
 

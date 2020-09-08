@@ -67,7 +67,6 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -166,7 +165,6 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_REFERENCE                       = "TOURREFERENCE";                                         //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG                             = "TOURTAG";                                               //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG_CATEGORY                    = "TOURTAGCATEGORY";                                       //$NON-NLS-1$
-   public static final String  TABLE_TOUR_TIMER_PAUSE                     = "TOURTIMERPAUSE";                                        //$NON-NLS-1$
    public static final String  TABLE_TOUR_TYPE                            = "TOURTYPE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_WAYPOINT                        = "TOURWAYPOINT";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
@@ -202,7 +200,6 @@ public class TourDatabase {
    public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TIMERPAUSE            = "TimerPauseId";                                         //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
@@ -3143,7 +3140,6 @@ public class TourDatabase {
 
             // version 42 start  -  20.X
             //
-            + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
             + " tourDeviceTime_Recorded                       BIGINT,                  \n" //$NON-NLS-1$
             + " tourDeviceTime_Paused                         BIGINT,                  \n" //$NON-NLS-1$
             //
@@ -3575,29 +3571,6 @@ public class TourDatabase {
                   + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + "2)                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
                   + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
-   }
-
-   /**
-    * Create table {@link #TABLE_TOUR_TIMER_PAUSE} for {@link TourTimerPause}.
-    *
-    * @param stmt
-    * @throws SQLException
-    */
-   private void createTable_TourTimerPauses(final Statement stmt) throws SQLException {
-
-      /*
-       * CREATE TABLE TourTimerPause
-       */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TIMER_PAUSE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_TIMERPAUSE, true)
-            //
-            + "   " + KEY_TOUR + "         BIGINT,                                          \n" //$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + "   startTime      BIGINT   NOT NULL,                                        \n" //$NON-NLS-1$
-            + "   endTime        BIGINT   NOT NULL                                        \n" //$NON-NLS-1$
-
-            + ")"); //$NON-NLS-1$
    }
 
    /**
@@ -4334,8 +4307,6 @@ public class TourDatabase {
 
 //            createTable_TourSign(stmt);
 //            createTable_TourSignCategory(stmt);
-
-            createTable_TourTimerPauses(stmt);
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
@@ -7527,12 +7498,6 @@ public class TourDatabase {
 
       final Statement stmt = conn.createStatement();
       {
-         // double check if db is already updated
-         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
-
-            createTable_TourTimerPauses(stmt);
-         }
-
          // check if db is updated to version 42
          if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourDeviceTime_Recorded") == false) { //$NON-NLS-1$
 

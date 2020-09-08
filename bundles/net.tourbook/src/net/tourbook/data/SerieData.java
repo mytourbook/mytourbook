@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -126,6 +126,8 @@ public class SerieData implements Serializable {
    public int[] powerSerie;
    public int[] deviceMarker;
 
+   public TourTimerPause[] timerPausesSerie;
+
    @Override
    public String toString() {
 
@@ -173,6 +175,7 @@ public class SerieData implements Serializable {
             + "   temperatureSerie           " + (temperatureSerie != null       ? Arrays.toString(Arrays.copyOf(temperatureSerie,        Math.min(temperatureSerie.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   speedSerie                 " + (speedSerie != null             ? Arrays.toString(Arrays.copyOf(speedSerie,              Math.min(speedSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   powerSerie                 " + (powerSerie != null             ? Arrays.toString(Arrays.copyOf(powerSerie,              Math.min(powerSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   timerPausesSerie           " + (timerPausesSerie != null             ? Arrays.toString(Arrays.copyOf(timerPausesSerie,              Math.min(timerPausesSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   deviceMarker               " + (deviceMarker != null           ? Arrays.toString(Arrays.copyOf(deviceMarker,            Math.min(deviceMarker.length, maxLen)))          : UI.EMPTY_STRING) ; //$NON-NLS-1$
    }
