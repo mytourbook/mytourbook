@@ -1303,9 +1303,16 @@ public class RawDataManager {
 
          oldTourData.setTourDeviceTime_Recorded(reimportedTourData.getTourDeviceTime_Recorded());
 
-         oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
-         oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
-         final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
+         long totalTourTimerPauses = 0;
+         final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
+         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+            oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
+            oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
+            totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
+         } else {
+            totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();
+         }
+
          oldTourData.setTourDeviceTime_Paused(totalTourTimerPauses);
       }
 
