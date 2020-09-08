@@ -26,7 +26,7 @@ Improvements
 
 * Dialog Adjust Elevation
   - Adjustment Type: "Approach elevation with SRMT data"
-    New action: "Set END elevation to SRTM data"
+    New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
 
 Changes  
 =======

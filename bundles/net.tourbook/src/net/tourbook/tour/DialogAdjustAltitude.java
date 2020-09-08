@@ -1330,7 +1330,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          createUI_52_SRTMOptions(container);
-         createUI_54_SRTMActions(container);
+         createUI_54_SRTMLinks(container);
+         createUI_56_SRTMActions(container);
       }
 
       return container;
@@ -1341,159 +1342,163 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final int valueWidth = _pc.convertWidthInCharsToPixels(6);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-
-         final Composite valueContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, false).applyTo(valueContainer);
-         GridLayoutFactory.fillDefaults().numColumns(6).applyTo(valueContainer);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
 //         valueContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      {
          {
-            {
-               /*
-                * Label: Elevation UP
-                */
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(Messages.Dialog_AdjustAltitude_Label_ElevationGain);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-            }
-            {
-               /*
-                * Value: Elevation UP
-                */
-               _lblElevation_Up = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_Up.setText(UI.SPACE);
-               _lblElevation_Up.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_Up);
-            }
-            {
-               /*
-                * Label: ->
-                */
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(net.tourbook.common.UI.SYMBOL_ARROW_RIGHT);
-               GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).indent(10, 0).applyTo(label);
-            }
-            {
-               /*
-                * Value: Adjusted elevation UP
-                */
-               _lblElevation_UpAdjusted = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_UpAdjusted.setText(UI.SPACE);
-               _lblElevation_UpAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_UpAdjusted);
-            }
-            {
-               /*
-                * Value: Elevation UP delta
-                */
-               _lblElevation_UpAdjustedDiff = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_UpAdjustedDiff.setText(UI.SPACE);
-               _lblElevation_UpAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_UpAdjustedDiff);
-            }
-            {
-               /*
-                * Label: Unit
-                */
-               final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                     + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
-                     + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_UP;
+            /*
+             * Label: Elevation UP
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Dialog_AdjustAltitude_Label_ElevationGain);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         }
+         {
+            /*
+             * Value: Elevation UP
+             */
+            _lblElevation_Up = new Label(container, SWT.TRAIL);
+            _lblElevation_Up.setText(UI.SPACE);
+            _lblElevation_Up.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_Up);
+         }
+         {
+            /*
+             * Label: ->
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(net.tourbook.common.UI.SYMBOL_ARROW_RIGHT);
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).indent(10, 0).applyTo(label);
+         }
+         {
+            /*
+             * Value: Adjusted elevation UP
+             */
+            _lblElevation_UpAdjusted = new Label(container, SWT.TRAIL);
+            _lblElevation_UpAdjusted.setText(UI.SPACE);
+            _lblElevation_UpAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_UpAdjusted);
+         }
+         {
+            /*
+             * Value: Elevation UP delta
+             */
+            _lblElevation_UpAdjustedDiff = new Label(container, SWT.TRAIL);
+            _lblElevation_UpAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_UpAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_UpAdjustedDiff);
+         }
+         {
+            /*
+             * Label: Unit
+             */
+            final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
+                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_UP;
 
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(unitLabel);
-               label.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-            {
-               /*
-                * Label: Elevation DOWN
-                */
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-            }
-            {
-               /*
-                * Value: Elevation DOWN
-                */
-               _lblElevation_Down = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_Down.setText(UI.SPACE);
-               _lblElevation_Down.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_Down);
-            }
-            {
-               /*
-                * Label: ->
-                */
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(net.tourbook.common.UI.SYMBOL_ARROW_RIGHT);
-               GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).indent(10, 0).applyTo(label);
-            }
-            {
-               /*
-                * Value: Adjusted elevation DOWN
-                */
-               _lblElevation_DownAdjusted = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_DownAdjusted.setText(UI.SPACE);
-               _lblElevation_DownAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_DownAdjusted);
-            }
-            {
-               /*
-                * Value: Elevation UP delta
-                */
-               _lblElevation_DownAdjustedDiff = new Label(valueContainer, SWT.TRAIL);
-               _lblElevation_DownAdjustedDiff.setText(UI.SPACE);
-               _lblElevation_DownAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.END, SWT.CENTER)
-                     .hint(valueWidth, SWT.DEFAULT)
-                     .applyTo(_lblElevation_DownAdjustedDiff);
-            }
-            {
-               /*
-                * Label: Unit
-                */
-               final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                     + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
-                     + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_DOWN;
-
-               final Label label = new Label(valueContainer, SWT.NONE);
-               label.setText(unitLabel);
-               label.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-            }
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(unitLabel);
+            label.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          }
 
          ///////////////////////////////////////////////////////////////////////////////////////////////////
 
          {
             /*
+             * Label: Elevation DOWN
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         }
+         {
+            /*
+             * Value: Elevation DOWN
+             */
+            _lblElevation_Down = new Label(container, SWT.TRAIL);
+            _lblElevation_Down.setText(UI.SPACE);
+            _lblElevation_Down.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_Down);
+         }
+         {
+            /*
+             * Label: ->
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(net.tourbook.common.UI.SYMBOL_ARROW_RIGHT);
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).indent(10, 0).applyTo(label);
+         }
+         {
+            /*
+             * Value: Adjusted elevation DOWN
+             */
+            _lblElevation_DownAdjusted = new Label(container, SWT.TRAIL);
+            _lblElevation_DownAdjusted.setText(UI.SPACE);
+            _lblElevation_DownAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_DownAdjusted);
+         }
+         {
+            /*
+             * Value: Elevation UP delta
+             */
+            _lblElevation_DownAdjustedDiff = new Label(container, SWT.TRAIL);
+            _lblElevation_DownAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_DownAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.CENTER)
+                  .hint(valueWidth, SWT.DEFAULT)
+                  .applyTo(_lblElevation_DownAdjustedDiff);
+         }
+         {
+            /*
+             * Label: Unit
+             */
+            final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
+                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_DOWN;
+
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(unitLabel);
+            label.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         }
+      }
+   }
+
+   private void createUI_54_SRTMLinks(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         {
+            /*
              * Link: Adjust END to the START elevation
              */
             _linkSRTM_AdjustEndToStart = new Link(container, SWT.NONE);
-            _linkSRTM_AdjustEndToStart.setText(Messages.Dialog_AdjustAltitude_Link_SetEndToSRTM);
+            _linkSRTM_AdjustEndToStart.setText(Messages.Dialog_AdjustAltitude_Link_SetLastPointToSRTM);
+            _linkSRTM_AdjustEndToStart.setToolTipText(Messages.Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip);
             _linkSRTM_AdjustEndToStart.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -1519,10 +1524,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       }
    }
 
-   private Composite createUI_54_SRTMActions(final Composite parent) {
+   private Composite createUI_56_SRTMActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.BEGINNING)
+            .span(2, 1)
+            .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
@@ -2294,19 +2302,30 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    private void onSpline_SetEndElevationToSRTM() {
 
       final float[] yDataSerie = _tourData.altitudeSerie;
-      final int lastSerieIndex = yDataSerie.length - 1;
+      final int[] splineSerieIndex = _splineData.serieIndex;
 
-      final double[] graphYValues = _splineData.graphYValues;
+      // get serie index from the last horizontal spline point, the serie index array is not sorted by value !!!
+      int serieIndexAtTheEnd = 0;
+      int relativePosYIndex = 0;
 
-      final int lastSplineIndex = graphYValues.length - 1;
+      for (int serieIndexIndex = 0; serieIndexIndex < splineSerieIndex.length; serieIndexIndex++) {
+
+         final int splineIndexValue = splineSerieIndex[serieIndexIndex];
+
+         if (splineIndexValue > serieIndexAtTheEnd) {
+
+            serieIndexAtTheEnd = splineIndexValue;
+            relativePosYIndex = serieIndexIndex;
+         }
+      }
 
       /*
        * Set new relative position
        */
-      final double lastTimeSlice_ElevationDiff = _backupSrtmSerie[lastSerieIndex] - yDataSerie[lastSerieIndex];
+      final double lastTimeSlice_ElevationDiff = _backupSrtmSerie[serieIndexAtTheEnd] - yDataSerie[serieIndexAtTheEnd];
       final double graphRelative = lastTimeSlice_ElevationDiff / _firstTimeSlice_ElevationDiff;
 
-      _splineData.relativePositionY[this is NOT the lastSplineIndex] = graphRelative;
+      _splineData.relativePositionY[relativePosYIndex] = graphRelative;
 
       /*
        * Update UI
