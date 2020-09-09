@@ -24,15 +24,27 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-   protected static final String XML_START_ID          = "<?xml";                                          //$NON-NLS-1$
-   protected static final String XML_HEADER            = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";    //$NON-NLS-1$
+   protected static final String XML_START_ID                    = "<?xml";                                                    //$NON-NLS-1$
+   protected static final String XML_HEADER                      = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";              //$NON-NLS-1$
 
-   private static final boolean  _isCreateRandomTourId = System.getProperty("createRandomTourId") != null; //$NON-NLS-1$
+   private static final String   SYS_PROP__CREATE_RANDOM_TOUR_ID = "createRandomTourId";                                       //$NON-NLS-1$
+   private static final boolean  _isCreateRandomTourId           = System.getProperty(SYS_PROP__CREATE_RANDOM_TOUR_ID) != null;
+
+   static {
+
+      if (_isCreateRandomTourId) {
+
+         Util.logSystemProperty_IsEnabled(TourbookDevice.class,
+               SYS_PROP__CREATE_RANDOM_TOUR_ID,
+               "Every imported tour has a unique tour ID"); //$NON-NLS-1$
+      }
+   }
 
    /**
     * Temperature scale when a device supports scaled temperature values. A value greater than 10
@@ -141,9 +153,6 @@ public abstract class TourbookDevice implements IRawDataReader {
    public String createUniqueId(final TourData tourData, final String defaultKey) {
 
       if (_isCreateRandomTourId) {
-
-         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createUniqueId()") //$NON-NLS-1$ //$NON-NLS-2$
-               + (" - System property \"createRandomTourId\" is recognized -> Every imported tour has a unique tour id")); //$NON-NLS-1$
 
          final Double randomNumber = Double.valueOf(Math.random());
 
