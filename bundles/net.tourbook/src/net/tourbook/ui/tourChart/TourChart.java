@@ -2254,27 +2254,34 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    /**
     * create the layer which displays the tour pauses
-    *
-    * @param isForcedPauses
-    *           When <code>true</code> the pauses must be drawn, otherwise
-    *           {@link TourChartConfiguration#isShowTourPauses} determines if the pauses are drawn
-    *           or not.
-    *           <p>
     */
-   private void createLayer_Pauses(final boolean isForcedPauses) {
-
-      if (isForcedPauses == false && _tcc.isShowTourPauses == false) {
-
-         // pauses layer is not displayed
-
-         hidePausesLayer();
-
-         return;
-      }
+   private void createLayer_Pauses() {
 
       // pauses layer is visible
 
       final ChartMarkerConfig cmc = new ChartMarkerConfig();
+
+      cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
+      cmc.isShowAbsoluteValues = _tcc.isShowAbsoluteValues;
+      cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
+      cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
+      cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+      cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
+      cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
+      cmc.isShowSignImage = _tcc.isShowSignImage;
+      cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
+
+      cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
+      cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
+
+      cmc.markerHoverSize = _tcc.markerHoverSize;
+      cmc.markerLabelOffset = _tcc.markerLabelOffset;
+      cmc.markerPointSize = _tcc.markerPointSize;
+      cmc.markerSignImageSize = _tcc.markerSignImageSize;
+
+      cmc.markerColorDefault = _tcc.markerColorDefault;
+      cmc.markerColorDevice = _tcc.markerColorDevice;
+      cmc.markerColorHidden = _tcc.markerColorHidden;
 
       if (_layerPause == null) {
 
@@ -5083,6 +5090,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       /*
+       * pauses layer
+       */
+      // show label layer only for ONE visible graph
+      if (_layerPause != null && yData == yDataWithLabels) {
+         customFgLayers.add(_layerPause);
+      }
+
+      /*
        * photo layer
        */
       // show photo layer only for ONE visible graph
@@ -5732,7 +5747,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // create/hide pauses layer
       if (arePausesVisible) {
-         createLayer_Pauses(true);
+         createLayer_Pauses();
       } else {
          hidePausesLayer();
       }
