@@ -2366,6 +2366,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             pauseDurationText = UI.format_hh_mm_ss((pausedTime_End[index] - pausedTime_Start[index]) / 1000);
 
+            //TODO find the seie index - not too hard
+            // find the label position..... huh pretty hard, how is it found for markers ?
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
