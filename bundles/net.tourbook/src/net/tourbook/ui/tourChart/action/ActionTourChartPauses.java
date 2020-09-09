@@ -38,6 +38,6 @@ public class ActionTourChartPauses extends Action {
 
    @Override
    public void run() {
-      _tourChart.actionShowTourChartPauses(isChecked());
+      _tourChart.actionShowTourPauses(isChecked());
    }
 }

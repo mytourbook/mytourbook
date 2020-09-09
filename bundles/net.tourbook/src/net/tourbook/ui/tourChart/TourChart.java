@@ -913,20 +913,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
    }
 
-   /**
-    * Show/Hide tour pauses
-    *
-    * @param isChecked
-    */
-   public void actionShowTourChartPauses(final boolean arePausesVisible) {
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, arePausesVisible);
-
-      _tcc.isShowTourPauses = arePausesVisible;
-
-      updateUI_PausesLayer(arePausesVisible);
-   }
-
    public void actionShowTourInfo(final boolean isTourInfoVisible) {
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, isTourInfoVisible);
@@ -941,6 +927,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, isMarkerVisible);
 
       updateUI_Marker(isMarkerVisible);
+   }
+
+   /**
+    * Show/Hide tour pauses
+    *
+    * @param isChecked
+    */
+   public void actionShowTourPauses(final boolean arePausesVisible) {
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, arePausesVisible);
+
+      _tcc.isShowTourPauses = arePausesVisible;
+
+      updateUI_PausesLayer(arePausesVisible);
    }
 
    public void actionShowTourPhotos() {
@@ -2288,7 +2288,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       _layerPause.setChartMarkerConfig(cmc);
-      _tourMarkerTooltip.setChartMarkerConfig(cmc);
 
       // set data serie for the x-axis
       final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
@@ -5443,6 +5442,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       _actionTourMarker.setSelected(_tcc.isShowTourMarker);
       _actionTourMarker.setEnabled(true);
+
+      /*
+       * Tour pauses
+       */
+      tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PAUSES);
+      tourAction.setEnabled(true);
+      tourAction.setChecked(_tcc.isShowTourPauses);
 
       /*
        * Tour photos
