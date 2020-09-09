@@ -372,6 +372,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private I2ndAltiLayer             _layer2ndAlti;
    private ChartLayerMarker          _layerMarker;
    private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
+   private ChartLayerMarker          _layerPause;
    private ChartLayerPhoto           _layerPhoto;
    private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
    private ChartLayerSegmentValue    _layerTourSegmenterOther;
@@ -2221,6 +2222,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
+    * @param pauseDuration
+    * @param xAxisSerie
+    * @param xAxisSerieIndex
+    * @param labelPosition
+    * @return
+    */
+   private ChartLabel createLayer_Pause_ChartLabel(final String pauseDuration,
+                                                   final double[] xAxisSerie,
+                                                   final int xAxisSerieIndex,
+                                                   final int labelPosition) {
+
+      final ChartLabel chartLabel = new ChartLabel();
+
+      chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabel.serieIndex = xAxisSerieIndex;
+
+      chartLabel.markerLabel = pauseDuration;
+      chartLabel.isDescription = true;
+      chartLabel.visualPosition = labelPosition;
+      chartLabel.type = ChartLabel.MARKER_TYPE_DEVICE;
+      chartLabel.visualType = ChartLabel.VISIBLE_TYPE_DEFAULT;
+//
+//      chartLabel.labelXOffset = tourMarker.getLabelXOffset();
+//      chartLabel.labelYOffset = tourMarker.getLabelYOffset();
+
+      chartLabel.isVisible = true;
+
+      return chartLabel;
+   }
+
+   /**
     * create the layer which displays the tour pauses
     *
     * @param isForcedPauses
@@ -2242,30 +2274,30 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // pauses layer is visible
 
-//      final ChartMarkerConfig cmc = new ChartMarkerConfig();
-//
-//      if (_layerMarker == null) {
-//
-//         // setup marker layer, a layer is created only once
-//
-//         _layerMarker = new ChartLayerMarker(this);
-//
-//         // set overlay painter
-//         addChartOverlay(_layerMarker);
-//
-//         addChartMouseListener(_mouseMarkerListener);
-//      }
-//
-//      _layerMarker.setChartMarkerConfig(cmc);
-//      _tourMarkerTooltip.setChartMarkerConfig(cmc);
-//
-//      // set data serie for the x-axis
-//      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
-//            ? _tourData.getTimeSerieDouble()
-//            : _tourData.getDistanceSerieDouble();
-//
-//      if (_tourData.isMultipleTours()) {
-//
+      final ChartMarkerConfig cmc = new ChartMarkerConfig();
+
+      if (_layerPause == null) {
+
+         // setup marker layer, a layer is created only once
+
+         _layerPause = new ChartLayerMarker(this);
+
+         // set overlay painter
+         addChartOverlay(_layerPause);
+
+      }
+
+      _layerPause.setChartMarkerConfig(cmc);
+      _tourMarkerTooltip.setChartMarkerConfig(cmc);
+
+      // set data serie for the x-axis
+      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
+            ? _tourData.getTimeSerieDouble()
+            : _tourData.getDistanceSerieDouble();
+
+      if (_tourData.isMultipleTours()) {
+
+         //TODO FB
 //         final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 //         final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
 //
@@ -2312,20 +2344,33 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //
 //            cmc.chartLabels.add(chartLabel);
 //         }
-//
-//      } else {
-//
-//         for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
-//
-//            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(
-//                  tourMarker,
-//                  xAxisSerie,
-//                  tourMarker.getSerieIndex(),
-//                  tourMarker.getLabelPosition());
-//
-//            cmc.chartLabels.add(chartLabel);
-//         }
-//      }
+
+      } else {
+
+         final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+
+         if (pausedTime_Start == null) {
+            return;
+         }
+
+         final long[] pausedTime_End = _tourData.getPausedTime_End();
+
+         String pauseDurationText;
+         for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+            pauseDurationText = UI.format_hh_mm_ss((pausedTime_End[index] - pausedTime_Start[index]) / 1000);
+
+            final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
+                  pauseDurationText,
+                  xAxisSerie,
+                  150,
+                  150);
+            //tourMarker.getSerieIndex(),
+            //    tourMarker.getLabelPosition());
+
+            cmc.chartLabels.add(chartLabel);
+         }
+      }
    }
 
    private void createLayer_Photo() {
@@ -3423,14 +3468,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private void hidePausesLayer() {
 
-//      if (_layerMarker != null) {
-//
-//         removeChartOverlay(_layerMarker);
-//
-//         _layerMarker = null;
-//      }
-//
-//      removeChartMouseListener(_mouseMarkerListener);
+      if (_layerPause != null) {
+
+         removeChartOverlay(_layerPause);
+
+         _layerPause = null;
+      }
    }
 
    private void hidePhotoLayer() {

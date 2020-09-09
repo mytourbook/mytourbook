@@ -28,7 +28,7 @@ public class ActionTourChartPauses extends Action {
 
    public ActionTourChartPauses(final TourChart tourChart) {
 
-      super(Messages.Tour_Action_Show_Tour_Pauses, AS_RADIO_BUTTON);
+      super(Messages.Tour_Action_Show_Tour_Pauses, AS_CHECK_BOX);
 
       _tourChart = tourChart;
 
