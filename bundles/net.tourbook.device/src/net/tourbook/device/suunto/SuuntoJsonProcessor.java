@@ -380,7 +380,7 @@ public class SuuntoJsonProcessor {
 
                //We use the time stamp when the user stopped the activity "TAG_PAUSE",
                //NOT when the user saved the activity (TAG_STOP)
-               timeData.absoluteTime = pauseStartTime.toEpochSecond() * 1000;
+               timeData.absoluteTime = pauseStartTime.toInstant().toEpochMilli();
                timeData.markerLabel = EndOfTour;
 
                _sampleList.add(timeData);
@@ -503,7 +503,7 @@ public class SuuntoJsonProcessor {
 
          //We use the time stamp when the user started the activity "TAG_START",
          final TimeData startTimeData = new TimeData();
-         startTimeData.absoluteTime = startTime.toEpochSecond() * 1000;
+         startTimeData.absoluteTime = startTime.toInstant().toEpochMilli();
          startTimeData.markerLabel = StartOfTour;
          _sampleList.add(startTimeData);
 
