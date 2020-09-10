@@ -723,6 +723,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
+      statContext.outStatisticValues = _tourDayData.statisticValues;
+
       _isDuration_ReloadData = false;
 
       // reset min/max values

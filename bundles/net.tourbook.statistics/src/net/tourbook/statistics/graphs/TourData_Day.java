@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ public class TourData_Day {
 
    int[]                          yearValues;
    int[]                          monthValues;
+   int[]                          dayValues;
    int[]                          weekValues;
 
    private int[]                  _doyValues;
@@ -72,6 +73,8 @@ public class TourData_Day {
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;
+
+   String                         statisticValues;
 
    /**
     * Contains the tags for the tour where the key is the tour ID

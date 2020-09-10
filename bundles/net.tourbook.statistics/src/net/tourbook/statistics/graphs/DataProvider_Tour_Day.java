@@ -27,6 +27,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -289,6 +290,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          final TIntArrayList dbAllYears = new TIntArrayList();
          final TIntArrayList dbAllMonths = new TIntArrayList();
+         final TIntArrayList dbAllDays = new TIntArrayList();
          final TIntArrayList dbAllYearsDOY = new TIntArrayList(); // DOY...Day Of Year
 
          final TIntArrayList dbAllTourStartTime = new TIntArrayList();
@@ -397,6 +399,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                dbAllYears.add(dbTourYear);
                dbAllMonths.add(zonedStartDateTime.getMonthValue());
+               dbAllDays.add(zonedStartDateTime.getDayOfMonth());
                dbAllYearsDOY.add(yearDOYs + tourDOY);
                dbAllTourStartWeek.add(dbTourStartWeek);
 
@@ -577,6 +580,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.yearValues = dbAllYears.toArray();
          _tourDayData.monthValues = dbAllMonths.toArray();
+         _tourDayData.dayValues = dbAllDays.toArray();
          _tourDayData.setDoyValues(allYearsDOY);
          _tourDayData.weekValues = dbAllTourStartWeek.toArray();
 
@@ -626,32 +630,80 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;
 
+         _tourDayData.statisticValues = getStatisticValues();
+
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      }
-
-      if (isLogStatisticValues) {
-         logValues();
       }
 
       return _tourDayData;
    }
 
-   private void logValues() {
+   private String getStatisticValues() {
 
-      System.out.println();
-      System.out.println();
+      final String FIELD_SEPARATOR = ",";
+      final Pattern SPACE_PATTERN = Pattern.compile("  *"); //$NON-NLS-1$
+      final Pattern DUMMY_PATTERN = Pattern.compile("#"); //$NON-NLS-1$
 
-      final String part_1_1 = "Year Month DOY       Duration       Altitude           Distance              Speed           Pace"; //$NON-NLS-1$
-      final String part_1_2 = "                        (sec)            (m)                (m)             (km/h)       (min/km)"; //$NON-NLS-1$
+      final StringBuilder sb = new StringBuilder();
 
-      final String part_2_1 = "       Training       Training       Training"; //$NON-NLS-1$
-      final String part_2_2 = "          Aerob        Anaerob    Performance"; //$NON-NLS-1$
+      String part_1_1 = "Year Month Day DOY      # Duration      # Altitude          # Distance             # Speed          # Pace"; //$NON-NLS-1$
+      String part_1_2 = "         #   #   #            # (sec)           # (m)               # (m)            # (km/h)      # (min/km)"; //$NON-NLS-1$
 
-      System.out.println(part_1_1 + part_2_1);
-      System.out.println(part_1_2 + part_2_2);
+      String part_2_1 = "      # Training      # Training      # Training"; //$NON-NLS-1$
+      String part_2_2 = "         # Aerob       # Anaerob   # Performance"; //$NON-NLS-1$
 
-      System.out.println();
+      String valueFormatting = UI.EMPTY_STRING
+
+            // date
+            + "%4d   %3d %3d %3d" //$NON-NLS-1$
+
+            // duration
+            + "  %6.0f %6.0f" //$NON-NLS-1$
+
+            // altitude
+            + "  %6.0f %6.0f" //$NON-NLS-1$
+
+            // distance
+            + "  %8.0f %8.0f" //$NON-NLS-1$
+
+            // speed
+            + "  %8.2f %8.2f" //$NON-NLS-1$
+
+            // pace
+            + "  %6.2f %6.2f" //$NON-NLS-1$
+
+            // training aerob
+            + "  %6.1f %6.1f" //$NON-NLS-1$
+
+            // training anaerob
+            + "  %6.1f %6.1f" //$NON-NLS-1$
+
+            // training performance
+            + "  %6.2f %6.2f" //$NON-NLS-1$
+
+            + NL;
+
+      final boolean isUseFieldSeparator = false;
+
+      if (isUseFieldSeparator) {
+
+         part_1_1 = SPACE_PATTERN.matcher(part_1_1).replaceAll(FIELD_SEPARATOR);
+         part_1_2 = SPACE_PATTERN.matcher(part_1_2).replaceAll(FIELD_SEPARATOR);
+         part_2_1 = SPACE_PATTERN.matcher(part_2_1).replaceAll(FIELD_SEPARATOR);
+         part_2_2 = SPACE_PATTERN.matcher(part_2_2).replaceAll(FIELD_SEPARATOR);
+
+         valueFormatting = SPACE_PATTERN.matcher(valueFormatting).replaceAll(FIELD_SEPARATOR);
+      }
+
+      // remove dummy symbol
+      part_1_1 = DUMMY_PATTERN.matcher(part_1_1).replaceAll(UI.EMPTY_STRING);
+      part_1_2 = DUMMY_PATTERN.matcher(part_1_2).replaceAll(UI.EMPTY_STRING);
+      part_2_1 = DUMMY_PATTERN.matcher(part_2_1).replaceAll(UI.EMPTY_STRING);
+      part_2_2 = DUMMY_PATTERN.matcher(part_2_2).replaceAll(UI.EMPTY_STRING);
+
+      sb.append(part_1_1 + part_2_1 + NL);
+      sb.append(part_1_2 + part_2_2 + NL);
 
       final float[] durationLow = _tourDayData.getDurationLowFloat();
       final float[] durationHigh = _tourDayData.getDurationHighFloat();
@@ -659,39 +711,13 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       for (int dataIndex = 0; dataIndex < durationLow.length; dataIndex++) {
 
-         System.out.println(String.format(UI.EMPTY_STRING
+//         string = string.replace(/  +/g, ' ');
 
-               // date
-               + "%4d %3d %5d" //$NON-NLS-1$
-
-               // duration
-               + "  %6.0f %6.0f" //$NON-NLS-1$
-
-               // altitude
-               + "  %6.0f %6.0f" //$NON-NLS-1$
-
-               // distance
-               + "  %8.0f %8.0f" //$NON-NLS-1$
-
-               // speed
-               + "  %8.2f %8.2f" //$NON-NLS-1$
-
-               // pace
-               + "  %6.2f %6.2f" //$NON-NLS-1$
-
-               // training aerob
-               + "  %6.1f %6.1f" //$NON-NLS-1$
-
-               // training anaerob
-               + "  %6.1f %6.1f" //$NON-NLS-1$
-
-               // training performance
-               + "  %6.2f %6.2f" //$NON-NLS-1$
-
-               ,
+         sb.append(String.format(valueFormatting,
 
                _tourDayData.yearValues[dataIndex],
                _tourDayData.monthValues[dataIndex],
+               _tourDayData.dayValues[dataIndex],
                doyValues[dataIndex],
 
                durationLow[dataIndex],
@@ -715,11 +741,32 @@ public class DataProvider_Tour_Day extends DataProvider {
                _tourDayData.trainingEffect_Anaerob_High[dataIndex],
                _tourDayData.trainingPerformance_Low[dataIndex],
                _tourDayData.trainingPerformance_High[dataIndex]
-
+         //
          ));
       }
 
-      System.out.println();
+      String formattedValues = sb.toString();
+
+      final boolean isRemoveZeros = true;
+      if (isRemoveZeros) {
+
+// SET_FORMATTING_OFF
+
+         final Pattern PATTERN_0    = Pattern.compile(" 0 "); //$NON-NLS-1$
+         final Pattern PATTERN_0_0  = Pattern.compile(" 0.0 "); //$NON-NLS-1$
+         final Pattern PATTERN_0_00 = Pattern.compile(" 0.00 "); //$NON-NLS-1$
+         final Pattern PATTERN_0_00_END = Pattern.compile(" 0.00"); //$NON-NLS-1$
+
+         formattedValues = PATTERN_0.        matcher(formattedValues).replaceAll("   ");
+         formattedValues = PATTERN_0_0.      matcher(formattedValues).replaceAll("     ");
+         formattedValues = PATTERN_0_00.     matcher(formattedValues).replaceAll("      ");
+         formattedValues = PATTERN_0_00_END. matcher(formattedValues).replaceAll("     ");
+
+// SET_FORMATTING_ON
+
+      }
+
+      return formattedValues;
    }
 
    public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {

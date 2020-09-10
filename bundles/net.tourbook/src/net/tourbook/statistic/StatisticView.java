@@ -512,6 +512,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
       super.dispose();
    }
 
+   private void fireEvent_StatisticValues(final String statisticValues) {
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.STATISTIC_VALUES,
+            new Selection_StatisticValues(statisticValues),
+            this);
+   }
+
    /**
     * @param defaultYear
     * @return Returns the index for the active year or <code>-1</code> when there are no years
@@ -992,6 +1000,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.updateStatistic(statContext);
 
       updateStatistic_20_PostRefresh(statContext);
+
+      fireEvent_StatisticValues(statContext.outStatisticValues);
    }
 
    /**
@@ -1025,6 +1035,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       updateStatistic_20_PostRefresh(statContext);
       updateUI_Toolbar();
+
+      fireEvent_StatisticValues(statContext.outStatisticValues);
    }
 
    private void updateStatistic_20_PostRefresh(final StatisticContext statContext) {
