@@ -19,9 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
@@ -67,26 +66,9 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-      SQLData sqlCombineTagsWithAnd = null;
-
-      String sqlTagJoinTable;
-
-      if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-         // combine tags with OR
-
-         sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-      } else {
-
-         // combine tags with AND
-
-         sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-         sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-      }
-
       final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
       final String sql = NL
 
@@ -98,10 +80,8 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                        //$NON-NLS-1$
 
             // get/filter tag's
-            + "   " + sqlTagJoinTable
-
-            + "   AS jTdataTtag" + NL //$NON-NLS-1$
-            + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                   //$NON-NLS-1$
+            + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //       //$NON-NLS-1$
+            + " ON tourID = jTdataTtag.TourData_tourId" + NL //                     //$NON-NLS-1$
 
             // get marker id's
             + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -122,18 +102,8 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          int paramIndex = 1;
 
          // set sql tag parameters
-         if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+//         }
 
          // set sql other parameters
          prepStmt.setInt(paramIndex++, tourYear);

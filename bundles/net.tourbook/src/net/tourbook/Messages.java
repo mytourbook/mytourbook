@@ -153,7 +153,9 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
-
+   public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM;
+   public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip;
+   
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
    public static String        Dialog_AdjustTemperature_Dialog_Message;
    public static String        Dialog_AdjustTemperature_Dialog_Title;
@@ -2239,11 +2241,6 @@ public class Messages extends NLS {
    public static String Slideout_TourFilter_Label_Title;
    public static String Slideout_TourFilter_Link_TextSearchHint;
    public static String Slideout_TourFilter_Link_TextSearchHint_Tooltip;
-   public static String Slideout_TourFilter_Radio_TagOperator_AND;
-   public static String Slideout_TourFilter_Radio_TagOperator_AND_Tooltip;
-   public static String Slideout_TourFilter_Radio_TagOperator_OR;
-   public static String Slideout_TourFilter_Radio_TagOperator_OR_Tooltip;
-
    public static String Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
    public static String Slideout_TourGeoFilter_Action_Delete_WithoutName;
    public static String Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
@@ -2302,11 +2299,22 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Action_CheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip;
    public static String Slideout_TourTagFilter_Checkbox_IsLiveUpdate_Tooltip;
-   public static String Slideout_TourTagFilter_Column_Properties_Tooltip;
+   public static String Slideout_TourTagFilter_Column_CombineTags;
+   public static String Slideout_TourTagFilter_Column_CombineTags_Tooltip;
+   public static String Slideout_TourTagFilter_Column_Tags_Checked;
+   public static String Slideout_TourTagFilter_Column_Tags_Checked_Tooltip;
+   public static String Slideout_TourTagFilter_Column_Tags_Unchecked;
+   public static String Slideout_TourTagFilter_Column_Tags_Unchecked_Tooltip;
+   public static String Slideout_TourTagFilter_CombineTags_With_AND;
+   public static String Slideout_TourTagFilter_CombineTags_With_OR;
    public static String Slideout_TourTagFilter_Label_AllTags;
    public static String Slideout_TourTagFilter_Label_SelectedTags;
    public static String Slideout_TourTagFilter_Label_TagOperator;
    public static String Slideout_TourTagFilter_Label_Title;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_AND;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_AND_Tooltip;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_OR;
+   public static String Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String Slideout_TrainingOptions_Label_Title;
 

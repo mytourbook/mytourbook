@@ -30,11 +30,14 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;
@@ -109,7 +112,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private TIntArrayList                _availableYears;
+   private TIntArrayList                _availableYears          = new TIntArrayList();
 
    /**
     * contains the statistics in the same sort order as the statistic combo box
@@ -645,13 +648,16 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _comboNumberOfYears.setItems(yearsToDisplayList);
 
          if (yearsToDisplayList.length > 0) {
+
             int newComboIndex = currentNumberOfYearsIndexSelected;
 
             if (currentNumberOfYearsIndexSelected == -1) {
+
                newComboIndex = 0;
+
             } else if (currentNumberOfYearsIndexSelected >= yearsToDisplayList.length) {
-               newComboIndex =
-                     yearsToDisplayList.length - 1;
+
+               newComboIndex = yearsToDisplayList.length - 1;
             }
 
             _comboNumberOfYears.select(newComboIndex);
@@ -700,96 +706,105 @@ public class StatisticView extends ViewPart implements ITourProvider {
     */
    private void refreshYearCombobox() {
 
-      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final TIntArrayList allAvailableYears = new TIntArrayList();
 
-      String fromTourData;
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
-
-         // with tag filter
-
-         fromTourData = NL
-
-               + "FROM (         " + NL //$NON-NLS-1$
-
-               + " SELECT        " + NL //$NON-NLS-1$
-
-               + "  StartYear    " + NL //$NON-NLS-1$
-
-               + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
-
-               // get tag id's
-               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
-
-               + "  WHERE 1=1    " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause()
-
-               + ") td           " + NL//$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         fromTourData = NL
-
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
-
-               + " WHERE 1=1        " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause() + NL;
-      }
-
-      final String sqlString = NL +
-
-            "SELECT                 " + NL //$NON-NLS-1$
-
-            + " StartYear           " + NL //$NON-NLS-1$
-
-            + fromTourData
-
-            + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
-            + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
-      ;
-      _availableYears = new TIntArrayList();
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         filter.setParameters(statement, 1);
 
-         final ResultSet result = statement.executeQuery();
+         String sqlFromTourData;
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
+
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+
+            // with tag filter
+
+            sqlFromTourData = UI.EMPTY_STRING
+
+                  + "FROM (" + NL //                                       //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                    //$NON-NLS-1$
+                  + "      StartYear" + NL //                              //$NON-NLS-1$
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
+
+                  // get/filter tag id's
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
+
+                  + "   WHERE 1=1" + NL //                                 //$NON-NLS-1$
+                  + "      " + sqlAppFilter.getWhereClause() //            //$NON-NLS-1$
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //          //$NON-NLS-1$
+            ;
+
+         } else {
+
+            // without tag filter
+
+            sqlFromTourData = UI.EMPTY_STRING
+
+                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+                  + "WHERE 1=1" + NL //                                    //$NON-NLS-1$
+                  + "   " + sqlAppFilter.getWhereClause() + NL; //         //$NON-NLS-1$
+         }
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                          //$NON-NLS-1$
+
+               + "   StartYear" + NL //                                    //$NON-NLS-1$
+
+               + sqlFromTourData
+
+               + "GROUP BY STARTYEAR" + NL //                              //$NON-NLS-1$
+               + "ORDER BY STARTYEAR" + NL //                              //$NON-NLS-1$
+         ;
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         int paramIndex = 1;
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
 
          while (result.next()) {
-            _availableYears.add(result.getInt(1));
+            allAvailableYears.add(result.getInt(1));
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
-      _comboYear.removeAll();
-
-      /*
-       * add all years of the tours and the current year
-       */
+      // add all years of the tours and the current year
       final int thisYear = LocalDate.now().getYear();
 
-      boolean isThisYearSet = false;
+      int firstYear = allAvailableYears.size() > 0
+            ? allAvailableYears.get(0)
+            : thisYear;
 
-      for (final int year : _availableYears.toArray()) {
+      /*
+       * Add first year -1 to be able to see values from weeks view where the first days of a year
+       * are in a week of the previous year, e.g. 1. Jan 2016 is in a week in year 2015
+       */
+      firstYear--;
 
-         if (year == thisYear) {
-            isThisYearSet = true;
-         }
+      /*
+       * Create a continuos sequence of available years otherwise the year can jump when data are
+       * not available for every year
+       */
+      _comboYear.removeAll();
+      _availableYears.clear();
 
+      for (int year = firstYear; year <= thisYear; year++) {
+
+         _availableYears.add(year);
          _comboYear.add(Integer.toString(year));
-      }
-
-      // add current year if not set
-      if (isThisYearSet == false) {
-         _availableYears.add(thisYear);
-         _comboYear.add(Integer.toString(thisYear));
       }
    }
 
@@ -950,6 +965,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       refreshYearCombobox();
       selectYear(-1);
+
+      // update number of years is _comboNumberOfYears
+      onSelectYear();
 
       // tell all existing statistics the data have changed
       for (final TourbookStatistic statistic : getAvailableStatistics()) {

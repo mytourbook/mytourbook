@@ -23,24 +23,30 @@ import net.tourbook.common.util.StatusUtil;
 
 public class TourTagFilterProfile implements Cloneable {
 
-   private static int  _idCounter   = 0;
+   private static int  _idCounter             = 0;
 
    int                 profileId;
 
    /**
     * Profile name
     */
-   String              name         = Messages.Tour_Filter_Default_ProfileName;
+   String              name                   = Messages.Tour_Filter_Default_ProfileName;
 
    /**
     * Contains all tag id's for this profile
     */
-   public TLongHashSet tagFilterIds = new TLongHashSet();
+   public TLongHashSet tagFilterIds           = new TLongHashSet();
 
    /**
-    * When <code>true</code> (default) then the tags are OR'ed otherwise they are AND'ed
+    * Keeps tag id's which are unchecked in the tag cloud viewer
     */
-   public boolean      isOrOperator = TourTagFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
+   public TLongHashSet tagFilterIds_Unchecked = new TLongHashSet();
+
+   /**
+    * When <code>true</code> (default) then the tags are combined with OR otherwise they are
+    * combined with AND
+    */
+   public boolean      isOrOperator           = TourTagFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
    public TourTagFilterProfile() {
 
@@ -62,6 +68,7 @@ public class TourTagFilterProfile implements Cloneable {
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
          clonedObject.tagFilterIds = new TLongHashSet(tagFilterIds.toArray());
+         clonedObject.tagFilterIds_Unchecked = new TLongHashSet(tagFilterIds_Unchecked.toArray());
 
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);

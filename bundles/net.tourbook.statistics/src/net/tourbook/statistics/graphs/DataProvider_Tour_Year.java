@@ -22,11 +22,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -40,9 +43,11 @@ public class DataProvider_Tour_Year extends DataProvider {
    private DataProvider_Tour_Year() {}
 
    public static DataProvider_Tour_Year getInstance() {
+
       if (_instance == null) {
          _instance = new DataProvider_Tour_Year();
       }
+
       return _instance;
    }
 
@@ -65,116 +70,123 @@ public class DataProvider_Tour_Year extends DataProvider {
          return _tourDataYear;
       }
 
-      _activePerson = person;
-      _activeTourTypeFilter = tourTypeFilter;
-      _lastYear = lastYear;
-      _numberOfYears = numYears;
-
-      // get the tour types
-      final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-      final TourType[] allTourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
-
-      _tourDataYear = new TourData_Year();
-
-      String fromTourData;
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
-
-         // with tag filter
-
-         fromTourData = NL
-
-               + "FROM (                     " + NL //$NON-NLS-1$
-
-               + " SELECT                     " + NL //$NON-NLS-1$
-
-               + "  StartYear,               " + NL //$NON-NLS-1$
-               + "  TourDistance,            " + NL //$NON-NLS-1$
-               + "  TourAltUp,               " + NL //$NON-NLS-1$
-               + "  TourRecordingTime,         " + NL //$NON-NLS-1$
-               + "  TourDrivingTime,         " + NL //$NON-NLS-1$
-
-               + "  TourType_TypeId,          " + NL //$NON-NLS-1$
-               + "  jTdataTtag.TourTag_tagId   " + NL //$NON-NLS-1$
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
-
-               // get tag id's
-               + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlFilter.getWhereClause() + NL
-
-               + ") td" //$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         fromTourData = NL
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlFilter.getWhereClause()
-
-         ;
-      }
-
-      String sqlDurationTime = null;
-
-      switch (durationTime) {
-      case BREAK:
-
-         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
-         break;
-
-      case RECORDING:
-
-         sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
-         break;
-
-      case MOVING:
-      default:
-         // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
-         break;
-      }
-
-      final String sqlString = NL +
-
-            "SELECT" + NL //$NON-NLS-1$
-
-            + " StartYear,                " + NL //      1 //$NON-NLS-1$
-
-            + " SUM(TourDistance),        " + NL //      2 //$NON-NLS-1$
-            + " SUM(TourAltUp),           " + NL //      3 //$NON-NLS-1$
-            + sqlDurationTime + "         " + NL //      4 //$NON-NLS-1$
-            + " SUM(TourRecordingTime),   " + NL //      5 //$NON-NLS-1$
-            + " SUM(TourDrivingTime),     " + NL //      6 //$NON-NLS-1$
-            + " SUM(1),                   " + NL //      7 //$NON-NLS-1$
-            + " TourType_TypeId           " + NL //      8 //$NON-NLS-1$
-
-            + fromTourData
-
-            + (" GROUP BY StartYear, tourType_typeId ") + NL //      //$NON-NLS-1$
-            + (" ORDER BY StartYear") + NL //                  //$NON-NLS-1$
-      ;
-
-      final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
-
-      int colorOffset = 0;
-      if (isShowNoTourTypes) {
-         colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      int numTourTypes = colorOffset + allTourTypes.length;
-      numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         _activePerson = person;
+         _activeTourTypeFilter = tourTypeFilter;
+         _lastYear = lastYear;
+         _numberOfYears = numYears;
+
+         // get the tour types
+         final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+         final TourType[] allTourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+
+         _tourDataYear = new TourData_Year();
+
+         String fromTourData;
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+ 
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
+
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+
+            // with tag filter
+
+            fromTourData = NL
+
+                  + "FROM (" + NL //                                                            //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                                         //$NON-NLS-1$
+
+                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  + "      DISTINCT TourId," + NL //                                            //$NON-NLS-1$
+
+                  + "      StartYear," + NL //                                                  //$NON-NLS-1$
+                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
+                  + "      TourRecordingTime," + NL //                                          //$NON-NLS-1$
+                  + "      TourDrivingTime," + NL //                                            //$NON-NLS-1$
+
+                  + "      TourType_TypeId" + NL //                                             //$NON-NLS-1$
+
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+
+                  // get/filter tag id's
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
+
+                  + "   WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+                  + "      " + sqlAppFilter.getWhereClause()
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                               //$NON-NLS-1$
+            ;
+
+         } else {
+
+            // without tag filter
+
+            fromTourData = NL
+
+                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                              //$NON-NLS-1$
+
+                  + "WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   " + sqlAppFilter.getWhereClause()
+
+            ;
+         }
+
+         String sqlDurationTime = null;
+
+         switch (durationTime) {
+         case BREAK:
+
+            sqlDurationTime = "SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
+            break;
+
+         case RECORDING:
+
+            sqlDurationTime = "SUM(TourRecordingTime),"; //$NON-NLS-1$
+            break;
+
+         case MOVING:
+         default:
+            // this is also the old implementation for the duration values
+            sqlDurationTime = "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
+            break;
+         }
+
+         sql = NL +
+
+               "SELECT" + NL //                                   //$NON-NLS-1$
+
+               + "   StartYear," + NL //                       1  //$NON-NLS-1$
+
+               + "   SUM(TourDistance)," + NL //               2  //$NON-NLS-1$
+               + "   SUM(TourAltUp)," + NL //                  3  //$NON-NLS-1$
+               + "   " + sqlDurationTime + NL //               4  //$NON-NLS-1$
+               + "   SUM(TourRecordingTime)," + NL //          5  //$NON-NLS-1$
+               + "   SUM(TourDrivingTime)," + NL //            6  //$NON-NLS-1$
+               + "   SUM(1)," + NL //                          7  //$NON-NLS-1$
+               + "   TourType_TypeId" + NL //                  8  //$NON-NLS-1$
+
+               + fromTourData
+
+               + "GROUP BY StartYear, tourType_typeId " + NL //   //$NON-NLS-1$
+               + "ORDER BY StartYear" + NL //                     //$NON-NLS-1$
+         ;
+
+         final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
+
+         int colorOffset = 0;
+         if (isShowNoTourTypes) {
+            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+         }
+
+         int numTourTypes = colorOffset + allTourTypes.length;
+         numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
          final float[][] dbDistance = new float[numTourTypes][numYears];
          final float[][] dbAltitude = new float[numTourTypes][numYears];
@@ -190,20 +202,28 @@ public class DataProvider_Tour_Year extends DataProvider {
          final long[] usedTourTypeIds = new long[numTourTypes];
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         sqlFilter.setParameters(statement, 1);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         final ResultSet result = statement.executeQuery();
+         int paramIndex = 1;
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final int dbValue_ResultYear = result.getInt(1);
-            final int dbValue_Altitude = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
-            final int dbValue_Distance = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Duration = result.getInt(4);
-            final int dbValue_RecordingTime = result.getInt(5);
-            final int dbValue_DrivingTime = result.getInt(6);
-            final int dbValue_NumTours = result.getInt(7);
+// SET_FORMATTING_OFF
+
+            final int dbValue_ResultYear        = result.getInt(1);
+            final int dbValue_Altitude          = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
+            final int dbValue_Distance          = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
+            final int dbValue_Duration          = result.getInt(4);
+            final int dbValue_RecordingTime     = result.getInt(5);
+            final int dbValue_DrivingTime       = result.getInt(6);
+            final int dbValue_NumTours          = result.getInt(7);
             final Long dbValue_TourTypeIdObject = (Long) result.getObject(8);
+
+// SET_FORMATTING_ON
 
             final int yearIndex = numYears - (lastYear - dbValue_ResultYear + 1);
 
@@ -365,7 +385,7 @@ public class DataProvider_Tour_Year extends DataProvider {
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       return _tourDataYear;

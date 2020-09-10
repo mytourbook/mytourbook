@@ -34,12 +34,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 
 public class CalendarTourDataProvider {
@@ -443,24 +443,7 @@ public class CalendarTourDataProvider {
 
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
-         final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-         SQLData sqlCombineTagsWithAnd = null;
-
-         String sqlTagJoinTable;
-
-         if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // combine tags with OR
-
-            sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-         } else {
-
-            // combine tags with AND
-
-            sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-            sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-         }
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
          sql = NL
 
@@ -494,7 +477,7 @@ public class CalendarTourDataProvider {
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
 
                // get/filter tag's
-               + sqlTagJoinTable
+               + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
 
                + " AS jTdataTtag" + NL //                            //$NON-NLS-1$
                + " ON tourID = jTdataTtag.TourData_tourId" + NL //   //$NON-NLS-1$
@@ -511,19 +494,7 @@ public class CalendarTourDataProvider {
 
          int paramIndex = 1;
 
-         // set sql tag parameters
-         if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
 
          // set sql other parameters
          prepStmt.setInt(paramIndex++, year);
@@ -532,12 +503,6 @@ public class CalendarTourDataProvider {
          final int dayParamIndex = paramIndex++;
 
          sqlAppFilter.setParameters(prepStmt, paramIndex++);
-
-//         final PreparedStatement prepStmt = conn.prepareStatement(sql);
-//
-//         prepStmt.setInt(1, year);
-//         prepStmt.setInt(2, month);
-//         sqlAppFilter.setParameters(prepStmt, 4);
 
          monthData = new CalendarTourData[31][];
 
@@ -786,26 +751,12 @@ public class CalendarTourDataProvider {
          String sqlFromTourData;
 
          final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-         boolean isNoTagFilter_Or_CombineTagsWithOr = false;
-         SQLData sqlCombineTagsWithAnd = null;
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
          if (isTourTagFilterEnabled) {
 
             // filter by tag
-
-            isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-
-            String sqlTagJoinTable;
-
-            if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-               sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-            } else {
-
-               sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-               sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-            }
 
             sqlFromTourData = NL
 
@@ -828,7 +779,7 @@ public class CalendarTourDataProvider {
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
-                  + "   " + sqlTagJoinTable
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
 
                   + "   AS jTdataTtag" //                                              //$NON-NLS-1$
                   + "   ON tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
@@ -874,18 +825,7 @@ public class CalendarTourDataProvider {
 
          int paramIndex = 1;
 
-         if (isTourTagFilterEnabled == false || isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
 
          prepStmt.setInt(paramIndex++, year);
          prepStmt.setInt(paramIndex++, week);

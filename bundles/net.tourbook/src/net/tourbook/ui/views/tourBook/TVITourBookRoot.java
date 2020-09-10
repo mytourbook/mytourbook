@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
@@ -69,142 +69,37 @@ public class TVITourBookRoot extends TVITourBookItem {
                ? "WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
                : UI.EMPTY_STRING;
 
-         final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-         boolean isNoTagFilter_Or_CombineTagsWithOr = false;
-         SQLData sqlCombineTagsWithAnd = null;
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
-         if (isTourTagFilterEnabled) {
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
 
             // with tag filter
 
-            isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-
-            String sqlTagJoinTable;
-
-            if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-               /**
-                * <code>
-                *
-                * SELECT
-                *    StartYear,
-                *    SUM( CAST(TourDistance AS BIGINT)),
-                *    ...
-                * 	MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
-                * FROM (
-                *    SELECT
-                *       DISTINCT TourId,
-                *       StartYear,
-                *       ...
-                * 		weather_Temperature_Max
-                * 	FROM TOURDATA
-                * 	LEFT JOIN TOURDATA_TOURTAG AS jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId
-                *    WHERE 1=1
-                * 		AND TourData.tourPerson_personId = 0
-                * 		AND TourData.tourType_typeId IN ( 0, 1, 34)
-                * 		AND jTdataTtag.TourTag_tagId IN ( 22, 9)
-                * ) NecessaryNameOtherwiseItDoNotWork
-                * GROUP BY ROLLUP(StartYear)
-                * ORDER BY StartYear
-                *
-                * </code>
-                */
-
-               sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-            } else {
-
-               /**
-                * <code>
-                *
-                * SELECT
-                *    StartYear,
-                *    SUM( CAST(TourDistance AS BIGINT)),
-                * 	...
-                * 	MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
-                * FROM (
-                *    SELECT
-                *       DISTINCT TourId,
-                *       StartYear,
-                *       TourDistance,
-                * 		...
-                * 		weather_Temperature_Max
-                * 	FROM TOURDATA
-                * 	INNER JOIN
-                * 	(
-                * 	 SELECT *
-                * 	 FROM TOURDATA_TOURTAG
-                * 	 INNER JOIN
-                * 	 (
-                * 		 SELECT TOURDATA_TOURID AS Count_TourId, COUNT(*) AS NumTagIds
-                * 		 FROM TOURDATA_TOURTAG
-                * 		 WHERE  TOURTAG_TAGID IN ( 22, 9)
-                * 		 GROUP BY TOURDATA_TOURID
-                * 		 HAVING COUNT(TOURDATA_TOURID) = 2
-                * 	 )
-                * 	 AS jTdataTtag
-                * 	 ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId
-                * 	)
-                *    AS jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId
-                *    WHERE 1=1
-                * 		AND TourData.tourPerson_personId = 0
-                * 		AND TourData.tourType_typeId IN ( 0, 1, 34)
-                * ) NecessaryNameOtherwiseItDoNotWork
-                * GROUP BY ROLLUP(StartYear)
-                * ORDER BY StartYear
-                *
-                * </code>
-                */
-
-               sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-               sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-            }
-
             sqlFromTourData = UI.EMPTY_STRING
 
-                  + "FROM (" + NL //                                                   //$NON-NLS-1$
+                  + "FROM (" + NL //                                                         //$NON-NLS-1$
 
-                  + "   SELECT" + NL //                                                //$NON-NLS-1$
+                  + "   SELECT" + NL //                                                      //$NON-NLS-1$
 
                   // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
-                  + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
+                  + "      DISTINCT TourId," + NL //                                         //$NON-NLS-1$
 
-                  + "      StartYear," + NL //                                         //$NON-NLS-1$
+                  + "      StartYear," + NL //                                               //$NON-NLS-1$
                   + "      " + SQL_SUM_FIELDS
 
-                  + "   FROM TOURDATA" + NL //                                         //$NON-NLS-1$
+                  + "   FROM TOURDATA" + NL //                                               //$NON-NLS-1$
 
-                  + "   " + sqlTagJoinTable
-
-                  + "   AS jTdataTtag" //                                              //$NON-NLS-1$
-                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //  //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //             //$NON-NLS-1$
 
                   + "   " + sqlWhereClause
 
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                      //$NON-NLS-1$
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                            //$NON-NLS-1$
             ;
 
          } else {
 
             // without tag filter
-
-            /**
-             * <code>
-             *
-             *  SELECT
-             *     StartYear,
-             *     SUM( CAST(TourDistance AS BIGINT)),
-             *     ...
-             *     MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
-             *  FROM TOURDATA
-             *  WHERE 1=1
-             *     AND TourData.tourPerson_personId = 0
-             *     AND TourData.tourType_typeId IN ( 0, 1, 34)
-             *  GROUP BY ROLLUP(StartYear)
-             *  ORDER BY StartYear
-             *
-             * </code>
-             */
 
             sqlFromTourData = UI.EMPTY_STRING
 
@@ -238,18 +133,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isTourTagFilterEnabled == false || isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
 
          sqlAppFilter.setParameters(prepStmt, paramIndex);
 

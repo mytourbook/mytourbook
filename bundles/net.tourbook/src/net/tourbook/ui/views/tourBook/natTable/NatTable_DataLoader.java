@@ -38,6 +38,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
@@ -312,7 +313,7 @@ public class NatTable_DataLoader {
             // tags are combined with AND
 
             final SQLFilter sqlFilter = new SQLFilter();
-            final SQLData sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
+            final SQLData sqlCombineTagsWithAnd = TourTagFilterSqlJoinBuilder.createSql_CombineTagsWithAnd();
 
             sql = NL
 
@@ -406,7 +407,7 @@ public class NatTable_DataLoader {
          } else {
 
             final SQLFilter sqlFilter = new SQLFilter();
-            final SQLData sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
+            final SQLData sqlCombineTagsWithAnd = TourTagFilterSqlJoinBuilder.createSql_CombineTagsWithAnd();
 
             sql = NL
 
@@ -435,9 +436,6 @@ public class NatTable_DataLoader {
             sqlCombineTagsWithAnd.setParameters(prepStmt, 1);
             sqlFilter.setParameters(prepStmt, sqlCombineTagsWithAnd.getLastParameterIndex());
          }
-
-//      System.out.println((System.currentTimeMillis() + sql));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
          final ResultSet result = prepStmt.executeQuery();
 
@@ -485,22 +483,7 @@ public class NatTable_DataLoader {
 
          int rowIndex = loaderItem.sqlOffset;
 
-         PreparedStatement prepStmt;
-
-         final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-
-         String sqlTagJoinTable;
-         SQLData sqlCombineTagsWithAnd = null;
-
-         if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-            sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-         } else {
-
-            sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-            sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-         }
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
          sql = NL
 
@@ -527,7 +510,7 @@ public class NatTable_DataLoader {
 
                + "       FROM TOURDATA" + NL //                                                          //$NON-NLS-1$
 
-               + "       " + sqlTagJoinTable
+               + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
 
                + "       AS jTdataTtag" //      //$NON-NLS-1$
                + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                        //$NON-NLS-1$
@@ -550,22 +533,11 @@ public class NatTable_DataLoader {
                + " " + createSql_Sorting_OrderBy() //                                                    //$NON-NLS-1$
          ;
 
-         prepStmt = conn.prepareStatement(sql);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
          int paramIndex = 1;
 
-         if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
 
          // set filter parameters
          sqlAppFilter.setParameters(prepStmt, paramIndex);
@@ -574,9 +546,6 @@ public class NatTable_DataLoader {
          // set other parameters
          prepStmt.setInt(paramIndex++, rowIndex);
          prepStmt.setInt(paramIndex++, FETCH_SIZE);
-
-//      System.out.println((System.currentTimeMillis() + " sql:" + sql));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
          long prevTourId = -1;
          HashSet<Long> tagIds = null;
