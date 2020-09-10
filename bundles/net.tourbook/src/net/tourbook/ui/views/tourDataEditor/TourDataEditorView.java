@@ -239,19 +239,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
-   // Add entries in time slices for pauses ? or just add a column "paused" like "break" and select the checkbox if it is a pause ?
-   //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
-
-   //TODO check that the sums of paused time work with my big database
-
    //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
    //Yes, the translators will have to translate : elapsed, paused, recorded, ...
-
-   //Why and how did I bring such a regression in the gpx export ?  accessor issues ?
-   //  <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
-//   <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
-
-   //TODO I think we should display the pauses in the graph chart just like for markers (add a button like markers as well)
 
    // TODO Rename the last strings that contain "recording", "driving"
 
