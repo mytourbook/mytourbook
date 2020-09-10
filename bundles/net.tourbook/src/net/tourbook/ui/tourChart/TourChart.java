@@ -2240,12 +2240,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       chartLabel.markerLabel = pauseDuration;
       chartLabel.isDescription = true;
-      chartLabel.visualPosition = labelPosition;
+      chartLabel.visualPosition = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
       chartLabel.type = ChartLabel.MARKER_TYPE_DEVICE;
       chartLabel.visualType = ChartLabel.VISIBLE_TYPE_DEFAULT;
-//
-//      chartLabel.labelXOffset = tourMarker.getLabelXOffset();
-//      chartLabel.labelYOffset = tourMarker.getLabelYOffset();
 
       chartLabel.isVisible = true;
 
@@ -2254,8 +2251,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    /**
     * create the layer which displays the tour pauses
+    *
+    * @param isForcedPauses
+    *           When <code>true</code> the pauses must be drawn, otherwise
+    *           {@link TourChartConfiguration#isShowTourPauses} determines if the pauses are drawn
+    *           or not.
+    *           <p>
     */
-   private void createLayer_Pauses() {
+   private void createLayer_Pauses(final boolean isForcedPauses) {
+
+      if (isForcedPauses == false && _tcc.isShowTourPauses == false) {
+         // pauses layer is not displayed
+         hidePausesLayer();
+         return;
+      }
 
       // pauses layer is visible
 
@@ -2362,19 +2371,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final long[] pausedTime_End = _tourData.getPausedTime_End();
 
          String pauseDurationText;
+         int serieIndex = 0;
+         final int[] timeSerie = _tourData.timeSerie;
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
             pauseDurationText = UI.format_hh_mm_ss((pausedTime_End[index] - pausedTime_Start[index]) / 1000);
 
-            //TODO find the seie index - not too hard
-            // find the label position..... huh pretty hard, how is it found for markers ?
+            for (; serieIndex < timeSerie.length; ++serieIndex) {
+
+               final long currentTime = timeSerie[serieIndex] * 1000 + _tourData.getTourStartTimeMS();
+
+               if (currentTime == pausedTime_Start[index] || currentTime > pausedTime_Start[index]) {
+                  break;
+               }
+            }
+
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
-                  150,
-                  150);
-            //tourMarker.getSerieIndex(),
-            //    tourMarker.getLabelPosition());
+                  serieIndex,
+                  0);
 
             cmc.chartLabels.add(chartLabel);
          }
@@ -5643,6 +5659,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createLayer_TourSegmenter();
       createLayer_Marker(false);
+      createLayer_Pauses(false);
       createLayer_2ndAlti();
       createLayer_Photo();
 
@@ -5749,7 +5766,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // create/hide pauses layer
       if (arePausesVisible) {
-         createLayer_Pauses();
+         createLayer_Pauses(true);
       } else {
          hidePausesLayer();
       }
