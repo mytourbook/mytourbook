@@ -1603,10 +1603,10 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_moving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_moving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_moving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_moving_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -1628,10 +1628,10 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_moving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_moving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_moving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_moving_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
