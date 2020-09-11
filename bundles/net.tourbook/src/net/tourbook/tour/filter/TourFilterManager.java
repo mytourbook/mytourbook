@@ -574,7 +574,7 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_DrivingTime)
+                  .name(Messages.Tour_Filter_Field_MovingTime)
                   .fieldId(TourFilterFieldId.TIME_MOVING_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)

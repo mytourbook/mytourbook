@@ -242,8 +242,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
    //Yes, the translators will have to translate : elapsed, paused, recorded, ...
 
-   // TODO Rename the last strings that contain "recording", "driving"
-
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
@@ -2900,7 +2898,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       };
 
       /*
-       * listener for recording/driving/paused time
+       * listener for elapsed/moving/paused time
        */
       _tourTimeListener = new SelectionAdapter() {
          @Override
