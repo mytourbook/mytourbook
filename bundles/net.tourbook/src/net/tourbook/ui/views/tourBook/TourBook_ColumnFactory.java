@@ -2379,7 +2379,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final long value = ((TVITourBookItem) element).colBreakTime;
+            final long value = ((TVITourBookItem) element).colTourComputedTime_Break;
 
             return colDef_NatTable.printLongValue(value);
          }
@@ -2394,7 +2394,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final TVITourBookItem item = (TVITourBookItem) element;
 
-            final long value = item.colBreakTime;
+            final long value = item.colTourComputedTime_Break;
 
             colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2416,8 +2416,8 @@ public class TourBook_ColumnFactory {
 
             final TVITourBookItem item = (TVITourBookItem) element;
 
-            final long dbPausedTime = item.colBreakTime;
-            final long dbElapsedTime = item.colTourElapsedTime;
+            final long dbPausedTime = item.colTourComputedTime_Break;
+            final long dbElapsedTime = item.colTourDeviceTime_Elapsed;
 
             final double relativePausedTime = dbElapsedTime == 0
                   ? 0
@@ -2439,8 +2439,8 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final TVITourBookItem item = (TVITourBookItem) element;
 
-            final long dbPausedTime = item.colBreakTime;
-            final long dbElapsedTime = item.colTourElapsedTime;
+            final long dbPausedTime = item.colTourComputedTime_Break;
+            final long dbElapsedTime = item.colTourDeviceTime_Elapsed;
 
             final double relativePausedTime = dbElapsedTime == 0
                   ? 0
@@ -2464,7 +2464,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final long value = ((TVITourBookItem) element).colTourElapsedTime;
+            final long value = ((TVITourBookItem) element).colTourDeviceTime_Elapsed;
 
             return colDef_NatTable.printLongValue(value);
          }
@@ -2477,7 +2477,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colTourElapsedTime;
+            final long value = ((TVITourBookItem) element).colTourDeviceTime_Elapsed;
 
             colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2498,7 +2498,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final long value = ((TVITourBookItem) element).colTourMovingTime;
+            final long value = ((TVITourBookItem) element).colTourComputedTime_Moving;
 
             return colDef_NatTable.printLongValue(value);
          }
@@ -2511,7 +2511,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colTourMovingTime;
+            final long value = ((TVITourBookItem) element).colTourComputedTime_Moving;
 
             colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 
