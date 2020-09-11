@@ -574,7 +574,7 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_MovingTime)
+                  .name(Messages.Tour_Filter_Field_ComputedTime_Moving)
                   .fieldId(TourFilterFieldId.TIME_MOVING_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
@@ -582,7 +582,7 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_BreakTime)
+                  .name(Messages.Tour_Filter_Field_ComputedTime_Break)
                   .fieldId(TourFilterFieldId.TIME_BREAK_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)

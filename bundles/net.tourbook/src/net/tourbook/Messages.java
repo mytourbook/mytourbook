@@ -2571,9 +2571,9 @@ public class Messages extends NLS {
    public static String Tour_Filter_Field_Altitude_Ascent;
    public static String Tour_Filter_Field_Altitude_Descent;
    public static String Tour_Filter_Field_Altitude_Max;
-   public static String Tour_Filter_Field_BreakTime;
+   public static String Tour_Filter_Field_ComputedTime_Break;
    public static String Tour_Filter_Field_Distance;
-   public static String Tour_Filter_Field_MovingTime;
+   public static String Tour_Filter_Field_ComputedTime_Moving;
    public static String Tour_Filter_Field_ManualTour;
    public static String Tour_Filter_Field_Photos;
    public static String Tour_Filter_Field_DeviceTime_Elapsed;
