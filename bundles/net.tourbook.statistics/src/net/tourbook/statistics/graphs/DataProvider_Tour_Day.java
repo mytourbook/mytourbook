@@ -310,8 +310,8 @@ public class DataProvider_Tour_Day extends DataProvider {
          final ArrayList<ZonedDateTime> dbAllTourStartDateTime = new ArrayList<>();
 
          final TIntArrayList dbAllTourDuration = new TIntArrayList();
-         final TIntArrayList dbAllTourElapsedTime = new TIntArrayList();
-         final TIntArrayList dbAllTourMovingTime = new TIntArrayList();
+         final TIntArrayList dbAllTourDeviceTime_Elapsed = new TIntArrayList();
+         final TIntArrayList dbAllTourComputedTime_Moving = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
 
@@ -425,8 +425,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourStartDateTime.add(zonedStartDateTime);
                dbAllTourStartTime.add(startDayTime);
                dbAllTourEndTime.add((startDayTime + dbElapsedTime));
-               dbAllTourElapsedTime.add(dbElapsedTime);
-               dbAllTourMovingTime.add(dbMovingTime);
+               dbAllTourDeviceTime_Elapsed.add(dbElapsedTime);
+               dbAllTourComputedTime_Moving.add(dbMovingTime);
                dbAllTourDeviceTime_Recorded.add(dbRecordedTime);
                dbAllTourDeviceTime_Paused.add(dbPausedTime);
 
@@ -645,8 +645,8 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTraining_Effect_Anaerobic = dbAllTrain_Effect_Anaerob.toArray();
          _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
 
-         _tourDayData.allDeviceTime_Elapsed = dbAllTourElapsedTime.toArray();
-         _tourDayData.allComputedTime_Moving = dbAllTourMovingTime.toArray();
+         _tourDayData.allDeviceTime_Elapsed = dbAllTourDeviceTime_Elapsed.toArray();
+         _tourDayData.allComputedTime_Moving = dbAllTourComputedTime_Moving.toArray();
          _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
          _tourDayData.allDeviceTime_Paused = dbAllTourDeviceTime_Paused.toArray();
 
