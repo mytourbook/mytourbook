@@ -226,16 +226,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // DONE BUT TO CHECK WITH MULTIPLE FILES: Suunto 9
-   // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
-   //example: 05-12-2020 : The elapsed time should be 0:46:46 or 0:46:47
-   //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
-   // so the elapsed time is erroneous when importing from json.gz and gpx
-   //If i import from a FIT (exported from Movescount), the recorded time is the same
-   //08/22/2020: Hunch => is it because maybe in some cases the last x seconds of data not having GPS data,
-   // we dont keep them and hence we are missing those seconds. If it's the case, then we should make an exception for
-   //the last bit of data right before the "stop" and save them
-
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
