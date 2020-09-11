@@ -3187,10 +3187,10 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -3210,14 +3210,14 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_ELAPSED_TIME_TOTAL", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_recording_time;
+            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_elapsed_time;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_timeTotal_label);
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_timeTotal_label);
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_timeTotal_tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_timeTotal_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(

@@ -1747,10 +1747,10 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(//

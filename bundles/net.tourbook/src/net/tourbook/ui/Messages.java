@@ -136,11 +136,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_recorded_time;
    public static String        ColumnFactory_recorded_time_label;
    public static String        ColumnFactory_recorded_time_tooltip;
-   public static String        ColumnFactory_recording_time;
-   public static String        ColumnFactory_recording_time_label;
-   public static String        ColumnFactory_recording_time_tooltip;
-   public static String        ColumnFactory_recording_timeTotal_label;
-   public static String        ColumnFactory_recording_timeTotal_tooltip;
+   public static String        ColumnFactory_elapsed_time;
+   public static String        ColumnFactory_elapsed_time_label;
+   public static String        ColumnFactory_elapsed_time_tooltip;
+   public static String        ColumnFactory_elapsed_timeTotal_label;
+   public static String        ColumnFactory_elapsed_timeTotal_tooltip;
    public static String        ColumnFactory_reference_tour;
    public static String        ColumnFactory_sequence;
    public static String        ColumnFactory_sequence_label;
