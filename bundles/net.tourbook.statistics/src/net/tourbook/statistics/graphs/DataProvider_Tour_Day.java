@@ -645,10 +645,10 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTraining_Effect_Anaerobic = dbAllTrain_Effect_Anaerob.toArray();
          _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
 
-         _tourDayData.allElapsedTime = dbAllTourElapsedTime.toArray();
-         _tourDayData.allMovingTime = dbAllTourMovingTime.toArray();
+         _tourDayData.allDeviceTime_Elapsed = dbAllTourElapsedTime.toArray();
+         _tourDayData.allComputedTime_Moving = dbAllTourMovingTime.toArray();
          _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
-         _tourDayData.allPausedTime = dbAllTourDeviceTime_Paused.toArray();
+         _tourDayData.allDeviceTime_Paused = dbAllTourDeviceTime_Paused.toArray();
 
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;

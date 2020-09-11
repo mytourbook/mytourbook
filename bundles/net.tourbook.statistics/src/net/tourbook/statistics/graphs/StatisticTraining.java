@@ -298,11 +298,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final int[] startValue = _tourDayData.allStartTime;
       final int[] endValue = _tourDayData.allEndTime;
 
-      final int elapsedTime = _tourDayData.allElapsedTime[valueIndex];
-      final int movingTime = _tourDayData.allMovingTime[valueIndex];
+      final int elapsedTime = _tourDayData.allDeviceTime_Elapsed[valueIndex];
+      final int movingTime = _tourDayData.allComputedTime_Moving[valueIndex];
       final int breakTime = elapsedTime - movingTime;
       final int recordedTime = _tourDayData.allDeviceTime_Recorded[valueIndex];
-      final int pausedTime = _tourDayData.allPausedTime[valueIndex];
+      final int pausedTime = _tourDayData.allDeviceTime_Paused[valueIndex];
 
       final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
