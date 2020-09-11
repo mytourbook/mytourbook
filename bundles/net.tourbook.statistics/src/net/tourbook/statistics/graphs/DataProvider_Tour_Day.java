@@ -630,7 +630,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;
 
-         _tourDayData.statisticValues = getStatisticValues();
+         setStatisticValues();
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
@@ -639,7 +639,13 @@ public class DataProvider_Tour_Day extends DataProvider {
       return _tourDayData;
    }
 
-   private String getStatisticValues() {
+   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
+
+      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
+      _isAdjustSamePosition = isAdjustmentSamePosition;
+   }
+
+   private void setStatisticValues() {
 
       final String FIELD_SEPARATOR = ",";
       final Pattern SPACE_PATTERN = Pattern.compile("  *"); //$NON-NLS-1$
@@ -746,6 +752,7 @@ public class DataProvider_Tour_Day extends DataProvider {
       }
 
       String formattedValues = sb.toString();
+      final String formattedValuesCSV = sb.toString();
 
       final boolean isRemoveZeros = true;
       if (isRemoveZeros) {
@@ -766,12 +773,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       }
 
-      return formattedValues;
-   }
-
-   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
-
-      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
-      _isAdjustSamePosition = isAdjustmentSamePosition;
+      _tourDayData.statisticValues = formattedValues;
+      _tourDayData.statisticValuesCSV = formattedValuesCSV;
    }
 }

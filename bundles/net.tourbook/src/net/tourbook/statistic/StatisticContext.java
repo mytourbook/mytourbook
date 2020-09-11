@@ -80,6 +80,11 @@ public class StatisticContext {
     */
    public String         outStatisticValues;
 
+   /**
+    * Contains the statistic values in CSV format.
+    */
+   public String         outStatisticValuesCSV;
+
    public StatisticView  eventManager;
 
    /**

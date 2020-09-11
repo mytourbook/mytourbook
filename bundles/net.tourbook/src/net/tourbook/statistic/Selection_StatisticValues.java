@@ -24,12 +24,14 @@ import org.eclipse.jface.viewers.ISelection;
 public class Selection_StatisticValues implements ISelection {
 
    String statisticValues;
+   String statisticValuesCSV;
 
-   public Selection_StatisticValues(final String statisticValues) {
+   public Selection_StatisticValues(final String statisticValues, final String statisticValuesCSV) {
 
       super();
 
       this.statisticValues = statisticValues;
+      this.statisticValuesCSV = statisticValuesCSV;
    }
 
    @Override
@@ -42,8 +44,9 @@ public class Selection_StatisticValues implements ISelection {
 
       return "Selection_StatisticValues\n" //$NON-NLS-1$
             + "[\n" //$NON-NLS-1$
-            + "statisticValues=" + statisticValues //$NON-NLS-1$
-            + "\n]"; //$NON-NLS-1$
+            + "statisticValues=" + statisticValues + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "statisticValuesCSV=" + statisticValuesCSV + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "]"; //$NON-NLS-1$
    }
 
 }

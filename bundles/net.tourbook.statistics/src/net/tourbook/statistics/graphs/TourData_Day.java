@@ -75,6 +75,7 @@ public class TourData_Day {
    ArrayList<String>              tourDescription;
 
    String                         statisticValues;
+   String                         statisticValuesCSV;
 
    /**
     * Contains the tags for the tour where the key is the tour ID

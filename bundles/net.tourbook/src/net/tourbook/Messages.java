@@ -155,7 +155,7 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip;
-   
+
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
    public static String        Dialog_AdjustTemperature_Dialog_Message;
    public static String        Dialog_AdjustTemperature_Dialog_Title;
@@ -941,6 +941,10 @@ public class Messages extends NLS {
    public static String        Image__assignMergedTour_disabled;
    public static String        Image__chart_analyzer;
    public static String        Image__collapse_all;
+   public static String        Image__Copy;
+   public static String        Image__Copy_Disabled;
+   public static String        Image__CSVFormat;
+   public static String        Image__CSVFormat_Disabled;
    public static String        Image__database;
    public static String        Image__database_other_person;
    public static String        Image__delete;
@@ -2677,6 +2681,10 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Type_Surfing;
 
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
+
+   public static String Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip;
+   public static String Tour_StatisticValues_Action_CSVFormat_Tooltip;
+   public static String Tour_StatisticValues_Label_NoData;
 
    public static String Tour_SubMenu_Cadence;
    public static String Tour_SubMenu_Elevation;

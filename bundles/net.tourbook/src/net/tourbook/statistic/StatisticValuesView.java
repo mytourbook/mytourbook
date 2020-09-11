@@ -24,6 +24,9 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -39,28 +42,66 @@ import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
 
-   public static final String            ID         = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
+   public static final String            ID                  = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final String           STATE_IS_CSV_FORMAT = "STATE_IS_CSV_FORMAT";                        //$NON-NLS-1$
+
+   private static final IPreferenceStore _prefStore          = TourbookPlugin.getPrefStore();
+   private final IDialogSettings         _state              = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener       _prefChangeListener;
    private ITourEventListener            _tourEventListener;
 
+   private Selection_StatisticValues     _selection_StatisticValues;
+
+   private Action_CopyIntoClipboard      _action_CopyIntoClipboard;
+   private Action_CSVFormat              _action_CSVFormat;
+
    /*
     * UI controls
     */
-   private PageBook                  _pageBook;
+   private PageBook  _pageBook;
 
-   private Composite                 _pageNoData;
-   private Composite                 _pageContent;
+   private Composite _pageNoData;
+   private Composite _pageContent;
 
-   /**
-    * With a label, the content can easily be scrolled but cannot be selected
-    */
-//   private Label     _txtAllFields;
-   private Text                      _txtAllFields;
+   private Text      _txtAllFields;
 
-   private Selection_StatisticValues _selection_StatisticValues;
+   private class Action_CopyIntoClipboard extends Action {
+
+      Action_CopyIntoClipboard() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_CopyIntoClipboard();
+      }
+   }
+
+   private class Action_CSVFormat extends Action {
+
+      Action_CSVFormat() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_CSVFormat();
+      }
+   }
 
    private void addPrefListener() {
 
@@ -79,9 +120,6 @@ public class StatisticValuesView extends ViewPart {
                // update font
 
                _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
-
-               // relayout UI
-//               _txtAllFields.pack(true);
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
@@ -123,6 +161,10 @@ public class StatisticValuesView extends ViewPart {
 
    private void createActions() {
 
+      _action_CopyIntoClipboard = new Action_CopyIntoClipboard();
+      _action_CSVFormat = new Action_CSVFormat();
+
+      fillActionBars();
    }
 
    @Override
@@ -136,6 +178,8 @@ public class StatisticValuesView extends ViewPart {
       addTourEventListener();
       addPrefListener();
 
+      restoreState();
+
       showInvalidPage();
    }
 
@@ -143,7 +187,7 @@ public class StatisticValuesView extends ViewPart {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.Tour_StatisticValues_Label_NoData);
 
       _pageContent = new Composite(_pageBook, SWT.NONE);
       _pageContent.setLayout(new FillLayout());
@@ -174,7 +218,30 @@ public class StatisticValuesView extends ViewPart {
       super.dispose();
    }
 
+   private void fillActionBars() {
+
+      /*
+       * Fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_action_CopyIntoClipboard);
+      tbm.add(_action_CSVFormat);
+
+      // setup actions
+      tbm.update(true);
+   }
+
    private void initUI() {
+
+   }
+
+   private void onAction_CopyIntoClipboard() {
+
+   }
+
+   private void onAction_CSVFormat() {
+      // TODO Auto-generated method stub
 
    }
 
@@ -185,8 +252,14 @@ public class StatisticValuesView extends ViewPart {
       updateUI();
    }
 
+   private void restoreState() {
+
+   }
+
    @PersistState
    private void saveState() {
+
+      _state.put(STATE_IS_CSV_FORMAT, _action_CSVFormat.isChecked());
 
    }
 
@@ -201,7 +274,7 @@ public class StatisticValuesView extends ViewPart {
       _pageBook.showPage(_pageNoData);
    }
 
-   void updateUI() {
+   private void updateUI() {
 
       if (_selection_StatisticValues == null || _selection_StatisticValues.statisticValues == null) {
 
@@ -211,7 +284,10 @@ public class StatisticValuesView extends ViewPart {
 
       _pageBook.showPage(_pageContent);
 
-      _txtAllFields.setText(_selection_StatisticValues.statisticValues);
+      final String statisticValues = _action_CSVFormat.isChecked()
+            ? _selection_StatisticValues.statisticValues
+            : _selection_StatisticValues.statisticValuesCSV;
+      _txtAllFields.setText(statisticValues);
 
    }
 

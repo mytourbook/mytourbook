@@ -724,6 +724,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   durationTime);
 
       statContext.outStatisticValues = _tourDayData.statisticValues;
+      statContext.outStatisticValuesCSV = _tourDayData.statisticValuesCSV;
 
       _isDuration_ReloadData = false;
 

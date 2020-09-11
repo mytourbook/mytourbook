@@ -394,13 +394,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int widgetSpacing = 15;
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(6)
             .margins(3, 3)
             .applyTo(container);
@@ -512,11 +510,13 @@ public class StatisticView extends ViewPart implements ITourProvider {
       super.dispose();
    }
 
-   private void fireEvent_StatisticValues(final String statisticValues) {
+   private void fireEvent_StatisticValues(final StatisticContext statContext) {
 
       TourManager.fireEventWithCustomData(
             TourEventId.STATISTIC_VALUES,
-            new Selection_StatisticValues(statisticValues),
+            new Selection_StatisticValues(
+                  statContext.outStatisticValues,
+                  statContext.outStatisticValuesCSV),
             this);
    }
 
@@ -1001,7 +1001,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       updateStatistic_20_PostRefresh(statContext);
 
-      fireEvent_StatisticValues(statContext.outStatisticValues);
+      fireEvent_StatisticValues(statContext);
    }
 
    /**
@@ -1036,7 +1036,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       updateStatistic_20_PostRefresh(statContext);
       updateUI_Toolbar();
 
-      fireEvent_StatisticValues(statContext.outStatisticValues);
+      fireEvent_StatisticValues(statContext);
    }
 
    private void updateStatistic_20_PostRefresh(final StatisticContext statContext) {
