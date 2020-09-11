@@ -78,7 +78,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                                  final int numberOfYears,
                                  final boolean isForceUpdate) {
 
-      // dont reload data which are already here
+      // don't reload data which are already here
       if (_activePerson == person
             && _activeTourTypeFilter == tourTypeFilter
             && _lastYear == lastYear
@@ -324,7 +324,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
          _tourDataTime.tourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
-         _tourDataTime.tourMovingTimeValues = allTourMovingTime.toArray();
+         _tourDataTime.tourComputedTime_MovingValues = allTourMovingTime.toArray();
 
          _tourDataTime.tourTitle = allTourTitle;
          _tourDataTime.tourDescription = allTourDescription;

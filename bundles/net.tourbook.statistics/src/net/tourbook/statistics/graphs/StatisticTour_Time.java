@@ -250,7 +250,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int elapsedTime = _tourTimeData.tourDeviceTime_ElapsedValues[valueIndex];
       final int recordedTime = _tourTimeData.tourDeviceTime_RecordedValues[valueIndex];
       final int pausedTime = elapsedTime - recordedTime;
-      final int movingTime = _tourTimeData.tourMovingTimeValues[valueIndex];
+      final int movingTime = _tourTimeData.tourComputedTime_MovingValues[valueIndex];
       final int breakTime = elapsedTime - movingTime;
 
       final ZonedDateTime zdtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
