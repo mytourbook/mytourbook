@@ -108,7 +108,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    public boolean isChecksumValidation = true;
 
    /**
-    * A tour id will be created with recording time when <code>true</code>.
+    * A tour id will be created with elapsed time when <code>true</code>.
     */
    public boolean isCreateTourIdWithElapsedTime;
 
@@ -139,9 +139,9 @@ public abstract class TourbookDevice implements IRawDataReader {
 
    /**
     * Creates a unique id for the tour, {@link TourData#createTimeSeries()} must be called ahead, to
-    * create recording time.
+    * create elapsed time.
     * <p>
-    * Recording time is added to the tour id when {@link #isCreateTourIdWithElapsedTime} is
+    * Elapsed time is added to the tour id when {@link #isCreateTourIdWithElapsedTime} is
     * <code>true</code>.
     *
     * @param tourData
@@ -166,7 +166,7 @@ public abstract class TourbookDevice implements IRawDataReader {
       if (isCreateTourIdWithElapsedTime) {
 
          /*
-          * 25.5.2009: added recording time to the tour distance for the unique key because tour
+          * 25.5.2009: added elapsed time to the tour distance for the unique key because tour
           * export and import found a wrong tour when exporting was done with camouflage speed ->
           * this resulted in a NEW tour
           */
@@ -203,7 +203,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     *         <p>
     *         <code>Integer.toString(tourDistance)</code>
     *         <p>
-    *         as default, when recording time is not used as it was in the initial implementation.
+    *         as default, when elapsed time is not used as it was in the initial implementation.
     */
    public String createUniqueId_Legacy(final TourData tourData, final int tourDistance) {
 
@@ -216,7 +216,7 @@ public abstract class TourbookDevice implements IRawDataReader {
       } else {
 
          /*
-          * This represents the original (1st) implementation without recording time.
+          * This represents the original (1st) implementation without elapsed time.
           */
 
          uniqueKey = Integer.toString(tourDistance);

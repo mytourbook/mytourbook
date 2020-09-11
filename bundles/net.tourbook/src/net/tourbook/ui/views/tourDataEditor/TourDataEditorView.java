@@ -239,9 +239,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
-   //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
-   //Yes, the translators will have to translate : elapsed, paused, recorded, ...
-
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;

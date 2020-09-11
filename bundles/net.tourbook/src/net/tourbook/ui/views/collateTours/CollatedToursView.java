@@ -1256,7 +1256,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();
@@ -1354,7 +1354,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();

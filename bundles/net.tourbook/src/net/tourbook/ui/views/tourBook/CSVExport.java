@@ -786,7 +786,7 @@ public class CSVExport {
          sb.append(UI.TAB);
       }
 
-      { // HEADER_TIME_RECORDING_TIME hhh:mm:ss
+      { // HEADER_TIME_ELAPSED_TIME hhh:mm:ss
 
          final long colElapsedTime = (tviItem).colTourDeviceTime_Elapsed;
          if (colElapsedTime != 0) {

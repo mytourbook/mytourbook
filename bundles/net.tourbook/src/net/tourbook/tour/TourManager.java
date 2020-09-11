@@ -1079,7 +1079,7 @@ public class TourManager {
             tourDistance += fromDistanceSerie[fromSerieLength - 1];
          }
 
-         // summarize recording time
+         // summarize elapsed time
          final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
          tourElapsedTime += fromTourEnd;
 

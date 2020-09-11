@@ -157,7 +157,7 @@ public class CRPDataReader extends TourbookDevice {
                ? Integer.parseInt(tourStartTime.substring(3, 5))
                : Integer.parseInt(tourStartTime.substring(3));
 
-         // recording time
+         // elapsed time
          final String tourRecTimeSt = tokenLine.nextToken();
          final int tourDeviceTime_Elapsed = Integer.parseInt(tourRecTimeSt.substring(0, 2))
                * 3600
