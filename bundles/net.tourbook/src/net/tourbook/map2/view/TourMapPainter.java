@@ -1437,7 +1437,7 @@ public class TourMapPainter extends MapPainter {
                continue;
             }
 
-            final long pauseDuration = (endTime - startTime) / 1000;
+            final long pauseDuration = Math.round((float) (endTime - startTime) / 1000);
 
             // draw tour marker
             if (drawTourPauses(

@@ -2375,7 +2375,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final int[] timeSerie = _tourData.timeSerie;
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-            pauseDurationText = UI.format_hh_mm_ss((pausedTime_End[index] - pausedTime_Start[index]) / 1000);
+            final long pauseDuration = Math.round((float) (pausedTime_End[index] - pausedTime_Start[index]) / 1000);
+            pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
             for (; serieIndex < timeSerie.length; ++serieIndex) {
 

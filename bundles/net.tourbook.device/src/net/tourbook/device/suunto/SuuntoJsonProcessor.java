@@ -362,8 +362,8 @@ public class SuuntoJsonProcessor {
             } else if (currentSampleData.contains(Boolean.FALSE.toString())) {
                isPaused = false;
 
-               _pausedTime_Start.add(pauseStartTime.toEpochSecond() * 1000);
-               _pausedTime_End.add(currentZonedDateTime.toEpochSecond() * 1000);
+               _pausedTime_Start.add(pauseStartTime.toInstant().toEpochMilli());
+               _pausedTime_End.add(currentZonedDateTime.toInstant().toEpochMilli());
             }
          }
 
