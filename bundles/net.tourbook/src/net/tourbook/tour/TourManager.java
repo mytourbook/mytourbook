@@ -847,7 +847,7 @@ public class TourManager {
 
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
-      int tourElapsedTime = 0;
+      int tourDeviceTime_Elapsed = 0;
       int tourDeviceTime_Recorded = 0;
       int tourDeviceTime_Paused = 0;
       float tourDistance = 0;
@@ -939,12 +939,12 @@ public class TourManager {
 
             // adjust relative time series
             for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
-               toTimeSerie[toStartIndex + serieIndex] = tourElapsedTime + fromTimeSerie[serieIndex];
+               toTimeSerie[toStartIndex + serieIndex] = tourDeviceTime_Elapsed + fromTimeSerie[serieIndex];
             }
             if (fromSwim_Time != null) {
                isSwim_Time = true;
                for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
-                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourElapsedTime + fromSwim_Time[swimSerieIndex];
+                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourDeviceTime_Elapsed + fromSwim_Time[swimSerieIndex];
                }
             }
 
@@ -1081,7 +1081,7 @@ public class TourManager {
 
          // summarize elapsed time
          final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
-         tourElapsedTime += fromTourEnd;
+         tourDeviceTime_Elapsed += fromTourEnd;
 
          // summarize altitude up/down
          tourAltUp += fromTourData.getTourAltUp();
@@ -1099,7 +1099,7 @@ public class TourManager {
           * Add 1 otherwise the next tour has the same start time as the previous tour end time,
           * this is because it starts with 0.
           */
-         tourElapsedTime++;
+         tourDeviceTime_Elapsed++;
 
          tourDeviceTime_Recorded += fromTourData.getTourDeviceTime_Recorded();
          tourDeviceTime_Paused += fromTourData.getTourDeviceTime_Paused();
@@ -1179,7 +1179,7 @@ public class TourManager {
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
       joinedTourData.setTourStartTime(tourStartTime);
-      joinedTourData.setTourDeviceTime_Elapsed(tourElapsedTime);
+      joinedTourData.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
       joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
       joinedTourData.setTourDeviceTime_Paused(tourDeviceTime_Paused);
       joinedTourData.setTourDistance(tourDistance);
