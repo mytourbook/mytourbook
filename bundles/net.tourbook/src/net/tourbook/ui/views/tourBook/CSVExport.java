@@ -772,7 +772,7 @@ public class CSVExport {
       csvField(sb, tviItem.colTourComputedTime_Moving); // HEADER_TIME_MOVING_TIME
       csvField(sb, tviItem.colTourComputedTime_Break); // HEADER_TIME_BREAK_TIME
 
-      { // HEADER_TIME_PAUSED_TIME_RELATIVE
+      { // HEADER_TIME_BREAK_TIME_RELATIVE
 
          final long colBreakTime = tviItem.colTourComputedTime_Break;
          final long dbPausedTime = colBreakTime;
