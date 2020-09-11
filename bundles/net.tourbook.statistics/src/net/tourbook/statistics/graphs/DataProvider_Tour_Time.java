@@ -160,7 +160,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
          final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList allTourMovingTime = new TIntArrayList();
+         final TIntArrayList allTourComputedTime_Moving = new TIntArrayList();
 
          final TIntArrayList allDistance = new TIntArrayList();
          final TIntArrayList allAltitudeUp = new TIntArrayList();
@@ -245,7 +245,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourStartTime.add(startDayTime);
                allTourDeviceTime_Elapsed.add(dbElapsedTime);
                allTourDeviceTime_Recorded.add(dbRecordedTime);
-               allTourMovingTime.add(dbMovingTime);
+               allTourComputedTime_Moving.add(dbMovingTime);
 
                allDistance.add((int) (dbDistance / UI.UNIT_VALUE_DISTANCE));
                allAltitudeUp.add((int) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE));
@@ -324,7 +324,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
          _tourDataTime.tourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
-         _tourDataTime.tourComputedTime_MovingValues = allTourMovingTime.toArray();
+         _tourDataTime.tourComputedTime_MovingValues = allTourComputedTime_Moving.toArray();
 
          _tourDataTime.tourTitle = allTourTitle;
          _tourDataTime.tourDescription = allTourDescription;
