@@ -723,8 +723,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      statContext.outStatisticValues = _tourDayData.statisticValues;
-      statContext.outStatisticValuesCSV = _tourDayData.statisticValuesCSV;
+      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

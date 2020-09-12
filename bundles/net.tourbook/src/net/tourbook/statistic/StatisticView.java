@@ -129,6 +129,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private PixelConverter               _pc;
 
+   private String                       _statisticValuesRaw;
+
    /*
     * UI controls
     */
@@ -179,20 +181,18 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {
-
-//          if (partRef.getPart(false) == TourStatisticsView.this) {
-//
-//             int a = 0;
-//             a++;
-//          }
-         }
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
+         public void partClosed(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticView.this) {
+               StatisticManager.setStatisticView(null);
+            }
+         }
 
          @Override
          public void partDeactivated(final IWorkbenchPartReference partRef) {}
@@ -204,7 +204,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
          public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
+         public void partOpened(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == StatisticView.this) {
+               StatisticManager.setStatisticView(StatisticView.this);
+            }
+         }
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {}
@@ -512,11 +517,12 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void fireEvent_StatisticValues(final StatisticContext statContext) {
 
+      // keep values that the statistic values view can show these values when it is opened
+      _statisticValuesRaw = statContext.outStatisticValuesRaw;
+
       TourManager.fireEventWithCustomData(
             TourEventId.STATISTIC_VALUES,
-            new Selection_StatisticValues(
-                  statContext.outStatisticValues,
-                  statContext.outStatisticValuesCSV),
+            new Selection_StatisticValues(_statisticValuesRaw),
             this);
    }
 
@@ -613,6 +619,13 @@ public class StatisticView extends ViewPart implements ITourProvider {
          selectedTours.add(selectedTourData);
          return selectedTours;
       }
+   }
+
+   /**
+    * @return Returns the statistic values from the currently displayed statistic graph.
+    */
+   public String getStatisticValuesRaw() {
+      return _statisticValuesRaw;
    }
 
    private void initUI(final Composite parent) {
@@ -995,7 +1008,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
             getNumberOfYears());
 
       statContext.isRefreshData = true;
-      statContext.eventManager = this;
 
       _activeStatistic.updateStatistic(statContext);
 

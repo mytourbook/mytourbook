@@ -78,14 +78,7 @@ public class StatisticContext {
    /**
     * Contains the statistic values on which the statistic graph is based.
     */
-   public String         outStatisticValues;
-
-   /**
-    * Contains the statistic values in CSV format.
-    */
-   public String         outStatisticValuesCSV;
-
-   public StatisticView  eventManager;
+   public String         outStatisticValuesRaw;
 
    /**
     * @param person
@@ -115,7 +108,9 @@ public class StatisticContext {
     */
    public boolean canFireEvents() {
 
-      return eventManager == null || eventManager.canFireEvents();
+      final StatisticView statView = StatisticManager.getStatisticView();
+
+      return statView != null && statView.canFireEvents();
    }
 
 }

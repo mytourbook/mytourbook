@@ -1133,13 +1133,14 @@ public class Messages extends NLS {
    public static String        Image__TourSegments_Disabled;
    public static String        Image__TourTagFilter;
    public static String        Image__TourTagFilter_Disabled;
-
    public static String        Image__TourTags;
    public static String        Image__undo_edit;
    public static String        Image__undo_edit_disabled;
    public static String        Image__undo_tour_type_filter;
    public static String        Image__undo_tour_type_filter_system;
    public static String        Image__view_compare_wizard;
+   public static String        Image__ZeroValues;
+   public static String        Image__ZeroValues_Disabled;
    public static String        Image__ZoomFitGraph;
    public static String        Image__ZoomCentered;
 
@@ -2684,6 +2685,8 @@ public class Messages extends NLS {
 
    public static String Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip;
    public static String Tour_StatisticValues_Action_CSVFormat_Tooltip;
+   public static String Tour_StatisticValues_Action_ShowZeroValued_Tooltip;
+   public static String Tour_StatisticValues_Info_DataAreCopied;
    public static String Tour_StatisticValues_Label_NoData;
 
    public static String Tour_SubMenu_Cadence;
