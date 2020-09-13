@@ -1282,7 +1282,7 @@ public class TourInfoUI {
 
    private boolean isSimpleTour() {
 
-      final long elapsedTime = _tourData.getTourElapsedTime();
+      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
 
       final boolean isShortTour = elapsedTime < UI.DAY_IN_SECONDS;
       final boolean isSingleTour = !_tourData.isMultipleTours();
@@ -1345,10 +1345,10 @@ public class TourInfoUI {
       /*
        * column: left
        */
-      final long elapsedTime = _tourData.getTourElapsedTime();
-      final long recordedTime = _tourData.getTourRecordedTime();
-      final long pausedTime = _tourData.getTourPausedTime();
-      final long movingTime = _tourData.getTourMovingTime();
+      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
+      final long recordedTime = _tourData.getTourDeviceTime_Recorded();
+      final long pausedTime = _tourData.getTourDeviceTime_Paused();
+      final long movingTime = _tourData.getTourComputedTime_Moving();
       final long breakTime = elapsedTime - movingTime;
 
       final ZonedDateTime zdtTourStart = _tourData.getTourStartTime();

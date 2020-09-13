@@ -179,10 +179,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";        //$NON-NLS-1$
    private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDING_TIME      = "mt:tourRecordingTime";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourRecordedTime";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourPausedTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";      //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
    private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";          //$NON-NLS-1$
@@ -610,24 +610,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
+      } else if (name.equals(TAG_MT_TOUR_MOVING_TIME)) {
 
-         _tourData.setTourMovingTime(getIntValue(charData));
+         _tourData.setTourComputedTime_Moving(getIntValue(charData));
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_RECORDING_TIME)) {
+      } else if (name.equals(TAG_MT_TOUR_ELAPSED_TIME)) {
 
-         _tourData.setTourElapsedTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Elapsed(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_RECORDED_TIME)) {
 
-         _tourData.setTourRecordedTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Recorded(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_PAUSED_TIME)) {
 
-         _tourData.setTourPausedTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Paused(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {
@@ -1101,7 +1101,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _newlyImportedTours.put(tourId, _tourData);
 
          _tourData.computeAltitudeUpDown();
-         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime());
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed());
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
@@ -1626,8 +1626,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             || name.equals(TAG_MT_TOUR_START_TIME)
             || name.equals(TAG_MT_TOUR_END_TIME)
-            || name.equals(TAG_MT_TOUR_DRIVING_TIME)
-            || name.equals(TAG_MT_TOUR_RECORDING_TIME)
+            || name.equals(TAG_MT_TOUR_MOVING_TIME)
+            || name.equals(TAG_MT_TOUR_ELAPSED_TIME)
 
             || name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)
             || name.equals(TAG_MT_TOUR_ALTITUDE_UP)

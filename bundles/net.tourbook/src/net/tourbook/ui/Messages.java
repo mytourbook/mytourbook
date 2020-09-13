@@ -87,9 +87,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_distance_tooltip;
    public static String        ColumnFactory_distanceTotal_label;
    public static String        ColumnFactory_distanceTotal_tooltip;
-   public static String        ColumnFactory_driving_time;
-   public static String        ColumnFactory_driving_time_label;
-   public static String        ColumnFactory_driving_time_tooltip;
+   public static String        ColumnFactory_moving_time;
+   public static String        ColumnFactory_moving_time_label;
+   public static String        ColumnFactory_moving_time_tooltip;
    public static String        ColumnFactory_avg_gradient;
    public static String        ColumnFactory_avg_gradient_label;
    public static String        ColumnFactory_avg_gradient_tooltip;
@@ -136,11 +136,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_recorded_time;
    public static String        ColumnFactory_recorded_time_label;
    public static String        ColumnFactory_recorded_time_tooltip;
-   public static String        ColumnFactory_recording_time;
-   public static String        ColumnFactory_recording_time_label;
-   public static String        ColumnFactory_recording_time_tooltip;
-   public static String        ColumnFactory_recording_timeTotal_label;
-   public static String        ColumnFactory_recording_timeTotal_tooltip;
+   public static String        ColumnFactory_elapsed_time;
+   public static String        ColumnFactory_elapsed_time_label;
+   public static String        ColumnFactory_elapsed_time_tooltip;
+   public static String        ColumnFactory_elapsed_timeTotal_label;
+   public static String        ColumnFactory_elapsed_timeTotal_tooltip;
    public static String        ColumnFactory_reference_tour;
    public static String        ColumnFactory_sequence;
    public static String        ColumnFactory_sequence_label;
@@ -468,7 +468,7 @@ public class Messages extends NLS {
    public static String        Segmenter_Tooltip_Label_Distance;
    public static String        Segmenter_Tooltip_Label_Gradient;
    public static String        Segmenter_Tooltip_Label_MovingTime;
-   public static String        Segmenter_Tooltip_Label_RecordingTime;
+   public static String        Segmenter_Tooltip_Label_DeviceTime_Elapsed;
    public static String        Segmenter_Tooltip_Label_Title;
 
    public static String        Tooltip_WayPoint_Label_Altitude;

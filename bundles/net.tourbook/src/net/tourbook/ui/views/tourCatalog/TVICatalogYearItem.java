@@ -91,7 +91,7 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
       sb.append(" jTdataTtag.TourTag_tagId,"); //		10 //$NON-NLS-1$
 
-      sb.append(" TourCompared.tourRecordingTime"); //		11 //$NON-NLS-1$
+      sb.append(" TourCompared.tourDeviceTime_Elapsed"); //		11 //$NON-NLS-1$
 
       sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -146,7 +146,7 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
                tourItem.avgPulse = result.getFloat(4);
                tourItem.tourSpeed = result.getFloat(5);
-               tourItem.tourRecordingTime = result.getInt(11);
+               tourItem.tourDeviceTime_Elapsed = result.getInt(11);
 
                tourItem.startIndex = result.getInt(6);
                tourItem.endIndex = result.getInt(7);

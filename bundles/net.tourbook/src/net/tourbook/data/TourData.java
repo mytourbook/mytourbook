@@ -291,23 +291,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# TIME #############################################
 
-   //TODO FB Rename into elapsed in the DB
    /**
-    * Total recording time in seconds
+    * Total elapsed time in seconds
     *
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   private long                  tourRecordingTime;
+   private long                  tourDeviceTime_Elapsed;
 
-   //TODO FB Rename into moving in to db
    /**
     * Total moving time in seconds
     *
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   private long                  tourDrivingTime;
+   private long                  tourComputedTime_Moving;
 
    /**
     * Time zone ID or <code>null</code> when the time zone ID is not available.
@@ -316,34 +314,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private String                timeZoneId;
 
    /**
-    * An array of {@link TourTimerPause}
-    * A timer pause is a device event triggered by the user.
-    * TODO FB rename to ?
-    * tourDevicePauses
-    * tourUserPauses
-    * .....
-    */
-   //TODO FB Can't i map it just with the tourid ???
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   @XmlElementWrapper(name = "TourTimerPauses")
-   @XmlElement(name = "TourTimerPause")
-   private List<TourTimerPause>             tourTimerPauses                         = new ArrayList<>();
-
-   /**
     * Total paused time in seconds
     *
     * This number could come from a direct value or from {@link tourTimerPauses}
     */
    @XmlElement
-   private long                  tourPausedTime;
+   private long                  tourDeviceTime_Paused;
 
 
    /**
     * Total recorded time in seconds
     */
    @XmlElement
-   private long                  tourRecordedTime;
+   private long                  tourDeviceTime_Recorded;
 
    // ############################################# DISTANCE #############################################
 
@@ -1252,9 +1235,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private int[]              segmentSerie_Time_Total;
    @Transient
-   private int[]              segmentSerie_Time_Recording;
+   private int[]              segmentSerie_Time_Elapsed;
    @Transient
-   public int[]               segmentSerie_Time_Driving;
+   public int[]               segmentSerie_Time_Moving;
 
    @Transient
    private int[]              segmentSerie_Time_Break;
@@ -1525,7 +1508,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Is <code>true</code> when the tour is imported and contained MT specific fields, e.g. tour
-    * recording time, average temperature, ...
+    * elapsed time, average temperature, ...
     */
    @Transient
    private boolean            _isImportedMTTour;
@@ -1685,8 +1668,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public boolean[]     visiblePoints_ForSurfing;
 
+   /**
+    * An array containing the start time of each pause (in milliseconds)
+    * A timer pause is a device event triggered by the user.
+    */
+   @XmlElementWrapper(name = "PausedTime_Starts")
+   @XmlElement(name = "PausedTime_Start")
+   @Transient
+   public long[]           pausedTime_Start;
 
-// SET_FORMATTING_ON
+   /**
+    * An array containing the end time of each pause (in milliseconds)
+    * A timer pause is a device event triggered by the user.
+    */
+   @XmlElementWrapper(name = "PausedTime_Ends")
+   @XmlElement(name = "PausedTime_End")
+   @Transient
+   public long[]           pausedTime_End;
 
    public TourData() {}
 
@@ -3299,11 +3297,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * calculate the driving time, ignore the time when the distance is 0 within a time period which
+    * calculate the moving time, ignore the time when the distance is 0 within a time period which
     * is defined by <code>sliceMin</code>
     *
     * @param minSlices
-    *           A break will occure when the distance will not change within the minimum number of
+    *           A break will occur when the distance will not change within the minimum number of
     *           time slices.
     * @return Returns the number of slices which can be ignored
     */
@@ -4923,7 +4921,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes the tour moving time in seconds, this is the tour elapsed time - tour break time.
-    * This value is store in {@link #tourDrivingTime}.
+    * This value is store in {@link #tourComputedTime_Moving}.
     */
    public void computeTourMovingTime() {
 
@@ -4933,15 +4931,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (_isImportedMTTour) {
-         // these types of tour are setting the driving time
+         // these types of tour are setting the moving time
          return;
       }
 
       if ((timeSerie == null) || (timeSerie.length == 0)) {
-         tourDrivingTime = 0;
+         tourComputedTime_Moving = 0;
       } else {
-         final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
-         tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
+         final int tourMovingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
+         tourComputedTime_Moving = Math.max(0, tourMovingTimeRaw);
       }
    }
 
@@ -5140,7 +5138,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       timeSerieHistory = new long[serieSize];
 
       // time is in seconds relative to the tour start
-      long recordingTime = 0;
+      long elapsedTime = 0;
 
       long historyTourStartTime = 0;
 
@@ -5162,13 +5160,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // 1..Nth trackpoint
 
-            recordingTime = (absoluteTime - historyTourStartTime) / 1000;
-            timeSerieHistory[serieIndex] = (recordingTime);
+            elapsedTime = (absoluteTime - historyTourStartTime) / 1000;
+            timeSerieHistory[serieIndex] = (elapsedTime);
 
          }
       }
 
-      tourRecordingTime = recordingTime;
+      tourDeviceTime_Elapsed = elapsedTime;
 
       setTourEndTimeMS();
    }
@@ -5234,10 +5232,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final float tourPace = tourDistance == 0 //
             ? 0
-            : tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
+            : tourComputedTime_Moving * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
-      segmentSerie_Time_Recording = new int[segmentSerieLength];
-      segmentSerie_Time_Driving = new int[segmentSerieLength];
+      segmentSerie_Time_Elapsed = new int[segmentSerieLength];
+      segmentSerie_Time_Moving = new int[segmentSerieLength];
       segmentSerie_Time_Break = new int[segmentSerieLength];
       segmentSerie_Time_Total = new int[segmentSerieLength];
 
@@ -5286,18 +5284,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
           * time
           */
          final int segmentEndTime = timeSerie[segmentEndIndex];
-         final int segmentRecordingTime = segmentEndTime - segmentStartTime;
+         final int segmentElapsedTime = segmentEndTime - segmentStartTime;
          final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
-         final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
+         final float segmentMovingTime = segmentElapsedTime - segmentBreakTime;
 
-         segmentSerie_Time_Recording[segmentIndex] = segment.time_Elapsed = segmentRecordingTime;
-         segmentSerie_Time_Driving[segmentIndex] = segment.time_Moving = (int) segmentDrivingTime;
-         segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
-         segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentRecordingTime;
+         segmentSerie_Time_Elapsed[segmentIndex] = segment.deviceTime_Elapsed = segmentElapsedTime;
+         segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = (int) segmentMovingTime;
+         segmentSerie_Time_Break[segmentIndex] = segment.computedTime_Break = segmentBreakTime;
+         segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentElapsedTime;
 
-         totalTime_Elapsed += segmentRecordingTime;
-         totalTime_Moving += segmentDrivingTime;
+         totalTime_Elapsed += segmentElapsedTime;
+         totalTime_Moving += segmentMovingTime;
          totalTime_Break += segmentBreakTime;
 
          float segmentDistance = 0.0f;
@@ -5320,12 +5318,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (segmentDistance != 0.0) {
 
                // speed
-               segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f //
+               segmentSerie_Speed[segmentIndex] = segment.speed = segmentMovingTime == 0.0f //
                      ? 0.0f
-                     : segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
+                     : segmentDistance / segmentMovingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
                // pace
-               final float segmentPace = segmentDrivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
+               final float segmentPace = segmentMovingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
                segment.pace = segmentPace;
                segment.pace_Diff = segment.pace - tourPace;
                segmentSerie_Pace[segmentIndex] = segmentPace;
@@ -5342,9 +5340,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
             final float altitudeDiff = altitudeEnd - altitudeStart;
 
-            final float altiUpDownHour = segmentDrivingTime == 0 //
+            final float altiUpDownHour = segmentMovingTime == 0 //
                   ? 0
-                  : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentDrivingTime * 3600;
+                  : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentMovingTime * 3600;
 
             segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
             segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
@@ -5451,7 +5449,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 
             // stride length with rule of 3
-            final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Elapsed;
+            final float revolutionTotal = segmentAvgCadence / 60 * segment.deviceTime_Elapsed;
             segment.strideLength = segment.distance_Diff / revolutionTotal;
          }
 
@@ -5474,9 +5472,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       totalSegment.isTotal = true;
 
-      totalSegment.time_Elapsed = totalTime_Elapsed;
-      totalSegment.time_Moving = totalTime_Moving;
-      totalSegment.time_Break = totalTime_Break;
+      totalSegment.deviceTime_Elapsed = totalTime_Elapsed;
+      totalSegment.computedTime_Moving = totalTime_Moving;
+      totalSegment.computedTime_Break = totalTime_Break;
 
       totalSegment.distance_Diff = totalDistance;
       totalSegment.pace = totalPace;
@@ -5760,7 +5758,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 // SET_FORMATTING_ON
 
       // time in seconds relative to the tour start
-      long recordingTime = 0;
+      long elapsedTime = 0;
 
       if (isAbsoluteData) {
 
@@ -5793,7 +5791,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   tourStartTime = absoluteTime;
                }
 
-               recordingTime = 0;
+               elapsedTime = 0;
                lastValidTime = tourStartTime;
                lastValidAbsoluteTime = tourStartTime;
 
@@ -5827,12 +5825,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                 * but time can NOT be in the past.
                 */
                if (absoluteTime == Long.MIN_VALUE || absoluteTime < lastValidAbsoluteTime) {
-                  recordingTime = lastValidTime;
+                  elapsedTime = lastValidTime;
                } else {
-                  recordingTime = (absoluteTime - tourStartTime) / 1000;
+                  elapsedTime = (absoluteTime - tourStartTime) / 1000;
                   lastValidAbsoluteTime = absoluteTime;
                }
-               timeSerie[serieIndex] = (int) (lastValidTime = recordingTime);
+               timeSerie[serieIndex] = (int) (lastValidTime = elapsedTime);
 
                /*
                 * distance
@@ -5964,7 +5962,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final int tdTime = timeData.time;
 
             // set time
-            timeSerie[serieIndex] = (int) (recordingTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
+            timeSerie[serieIndex] = (int) (elapsedTime += tdTime == Integer.MIN_VALUE ? 0 : tdTime);
 
             if (isDistance) {
                final float tdDistance = timeData.distance;
@@ -6013,7 +6011,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       createTimeSeries_50_PulseTimes(timeDataSerie);
 
       tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
-      tourRecordingTime = recordingTime;
+      tourDeviceTime_Elapsed = elapsedTime;
       setTourEndTimeMS();
 
       if (isGear) {
@@ -6512,11 +6510,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final PrintStream out = System.out;
 
       out.print(
-            (tourRecordingTime / 3600)
+            (tourDeviceTime_Elapsed / 3600)
                   + UI.SYMBOL_COLON
-                  + ((tourRecordingTime % 3600) / 60)
+                  + ((tourDeviceTime_Elapsed % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + ((tourRecordingTime % 3600) % 60)
+                  + ((tourDeviceTime_Elapsed % 3600) % 60)
                   + UI.SPACE2);
       out.print(getTourDistance());
    }
@@ -6529,27 +6527,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.println(
             "Tour time:      " //$NON-NLS-1$
-                  + (tourRecordingTime / 3600)
+                  + (tourDeviceTime_Elapsed / 3600)
                   + UI.SYMBOL_COLON
-                  + ((tourRecordingTime % 3600) / 60)
+                  + ((tourDeviceTime_Elapsed % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + (tourRecordingTime % 3600) % 60);
+                  + (tourDeviceTime_Elapsed % 3600) % 60);
 
       out.println(
             "Recorded time:      " //$NON-NLS-1$
-                  + (getTourRecordedTime() / 3600)
+                  + (getTourDeviceTime_Recorded() / 3600)
                   + UI.SYMBOL_COLON
-                  + ((getTourRecordedTime() % 3600) / 60)
+                  + ((getTourDeviceTime_Recorded() % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + (getTourRecordedTime() % 3600) % 60);
+                  + (getTourDeviceTime_Recorded() % 3600) % 60);
 
       out.println(
             "Moving time:      " //$NON-NLS-1$
-                  + (getTourMovingTime() / 3600)
+                  + (getTourComputedTime_Moving() / 3600)
                   + UI.SYMBOL_COLON
-                  + ((getTourMovingTime() % 3600) / 60)
+                  + ((getTourComputedTime_Moving() % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + (getTourMovingTime() % 3600) % 60);
+                  + (getTourComputedTime_Moving() % 3600) % 60);
 
       out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
       out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
@@ -6687,6 +6685,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
          tourData.swim_Cadence = null;
       }
+   }
+
+   public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
+                                        final List<Long> pausedTime_End) {
+
+      if (pausedTime_Start == null || pausedTime_Start.size() == 0) {
+         return;
+      }
+
+      pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+
+      setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
+      setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
+
+      final long totalTourTimerPauses = getTotalTourTimerPauses();
+
+      setTourDeviceTime_Recorded(getTourDeviceTime_Elapsed() - totalTourTimerPauses);
+      setTourDeviceTime_Paused(totalTourTimerPauses);
    }
 
    /**
@@ -7528,6 +7544,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public long[] getPausedTime_End() {
+      return pausedTime_End;
+   }
+
+   public long[] getPausedTime_Start() {
+      return pausedTime_Start;
+   }
+
    public int getPhotoTimeAdjustment() {
       return photoTimeAdjustment;
    }
@@ -8299,13 +8323,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public long getTotalTourTimerPauses() {
 
-      if (tourTimerPauses == null || tourTimerPauses.size() == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
+            pausedTime_End == null || pausedTime_End.length == 0) {
          return 0;
       }
 
-      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
+      long totalTourTimerPauses = 0;
+      for (int index = 0; index < pausedTime_Start.length; ++index) {
+         totalTourTimerPauses += pausedTime_End[index] - pausedTime_Start[index];
+      }
 
-      return pausedTime / 1000;
+      return totalTourTimerPauses / 1000;
    }
 
    /**
@@ -8327,6 +8355,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the total moving time in seconds.
+    */
+   public long getTourComputedTime_Moving() {
+      return tourComputedTime_Moving;
+   }
+
+   /**
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
@@ -8343,17 +8378,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the total elapsed time in seconds
+    */
+   public long getTourDeviceTime_Elapsed() {
+      return tourDeviceTime_Elapsed;
+   }
+
+   /**
+    * @return Returns the total paused time in seconds.
+    */
+   public long getTourDeviceTime_Paused() {
+      return tourDeviceTime_Paused;
+   }
+
+   /**
+    * @return Returns the total recorded time in seconds.
+    */
+   public long getTourDeviceTime_Recorded() {
+      return tourDeviceTime_Recorded;
+   }
+
+   /**
     * @return the tour distance in metric measurement system
     */
    public float getTourDistance() {
       return tourDistance;
-   }
-
-   /**
-    * @return Returns total elapsed time in seconds
-    */
-   public long getTourElapsedTime() {
-      return tourRecordingTime;
    }
 
    /**
@@ -8365,7 +8414,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
-    *         {@link #tourRecordingTime}
+    *         {@link #tourDeviceTime_Elapsed}
     */
    public long getTourEndTimeMS() {
       return tourEndTime;
@@ -8409,17 +8458,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns moving time in seconds.
-    */
-   public long getTourMovingTime() {
-      return tourDrivingTime;
-   }
-
-   public long getTourPausedTime() {
-      return tourPausedTime;
-   }
-
-   /**
     * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
     *         not saved in the database.
     */
@@ -8432,10 +8470,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public Set<TourPhoto> getTourPhotos() {
       return tourPhotos;
-   }
-
-   public long getTourRecordedTime() {
-      return tourRecordedTime;
    }
 
    public Collection<TourReference> getTourReferences() {
@@ -8501,10 +8535,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public Set<TourTag> getTourTags() {
       return tourTags;
-   }
-
-   public List<TourTimerPause> getTourTimerPauses() {
-      return tourTimerPauses;
    }
 
    /**
@@ -8661,7 +8691,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       result = 37 * result + startHour;
       result = 37 * result + startMinute;
       result = 37 * result + (int) this.getTourDistance();
-      result = 37 * result + (int) tourRecordingTime;
+      result = 37 * result + (int) tourDeviceTime_Elapsed;
 
       return result;
    }
@@ -8986,6 +9016,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       temperatureSerie = serieData.temperatureSerie20;
       powerSerie = serieData.powerSerie20;
       speedSerie = serieData.speedSerie20;
+      pausedTime_Start = serieData.pausedTime_Start;
+      pausedTime_End = serieData.pausedTime_End;
 
       latitudeSerie = serieData.latitude;
       longitudeSerie = serieData.longitude;
@@ -9045,6 +9077,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.distanceSerie20 = distanceSerie;
       serieData.pulseSerie20 = pulseSerie;
       serieData.temperatureSerie20 = temperatureSerie;
+      serieData.pausedTime_Start = pausedTime_Start;
+      serieData.pausedTime_End = pausedTime_End;
 
       /*
        * don't save computed data series
@@ -9477,6 +9511,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.mergeTargetTourId = mergeTargetTourId;
    }
 
+   public void setPausedTime_End(final long[] pausedTime_End) {
+      this.pausedTime_End = pausedTime_End;
+   }
+
+   public void setPausedTime_Start(final long[] pausedTime_Start) {
+      this.pausedTime_Start = pausedTime_Start;
+   }
+
    public void setPower_Avg(final float avgPower) {
       this.power_Avg = avgPower;
    }
@@ -9663,6 +9705,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Set total moving time in seconds.
+    *
+    * @param tourComputedTime_Moving
+    */
+   public void setTourComputedTime_Moving(final int tourComputedTime_Moving) {
+      this.tourComputedTime_Moving = tourComputedTime_Moving;
+   }
+
+   /**
     * @param tourDescription
     *           the tourDescription to set
     */
@@ -9670,20 +9721,34 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourDescription = tourDescription;
    }
 
-   public void setTourDistance(final float tourDistance) {
-      this.tourDistance = tourDistance;
-   }
-
    /**
     * Set total elapsed time in seconds
     *
     * @param tourElapsedTime
     */
-   public void setTourElapsedTime(final long tourElapsedTime) {
+   public void setTourDeviceTime_Elapsed(final long tourDeviceTime_Elapsed) {
 
-      this.tourRecordingTime = tourElapsedTime;
+      this.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
 
       setTourEndTimeMS();
+   }
+
+   /**
+    * Set total paused time in seconds
+    *
+    * @param tourDeviceTime_Paused
+    */
+   public void setTourDeviceTime_Paused(final long tourDeviceTime_Paused) {
+
+      this.tourDeviceTime_Paused = tourDeviceTime_Paused;
+   }
+
+   public void setTourDeviceTime_Recorded(final long tourDeviceTime_Recorded) {
+      this.tourDeviceTime_Recorded = tourDeviceTime_Recorded;
+   }
+
+   public void setTourDistance(final float tourDistance) {
+      this.tourDistance = tourDistance;
    }
 
    /**
@@ -9696,7 +9761,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private void setTourEndTimeMS() {
 
-      tourEndTime = tourStartTime + (tourRecordingTime * 1000);
+      tourEndTime = tourStartTime + (tourDeviceTime_Elapsed * 1000);
    }
 
    public void setTourMarkers(final Set<TourMarker> tourMarkers) {
@@ -9708,25 +9773,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourMarkers = tourMarkers;
 
       resetSortedMarkers();
-   }
-
-   /**
-    * Set total moving time in seconds.
-    *
-    * @param tourMovingTime
-    */
-   public void setTourMovingTime(final int tourMovingTime) {
-      tourDrivingTime = tourMovingTime;
-   }
-
-   /**
-    * Set total paused time in seconds
-    *
-    * @param tourPausedTime
-    */
-   public void setTourPausedTime(final long tourPausedTime) {
-
-      this.tourPausedTime = tourPausedTime;
    }
 
    /**
@@ -9797,10 +9843,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfPhotos = tourPhotos.size();
 
       computePhotoTimeAdjustment();
-   }
-
-   public void setTourRecordedTime(final long tourRecordedTime) {
-      this.tourRecordedTime = tourRecordedTime;
    }
 
    /**
@@ -9898,10 +9940,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourTags(final Set<TourTag> tourTags) {
       this.tourTags = tourTags;
-   }
-
-   public void setTourTimerPauses(final List<TourTimerPause> timerPauses) {
-      this.tourTimerPauses = timerPauses;
    }
 
    /**

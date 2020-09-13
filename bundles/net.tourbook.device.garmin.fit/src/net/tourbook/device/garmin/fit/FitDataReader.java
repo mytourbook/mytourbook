@@ -32,6 +32,7 @@ import java.util.HashMap;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Activity;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_BikeProfile;
@@ -59,9 +60,19 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FitDataReader extends TourbookDevice {
 
-   private static boolean _isLogging_FitData = System.getProperty("logFitData") != null; //$NON-NLS-1$
+   private static final String SYS_PROP__LOG_FIT_DATA = "logFitData";
+   private static boolean      _isLogging_FitData     = System.getProperty(SYS_PROP__LOG_FIT_DATA) != null;
 
-   private boolean        _isVersionLogged;
+   static {
+
+      if (_isLogging_FitData) {
+
+         Util.logSystemProperty_IsEnabled(FitDataReader.class,
+               SYS_PROP__LOG_FIT_DATA,
+               "Fit data are logged"); //$NON-NLS-1$
+      }
+   }
+   private boolean _isVersionLogged;
 
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 

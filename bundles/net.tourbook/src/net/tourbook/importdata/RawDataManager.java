@@ -942,7 +942,7 @@ public class RawDataManager {
 
          long previousTourTimerPauses = 0;
          if (reimportId == ReImport.OnlyTourTimerPauses) {
-            previousTourTimerPauses = oldTourData.getTourPausedTime();
+            previousTourTimerPauses = oldTourData.getTourDeviceTime_Paused();
          }
 
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
@@ -966,7 +966,7 @@ public class RawDataManager {
 
                differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
                      UI.format_hhh_mm_ss(previousTourTimerPauses),
-                     UI.format_hhh_mm_ss(newTourData.getTourPausedTime()));
+                     UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused()));
             }
 
             if (!StringUtils.isNullOrEmpty(differences)) {
@@ -1301,11 +1301,19 @@ public class RawDataManager {
 
          // re-import pauses only
 
-         oldTourData.setTourRecordedTime(reimportedTourData.getTourRecordedTime());
+         oldTourData.setTourDeviceTime_Recorded(reimportedTourData.getTourDeviceTime_Recorded());
 
-         oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
-         final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
-         oldTourData.setTourPausedTime(totalTourTimerPauses);
+         long totalTourTimerPauses = 0;
+         final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
+         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+            oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
+            oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
+            totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
+         } else {
+            totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();
+         }
+
+         oldTourData.setTourDeviceTime_Paused(totalTourTimerPauses);
       }
 
       // ALL

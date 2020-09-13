@@ -226,34 +226,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // DONE BUT TO CHECK WITH MULTIPLE FILES: Suunto 9
-   // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
-   //example: 05-12-2020 : The elapsed time should be 0:46:46 or 0:46:47
-   //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
-   // so the elapsed time is erroneous when importing from json.gz and gpx
-   //If i import from a FIT (exported from Movescount), the recorded time is the same
-   //08/22/2020: Hunch => is it because maybe in some cases the last x seconds of data not having GPS data,
-   // we dont keep them and hence we are missing those seconds. If it's the case, then we should make an exception for
-   //the last bit of data right before the "stop" and save them
-
-   // Elevation gain is OK from fit and GPX but not JSON!
-
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
-
-   // Add entries in time slices for pauses ? or just add a column "paused" like "break" and select the checkbox if it is a pause ?
-   //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
-
-   //TODO check that the sums of paused time work with my big database
-
-   //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
-   //Yes, the translators will have to translate : elapsed, paused, recorded, ...
-
-   //Why and how did I bring such a regression in the gpx export ?
-   //  <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
-//   <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
-
-   //TODO I think we should display the pauses in the graph chart just like for markers (add a button like markers as well)
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -682,11 +656,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text              _txtDistance;
    private Text              _txtWeather;
    //
-   private TimeDuration      _timeElapsed;                         // Total time of the activity                      //TODO FB Formerly Recording time
-   private TimeDuration      _timeRecorded;                        // Time recorded by the device = Total time - paused times
-   private TimeDuration      _timePaused;                          // Time where the user deliberately paused the device
-   private TimeDuration      _timeMoving;                          // Computed time moving
-   private TimeDuration      _timeBreak;                           // Computed time stopped
+   private TimeDuration      _deviceTime_Elapsed;                  // Total time of the activity
+   private TimeDuration      _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
+   private TimeDuration      _deviceTime_Paused;                   // Time where the user deliberately paused the device
+   private TimeDuration      _computedTime_Moving;                 // Computed time moving
+   private TimeDuration      _computedTime_Break;                  // Computed time stopped
 
    private Menu              _swimViewer_ContextMenu;
    private Menu              _timeViewer_ContextMenu;
@@ -1496,11 +1470,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tab1Container.setRedraw(true);
       }
 
-      public void setTime(final int recordingTime) {
+      public void setTime(final int elapsedTime) {
 
-         final int hours = recordingTime / 3600;
-         final int minutes = (recordingTime % 3600) / 60;
-         final int seconds = (recordingTime % 3600) % 60;
+         final int hours = elapsedTime / 3600;
+         final int minutes = (elapsedTime % 3600) / 60;
+         final int seconds = (elapsedTime % 3600) % 60;
 
          _txtTime.setText(String.format(timeFormat, hours, minutes, seconds));
 
@@ -2911,7 +2885,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       };
 
       /*
-       * listener for recording/driving/paused time
+       * listener for elapsed/moving/paused time
        */
       _tourTimeListener = new SelectionAdapter() {
          @Override
@@ -3633,50 +3607,50 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                /*
                 * Elapsed time
                 */
-               final Label label = _tk.createLabel(elapsedTimeContainer, "Elapsed time");//Messages.tour_editor_label_recording_time);
+               final Label label = _tk.createLabel(elapsedTimeContainer, Messages.tour_editor_label_elapsed_time);
                _secondColumnControls.add(label);
 
-               _timeElapsed = new TimeDuration(elapsedTimeContainer);
+               _deviceTime_Elapsed = new TimeDuration(elapsedTimeContainer);
             }
          }
          {
             /*
              * Recorded time
              */
-            final Label label = _tk.createLabel(container, "Recorded time");//Messages.tour_editor_label_paused_time);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_recorded_time);
             _secondColumnControls.add(label);
 
-            _timeRecorded = new TimeDuration(container);
+            _deviceTime_Recorded = new TimeDuration(container);
          }
 
          {
             /*
              * Moving time
              */
-            final Label label = _tk.createLabel(container, "Moving time");// Messages.tour_editor_label_driving_time);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_moving_time);
             _secondColumnControls.add(label);
 
-            _timeMoving = new TimeDuration(container);
+            _computedTime_Moving = new TimeDuration(container);
          }
 
          {
             /*
              * Paused time
              */
-            final Label label = _tk.createLabel(container, "Paused time");// Messages.tour_editor_label_driving_time);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_paused_time);
             _secondColumnControls.add(label);
 
-            _timePaused = new TimeDuration(container);
+            _deviceTime_Paused = new TimeDuration(container);
          }
 
          {
             /*
              * Break time
              */
-            final Label label = _tk.createLabel(container, "Break time");// Messages.tour_editor_label_driving_time);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_break_time);
             _secondColumnControls.add(label);
 
-            _timeBreak = new TimeDuration(container);
+            _computedTime_Break = new TimeDuration(container);
          }
       }
    }
@@ -6378,11 +6352,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkRemoveTimeZone.setEnabled(canEdit);
       _linkGeoTimeZone.setEnabled(canEdit && isGeoAvailable);
 
-      _timeElapsed.setEditMode(isManualAndEdit);
-      _timeRecorded.setEditMode(isManualAndEdit);
-      _timePaused.setEditMode(isManualAndEdit);
-      _timeMoving.setEditMode(isManualAndEdit);
-      _timeBreak.setEditMode(isManualAndEdit);
+      _deviceTime_Elapsed.setEditMode(isManualAndEdit);
+      _deviceTime_Recorded.setEditMode(isManualAndEdit);
+      _deviceTime_Paused.setEditMode(isManualAndEdit);
+      _computedTime_Moving.setEditMode(isManualAndEdit);
+      _computedTime_Break.setEditMode(isManualAndEdit);
 
       // distance can be edited when no distance time slices are available
       _txtDistance.setEnabled(canEdit && isDistanceSerie == false);
@@ -6697,9 +6671,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is imported
 
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourElapsedTime(0);
+            _tourData.setTourDeviceTime_Elapsed(0);
          } else {
-            _tourData.setTourElapsedTime(_serieTime[_serieTime.length - 1]);
+            _tourData.setTourDeviceTime_Elapsed(_serieTime[_serieTime.length - 1]);
          }
          _tourData.computeTourMovingTime();
 
@@ -8468,10 +8442,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            _tourData.setTourElapsedTime(_timeElapsed.getTime());
-            _tourData.setTourRecordedTime(_timeRecorded.getTime());
-            _tourData.setTourPausedTime(_timePaused.getTime());
-            _tourData.setTourMovingTime(_timeMoving.getTime());
+            _tourData.setTourDeviceTime_Elapsed(_deviceTime_Elapsed.getTime());
+            _tourData.setTourDeviceTime_Recorded(_deviceTime_Recorded.getTime());
+            _tourData.setTourDeviceTime_Paused(_deviceTime_Paused.getTime());
+            _tourData.setTourComputedTime_Moving(_computedTime_Moving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {
@@ -8927,16 +8901,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
       // tour times
-      final int elapsedTime = (int) _tourData.getTourElapsedTime();
-      final int movingTime = (int) _tourData.getTourMovingTime();
-      final int recordedTime = (int) _tourData.getTourRecordedTime();
-      final int pausedTime = (int) _tourData.getTourPausedTime();
+      final int elapsedTime = (int) _tourData.getTourDeviceTime_Elapsed();
+      final int movingTime = (int) _tourData.getTourComputedTime_Moving();
+      final int recordedTime = (int) _tourData.getTourDeviceTime_Recorded();
+      final int pausedTime = (int) _tourData.getTourDeviceTime_Paused();
 
-      _timeElapsed.setTime(elapsedTime);
-      _timeRecorded.setTime(recordedTime);
-      _timePaused.setTime(pausedTime);
-      _timeMoving.setTime(movingTime);
-      _timeBreak.setTime(elapsedTime - movingTime);
+      _deviceTime_Elapsed.setTime(elapsedTime);
+      _deviceTime_Recorded.setTime(recordedTime);
+      _deviceTime_Paused.setTime(pausedTime);
+      _computedTime_Moving.setTime(movingTime);
+      _computedTime_Break.setTime(elapsedTime - movingTime);
 
       /*
        * Time zone
@@ -9059,30 +9033,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * check if a time control is currently used
        */
-      if ((widget == _timeElapsed._spinHours
-            || widget == _timeElapsed._spinMinutes
-            || widget == _timeElapsed._spinSeconds
-            || widget == _timeRecorded._spinHours
-            || widget == _timeRecorded._spinMinutes
-            || widget == _timeRecorded._spinSeconds
-            || widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes
-            || widget == _timePaused._spinSeconds
-            || widget == _timeMoving._spinHours
-            || widget == _timeMoving._spinMinutes
-            || widget == _timeMoving._spinSeconds
-            || widget == _timeBreak._spinHours
-            || widget == _timeBreak._spinMinutes
-            || widget == _timeBreak._spinSeconds) == false) {
+      if ((widget == _deviceTime_Elapsed._spinHours
+            || widget == _deviceTime_Elapsed._spinMinutes
+            || widget == _deviceTime_Elapsed._spinSeconds
+            || widget == _deviceTime_Recorded._spinHours
+            || widget == _deviceTime_Recorded._spinMinutes
+            || widget == _deviceTime_Recorded._spinSeconds
+            || widget == _deviceTime_Paused._spinHours
+            || widget == _deviceTime_Paused._spinMinutes
+            || widget == _deviceTime_Paused._spinSeconds
+            || widget == _computedTime_Moving._spinHours
+            || widget == _computedTime_Moving._spinMinutes
+            || widget == _computedTime_Moving._spinSeconds
+            || widget == _computedTime_Break._spinHours
+            || widget == _computedTime_Break._spinMinutes
+            || widget == _computedTime_Break._spinSeconds) == false) {
 
          return;
       }
 
-      int elapsedTime = _timeElapsed.getTime();
-      int recordedTime = _timeRecorded.getTime();
-      int pausedTime = _timePaused.getTime();
-      int breakTime = _timeBreak.getTime();
-      int movingTime = _timeMoving.getTime();
+      int elapsedTime = _deviceTime_Elapsed.getTime();
+      int recordedTime = _deviceTime_Recorded.getTime();
+      int pausedTime = _deviceTime_Paused.getTime();
+      int breakTime = _computedTime_Break.getTime();
+      int movingTime = _computedTime_Moving.getTime();
 
       if (elapsedTime < 0) {
          elapsedTime = -elapsedTime - 1;
@@ -9091,9 +9065,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          breakTime = 0;
       }
 
-      if (widget == _timeElapsed._spinHours
-            || widget == _timeElapsed._spinMinutes
-            || widget == _timeElapsed._spinSeconds) {
+      if (widget == _deviceTime_Elapsed._spinHours
+            || widget == _deviceTime_Elapsed._spinMinutes
+            || widget == _deviceTime_Elapsed._spinSeconds) {
          // elapsed time is modified
 
          if (breakTime > elapsedTime) {
@@ -9106,9 +9080,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          movingTime = elapsedTime - breakTime;
          recordedTime = elapsedTime - pausedTime;
 
-      } else if (widget == _timeRecorded._spinHours
-            || widget == _timeRecorded._spinMinutes
-            || widget == _timeRecorded._spinSeconds) {
+      } else if (widget == _deviceTime_Recorded._spinHours
+            || widget == _deviceTime_Recorded._spinMinutes
+            || widget == _deviceTime_Recorded._spinSeconds) {
          // recorded time is modified
 
          if (recordedTime > elapsedTime) {
@@ -9117,9 +9091,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
          pausedTime = elapsedTime - recordedTime;
 
-      } else if (widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes
-            || widget == _timePaused._spinSeconds) {
+      } else if (widget == _deviceTime_Paused._spinHours
+            || widget == _deviceTime_Paused._spinMinutes
+            || widget == _deviceTime_Paused._spinSeconds) {
          // paused time is modified
 
          if (pausedTime > elapsedTime) {
@@ -9129,9 +9103,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          recordedTime = elapsedTime - pausedTime;
 
-      } else if (widget == _timeBreak._spinHours
-            || widget == _timeBreak._spinMinutes
-            || widget == _timeBreak._spinSeconds) {
+      } else if (widget == _computedTime_Break._spinHours
+            || widget == _computedTime_Break._spinMinutes
+            || widget == _computedTime_Break._spinSeconds) {
          // break time is modified
 
          if (breakTime > elapsedTime) {
@@ -9141,9 +9115,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          movingTime = elapsedTime - breakTime;
 
-      } else if (widget == _timeMoving._spinHours
-            || widget == _timeMoving._spinMinutes
-            || widget == _timeMoving._spinSeconds) {
+      } else if (widget == _computedTime_Moving._spinHours
+            || widget == _computedTime_Moving._spinMinutes
+            || widget == _computedTime_Moving._spinSeconds) {
          // moving time is modified
 
          if (movingTime > elapsedTime) {
@@ -9154,11 +9128,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       }
 
-      _timeElapsed.setTime(elapsedTime / 3600, ((elapsedTime % 3600) / 60), ((elapsedTime % 3600) % 60));
-      _timeRecorded.setTime(recordedTime / 3600, ((recordedTime % 3600) / 60), ((recordedTime % 3600) % 60));
-      _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
-      _timeMoving.setTime(movingTime / 3600, ((movingTime % 3600) / 60), ((movingTime % 3600) % 60));
-      _timeBreak.setTime(breakTime / 3600, ((breakTime % 3600) / 60), ((breakTime % 3600) % 60));
+      _deviceTime_Elapsed.setTime(elapsedTime / 3600, ((elapsedTime % 3600) / 60), ((elapsedTime % 3600) % 60));
+      _deviceTime_Recorded.setTime(recordedTime / 3600, ((recordedTime % 3600) / 60), ((recordedTime % 3600) % 60));
+      _deviceTime_Paused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+      _computedTime_Moving.setTime(movingTime / 3600, ((movingTime % 3600) / 60), ((movingTime % 3600) % 60));
+      _computedTime_Break.setTime(breakTime / 3600, ((breakTime % 3600) / 60), ((breakTime % 3600) % 60));
 
    }
 

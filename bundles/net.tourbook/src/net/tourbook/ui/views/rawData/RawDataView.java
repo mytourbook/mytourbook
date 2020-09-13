@@ -2707,8 +2707,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       defineColumn_Time_TourDate();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_RecordingTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Time_TimeZone();
       defineColumn_Time_TimeZoneDifference();
@@ -2921,7 +2921,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourMovingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
@@ -2951,7 +2951,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourMovingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
@@ -3028,17 +3028,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: driving time
+    * column: elapsed time
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourMovingTime();
+            final long value = ((TourData) cell.getElement()).getTourDeviceTime_Elapsed();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3046,18 +3047,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: recording time
+    * column: moving time
     */
-   private void defineColumn_Time_RecordingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourElapsedTime();
+            final long value = ((TourData) cell.getElement()).getTourComputedTime_Moving();
 
             colDef.printDetailValue(cell, value);
          }

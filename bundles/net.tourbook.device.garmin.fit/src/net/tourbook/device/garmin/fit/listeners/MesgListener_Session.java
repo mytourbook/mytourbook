@@ -100,14 +100,14 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 
       final Float totalElapsedTime = mesg.getTotalElapsedTime();
       if (totalElapsedTime != null) {
-         tourData.setTourElapsedTime(Math.round(totalElapsedTime));
+         tourData.setTourDeviceTime_Elapsed(Math.round(totalElapsedTime));
       }
 
       final Float totalTimerTime = mesg.getTotalTimerTime();
       if (totalTimerTime != null) {
-         tourData.setTourMovingTime(Math.round(totalTimerTime));
-         tourData.setTourRecordedTime(Math.round(totalTimerTime));
-         tourData.setTourPausedTime(tourData.getTourElapsedTime() - tourData.getTourRecordedTime());
+         tourData.setTourComputedTime_Moving(Math.round(totalTimerTime));
+         tourData.setTourDeviceTime_Recorded(Math.round(totalTimerTime));
+         tourData.setTourDeviceTime_Paused(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Recorded());
       }
 
       // -----------------------POWER -----------------------

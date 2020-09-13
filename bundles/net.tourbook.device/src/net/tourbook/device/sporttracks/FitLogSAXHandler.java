@@ -39,7 +39,6 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
@@ -343,7 +342,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour() {
 
-      boolean isComputeDrivingTime = true;
+      boolean isComputeMovingTime = true;
 
       // create data object for each tour
       final TourData tourData = new TourData();
@@ -419,10 +418,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDistance(_currentActivity.distance);
 
-         tourData.setTourElapsedTime(_currentActivity.duration);
-         tourData.setTourRecordedTime(_currentActivity.duration);
-         tourData.setTourMovingTime(_currentActivity.duration);
-         isComputeDrivingTime = false;
+         tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
+         tourData.setTourDeviceTime_Recorded(_currentActivity.duration);
+         tourData.setTourComputedTime_Moving(_currentActivity.duration);
+         isComputeMovingTime = false;
 
          tourData.setTourAltUp(_currentActivity.elevationUp);
          tourData.setTourAltDown(_currentActivity.elevationDown);
@@ -475,12 +474,16 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (_currentActivity.pauses.size() > 0) {
 
-         final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
+         final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
+         final ArrayList<Long> _pausedTime_End = new ArrayList<>();
+
          for (final Pause element : _currentActivity.pauses) {
-            tourTimerPauses.add(new TourTimerPause(tourData, element.startTime, element.endTime));
+            _pausedTime_Start.add(element.startTime);
+            _pausedTime_End.add(element.endTime);
          }
 
-         tourData.setTourTimerPauses(tourTimerPauses);
+         tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
+         tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
@@ -508,13 +511,13 @@ public class FitLogSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         if (isComputeDrivingTime) {
+         if (isComputeMovingTime) {
             tourData.computeTourMovingTime();
          }
 
          final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-         tourData.setTourPausedTime(totalTourTimerPauses);
-         tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
+         tourData.setTourDeviceTime_Paused(totalTourTimerPauses);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();
 

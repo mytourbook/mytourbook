@@ -1001,7 +1001,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       _tourDataTarget.setDeviceTimeInterval(_tourDataSource.getDeviceTimeInterval());
 
-      _tourDataTarget.setTourElapsedTime(extractedElapsedTime);
+      _tourDataTarget.setTourDeviceTime_Elapsed(extractedElapsedTime);
       _tourDataTarget.setTourDistance(extractedDistance);
 
       _tourDataTarget.setWeather(_tourDataSource.getWeather());
@@ -1049,7 +1049,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       }
 
       _tourDataTarget.computeAltitudeUpDown();
-      _tourDataTarget.setTourRecordedTime(_tourDataTarget.getTourElapsedTime());
+      _tourDataTarget.setTourDeviceTime_Recorded(_tourDataTarget.getTourDeviceTime_Elapsed());
       //TODO FB set the pauses as well ??
       _tourDataTarget.computeTourMovingTime();
       _tourDataTarget.computeComputedValues();

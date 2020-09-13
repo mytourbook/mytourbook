@@ -114,8 +114,8 @@ public class MapsforgeThemeStyle {
 
       return "MapsforgeThemeStyle " //$NON-NLS-1$
 
-            + "xmlLayer=" + xmlLayer + net.tourbook.common.UI.SPACE1 //$NON-NLS-1$
-            + "name= " + name.get(defaultlanguage) + net.tourbook.common.UI.SPACE1 //$NON-NLS-1$
+            + "xmlLayer=" + xmlLayer + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
    }
 
@@ -123,8 +123,8 @@ public class MapsforgeThemeStyle {
 
       return "MapsforgeThemeStyle " //$NON-NLS-1$
 
-            + "xmlLayer=" + xmlLayer + net.tourbook.common.UI.SPACE1 //$NON-NLS-1$
-            + "name= " + name.get(defaultlanguage) + net.tourbook.common.UI.SPACE1 //$NON-NLS-1$
+            + "xmlLayer=" + xmlLayer + " " //$NON-NLS-1$ //$NON-NLS-2$
+            + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
    }
 

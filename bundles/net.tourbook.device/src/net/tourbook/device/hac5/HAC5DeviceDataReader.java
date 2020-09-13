@@ -487,7 +487,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
                newlyImportedTours.put(tourId, tourData);
 
                // create additional data
-               tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+               tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
                tourData.computeTourMovingTime();
                tourData.computeComputedValues();
             }

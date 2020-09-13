@@ -67,7 +67,6 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -166,7 +165,6 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_REFERENCE                       = "TOURREFERENCE";                                         //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG                             = "TOURTAG";                                               //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG_CATEGORY                    = "TOURTAGCATEGORY";                                       //$NON-NLS-1$
-   public static final String  TABLE_TOUR_TIMER_PAUSE                     = "TOURTIMERPAUSE";                                        //$NON-NLS-1$
    public static final String  TABLE_TOUR_TYPE                            = "TOURTYPE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_WAYPOINT                        = "TOURWAYPOINT";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
@@ -202,7 +200,6 @@ public class TourDatabase {
    public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TIMERPAUSE            = "timerPauseId";                                         //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
@@ -462,8 +459,8 @@ public class TourDatabase {
                                         final int columnWidth) throws SQLException {
 
          final String sql = UI.EMPTY_STRING//
-               + ("ALTER TABLE " + table) //$NON-NLS-1$
-               + ("   ADD COLUMN   " + columnName + "   VARCHAR(" + columnWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               + "ALTER TABLE " + table //$NON-NLS-1$
+               + "   ADD COLUMN   " + columnName + "   VARCHAR(" + columnWidth + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
          exec(stmt, sql);
       }
@@ -474,9 +471,9 @@ public class TourDatabase {
                                                  final int newWidth) throws SQLException {
 
          final String sql = UI.EMPTY_STRING//
-               + ("ALTER TABLE " + table + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   ALTER COLUMN " + field + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-               + ("   SET DATA TYPE   VARCHAR(" + newWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$
+               + "ALTER TABLE " + table + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+               + "   ALTER COLUMN " + field + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+               + "   SET DATA TYPE   VARCHAR(" + newWidth + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
@@ -551,9 +548,9 @@ public class TourDatabase {
 //       SUBJECT CHAR(64) NOT NULL CONSTRAINT OUT_TRAY_PK PRIMARY KEY,
 
          return "   " //$NON-NLS-1$
-               + (fieldName + " BIGINT NOT NULL ") //$NON-NLS-1$
+               + fieldName + " BIGINT NOT NULL " //$NON-NLS-1$
                + generateID
-               + (" CONSTRAINT " + fieldName + "_pk PRIMARY KEY") //$NON-NLS-1$ //$NON-NLS-2$
+               + " CONSTRAINT " + fieldName + "_pk PRIMARY KEY" //$NON-NLS-1$ //$NON-NLS-2$
                + ",\n";//$NON-NLS-1$
       }
 
@@ -569,6 +566,24 @@ public class TourDatabase {
          final String sql = "CREATE INDEX " + indexAndColumnName //$NON-NLS-1$
                + " ON " + tableName //$NON-NLS-1$
                + " (" + indexAndColumnName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+
+         exec(stmt, sql);
+      }
+
+      /**
+       * @param stmt
+       * @param table
+       * @param columnName
+       * @param newColumnName
+       * @throws SQLException
+       */
+      private static void RenameCol(final Statement stmt,
+                                        final String table,
+                                        final String columnName,
+                                        final String newColumnName) throws SQLException {
+
+         final String sql = UI.EMPTY_STRING//
+               + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
@@ -1434,7 +1449,7 @@ public class TourDatabase {
             final Query emQuery = em.createQuery(
                   UI.EMPTY_STRING
                         + "SELECT tourTagCategory" //$NON-NLS-1$
-                        + (" FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory")); //$NON-NLS-1$ //$NON-NLS-2$
+                        + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
 
             _allTourTagCategories = new HashMap<>();
 
@@ -1478,7 +1493,7 @@ public class TourDatabase {
             final Query emQuery = em.createQuery(
                   UI.EMPTY_STRING
                         + "SELECT tourTag" //$NON-NLS-1$
-                        + (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
+                        + " FROM " + TourTag.class.getSimpleName() + " AS tourTag"); //$NON-NLS-1$ //$NON-NLS-2$
 
             _allTourTags = new HashMap<>();
 
@@ -1540,8 +1555,8 @@ public class TourDatabase {
             final Query emQuery = em.createQuery(//
                   //
                   "SELECT tourType" //$NON-NLS-1$
-                        + (" FROM TourType AS tourType") //$NON-NLS-1$
-                        + (" ORDER  BY tourType.name")); //$NON-NLS-1$
+                        + " FROM TourType AS tourType" //$NON-NLS-1$
+                        + " ORDER  BY tourType.name"); //$NON-NLS-1$
 
             _dbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
 
@@ -1684,9 +1699,9 @@ public class TourDatabase {
       Query emQuery = em.createQuery(//
             //
             "SELECT ttCategory" //$NON-NLS-1$
-                  + (" FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" WHERE ttCategory.isRoot=1") //$NON-NLS-1$
-                  + (" ORDER BY ttCategory.name")); //$NON-NLS-1$
+                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory" //$NON-NLS-1$ //$NON-NLS-2$
+                  + " WHERE ttCategory.isRoot=1" //$NON-NLS-1$
+                  + " ORDER BY ttCategory.name"); //$NON-NLS-1$
 
       rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) emQuery.getResultList();
 
@@ -1696,9 +1711,9 @@ public class TourDatabase {
       emQuery = em.createQuery(//
             //
             "SELECT tourTag" //$NON-NLS-1$
-                  + (" FROM " + TourTag.class.getSimpleName() + " AS tourTag ") //$NON-NLS-1$ //$NON-NLS-2$
-                  + (" WHERE tourTag.isRoot=1") //$NON-NLS-1$
-                  + (" ORDER BY tourTag.name")); //$NON-NLS-1$
+                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag " //$NON-NLS-1$ //$NON-NLS-2$
+                  + " WHERE tourTag.isRoot=1" //$NON-NLS-1$
+                  + " ORDER BY tourTag.name"); //$NON-NLS-1$
 
       rootEntry.tourTags = (ArrayList<TourTag>) emQuery.getResultList();
 
@@ -1934,8 +1949,8 @@ public class TourDatabase {
          final Query emQuery = em.createQuery(//
                //
                "SELECT tourBike" //$NON-NLS-1$
-                     + (" FROM TourBike AS tourBike ") //$NON-NLS-1$
-                     + (" ORDER  BY tourBike.name")); //$NON-NLS-1$
+                     + " FROM TourBike AS tourBike " //$NON-NLS-1$
+                     + " ORDER  BY tourBike.name"); //$NON-NLS-1$
 
          bikeList = (ArrayList<TourBike>) emQuery.getResultList();
 
@@ -2407,7 +2422,7 @@ public class TourDatabase {
 //                  (System.nanoTime() - startTime) / 1_000_000.0)
 //
 //      );
-// TODO remove SYSTEM.OUT.PRINTLN
+//  remove SYSTEM.OUT.PRINTLN
    }
 
    public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -2513,20 +2528,22 @@ public class TourDatabase {
 
       boolean isUpdated = false;
 
-      final PreparedStatement stmtSelect = conn.prepareStatement( //
-            "SELECT" //                     //$NON-NLS-1$
-                  + " StartYear," //             // 1 //$NON-NLS-1$
-                  + " StartMonth," //          // 2 //$NON-NLS-1$
-                  + " StartDay" //             // 3 //$NON-NLS-1$
-                  + (" FROM " + TABLE_TOUR_DATA) //   $NON-NLS-1$ //$NON-NLS-1$
-                  + " WHERE TourId=?"); //         $NON-NLS-1$ //$NON-NLS-1$
+      final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            "UPDATE " + TABLE_TOUR_DATA //  //$NON-NLS-1$
-                  + " SET" //$NON-NLS-1$
-                  + " startWeek=?, " //$NON-NLS-1$
-                  + " startWeekYear=? " //$NON-NLS-1$
-                  + " WHERE tourId=?"); //$NON-NLS-1$
+            + "SELECT" //                       //$NON-NLS-1$
+            + " StartYear," //            // 1  //$NON-NLS-1$
+            + " StartMonth," //           // 2  //$NON-NLS-1$
+            + " StartDay" //              // 3  //$NON-NLS-1$
+            + " FROM " + TABLE_TOUR_DATA //      //$NON-NLS-1$
+            + " WHERE TourId=?"); //             //$NON-NLS-1$
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+            + "UPDATE " + TABLE_TOUR_DATA //    //$NON-NLS-1$
+            + " SET" //                         //$NON-NLS-1$
+            + " startWeek=?, " //               //$NON-NLS-1$
+            + " startWeekYear=? " //            //$NON-NLS-1$
+            + " WHERE tourId=?"); //            //$NON-NLS-1$
 
       int tourIdx = 1;
 
@@ -2793,7 +2810,7 @@ public class TourDatabase {
             //
             // version 40 start
             //
-            + "   tourRecordingTime  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
+            + "   tourDeviceTime_Elapsed  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
             //
             // version 40 end ---------
             //
@@ -2984,8 +3001,8 @@ public class TourDatabase {
             + " TourStartTime          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             + " TourEndTime            BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
 
-            + " TourRecordingTime      BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
-            + " TourDrivingTime        BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + " TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + " TourComputedTime_Moving BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             //
             // version 22 end ---------
 
@@ -3123,9 +3140,8 @@ public class TourDatabase {
 
             // version 42 start  -  20.X
             //
-            + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
-            + " tourRecordedTime                              BIGINT,                  \n" //$NON-NLS-1$
-            + " tourPausedTime                                BIGINT,                  \n" //$NON-NLS-1$
+            + " tourDeviceTime_Recorded                       BIGINT,                  \n" //$NON-NLS-1$
+            + " tourDeviceTime_Paused                         BIGINT,                  \n" //$NON-NLS-1$
             //
             // version 42 end
 
@@ -3558,29 +3574,6 @@ public class TourDatabase {
    }
 
    /**
-    * Create table {@link #TABLE_TOUR_TIMER_PAUSE} for {@link TourTimerPause}.
-    *
-    * @param stmt
-    * @throws SQLException
-    */
-   private void createTable_TourTimerPauses(final Statement stmt) throws SQLException {
-
-      /*
-       * CREATE TABLE TourTimerPause
-       */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TIMER_PAUSE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + SQL.CreateField_EntityId(ENTITY_ID_TIMERPAUSE, true)
-            //
-            + "   " + KEY_TOUR + "         BIGINT,                                          \n" //$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + "   startTime      BIGINT   NOT NULL,                                        \n" //$NON-NLS-1$
-            + "   endTime        BIGINT   NOT NULL                                        \n" //$NON-NLS-1$
-
-            + ")"); //$NON-NLS-1$
-   }
-
-   /**
     * create table {@link #TABLE_TOUR_TYPE}
     *
     * @param stmt
@@ -3633,26 +3626,26 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourWayPoint
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_WAYPOINT + "   (                                 \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_WAYPOINT + "   (                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_WAY_POINT, true)
             //
-            + "   " + KEY_TOUR + "   BIGINT,                                                \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "     BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   latitude          DOUBLE NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   longitude          DOUBLE NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   time            BIGINT,                                                \n" //$NON-NLS-1$
-            + "   altitude         FLOAT,                                                \n" //$NON-NLS-1$
-            + "   name            VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),                  \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   description         VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),            \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   comment            VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),               \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   symbol            VARCHAR(" + TourWayPoint.DB_LENGTH_SYMBOL + "),                  \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   category         VARCHAR(" + TourWayPoint.DB_LENGTH_CATEGORY + "),               \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   latitude             DOUBLE NOT NULL,                                         \n" //$NON-NLS-1$
+            + "   longitude            DOUBLE NOT NULL,                                         \n" //$NON-NLS-1$
+            + "   time                 BIGINT,                                                  \n" //$NON-NLS-1$
+            + "   altitude             FLOAT,                                                   \n" //$NON-NLS-1$
+            + "   name                 VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   description          VARCHAR(" + TourWayPoint.DB_LENGTH_DESCRIPTION + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   comment              VARCHAR(" + TourWayPoint.DB_LENGTH_COMMENT + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   symbol               VARCHAR(" + TourWayPoint.DB_LENGTH_SYMBOL + "),          \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   category             VARCHAR(" + TourWayPoint.DB_LENGTH_CATEGORY + "),        \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 28 start - create common fields with TourMarker
             //
-            + "   urlText            VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),                  \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   urlAddress         VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + ")               \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   urlText              VARCHAR(" + TourMarker.DB_LENGTH_URL_TEXT + "),          \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   urlAddress           VARCHAR(" + TourMarker.DB_LENGTH_URL_ADDRESS + ")        \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 28 end ---------
             //
@@ -3672,7 +3665,7 @@ public class TourDatabase {
        */
       exec(stmt, "CREATE TABLE " + TABLE_DB_VERSION + " (                                       \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   version    INTEGER   NOT NULL                                             \n" //$NON-NLS-1$
+            + "   version    INTEGER   NOT NULL                                                 \n" //$NON-NLS-1$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -4314,8 +4307,6 @@ public class TourDatabase {
 
 //            createTable_TourSign(stmt);
 //            createTable_TourSignCategory(stmt);
-
-            createTable_TourTimerPauses(stmt);
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
@@ -7456,7 +7447,7 @@ public class TourDatabase {
 
          } else {
 
-            final int tourRecordingTime = TourManager.computeTourRecordingTime(tourData, startIndex, endIndex);
+            final int tourRecordingTime = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
 
             // update tour recording time for the compared tour
             stmtUpdate.setInt(1, tourRecordingTime);
@@ -7507,20 +7498,17 @@ public class TourDatabase {
 
       final Statement stmt = conn.createStatement();
       {
-         // double check if db is already updated
-         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
-
-            createTable_TourTimerPauses(stmt);
-         }
-
          // check if db is updated to version 42
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourDeviceTime_Recorded") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourPausedTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded", DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Paused",   DEFAULT_0);                            //$NON-NLS-1$
+
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed");
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving");
 
 // SET_FORMATTING_ON
          }
@@ -7651,7 +7639,7 @@ public class TourDatabase {
             //
                   + " SET" //                     //$NON-NLS-1$
                   //
-                  + " tourRecordedTime=tourRecordingTime"); //$NON-NLS-1$
+                  + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
 
       stmtUpdate.executeUpdate();
 

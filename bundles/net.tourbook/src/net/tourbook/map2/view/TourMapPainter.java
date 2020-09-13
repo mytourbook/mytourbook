@@ -50,7 +50,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
@@ -1069,6 +1068,12 @@ public class TourMapPainter extends MapPainter {
 
          // draw marker/pauses above the tour
 
+         // status if a marker is drawn
+         int staticMarkerCounter = 0;
+
+         // status if a pause is drawn
+         int staticPauseCounter = 0;
+
          for (final TourData tourData : tourDataList) {
 
             if (tourData == null) {
@@ -1086,7 +1091,7 @@ public class TourMapPainter extends MapPainter {
 
             if (_tourPaintConfig.isShowTourMarker) {
 
-               isContentInTile = doPaint_Marker(
+               if (doPaint_Marker(
                      gcTile,
                      map,
                      tile,
@@ -1094,7 +1099,28 @@ public class TourMapPainter extends MapPainter {
                      isContentInTile,
                      tourData,
                      latitudeSerie,
-                     longitudeSerie);
+                     longitudeSerie)) {
+                  ++staticMarkerCounter;
+               }
+
+               isContentInTile = isContentInTile || staticMarkerCounter > 0;
+            }
+
+            if (_tourPaintConfig.isShowTourPauses) {
+
+               if (doPaint_Pauses(
+                     gcTile,
+                     map,
+                     tile,
+                     parts,
+                     isContentInTile,
+                     tourData,
+                     latitudeSerie,
+                     longitudeSerie)) {
+                  ++staticPauseCounter;
+               }
+
+               isContentInTile = isContentInTile || staticPauseCounter > 0;
             }
 
             if (_tourPaintConfig.isShowTourPauses) {
@@ -1315,10 +1341,11 @@ public class TourMapPainter extends MapPainter {
                                   final double[] latitudeSerie,
                                   final double[] longitudeSerie) {
 
-      final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
+      final long[] pausedTime_Start = tourData.getPausedTime_Start();
+      final long[] pausedTime_End = tourData.getPausedTime_End();
 
       // check if pauses are available
-      if (tourTimerPauses.size() == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.length == 0) {
          return isContentInTile;
       }
 
@@ -1382,45 +1409,48 @@ public class TourMapPainter extends MapPainter {
 
       } else {
 
-            // draw tour pauses durations
+         // draw tour pauses durations
 
-            int pauseCounter = 0;
-            int serieIndex = 0;
+         int pauseCounter = 0;
+         int serieIndex = 0;
 
-            for (final TourTimerPause tourTimerPause : tourTimerPauses) {
+         for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-               final long startTime = tourTimerPause.getStartTime();
+            final long startTime = pausedTime_Start[index];
+            final long endTime = pausedTime_End[index];
 
-               for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
+            for (int timeSerieIndex = serieIndex; timeSerieIndex < tourData.timeSerie.length; ++timeSerieIndex) {
 
-                  final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
+               final long currentTime = tourData.timeSerie[timeSerieIndex] * 1000 + tourData.getTourStartTimeMS();
 
-                  if (currentTime == startTime || currentTime > startTime) {
-                     serieIndex = index;
-                     break;
-                  }
+               if (currentTime == startTime || currentTime > startTime) {
+                  serieIndex = timeSerieIndex;
+                  break;
                }
+            }
 
-               /*
-                * check bounds because when a tour is split, it can happen that the marker serie
-                * index is out of scope
-                */
-               if (serieIndex >= latitudeSerie.length) {
-                  continue;
-               }
+            /*
+             * check bounds because when a tour is split, it can happen that the marker serie
+             * index is out of scope
+             */
+            if (serieIndex >= latitudeSerie.length) {
+               continue;
+            }
 
-               // draw tour marker
-               if (drawTourPauses(
-                     gcTile,
-                     map,
-                     tile,
-                     latitudeSerie[serieIndex],
-                     longitudeSerie[serieIndex],
-                     tourTimerPause,
-                     parts)) {
+            final long pauseDuration = Math.round((float) (endTime - startTime) / 1000);
 
-                  pauseCounter++;
-               }
+            // draw tour marker
+            if (drawTourPauses(
+                  gcTile,
+                  map,
+                  tile,
+                  latitudeSerie[serieIndex],
+                  longitudeSerie[serieIndex],
+                  pauseDuration,
+                  parts)) {
+
+               pauseCounter++;
+            }
 
             isContentInTile = isContentInTile || pauseCounter > 0;
          }
@@ -2073,7 +2103,7 @@ public class TourMapPainter extends MapPainter {
                                   final Tile tile,
                                   final double latitude,
                                   final double longitude,
-                                  final TourTimerPause tourTimerPause,
+                                  final long pauseDuration,
                                   final int parts) {
 
       final MP mp = map.getMapProvider();
@@ -2096,8 +2126,8 @@ public class TourMapPainter extends MapPainter {
        * create and cache marker bounds
        */
 
-      final String pauseDuration = UI.format_hh_mm_ss(tourTimerPause.getPauseDuration() / 1000);
-      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDuration);
+      final String pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
+      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDurationText);
 
       final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
       final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
@@ -2113,7 +2143,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDuration, pauseBounds);
+         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;

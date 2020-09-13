@@ -38,7 +38,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 
@@ -111,44 +110,45 @@ public class Suunto3_STAXHandler {
       // is the actual recorded local time.
    }
    //
-   private HashMap<Long, TourData>   _alreadyImportedTours;
-   private HashMap<Long, TourData>   _newlyImportedTours;
-   private TourbookDevice            _device;
-   private String                    _importFilePath;
+   private HashMap<Long, TourData> _alreadyImportedTours;
+   private HashMap<Long, TourData> _newlyImportedTours;
+   private TourbookDevice          _device;
+   private String                  _importFilePath;
    //
-   private TimeData                  _sampleData;
+   private TimeData                _sampleData;
 
-   private ArrayList<TimeData>       _sampleList      = new ArrayList<>();
-   private TimeData                  _gpsData;
+   private ArrayList<TimeData>     _sampleList       = new ArrayList<>();
+   private TimeData                _gpsData;
 
-   private ArrayList<TimeData>       _gpsList         = new ArrayList<>();
-   private TimeData                  _markerData;
+   private ArrayList<TimeData>     _gpsList          = new ArrayList<>();
+   private TimeData                _markerData;
 
-   private ArrayList<TimeData>       _markerList      = new ArrayList<>();
+   private ArrayList<TimeData>     _markerList       = new ArrayList<>();
 
-   private ArrayList<TourTimerPause> _tourTimerPauses = new ArrayList<>();
+   private List<Long>              _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
 
-   private boolean                   _isImported;
-   private String                    _currentSampleType;
-   private long                      _currentUtcTime;
-   private long                      _currentTime;
+   private boolean                 _isImported;
+   private String                  _currentSampleType;
+   private long                    _currentUtcTime;
+   private long                    _currentTime;
 
-   private long                      _prevSampleTime;
+   private long                    _prevSampleTime;
 
-   private boolean                   _isInEvents;
+   private boolean                 _isInEvents;
 
-   private float                     _tourPeakTrainingEffect;
-   private float                     _tourPerformanceLevel;
+   private float                   _tourPeakTrainingEffect;
+   private float                   _tourPerformanceLevel;
 
-   private int                       _tourCalories;
+   private int                     _tourCalories;
 
    /**
     * This time is used when a time is not available.
     */
-   private long                      _tourStartTime;
-   private String                    _tourDeviceSW;
+   private long                    _tourStartTime;
+   private String                  _tourDeviceSW;
 
-   private String                    _tourDeviceName;
+   private String                  _tourDeviceName;
 
    public Suunto3_STAXHandler(final TourbookDevice deviceDataReader,
                               final String importFilePath,
@@ -168,7 +168,8 @@ public class Suunto3_STAXHandler {
       _sampleList.clear();
       _gpsList.clear();
       _markerList.clear();
-      _tourTimerPauses.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    private void finalizeSample() {
@@ -282,7 +283,7 @@ public class Suunto3_STAXHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
-      finalizeTour_TimerPauses(tourData);
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
 
       setDistanceSerie(tourData);
 
@@ -303,30 +304,6 @@ public class Suunto3_STAXHandler {
       }
 
       _isImported = true;
-   }
-
-   private void finalizeTour_TimerPauses(final TourData tourData) {
-
-      //TODO FB this function is duplicated, where to put it to be a shared function ?
-      if (_tourTimerPauses.size() == 0) {
-         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
-         return;
-      }
-
-      final List<TourTimerPause> tourTimerPauses = new ArrayList<>();
-
-      for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
-         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
-            tourTimerPause.setTourData(tourData);
-            tourTimerPauses.add(tourTimerPause);
-         }
-      }
-
-      tourData.setTourTimerPauses(tourTimerPauses);
-      final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-
-      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
-      tourData.setTourPausedTime(totalTourTimerPauses);
    }
 
    /**
@@ -724,18 +701,15 @@ public class Suunto3_STAXHandler {
 
                if (data.equalsIgnoreCase(Boolean.TRUE.toString())) {
 
-                  final TourTimerPause tourTimerPause = new TourTimerPause();
-                  tourTimerPause.setStartTime(_currentUtcTime);
-
-                  _tourTimerPauses.add(tourTimerPause);
+                  _pausedTime_Start.add(_currentUtcTime);
 
                } else if (data.equalsIgnoreCase(Boolean.FALSE.toString())) {
 
-                  if (_tourTimerPauses.size() == 0) {
+                  if (_pausedTime_Start.size() == 0) {
                      return;
                   }
 
-                  _tourTimerPauses.get(_tourTimerPauses.size() - 1).setEndTime(_currentUtcTime);
+                  _pausedTime_End.add(_currentUtcTime);
 
                }
                break;

@@ -45,7 +45,7 @@ public class GalleryMT20Item {
    public Photo                       photo;
 
    /**
-    * Each gallery item needs a unique id.
+    * Each gallery item needs a uniqueue id.
     */
    public String                      uniqueItemID;
 
@@ -89,7 +89,7 @@ public class GalleryMT20Item {
    public int                         paintedY_Photo;
 
    /*
-    * annotations
+    * annotaions
     */
    public boolean isHovered_AnnotationTour;
    public int     paintedX_Annotation_Gps;
@@ -148,7 +148,7 @@ public class GalleryMT20Item {
             + ("\ty=" + viewPortY) //$NON-NLS-1$
             + ("\t" + width) //$NON-NLS-1$
             + ("x" + height) //$NON-NLS-1$
-            + (UI.SPACE1 + photo)
+            + (" " + photo) //$NON-NLS-1$
 //
       ;
    }

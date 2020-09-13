@@ -1539,7 +1539,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    @Override
    public String toString() {
-      return _mapProviderName + net.tourbook.common.UI.SYMBOL_BRACKET_LEFT + _mapProviderId + net.tourbook.common.UI.SYMBOL_BRACKET_RIGHT;
+      return _mapProviderName + "(" + _mapProviderId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 }

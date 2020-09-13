@@ -1399,7 +1399,7 @@ public class TrainingView extends ViewPart {
 
       final int personZoneSize = _personHrZones.size();
       final int[] tourHrZoneTimes = _tourData.getHrZones();
-      final long movingTime = _tourData.getTourMovingTime();
+      final long movingTime = _tourData.getTourComputedTime_Moving();
 
       _tourHrZonePercent = new double[personZoneSize];
 

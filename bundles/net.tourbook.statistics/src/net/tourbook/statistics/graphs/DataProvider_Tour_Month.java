@@ -22,11 +22,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
@@ -67,130 +70,138 @@ public class DataProvider_Tour_Month extends DataProvider {
          return _tourMonthData;
       }
 
-      _activePerson = person;
-      _activeTourTypeFilter = tourTypeFilter;
-      _lastYear = lastYear;
-      _numberOfYears = numYears;
-
-      // get the tour types
-      final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
-      final TourType[] allTourTypes = allTourTypesList.toArray(new TourType[allTourTypesList.size()]);
-
-      _tourMonthData = new TourData_Month();
-
-      String fromTourData;
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
-
-         // with tag filter
-
-         fromTourData = NL
-
-               + "FROM (							" + NL //$NON-NLS-1$
-
-               + " SELECT							" + NL //$NON-NLS-1$
-
-               + "  StartYear,					" + NL //$NON-NLS-1$
-               + "  StartMonth,					" + NL //$NON-NLS-1$
-               + "  TourDistance,				" + NL //$NON-NLS-1$
-               + "  TourAltUp,					" + NL //$NON-NLS-1$
-               + "  TourRecordingTime,			" + NL //$NON-NLS-1$
-               + "  TourDrivingTime,			" + NL //$NON-NLS-1$
-
-               + "  TourType_TypeId 			" + NL //$NON-NLS-1$
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
-
-               // get tag id's
-               + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause() + NL
-
-               + ") td" //$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         fromTourData = NL
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause()
-
-         ;
-      }
-
-      String sqlDurationTime = null;
-
-      switch (durationTime) {
-      case BREAK:
-
-         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
-         break;
-
-      case ELAPSED:
-
-         sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
-         break;
-
-      case PAUSED:
-
-         sqlDurationTime = " SUM(TourPausedTime),"; //$NON-NLS-1$
-         break;
-
-      case RECORDED:
-
-         sqlDurationTime = " SUM(TourRecordedTime),"; //$NON-NLS-1$
-         break;
-
-      case MOVING:
-      default:
-         // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
-         break;
-      }
-
-      final String sqlString = NL +
-
-            "SELECT" + NL //$NON-NLS-1$
-
-            + " StartYear,						" + NL //       1 //$NON-NLS-1$
-            + " StartMonth,					" + NL //       2 //$NON-NLS-1$
-            + " SUM(TourDistance),			" + NL //       3 //$NON-NLS-1$
-            + " SUM(TourAltUp),				" + NL //       4 //$NON-NLS-1$
-            + sqlDurationTime + "         " + NL //       5 //$NON-NLS-1$
-            + " SUM(TourRecordingTime),	" + NL //       6 //$NON-NLS-1$
-            + " SUM(TourDrivingTime),		" + NL //       7 //$NON-NLS-1$
-            + " SUM(1),                   " + NL //       8 //$NON-NLS-1$
-            + " TourType_TypeId,          " + NL //       9 //$NON-NLS-1$
-            + " SUM(tourRecordedTime),    " + NL //      10 //$NON-NLS-1$
-            + " SUM(tourPausedTime)       " + NL //      11 //$NON-NLS-1$
-
-            + fromTourData
-
-            + (" GROUP BY StartYear, StartMonth, tourType_typeId ") + NL//$NON-NLS-1$
-            + (" ORDER BY StartYear, StartMonth") + NL //$NON-NLS-1$
-      ;
-
-      final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
-
-      int colorOffset = 0;
-      if (isShowNoTourTypes) {
-         colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      int numTourTypes = colorOffset + allTourTypes.length;
-      numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
-
-      final int numMonths = 12 * numYears;
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         _activePerson = person;
+         _activeTourTypeFilter = tourTypeFilter;
+         _lastYear = lastYear;
+         _numberOfYears = numYears;
+
+         // get the tour types
+         final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
+         final TourType[] allTourTypes = allTourTypesList.toArray(new TourType[allTourTypesList.size()]);
+
+         _tourMonthData = new TourData_Month();
+
+         String fromTourData;
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
+
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+
+            // with tag filter
+
+            fromTourData = NL
+
+                  + "FROM (" + NL //                                                            //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                                         //$NON-NLS-1$
+
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
+                  + "      DISTINCT TourId," + NL //                                            //$NON-NLS-1$
+
+                  + "      StartYear," + NL //                                                  //$NON-NLS-1$
+                  + "      StartMonth," + NL //                                                 //$NON-NLS-1$
+                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
+                  + "      TourDeviceTime_Elapsed,  " + NL //$NON-NLS-1$
+                  + "      TourComputedTime_Moving, " + NL //$NON-NLS-1$
+
+                  + "      TourType_TypeId" + NL //                                             //$NON-NLS-1$
+
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+
+                  // get/filter tag id's
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
+
+                  + "   WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+                  + "      " + sqlAppFilter.getWhereClause() + NL
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                               //$NON-NLS-1$
+            ;
+
+         } else {
+
+            // without tag filter
+
+            fromTourData = NL
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                             //$NON-NLS-1$
+
+                  + " WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + sqlAppFilter.getWhereClause()
+
+            ;
+         }
+
+         String sqlDurationTime = null;
+
+         switch (durationTime) {
+         case BREAK:
+
+            sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
+            break;
+
+         case ELAPSED:
+
+            sqlDurationTime = " SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
+            break;
+
+         case PAUSED:
+
+            sqlDurationTime = " SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
+            break;
+
+         case RECORDED:
+
+            sqlDurationTime = " SUM(TourDeviceTime_Recorded),"; //$NON-NLS-1$
+            break;
+
+         case MOVING:
+         default:
+            // this is also the old implementation for the duration values
+            sqlDurationTime = "SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
+            break;
+         }
+
+         sql = NL +
+
+               "SELECT" + NL //                                               //$NON-NLS-1$
+
+               + "   StartYear," + NL //                                   1  //$NON-NLS-1$
+               + "   StartMonth," + NL //                                  2  //$NON-NLS-1$
+               + "   SUM(TourDistance)," + NL //                           3  //$NON-NLS-1$
+               + "   SUM(TourAltUp)," + NL //                              4  //$NON-NLS-1$
+               + "   " + sqlDurationTime + NL //                           5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Elapsed), " + NL //       6 //$NON-NLS-1$
+               + "   SUM(TourComputedTime_Moving)," + NL //       7 //$NON-NLS-1$
+               + "   SUM(1),                   " + NL //       8 //$NON-NLS-1$
+               + "   TourType_TypeId,          " + NL //       9 //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded),    " + NL //      10 //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)       " + NL //      11 //$NON-NLS-1$
+
+               + fromTourData
+
+               + "GROUP BY StartYear, StartMonth, tourType_typeId" + NL //   //$NON-NLS-1$
+               + "ORDER BY StartYear, StartMonth" + NL //                    //$NON-NLS-1$
+         ;
+
+         final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
+
+         int colorOffset = 0;
+         if (isShowNoTourTypes) {
+            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+         }
+
+         int numTourTypes = colorOffset + allTourTypes.length;
+         numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
+
+         final int numMonths = 12 * numYears;
 
          final float[][] dbAltitude = new float[numTourTypes][numMonths];
          final float[][] dbDistance = new float[numTourTypes][numMonths];
@@ -208,23 +219,31 @@ public class DataProvider_Tour_Month extends DataProvider {
          final long[] usedTourTypeIds = new long[numTourTypes];
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         sqlFilter.setParameters(statement, 1);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         final ResultSet result = statement.executeQuery();
+         int paramIndex = 1;
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final int dbValue_Year = result.getInt(1);
-            final int dbValue_Month = result.getInt(2);
-            final int dbValue_Distance = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Altitude = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-            final int dbValue_Duration = result.getInt(5);
+// SET_FORMATTING_OFF
+
+            final int dbValue_Year                 = result.getInt(1);
+            final int dbValue_Month                = result.getInt(2);
+            final int dbValue_Distance             = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
+            final int dbValue_Altitude             = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
+            final int dbValue_Duration             = result.getInt(5);
             final int dbValue_ElapsedTime = result.getInt(6);
             final int dbValue_MovingTime = result.getInt(7);
-            final int dbValue_NumTours = result.getInt(8);
-            final Long dbValue_TourTypeIdObject = (Long) result.getObject(9);
+            final int dbValue_NumTours             = result.getInt(8);
+            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(9);
             final int dbValue_RecordedTime = result.getInt(10);
             final int dbValue_PausedTime = result.getInt(11);
+
+// SET_FORMATTING_ON
 
             final int yearIndex = numYears - (lastYear - dbValue_Year + 1);
             final int monthIndex = (dbValue_Month - 1) + yearIndex * 12;
@@ -393,7 +412,7 @@ public class DataProvider_Tour_Month extends DataProvider {
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
       return _tourMonthData;

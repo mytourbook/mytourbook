@@ -667,7 +667,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Time_MovingTime();
       defineColumn_Time_WeekNo();
       defineColumn_Time_WeekYear();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_ElapsedTime();
       defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_BreakTime_Relative();
@@ -1256,20 +1256,41 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
 
-            final long dbPausedTime = item.colBreakTime;
-            final long dbRecordingTime = item.colElapsedTime;
+            final long dbBreakTime = item.colBreakTime;
+            final long dbElapsedTime = item.colElapsedTime;
 
-            final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-                  / dbRecordingTime
+            final float relativePausedTime = dbElapsedTime == 0 ? 0 : (float) dbBreakTime
+                  / dbElapsedTime
                   * 100;
 
             cell.setText(_nf1.format(relativePausedTime));
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: elapsed time (h)
+    */
+   private void defineColumn_Time_ElapsedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVICollatedTour) element).colElapsedTime;
+
+            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
             setCellColor(cell, element);
          }
@@ -1281,7 +1302,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1333,34 +1354,13 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
 
             final long value = item.colRecordedTime;
-
-            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: recording time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colElapsedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 

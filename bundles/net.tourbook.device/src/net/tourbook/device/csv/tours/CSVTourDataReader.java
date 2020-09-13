@@ -342,14 +342,14 @@ public class CSVTourDataReader extends TourbookDevice {
                      0);
 
                duration = parseInteger(allToken[2]); //						3 Duration (sec);
-               tourData.setTourElapsedTime(duration);
+               tourData.setTourDeviceTime_Elapsed(duration);
 
                pausedTime = parseInteger(allToken[3]); //						4 Paused Time (sec),
-               tourData.setTourPausedTime(pausedTime);
+               tourData.setTourDeviceTime_Paused(pausedTime);
 
                final int recordedTime = Math.max(0, duration - pausedTime);
-               tourData.setTourRecordedTime(recordedTime);
-               tourData.setTourMovingTime(recordedTime);
+               tourData.setTourDeviceTime_Recorded(recordedTime);
+               tourData.setTourComputedTime_Moving(recordedTime);
 
                distance = parseInteger(allToken[4]);//							5 Distance (m);
                tourData.setTourDistance(distance);

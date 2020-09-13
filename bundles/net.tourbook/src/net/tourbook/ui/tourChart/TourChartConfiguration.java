@@ -314,7 +314,6 @@ public class TourChartConfiguration {
        */
 		isShowTourPauses 					= _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
 
-
 		/*
 		 * Tour info
 		 */

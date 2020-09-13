@@ -247,16 +247,18 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int[] startValue = _tourTimeData.tourTimeStartValues;
       final int[] endValue = _tourTimeData.tourTimeEndValues;
 
-      final int recordingTime = _tourTimeData.tourRecordingTimeValues[valueIndex];
-      final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final int elapsedTime = _tourTimeData.tourDeviceTime_ElapsedValues[valueIndex];
+      final int recordedTime = _tourTimeData.tourDeviceTime_RecordedValues[valueIndex];
+      final int pausedTime = elapsedTime - recordedTime;
+      final int movingTime = _tourTimeData.tourComputedTime_MovingValues[valueIndex];
+      final int breakTime = elapsedTime - movingTime;
 
       final ZonedDateTime zdtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourTimeData.tourDistanceValues[valueIndex];
-      final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-      final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
+      final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+      final float pace = distance == 0 ? 0 : movingTime * 1000 / distance;
 
       final String tourTimeZoneOffset = _tourTimeData.tourTimeZoneOffset.get(valueIndex);
 
@@ -330,13 +332,21 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
             zdtTourStart.getZone().getId(),
             tourTimeZoneOffset,
             //
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
-            (recordingTime % 3600) % 60,
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
+            (elapsedTime % 3600) % 60,
             //
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
-            (drivingTime % 3600) % 60,
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            (recordedTime % 3600) % 60,
+            //
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            (pausedTime % 3600) % 60,
+            //
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
+            (movingTime % 3600) % 60,
             //
             breakTime / 3600,
             (breakTime % 3600) / 60,

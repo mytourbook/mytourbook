@@ -105,7 +105,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
-             * Moving, recording + break time
+             * Moving, elapsed + break time
              */
             final Composite timeContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()

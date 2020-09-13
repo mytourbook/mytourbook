@@ -141,7 +141,7 @@ public class TourGeoFilter_Loader {
 
                } else {
 
-                  // update loading state - this should not occur but is helpful for testing
+                  // update loading state - this should not occure but is helpfull for testing
 
                   // show loading state
                   geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE +
@@ -177,7 +177,7 @@ public class TourGeoFilter_Loader {
 
       if (selectTourIdsFromGeoParts == null) {
 
-         // this can occur when there are no geo parts, this would cause a sql exception
+         // this can occure when there are no geo parts, this would cause a sql exception
 
          return false;
       }
@@ -211,7 +211,7 @@ public class TourGeoFilter_Loader {
 
                + " WHERE 1=1 " + appFilter.getWhereClause() + NL//      //$NON-NLS-1$
 
-               + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectTourIdsFromGeoParts + UI.SYMBOL_BRACKET_RIGHT; //         //$NON-NLS-1$ //$NON-NLS-2$
+               + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       } else {
 
@@ -232,7 +232,7 @@ public class TourGeoFilter_Loader {
                   + " TourId" + NL //                                      //$NON-NLS-1$
                   + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //        //$NON-NLS-1$
 
-                  + " WHERE TourId NOT IN (" + selectTourIdsFromGeoParts + UI.SYMBOL_BRACKET_RIGHT; //         //$NON-NLS-1$
+                  + " WHERE TourId NOT IN (" + selectTourIdsFromGeoParts + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
          }
       }
 

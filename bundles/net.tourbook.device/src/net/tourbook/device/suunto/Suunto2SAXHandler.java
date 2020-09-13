@@ -28,7 +28,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 
@@ -109,52 +108,53 @@ public class Suunto2SAXHandler extends DefaultHandler {
       TIME_FORMAT_RFC822.setTimeZone(utc);
    }
    //
-   private HashMap<Long, TourData>   _alreadyImportedTours;
-   private HashMap<Long, TourData>   _newlyImportedTours;
-   private TourbookDevice            _device;
-   private String                    _importFilePath;
+   private HashMap<Long, TourData> _alreadyImportedTours;
+   private HashMap<Long, TourData> _newlyImportedTours;
+   private TourbookDevice          _device;
+   private String                  _importFilePath;
    //
-   private TimeData                  _sampleData;
+   private TimeData                _sampleData;
 
-   private ArrayList<TimeData>       _sampleList      = new ArrayList<>();
-   private TimeData                  _gpsData;
+   private ArrayList<TimeData>     _sampleList       = new ArrayList<>();
+   private TimeData                _gpsData;
 
-   private ArrayList<TimeData>       _gpsList         = new ArrayList<>();
-   private TimeData                  _markerData;
+   private ArrayList<TimeData>     _gpsList          = new ArrayList<>();
+   private TimeData                _markerData;
 
-   private ArrayList<TimeData>       _markerList      = new ArrayList<>();
+   private ArrayList<TimeData>     _markerList       = new ArrayList<>();
 
-   private ArrayList<TourTimerPause> _tourTimerPauses = new ArrayList<>();
+   private final List<Long>        _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
 
-   private boolean                   _isImported;
-   private StringBuilder             _characters      = new StringBuilder();
-   private String                    _currentSampleType;
-   private long                      _currentTime;
+   private boolean                 _isImported;
+   private StringBuilder           _characters       = new StringBuilder();
+   private String                  _currentSampleType;
+   private long                    _currentTime;
 
-   private long                      _prevSampleTime;
-   private boolean                   _isInRootDevice;
-   private boolean                   _isInRootSamples;
+   private long                    _prevSampleTime;
+   private boolean                 _isInRootDevice;
+   private boolean                 _isInRootSamples;
 
-   private boolean                   _isInRootHeader;
-   private boolean                   _isInAltitude;
-   private boolean                   _isInCadence;
-   private boolean                   _isInDistance;
-   private boolean                   _isInEnergy;
-   private boolean                   _isInEvents;
-   private boolean                   _isInHR;
-   private boolean                   _isInLatitude;
-   private boolean                   _isInLongitude;
-   private boolean                   _isInPause;
-   private boolean                   _isInSample;
-   private boolean                   _isInSampleType;
-   private boolean                   _isInState;
-   private boolean                   _isInSW;
-   private boolean                   _isInUTC;
+   private boolean                 _isInRootHeader;
+   private boolean                 _isInAltitude;
+   private boolean                 _isInCadence;
+   private boolean                 _isInDistance;
+   private boolean                 _isInEnergy;
+   private boolean                 _isInEvents;
+   private boolean                 _isInHR;
+   private boolean                 _isInLatitude;
+   private boolean                 _isInLongitude;
+   private boolean                 _isInPause;
+   private boolean                 _isInSample;
+   private boolean                 _isInSampleType;
+   private boolean                 _isInState;
+   private boolean                 _isInSW;
+   private boolean                 _isInUTC;
 
-   private boolean                   _isInTemperature;
-   private int                       _tourCalories;
+   private boolean                 _isInTemperature;
+   private int                     _tourCalories;
 
-   private String                    _tourSW;
+   private String                  _tourSW;
 
    public Suunto2SAXHandler(final TourbookDevice deviceDataReader,
                             final String importFileName,
@@ -193,7 +193,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
       _sampleList.clear();
       _gpsList.clear();
       _markerList.clear();
-      _tourTimerPauses.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    @Override
@@ -282,18 +283,15 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
          if (stateValue.equalsIgnoreCase(Boolean.TRUE.toString())) {
 
-            final TourTimerPause tourTimerPause = new TourTimerPause();
-            tourTimerPause.setStartTime(_currentTime);
-
-            _tourTimerPauses.add(tourTimerPause);
+            _pausedTime_Start.add(_currentTime);
 
          } else if (stateValue.equalsIgnoreCase(Boolean.FALSE.toString())) {
 
-            if (_tourTimerPauses.size() == 0) {
+            if (_pausedTime_Start.size() == 0) {
                return;
             }
 
-            _tourTimerPauses.get(_tourTimerPauses.size() - 1).setEndTime(_currentTime);
+            _pausedTime_End.add(_currentTime);
 
          }
       }
@@ -503,7 +501,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
-      finalizeTour_TimerPauses(tourData);
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
 
       setDistanceSerie(tourData);
 
@@ -524,29 +522,6 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
 
       _isImported = true;
-   }
-
-   private void finalizeTour_TimerPauses(final TourData tourData) {
-
-      if (_tourTimerPauses.size() == 0) {
-         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
-         return;
-      }
-
-      final List<TourTimerPause> tourTimerPauses = new ArrayList<>();
-
-      for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
-         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
-            tourTimerPause.setTourData(tourData);
-            tourTimerPauses.add(tourTimerPause);
-         }
-      }
-
-      tourData.setTourTimerPauses(tourTimerPauses);
-      final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-
-      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
-      tourData.setTourPausedTime(totalTourTimerPauses);
    }
 
    /**
