@@ -37,9 +37,11 @@ import java.util.List;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
+import net.tourbook.ui.views.calendar.CalendarProfile;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -48,10 +50,21 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private static final boolean   _isLogWeatherData = System.getProperty("logWeatherData") != null;                     //$NON-NLS-1$
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";
+   private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
-   private final static String    baseApiUrl        = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private final static String    keyParameter      = "?key=";                                                          //$NON-NLS-1$
+   static {
+
+      if (_isLogWeatherData) {
+
+         Util.logSystemProperty_IsEnabled(CalendarProfile.class,
+               SYS_PROP__LOG_WEATHER_DATA,
+               "Weather data are logged"); //$NON-NLS-1$
+      }
+   }
+
+   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    keyParameter = "?key=";                                                          //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
@@ -61,7 +74,7 @@ public class HistoricalWeatherRetriever {
 
    private WeatherData            historicalWeatherData;
 
-   private final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
    public HistoricalWeatherRetriever() {}
 

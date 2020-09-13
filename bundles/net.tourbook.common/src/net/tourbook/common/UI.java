@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.jface.action.Action;
@@ -512,12 +513,14 @@ public class UI {
    /**
     * Number of horizontal dialog units per character, value <code>4</code>.
     */
-   private static final int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
+   private static final int    HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
 
    /**
     * Number of vertical dialog units per character, value <code>8</code>.
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
@@ -525,7 +528,17 @@ public class UI {
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
     */
-   public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
+   public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
+
+   static {
+
+      if (IS_SCRAMBLE_DATA) {
+
+         Util.logSystemProperty_IsEnabled(UI.class,
+               SYS_PROP__SCRAMBLE_DATA,
+               "Visible data are scrambled"); //$NON-NLS-1$
+      }
+   }
 
    /**
     * @param sash
