@@ -438,7 +438,6 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllDistance.add(distance);
                dbAllAltitudeUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
 
-               //todo FB propose pace based on RECORDED TIME ?
                dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
                dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);
 
