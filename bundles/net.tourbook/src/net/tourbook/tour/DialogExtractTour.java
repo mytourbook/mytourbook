@@ -1050,7 +1050,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       _tourDataTarget.computeAltitudeUpDown();
       _tourDataTarget.setTourDeviceTime_Recorded(_tourDataTarget.getTourDeviceTime_Elapsed());
-      //TODO FB set the pauses as well ??
       _tourDataTarget.computeTourMovingTime();
       _tourDataTarget.computeComputedValues();
 
