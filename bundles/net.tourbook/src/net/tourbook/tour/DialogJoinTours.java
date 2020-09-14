@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +42,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.ChartLabel;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -941,6 +943,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedElapsedTime = 0;
       int joinedRecordedTime = 0;
       int joinedPausedTime = 0;
+      final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
+      final ArrayList<Long> joinedPausedTime_End = new ArrayList<>();
       int joinedMovingTime = 0;
       float joinedDistance = 0;
       int joinedCalories = 0;
@@ -1325,12 +1329,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          /*
           * summarize other fields
           */
-         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
-         //TODO FB merge the pauses
          tourData.computeTourMovingTime();
-
          joinedElapsedTime += tourData.getTourDeviceTime_Elapsed();
          joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
+
+         final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
+         joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
+         final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
+         joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
          joinedMovingTime += tourData.getTourComputedTime_Moving();
 
@@ -1378,6 +1385,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setTourDeviceTime_Elapsed(joinedElapsedTime);
       _joinedTourData.setTourDeviceTime_Recorded(joinedRecordedTime);
       _joinedTourData.setTourDeviceTime_Paused(joinedPausedTime);
+      _joinedTourData.setPausedTime_Start(joinedPausedTime_Start.stream().mapToLong(l -> l).toArray());
+      _joinedTourData.setPausedTime_End(joinedPausedTime_End.stream().mapToLong(l -> l).toArray());
       _joinedTourData.setTourComputedTime_Moving(joinedMovingTime);
       _joinedTourData.setTourDistance(joinedDistance);
 
