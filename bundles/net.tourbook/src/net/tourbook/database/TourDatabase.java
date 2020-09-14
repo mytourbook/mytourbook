@@ -7510,6 +7510,8 @@ public class TourDatabase {
             SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed");
             SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving");
 
+            SQL.RenameCol(stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", "TourDeviceTime_Elapsed");
+
 // SET_FORMATTING_ON
          }
       }
