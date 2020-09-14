@@ -1686,6 +1686,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public long[]           pausedTime_End;
 
+   // SET_FORMATTING_ON
+
    public TourData() {}
 
    /**
