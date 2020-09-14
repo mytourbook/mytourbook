@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -31,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;

@@ -15,11 +15,10 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import de.byteholder.geoclipse.map.UI;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
