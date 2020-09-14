@@ -1351,7 +1351,7 @@ public class TourMapPainter extends MapPainter {
 
       if (tourData.isMultipleTours()) {
 
-         //TODO FB support joining pauses when creating a multiple tour
+         //TODO FB support joining pauses when creating a multiple tour, what is a multiple tour ?
          final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
          final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
 //         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
