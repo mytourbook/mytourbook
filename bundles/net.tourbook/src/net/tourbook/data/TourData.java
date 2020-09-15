@@ -105,7 +105,6 @@ import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-import org.hibernate.annotations.Cascade;
 
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
@@ -836,8 +835,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Photos for this tour
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    // ############################################# ASSOCIATED ENTITIES #############################################
@@ -845,8 +843,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Tour marker
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
@@ -854,15 +851,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Contains the tour way points
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
    private final Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData", orphanRemoval=true)
    private final Set<TourReference>    tourReferences                     = new HashSet<>();
 
    /**

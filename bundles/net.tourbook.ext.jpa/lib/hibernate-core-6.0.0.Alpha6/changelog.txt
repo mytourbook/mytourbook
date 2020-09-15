@@ -1,0 +1,97 @@
+Hibernate 6 Changelog
+=======================
+
+Note: Please refer to JIRA to learn more about each issue.
+
+Changes in 6.0.0.Alpha6 (August 20, 2020)
+------------------------------------------------------------------------------------------------------------------------
+
+https://hibernate.atlassian.net/projects/HHH/versions/31848
+
+** Bug
+    * [HHH-13828] - Drop EntityPersister extending the internal interface InFlightEntityMappingType
+
+** Improvement
+    * [HHH-14172] - Drop any/all usage of Javassist
+    * [HHH-14167] - JpaCompliance for @OrderBy handling
+    * [HHH-13745] - Verify HqlTranslator usability without SessionFactory
+
+** New Feature
+    * [HHH-13132] - HQL inline EntityGraph support
+    * [HHH-1523] - Rebuild fetches from query-cache hits
+
+** Task
+    * [HHH-14174] - Implent Collection#getElementByIndex
+    * [HHH-14173] - @Parent support
+    * [HHH-14171] - `@Formula` support
+    * [HHH-14170] - Implement RowId support
+    * [HHH-14169] - Implement SQM `member of` predicate
+    * [HHH-14168] - Support for custom Type/UserType impls
+    * [HHH-14166] - Allow nulls-precedence in HQL/SQM
+    * [HHH-14165] - Implement support for embeddable-valued QueryParameters
+    * [HHH-14164] - Verify / enable query result caching
+    * [HHH-14163] - Named ResultSet mappings
+    * [HHH-14162] - NativeQuery support
+    * [HHH-14161] - NamedQuery support
+
+
+
+Changes in 6.0.0.Alpha5 (April 24, 2020)
+------------------------------------------------------------------------------------------------------------------------
+
+https://hibernate.atlassian.net/browse/HHH/fixforversion/31821
+
+** Bug
+    * [HHH-13711] - H2 dialect not accurate for drop table since version 1.4.200
+
+** Task
+    * [HHH-13937] - Remove JUnit 5 as compile-time dependency
+    * [HHH-13953] - Upgrade dom4j to 2.1.3
+
+
+
+Changes in 6.0.0.Alpha4 (December 20, 2019)
+------------------------------------------------------------------------------------------------------------------------
+
+https://hibernate.atlassian.net/projects/HHH/versions/31817
+
+** Bug
+    * [HHH-13777] - UnsupportedOperationException is thrown for MappedSuperclass if the id is declared on subclasses
+
+** Task
+    * [HHH-13746] - Implement Load by Multiple Ids using SQL AST
+    * [HHH-13763] - Update all load-by-key handling to use SQL AST
+    * [HHH-13778] - `@OrderBy` handling using SQL AST
+
+** Improvement
+    * [HHH-13718] - secondary tables support
+    * [HHH-13769] - Avoid unnecessary joins
+
+
+Changes in 6.0.0.Alpha1 (November 23, 2019)
+------------------------------------------------------------------------------------------------------------------------
+
+https://hibernate.atlassian.net/projects/HHH/versions/31768/
+
+** Sub-task
+    * [HHH-13714] - HQL/Criteria UPDATE support
+    * [HHH-13715] - HQL/Criteria DELETE support
+
+** New Feature
+    * [HHH-11474] - Implement support for LIMIT and OFFSET clause
+
+** Task
+    * [HHH-13395] - Update Envers to use the new Integrator signature.
+    * [HHH-13725] - Implement ToOne Associations support
+    * [HHH-13732] - Implement OneToOne support
+
+** Improvement
+    * [HHH-11828] - Adjust EntityMode, Tuplizer and friends to the 6.0 metamodel (Navigable et.al.) contracts
+    * [HHH-13081] - Pass BootstrapContext to Integrator#integrate
+    * [HHH-13224] - Look at removing references to SessionFactory from various components
+
+** Remove Feature
+    * [HHH-10071] - Remove support for "collection properties" in HQL
+    * [HHH-11990] - Remove LogicalConnectionImplementor#makeShareableCopy
+
+
