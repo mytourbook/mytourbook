@@ -178,11 +178,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "tourEndPlace, " //                                 84    //$NON-NLS-1$
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
-            + "avgAltitudeChange, " //                             85    //$NON-NLS-1$
+            + "avgAltitudeChange, " //                            85    //$NON-NLS-1$
 
             // -------- TOUR DATA -----------
 
-            + "tourDeviceTime_Recorded " //                             86    //$NON-NLS-1$
+            + "tourDeviceTime_Recorded " //                       86    //$NON-NLS-1$
 
       ;
 
@@ -199,85 +199,86 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
 
-            + "TourDistance,                " + NL //$NON-NLS-1$
-            + "TourDeviceTime_Elapsed,      " + NL //$NON-NLS-1$
-            + "TourComputedTime_Moving,     " + NL //$NON-NLS-1$
-            + "TourAltUp,                   " + NL //$NON-NLS-1$
-            + "TourAltDown,                 " + NL //$NON-NLS-1$
+            + "TourDistance," + NL //                       //$NON-NLS-1$
+            + "TourDeviceTime_Elapsed," + NL //             //$NON-NLS-1$
+            + "TourComputedTime_Moving," + NL //            //$NON-NLS-1$
+            + "TourAltUp," + NL //                          //$NON-NLS-1$
+            + "TourAltDown," + NL //                        //$NON-NLS-1$
 
-            + "MaxAltitude,                 " + NL //$NON-NLS-1$
-            + "MaxPulse,                    " + NL //$NON-NLS-1$
-            + "MaxSpeed,                    " + NL //$NON-NLS-1$
+            + "MaxAltitude," + NL //                        //$NON-NLS-1$
+            + "MaxPulse," + NL //                           //$NON-NLS-1$
+            + "MaxSpeed," + NL //                           //$NON-NLS-1$
 
-            + "AvgCadence,                  " + NL //$NON-NLS-1$
-            + "AvgPulse,                    " + NL //$NON-NLS-1$
-            + "AvgTemperature,              " + NL //$NON-NLS-1$
-            + "CadenceMultiplier,           " + NL //$NON-NLS-1$
-            + "TemperatureScale,            " + NL //$NON-NLS-1$
-            + "WeatherWindDir,              " + NL //$NON-NLS-1$
-            + "WeatherWindSpd,              " + NL //$NON-NLS-1$
+            + "AvgCadence," + NL //                         //$NON-NLS-1$
+            + "AvgPulse," + NL //                           //$NON-NLS-1$
+            + "AvgTemperature," + NL //                     //$NON-NLS-1$
+            + "CadenceMultiplier," + NL //                  //$NON-NLS-1$
+            + "TemperatureScale," + NL //                   //$NON-NLS-1$
+            + "WeatherWindDir," + NL //                     //$NON-NLS-1$
+            + "WeatherWindSpd," + NL //                     //$NON-NLS-1$
 
-            + "Calories,                    " + NL //$NON-NLS-1$
-            + "RestPulse,                   " + NL //$NON-NLS-1$
+            + "Calories," + NL //                           //$NON-NLS-1$
+            + "RestPulse," + NL //                          //$NON-NLS-1$
 
-            + "Power_TotalWork,             " + NL //$NON-NLS-1$
+            + "Power_TotalWork," + NL //                    //$NON-NLS-1$
 
-            + "NumberOfTimeSlices,          " + NL //$NON-NLS-1$
-            + "NumberOfPhotos,              " + NL //$NON-NLS-1$
+            + "NumberOfTimeSlices," + NL //                 //$NON-NLS-1$
+            + "NumberOfPhotos," + NL //                     //$NON-NLS-1$
 
-            + "FrontShiftCount,             " + NL //$NON-NLS-1$
-            + "RearShiftCount,              " + NL //$NON-NLS-1$
+            + "FrontShiftCount," + NL //                    //$NON-NLS-1$
+            + "RearShiftCount," + NL //                     //$NON-NLS-1$
 
-            + "surfing_NumberOfEvents,      " + NL //$NON-NLS-1$
+            + "surfing_NumberOfEvents," + NL //             //$NON-NLS-1$
 
-            + "cadenceZone_SlowTime,        " + NL //$NON-NLS-1$
-            + "cadenceZone_FastTime,        " + NL //$NON-NLS-1$
-            + "cadenceZones_DelimiterValue, " + NL //$NON-NLS-1$
+            + "cadenceZone_SlowTime," + NL //               //$NON-NLS-1$
+            + "cadenceZone_FastTime," + NL //               //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue," + NL //        //$NON-NLS-1$
 
-            + "weather_Temperature_Min,     " + NL //$NON-NLS-1$
-            + "weather_Temperature_Max      " + NL //$NON-NLS-1$
+            + "weather_Temperature_Min," + NL //            //$NON-NLS-1$
+            + "weather_Temperature_Max," + NL //            //$NON-NLS-1$
 
+            + "tourDeviceTime_Recorded" + NL //             //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
 
-            + "SUM( CAST(TourDistance AS BIGINT)),          " + NL // 0    //$NON-NLS-1$
-            + "SUM( CAST(TourDeviceTime_Elapsed AS BIGINT))," + NL // 1    //$NON-NLS-1$
-            + "SUM( CAST(TourComputedTime_Moving AS BIGINT)), " + NL // 2    //$NON-NLS-1$
-            + "SUM( CAST(TourAltUp AS BIGINT)),             " + NL // 3    //$NON-NLS-1$
-            + "SUM( CAST(TourAltDown AS BIGINT)),           " + NL // 4    //$NON-NLS-1$
-            + "SUM(1),                                      " + NL // 5    //$NON-NLS-1$
+            + "SUM( CAST(TourDistance AS BIGINT))," + NL //             0  //$NON-NLS-1$
+            + "SUM( CAST(TourDeviceTime_Elapsed AS BIGINT))," + NL //   1  //$NON-NLS-1$
+            + "SUM( CAST(TourComputedTime_Moving AS BIGINT))," + NL //  2  //$NON-NLS-1$
+            + "SUM( CAST(TourAltUp AS BIGINT))," + NL //                3  //$NON-NLS-1$
+            + "SUM( CAST(TourAltDown AS BIGINT))," + NL //              4  //$NON-NLS-1$
+            + "SUM(1)," + NL //                                         5  //$NON-NLS-1$
             //
-            + "MAX(MaxSpeed),                               " + NL // 6    //$NON-NLS-1$
-            + "MAX(MaxAltitude),                            " + NL // 7    //$NON-NLS-1$
-            + "MAX(MaxPulse),                               " + NL // 8    //$NON-NLS-1$
+            + "MAX(MaxSpeed)," + NL //                                  6  //$NON-NLS-1$
+            + "MAX(MaxAltitude)," + NL //                               7  //$NON-NLS-1$
+            + "MAX(MaxPulse)," + NL //                                  8  //$NON-NLS-1$
             //
-            + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END         ), " + NL //                              9     //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),      " + NL //   10    //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),   " + NL //   11    //$NON-NLS-1$
-            + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END   ), " + NL //                              12    //$NON-NLS-1$
-            + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END   ), " + NL //                              13    //$NON-NLS-1$
-            + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END        ), " + NL //                              14    //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END), " + NL //                                    9     //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END)," + NL //    11    //$NON-NLS-1$
+            + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END), " + NL //                              12    //$NON-NLS-1$
+            + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END), " + NL //                              13    //$NON-NLS-1$
+            + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$
             //
-            + "SUM( CAST(Calories AS BIGINT)),              " + NL // 15   //$NON-NLS-1$
-            + "SUM( CAST(Power_TotalWork AS BIGINT)),       " + NL // 16   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT))," + NL //                 15 //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT))," + NL //          16 //$NON-NLS-1$
 
-            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),    " + NL // 17   //$NON-NLS-1$
-            + "SUM( CAST(NumberOfPhotos AS BIGINT)),        " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT))," + NL //       17 //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT))," + NL //           18 //$NON-NLS-1$
             //
-            + "SUM( CAST(FrontShiftCount AS BIGINT)),       " + NL // 19   //$NON-NLS-1$
-            + "SUM( CAST(RearShiftCount AS BIGINT)),        " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT))," + NL //          19 //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT))," + NL //           20 //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT))," + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT))," + NL //   21 //$NON-NLS-1$
 
-            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),  " + NL // 22   //$NON-NLS-1$
-            + "SUM( CAST(cadenceZone_FastTime AS BIGINT)),  " + NL // 23   //$NON-NLS-1$
-            + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END ), " + NL //     24 //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT))," + NL //     22 //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_FastTime AS BIGINT))," + NL //     23 //$NON-NLS-1$
+            + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
 
-            + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25            //$NON-NLS-1$
-            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END), " + NL // 26            //$NON-NLS-1$
+            + "MIN( CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END)," + NL //               25 //$NON-NLS-1$
+            + "MAX( CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)," + NL //               26 //$NON-NLS-1$
 
-            + "SUM(CAST(tourDeviceTime_Recorded AS BIGINT))     " + NL // 27   //$NON-NLS-1$
+            + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))" + NL //    27 //$NON-NLS-1$
       ;
 
    }
