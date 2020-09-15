@@ -1291,20 +1291,15 @@ public class DialogExportTour extends TitleAreaDialog {
 
       doExport_20_TourValues(vc);
 
-      final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(
-            new FileOutputStream(exportFile),
-            UI.UTF_8));
-
-      final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));
-
-      try {
+      try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            final Writer exportWriter = new BufferedWriter(outputStreamWriter);
+            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate))) {
 
          Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.showStatus(e);
-      } finally {
-         exportWriter.close();
       }
    }
 
