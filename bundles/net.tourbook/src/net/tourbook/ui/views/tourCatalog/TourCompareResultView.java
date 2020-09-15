@@ -933,7 +933,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
 

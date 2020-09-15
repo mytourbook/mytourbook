@@ -1247,7 +1247,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_BreakTime_Relative() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_BREAK_TIME_RELATIVE.createColumn(
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE.createColumn(
             _columnManager,
             _pc);
 
@@ -1281,7 +1281,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1302,7 +1302,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1324,7 +1324,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_PausedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1347,7 +1347,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_RecordedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

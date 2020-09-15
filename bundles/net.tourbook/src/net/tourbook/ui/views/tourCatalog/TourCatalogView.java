@@ -881,7 +881,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

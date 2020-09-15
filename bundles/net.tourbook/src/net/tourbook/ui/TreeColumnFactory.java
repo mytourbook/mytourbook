@@ -94,14 +94,15 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory SURFING_MIN_TIME_DURATION;
    public static final TreeColumnFactory SURFING_NUMBER_OF_EVENTS;
 
-   public static final TreeColumnFactory TIME_BREAK_TIME;
-   public static final TreeColumnFactory TIME_BREAK_TIME_RELATIVE;
+   public static final TreeColumnFactory TIME__DEVICE_ELAPSED_TIME;
+   public static final TreeColumnFactory TIME__DEVICE_RECORDED_TIME;
+   public static final TreeColumnFactory TIME__DEVICE_PAUSED_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_MOVING_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_MOVING_TIME_NO_CATEGORY;
+   public static final TreeColumnFactory TIME__COMPUTED_BREAK_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_BREAK_TIME_RELATIVE;
+
    public static final TreeColumnFactory TIME_DATE;
-   public static final TreeColumnFactory TIME_MOVING_TIME;
-   public static final TreeColumnFactory TIME_MOVING_TIME_NO_CATEGORY;
-   public static final TreeColumnFactory TIME_PAUSED_TIME;
-   public static final TreeColumnFactory TIME_RECORDED_TIME;
-   public static final TreeColumnFactory TIME_ELAPSED_TIME;
    public static final TreeColumnFactory TIME_TIME_ZONE;
    public static final TreeColumnFactory TIME_TIME_ZONE_DIFFERENCE;
    public static final TreeColumnFactory TIME_TOUR_START_TIME;
@@ -1594,12 +1595,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_MOVING_TIME = new TreeColumnFactory() {
+      TIME__COMPUTED_MOVING_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1619,12 +1620,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_MOVING_TIME_NO_CATEGORY = new TreeColumnFactory() {
+      TIME__COMPUTED_MOVING_TIME_NO_CATEGORY = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1643,12 +1644,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_PAUSED_TIME = new TreeColumnFactory() {
+      TIME__DEVICE_PAUSED_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_PAUSED_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_PAUSED_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1668,12 +1669,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_BREAK_TIME = new TreeColumnFactory() {
+      TIME__COMPUTED_BREAK_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1693,12 +1694,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_BREAK_TIME_RELATIVE = new TreeColumnFactory() {
+      TIME__COMPUTED_BREAK_TIME_RELATIVE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_BREAK_TIME_RELATIVE", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_BREAK_TIME_RELATIVE", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1713,12 +1714,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_RECORDED_TIME = new TreeColumnFactory() {
+      TIME__DEVICE_RECORDED_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_RECORDED_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_RECORDED_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1738,12 +1739,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_ELAPSED_TIME = new TreeColumnFactory() {
+      TIME__DEVICE_ELAPSED_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_ELAPSED_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_ELAPSED_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 

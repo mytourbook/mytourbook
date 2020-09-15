@@ -3032,7 +3032,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3051,7 +3051,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

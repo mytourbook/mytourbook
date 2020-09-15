@@ -11,7 +11,6 @@ New
 
 * Elapsed Time - Recorded Time - Paused Time (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/222
 
-
     New time data:
 
     Elapsed time (formerly Recording Time)
@@ -27,6 +26,7 @@ New
  - Added the ability to re-import, for existing tours, only the timer pauses (and hence also the recorded time).
  - The new tour times (Recorded & Paused Times) are available for display in the TourDataEditorView, TourBookView, Calendar view & Statistics View
  - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
+
 
 Improvements
 ============
@@ -44,10 +44,11 @@ Improvements
   - Adjustment Type: "Approach elevation with SRMT data"
     New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
 
+
 Changes  
 =======
 
-* 
+* All time columns in the column profiles must be added because it's internal names are modified
 
 
 Fixes   

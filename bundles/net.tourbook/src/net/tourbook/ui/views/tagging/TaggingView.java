@@ -1231,7 +1231,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1256,7 +1256,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -1280,7 +1280,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_Time_PausedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {

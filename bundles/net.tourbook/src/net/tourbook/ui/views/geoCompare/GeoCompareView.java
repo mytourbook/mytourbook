@@ -355,11 +355,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.distance - item2.distance;
             break;
 
-         case TableColumnFactory.TIME_MOVING_TIME_ID:
+         case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:
             rc = item1.movingTime - item2.movingTime;
             break;
 
-         case TableColumnFactory.TIME_ELAPSED_TIME_ID:
+         case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:
             rc = item1.elapsedTime - item2.elapsedTime;
             break;
 
@@ -1508,7 +1508,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1530,7 +1530,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 

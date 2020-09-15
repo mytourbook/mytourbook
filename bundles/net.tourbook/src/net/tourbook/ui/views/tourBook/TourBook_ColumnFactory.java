@@ -2373,7 +2373,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_BreakTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_BREAK_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__COMPUTED_BREAK_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
@@ -2385,7 +2385,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_BREAK_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__COMPUTED_BREAK_TIME.createColumn(_columnManager_Tree, _pc);
 
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2408,7 +2408,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_BreakTime_Relative() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_BREAK_TIME_RELATIVE.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
@@ -2427,7 +2427,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_BREAK_TIME_RELATIVE.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2458,7 +2458,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_ElapsedTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
@@ -2470,7 +2470,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager_Tree, _pc);
 
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2491,7 +2491,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
@@ -2504,7 +2504,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2525,7 +2525,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_PausedTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
@@ -2537,7 +2537,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager_Tree, _pc);
 
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2560,7 +2560,7 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Time_RecordedTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
@@ -2572,7 +2572,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager_Tree, _pc);
 
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override

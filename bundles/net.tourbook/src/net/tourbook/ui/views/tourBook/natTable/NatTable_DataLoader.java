@@ -838,12 +838,13 @@ public class NatTable_DataLoader {
       /*
        * TIME
        */
-      case TableColumnFactory.TIME_BREAK_TIME_RELATIVE_ID:           return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_MOVING_TIME_ID:                  return "tourComputedTime_Moving";                 //$NON-NLS-1$
-      case TableColumnFactory.TIME_BREAK_TIME_ID:                    return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_RECORDED_TIME_ID:                 return "tourDeviceTime_Recorded";                 //$NON-NLS-1$
-      case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_ELAPSED_TIME_ID:                  return "tourDeviceTime_Elapsed";               //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:          return "tourDeviceTime_Elapsed";          //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_RECORDED_TIME_ID:         return "tourDeviceTime_Recorded";         //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_PAUSED_TIME_ID:           return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:         return "tourComputedTime_Moving";         //$NON-NLS-1$
+      case TableColumnFactory.TIME__COMPUTED_BREAK_TIME_ID:          return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE_ID: return FIELD_WITHOUT_SORTING;
+
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields

@@ -313,7 +313,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.MOTION_DISTANCE_ID);
       _allSortableColumns.add(TableColumnFactory.MOTION_AVG_PACE_ID);
       _allSortableColumns.add(TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID);
-      _allSortableColumns.add(TableColumnFactory.TIME_ELAPSED_TIME_ID);
+      _allSortableColumns.add(TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID);
    }
 
    private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
@@ -565,7 +565,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             rc = segment1.cadence - segment2.cadence;
             break;
 
-         case TableColumnFactory.TIME_ELAPSED_TIME_ID:
+         case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:
             rc = segment1.deviceTime_Elapsed - segment2.deviceTime_Elapsed;
             break;
 
@@ -3772,7 +3772,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3802,7 +3802,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_ELAPSED_TIME_TOTAL.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_TOTAL.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3830,7 +3830,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3858,7 +3858,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
