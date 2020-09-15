@@ -15,14 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;

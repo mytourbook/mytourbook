@@ -17,7 +17,6 @@ package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.time.format.DateTimeFormatter;
@@ -25,6 +24,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 
@@ -41,8 +41,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogMP extends TitleAreaDialog {
 
-   private static final String            SPACE1                  = net.tourbook.common.UI.SPACE1;
-   private static final String            SPACE2                  = net.tourbook.common.UI.SPACE2;
+   private static final String            SPACE1                  = UI.SPACE1;
+   private static final String            SPACE2                  = UI.SPACE2;
 
    private static final String            TIME_SPACER             = "       ";                    //$NON-NLS-1$
 

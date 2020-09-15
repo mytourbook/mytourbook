@@ -307,7 +307,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
-      //TODO FB speed and pace should be with recorded time or at least give an option ?
       final float distance = _tourDayData.allDistance[valueIndex];
       final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
       final float pace = distance == 0 ? 0 : movingTime * 1000 / distance;

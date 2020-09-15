@@ -131,7 +131,7 @@ public interface ITourbookPreferences {
     */
    public static final String GRAPH_ALL                                  = "graphs.all";                                 //$NON-NLS-1$
    public static final String GRAPH_ANTIALIASING                         = "Graph_Antialiasing";                         //$NON-NLS-1$
-   public static final String GRAPH_ARE_PAUSES_VISIBLE                   = "Graph_ArePausesVisible";                     //$NON-NLS-1$
+   public static final String GRAPH_ARE_PAUSES_VISIBLE                   = "GRAPH_ARE_PAUSES_VISIBLE";                   //$NON-NLS-1$
    public static final String GRAPH_BACKGROUND_SOURCE                    = "GRAPH_BACKGROUND_SOURCE";                    //$NON-NLS-1$
    public static final String GRAPH_BACKGROUND_STYLE                     = "GRAPH_BACKGROUND_STYLE";                     //$NON-NLS-1$
    public static final String GRAPH_IS_BREAKTIME_VALUES_VISIBLE          = "Graph_IsBreaktimeVisible";                   //$NON-NLS-1$

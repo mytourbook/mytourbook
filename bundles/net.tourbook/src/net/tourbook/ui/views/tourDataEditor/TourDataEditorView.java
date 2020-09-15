@@ -221,13 +221,6 @@ import org.eclipse.ui.progress.UIJob;
  * This editor can edit (when all is implemented) all data for a tour
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
-   //TODO FB
-   // Do the following formats :
-   // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
-   // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
-   // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
-   //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //

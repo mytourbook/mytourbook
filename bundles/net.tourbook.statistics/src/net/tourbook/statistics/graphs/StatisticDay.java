@@ -301,6 +301,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
+      //TODO FB propose pace based on RECORDED TIME ?
       //TODO FB speed and pace should be with recorded time or at least give an option ?
       final float distance = _tourDayData.allDistance[valueIndex];
       final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);

@@ -802,8 +802,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @return Returns the folder where tile files will be cached relative to the common offline
-    *         image
-    *         path
+    *         image path
     */
    public String getOfflineFolder() {
       return _offlineFolder;
