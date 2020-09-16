@@ -302,17 +302,20 @@ public class RawDataManager {
     */
    private static void save_InvalidFilesToIgnore_InTxt() {
 
-      BufferedWriter writer = null;
+      final File file = getInvalidFilesToIgnoreFile();
 
       try {
-
-         final File file = getInvalidFilesToIgnoreFile();
-
          if (!file.exists()) {
             file.createNewFile();
          }
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), UI.UTF_8));
+      try (FileOutputStream fileOutputStream = new FileOutputStream(file, true);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
+
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
          for (final String invalidFile : _invalidFilesList) {
@@ -335,14 +338,6 @@ public class RawDataManager {
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
    }
 
