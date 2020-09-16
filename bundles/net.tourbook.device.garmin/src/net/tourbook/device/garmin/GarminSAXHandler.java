@@ -957,6 +957,9 @@ public class GarminSAXHandler extends DefaultHandler {
       _sport = new Sport();
       _tourNotes = null;
       _tourTitle = UI.EMPTY_STRING;
+
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    /**
