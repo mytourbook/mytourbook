@@ -3588,64 +3588,76 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_128_DateTime_Col2(final Composite section) {
 
-      final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      final Composite container = new Composite(section, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(COLUMN_SPACING, 0)
+            .applyTo(container);
       {
-         final Composite elapsedTimeContainer = _tk.createComposite(container);
-         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).span(4, 1).applyTo(elapsedTimeContainer);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(elapsedTimeContainer);
+         final Composite container_Left = _tk.createComposite(container);
+         GridDataFactory.fillDefaults().applyTo(container_Left);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container_Left);
          {
             {
                /*
                 * Elapsed time
                 */
-               final Label label = _tk.createLabel(elapsedTimeContainer, Messages.tour_editor_label_elapsed_time);
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_elapsed_time);
                _secondColumnControls.add(label);
 
-               _deviceTime_Elapsed = new TimeDuration(elapsedTimeContainer);
+               _deviceTime_Elapsed = new TimeDuration(container_Left);
+            }
+            {
+               /*
+                * Recorded time
+                */
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_recorded_time);
+               _secondColumnControls.add(label);
+
+               _deviceTime_Recorded = new TimeDuration(container_Left);
+            }
+            {
+               /*
+                * Paused time
+                */
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_paused_time);
+               _secondColumnControls.add(label);
+
+               _deviceTime_Paused = new TimeDuration(container_Left);
             }
          }
-         {
-            /*
-             * Recorded time
-             */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_recorded_time);
-            _secondColumnControls.add(label);
 
-            _deviceTime_Recorded = new TimeDuration(container);
-         }
+         final Composite container_Right = _tk.createComposite(container);
+         GridDataFactory.fillDefaults()
 
+               // align to the bottom that recorded/paused and moving/break time are at the same vertical position
+               .align(SWT.FILL, SWT.END)
+
+               .applyTo(container_Right);
+
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container_Right);
          {
             /*
              * Moving time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_moving_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_moving_time);
             _secondColumnControls.add(label);
 
-            _computedTime_Moving = new TimeDuration(container);
-         }
-
-         {
-            /*
-             * Paused time
-             */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_paused_time);
-            _secondColumnControls.add(label);
-
-            _deviceTime_Paused = new TimeDuration(container);
+            _computedTime_Moving = new TimeDuration(container_Right);
          }
 
          {
             /*
              * Break time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_break_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_break_time);
             _secondColumnControls.add(label);
 
-            _computedTime_Break = new TimeDuration(container);
+            _computedTime_Break = new TimeDuration(container_Right);
          }
       }
+
    }
 
    private void createUI_Section_129_DateTime_TimeZone(final Composite parent) {
