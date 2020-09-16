@@ -243,6 +243,11 @@ public class FitData {
 
       _tourData.createTimeSeries(_allTimeData, false);
 
+      //We set the recorded time again as the elapsed time might have changed (+- few seconds)
+      //after the time series were created.
+      final long tourDeviceTime_Paused = _tourData.getTourDeviceTime_Paused();
+      _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - tourDeviceTime_Paused);
+
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
       final Long tourId = _tourData.createTourId(uniqueId);
