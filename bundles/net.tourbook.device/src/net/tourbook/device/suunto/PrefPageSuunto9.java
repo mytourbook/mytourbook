@@ -103,7 +103,7 @@ public class PrefPageSuunto9 extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
-      _comboAltitudeDataSource.select(0);
+      _comboAltitudeDataSource.select(1);
       _comboDistanceDataSource.select(0);
    }
 
