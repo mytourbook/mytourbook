@@ -104,6 +104,7 @@ public class RawDataManager {
    public static final String       LOG_REIMPORT_END                     = Messages.Log_Reimport_PreviousFiles_End;
 
    private static final String      LOG_REIMPORT_ALL_TIME_SLICES         = Messages.Log_Reimport_AllTimeSlices;
+   private static final String      LOG_REIMPORT_MANUAL_TOUR             = Messages.Log_Reimport_ManualTour;
    private static final String      LOG_REIMPORT_ONLY_ALTITUDE           = Messages.Log_Reimport_Only_Altitude;
    private static final String      LOG_REIMPORT_ONLY_CADENCE            = Messages.Log_Reimport_Only_Cadence;
    private static final String      LOG_REIMPORT_ONLY_GEAR               = Messages.Log_Reimport_Only_Gear;
@@ -513,6 +514,21 @@ public class RawDataManager {
 
                if (oldTourData == null) {
                   continue;
+               }
+
+               if (oldTourData.isManualTour()) {
+
+                  /**
+                   * Manually created tours cannot be reimported, there is no import filepath
+                   * <p>
+                   * It took a very long time (years) until this case was discovered
+                   */
+
+                  TourLogManager.addSubLog(TourLogState.INFO,
+                        NLS.bind(
+                              LOG_REIMPORT_MANUAL_TOUR,
+                              oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+                  return;
                }
 
                boolean isTourReImportedFromSameFile = false;

@@ -157,7 +157,7 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip;
-   
+
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
    public static String        Dialog_AdjustTemperature_Dialog_Message;
    public static String        Dialog_AdjustTemperature_Dialog_Title;
@@ -1328,6 +1328,7 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour_Old_Data_Vs_New_Data;
 
    public static String        Log_Reimport_AllTimeSlices;
+   public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_Only_Altitude;
    public static String        Log_Reimport_Only_Cadence;
    public static String        Log_Reimport_Only_Gear;
