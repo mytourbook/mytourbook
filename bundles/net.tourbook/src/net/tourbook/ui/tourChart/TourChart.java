@@ -19,6 +19,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.tourbook.Messages;
@@ -2312,53 +2313,63 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       if (_tourData.isMultipleTours()) {
 
-         //TODO FB
-//         final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
-//         final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
-//
-//         // fixing ArrayIndexOutOfBoundsException: 0
-//         if (multipleStartTimeIndex.length == 0) {
-//            return;
-//         }
-//
-//         int tourIndex = 0;
-//         int numberOfMultiMarkers = 0;
-//         int tourSerieIndex = 0;
-//
-//         // setup first multiple tour
-//         tourSerieIndex = multipleStartTimeIndex[tourIndex];
-//         numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
-//
-//         final ArrayList<TourMarker> allTourMarkers = _tourData.multiTourMarkers;
-//
-//         for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
-//
-//            while (markerIndex >= numberOfMultiMarkers) {
-//
-//               // setup next tour
-//
-//               tourIndex++;
-//
-//               if (tourIndex <= multipleStartTimeIndex.length - 1) {
-//
-//                  tourSerieIndex = multipleStartTimeIndex[tourIndex];
-//                  numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
-//               }
-//            }
-//
-//            final TourMarker tourMarker = allTourMarkers.get(markerIndex);
-//            final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
-//
-//            tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
-//
-//            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(//
-//                  tourMarker,
-//                  xAxisSerie,
-//                  xAxisSerieIndex,
-//                  tourMarker.getLabelPosition());
-//
-//            cmc.chartLabels.add(chartLabel);
-//         }
+         final int numberOfTours = _tourData.multipleTourStartIndex.length;
+         final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
+         final int[] multipleNumberOfPauses = _tourData.multipleNumberOfPauses;
+         final long[] multipleTourStartTime = _tourData.multipleTourStartTime;
+
+         if (multipleStartTimeIndex.length == 0) {
+            return;
+         }
+
+         int tourSerieIndex = 0;
+         int numberOfPauses = 0;
+         long tourStartTime = 0;
+         final ArrayList<List<Long>> allTourPauses = _tourData.multiTourPauses;
+         String pauseDurationText;
+         int currentTourPauseIndex = 0;
+         for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
+
+            tourStartTime = multipleTourStartTime[tourIndex];
+            numberOfPauses = multipleNumberOfPauses[tourIndex];
+            tourSerieIndex = multipleStartTimeIndex[tourIndex];
+
+            for (int relativeTourPauseIndex = 0; relativeTourPauseIndex < numberOfPauses;) {
+
+               final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
+               final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
+
+               final long pauseDuration = Math.round((float) (pausedTime_End - pausedTime_Start) / 1000);
+               pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
+
+               long previousTourElapsedTime = 0;
+               if (tourIndex > 0) {
+                  previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+               }
+
+               for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
+
+                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+
+                  if (currentTime >= pausedTime_Start) {
+                     break;
+                  }
+               }
+
+               if (tourSerieIndex < xAxisSerie.length) {
+                  final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
+                        pauseDurationText,
+                        xAxisSerie,
+                        tourSerieIndex,
+                        0);
+
+                  cmc.chartLabels.add(chartLabel);
+               }
+
+               ++relativeTourPauseIndex;
+               ++currentTourPauseIndex;
+            }
+         }
 
       } else {
 
