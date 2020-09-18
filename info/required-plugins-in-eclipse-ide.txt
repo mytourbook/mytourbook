@@ -1,0 +1,12 @@
+This file contains dependencies which needs to be installed additionally to the Eclipse SDK to run MyTourbook in the Eclipse IDE
+
+
+http://download.eclipse.org/nattable/releases/1.6.0/repository/
+
+  Plugin: NatTable Core Feature
+
+
+http://download.eclipse.org/releases/<current version>
+
+	Plugin: Eclipse Collections
+	

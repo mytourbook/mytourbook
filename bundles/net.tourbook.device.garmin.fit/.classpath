@@ -3,6 +3,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="fit-21.32.00.jar"/> <!-- https://www.thisisant.com/developer/resources/downloads/ https://www.thisisant.com/developer/fit-sdk-release-notes -->
+	<classpathentry kind="lib" path="fit-21.38.00.jar"/> <!-- https://www.thisisant.com/developer/resources/downloads/ https://www.thisisant.com/developer/fit-sdk-release-notes -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
