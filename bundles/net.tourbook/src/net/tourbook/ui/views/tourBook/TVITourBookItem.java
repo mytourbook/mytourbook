@@ -182,11 +182,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             // -------- TOUR DATA -----------
 
-            + "tourDeviceTime_Recorded " //                       86    //$NON-NLS-1$
+            + "tourDeviceTime_Recorded, " //                       86    //$NON-NLS-1$
+            + "tourDeviceTime_Paused " //                          87    //$NON-NLS-1$
 
       ;
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 87;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 88;
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
             /////////////////////////////////////////////////////////////////////////
@@ -237,7 +238,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "weather_Temperature_Min," + NL //            //$NON-NLS-1$
             + "weather_Temperature_Max," + NL //            //$NON-NLS-1$
 
-            + "tourDeviceTime_Recorded" + NL //             //$NON-NLS-1$
+            + "tourDeviceTime_Recorded," + NL //            //$NON-NLS-1$
+            + "tourDeviceTime_Paused" + NL //             //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
@@ -278,7 +280,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "MIN( CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END)," + NL //               25 //$NON-NLS-1$
             + "MAX( CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)," + NL //               26 //$NON-NLS-1$
 
-            + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))" + NL //    27 //$NON-NLS-1$
+            + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))," + NL //    27 //$NON-NLS-1$
+            + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))" + NL //    28 //$NON-NLS-1$
       ;
 
    }
@@ -583,6 +586,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // -------- TOUR DATA -----------
 
       tourItem.colTourDeviceTime_Recorded    = result.getLong(86);
+      tourItem.colTourDeviceTime_Paused    = result.getLong(87);
 
 // SET_FORMATTING_ON
 
@@ -633,7 +637,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbMovingTime * 1000 / dbDistance;
 
-      tourItem.colTourDeviceTime_Paused = tourItem.colTourDeviceTime_Elapsed - tourItem.colTourDeviceTime_Recorded;
       tourItem.colTourComputedTime_Break = tourItem.colTourDeviceTime_Elapsed - tourItem.colTourComputedTime_Moving;
 
       if (UI.IS_SCRAMBLE_DATA) {
@@ -698,6 +701,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTemperature_Max               = result.getFloat(startIndex + 26);
 
       colTourDeviceTime_Recorded  =  result.getLong(startIndex + 27);
+      colTourDeviceTime_Paused  =  result.getLong(startIndex + 28);
 
 // SET_FORMATTING_ON
 
