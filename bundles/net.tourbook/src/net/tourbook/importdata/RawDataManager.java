@@ -528,7 +528,7 @@ public class RawDataManager {
                         NLS.bind(
                               LOG_REIMPORT_MANUAL_TOUR,
                               oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
-                  return;
+                  continue;
                }
 
                boolean isTourReImportedFromSameFile = false;
