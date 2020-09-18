@@ -17,7 +17,9 @@ package net.tourbook.device.garmin.fit;
 
 import com.garmin.fit.SessionMesg;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -485,8 +487,36 @@ public class FitData {
 
       tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
       tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
+
       final long pausedTime = tourData.getTotalTourTimerPauses();
       tourData.setTourDeviceTime_Paused(pausedTime);
+
+      // dump paused time
+      final boolean isDebug = false;
+      if (isDebug) {
+
+         System.out.println();
+         System.out.println("Start,End,Diff");
+
+         for (int timeIndex = 0; timeIndex < _pausedTime_Start.size(); timeIndex++) {
+
+            final Long startTime = _pausedTime_Start.get(timeIndex);
+            final Long endTime = _pausedTime_End.get(timeIndex);
+
+            final LocalDateTime dtStart = TimeTools.toLocalDateTime(startTime);
+            final LocalDateTime dtEnd = TimeTools.toLocalDateTime(endTime);
+
+            final long diff = ChronoUnit.MILLIS.between(dtStart, dtEnd);
+            final LocalDateTime dtDiff = TimeTools.toLocalDateTime(diff);
+
+            System.out.println(String.format("%s,%s,%s",
+                  dtStart.format(TimeTools.Formatter_Time_M),
+                  dtEnd.format(TimeTools.Formatter_Time_M),
+                  dtDiff.format(TimeTools.Formatter_Time_M)
+
+            ));
+         }
+      }
    }
 
    private void finalizeTour_Type(final TourData tourData) {
