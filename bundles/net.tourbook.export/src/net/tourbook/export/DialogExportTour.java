@@ -1291,9 +1291,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
       doExport_20_TourValues(vc);
 
-      try (FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
-            Writer exportWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream, UI.UTF_8));
-            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));) {
+      try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            final Writer exportWriter = new BufferedWriter(outputStreamWriter);
+            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate))) {
 
          Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 
@@ -1461,9 +1462,9 @@ public class DialogExportTour extends TitleAreaDialog {
       for (final Object name : tracks) {
 
          final GPSTrack track = (GPSTrack) name;
-         for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+         for (final Object name2 : track.getWaypoints()) {
 
-            final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+            final GPSTrackpoint wp = (GPSTrackpoint) name2;
 
             // starttime, totaltime
             if (wp.getDate() != null) {
