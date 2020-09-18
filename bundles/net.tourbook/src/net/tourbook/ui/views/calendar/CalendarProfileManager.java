@@ -37,11 +37,13 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -252,73 +254,72 @@ public class CalendarProfileManager {
    /*
     * min / MAX values
     */
-   static final int                   CALENDAR_COLUMNS_SPACE_MIN = 0;
-   static final int                   CALENDAR_COLUMNS_SPACE_MAX = 300;
-   static final int                   DATE_COLUMN_WIDTH_MIN      = 1;
-   static final int                   DATE_COLUMN_WIDTH_MAX      = 200;
-   static final int                   TOUR_BACKGROUND_WIDTH_MIN  = 0;
-   static final int                   TOUR_BACKGROUND_WIDTH_MAX  = 100;
-   static final int                   TOUR_BORDER_WIDTH_MIN      = 0;
-   static final int                   TOUR_BORDER_WIDTH_MAX      = 100;
-   static final int                   TOUR_TRUNCATED_LINES_MIN   = 1;
-   static final int                   TOUR_TRUNCATED_LINES_MAX   = 10;
-   static final int                   TOUR_VALUE_COLUMNS_MIN     = 1;
-   static final int                   TOUR_VALUE_COLUMNS_MAX     = 5;
-   static final int                   WEEK_COLUMN_WIDTH_MIN      = 1;
-   static final int                   WEEK_COLUMN_WIDTH_MAX      = 200;
-   static final int                   WEEK_HEIGHT_MIN            = 2;
-   static final int                   WEEK_HEIGHT_MAX            = 1000;
-   static final int                   WEEK_ROWS_MIN              = 1;
-   static final int                   WEEK_ROWS_MAX              = 1000;
-   static final int                   YEAR_COLUMNS_MIN           = 1;
-   static final int                   YEAR_COLUMNS_MAX           = 100;
-   static final int                   YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
-   static final int                   YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
+   static final int                     CALENDAR_COLUMNS_SPACE_MIN = 0;
+   static final int                     CALENDAR_COLUMNS_SPACE_MAX = 300;
+   static final int                     DATE_COLUMN_WIDTH_MIN      = 1;
+   static final int                     DATE_COLUMN_WIDTH_MAX      = 200;
+   static final int                     TOUR_BACKGROUND_WIDTH_MIN  = 0;
+   static final int                     TOUR_BACKGROUND_WIDTH_MAX  = 100;
+   static final int                     TOUR_BORDER_WIDTH_MIN      = 0;
+   static final int                     TOUR_BORDER_WIDTH_MAX      = 100;
+   static final int                     TOUR_TRUNCATED_LINES_MIN   = 1;
+   static final int                     TOUR_TRUNCATED_LINES_MAX   = 10;
+   static final int                     TOUR_VALUE_COLUMNS_MIN     = 1;
+   static final int                     TOUR_VALUE_COLUMNS_MAX     = 5;
+   static final int                     WEEK_COLUMN_WIDTH_MIN      = 1;
+   static final int                     WEEK_COLUMN_WIDTH_MAX      = 200;
+   static final int                     WEEK_HEIGHT_MIN            = 2;
+   static final int                     WEEK_HEIGHT_MAX            = 1000;
+   static final int                     WEEK_ROWS_MIN              = 1;
+   static final int                     WEEK_ROWS_MAX              = 1000;
+   static final int                     YEAR_COLUMNS_MIN           = 1;
+   static final int                     YEAR_COLUMNS_MAX           = 100;
+   static final int                     YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
+   static final int                     YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
+   private static final DataFormatter   _tourFormatter_Distance;
 
-   private static final DataFormatter _tourFormatter_Distance;
-   private static final DataFormatter _tourFormatter_Elevation;
-   private static final DataFormatter _tourFormatter_Elevation_Change;
-   private static final DataFormatter _tourFormatter_Energy_kcal;
-   private static final DataFormatter _tourFormatter_Energy_MJ;
-   private static final DataFormatter _tourFormatter_Pace;
-   private static final DataFormatter _tourFormatter_Power_Avg;
-   private static final DataFormatter _tourFormatter_Pulse_Avg;
-   private static final DataFormatter _tourFormatter_Speed;
-   private static final DataFormatter _tourFormatter_Time_Elapsed;
-   private static final DataFormatter _tourFormatter_Time_Recorded;
-   private static final DataFormatter _tourFormatter_Time_Paused;
-   private static final DataFormatter _tourFormatter_Time_Moving;
-   private static final DataFormatter _tourFormatter_Time_Break;
-   private static final DataFormatter _tourFormatter_TourDescription;
-   private static final DataFormatter _tourFormatter_TourTitle;
+   private static final DataFormatter   _tourFormatter_Elevation;
+   private static final DataFormatter   _tourFormatter_Elevation_Change;
+   private static final DataFormatter   _tourFormatter_Energy_kcal;
+   private static final DataFormatter   _tourFormatter_Energy_MJ;
+   private static final DataFormatter   _tourFormatter_Pace;
+   private static final DataFormatter   _tourFormatter_Power_Avg;
+   private static final DataFormatter   _tourFormatter_Pulse_Avg;
+   private static final DataFormatter   _tourFormatter_Speed;
+   private static final DataFormatter   _tourFormatter_Time_Elapsed;
+   private static final DataFormatter   _tourFormatter_Time_Recorded;
+   private static final DataFormatter   _tourFormatter_Time_Paused;
+   private static final DataFormatter   _tourFormatter_Time_Moving;
+   private static final DataFormatter   _tourFormatter_Time_Break;
+   private static final DataFormatter   _tourFormatter_TourDescription;
+   private static final DataFormatter   _tourFormatter_TourTitle;
+   private static final DataFormatter   _weekFormatter_CadenceZones_TimePercentages;
 
-   private static final DataFormatter _weekFormatter_CadenceZones_TimePercentages;
-   private static final DataFormatter _weekFormatter_Distance;
-   private static final DataFormatter _weekFormatter_Elevation;
-   private static final DataFormatter _weekFormatter_Elevation_Change;
-   private static final DataFormatter _weekFormatter_Energy_kcal;
-   private static final DataFormatter _weekFormatter_Energy_MJ;
-   private static final DataFormatter _weekFormatter_Pace;
-   private static final DataFormatter _weekFormatter_Speed;
-   private static final DataFormatter _weekFormatter_Time_Elapsed;
-   private static final DataFormatter _weekFormatter_Time_Recorded;
-   private static final DataFormatter _weekFormatter_Time_Paused;
-   private static final DataFormatter _weekFormatter_Time_Moving;
-   private static final DataFormatter _weekFormatter_Time_Break;
+   private static final DataFormatter   _weekFormatter_Distance;
+   private static final DataFormatter   _weekFormatter_Elevation;
+   private static final DataFormatter   _weekFormatter_Elevation_Change;
+   private static final DataFormatter   _weekFormatter_Energy_kcal;
+   private static final DataFormatter   _weekFormatter_Energy_MJ;
+   private static final DataFormatter   _weekFormatter_Pace;
+   private static final DataFormatter   _weekFormatter_Speed;
+   private static final DataFormatter   _weekFormatter_Time_Elapsed;
+   private static final DataFormatter   _weekFormatter_Time_Recorded;
+   private static final DataFormatter   _weekFormatter_Time_Paused;
+   private static final DataFormatter   _weekFormatter_Time_Moving;
+   private static final DataFormatter   _weekFormatter_Time_Break;
+   static final DataFormatter[]         allTourContentFormatter;
 
-   static final DataFormatter[]       allTourContentFormatter;
-   static final DataFormatter[]       allWeekFormatter;
+   static final DataFormatter[]         allWeekFormatter;
+   private static final IValueFormatter _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
 
 // SET_FORMATTING_OFF
 
-   private static final IValueFormatter   _valueFormatter_Number_1_0            = new ValueFormatter_Number_1_0(false);
    private static final IValueFormatter   _valueFormatter_Number_1_1            = new ValueFormatter_Number_1_1(false);
    private static final IValueFormatter   _valueFormatter_Number_1_2            = new ValueFormatter_Number_1_2(false);
    private static final IValueFormatter   _valueFormatter_Number_1_3            = new ValueFormatter_Number_1_3(false);
    private static final IValueFormatter   _valueFormatter_Time_HH               = new ValueFormatter_Time_HH();
    private static final IValueFormatter   _valueFormatter_Time_HHMM             = new ValueFormatter_Time_HHMM();
    private static final IValueFormatter   _valueFormatter_Time_HHMMSS           = new ValueFormatter_Time_HHMMSS();
-
    static {
 
       /*
@@ -611,12 +612,13 @@ public class CalendarProfileManager {
          new DayContentColor_ComboData(CalendarColor.CUSTOM,      Messages.Calendar_Profile_Color_Custom),
       };
 
-// SET_FORMATTING_ON
+   // SET_FORMATTING_ON
    //
    /**
     * Contains all calendar profiles which are loaded from a xml file.
     */
    private static final ArrayList<CalendarProfile> _allCalendarProfiles       = new ArrayList<>();
+
    private static final ArrayList<CalendarProfile> _allDefaultDefaultProfiles = new ArrayList<>();
    static {
       createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
@@ -627,6 +629,7 @@ public class CalendarProfileManager {
    private static String                                       _fromXml_ActiveCalendarProfileId;
    //
    private final static ListenerList<ICalendarProfileListener> _profileListener = new ListenerList<>();
+   private final static IPreferenceStore                       _prefStore       = TourbookPlugin.getPrefStore();
 
    static class CalendarColor_ComboData {
 
@@ -1197,9 +1200,12 @@ public class CalendarProfileManager {
 
             if (data.movingTime > 0 && data.distance > 0) {
 
+               final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+               final int time = isPaceFromRecordedTime ? data.recordedTime : data.movingTime;
+
                final float pace = data.distance == 0
                      ? 0
-                     : 1000 * data.movingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     : 1000 * time / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = UI.format_mm_ss((long) pace);
 

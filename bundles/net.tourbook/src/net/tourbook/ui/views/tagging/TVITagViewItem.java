@@ -21,16 +21,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.SQLFilter;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVITagViewItem extends TreeViewerItem {
 
    static final String SQL_SUM_COLUMNS;
    static final String SQL_SUM_COLUMNS_TOUR;
-
    static {
 
       SQL_SUM_COLUMNS = UI.EMPTY_STRING
@@ -49,8 +52,10 @@ public abstract class TVITagViewItem extends TreeViewerItem {
             + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," //                                 9   //$NON-NLS-1$
             + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //  10   //$NON-NLS-1$
 
+            + "SUM(TourDeviceTime_Recorded)," //    11   //$NON-NLS-1$
+
             // tour counter
-            + "SUM(1)" //                          11   //$NON-NLS-1$
+            + "SUM(1)" //                          12   //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS_TOUR = UI.EMPTY_STRING
@@ -67,38 +72,42 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "avgPulse," //                 8   //$NON-NLS-1$
             + "avgCadence," //               9   //$NON-NLS-1$
-            + "(DOUBLE(AvgTemperature) / TemperatureScale)" //         10   //$NON-NLS-1$
+            + "(DOUBLE(AvgTemperature) / TemperatureScale)," //         10   //$NON-NLS-1$
+            + "TourDeviceTime_Recorded" //   11   //$NON-NLS-1$
       ;
    }
+
+   protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /**
     * content which is displayed in the tree column
     */
-   String treeColumn;
+   String                           treeColumn;
 
-   long   colDistance;
+   long                             colDistance;
 
-   long   colElapsedTime;
-   long   colMovingTime;
-   long   colPausedTime;
+   long                             colElapsedTime;
+   long                             colRecordedTime;
+   long                             colMovingTime;
+   long                             colPausedTime;
 
-   long   colAltitudeUp;
-   long   colAltitudeDown;
+   long                             colAltitudeUp;
+   long                             colAltitudeDown;
 
-   float  colMaxSpeed;
-   long   colMaxPulse;
-   long   colMaxAltitude;
+   float                            colMaxSpeed;
+   long                             colMaxPulse;
+   long                             colMaxAltitude;
 
-   float  colAvgSpeed;
-   float  colAvgPace;
+   float                            colAvgSpeed;
+   float                            colAvgPace;
 
-   float  colAvgPulse;
-   float  colAvgCadence;
-   float  colAvgTemperature;
+   float                            colAvgPulse;
+   float                            colAvgCadence;
+   float                            colAvgTemperature;
 
-   long   colTourCounter;
+   long                             colTourCounter;
 
-   int    temperatureDigits;
+   int                              temperatureDigits;
 
    /**
     * Read sum totals from the database for the tagItem
@@ -168,16 +177,21 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       colAvgCadence = result.getFloat(startIndex + 9);
       colAvgTemperature = result.getFloat(startIndex + 10);
 
+      colRecordedTime = result.getLong(startIndex + 11);
+
       // prevent divide by 0
       // 3.6 * SUM(TOURDISTANCE) / SUM(tourComputedTime_Moving)
       colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
-      colAvgPace = colDistance == 0 ? 0 : colMovingTime * 1000f / colDistance;
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      long time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+      colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
 
          colDistance = UI.scrambleNumbers(colDistance);
 
          colElapsedTime = UI.scrambleNumbers(colElapsedTime);
+         colRecordedTime = UI.scrambleNumbers(colRecordedTime);
          colMovingTime = UI.scrambleNumbers(colMovingTime);
          colPausedTime = UI.scrambleNumbers(colPausedTime);
 
@@ -194,7 +208,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
          // prevent divide by 0
          colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
-         colAvgPace = colDistance == 0 ? 0 : colMovingTime * 1000f / colDistance;
+         time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+         colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
       }
    }
 
@@ -202,7 +217,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       readDefaultColumnData(result, startIndex);
 
-      colTourCounter = result.getLong(startIndex + 11);
+      colTourCounter = result.getLong(startIndex + 12);
    }
 
 }

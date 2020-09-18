@@ -37,6 +37,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.IBarSelectionProvider;
@@ -258,7 +259,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
       final float distance = _tourTimeData.tourDistanceValues[valueIndex];
       final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
-      final float pace = distance == 0 ? 0 : movingTime * 1000 / distance;
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final String tourTimeZoneOffset = _tourTimeData.tourTimeZoneOffset.get(valueIndex);
 

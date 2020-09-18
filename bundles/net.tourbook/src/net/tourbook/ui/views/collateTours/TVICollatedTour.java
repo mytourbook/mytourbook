@@ -21,15 +21,18 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.UI;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class TVICollatedTour extends TreeViewerItem implements ITourItem {
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
-
    static final String  SQL_SUM_COLUMNS;
 
    static {
@@ -64,62 +67,64 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
             + "SUM(TourDeviceTime_Recorded)"; //							21//$NON-NLS-1$
    }
 
-   CollatedToursView       collateToursView;
+   protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   String                  treeColumn;
+   CollatedToursView                collateToursView;
+
+   String                           treeColumn;
 
    /**
     * Id's for the tags or <code>null</code> when tags are not available.
     */
-   private ArrayList<Long> _tagIds;
-   HashSet<Long>           sqlTagIds;
+   private ArrayList<Long>          _tagIds;
+   HashSet<Long>                    sqlTagIds;
 
    /**
     * Tour start time in ms.
     */
-   long                    colTourStartTime;
+   long                             colTourStartTime;
 
-   String                  colTourTitle;
-   long                    colPersonId;          // tourPerson_personId
-   long                    colCounter;
-   long                    colCalories;
+   String                           colTourTitle;
+   long                             colPersonId;                               // tourPerson_personId
+   long                             colCounter;
+   long                             colCalories;
 
-   long                    colDistance;
-   long                    colRecordedTime;
-   long                    colElapsedTime;
-   long                    colMovingTime;
+   long                             colDistance;
+   long                             colRecordedTime;
+   long                             colElapsedTime;
+   long                             colMovingTime;
 
-   long                    colBreakTime;
-   long                    colPausedTime;
-   long                    colAltitudeUp;
-   long                    colAltitudeDown;
+   long                             colBreakTime;
+   long                             colPausedTime;
+   long                             colAltitudeUp;
+   long                             colAltitudeDown;
 
-   float                   colMaxSpeed;
-   long                    colMaxAltitude;
+   float                            colMaxSpeed;
+   long                             colMaxAltitude;
 
-   long                    colMaxPulse;
-   float                   colAvgSpeed;
-   float                   colAvgPace;
+   long                             colMaxPulse;
+   float                            colAvgSpeed;
+   float                            colAvgPace;
 
-   float                   colAvgPulse;
-   float                   colAvgCadence;
-   float                   colAvgTemperature;
-   int                     colWindSpd;
-   int                     colWindDir;
+   float                            colAvgPulse;
+   float                            colAvgCadence;
+   float                            colAvgTemperature;
+   int                              colWindSpd;
+   int                              colWindDir;
 
-   String                  colClouds;
-   int                     colRestPulse;
-   int                     colWeekNo;
-   String                  colWeekDay;
+   String                           colClouds;
+   int                              colRestPulse;
+   int                              colWeekNo;
+   String                           colWeekDay;
 
-   int                     colWeekYear;
-   int                     colNumberOfTimeSlices;
-   int                     colNumberOfPhotos;
+   int                              colWeekYear;
+   int                              colNumberOfTimeSlices;
+   int                              colNumberOfPhotos;
 
-   int                     colDPTolerance;
-   int                     colFrontShiftCount;
+   int                              colDPTolerance;
+   int                              colFrontShiftCount;
 
-   int                     colRearShiftCount;
+   int                              colRearShiftCount;
 
    TVICollatedTour(final CollatedToursView view) {
 
@@ -144,7 +149,10 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       final long dbDistance = result.getLong(startIndex + 7);
 
       colAvgSpeed = colMovingTime == 0 ? 0 : 3.6f * dbDistance / colMovingTime;
-      colAvgPace = dbDistance == 0 ? 0 : colMovingTime * 1000f / dbDistance;
+
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final long time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+      colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
       colMaxAltitude = result.getLong(startIndex + 8);
       colMaxPulse = result.getLong(startIndex + 9);

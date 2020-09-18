@@ -309,7 +309,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final float distance = _tourDayData.allDistance[valueIndex];
       final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
-      final float pace = distance == 0 ? 0 : movingTime * 1000 / distance;
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final float training_Effect = _tourDayData.allTraining_Effect[valueIndex];
       final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerobic[valueIndex];
