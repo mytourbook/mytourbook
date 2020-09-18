@@ -85,12 +85,14 @@ public class FitData {
    private final List<GearData>    _allGearData          = new ArrayList<>();
    private final List<SwimData>    _allSwimData          = new ArrayList<>();
    private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
+   private List<Long>              _pausedTime_Start     = new ArrayList<>();
+   private final List<Long>        _pausedTime_End       = new ArrayList<>();
 
    private TimeData                _current_TimeData;
+
    private TimeData                _previous_TimeData;
 
    private TourMarker              _current_TourMarker;
-
    private long                    _timeDiffMS;
 
    public FitData(final FitDataReader fitDataReader,
@@ -271,6 +273,8 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
+
+         finalizeTour_TimerPauses(_tourData);
       }
    }
 
@@ -464,6 +468,22 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
+   private void finalizeTour_TimerPauses(final TourData tourData) {
+
+      if (_pausedTime_Start.size() == 0) {
+         return;
+      }
+
+      if (_pausedTime_Start.size() != _pausedTime_End.size()) {
+         _pausedTime_Start = _pausedTime_Start.subList(0, _pausedTime_End.size());
+      }
+
+      tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
+      tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
+      final long pausedTime = tourData.getTotalTourTimerPauses();
+      tourData.setTourDeviceTime_Paused(pausedTime);
+   }
+
    private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
@@ -545,6 +565,14 @@ public class FitData {
 
    public List<GearData> getGearData() {
       return _allGearData;
+   }
+
+   public List<Long> getPausedTime_End() {
+      return _pausedTime_End;
+   }
+
+   public List<Long> getPausedTime_Start() {
+      return _pausedTime_Start;
    }
 
    public List<SwimData> getSwimData() {

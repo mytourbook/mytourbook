@@ -189,6 +189,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE, true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION, ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION);
 
+      //tour pauses
+      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, true);
+
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,  new RGB(0xff, 0x0, 0x80));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,  new RGB(0x24, 0x9C, 0xFF));

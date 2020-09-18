@@ -274,7 +274,7 @@ public class CalendarTourDataProvider {
 
             firstTourStartTime = result.getLong(1);
 
-            // this occures when there are 0 tours
+            // this occurs when there are 0 tours
             if (firstTourStartTime != 0) {
 
                _firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
@@ -422,8 +422,9 @@ public class CalendarTourDataProvider {
          ArrayList<Integer> dbDistance = null;
          ArrayList<Integer> dbElevationGain = null;
          ArrayList<Integer> dbElevationLoss = null;
-         ArrayList<Integer> dbTourRecordingTime = null;
-         ArrayList<Integer> dbTourDrivingTime = null;
+         ArrayList<Integer> dbTourElapsedTime = null;
+         ArrayList<Integer> dbTourDeviceTime_Recorded = null;
+         ArrayList<Integer> dbTourMovingTime = null;
 
          ArrayList<Integer> dbCalories = null;
          TFloatArrayList dbPowerAvg = null;
@@ -457,8 +458,8 @@ public class CalendarTourDataProvider {
                + "   StartMinute," + NL //                        6  //$NON-NLS-1$
                + "   TourDistance," + NL //                       7  //$NON-NLS-1$
                + "   TourAltUp," + NL //                          8  //$NON-NLS-1$
-               + "   TourRecordingTime," + NL //                  9  //$NON-NLS-1$
-               + "   TourDrivingTime," + NL //                    10 //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //             9  //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //                    10 //$NON-NLS-1$
                + "   TourTitle," + NL //                          11 //$NON-NLS-1$
                + "   TourType_typeId," + NL //                    12 //$NON-NLS-1$
                + "   TourDescription," + NL //                    13 //$NON-NLS-1$
@@ -470,7 +471,8 @@ public class CalendarTourDataProvider {
 
                + "   TourAltDown," + NL //                        18 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
-               + "   Power_Avg" + NL //                           20 //$NON-NLS-1$
+               + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded" + NL //                    21 //$NON-NLS-1$
 
                + NL
 
@@ -535,8 +537,9 @@ public class CalendarTourDataProvider {
                   dbDistance = new ArrayList<>();
                   dbElevationGain = new ArrayList<>();
                   dbElevationLoss = new ArrayList<>();
-                  dbTourRecordingTime = new ArrayList<>();
-                  dbTourDrivingTime = new ArrayList<>();
+                  dbTourElapsedTime = new ArrayList<>();
+                  dbTourDeviceTime_Recorded = new ArrayList<>();
+                  dbTourMovingTime = new ArrayList<>();
 
                   dbCalories = new ArrayList<>();
                   dbPowerAvg = new TFloatArrayList();
@@ -573,20 +576,22 @@ public class CalendarTourDataProvider {
                   final int startMinute = result.getShort(6);
                   final int startTime = startHour * 3600 + startMinute * 60;
 
-                  final int recordingTime = result.getInt(9);
+                  final int elapsedTime = result.getInt(9);
+                  final int recordedTime = result.getInt(21);
 
                   dbTourYear.add(tourYear);
                   dbTourMonth.add(tourMonth);
                   dbTourDay.add(tourDay);
 
                   dbTourStartTime.add(startTime);
-                  dbTourEndTime.add((startTime + recordingTime));
+                  dbTourEndTime.add((startTime + elapsedTime));
 
                   dbDistance.add(result.getInt(7));
                   dbElevationGain.add(result.getInt(8));
 
-                  dbTourRecordingTime.add(recordingTime);
-                  dbTourDrivingTime.add(result.getInt(10));
+                  dbTourElapsedTime.add(elapsedTime);
+                  dbTourDeviceTime_Recorded.add(recordedTime);
+                  dbTourMovingTime.add(result.getInt(10));
 
                   dbTourTitle.add(result.getString(11));
 
@@ -670,8 +675,9 @@ public class CalendarTourDataProvider {
                data.elevationGain = dbElevationGain.get(tourIndex);
                data.elevationLoss = dbElevationGain.get(tourIndex);
 
-               data.recordingTime = dbTourRecordingTime.get(tourIndex);
-               data.drivingTime = dbTourDrivingTime.get(tourIndex);
+               data.elapsedTime = dbTourElapsedTime.get(tourIndex);
+               data.recordedTime = dbTourDeviceTime_Recorded.get(tourIndex);
+               data.movingTime = dbTourMovingTime.get(tourIndex);
 
                data.calories = dbCalories.get(tourIndex);
                data.power_Avg = dbPowerAvg.get(tourIndex);
@@ -698,8 +704,9 @@ public class CalendarTourDataProvider {
                   data.elevationLoss = UI.scrambleNumbers(data.elevationLoss);
                   data.calories = UI.scrambleNumbers(data.calories);
 
-                  data.recordingTime = UI.scrambleNumbers(data.recordingTime);
-                  data.drivingTime = UI.scrambleNumbers(data.drivingTime);
+                  data.elapsedTime = UI.scrambleNumbers(data.elapsedTime);
+                  data.movingTime = UI.scrambleNumbers(data.movingTime);
+                  data.recordedTime = UI.scrambleNumbers(data.recordedTime);
                }
 
             } // create data for this day
@@ -764,12 +771,12 @@ public class CalendarTourDataProvider {
 
                   + "   SELECT" + NL //                                                //$NON-NLS-1$
 
-                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
                   + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
 
                   + "      TourDistance," + NL //                                      //$NON-NLS-1$
-                  + "      TourRecordingTime," + NL //                                 //$NON-NLS-1$
-                  + "      TourDrivingTime," + NL //                                   //$NON-NLS-1$
+                  + "      TourDeviceTime_Elapsed," + NL //                            //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                   //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                         //$NON-NLS-1$
                   + "      TourAltDown," + NL //                                       //$NON-NLS-1$
                   + "      calories," + NL //                                          //$NON-NLS-1$
@@ -808,8 +815,8 @@ public class CalendarTourDataProvider {
                + " SUM(1)," + NL //                                                 1  //$NON-NLS-1$
                + " SUM(TourDistance)," + NL //                                      2  //$NON-NLS-1$
 
-               + " SUM(TourRecordingTime)," + NL //                                 3  //$NON-NLS-1$
-               + " SUM(TourDrivingTime)," + NL //                                   4  //$NON-NLS-1$
+               + " SUM(TourDeviceTime_Elapsed)," + NL //                            3  //$NON-NLS-1$
+               + " SUM(TourComputedTime_Moving)," + NL //                                   4  //$NON-NLS-1$
 
                + " SUM(TourAltUp)," + NL //                                         5  //$NON-NLS-1$
                + " SUM(TourAltDown)," + NL //                                       6  //$NON-NLS-1$
@@ -817,7 +824,8 @@ public class CalendarTourDataProvider {
                + " SUM(calories)," + NL //                                          7  //$NON-NLS-1$
 
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
-               + " SUM(cadenceZone_FastTime)" + NL //                               9  //$NON-NLS-1$
+               + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
+               + " SUM(TourDeviceTime_Recorded)" + NL //                                  10  //$NON-NLS-1$
 
                + sqlFromTourData;
 
@@ -842,8 +850,8 @@ public class CalendarTourDataProvider {
             weekData.numTours = result.getInt(1);
             weekData.distance = result.getInt(2);
 
-            weekData.recordingTime = result.getInt(3);
-            weekData.drivingTime = result.getInt(4);
+            weekData.elapsedTime = result.getInt(3);
+            weekData.movingTime = result.getInt(4);
 
             weekData.elevationGain = result.getInt(5);
             weekData.elevationLoss = result.getInt(6);
@@ -853,16 +861,19 @@ public class CalendarTourDataProvider {
             weekData.cadenceZone_SlowTime = result.getInt(8);
             weekData.cadenceZone_FastTime = result.getInt(9);
 
+            weekData.recordedTime = result.getInt(10);
+
             if (UI.IS_SCRAMBLE_DATA) {
 
                weekData.elevationGain = UI.scrambleNumbers(weekData.elevationGain);
                weekData.elevationLoss = UI.scrambleNumbers(weekData.elevationLoss);
                weekData.distance = UI.scrambleNumbers(weekData.distance);
 
-               weekData.recordingTime = UI.scrambleNumbers(weekData.recordingTime);
-               weekData.drivingTime = UI.scrambleNumbers(weekData.drivingTime);
+               weekData.elapsedTime = UI.scrambleNumbers(weekData.elapsedTime);
+               weekData.movingTime = UI.scrambleNumbers(weekData.movingTime);
 
                weekData.calories = UI.scrambleNumbers(weekData.calories);
+               weekData.recordedTime = UI.scrambleNumbers(weekData.recordedTime);
             }
          }
 

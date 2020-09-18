@@ -1210,7 +1210,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * Get Tours
              */
             sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append("   " + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
             sb.append("</div>\n"); //$NON-NLS-1$
 
             createHTML_90_SimpleImport(sb);
@@ -2707,8 +2707,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       defineColumn_Time_TourDate();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_RecordingTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Time_TimeZone();
       defineColumn_Time_TimeZoneDifference();
@@ -2921,11 +2921,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
-                  : drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : movingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2951,12 +2951,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
-            if (drivingTime != 0) {
-               value = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            if (movingTime != 0) {
+               value = tourDistance / movingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
@@ -3028,17 +3028,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: driving time
+    * column: elapsed time
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourDrivingTime();
+            final long value = ((TourData) cell.getElement()).getTourDeviceTime_Elapsed();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3046,18 +3047,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: recording time
+    * column: moving time
     */
-   private void defineColumn_Time_RecordingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourRecordingTime();
+            final long value = ((TourData) cell.getElement()).getTourComputedTime_Moving();
 
             colDef.printDetailValue(cell, value);
          }

@@ -664,9 +664,9 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the recording time
+    * @return Returns the elapsed time
     */
-   public static int computeTourRecordingTime(final TourData tourData, final int startIndex, final int endIndex) {
+   public static int computeTourDeviceTime_Elapsed(final TourData tourData, final int startIndex, final int endIndex) {
 
       final float[] distanceSerie = tourData.getMetricDistanceSerie();
       final int[] timeSerie = tourData.timeSerie;
@@ -847,7 +847,9 @@ public class TourManager {
 
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
-      int tourRecordingTime = 0;
+      int tourDeviceTime_Elapsed = 0;
+      int tourDeviceTime_Recorded = 0;
+      int tourDeviceTime_Paused = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
       float tourAltDown = 0;
@@ -937,12 +939,12 @@ public class TourManager {
 
             // adjust relative time series
             for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
-               toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
+               toTimeSerie[toStartIndex + serieIndex] = tourDeviceTime_Elapsed + fromTimeSerie[serieIndex];
             }
             if (fromSwim_Time != null) {
                isSwim_Time = true;
                for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
-                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
+                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourDeviceTime_Elapsed + fromSwim_Time[swimSerieIndex];
                }
             }
 
@@ -1077,9 +1079,9 @@ public class TourManager {
             tourDistance += fromDistanceSerie[fromSerieLength - 1];
          }
 
-         // summarize recording time
+         // summarize elapsed time
          final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
-         tourRecordingTime += fromTourEnd;
+         tourDeviceTime_Elapsed += fromTourEnd;
 
          // summarize altitude up/down
          tourAltUp += fromTourData.getTourAltUp();
@@ -1097,7 +1099,10 @@ public class TourManager {
           * Add 1 otherwise the next tour has the same start time as the previous tour end time,
           * this is because it starts with 0.
           */
-         tourRecordingTime++;
+         tourDeviceTime_Elapsed++;
+
+         tourDeviceTime_Recorded += fromTourData.getTourDeviceTime_Recorded();
+         tourDeviceTime_Paused += fromTourData.getTourDeviceTime_Paused();
       }
 
       /*
@@ -1174,14 +1179,16 @@ public class TourManager {
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
       joinedTourData.setTourStartTime(tourStartTime);
-      joinedTourData.setTourRecordingTime(tourRecordingTime);
+      joinedTourData.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
+      joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
+      joinedTourData.setTourDeviceTime_Paused(tourDeviceTime_Paused);
       joinedTourData.setTourDistance(tourDistance);
 
-      // computing these values is VERY cpu intensive because of the DP algorithm
+      // computing these values is VERY CPU intensive because of the DP algorithm
       joinedTourData.setTourAltUp(tourAltUp);
       joinedTourData.setTourAltDown(tourAltDown);
 
-      joinedTourData.computeTourDrivingTime();
+      joinedTourData.computeTourMovingTime();
       joinedTourData.computeComputedValues();
 
       joinedTourData.multipleTour_IsCadenceRpm = isCadenceRpm;

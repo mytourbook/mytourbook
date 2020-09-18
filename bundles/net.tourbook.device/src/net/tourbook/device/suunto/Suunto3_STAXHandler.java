@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -88,7 +89,9 @@ public class Suunto3_STAXHandler {
    private static final String TAG_SAMPLE_LAP               = "Lap";              //$NON-NLS-1$
    private static final String TAG_SAMPLE_LATITUDE          = "Latitude";         //$NON-NLS-1$
    private static final String TAG_SAMPLE_LONGITUDE         = "Longitude";        //$NON-NLS-1$
+   private static final String TAG_SAMPLE_PAUSE             = "Pause";            //$NON-NLS-1$
    private static final String TAG_SAMPLE_PERFORMANCE_LEVEL = "PerformanceLevel"; //$NON-NLS-1$
+   private static final String TAG_SAMPLE_STATE             = "State";            //$NON-NLS-1$
    private static final String TAG_SAMPLE_TEMPERATURE       = "Temperature";      //$NON-NLS-1$
    private static final String TAG_SAMPLE_TIME              = "Time";             //$NON-NLS-1$
    private static final String TAG_SAMPLE_TYPE              = "SampleType";       //$NON-NLS-1$
@@ -114,13 +117,16 @@ public class Suunto3_STAXHandler {
    //
    private TimeData                _sampleData;
 
-   private ArrayList<TimeData>     _sampleList = new ArrayList<>();
+   private ArrayList<TimeData>     _sampleList       = new ArrayList<>();
    private TimeData                _gpsData;
 
-   private ArrayList<TimeData>     _gpsList    = new ArrayList<>();
+   private ArrayList<TimeData>     _gpsList          = new ArrayList<>();
    private TimeData                _markerData;
 
-   private ArrayList<TimeData>     _markerList = new ArrayList<>();
+   private ArrayList<TimeData>     _markerList       = new ArrayList<>();
+
+   private List<Long>              _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
 
    private boolean                 _isImported;
    private String                  _currentSampleType;
@@ -162,6 +168,8 @@ public class Suunto3_STAXHandler {
       _sampleList.clear();
       _gpsList.clear();
       _markerList.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    private void finalizeSample() {
@@ -275,6 +283,8 @@ public class Suunto3_STAXHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+
       setDistanceSerie(tourData);
 
       // after all data are added, the tour id can be created
@@ -289,7 +299,7 @@ public class Suunto3_STAXHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 
@@ -538,6 +548,7 @@ public class Suunto3_STAXHandler {
 
             case TAG_SAMPLE_EVENTS:
                _isInEvents = true;
+               parseXML_36_Events(eventReader);
                break;
 
             case TAG_SAMPLE_DISTANCE:
@@ -634,6 +645,87 @@ public class Suunto3_STAXHandler {
             case TAG_SAMPLE:
                finalizeSample();
                return;
+            }
+         }
+      }
+   }
+
+   private void parseXML_36_Events(final XMLEventReader eventReader) throws XMLStreamException {
+
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final StartElement startElement = xmlEvent.asStartElement();
+            final String elementName = startElement.getName().getLocalPart();
+
+            switch (elementName) {
+            case TAG_SAMPLE_PAUSE:
+               parseXML_37_Pause(eventReader);
+               break;
+
+            }
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            final String elementName = xmlEvent.asEndElement().getName().getLocalPart();
+
+            if (TAG_SAMPLE_EVENTS.equals(elementName)) {
+
+               // </Events>
+
+               break;
+            }
+         }
+      }
+   }
+
+   private void parseXML_37_Pause(final XMLEventReader eventReader) throws XMLStreamException {
+
+      String data;
+
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final String elementName = xmlEvent.asStartElement().getName().getLocalPart();
+
+            switch (elementName) {
+            case TAG_SAMPLE_STATE:
+               data = ((Characters) eventReader.nextEvent()).getData();
+
+               if (data.equalsIgnoreCase(Boolean.TRUE.toString())) {
+
+                  _pausedTime_Start.add(_currentUtcTime);
+
+               } else if (data.equalsIgnoreCase(Boolean.FALSE.toString())) {
+
+                  if (_pausedTime_Start.size() == 0) {
+                     return;
+                  }
+
+                  _pausedTime_End.add(_currentUtcTime);
+
+               }
+               break;
+
+            }
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            final String elementName = xmlEvent.asEndElement().getName().getLocalPart();
+
+            if (TAG_SAMPLE_PAUSE.equals(elementName)) {
+
+               // </Pause>
+
+               break;
             }
          }
       }

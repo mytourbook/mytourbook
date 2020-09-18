@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,18 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.preferences.IMappingPreferences;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -30,19 +39,12 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.time.TimeTools;
-
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.preferences.IMappingPreferences;
-
 public class DialogMP extends TitleAreaDialog {
 
+   private static final String            SPACE1                  = UI.SPACE1;
+   private static final String            SPACE2                  = UI.SPACE2;
+
    private static final String            TIME_SPACER             = "       ";                    //$NON-NLS-1$
-   private static final String            COLUMN_SPACER           = "  ";                         //$NON-NLS-1$
 
    private static final String            DEFAULT_MONO_FONT       = "Courier";                    //$NON-NLS-1$
 
@@ -143,11 +145,11 @@ public class DialogMP extends TitleAreaDialog {
 
          sb.setLength(0);
          sb.append(TimeTools.getZonedDateTime(logEntry.time).format(_timeFormatter));
-         sb.append(COLUMN_SPACER);
+         sb.append(SPACE2);
          sb.append(logEntry.counter);
-         sb.append(COLUMN_SPACER);
+         sb.append(SPACE2);
          sb.append(logEntry.threadName);
-         sb.append(COLUMN_SPACER);
+         sb.append(SPACE2);
          sb.append(logEntry.tileEventId);
 
          final Tile tile = logEntry.tile;
@@ -157,7 +159,7 @@ public class DialogMP extends TitleAreaDialog {
             final long start = tile.getTimeStartLoading();
             final long end = tile.getTimeEndLoading();
 
-            sb.append(COLUMN_SPACER);
+            sb.append(SPACE2);
 
             // column: time how long it takes until loading starts
             String time = TIME_SPACER;
@@ -167,7 +169,7 @@ public class DialogMP extends TitleAreaDialog {
             int length = time.length();
             sb.append(time.substring(length - 7, length));
 
-            sb.append(" "); //$NON-NLS-1$
+            sb.append(SPACE1);
 
             // column: time how long the tile image is being loaded
             time = TIME_SPACER;
@@ -178,15 +180,15 @@ public class DialogMP extends TitleAreaDialog {
             sb.append(time.substring(length - 7, length));
 
             // column: tile key
-            sb.append(COLUMN_SPACER);
+            sb.append(SPACE2);
             sb.append(tile.toString());
 
             if (tile.getOfflinePath() != null) {
-               sb.append(COLUMN_SPACER);
+               sb.append(SPACE2);
                sb.append(tile.getOfflinePath());
             }
             if (tile.getUrl() != null) {
-               sb.append(COLUMN_SPACER);
+               sb.append(SPACE2);
                sb.append(tile.getUrl());
             }
          }

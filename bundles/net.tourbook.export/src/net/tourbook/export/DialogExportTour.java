@@ -1010,7 +1010,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void doExport() throws IOException {
 
-      // disable button's
+      // disable buttons
       getButton(IDialogConstants.OK_ID).setEnabled(false);
       getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
@@ -1171,7 +1171,7 @@ public class DialogExportTour extends TitleAreaDialog {
          }
 
          /*
-          * There is currently no listener to stop the velocity evalute method
+          * There is currently no listener to stop the velocity evaluate method
           */
          monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
 
@@ -1291,20 +1291,14 @@ public class DialogExportTour extends TitleAreaDialog {
 
       doExport_20_TourValues(vc);
 
-      final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(
-            new FileOutputStream(exportFile),
-            UI.UTF_8));
-
-      final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));
-
-      try {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+            Writer exportWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream, UI.UTF_8));
+            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));) {
 
          Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.showStatus(e);
-      } finally {
-         exportWriter.close();
       }
    }
 
@@ -2396,7 +2390,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          String fileName = getExportFileName();
 
-         // remove extentions
+         // remove extensions
          final int extPos = fileName.indexOf('.');
          if (extPos != -1) {
             fileName = fileName.substring(0, extPos);

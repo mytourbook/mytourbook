@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import de.byteholder.geoclipse.map.UI;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;

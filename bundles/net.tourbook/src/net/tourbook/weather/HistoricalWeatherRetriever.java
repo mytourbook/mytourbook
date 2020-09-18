@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,6 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -152,9 +151,9 @@ public class HistoricalWeatherRetriever {
 
       if (_isLogWeatherData) {
 
-         final long recordingTime = tour.getTourRecordingTime();
+         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
          final ZonedDateTime zdtTourStart = tour.getTourStartTime();
-         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
          final String tourTitle = tour.getTourTitle();
 
          System.out.println();
