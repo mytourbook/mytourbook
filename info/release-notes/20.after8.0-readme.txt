@@ -77,6 +77,6 @@ Translation
 System   
 ======
 
-* FIT SDK 21.32
+* FIT SDK 21.38
 * Eclipse 2020-09
 
