@@ -1175,7 +1175,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                   if (categoryCounter > 0) {
                      categoryString = "/" + categoryCounter; //$NON-NLS-1$
                   }
-                  styledString.append("   " + tagCounter + categoryString, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
+                  styledString.append(UI.SPACE3 + tagCounter + categoryString, StyledString.QUALIFIER_STYLER);
                }
 
             } else {
@@ -1883,7 +1883,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private void onTag_SelectCategory(final TreeSelection treeSelection) {
 
       if (_isExpandingSelection) {
-         // prevent entless loops
+         // prevent endless loops
          return;
       }
 
@@ -1903,7 +1903,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    /**
     * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
     * tree is clicked.
     *
     * @param treeSelection
@@ -1937,7 +1937,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             @Override
             public void run() {
 
-               // check if a newer expand event occured
+               // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
                   return;
                }
@@ -2003,7 +2003,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
              * set top item to the previous top item, otherwise the expanded/collapse item is
              * positioned at the bottom and the UI is jumping all the time
              * <p>
-             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * win behavior: when an item is set to top which was collapsed before, it will be
              * expanded
              */
             if (topItem.isDisposed() == false) {

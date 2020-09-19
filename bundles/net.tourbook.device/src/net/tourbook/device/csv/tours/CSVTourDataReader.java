@@ -164,7 +164,7 @@ public class CSVTourDataReader extends TourbookDevice {
       boolean isNewTag = false;
 
       final StringTokenizer tokenizer = new StringTokenizer(tagToken, CSV_TAG_SEPARATOR);
-      final Set<TourTag> tourTags = new HashSet<TourTag>();
+      final Set<TourTag> tourTags = new HashSet<>();
 
       HashMap<Long, TourTag> tourTagMap = TourDatabase.getAllTourTags();
       TourTag[] allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
@@ -342,10 +342,14 @@ public class CSVTourDataReader extends TourbookDevice {
                      0);
 
                duration = parseInteger(allToken[2]); //						3 Duration (sec);
-               tourData.setTourRecordingTime(duration);
+               tourData.setTourDeviceTime_Elapsed(duration);
 
                pausedTime = parseInteger(allToken[3]); //						4 Paused Time (sec),
-               tourData.setTourDrivingTime(Math.max(0, duration - pausedTime));
+               tourData.setTourDeviceTime_Paused(pausedTime);
+
+               final int recordedTime = Math.max(0, duration - pausedTime);
+               tourData.setTourDeviceTime_Recorded(recordedTime);
+               tourData.setTourComputedTime_Moving(recordedTime);
 
                distance = parseInteger(allToken[4]);//							5 Distance (m);
                tourData.setTourDistance(distance);

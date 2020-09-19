@@ -452,9 +452,9 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
       final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
-      final int recordingTime = TourManager.computeTourRecordingTime(_tourData, startIndex, endIndex);
+      final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, startIndex, endIndex);
 
-      fireChangeEvent(startIndex, endIndex, avgPulse, speed, recordingTime, false);
+      fireChangeEvent(startIndex, endIndex, avgPulse, speed, elapsedTime, false);
    }
 
    /**
@@ -469,7 +469,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
                                 final int endIndex,
                                 final float avgPulse,
                                 final float speed,
-                                final int recordingTime,
+                                final int tourDeviceTime_Elapsed,
                                 final boolean isDataSaved) {
 
       final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
@@ -481,7 +481,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
       customData.avgPulse = avgPulse;
       customData.speed = speed;
-      customData.recordingTime = recordingTime;
+      customData.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
 
       TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, customData, this);
    }
@@ -619,7 +619,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
             final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
             final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
-            final int recordingTime = TourManager.computeTourRecordingTime(_tourData, _movedStartIndex, _movedEndIndex);
+            final int elapsedTime = TourManager.computeTourDeviceTime_Elapsed(_tourData, _movedStartIndex, _movedEndIndex);
 
             // set new data in entity
             comparedTour.setStartIndex(_movedStartIndex);
@@ -649,7 +649,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
             _tourChart.updateChart(chartDataModel, true);
             enableActions();
 
-            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, recordingTime, true);
+            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, elapsedTime, true);
          }
       } catch (final Exception e) {
          e.printStackTrace();

@@ -39,7 +39,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1210,7 +1209,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * Get Tours
              */
             sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append("   " + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
             sb.append("</div>\n"); //$NON-NLS-1$
 
             createHTML_90_SimpleImport(sb);
@@ -2707,8 +2706,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       defineColumn_Time_TourDate();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_RecordingTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Time_TimeZone();
       defineColumn_Time_TimeZoneDifference();
@@ -2921,11 +2920,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+            final long time = isPaceFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
-                  : drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : time * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2951,12 +2951,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
-            if (drivingTime != 0) {
-               value = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            if (movingTime != 0) {
+               value = tourDistance / movingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
@@ -3028,17 +3028,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: driving time
+    * column: elapsed time
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourDrivingTime();
+            final long value = ((TourData) cell.getElement()).getTourDeviceTime_Elapsed();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3046,18 +3047,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: recording time
+    * column: moving time
     */
-   private void defineColumn_Time_RecordingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourRecordingTime();
+            final long value = ((TourData) cell.getElement()).getTourComputedTime_Moving();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3569,8 +3569,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selection) {
          if (treeItem instanceof TourData) {
 
             selectedTours++;
@@ -3803,9 +3802,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 
@@ -3847,8 +3844,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // get selected tours, this must be outside of the runnable !!!
       final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-         selectedTours.add((TourData) iterator.next());
+      for (final Object name : selection) {
+         selectedTours.add((TourData) name);
       }
 
       return selectedTours;
@@ -4003,9 +4000,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 

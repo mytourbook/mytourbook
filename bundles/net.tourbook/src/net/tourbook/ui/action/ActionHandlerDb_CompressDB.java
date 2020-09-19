@@ -15,14 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 

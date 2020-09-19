@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -867,8 +867,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       defineColumn_1stColumn();
 
-      defineColumn_Time_RecordingTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
       defineColumn_Time_PausedTime();
 
       defineColumn_Tour_Title();
@@ -1227,11 +1227,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * column: driving time (h)
+    * column: elapsed time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -1241,7 +1242,31 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                return;
             }
 
-            final long value = ((TVITagViewItem) element).colDrivingTime;
+            final long value = ((TVITagViewItem) element).colElapsedTime;
+
+            colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: moving time (h)
+    */
+   private void defineColumn_Time_MovingTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITagView_TagCategory) {
+               return;
+            }
+
+            final long value = ((TVITagViewItem) element).colMovingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
 
@@ -1255,7 +1280,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_Time_PausedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -1266,31 +1291,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final long value = ((TVITagViewItem) element).colPausedTime;
-
-            colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: recording time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            if (element instanceof TVITagView_TagCategory) {
-               return;
-            }
-
-            final long value = ((TVITagViewItem) element).colRecordingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
 

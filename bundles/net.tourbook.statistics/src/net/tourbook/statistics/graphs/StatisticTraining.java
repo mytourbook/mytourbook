@@ -298,16 +298,20 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final int[] startValue = _tourDayData.allStartTime;
       final int[] endValue = _tourDayData.allEndTime;
 
-      final int recordingTime = _tourDayData.allRecordingTime[valueIndex];
-      final int drivingTime = _tourDayData.allDrivingTime[valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final int elapsedTime = _tourDayData.allDeviceTime_Elapsed[valueIndex];
+      final int movingTime = _tourDayData.allComputedTime_Moving[valueIndex];
+      final int breakTime = elapsedTime - movingTime;
+      final int recordedTime = _tourDayData.allDeviceTime_Recorded[valueIndex];
+      final int pausedTime = _tourDayData.allDeviceTime_Paused[valueIndex];
 
       final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourDayData.allDistance[valueIndex];
-      final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-      final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
+      final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final float training_Effect = _tourDayData.allTraining_Effect[valueIndex];
       final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerobic[valueIndex];
@@ -321,8 +325,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       toolTipFormat.append(Messages.tourtime_info_altitude + NL);
       toolTipFormat.append(Messages.tourtime_info_time + NL2);
 
-      toolTipFormat.append(Messages.tourtime_info_recording_time_tour + NL);
-      toolTipFormat.append(Messages.tourtime_info_driving_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_paused_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_moving_time_tour + NL);
       toolTipFormat.append(Messages.tourtime_info_break_time_tour + NL2);
 
       toolTipFormat.append(Messages.tourtime_info_avg_speed + NL);
@@ -371,15 +377,25 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             (tourEndTime / 3600) % 24,
             (tourEndTime % 3600) / 60,
 
-            // recording time
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
-            (recordingTime % 3600) % 60,
+            // elapsed time
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
+            (elapsedTime % 3600) % 60,
 
-            // driving time
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
-            (drivingTime % 3600) % 60,
+            // recorded time
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            (recordedTime % 3600) % 60,
+
+            // paused time
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            (pausedTime % 3600) % 60,
+
+            // moving time
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
+            (movingTime % 3600) % 60,
 
             // break time
             breakTime / 3600,

@@ -57,8 +57,10 @@ public class TourData_Day {
    private float[]                _durationLowFloat;
    private float[]                _durationHighFloat;
 
-   int[]                          allRecordingTime;
-   int[]                          allDrivingTime;
+   int[]                          allDeviceTime_Elapsed;
+   int[]                          allComputedTime_Moving;
+   int[]                          allDeviceTime_Recorded;
+   int[]                          allDeviceTime_Paused;
 
    int[]                          allStartTime;
    int[]                          allEndTime;

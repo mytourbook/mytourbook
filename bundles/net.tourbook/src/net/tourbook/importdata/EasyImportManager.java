@@ -150,7 +150,6 @@ public class EasyImportManager {
       return _instance;
    }
 
-
    /**
     * @param isForceRetrieveFiles
     *           When <code>true</code> files will be retrieved even when the stores have not
@@ -298,7 +297,7 @@ public class EasyImportManager {
                + "SELECT" //															//$NON-NLS-1$
                + " TourImportFileName" //												//$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
-               + (" WHERE TourImportFileName IN (" + deviceFileNameINList + ")") //	//$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE TourImportFileName IN (" + deviceFileNameINList + UI.SYMBOL_BRACKET_RIGHT) //	//$NON-NLS-1$
                + " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
 
          final ResultSet result = stmt.executeQuery(sqlQuery);
@@ -1212,12 +1211,12 @@ public class EasyImportManager {
          // set tour type by speed
 
          final float tourDistanceKm = tourData.getTourDistance();
-         final long drivingTime = tourData.getTourDrivingTime();
+         final long movingTime = tourData.getTourComputedTime_Moving();
 
          double tourAvgSpeed = 0;
 
-         if (drivingTime != 0) {
-            tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
+         if (movingTime != 0) {
+            tourAvgSpeed = tourDistanceKm / movingTime * 3.6;
          }
 
          final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;

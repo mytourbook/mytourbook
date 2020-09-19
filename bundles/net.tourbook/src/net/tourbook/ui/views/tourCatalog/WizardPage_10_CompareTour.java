@@ -293,7 +293,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
       defineColumn_Date(treeLayout);
       defineColumn_Distance(treeLayout);
       defineColumn_AltitudeUp(treeLayout);
-      defineColumn_RecordingTime(treeLayout);
+      defineColumn_ElapsedTime(treeLayout);
    }
 
    private void defineColumn_AltitudeUp(final TreeColumnLayout treeLayout) {
@@ -381,7 +381,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
 
-   private void defineColumn_RecordingTime(final TreeColumnLayout treeLayout) {
+   private void defineColumn_ElapsedTime(final TreeColumnLayout treeLayout) {
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourViewer, SWT.TRAIL);
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -394,13 +394,13 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
                final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
 
-               final long recordingTime = tourItem.colRecordingTime;
+               final long elapsedTime = tourItem.colElapsedTime;
 
                cell.setText(
                      String.format(//
                            Messages.Format_hhmm,
-                           (recordingTime / 3600),
-                           ((recordingTime % 3600) / 60)));
+                           (elapsedTime / 3600),
+                           ((elapsedTime % 3600) / 60)));
 
             } else {
 
@@ -418,7 +418,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
    /**
     * enables/disables the controls which belong to the tour
-    * 
+    *
     * @param isChecked
     */
    private void enableTours(final boolean isChecked) {
@@ -447,7 +447,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
    private Long[] getAllTourIds() {
 
-      final ArrayList<Long> allTourIds = new ArrayList<Long>();
+      final ArrayList<Long> allTourIds = new ArrayList<>();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
