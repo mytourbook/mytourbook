@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -442,6 +442,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
                   _statYoungestYear,
                   _statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData);
+
+      statContext.outStatisticValuesRaw = _tourWeekData.statisticValuesRaw;
 
       setupBars_10_HrZoneOrder(isNewPerson);
       setupBars_20_BarNames(statContext);

@@ -18,26 +18,12 @@ package net.tourbook.statistics.graphs;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-   static final char           NL                             = net.tourbook.common.UI.NEW_LINE;
-
-   private static final String SYS_PROP__LOG_STATISTIC_VALUES = "logStatisticValues";
-   static final boolean        isLogStatisticValues           = System.getProperty(SYS_PROP__LOG_STATISTIC_VALUES) != null;
-
-   static {
-
-      if (isLogStatisticValues) {
-
-         Util.logSystemProperty_IsEnabled(DataProvider.class,
-               SYS_PROP__LOG_STATISTIC_VALUES,
-               "Statistic values are logged"); //$NON-NLS-1$
-      }
-   }
+   static final char    NL        = net.tourbook.common.UI.NEW_LINE;
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 

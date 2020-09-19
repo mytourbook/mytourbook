@@ -571,6 +571,8 @@ public abstract class StatisticYear extends TourbookStatistic {
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
+      statContext.outStatisticValuesRaw = _tourYearData.statisticValuesRaw;
+
       _isDuration_ReloadData = false;
 
       StatisticServices.setBarNames(statContext, _tourYearData.usedTourTypeIds, _barOrderStart);

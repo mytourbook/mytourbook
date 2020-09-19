@@ -215,37 +215,90 @@ public class DataProvider_HrZone_Week extends DataProvider {
          UI.showSQLException(e);
       }
 
-      if (isLogStatisticValues) {
-         logValues();
-      }
+      setStatisticValues();
 
       return _weekData;
    }
 
-   private void logValues() {
+   private void setStatisticValues() {
 
-//      for (int yearIndex = 0; yearIndex < _years.length; yearIndex++) {
-//         System.out.println(String.format("%5d %3d", _years[yearIndex], _yearWeeks[yearIndex]));
-//      }
+      final StringBuilder sb = new StringBuilder();
 
-      System.out.println("\n" //$NON-NLS-1$
+//      sb.append("\n" //$NON-NLS-1$
+//
+//            + " week-year," //$NON-NLS-1$
+//            + "     zone1," //$NON-NLS-1$
+//            + "     zone2," //$NON-NLS-1$
+//            + "     zone3," //$NON-NLS-1$
+//            + "     zone4," //$NON-NLS-1$
+//            + "     zone5," //$NON-NLS-1$
+//            + "     zone6," //$NON-NLS-1$
+//            + "     zone7," //$NON-NLS-1$
+//            + "     zone8," //$NON-NLS-1$
+//            + "     zone9," //$NON-NLS-1$
+//            + "    zone10," //$NON-NLS-1$
+//
+//            + "      sum-sec," //$NON-NLS-1$
+//            + " sum-hh-mm-ss" //$NON-NLS-1$
+//
+//      );
 
-            + " week-year," //$NON-NLS-1$
-            + "     zone1," //$NON-NLS-1$
-            + "     zone2," //$NON-NLS-1$
-            + "     zone3," //$NON-NLS-1$
-            + "     zone4," //$NON-NLS-1$
-            + "     zone5," //$NON-NLS-1$
-            + "     zone6," //$NON-NLS-1$
-            + "     zone7," //$NON-NLS-1$
-            + "     zone8," //$NON-NLS-1$
-            + "     zone9," //$NON-NLS-1$
-            + "    zone10," //$NON-NLS-1$
+      sb.append(UI.EMPTY_STRING
 
-            + "      sum-sec," //$NON-NLS-1$
-            + " sum-hh-mm-ss" //$NON-NLS-1$
+            + "Year," //$NON-NLS-1$
+            + "  Week," //$NON-NLS-1$
+            + "     Zone1," //$NON-NLS-1$
+            + "      Zone2," //$NON-NLS-1$
+            + "      Zone3," //$NON-NLS-1$
+            + "      Zone4," //$NON-NLS-1$
+            + "      Zone5," //$NON-NLS-1$
+            + "      Zone6," //$NON-NLS-1$
+            + "      Zone7," //$NON-NLS-1$
+            + "      Zone8," //$NON-NLS-1$
+            + "      Zone9," //$NON-NLS-1$
+            + "     Zone10," //$NON-NLS-1$
 
-      );
+            + "      Summary," //$NON-NLS-1$
+            + "       Summary" //$NON-NLS-1$
+
+            + NL);
+
+      sb.append(UI.EMPTY_STRING
+
+            // year, week
+            + "    ," //$NON-NLS-1$
+            + "     ," //$NON-NLS-1$
+
+            // zones
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+
+            // summary
+            + "          (s)," //$NON-NLS-1$
+            + "    (hh:mm:ss)" //$NON-NLS-1$
+
+            + NL);
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            // year, week
+            + "%4d,  %4d," //$NON-NLS-1$
+
+            // zone 1...10
+            + "%10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d," //$NON-NLS-1$
+
+            // summaries
+            + "%13d, %13s" //$NON-NLS-1$
+
+            + NL;
 
       final int[][] hrZoneValues = _weekData.hrZoneValues;
       final int numWeeks = hrZoneValues[0].length;
@@ -284,20 +337,10 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
 
-         System.out.println(String.format(UI.EMPTY_STRING
+         sb.append(String.format(valueFormatting,
 
-//               + "weekIndex:%4d     sumWeeks:%4d     prevSumWeeks:%4d       "
-
-               + "%5d-%d," //$NON-NLS-1$
-               + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d," //$NON-NLS-1$
-               + "%13d,%13s", //$NON-NLS-1$
-
-//               weekIndex,
-//               sumYearWeeks,
-//               prevSumWeeks,
-
-               week + 1,
                year,
+               week + 1,
 
                hrZoneValues[0][weekIndex],
                hrZoneValues[1][weekIndex],
@@ -315,5 +358,8 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          ));
       }
+
+      _weekData.statisticValuesRaw = sb.toString();
+
    }
 }

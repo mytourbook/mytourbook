@@ -231,6 +231,10 @@ public class TourDatabase {
    private static ArrayList<TourType>                     _activeTourTypes;
 
    private static volatile ArrayList<TourType>            _dbTourTypes;
+
+   /**
+    * Key is tour type ID
+    */
    private static HashMap<Long, TourType>                 _dbTourTypeIds;
 
    /**
@@ -2002,27 +2006,29 @@ public class TourDatabase {
    }
 
    /**
-    * @param typeId
+    * @param tourTypeId
     * @return Returns the name for the {@link TourType} or an empty string when the tour type id was
     *         not found
     */
-   public static String getTourTypeName(final long typeId) {
+   public static String getTourTypeName(final long tourTypeId) {
 
-      /*
-       * Set default text for the case when tour type is not defined and
-       * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_USED or
-       * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA is set.
-       */
-      String tourTypeName = Messages.ui_tour_not_defined;
+      // ensure tour types are loaded
+      getAllTourTypes();
 
-      for (final TourType tourType : getAllTourTypes()) {
-         if (tourType.getTypeId() == typeId) {
-            tourTypeName = tourType.getName();
-            break;
-         }
+      final TourType tourType = _dbTourTypeIds.get(tourTypeId);
+      if (tourType == null) {
+
+         /*
+          * Use default text for the case when tour type is not defined and
+          * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_USED or
+          * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA is set.
+          */
+         return Messages.ui_tour_not_defined;
+
+      } else {
+
+         return tourType.getName();
       }
-
-      return tourTypeName;
    }
 
    /**

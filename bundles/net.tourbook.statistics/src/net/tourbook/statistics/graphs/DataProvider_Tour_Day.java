@@ -294,7 +294,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
                + "WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause()
+               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
                + "ORDER BY TourStartTime" + NL; //                                              //$NON-NLS-1$
 
@@ -674,11 +674,13 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final StringBuilder sb = new StringBuilder();
 
-      final String part_1_1 = "Year, Month, Day, DOY,      , Duration,      , Altitude,          , Distance,            ,  Speed,          , Pace,"; //$NON-NLS-1$
-      final String part_1_2 = "    ,      ,    ,    ,      ,    (sec),      ,      (m),          ,      (m),            , (km/h),      , (min/km),"; //$NON-NLS-1$
+      final String headerLine1_1 =
+            "Year, Month, Day, DOY,      , Duration,      , Altitude,          , Distance,            ,  Speed,          , Pace,"; //$NON-NLS-1$
+      final String headerLine2_1 =
+            "    ,      ,    ,    ,      ,      (s),      ,      (m),          ,      (m),            , (km/h),      , (min/km),"; //$NON-NLS-1$
 
-      final String part_2_1 = "      , Training,      , Training,      , Training"; //$NON-NLS-1$
-      final String part_2_2 = "         , Aerob,       , Anaerob,   , Performance"; //$NON-NLS-1$
+      final String headerLine1_2 = "      , Training,      , Training,      , Training"; //$NON-NLS-1$
+      final String headerLine2_2 = "         , Aerob,       , Anaerob,   , Performance"; //$NON-NLS-1$
 
       final String valueFormatting = UI.EMPTY_STRING
 
@@ -711,14 +713,16 @@ public class DataProvider_Tour_Day extends DataProvider {
 
             + NL;
 
-      sb.append(part_1_1 + part_2_1 + NL);
-      sb.append(part_1_2 + part_2_2 + NL);
+      sb.append(headerLine1_1 + headerLine1_2 + NL);
+      sb.append(headerLine2_1 + headerLine2_2 + NL);
 
       final float[] durationLow = _tourDayData.getDurationLowFloat();
       final float[] durationHigh = _tourDayData.getDurationHighFloat();
       final int[] doyValues = _tourDayData.getDoyValues();
 
-      for (int dataIndex = 0; dataIndex < durationLow.length; dataIndex++) {
+      final int numDataItems = durationLow.length;
+
+      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
 
          sb.append(String.format(valueFormatting,
 
