@@ -54,6 +54,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       if (event != null && event == Event.TIMER && eventType != null) {
 
          switch (eventType) {
+
          case STOP:
          case STOP_ALL:
             _pausedTime_Start.add(mesg.getTimestamp().getTimestamp() * 1000);
@@ -66,6 +67,9 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
             _pausedTime_End.add(mesg.getTimestamp().getTimestamp() * 1000);
             break;
+
+         //The usage/meaning of START/STOP/STOP_ALL is described here:
+         //https://www.thisisant.com/forum/viewthread/4319
 
          }
       }
