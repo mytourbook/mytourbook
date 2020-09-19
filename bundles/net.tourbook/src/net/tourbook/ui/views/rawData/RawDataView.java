@@ -39,7 +39,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -2921,11 +2920,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourComputedTime_Moving();
+            final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+            final long time = isPaceFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
-                  : movingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : time * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3569,8 +3569,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selection) {
          if (treeItem instanceof TourData) {
 
             selectedTours++;
@@ -3803,9 +3802,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 
@@ -3847,8 +3844,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // get selected tours, this must be outside of the runnable !!!
       final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-         selectedTours.add((TourData) iterator.next());
+      for (final Object name : selection) {
+         selectedTours.add((TourData) name);
       }
 
       return selectedTours;
@@ -4003,9 +4000,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 

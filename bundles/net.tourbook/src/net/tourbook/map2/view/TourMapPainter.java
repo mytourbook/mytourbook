@@ -1341,73 +1341,80 @@ public class TourMapPainter extends MapPainter {
                                   final double[] latitudeSerie,
                                   final double[] longitudeSerie) {
 
-      final long[] pausedTime_Start = tourData.getPausedTime_Start();
-      final long[] pausedTime_End = tourData.getPausedTime_End();
-
-      // check if pauses are available
-      if (pausedTime_Start == null || pausedTime_Start.length == 0) {
-         return isContentInTile;
-      }
-
       if (tourData.isMultipleTours()) {
 
-         //TODO FB support joining pauses when creating a multiple tour, what is a multiple tour ?
+         final int numberOfTours = tourData.multipleTourStartIndex.length;
          final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
-         final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
-//         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
+         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
+         final long[] multipleTourStartTime = tourData.multipleTourStartTime;
 
-         int tourIndex = 0;
-         int numberOfMultiMarkers = 0;
-         int tourSerieIndex = 0;
-
-         // setup first multiple tour
-         tourSerieIndex = multipleStartTimeIndex[tourIndex];
-         numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
-
-         final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
-
-         // draw tour marker
-
-         final int markerCounter = 0;
-
-         for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
-
-            while (markerIndex >= numberOfMultiMarkers) {
-
-               // setup next tour
-
-               tourIndex++;
-
-               if (tourIndex <= multipleStartTimeIndex.length - 1) {
-
-                  tourSerieIndex = multipleStartTimeIndex[tourIndex];
-                  numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
-               }
-            }
-
-            final TourMarker tourMarker = allTourMarkers.get(markerIndex);
-
-            final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
-
-            tourMarker.setMultiTourSerieIndex(markerSerieIndex);
-
-            // draw tour marker
-//            if (drawTourPauses(
-//                  gcTile,
-//                  map,
-//                  tile,
-//                  latitudeSerie[markerSerieIndex],
-//                  longitudeSerie[markerSerieIndex],
-//                  tourMarker,
-//                  parts)) {
-//
-//               markerCounter++;
-//            }
+         if (multipleStartTimeIndex.length == 0) {
+            return isContentInTile;
          }
 
-         isContentInTile = isContentInTile || markerCounter > 0;
+         int tourSerieIndex = 0;
+         int numberOfPauses = 0;
+         long tourStartTime = 0;
+         final ArrayList<List<Long>> allTourPauses = tourData.multiTourPauses;
+         int currentTourPauseIndex = 0;
+         int pauseCounter = 0;
+         for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
+
+            tourStartTime = multipleTourStartTime[tourIndex];
+            numberOfPauses = multipleNumberOfPauses[tourIndex];
+            tourSerieIndex = multipleStartTimeIndex[tourIndex];
+
+            for (int relativeTourPauseIndex = 0; relativeTourPauseIndex < numberOfPauses;) {
+
+               final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
+               final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
+
+               final long pauseDuration = Math.round((float) (pausedTime_End - pausedTime_Start) / 1000);
+
+               long previousTourElapsedTime = 0;
+               if (tourIndex > 0) {
+                  previousTourElapsedTime = tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+               }
+
+               for (; tourSerieIndex < tourData.timeSerie.length; ++tourSerieIndex) {
+
+                  final long currentTime = tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+
+                  if (currentTime >= pausedTime_Start) {
+                     break;
+                  }
+               }
+
+               // draw tour pause
+               if (drawTourPauses(
+                     gcTile,
+                     map,
+                     tile,
+                     latitudeSerie[tourSerieIndex],
+                     longitudeSerie[tourSerieIndex],
+                     pauseDuration,
+                     parts)) {
+
+                  pauseCounter++;
+               }
+
+               ++relativeTourPauseIndex;
+               ++currentTourPauseIndex;
+            }
+         }
+
+         isContentInTile = isContentInTile || pauseCounter > 0;
 
       } else {
+
+         final long[] pausedTime_Start = tourData.getPausedTime_Start();
+
+         // check if pauses are available
+         if (pausedTime_Start == null || pausedTime_Start.length == 0) {
+            return isContentInTile;
+         }
+
+         final long[] pausedTime_End = tourData.getPausedTime_End();
 
          // draw tour pauses durations
 
@@ -1439,7 +1446,7 @@ public class TourMapPainter extends MapPainter {
 
             final long pauseDuration = Math.round((float) (endTime - startTime) / 1000);
 
-            // draw tour marker
+            // draw tour pause
             if (drawTourPauses(
                   gcTile,
                   map,

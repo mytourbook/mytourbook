@@ -1462,9 +1462,9 @@ public class DialogExportTour extends TitleAreaDialog {
       for (final Object name : tracks) {
 
          final GPSTrack track = (GPSTrack) name;
-         for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+         for (final Object waypoint : track.getWaypoints()) {
 
-            final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+            final GPSTrackpoint wp = (GPSTrackpoint) waypoint;
 
             // starttime, totaltime
             if (wp.getDate() != null) {
