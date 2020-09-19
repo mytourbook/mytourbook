@@ -27,6 +27,10 @@ New
  - The new tour times (Recorded & Paused Times) are available for display in the TourDataEditorView, TourBookView, Calendar view & Statistics View
  - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
 
+* Statistic Values View
+  - Displays the values of the statistic graphs
+  - Statistic values can be copied in csv format to the clipboard
+
 
 Improvements
 ============
