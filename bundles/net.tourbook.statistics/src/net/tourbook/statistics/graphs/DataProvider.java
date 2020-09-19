@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
@@ -48,6 +49,41 @@ public abstract class DataProvider {
     * number of weeks in a year
     */
    int[]                _yearWeeks;
+
+   static String createSQL_SumDurationTime(final DurationTime durationTime) {
+
+      String sqlSumDurationTime = null;
+
+      switch (durationTime) {
+      case BREAK:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
+         break;
+
+      case ELAPSED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
+         break;
+
+      case PAUSED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
+         break;
+
+      case RECORDED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Recorded),"; //$NON-NLS-1$
+         break;
+
+      case MOVING:
+      default:
+         // this is also the old implementation for the duration values
+         sqlSumDurationTime = "SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
+         break;
+      }
+
+      return sqlSumDurationTime;
+   }
 
    /**
     * @param finalYear

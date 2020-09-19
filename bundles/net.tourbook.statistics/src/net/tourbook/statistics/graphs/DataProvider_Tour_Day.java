@@ -269,8 +269,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   TourStartTime," + NL //                         4  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                            5  //$NON-NLS-1$
 
-               + "   TourComputedTime_Moving," + NL //  6     //$NON-NLS-1$
-               + "   TourDeviceTime_Elapsed," + NL //  7     //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //               6  //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //                7  //$NON-NLS-1$
 
                + "   TourDistance," + NL //                          8  //$NON-NLS-1$
                + "   TourAltUp," + NL //                             9  //$NON-NLS-1$
@@ -282,10 +282,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   training_TrainingPerformance," + NL //          14 //$NON-NLS-1$
 
                + "   TourType_typeId," + NL //                       15 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId," + NL //               16 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId," + NL //              16 //$NON-NLS-1$
 
-               + "   TourDeviceTime_Recorded," + NL //  17    //$NON-NLS-1$
-               + "   TourDeviceTime_Paused" + NL //  18    //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded," + NL //               17 //$NON-NLS-1$
+               + "   TourDeviceTime_Paused" + NL //                  18 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -370,8 +370,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                final long dbStartTimeMilli            = result.getLong(4);
                final String dbTimeZoneId              = result.getString(5);
 
-               final int dbMovingTime = result.getInt(6);
-               final int dbElapsedTime = result.getInt(7);
+               final int dbMovingTime                 = result.getInt(6);
+               final int dbElapsedTime                = result.getInt(7);
 
                final float dbDistance                 = result.getFloat(8);
                final int dbAltitudeUp                 = result.getInt(9);
@@ -385,8 +385,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                final Object dbTypeIdObject            = result.getObject(15);
 
-               final int dbRecordedTime = result.getInt(17);
-               final int dbPausedTime = result.getInt(18);
+               final int dbRecordedTime               = result.getInt(17);
+               final int dbPausedTime                 = result.getInt(18);
 
 // SET_FORMATTING_ON
 
