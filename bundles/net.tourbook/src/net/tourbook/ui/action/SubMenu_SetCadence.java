@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -37,10 +37,23 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
 	private Menu			_menu;
 
-	private ActionSetRpm	_actionSetRpm;
-	private ActionSetSpm	_actionSetSpm;
+   private ActionSetNone _actionSetNone;
+   private ActionSetRpm  _actionSetRpm;
+   private ActionSetSpm  _actionSetSpm;
 
 	private ITourProvider	_tourProvider;
+
+   private class ActionSetNone extends Action {
+
+      public ActionSetNone() {
+         super(Messages.Action_Cadence_Set_None, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+         setCadenceMultiplier(0);
+      }
+   }
 
 	private class ActionSetRpm extends Action {
 
@@ -75,8 +88,9 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
 		_tourProvider = tourViewer;
 
-		_actionSetRpm = new ActionSetRpm();
-		_actionSetSpm = new ActionSetSpm();
+      _actionSetNone = new ActionSetNone();
+      _actionSetRpm = new ActionSetRpm();
+      _actionSetSpm = new ActionSetSpm();
 	}
 
 	@Override
@@ -92,32 +106,32 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
 		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
+      int numNone = 0;
 		int numSpm = 0;
 		int numRpm = 0;
 
 		for (final TourData tourData : selectedTours) {
 
-			if (tourData.isCadenceSpm()) {
-				numSpm++;
-			} else {
-				numRpm++;
-			}
+         switch ((int) tourData.getCadenceMultiplier()) {
+         case 0:
+            numNone++;
+            break;
+         case 1:
+            numRpm++;
+            break;
+         case 2:
+            numSpm++;
+            break;
+         }
 		}
 
-		if (numSpm > 0 && numRpm > 0) {
-			_actionSetRpm.setChecked(false);
-			_actionSetSpm.setChecked(false);
-		} else if (numRpm > 0) {
-			_actionSetRpm.setChecked(true);
-			_actionSetSpm.setChecked(false);
-		} else if (numSpm > 0) {
-			_actionSetRpm.setChecked(false);
-			_actionSetSpm.setChecked(true);
-		}
+      _actionSetRpm.setChecked(numRpm > 0);
+      _actionSetSpm.setChecked(numSpm > 0);
+      _actionSetNone.setChecked(numNone > 0);
 	}
 
 	private void fillMenu(final Menu menu) {
-
+      new ActionContributionItem(_actionSetNone).fill(menu, -1);
 		new ActionContributionItem(_actionSetRpm).fill(menu, -1);
 		new ActionContributionItem(_actionSetSpm).fill(menu, -1);
 	}

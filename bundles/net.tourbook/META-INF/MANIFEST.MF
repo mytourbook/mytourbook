@@ -35,7 +35,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.worldwind,
  net.tourbook.p2,
  net.tourbook.ext.vtm,
- net.tourbook.ext.geoclipse
+ net.tourbook.ext.geoclipse,
+ org.eclipse.jface
 Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,
