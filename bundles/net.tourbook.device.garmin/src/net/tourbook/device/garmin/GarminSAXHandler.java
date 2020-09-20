@@ -72,7 +72,6 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           TAG_NOTES                   = "Notes";                                                      //$NON-NLS-1$
    private static final String           TAG_RUN_CADENCE             = "RunCadence";                                                 //$NON-NLS-1$
    private static final String           TAG_SENSOR_STATE            = "SensorState";                                                //$NON-NLS-1$
-   private static final String           TAG_TRACK                   = "Track";                                                      //$NON-NLS-1$
    private static final String           TAG_TRACKPOINT              = "Trackpoint";                                                 //$NON-NLS-1$
    private static final String           TAG_TIME                    = "Time";                                                       //$NON-NLS-1$
    private static final String           TAG_VALUE                   = "Value";                                                      //$NON-NLS-1$
@@ -134,7 +133,6 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                 _isInRunCadence;
    private boolean                 _isInSensorState;
    private boolean                 _isInTime;
-   private boolean                 _isInTrack;
    private boolean                 _isInTrackpoint;
 
    private boolean                 _isInCreator;
@@ -468,15 +466,6 @@ public class GarminSAXHandler extends DefaultHandler {
       }
    }
 
-   private void cleanTimerPauses() {
-
-      if (_pausedTime_Start.size() == 0) {
-         return;
-      }
-
-      _pausedTime_Start.remove(_pausedTime_Start.size() - 1);
-   }
-
    public void dispose() {
 
       _allLapStart.clear();
@@ -542,14 +531,6 @@ public class GarminSAXHandler extends DefaultHandler {
                _characters.delete(0, _characters.length());
 
             } catch (final NumberFormatException e) {}
-
-         } else if (name.equals(TAG_TRACK)) {
-
-            _isInTrack = false;
-
-            if (_allTimeData.size() > 0) {
-               _pausedTime_Start.add(_allTimeData.get(_allTimeData.size() - 1).absoluteTime);
-            }
 
          } else if (_isInCourse && _isInName) {
 
@@ -641,7 +622,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
-      cleanTimerPauses();
       tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
 
       // after all data are added, the tour id can be created
@@ -924,10 +904,18 @@ public class GarminSAXHandler extends DefaultHandler {
 
          _timeData.absoluteTime = _currentTime;
 
-         if (_pausedTime_Start.size() == _pausedTime_End.size() + 1) {
-            _pausedTime_End.add(_currentTime);
-         }
+         final int allTimeData = _allTimeData.size();
 
+         if (allTimeData > 1) {
+            final long previousTrackPointTime = _allTimeData.get(allTimeData - 1).absoluteTime;
+
+            //If the current time is greater than the previous time by more than 1 second,
+            //we consider that a pause.
+            if (_currentTime - previousTrackPointTime > 1000) {
+               _pausedTime_Start.add(previousTrackPointTime);
+               _pausedTime_End.add(_currentTime);
+            }
+         }
       }
    }
 
@@ -1055,33 +1043,26 @@ public class GarminSAXHandler extends DefaultHandler {
 
                if (_isInLap) {
 
-                  if (_isInTrack) {
+                  if (_isInTrackpoint) {
 
-                     if (_isInTrackpoint) {
+                     getData_TrackPoint_10_Start(name);
 
-                        getData_TrackPoint_10_Start(name);
+                  } else if (name.equals(TAG_TRACKPOINT)) {
 
-                     } else if (name.equals(TAG_TRACKPOINT)) {
+                     _isInTrackpoint = true;
 
-                        _isInTrackpoint = true;
+                     // create new time item
+                     _timeData = new TimeData();
 
-                        // create new time item
-                        _timeData = new TimeData();
+                  } else if (name.equals(TAG_DISTANCE_METERS)) {
 
-                     } else if (name.equals(TAG_DISTANCE_METERS)) {
+                     _isInDistance = true;
+                     _characters.delete(0, _characters.length());
 
-                        _isInDistance = true;
-                        _characters.delete(0, _characters.length());
+                  } else if (name.equals(TAG_CALORIES)) {
 
-                     } else if (name.equals(TAG_CALORIES)) {
-
-                        _isInCalories = true;
-                        _characters.delete(0, _characters.length());
-                     }
-                  } else if (name.equals(TAG_TRACK)) {
-
-                     _isInTrack = true;
-
+                     _isInCalories = true;
+                     _characters.delete(0, _characters.length());
                   }
 
                } else if (name.equals(TAG_LAP)) {
