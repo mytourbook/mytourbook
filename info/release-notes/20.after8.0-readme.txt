@@ -72,7 +72,8 @@ Fixes
 Translation    
 ===========
 
- - Dutch (Maarten)
+ - Czech 20.8 (Lukas)
+ - Dutch 20.8 (Maarten)
  - French (Frederic)
  - German
  - Italian (Doriano)
