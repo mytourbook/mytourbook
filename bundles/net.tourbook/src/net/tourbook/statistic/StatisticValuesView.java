@@ -52,6 +52,7 @@ public class StatisticValuesView extends ViewPart {
 
    public static final String            ID                        = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
 
+   private static final String           STATE_IS_GROUP_VALUES     = "STATE_IS_GROUP_VALUES";                      //$NON-NLS-1$
    private static final String           STATE_IS_SHOW_CSV_FORMAT  = "STATE_IS_SHOW_CSV_FORMAT";                   //$NON-NLS-1$
    private static final String           STATE_IS_SHOW_ZERO_VALUES = "STATE_IS_SHOW_ZERO_VALUES";                  //$NON-NLS-1$
 
@@ -60,15 +61,16 @@ public class StatisticValuesView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-   private static final Pattern FIELD_PATTERN             = Pattern.compile(","); //$NON-NLS-1$
-   private static final Pattern SPACE_PATTERN             = Pattern.compile("  *"); //$NON-NLS-1$
+   private static final Pattern PATTERN_FIELDS           = Pattern.compile(",");                                            //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACES           = Pattern.compile("  *");                                          //$NON-NLS-1$
+   private static final Pattern PATTERN_EMPTY_LINES      = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);  //$NON-NLS-1$
 
-   private static final Pattern NUMBER_PATTERN_0          = Pattern.compile(" 0 ");                         //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_END      = Pattern.compile(" 0$",     Pattern.MULTILINE);  //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0        = Pattern.compile(" 0.0 ");                       //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0_END    = Pattern.compile(" 0.0$",   Pattern.MULTILINE);  //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00       = Pattern.compile(" 0.00 ");                      //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00_END   = Pattern.compile(" 0.00$",  Pattern.MULTILINE);  //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0         = Pattern.compile(" 0 ");                                          //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_END     = Pattern.compile(" 0$",     Pattern.MULTILINE);                   //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0       = Pattern.compile(" 0.0 ");                                        //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0_END   = Pattern.compile(" 0.0$",   Pattern.MULTILINE);                   //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00      = Pattern.compile(" 0.00 ");                                       //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_END  = Pattern.compile(" 0.00$",  Pattern.MULTILINE);                   //$NON-NLS-1$
 
 //SET_FORMATTING_ON
 
@@ -78,6 +80,7 @@ public class StatisticValuesView extends ViewPart {
    private Selection_StatisticValues _selection_StatisticValues;
 
    private Action_CopyIntoClipboard  _action_CopyIntoClipboard;
+   private Action_GroupValues        _action_GroupValues;
    private Action_ShowCSVFormat      _action_ShowCSVFormat;
    private Action_ShowZeroValues     _action_ShowZeroValues;
 
@@ -122,6 +125,25 @@ public class StatisticValuesView extends ViewPart {
       @Override
       public void run() {
          onAction_CopyIntoClipboard();
+      }
+   }
+
+   private class Action_GroupValues extends Action {
+
+      Action_GroupValues() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tour_StatisticValues_Action_GroupValues_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues_Disabled));
+      }
+
+      @Override
+      public void run() {
+         enableActions();
+         updateUI();
       }
    }
 
@@ -224,6 +246,7 @@ public class StatisticValuesView extends ViewPart {
       _action_CopyIntoClipboard = new Action_CopyIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();
       _action_ShowZeroValues = new Action_ShowZeroValues();
+      _action_GroupValues = new Action_GroupValues();
 
       fillActionBars();
    }
@@ -263,7 +286,7 @@ public class StatisticValuesView extends ViewPart {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.Tour_StatisticValues_Label_NoData);
+      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.Tour_StatisticValues_Label_NoStatistic);
 
       _pageContent = new Composite(_pageBook, SWT.NONE);
       _pageContent.setLayout(new FillLayout());
@@ -303,6 +326,7 @@ public class StatisticValuesView extends ViewPart {
       final boolean isStatValuesAvailable = _selection_StatisticValues != null && _selection_StatisticValues.statisticValuesRaw != null;
 
       _action_CopyIntoClipboard.setEnabled(isStatValuesAvailable);
+      _action_GroupValues.setEnabled(isStatValuesAvailable && !isCSVFormat);
       _action_ShowCSVFormat.setEnabled(isStatValuesAvailable);
       _action_ShowZeroValues.setEnabled(isStatValuesAvailable && !isCSVFormat);
    }
@@ -315,6 +339,7 @@ public class StatisticValuesView extends ViewPart {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_action_ShowZeroValues);
+      tbm.add(_action_GroupValues);
       tbm.add(_action_ShowCSVFormat);
       tbm.add(_action_CopyIntoClipboard);
 
@@ -322,17 +347,25 @@ public class StatisticValuesView extends ViewPart {
       tbm.update(true);
    }
 
-   private String formatStatValues(String statValues, final boolean isCSVFormat, final boolean isRemoveZeros) {
+   private String formatStatValues(String statValues, final boolean isCSVFormat, final boolean isRemoveZeros, final boolean isGroupValues) {
 
       if (isCSVFormat) {
 
-         // remove spaces
-         statValues = SPACE_PATTERN.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+         // remove spaces always
+         statValues = PATTERN_SPACES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+
+         // remove empty lines always
+         statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
 
       } else {
 
          // remove field separator
-         statValues = FIELD_PATTERN.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+         statValues = PATTERN_FIELDS.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+
+         // remove empty lines
+         if (isGroupValues == false) {
+            statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+         }
 
          // remove zeros
          if (isRemoveZeros) {
@@ -365,9 +398,10 @@ public class StatisticValuesView extends ViewPart {
       }
 
       final boolean isCSVFormat = true;
+      final boolean isGroupValues = false; // remove empty lines
       final boolean isRemoveZeros = false;
 
-      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw, isCSVFormat, isRemoveZeros);
+      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw, isCSVFormat, isRemoveZeros, isGroupValues);
 
       if (statValues.length() > 0) {
 
@@ -403,6 +437,7 @@ public class StatisticValuesView extends ViewPart {
 
    private void restoreState() {
 
+      _action_GroupValues.setChecked(Util.getStateBoolean(_state, STATE_IS_GROUP_VALUES, true));
       _action_ShowCSVFormat.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_CSV_FORMAT, false));
       _action_ShowZeroValues.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_ZERO_VALUES, false));
    }
@@ -410,6 +445,7 @@ public class StatisticValuesView extends ViewPart {
    @PersistState
    private void saveState() {
 
+      _state.put(STATE_IS_GROUP_VALUES, _action_GroupValues.isChecked());
       _state.put(STATE_IS_SHOW_CSV_FORMAT, _action_ShowCSVFormat.isChecked());
       _state.put(STATE_IS_SHOW_ZERO_VALUES, _action_ShowZeroValues.isChecked());
    }
@@ -437,8 +473,12 @@ public class StatisticValuesView extends ViewPart {
 
       final boolean isCSVFormat = _action_ShowCSVFormat.isChecked();
       final boolean isRemoveZeros = _action_ShowZeroValues.isChecked() == false;
+      final boolean isGroupValues = _action_GroupValues.isChecked();
 
-      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw, isCSVFormat, isRemoveZeros);
+      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw,
+            isCSVFormat,
+            isRemoveZeros,
+            isGroupValues);
 
       // keep scroll positions
       final int topIndex = _txtStatValues.getTopIndex();

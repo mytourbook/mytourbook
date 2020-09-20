@@ -443,7 +443,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _comboYear.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+                  onSelectYear(true);
                }
             });
          }
@@ -466,7 +466,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+                  onSelectYear(true);
                }
             });
          }
@@ -658,7 +658,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       updateStatistic_10_NoReload();
    }
 
-   private void onSelectYear() {
+   private void onSelectYear(final boolean isUpdateStatistic) {
 
       final int selectedItem = _comboYear.getSelectionIndex();
 
@@ -689,7 +689,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
-         updateStatistic_10_NoReload();
+         if (isUpdateStatistic) {
+            updateStatistic_10_NoReload();
+         }
       }
    }
 
@@ -844,7 +846,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       refreshYearCombobox();
       selectYear(defaultYear);
       // We trigger the update of _comboNumberOfYears
-      onSelectYear();
+      onSelectYear(false);
 
       // select number of years
       final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
@@ -988,7 +990,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       selectYear(-1);
 
       // update number of years is _comboNumberOfYears
-      onSelectYear();
+      onSelectYear(false);
 
       // tell all existing statistics the data have changed
       for (final TourbookStatistic statistic : getAvailableStatistics()) {
