@@ -1820,7 +1820,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          final String sql = "SELECT " // 																//$NON-NLS-1$
                //
                + " photoId, " //											1 //$NON-NLS-1$
-               + (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
+               + (UI.SPACE1 + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$
                //
                + " adjustedTime, " //										3 //$NON-NLS-1$
                + " imageExifTime, " //										4 //$NON-NLS-1$

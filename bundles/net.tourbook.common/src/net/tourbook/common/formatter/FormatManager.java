@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,12 +45,18 @@ public class FormatManager {
    private static IValueFormatter        _pulseFormatter;
    private static IValueFormatter        _speedFormatter;
 
-   private static IValueFormatter        _drivingTimeFormatter;
+   private static IValueFormatter        _elapsedTimeFormatter;
+   private static IValueFormatter        _recordedTimeFormatter;
    private static IValueFormatter        _pausedTimeFormatter;
-   private static IValueFormatter        _recordingTimeFormatter;
+   private static IValueFormatter        _movingTimeFormatter;
+   private static IValueFormatter        _breakTimeFormatter;
 
    public static String formatAltitude(final float value) {
       return _altitudeFormatter.printDouble(value);
+   }
+
+   public static String formatBreakTime(final long value) {
+      return _breakTimeFormatter.printLong(value);
    }
 
    public static String formatCadence(final double value) {
@@ -61,8 +67,12 @@ public class FormatManager {
       return _distanceFormatter.printDouble(value);
    }
 
-   public static String formatDrivingTime(final long value) {
-      return _drivingTimeFormatter.printLong(value);
+   public static String formatElapsedTime(final long value) {
+      return _elapsedTimeFormatter.printLong(value);
+   }
+
+   public static String formatMovingTime(final long value) {
+      return _movingTimeFormatter.printLong(value);
    }
 
    public static String formatNumber_0(final double value) {
@@ -90,8 +100,8 @@ public class FormatManager {
       return _pulseFormatter.printDouble(value);
    }
 
-   public static String formatRecordingTime(final long value) {
-      return _recordingTimeFormatter.printLong(value);
+   public static String formatRecordedTime(final long value) {
+      return _recordedTimeFormatter.printLong(value);
    }
 
    public static String formatSpeed(final double value) {
@@ -195,9 +205,11 @@ public class FormatManager {
       final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
       final String speed = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
 
-      final String drivingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+      final String elapsedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
+      final String recordedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
       final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
-      final String recordingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
+      final String movingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
+      final String breakTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
 
       _altitudeFormatter = getNumberFormatter(altitude);
       _cadenceFormatter = getNumberFormatter(cadence);
@@ -206,8 +218,10 @@ public class FormatManager {
       _pulseFormatter = getNumberFormatter(pulse);
       _speedFormatter = getNumberFormatter(speed);
 
-      _drivingTimeFormatter = getTimeFormatter(drivingTime);
+      _elapsedTimeFormatter = getTimeFormatter(elapsedTime);
+      _recordedTimeFormatter = getTimeFormatter(recordedTime);
       _pausedTimeFormatter = getTimeFormatter(pausedTime);
-      _recordingTimeFormatter = getTimeFormatter(recordingTime);
+      _movingTimeFormatter = getTimeFormatter(movingTime);
+      _breakTimeFormatter = getTimeFormatter(breakTime);
    }
 }

@@ -22,73 +22,73 @@ import org.eclipse.swt.graphics.Image;
  */
 public class HoveredAreaContext {
 
-	/**
-	 * Tour tool tip provider which provides a tool tip for the hovered area.
-	 */
-	public ITourToolTipProvider	tourToolTipProvider;
+   /**
+    * Tour tool tip provider which provides a tool tip for the hovered area.
+    */
+   public ITourToolTipProvider tourToolTipProvider;
 
-	/**
-	 * Image which is displayed when the mouse is hovered over the hovered area, when
-	 * <code>null</code> an hovered image is not available.
-	 */
-	public Image				hoveredImage;
+   /**
+    * Image which is displayed when the mouse is hovered over the hovered area, when
+    * <code>null</code> an hovered image is not available.
+    */
+   public Image                hoveredImage;
 
-	/**
-	 * Left corner of the hovereded area relativ to the client area
-	 */
-	public int					hoveredTopLeftX;
+   /**
+    * Left corner of the hovereded area relativ to the client area
+    */
+   public int                  hoveredTopLeftX;
 
-	/**
-	 * top corner of the hovereded area
-	 */
-	public int					hoveredTopLeftY;
+   /**
+    * top corner of the hovereded area
+    */
+   public int                  hoveredTopLeftY;
 
-	/**
-	 * Hovered area width
-	 */
-	public int					hoveredWidth;
+   /**
+    * Hovered area width
+    */
+   public int                  hoveredWidth;
 
-	/**
-	 * Hovered area height
-	 */
-	public int					hoveredHeight;
+   /**
+    * Hovered area height
+    */
+   public int                  hoveredHeight;
 
-	/**
-	 * @param tourToolTipProvider
-	 * @param hoveredArea
-	 * @param devTopLeftX
-	 * @param devTopLeftY
-	 * @param devWidth
-	 * @param devHeight
-	 */
-	public HoveredAreaContext(	final ITourToolTipProvider tourToolTipProvider,
-								final IHoveredArea hoveredArea,
-								final int devTopLeftX,
-								final int devTopLeftY,
-								final int devWidth,
-								final int devHeight) {
+   /**
+    * @param tourToolTipProvider
+    * @param hoveredArea
+    * @param devTopLeftX
+    * @param devTopLeftY
+    * @param devWidth
+    * @param devHeight
+    */
+   public HoveredAreaContext(final ITourToolTipProvider tourToolTipProvider,
+                             final IHoveredArea hoveredArea,
+                             final int devTopLeftX,
+                             final int devTopLeftY,
+                             final int devWidth,
+                             final int devHeight) {
 
-		this.tourToolTipProvider = tourToolTipProvider;
+      this.tourToolTipProvider = tourToolTipProvider;
 
-		hoveredImage = hoveredArea.getHoveredImage();
+      hoveredImage = hoveredArea.getHoveredImage();
 
-		hoveredTopLeftX = devTopLeftX;
-		hoveredTopLeftY = devTopLeftY;
-		hoveredWidth = devWidth;
-		hoveredHeight = devHeight;
-	}
+      hoveredTopLeftX = devTopLeftX;
+      hoveredTopLeftY = devTopLeftY;
+      hoveredWidth = devWidth;
+      hoveredHeight = devHeight;
+   }
 
-	@Override
-	public String toString() {
-		return "HoveredAreaContext [" // //$NON-NLS-1$
+   @Override
+   public String toString() {
+      return "HoveredAreaContext [" // //$NON-NLS-1$
 //				+ ("tourToolTipProvider=" + tourToolTipProvider + ", ")
 //				+ ("hoveredImage=" + hoveredImage + ", ")
 //				+ ("hoveredTopLeftX=" + hoveredTopLeftX + ", ")
 //				+ ("hoveredTopLeftY=" + hoveredTopLeftY + ", ")
 //				+ ("hoveredWidth=" + hoveredWidth + ", ")
 //				+ ("hoveredHeight=" + hoveredHeight)
-				+ "]" //$NON-NLS-1$
-				+ (" " + this.hashCode()); //$NON-NLS-1$
-	}
+            + "]" //$NON-NLS-1$
+            + (" " + this.hashCode()); //$NON-NLS-1$
+   }
 
 }

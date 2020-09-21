@@ -17,6 +17,8 @@ package net.tourbook.ui;
 
 import java.util.Arrays;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.accessibility.ACC;
@@ -378,7 +380,7 @@ public final class ImageCombo extends Composite {
       final String[] items = getStringsFromTable();
       int textWidth = 0;
       final GC gc = new GC(fLabel);
-      final int spacer = gc.stringExtent(" ").x; //$NON-NLS-1$
+      final int spacer = gc.stringExtent(UI.SPACE1).x;
       for (final String item : items) {
          textWidth = Math.max(gc.stringExtent(item).x, textWidth);
       }

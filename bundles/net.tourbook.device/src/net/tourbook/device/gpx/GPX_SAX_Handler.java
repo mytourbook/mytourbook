@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -179,8 +179,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";        //$NON-NLS-1$
    private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDING_TIME      = "mt:tourRecordingTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";      //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
    private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";          //$NON-NLS-1$
@@ -440,7 +442,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          /**
           * Set tourmarker/waypoints AFTER all tours are created that tourmarker/waypoints are set
-          * only ONCE, otherwise this exception occures:
+          * only ONCE, otherwise this exception occurs:
           * <p>
           * org.hibernate.PersistentObjectException: detached entity passed to persist:
           * net.tourbook.data.TourMarker
@@ -608,14 +610,24 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
+      } else if (name.equals(TAG_MT_TOUR_MOVING_TIME)) {
 
-         _tourData.setTourDrivingTime(getIntValue(charData));
+         _tourData.setTourComputedTime_Moving(getIntValue(charData));
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_RECORDING_TIME)) {
+      } else if (name.equals(TAG_MT_TOUR_ELAPSED_TIME)) {
 
-         _tourData.setTourRecordingTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Elapsed(getLongValue(charData));
+         _isInMT_Tour = false;
+
+      } else if (name.equals(TAG_MT_TOUR_RECORDED_TIME)) {
+
+         _tourData.setTourDeviceTime_Recorded(getLongValue(charData));
+         _isInMT_Tour = false;
+
+      } else if (name.equals(TAG_MT_TOUR_PAUSED_TIME)) {
+
+         _tourData.setTourDeviceTime_Paused(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {
@@ -1089,7 +1101,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _newlyImportedTours.put(tourId, _tourData);
 
          _tourData.computeAltitudeUpDown();
-         _tourData.computeTourDrivingTime();
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed());
+         _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
          finalizeTour_AdjustMarker();
@@ -1386,7 +1399,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       if (_tourData != null) {
 
          /**
-          * This can occure when MT tours are imported and tour metadata are read.
+          * This can occur when MT tours are imported and tour metadata are read.
           * <p>
           * When an MT tour is imported, there can be only 1 tour in a gpx file. The export of
           * multiple tours with MT data is disabled in the export dialog.
@@ -1496,7 +1509,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          if (name.equals(TAG_GPX)) {
 
             /*
-             * get version of the xml file
+             * get version of the XML file
              */
             for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 
@@ -1613,8 +1626,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             || name.equals(TAG_MT_TOUR_START_TIME)
             || name.equals(TAG_MT_TOUR_END_TIME)
-            || name.equals(TAG_MT_TOUR_DRIVING_TIME)
-            || name.equals(TAG_MT_TOUR_RECORDING_TIME)
+            || name.equals(TAG_MT_TOUR_MOVING_TIME)
+            || name.equals(TAG_MT_TOUR_ELAPSED_TIME)
 
             || name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)
             || name.equals(TAG_MT_TOUR_ALTITUDE_UP)
@@ -1706,7 +1719,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       } else if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
          /*
-          * new trackpoing
+          * new trackpoint
           */
          _isInTrkPt = true;
 

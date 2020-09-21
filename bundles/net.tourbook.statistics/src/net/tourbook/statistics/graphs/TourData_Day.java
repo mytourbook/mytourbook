@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ public class TourData_Day {
 
    int[]                          yearValues;
    int[]                          monthValues;
+   int[]                          dayValues;
    int[]                          weekValues;
 
    private int[]                  _doyValues;
@@ -56,8 +57,10 @@ public class TourData_Day {
    private float[]                _durationLowFloat;
    private float[]                _durationHighFloat;
 
-   int[]                          allRecordingTime;
-   int[]                          allDrivingTime;
+   int[]                          allDeviceTime_Elapsed;
+   int[]                          allComputedTime_Moving;
+   int[]                          allDeviceTime_Recorded;
+   int[]                          allDeviceTime_Paused;
 
    int[]                          allStartTime;
    int[]                          allEndTime;
@@ -72,6 +75,8 @@ public class TourData_Day {
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;
+
+   String                         statisticValuesRaw;
 
    /**
     * Contains the tags for the tour where the key is the tour ID

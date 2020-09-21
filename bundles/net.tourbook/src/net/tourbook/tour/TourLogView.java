@@ -190,7 +190,7 @@ public class TourLogView extends ViewPart {
 
                // message
                      + "var td = document.createElement('TD');\n" //$NON-NLS-1$
-                     + "td.className='column " + subItem + " " + css + "';\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                     + "td.className='column " + subItem + UI.SPACE1 + css + "';\n" //$NON-NLS-1$ //$NON-NLS-2$
                      + tdContent
 
                      + "tr.appendChild(td);\n" //$NON-NLS-1$

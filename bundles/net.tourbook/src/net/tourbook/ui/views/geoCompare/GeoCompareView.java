@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -355,12 +355,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.distance - item2.distance;
             break;
 
-         case TableColumnFactory.TIME_DRIVING_TIME_ID:
+         case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:
             rc = item1.movingTime - item2.movingTime;
             break;
 
-         case TableColumnFactory.TIME_RECORDING_TIME_ID:
-            rc = item1.recordingTime - item2.recordingTime;
+         case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:
+            rc = item1.elapsedTime - item2.elapsedTime;
             break;
 
          default:
@@ -641,7 +641,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       updateUI_GeoItem(null);
 
-      // delay tour comparator, moving the slider can occure very often
+      // delay tour comparator, moving the slider can occur very often
       _parent.getDisplay().timerExec(DELAY_BEFORE_STARTING_COMPARE, new Runnable() {
 
          private int __runningId = runnableRunningId;
@@ -1280,7 +1280,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * Ceate the view context menus
+    * Create the view context menus
     */
    private void createUI_82_ContextMenu() {
 
@@ -1301,8 +1301,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       defineColumn_Body_AvgPulse();
 
-      defineColumn_Time_DrivingTime();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_MovingTime();
+      defineColumn_Time_ElapsedTime();
 
       defineColumn_Tour_Type();
       defineColumn_Tour_Title();
@@ -1504,11 +1504,33 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * Column: Driving time (h)
+    * Column: Elapsed time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final long value = item.elapsedTime;
+
+            colDef.printLongValue(cell, value, true);
+         }
+      });
+   }
+
+   /**
+    * Column: Moving time (h)
+    */
+   private void defineColumn_Time_MovingTime() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -1521,28 +1543,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
             final long value = item.movingTime;
-
-            colDef.printLongValue(cell, value, true);
-         }
-      });
-   }
-
-   /**
-    * Column: Driving time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TableColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
-
-            final long value = item.recordingTime;
 
             colDef.printLongValue(cell, value, true);
          }
