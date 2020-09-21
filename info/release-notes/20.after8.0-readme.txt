@@ -2,9 +2,10 @@
 
 
 TODO's
-======  
-*
 
+======  
+* !!! Translators need new babel editor plugin when using Eclipse 2020-09 !!!
+  http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
 New
 ===
