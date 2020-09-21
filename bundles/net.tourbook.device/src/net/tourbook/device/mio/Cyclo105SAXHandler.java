@@ -328,7 +328,8 @@ public class Cyclo105SAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 
