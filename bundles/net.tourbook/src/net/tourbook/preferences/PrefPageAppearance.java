@@ -119,7 +119,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          createUI_10_Tagging(_uiContainer);
          createUI_20_LogFont(_uiContainer);
          createUI_30_OtherOptions(_uiContainer);
-         createUI_40_PaceDisplay(_uiContainer);
+         createUI_40_PaceSpeedDisplay(_uiContainer);
       }
 
       return _uiContainer;
@@ -263,8 +263,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_40_PaceDisplay(final Composite parent) {
+   private void createUI_40_PaceSpeedDisplay(final Composite parent) {
 
+      //TODO FB Have the speed also use this preference
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       group.setText(Messages.Pref_Appearance_Group_PaceDisplay);
