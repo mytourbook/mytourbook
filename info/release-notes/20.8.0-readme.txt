@@ -1,0 +1,195 @@
+20.8                                                      4. August 2020
+
+New   
+===
+
+* Flat Tour Book View
+  - Tours can be sorted
+    - By almost all columns except when a column is computed or has a 
+      SQL relation
+    - By using multiple columns (the Alt key has to be pressed)
+  - Columns can be freezed for horizontal scrolling (freeze action is in 
+    the header context menu)
+
+* 2.5D Map (Thomas)
+  - New online provider mapilion, the old default provider 
+    opensciencemap is dead
+  - New layer with satellite maps PR 158
+  - New layer with linked photos
+
+* Dropbox Integration (Frederic)
+  - Ability to connect a Dropbox account to MyTourbook, and also 
+    choosing a specific a folder for this account.
+    This Dropbox folder can be set up as a device to watch in the Easy 
+    Import Dashboard. In this case, added or deleted files will be 
+    automatically and immediately detected.
+
+* Import Suunto Quest Files (Frederic)
+
+ 
+Improvements   
+============
+
+* Tour Book View (Frederic)
+  - Adding the ability to bulk edit the weather conditions
+
+* Statistics (Frederic)
+  - The number of years to be displayed in the graph is now dynamically 
+    filled and updated based on the number of available years
+
+* Calendar View
+  - Tour pulse/power average values can be displayed in the tour (day) 
+    content cell
+
+* 2D Map
+  - The enhanced painting warning can be hidden in the track options 
+    slideout
+
+* 2.5D Map (Thomas)
+  - Storing marker position into map bookmark. currently not further 
+    used PR 158
+  - "S3DB" layer. when using offline mapsforge V5 maps, Buildings are 
+    looking nicely
+  - VTM map engine updated to version 0.13 PR 167
+  - When multiple map files are in the same folder, mt automatically 
+    switching between them
+  - Switching between online/offline is working almost correct now, 
+    without app restart
+
+* Tour Chart (Frederic)
+  - Adding the ability to select all the time slices in between the left 
+    and right sliders
+
+* Tour Marker View (Frederic)
+  - Added the Average Speed column
+
+* Photo View
+  - Show selected/hovered folder in the Photo view with more contrast 
+    which makes it better readable
+
+* Dialog Adjust Elevation
+  - Show elevation gain/loss values before and after the adjustment, 
+    supported adjustment type: "Approach elevation with SRTM data"  
+
+* Tour Tooltip (Frederic)
+  - Added the maximum pace (^ Pace)
+
+* Tree/Table Columns
+  - A new column is now added at the current mouse position and not at 
+    the end (nobody complained it)
+
+* Keyboard Shortcuts
+  - Ctrl+W - Close current view or tour
+  - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
+
+* Better Imperial Unit Support (rtdog)
+  - Changed first run wizard so that user can select units before 
+    configuring first user PR 204
+  - Changed user height unit to feet and inches instead of meters for 
+    users using imperial units PR 204
+
+ 
+UI Themes   
+=========
+
+MyTourbook is now using the Eclipse "e4_default" theme, other internal 
+themes can also be used by adding one of these commandline parameters 
+(including dash!):
+
+  -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
+  -cssTheme org.eclipse.e4.ui.css.theme.e4_default
+  -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
+
+  - The "dark" theme can be used but MyTourbook is not yet prepared for 
+    it
+  - The "classic" theme is a little bit different compared with the 
+    theme in MyTourbook before 20.8
+
+ 
+Changes  
+=======
+
+* Tour Book View
+  - Any existing column profiles must be recreated
+  - The csv export is now exporting all Tour Book view columns, existing 
+    csv column headers may also be modified
+
+* Tour Editor View - Swim Slices (Frederic)
+  - Renamed the column "Strokes" to "Stk/length"
+    (Number of strokes per length)
+  - Renamed the column "Cadence" to "Stk/min"
+    (Number of strokes per minute)
+
+* Suunto 9 (Frederic)
+  - Support for activities that are split into several physical files 
+    (i.e.: long activities)
+
+ 
+Bugfix   
+======
+
+* TCX Import (Frederic)
+  - Fixed an issue where the distance data and display were erroneous 
+    since the distance is reset at each new lap
+
+* GPX/TCX Export (Frederic)
+  - Fixed and updated the GPX/TCX export templates as the file 
+    validation was failing against the schemas
+
+* Easy Import (Frederic)
+  - When importing files, the tour type is set only if it is checked in 
+    the launcher configuration
+
+* EasyImport (rtdog)
+  - Added feature to allow interruption of filesystems in 
+    EasyImportManager which allows DropBox to perform better PR 211
+  - Removed a few synchronization issues to prevent spurious errors
+
+* 3D Map (Frederic)
+  - Removed the deprecated or unavailable layers
+    - ID_USDA_NAIP
+    - ID_USDA_NAIP_USGS
+    - MS Virtual Earth Aerial
+  - Added the layers
+    - USGS NAIP PLUS
+    - USGS Topo Base Map
+    - USGS Topo Base Map Large
+  - Disabled the actions when the data series are not available
+  - Fixed an issue where the Atmosphere and Scale layers would not 
+    appear when using MyTourbook in French
+  - 3D Map colors: Fixed the pace ranges from seconds to minutes for 
+    better readability
+
+* Tour Editor
+  - Show daytime with am/pm in time slices/swim slices when imperial 
+    measurement system is selected
+  - Fixed daytime to be not >24h
+
+* Tour Editor Save (rtdog)
+  - Using the hotkey to save a modified tour on TourData Editor saved to 
+    DB but not on local screen PR 201
+
+* Tour Filter (Frederic)
+  - When filtering on start dates, the filters "Greater Than or Equal", 
+    "Less than", "Equals", "Not Equals" were not working
+
+ 
+Translation    
+===========
+
+* French (Frederic)
+* German
+* Italian (Doriano)
+
+ 
+System   
+======
+
+* Java 9+ runtime support
+  - Java 9+ is working but these issues can occure, depending on the 
+    used Java VM and OS
+    - 2.5D map can crash the application
+    - 3D map could not be displayed
+  - Java 8 is currently the least headache-causing platform
+* Eclipse 2020-06
+* FIT SDK 21.32
