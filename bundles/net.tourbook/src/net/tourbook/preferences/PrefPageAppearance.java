@@ -119,7 +119,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          createUI_10_Tagging(_uiContainer);
          createUI_20_LogFont(_uiContainer);
          createUI_30_OtherOptions(_uiContainer);
-         createUI_40_PaceSpeedDisplay(_uiContainer);
+         createUI_40_PaceAndSpeedDisplay(_uiContainer);
       }
 
       return _uiContainer;
@@ -263,20 +263,19 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_40_PaceSpeedDisplay(final Composite parent) {
+   private void createUI_40_PaceAndSpeedDisplay(final Composite parent) {
 
-      //TODO FB Have the speed also use this preference
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(Messages.Pref_Appearance_Group_PaceDisplay);
+      group.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
          /*
-          * Time to use for pace computation
+          * Time to use for pace and speed computation
           */
          final Label label = new Label(group, NONE);
-         label.setText(Messages.pref_appearance_pace_computation_option);
-         label.setToolTipText(Messages.pref_appearance_pace_computation_option_tooltip);
+         label.setText(Messages.pref_appearance_paceandspeed_computation_option);
+         label.setToolTipText(Messages.pref_appearance_paceandspeed_computation_option_tooltip);
 
          // Recorded time
          _rdoDeviceTime_Recorded = new Button(group, SWT.RADIO);
@@ -392,9 +391,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
 
-      final boolean isPaceFromRecordedTime = _prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      _rdoDeviceTime_Recorded.setSelection(isPaceFromRecordedTime);
-      _rdoComputedTime_Moving.setSelection(!isPaceFromRecordedTime);
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      _rdoDeviceTime_Recorded.setSelection(isPaceAndSpeedFromRecordedTime);
+      _rdoComputedTime_Moving.setSelection(!isPaceAndSpeedFromRecordedTime);
 
       super.performDefaults();
 
@@ -450,7 +449,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.setPreferenceStore(_prefStore);
       _valueFontEditor.load();
 
-      _rdoDeviceTime_Recorded.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME));
+      _rdoDeviceTime_Recorded.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME));
       _rdoComputedTime_Moving.setSelection(!_rdoDeviceTime_Recorded.getSelection());
    }
 
@@ -464,6 +463,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
    }
 }

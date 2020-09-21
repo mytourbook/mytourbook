@@ -640,9 +640,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final long dbDistance = tourItem.colTourDistance;
       final long dbRecordedTime = tourItem.colTourDeviceTime_Recorded;
       final long dbMovingTime = tourItem.colTourComputedTime_Moving;
-      tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final long time = isPaceFromRecordedTime ? dbRecordedTime : dbMovingTime;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? dbRecordedTime : dbMovingTime;
+      tourItem.colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000 / dbDistance;
 
       tourItem.colTourComputedTime_Break = tourItem.colTourDeviceTime_Elapsed - tourItem.colTourComputedTime_Moving;
@@ -675,11 +675,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colMaxSpeed                      = result.getFloat(startIndex + 6);
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? colTourDeviceTime_Recorded : colTourComputedTime_Moving;
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed                      = colTourComputedTime_Moving == 0 ? 0 : 3.6f * colTourDistance / colTourComputedTime_Moving;
-
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final long time = isPaceFromRecordedTime ? colTourDeviceTime_Recorded : colTourComputedTime_Moving;
+      colAvgSpeed                      = time == 0 ? 0 : 3.6f * colTourDistance / time;
       colAvgPace                       = colTourDistance == 0 ? 0 : time * 1000f / colTourDistance;
 
       colMaxAltitude                   = result.getLong(startIndex + 7);

@@ -258,9 +258,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourTimeData.tourDistanceValues[valueIndex];
-      final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final int time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
+      final float speed = time == 0 ? 0 : distance / (time / 3.6f);
       final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final String tourTimeZoneOffset = _tourTimeData.tourTimeZoneOffset.get(valueIndex);

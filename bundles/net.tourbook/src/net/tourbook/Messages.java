@@ -1505,7 +1505,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
-   public static String        Pref_Appearance_Group_PaceDisplay;
+   public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
 
    public static String        Pref_Appearance_Label_AutoOpenTagging_Tooltip;
@@ -1729,8 +1729,8 @@ public class Messages extends NLS {
 
    public static String        pref_appearance_number_of_recent_tags;
    public static String        pref_appearance_number_of_recent_tags_tooltip;
-   public static String        pref_appearance_pace_computation_option;
-   public static String        pref_appearance_pace_computation_option_tooltip;
+   public static String        pref_appearance_paceandspeed_computation_option;
+   public static String        pref_appearance_paceandspeed_computation_option_tooltip;
    public static String        pref_appearance_showMemoryMonitor;
    public static String        pref_appearance_showMemoryMonitor_message;
    public static String        pref_appearance_showMemoryMonitor_title;

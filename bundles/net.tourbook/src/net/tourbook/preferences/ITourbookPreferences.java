@@ -451,7 +451,7 @@ public interface ITourbookPreferences {
    public static final String APPEARANCE_SHOW_MEMORY_MONITOR         = "appearance.show-memory-monitor";                    //$NON-NLS-1$
    public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
 
-   public static final String APPEARANCE_IS_PACE_FROM_RECORDED_TIME  = "Appearance.IsPaceFromRecordedTime";                 //$NON-NLS-1$
+   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
    public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN        = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
    public static final String APPEARANCE_IS_TAGGING_ANIMATION        = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
    public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY     = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
