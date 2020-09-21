@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,8 +38,8 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
    private ActionReimport_OnlyTimeSlices            _actionReimport_OnlyTimeSlices;
    private ActionReimport_OnlyTourMarker            _actionReimport_OnlyTourMarker;
 
-   private ActionReimport_OnlyAltitudeValues        _actionReimport_OnlyAltitudeValues;
    private ActionReimport_OnlyCadenceValues         _actionReimport_OnlyCadenceValues;
+   private ActionReimport_OnlyElevationValues       _actionReimport_OnlyElevationValues;
    private ActionReimport_OnlyGearValues            _actionReimport_OnlyGearValues;
    private ActionReimport_OnlyPowerPulseValues      _actionReimport_OnlyPowerPulseValues;
    private ActionReimport_OnlyPowerSpeedValues      _actionReimport_OnlyPowerSpeedValues;
@@ -63,18 +63,6 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
 
    }
 
-   private class ActionReimport_OnlyAltitudeValues extends Action {
-
-      public ActionReimport_OnlyAltitudeValues() {
-         setText(Messages.Import_Data_Action_Reimport_OnlyAltitudeValues);
-      }
-
-      @Override
-      public void run() {
-         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
-      }
-   }
-
    private class ActionReimport_OnlyCadenceValues extends Action {
 
       public ActionReimport_OnlyCadenceValues() {
@@ -84,6 +72,18 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
       @Override
       public void run() {
          RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyCadenceValues, _tourViewer);
+      }
+   }
+
+   private class ActionReimport_OnlyElevationValues extends Action {
+
+      public ActionReimport_OnlyElevationValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyAltitudeValues);
+      }
+
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
       }
    }
 
@@ -213,8 +213,8 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
       _actionReimport_OnlyTimeSlices = new ActionReimport_OnlyTimeSlices();
       _actionReimport_OnlyTourMarker = new ActionReimport_OnlyTourMarker();
 
-      _actionReimport_OnlyAltitudeValues = new ActionReimport_OnlyAltitudeValues();
       _actionReimport_OnlyCadenceValues = new ActionReimport_OnlyCadenceValues();
+      _actionReimport_OnlyElevationValues = new ActionReimport_OnlyElevationValues();
       _actionReimport_OnlyGearValues = new ActionReimport_OnlyGearValues();
       _actionReimport_OnlyPowerPulseValues = new ActionReimport_OnlyPowerPulseValues();
       _actionReimport_OnlyPowerSpeedValues = new ActionReimport_OnlyPowerSpeedValues();
@@ -235,8 +235,8 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
 
    private void fillMenu(final Menu menu) {
 
-      new ActionContributionItem(_actionReimport_OnlyAltitudeValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyCadenceValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyElevationValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyGearValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyPowerPulseValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyPowerSpeedValues).fill(menu, -1);

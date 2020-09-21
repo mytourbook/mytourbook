@@ -3846,7 +3846,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeGeo_Bounds() {
 
-      if (latitudeSerie == null || longitudeSerie == null) {
+      if (latitudeSerie == null || longitudeSerie == null || latitudeSerie.length == 0 || longitudeSerie.length == 0) {
          return;
       }
 
@@ -6799,7 +6799,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private int getBreakTime() {
 
-      if (timeSerie == null) {
+      if (timeSerie == null || timeSerie.length == 0) {
          return 0;
       }
 
