@@ -460,16 +460,8 @@ public class SuuntoJsonProcessor {
 
       tourData.createTimeSeries(_sampleList, true);
 
-      long pausedTime = 0;
-      if (_pausedTime_Start.size() > 0) {
-
-         tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
-         tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
-         pausedTime = tourData.getTotalTourTimerPauses();
-         tourData.setTourDeviceTime_Paused(pausedTime);
-      }
-
-      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - pausedTime);
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 

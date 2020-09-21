@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
@@ -1317,12 +1319,12 @@ public class RawDataManager {
          long totalTourTimerPauses = 0;
          final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
          if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-            oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
-            oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
-            totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
-         } else {
-            totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();
+            final List<Long> listPausedTime_Start = Arrays.stream(reimportedTourData.getPausedTime_Start()).boxed().collect(Collectors.toList());
+            final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().collect(Collectors.toList());
+            oldTourData.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End);
          }
+
+         totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();
 
          oldTourData.setTourDeviceTime_Paused(totalTourTimerPauses);
       }

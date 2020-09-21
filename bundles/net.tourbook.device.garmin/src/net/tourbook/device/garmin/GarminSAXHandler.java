@@ -622,8 +622,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
-      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
-
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
       final Long tourId = tourData.createTourId(uniqueId);
@@ -635,6 +633,9 @@ public class GarminSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
+
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();

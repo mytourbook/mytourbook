@@ -243,9 +243,13 @@ public class FitData {
 
       _tourData.createTimeSeries(_allTimeData, false);
 
-      //We set the recorded time again as the elapsed time might have changed (+- few seconds)
-      //after the time series were created.
       _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      final long tourDeviceTimePaused = _tourData.getTourDeviceTime_Paused();
+      if (tourDeviceTimePaused > 0) {
+         //For the tours with pauses, we set the recorded time again as the elapsed time might have changed (+- few seconds)
+         //after the time series were created.
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
+      }
 
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -277,7 +281,6 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
-
       }
    }
 

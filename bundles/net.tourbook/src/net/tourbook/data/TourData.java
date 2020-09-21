@@ -6714,10 +6714,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
 
-      final long totalTourTimerPauses = getTotalTourTimerPauses();
-
-      setTourDeviceTime_Recorded(getTourDeviceTime_Elapsed() - totalTourTimerPauses);
-      setTourDeviceTime_Paused(totalTourTimerPauses);
+      setTourDeviceTime_Paused(getTotalTourTimerPauses());
    }
 
    /**
@@ -8336,7 +8333,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tzId;
    }
 
-   public long getTotalTourTimerPauses() {
+   private long getTotalTourTimerPauses() {
 
       if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
             pausedTime_End == null || pausedTime_End.length == 0) {
