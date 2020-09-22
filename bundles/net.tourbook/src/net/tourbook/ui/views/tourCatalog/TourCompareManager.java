@@ -179,7 +179,7 @@ public class TourCompareManager {
             comparedTourItem.computedStartIndex,
             comparedTourItem.computedEndIndex);
 
-      final int tourRecordingTime = TourManager.computeTourRecordingTime(
+      final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(
             tourData,
             comparedTourItem.computedStartIndex,
             comparedTourItem.computedEndIndex);
@@ -196,7 +196,7 @@ public class TourCompareManager {
 
       comparedTour.setAvgPulse(avgPulse);
       comparedTour.setTourSpeed(speed);
-      comparedTour.setTourRecordingTime(tourRecordingTime);
+      comparedTour.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
 
       // persist entity
       ts.begin();
@@ -209,7 +209,7 @@ public class TourCompareManager {
       comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
 
       comparedTourItem.dbSpeed = speed;
-      comparedTourItem.dbRecordingTime = tourRecordingTime;
+      comparedTourItem.dbElapsedTime = tourDeviceTime_Elapsed;
    }
 
    public void clearCompareResult() {
@@ -393,16 +393,16 @@ public class TourCompareManager {
       compareResultItem.normalizedEndIndex = normCompareIndexStart + normIndexDiff;
 
       final float compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
-      final int recordingTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-      final int drivingTime = Math.max(0, recordingTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+      final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
+      final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
-      compareResultItem.compareDrivingTime = drivingTime;
-      compareResultItem.compareRecordingTime = recordingTime;
+      compareResultItem.compareMovingTime = movingTime;
+      compareResultItem.compareElapsedTime = elapsedTime;
       compareResultItem.compareDistance = compareDistance;
-      compareResultItem.compareSpeed = compareDistance / drivingTime * 3.6f;
+      compareResultItem.compareSpeed = compareDistance / movingTime * 3.6f;
       compareResultItem.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
 
-      compareResultItem.timeIntervall = compareTourData.getDeviceTimeInterval();
+      compareResultItem.timeInterval = compareTourData.getDeviceTimeInterval();
 
       return compareResultItem;
    }

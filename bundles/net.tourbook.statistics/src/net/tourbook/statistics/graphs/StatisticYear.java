@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -130,9 +130,11 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
-      final int recordingTime = _tourYearData.recordingTime[serieIndex][valueIndex];
-      final int drivingTime = _tourYearData.drivingTime[serieIndex][valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final int elapsedTime = _tourYearData.elapsedTime[serieIndex][valueIndex];
+      final int recordedTime = _tourYearData.recordedTime[serieIndex][valueIndex];
+      final int pausedTime = _tourYearData.pausedTime[serieIndex][valueIndex];
+      final int movingTime = _tourYearData.movingTime[serieIndex][valueIndex];
+      final int breakTime = elapsedTime - movingTime;
 
       /*
        * tool tip: title
@@ -164,9 +166,13 @@ public abstract class StatisticYear extends TourbookStatistic {
       toolTipFormat.append(Messages.tourtime_info_altitude);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recording_time);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_driving_time);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_paused_time);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_moving_time);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(Messages.tourtime_info_break_time);
       toolTipFormat.append(UI.NEW_LINE);
@@ -183,11 +189,17 @@ public abstract class StatisticYear extends TourbookStatistic {
             (int) _resortedAltitudeHigh[serieIndex][valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
             //
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            //
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            //
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
             //
             breakTime / 3600,
             (breakTime % 3600) / 60,
@@ -558,6 +570,8 @@ public abstract class StatisticYear extends TourbookStatistic {
                   statContext.statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
+
+      statContext.outStatisticValuesRaw = _tourYearData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

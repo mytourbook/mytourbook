@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -187,9 +187,11 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final String beginDate = _dateFormatter.format(dateStart);
       final String endDate = _dateFormatter.format(dateEnd);
 
-      final Integer recordingTime = _tourWeekData.recordingTime[serieIndex][valueIndex];
-      final Integer drivingTime = _tourWeekData.drivingTime[serieIndex][valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final Integer elapsedTime = _tourWeekData.elapsedTime[serieIndex][valueIndex];
+      final Integer recordedTime = _tourWeekData.recordedTime[serieIndex][valueIndex];
+      final Integer pausedTime = _tourWeekData.pausedTime[serieIndex][valueIndex];
+      final Integer movingTime = _tourWeekData.movingTime[serieIndex][valueIndex];
+      final int breakTime = elapsedTime - movingTime;
 
       final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _appTourTypeFilter);
 
@@ -220,9 +222,13 @@ public abstract class StatisticWeek extends TourbookStatistic {
       toolTipFormat.append(Messages.tourtime_info_altitude);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recording_time);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_driving_time);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_paused_time);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_moving_time);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(Messages.tourtime_info_break_time);
       toolTipFormat.append(UI.NEW_LINE);
@@ -241,11 +247,17 @@ public abstract class StatisticWeek extends TourbookStatistic {
             (int) _tourWeekData.altitudeHigh[serieIndex][valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
             //
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            //
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            //
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
             //
             breakTime / 3600,
             (breakTime % 3600) / 60,

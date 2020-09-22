@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -292,16 +292,21 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final int[] startValue = _tourDayData.allStartTime;
       final int[] endValue = _tourDayData.allEndTime;
 
-      final int recordingTime = _tourDayData.allRecordingTime[valueIndex];
-      final int drivingTime = _tourDayData.allDrivingTime[valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final int elapsedTime = _tourDayData.allDeviceTime_Elapsed[valueIndex];
+      final int movingTime = _tourDayData.allComputedTime_Moving[valueIndex];
+      final int breakTime = elapsedTime - movingTime;
+      final int recordedTime = _tourDayData.allDeviceTime_Recorded[valueIndex];
+      final int pausedTime = _tourDayData.allDeviceTime_Paused[valueIndex];
 
       final ZonedDateTime zdtTourStart = _tourDayData.allStartDateTimes.get(valueIndex);
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourDayData.allDistance[valueIndex];
-      final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-      final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
+      final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final StringBuilder toolTipFormat = new StringBuilder();
       toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //      %s - %s - %s - CW %d
@@ -315,9 +320,13 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       toolTipFormat.append(Messages.tourtime_info_time);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time_tour);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_paused_time_tour);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_moving_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(Messages.tourtime_info_break_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
@@ -367,18 +376,31 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             // end time
             (tourEndTime / 3600) % 24,
             (tourEndTime % 3600) / 60,
-            //
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
-            (recordingTime % 3600) % 60,
-            //
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
-            (drivingTime % 3600) % 60,
-            //
+            // elapsed time
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
+            (elapsedTime % 3600) % 60,
+
+            // recorded time
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+            (recordedTime % 3600) % 60,
+
+            // paused time
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+            (pausedTime % 3600) % 60,
+
+            // moving time
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
+            (movingTime % 3600) % 60,
+
+            // break time
             breakTime / 3600,
             (breakTime % 3600) / 60,
             (breakTime % 3600) % 60,
+
             //
             speed,
             UI.UNIT_LABEL_SPEED,
@@ -722,6 +744,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   statContext.statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
+
+      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

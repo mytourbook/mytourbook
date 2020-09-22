@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,91 +30,111 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class StatisticManager {
 
-	private static ArrayList<TourbookStatistic>	_statisticExtensionPoints;
+   private static ArrayList<TourbookStatistic> _statisticExtensionPoints;
 
-	/**
-	 * This method is synchronized to conform to FindBugs
-	 * 
-	 * @return Returns statistics from the extension registry in the sort order of the registry
-	 */
-	public static synchronized ArrayList<TourbookStatistic> getStatisticExtensionPoints() {
+   /**
+    * Keeps reference to the statistic view, is <code>null</code> when statistic view is closed.
+    */
+   private static StatisticView                _statisticView;
 
-		if (_statisticExtensionPoints != null) {
-			return _statisticExtensionPoints;
-		}
+   /**
+    * This method is synchronized to conform to FindBugs
+    *
+    * @return Returns statistics from the extension registry in the sort order of the registry
+    */
+   public static synchronized ArrayList<TourbookStatistic> getStatisticExtensionPoints() {
 
-		_statisticExtensionPoints = new ArrayList<TourbookStatistic>();
+      if (_statisticExtensionPoints != null) {
+         return _statisticExtensionPoints;
+      }
 
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
-				TourbookPlugin.PLUGIN_ID,
-				TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
+      _statisticExtensionPoints = new ArrayList<>();
 
-		if (extPoint != null) {
+      final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
+            TourbookPlugin.PLUGIN_ID,
+            TourbookPlugin.EXT_POINT_STATISTIC_YEAR);
 
-			for (final IExtension extension : extPoint.getExtensions()) {
+      if (extPoint != null) {
 
-				for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+         for (final IExtension extension : extPoint.getExtensions()) {
 
-					if (configElement.getName().equalsIgnoreCase("statistic")) { //$NON-NLS-1$
+            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-						Object object;
-						try {
-							object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
-							if (object instanceof TourbookStatistic) {
+               if (configElement.getName().equalsIgnoreCase("statistic")) { //$NON-NLS-1$
 
-								final TourbookStatistic statisticItem = (TourbookStatistic) object;
+                  Object object;
+                  try {
+                     object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+                     if (object instanceof TourbookStatistic) {
 
-								statisticItem.plugin_StatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
-								statisticItem.plugin_VisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-								statisticItem.plugin_Category_Data = configElement.getAttribute("category-data"); //$NON-NLS-1$
-								statisticItem.plugin_Category_Time = configElement.getAttribute("category-time"); //$NON-NLS-1$
+                        final TourbookStatistic statisticItem = (TourbookStatistic) object;
 
-								_statisticExtensionPoints.add(statisticItem);
-							}
-						} catch (final CoreException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
+                        statisticItem.plugin_StatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
+                        statisticItem.plugin_VisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+                        statisticItem.plugin_Category_Data = configElement.getAttribute("category-data"); //$NON-NLS-1$
+                        statisticItem.plugin_Category_Time = configElement.getAttribute("category-time"); //$NON-NLS-1$
 
-		return _statisticExtensionPoints;
-	}
+                        _statisticExtensionPoints.add(statisticItem);
+                     }
+                  } catch (final CoreException e) {
+                     e.printStackTrace();
+                  }
+               }
+            }
+         }
+      }
 
-	/**
-	 * @return Returns statistic providers with the custom sort order
-	 */
-	public static ArrayList<TourbookStatistic> getStatisticProviders() {
+      return _statisticExtensionPoints;
+   }
 
-		final ArrayList<TourbookStatistic> availableStatistics = getStatisticExtensionPoints();
-		final ArrayList<TourbookStatistic> visibleStatistics = new ArrayList<TourbookStatistic>();
+   /**
+    * @return Returns statistic providers with the custom sort order
+    */
+   public static ArrayList<TourbookStatistic> getStatisticProviders() {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
-		final String providerIds = prefStore.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS);
+      final ArrayList<TourbookStatistic> availableStatistics = getStatisticExtensionPoints();
+      final ArrayList<TourbookStatistic> visibleStatistics = new ArrayList<>();
 
-		final String[] prefStoreStatisticIds = StringToArrayConverter.convertStringToArray(providerIds);
+      final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
+      final String providerIds = prefStore.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS);
 
-		// get all statistics which are saved in the pref store
-		for (final String statisticId : prefStoreStatisticIds) {
+      final String[] prefStoreStatisticIds = StringToArrayConverter.convertStringToArray(providerIds);
 
-			// get statistic item from the id
-			for (final TourbookStatistic tourbookStatistic : availableStatistics) {
-				if (statisticId.equals(tourbookStatistic.plugin_StatisticId)) {
-					visibleStatistics.add(tourbookStatistic);
-					break;
-				}
-			}
-		}
+      // get all statistics which are saved in the pref store
+      for (final String statisticId : prefStoreStatisticIds) {
 
-		// get statistics which are available but not saved in the prefstore
-		for (final TourbookStatistic availableStatistic : availableStatistics) {
+         // get statistic item from the id
+         for (final TourbookStatistic tourbookStatistic : availableStatistics) {
+            if (statisticId.equals(tourbookStatistic.plugin_StatisticId)) {
+               visibleStatistics.add(tourbookStatistic);
+               break;
+            }
+         }
+      }
 
-			if (visibleStatistics.contains(availableStatistic) == false) {
-				visibleStatistics.add(availableStatistic);
-			}
-		}
+      // get statistics which are available but not saved in the prefstore
+      for (final TourbookStatistic availableStatistic : availableStatistics) {
 
-		return visibleStatistics;
-	}
+         if (visibleStatistics.contains(availableStatistic) == false) {
+            visibleStatistics.add(availableStatistic);
+         }
+      }
+
+      return visibleStatistics;
+   }
+
+   /**
+    * @return the _statisticView
+    */
+   public static StatisticView getStatisticView() {
+      return _statisticView;
+   }
+
+   /**
+    * @param statisticView
+    *           the _statisticView to set
+    */
+   public static void setStatisticView(final StatisticView statisticView) {
+      _statisticView = statisticView;
+   }
 }

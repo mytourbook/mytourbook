@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -71,6 +72,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           TAG_NOTES                   = "Notes";                                                      //$NON-NLS-1$
    private static final String           TAG_RUN_CADENCE             = "RunCadence";                                                 //$NON-NLS-1$
    private static final String           TAG_SENSOR_STATE            = "SensorState";                                                //$NON-NLS-1$
+   private static final String           TAG_TRACK                   = "Track";                                                      //$NON-NLS-1$
    private static final String           TAG_TRACKPOINT              = "Trackpoint";                                                 //$NON-NLS-1$
    private static final String           TAG_TIME                    = "Time";                                                       //$NON-NLS-1$
    private static final String           TAG_VALUE                   = "Value";                                                      //$NON-NLS-1$
@@ -82,6 +84,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           SENSOR_STATE_PRESENT        = "Present";                                                    //$NON-NLS-1$
    private static final String           ATTR_VALUE_SPORT            = "Sport";                                                      //$NON-NLS-1$
 
+   private static final String           DateTimePattern             = "yyyy-MM-dd'T'HH:mm:ss";
    private static final SimpleDateFormat TIME_FORMAT;
    private static final SimpleDateFormat TIME_FORMAT_SSSZ;
    private static final SimpleDateFormat TIME_FORMAT_RFC822;
@@ -99,9 +102,9 @@ public class GarminSAXHandler extends DefaultHandler {
             .toInstant()
             .toEpochMilli();
 
-      TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); //$NON-NLS-1$
+      TIME_FORMAT = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_SSSZ = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_RFC822 = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
 
       TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
       TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
@@ -131,6 +134,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                 _isInRunCadence;
    private boolean                 _isInSensorState;
    private boolean                 _isInTime;
+   private boolean                 _isInTrack;
    private boolean                 _isInTrackpoint;
 
    private boolean                 _isInCreator;
@@ -144,17 +148,19 @@ public class GarminSAXHandler extends DefaultHandler {
    private String                  _importFilePath;
    private boolean                 _isImported;
 
-   private ArrayList<TimeData>     _allTimeData = new ArrayList<>();
+   private final List<Long>        _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private ArrayList<TimeData>     _allTimeData      = new ArrayList<>();
 
    private TimeData                _timeData;
 
-   private int                     _dataVersion = -1;
+   private int                     _dataVersion      = -1;
    private int                     _lapCounter;
    private int                     _trackPointCounter;
 
    private boolean                 _isSetLapMarker;
    private boolean                 _isSetLapStartTime;
-   private ArrayList<Long>         _allLapStart = new ArrayList<>();
+   private ArrayList<Long>         _allLapStart      = new ArrayList<>();
 
    private long                    _currentTime;
    private String                  _activitySport;
@@ -163,7 +169,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                 _isDistanceFromSensor;
    private boolean                 _isFromStrideSensor;
 
-   private StringBuilder           _characters  = new StringBuilder();
+   private StringBuilder           _characters       = new StringBuilder();
 
    private Sport                   _sport;
    private String                  _tourNotes;
@@ -212,7 +218,7 @@ public class GarminSAXHandler extends DefaultHandler {
       final int weekYear = Util.getYearForWeek(jdkCalendar);
 
       sbJdk.append(jdkFormatter.format(dtDate));
-      sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
+      sbJdk.append(UI.SPACE1 + weekYear + " | "); //$NON-NLS-1$
    }
 
 // private static void weekCheck() {
@@ -294,8 +300,8 @@ public class GarminSAXHandler extends DefaultHandler {
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-            sbJoda.append("    "); //$NON-NLS-1$
-            sbJdk.append("    "); //$NON-NLS-1$
+            sbJoda.append(UI.SPACE4);
+            sbJdk.append(UI.SPACE4);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -319,7 +325,7 @@ public class GarminSAXHandler extends DefaultHandler {
    /**
     * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
     * partly corrupt. When tour starts with the date 2007-04-01, move forward in the list until
-    * another date occures and use this as the start date.
+    * another date occurs and use this as the start date.
     */
    private void adjustTourStart() {
 
@@ -462,10 +468,21 @@ public class GarminSAXHandler extends DefaultHandler {
       }
    }
 
+   private void cleanTimerPauses() {
+
+      if (_pausedTime_Start.size() == 0) {
+         return;
+      }
+
+      _pausedTime_Start.remove(_pausedTime_Start.size() - 1);
+   }
+
    public void dispose() {
 
       _allLapStart.clear();
       _allTimeData.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    @Override
@@ -509,7 +526,7 @@ public class GarminSAXHandler extends DefaultHandler {
             if (_trackPointCounter > 0) {
                /*
                 * summarize calories when at least one trackpoint is available. This will fix a bug
-                * because an invalid tcx file can contain old laps with calories but without
+                * because an invalid TCX file can contain old laps with calories but without
                 * trackpoints
                 */
                _tourCalories += _lapCalories;
@@ -526,11 +543,19 @@ public class GarminSAXHandler extends DefaultHandler {
 
             } catch (final NumberFormatException e) {}
 
+         } else if (name.equals(TAG_TRACK)) {
+
+            _isInTrack = false;
+
+            if (_allTimeData.size() > 0) {
+               _pausedTime_Start.add(_allTimeData.get(_allTimeData.size() - 1).absoluteTime);
+            }
+
          } else if (_isInCourse && _isInName) {
 
             _isInName = false;
 
-            // "Name" tag occures multiple times
+            // "Name" tag occurs multiple times
             if (!_isInCreator) {
 
                _tourTitle = _characters.toString();
@@ -616,6 +641,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
+      cleanTimerPauses();
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
       final Long tourId = tourData.createTourId(uniqueId);
@@ -628,7 +656,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 
@@ -896,6 +924,10 @@ public class GarminSAXHandler extends DefaultHandler {
 
          _timeData.absoluteTime = _currentTime;
 
+         if (_pausedTime_Start.size() == _pausedTime_End.size() + 1) {
+            _pausedTime_End.add(_currentTime);
+         }
+
       }
    }
 
@@ -925,6 +957,9 @@ public class GarminSAXHandler extends DefaultHandler {
       _sport = new Sport();
       _tourNotes = null;
       _tourTitle = UI.EMPTY_STRING;
+
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    /**
@@ -1020,21 +1055,33 @@ public class GarminSAXHandler extends DefaultHandler {
 
                if (_isInLap) {
 
-                  if (_isInTrackpoint) {
+                  if (_isInTrack) {
 
-                     getData_TrackPoint_10_Start(name);
+                     if (_isInTrackpoint) {
 
-                  } else if (name.equals(TAG_TRACKPOINT)) {
+                        getData_TrackPoint_10_Start(name);
 
-                     _isInTrackpoint = true;
+                     } else if (name.equals(TAG_TRACKPOINT)) {
 
-                     // create new time item
-                     _timeData = new TimeData();
+                        _isInTrackpoint = true;
 
-                  } else if (name.equals(TAG_CALORIES)) {
+                        // create new time item
+                        _timeData = new TimeData();
 
-                     _isInCalories = true;
-                     _characters.delete(0, _characters.length());
+                     } else if (name.equals(TAG_DISTANCE_METERS)) {
+
+                        _isInDistance = true;
+                        _characters.delete(0, _characters.length());
+
+                     } else if (name.equals(TAG_CALORIES)) {
+
+                        _isInCalories = true;
+                        _characters.delete(0, _characters.length());
+                     }
+                  } else if (name.equals(TAG_TRACK)) {
+
+                     _isInTrack = true;
+
                   }
 
                } else if (name.equals(TAG_LAP)) {
@@ -1106,7 +1153,7 @@ public class GarminSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_DATABASE)) {
 
          /*
-          * get version of the xml file
+          * get version of the XML file
           */
          for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 

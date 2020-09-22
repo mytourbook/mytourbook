@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,66 +32,68 @@ import org.eclipse.jface.preference.PreferenceConverter;
  */
 public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
-	public void initializeDefaultPreferences() {
+   @Override
+   public void initializeDefaultPreferences() {
 
-		final IPreferenceStore store = CommonActivator.getPrefStore();
+      final IPreferenceStore store = CommonActivator.getPrefStore();
 
-		/*
-		 * graph color preferences
-		 */
-		for (final ColorDefinition colorDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
+      /*
+       * graph color preferences
+       */
+      for (final ColorDefinition colorDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
-			PreferenceConverter.setDefault(
-					store,
-					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT),
-					colorDefinition.getGradientBright_Default());
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT),
+               colorDefinition.getGradientBright_Default());
 
-			PreferenceConverter.setDefault(
-					store,
-					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_DARK),
-					colorDefinition.getGradientDark_Default());
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_DARK),
+               colorDefinition.getGradientDark_Default());
 
-			PreferenceConverter.setDefault(
-					store,
-					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE),
-					colorDefinition.getLineColor_Default());
-		}
+         PreferenceConverter.setDefault(
+               store,
+               colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE),
+               colorDefinition.getLineColor_Default());
+      }
 
-		/*
-		 * Display formats
-		 */
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
+      /*
+       * Display formats
+       */
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED, ValueFormat.NUMBER_1_0.name());
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, ValueFormat.TIME_HH_MM.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME, ValueFormat.TIME_HH_MM.name());
 
-		/*
-		 * Time zone
-		 */
-		final ZoneId defaultZoneId = ZoneId.systemDefault();
-		final String defaultId = defaultZoneId.getId();
+      /*
+       * Time zone
+       */
+      final ZoneId defaultZoneId = ZoneId.systemDefault();
+      final String defaultId = defaultZoneId.getId();
 
-		store.setDefault(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, 1);
-		store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
-		store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, true);
-		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
-		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
-		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);
-		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, 1);
+      store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
+      store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, true);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, defaultId);
 
-		/*
-		 * calendar week
-		 */
-		store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
-		store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, 4);
-	}
+      /*
+       * calendar week
+       */
+      store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
+      store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, 4);
+   }
 }

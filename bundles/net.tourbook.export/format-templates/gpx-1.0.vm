@@ -30,8 +30,10 @@
 ## time
          <mt:tourStartTime>$tourData.getTourStartTimeMS()</mt:tourStartTime>
          <mt:tourEndTime>$tourData.getTourEndTimeMS()</mt:tourEndTime>
-         <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
-         <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
+         <mt:tourComputedTime_Moving>$tourData.tourComputedTime_Moving</mt:tourComputedTime_Moving>
+         <mt:tourDeviceTime_Elapsed>$tourData.tourDeviceTime_Elapsed</mt:tourDeviceTime_Elapsed>
+         <mt:tourDeviceTime_Recorded>$tourData.tourDeviceTime_Recorded</mt:tourDeviceTime_Recorded>
+         <mt:tourDeviceTime_Paused>$tourData.tourDeviceTime_Paused</mt:tourDeviceTime_Paused>
 ## distance
          <mt:tourAltDown>$tourData.tourAltDown</mt:tourAltDown>
          <mt:tourAltUp>$tourData.tourAltUp</mt:tourAltUp>

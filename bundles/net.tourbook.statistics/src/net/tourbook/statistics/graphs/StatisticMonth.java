@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -167,9 +167,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-      final Integer recordingTime = _tourMonthData.recordingTime[serieIndex][valueIndex];
-      final Integer drivingTime = _tourMonthData.drivingTime[serieIndex][valueIndex];
-      final int breakTime = recordingTime - drivingTime;
+      final Integer elapsedTime = _tourMonthData.elapsedTime[serieIndex][valueIndex];
+      final Integer recordedTime = _tourMonthData.recordedTime[serieIndex][valueIndex];
+      final Integer pausedTime = _tourMonthData.pausedTime[serieIndex][valueIndex];
+      final Integer movingTime = _tourMonthData.movingTime[serieIndex][valueIndex];
+      final int breakTime = elapsedTime - movingTime;
 
       /*
        * Tool tip: title
@@ -195,8 +197,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
             + Messages.tourtime_info_distance_tour + NL
             + Messages.tourtime_info_altitude + NL
             + NL
-            + Messages.tourtime_info_recording_time + NL
-            + Messages.tourtime_info_driving_time + NL
+            + Messages.tourtime_info_elapsed_time + NL
+            + Messages.tourtime_info_recorded_time + NL
+            + Messages.tourtime_info_paused_time + NL
+            + Messages.tourtime_info_moving_time + NL
             + Messages.tourtime_info_break_time + NL
             + NL
             + Messages.TourTime_Info_NumberOfTours;
@@ -209,11 +213,17 @@ public abstract class StatisticMonth extends TourbookStatistic {
             (int) _resortedAltitudeHigh[serieIndex][valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
 
-            recordingTime / 3600,
-            (recordingTime % 3600) / 60,
+            elapsedTime / 3600,
+            (elapsedTime % 3600) / 60,
 
-            drivingTime / 3600,
-            (drivingTime % 3600) / 60,
+            recordedTime / 3600,
+            (recordedTime % 3600) / 60,
+
+            pausedTime / 3600,
+            (pausedTime % 3600) / 60,
+
+            movingTime / 3600,
+            (movingTime % 3600) / 60,
 
             breakTime / 3600,
             (breakTime % 3600) / 60,
@@ -567,6 +577,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
                   _statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
+
+      statContext.outStatisticValuesRaw = _tourMonthData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

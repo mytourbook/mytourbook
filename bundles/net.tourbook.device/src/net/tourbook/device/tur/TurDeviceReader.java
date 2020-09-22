@@ -133,7 +133,7 @@ public class TurDeviceReader extends TourbookDevice {
 
    @Override
    public int getTransferDataSize() {
-      // We dont't have a com-port device so this is not neccessary
+      // We don't have a COM port device so this is not necessary
       return 0;
    }
 
@@ -334,8 +334,9 @@ public class TurDeviceReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
             tourData.computeComputedValues();
-            tourData.computeTourDrivingTime();
+            tourData.computeTourMovingTime();
 
             processDeviceData_10_CreateMarker(tourData, fileTurData);
             tourData.completeTourMarkerWithRelativeTime();

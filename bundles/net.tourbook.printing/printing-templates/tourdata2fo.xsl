@@ -223,7 +223,7 @@
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
 											<xsl:call-template name="FormatTime">
-												<xsl:with-param name="theTime" select="tourRecordingTime"/>
+												<xsl:with-param name="theTime" select="tourDeviceTime_Elapsed"/>
 											</xsl:call-template>
 										</fo:block>
 									</fo:table-cell>
@@ -239,7 +239,7 @@
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
 											<xsl:call-template name="FormatTime">
-												<xsl:with-param name="theTime" select="tourRecordingTime - tourDrivingTime"/>
+												<xsl:with-param name="theTime" select="tourDeviceTime_Elapsed - tourComputedTime_Moving"/>
 											</xsl:call-template>
 										</fo:block>
 									</fo:table-cell>
@@ -255,7 +255,7 @@
 									<fo:table-cell border-style="solid" border-width="0.5pt" padding="2pt">
 										<fo:block text-align="left">
 											<xsl:call-template name="FormatTime">
-												<xsl:with-param name="theTime" select="tourDrivingTime"/>
+												<xsl:with-param name="theTime" select="tourComputedTime_Moving"/>
 											</xsl:call-template>
 										</fo:block>
 									</fo:table-cell>

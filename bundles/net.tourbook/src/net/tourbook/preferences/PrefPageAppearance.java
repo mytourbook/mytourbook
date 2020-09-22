@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,6 +87,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner                 _spinnerRecentTags;
    private Spinner                 _spinnerAutoOpenDelay;
 
+   private Button                  _rdoDeviceTime_Recorded;
+   private Button                  _rdoComputedTime_Moving;
+
    private FontFieldEditorExtended _valueFontEditor;
 
    public PrefPageAppearance() {
@@ -116,6 +119,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          createUI_10_Tagging(_uiContainer);
          createUI_20_LogFont(_uiContainer);
          createUI_30_OtherOptions(_uiContainer);
+         createUI_40_PaceDisplay(_uiContainer);
       }
 
       return _uiContainer;
@@ -259,6 +263,30 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
+   private void createUI_40_PaceDisplay(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.Pref_Appearance_Group_PaceDisplay);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      {
+         /*
+          * Time to use for pace computation
+          */
+         final Label label = new Label(group, NONE);
+         label.setText(Messages.pref_appearance_pace_computation_option);
+         label.setToolTipText(Messages.pref_appearance_pace_computation_option_tooltip);
+
+         // Recorded time
+         _rdoDeviceTime_Recorded = new Button(group, SWT.RADIO);
+         _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
+
+         // Moving time
+         _rdoComputedTime_Moving = new Button(group, SWT.RADIO);
+         _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
+      }
+   }
+
    private void enableControls() {
 
       final boolean isTagAutoOpen = _chkAutoOpenTagging.getSelection();
@@ -363,6 +391,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
 
+      final boolean isPaceFromRecordedTime = _prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      _rdoDeviceTime_Recorded.setSelection(isPaceFromRecordedTime);
+      _rdoComputedTime_Moving.setSelection(!isPaceFromRecordedTime);
+
       super.performDefaults();
 
       // this do not work, I have no idea why, but with the apply button it works :-(
@@ -417,6 +449,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.setPreferenceStore(_prefStore);
       _valueFontEditor.load();
 
+      _rdoDeviceTime_Recorded.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME));
+      _rdoComputedTime_Moving.setSelection(!_rdoDeviceTime_Recorded.getSelection());
    }
 
    private void saveState() {
@@ -428,5 +462,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, _spinnerAutoOpenDelay.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
+
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
    }
 }

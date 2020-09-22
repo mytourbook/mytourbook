@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,168 +21,180 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public abstract class TVICollatedTour extends TreeViewerItem implements ITourItem {
 
-	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   static final String  SQL_SUM_COLUMNS;
 
-	static final String		SQL_SUM_COLUMNS;
+   static {
 
-	static {
+      SQL_SUM_COLUMNS = UI.EMPTY_STRING
+            //
+            + "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
+            + "SUM(tourDeviceTime_Elapsed)," //					1	//$NON-NLS-1$
+            + "SUM(TourComputedTime_Moving)," //				2	//$NON-NLS-1$
+            + "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
+            + "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
+            + "SUM(1)," //											5	//$NON-NLS-1$
+            //
+            + "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
+            + "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
+            + "MAX(MAXALTITUDE)," //								8	//$NON-NLS-1$
+            + "MAX(MAXPULSE)," //									9	//$NON-NLS-1$
+            //
+            + "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			10	//$NON-NLS-1$
+            + "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		11	//$NON-NLS-1$
+            + "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	12	//$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	13	//$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	14	//$NON-NLS-1$
+            + "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			15	//$NON-NLS-1$
+            //
+            + "SUM(CALORIES)," //									16	//$NON-NLS-1$
+            + "SUM(numberOfTimeSlices)," //							17	//$NON-NLS-1$
+            + "SUM(numberOfPhotos)," //								18	//$NON-NLS-1$
+            //
+            + "SUM(frontShiftCount)," //							19	//$NON-NLS-1$
+            + "SUM(rearShiftCount)," //								20	//$NON-NLS-1$
+            + "SUM(TourDeviceTime_Recorded)"; //							21//$NON-NLS-1$
+   }
 
-		SQL_SUM_COLUMNS = UI.EMPTY_STRING
-		//
-				+ "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
-				+ "SUM(TOURRECORDINGTIME)," //							1	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							2	//$NON-NLS-1$
-				+ "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
-				+ "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
-				+ "SUM(1)," //											5	//$NON-NLS-1$
-				//
-				+ "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							8	//$NON-NLS-1$
-				+ "MAX(MAXALTITUDE)," //								9	//$NON-NLS-1$
-				+ "MAX(MAXPULSE)," //									10	//$NON-NLS-1$
-				//
-				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			11	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		12	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	13	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	14	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	15	//$NON-NLS-1$
-				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			16	//$NON-NLS-1$
-				//
-				+ "SUM(CALORIES)," //									17	//$NON-NLS-1$
-				+ "SUM(numberOfTimeSlices)," //							18	//$NON-NLS-1$
-				+ "SUM(numberOfPhotos)," //								19	//$NON-NLS-1$
-				//
-				+ "SUM(frontShiftCount)," //							20	//$NON-NLS-1$
-				+ "SUM(rearShiftCount)"; //								21	//$NON-NLS-1$
-	}
+   protected final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-	CollatedToursView		collateToursView;
+   CollatedToursView                collateToursView;
 
-	String					treeColumn;
+   String                           treeColumn;
 
-	/**
-	 * Id's for the tags or <code>null</code> when tags are not available.
-	 */
-	private ArrayList<Long>	_tagIds;
-	HashSet<Long>			sqlTagIds;
+   /**
+    * Id's for the tags or <code>null</code> when tags are not available.
+    */
+   private ArrayList<Long>          _tagIds;
+   HashSet<Long>                    sqlTagIds;
 
-	/**
-	 * Tour start time in ms.
-	 */
-	long					colTourStartTime;
+   /**
+    * Tour start time in ms.
+    */
+   long                             colTourStartTime;
 
-	String					colTourTitle;
-	long					colPersonId;																	// tourPerson_personId
-	long					colCounter;
-	long					colCalories;
+   String                           colTourTitle;
+   long                             colPersonId;                               // tourPerson_personId
+   long                             colCounter;
+   long                             colCalories;
 
-	long					colDistance;
-	long					colRecordingTime;
-	long					colDrivingTime;
+   long                             colDistance;
+   long                             colRecordedTime;
+   long                             colElapsedTime;
+   long                             colMovingTime;
 
-	long					colPausedTime;
-	long					colAltitudeUp;
-	long					colAltitudeDown;
+   long                             colBreakTime;
+   long                             colPausedTime;
+   long                             colAltitudeUp;
+   long                             colAltitudeDown;
 
-	float					colMaxSpeed;
-	long					colMaxAltitude;
+   float                            colMaxSpeed;
+   long                             colMaxAltitude;
 
-	long					colMaxPulse;
-	float					colAvgSpeed;
-	float					colAvgPace;
+   long                             colMaxPulse;
+   float                            colAvgSpeed;
+   float                            colAvgPace;
 
-	float					colAvgPulse;
-	float					colAvgCadence;
-	float					colAvgTemperature;
-	int						colWindSpd;
-	int						colWindDir;
+   float                            colAvgPulse;
+   float                            colAvgCadence;
+   float                            colAvgTemperature;
+   int                              colWindSpd;
+   int                              colWindDir;
 
-	String					colClouds;
-	int						colRestPulse;
-	int						colWeekNo;
-	String					colWeekDay;
+   String                           colClouds;
+   int                              colRestPulse;
+   int                              colWeekNo;
+   String                           colWeekDay;
 
-	int						colWeekYear;
-	int						colNumberOfTimeSlices;
-	int						colNumberOfPhotos;
+   int                              colWeekYear;
+   int                              colNumberOfTimeSlices;
+   int                              colNumberOfPhotos;
 
-	int						colDPTolerance;
-	int						colFrontShiftCount;
+   int                              colDPTolerance;
+   int                              colFrontShiftCount;
 
-	int						colRearShiftCount;
+   int                              colRearShiftCount;
 
-	TVICollatedTour(final CollatedToursView view) {
+   TVICollatedTour(final CollatedToursView view) {
 
-		collateToursView = view;
-	}
+      collateToursView = view;
+   }
 
-	void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
+   void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
 
-		colDistance = result.getLong(startIndex + 0);
+      colDistance = result.getLong(startIndex + 0);
 
-		colRecordingTime = result.getLong(startIndex + 1);
-		colDrivingTime = result.getLong(startIndex + 2);
+      colElapsedTime = result.getLong(startIndex + 1);
+      colMovingTime = result.getLong(startIndex + 2);
 
-		colAltitudeUp = result.getLong(startIndex + 3);
-		colAltitudeDown = result.getLong(startIndex + 4);
+      colAltitudeUp = result.getLong(startIndex + 3);
+      colAltitudeDown = result.getLong(startIndex + 4);
 
-		colCounter = result.getLong(startIndex + 5);
+      colCounter = result.getLong(startIndex + 5);
 
-		colMaxSpeed = result.getFloat(startIndex + 6);
+      colMaxSpeed = result.getFloat(startIndex + 6);
 
-		// compute average speed/pace, prevent divide by 0
-		final long dbDistance = result.getLong(startIndex + 7);
-		final long dbDrivingTime = result.getLong(startIndex + 8);
+      // compute average speed/pace, prevent divide by 0
+      final long dbDistance = result.getLong(startIndex + 7);
 
-		colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-		colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000f / dbDistance;
+      colAvgSpeed = colMovingTime == 0 ? 0 : 3.6f * dbDistance / colMovingTime;
 
-		colMaxAltitude = result.getLong(startIndex + 9);
-		colMaxPulse = result.getLong(startIndex + 10);
+      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
+      final long time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+      colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
-		colAvgPulse = result.getFloat(startIndex + 11);
-		colAvgCadence = result.getFloat(startIndex + 12);
-		colAvgTemperature = result.getFloat(startIndex + 13);
+      colMaxAltitude = result.getLong(startIndex + 8);
+      colMaxPulse = result.getLong(startIndex + 9);
 
-		colWindDir = result.getInt(startIndex + 14);
-		colWindSpd = result.getInt(startIndex + 15);
-		colRestPulse = result.getInt(startIndex + 16);
+      colAvgPulse = result.getFloat(startIndex + 10);
+      colAvgCadence = result.getFloat(startIndex + 11);
+      colAvgTemperature = result.getFloat(startIndex + 12);
 
-		colCalories = result.getLong(startIndex + 17);
+      colWindDir = result.getInt(startIndex + 13);
+      colWindSpd = result.getInt(startIndex + 14);
+      colRestPulse = result.getInt(startIndex + 15);
 
-		colNumberOfTimeSlices = result.getInt(startIndex + 18);
-		colNumberOfPhotos = result.getInt(startIndex + 19);
+      colCalories = result.getLong(startIndex + 16);
 
-		colFrontShiftCount = result.getInt(startIndex + 20);
-		colRearShiftCount = result.getInt(startIndex + 21);
+      colNumberOfTimeSlices = result.getInt(startIndex + 17);
+      colNumberOfPhotos = result.getInt(startIndex + 18);
 
-		colPausedTime = colRecordingTime - colDrivingTime;
-	}
+      colFrontShiftCount = result.getInt(startIndex + 19);
+      colRearShiftCount = result.getInt(startIndex + 20);
 
-	public ArrayList<Long> getTagIds() {
+      colRecordedTime = result.getLong(startIndex + 21);
 
-		if (sqlTagIds != null && _tagIds == null) {
-			_tagIds = new ArrayList<Long>(sqlTagIds);
-		}
+      colBreakTime = colElapsedTime - colMovingTime;
+      colPausedTime = colElapsedTime - colRecordedTime;
+   }
 
-		return _tagIds;
-	}
+   public ArrayList<Long> getTagIds() {
 
-	@Override
-	public Long getTourId() {
-		return null;
-	}
+      if (sqlTagIds != null && _tagIds == null) {
+         _tagIds = new ArrayList<>(sqlTagIds);
+      }
 
-	public void setTagIds(final HashSet<Long> tagIds) {
-		sqlTagIds = tagIds;
-	}
+      return _tagIds;
+   }
+
+   @Override
+   public Long getTourId() {
+      return null;
+   }
+
+   public void setTagIds(final HashSet<Long> tagIds) {
+      sqlTagIds = tagIds;
+   }
 
 }

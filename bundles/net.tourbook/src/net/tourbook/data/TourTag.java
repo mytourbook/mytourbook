@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -286,7 +286,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
    @Override
    public String toString() {
-      return "tag: " + name + " (id:" + tagId + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      return "tag: " + name + " (id:" + tagId + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**

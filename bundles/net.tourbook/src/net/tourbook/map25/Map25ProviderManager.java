@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.file.Files;
@@ -22,14 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.XMLMemento;
-import org.oscim.theme.VtmThemes;
-import org.osgi.framework.Bundle;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -40,7 +34,13 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.MapsforgeStyleParser;
 import net.tourbook.preferences.MapsforgeThemeStyle;
 
-import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.XMLMemento;
+import org.oscim.theme.VtmThemes;
+import org.osgi.framework.Bundle;
 
 public class Map25ProviderManager {
 
@@ -91,29 +91,6 @@ public class Map25ProviderManager {
       _mapProviderListeners.add(listener);
    }
 
-   
-   /**
-    * mapilion.com/
-    */
-   private static Map25Provider createMapProvider_Mapilion() {
-
-      final Map25Provider mapProvider = new Map25Provider();
-
-      mapProvider.isDefault = true;
-      mapProvider.isEnabled = true;
-      mapProvider.name = Messages.Map25_Provider_Mapilion_Name;
-      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
-      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
-      mapProvider.tileEncoding = TileEncoding.MP;
-      mapProvider.theme = VtmThemes.OPENMAPTILES;
-      mapProvider.description = Messages.Map25_Provider_Mapilion_Description; //$NON-NLS-1$
-
-      _defaultMapProvider = mapProvider;
-
-      return mapProvider;
-   }
-   
-   
    /**
     * opensciencemap.org, server seems to be down since 2019-12
     */
@@ -131,6 +108,27 @@ public class Map25ProviderManager {
       mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
       //_defaultMapProvider = mapProvider;
+
+      return mapProvider;
+   }
+
+   /**
+    * mapilion.com/
+    */
+   private static Map25Provider createMapProvider_Mapilion() {
+
+      final Map25Provider mapProvider = new Map25Provider();
+
+      mapProvider.isDefault = true;
+      mapProvider.isEnabled = true;
+      mapProvider.name = Messages.Map25_Provider_Mapilion_Name;
+      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
+      mapProvider.tileEncoding = TileEncoding.MP;
+      mapProvider.theme = VtmThemes.OPENMAPTILES;
+      mapProvider.description = Messages.Map25_Provider_Mapilion_Description;
+
+      _defaultMapProvider = mapProvider;
 
       return mapProvider;
    }
@@ -218,7 +216,7 @@ public class Map25ProviderManager {
       case MVT:
          return VtmThemes.MAPZEN;
 
-         // Mapilion   
+      // Mapilion
       case MP:
          return VtmThemes.OPENMAPTILES;
 
@@ -355,7 +353,7 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + UI.SPACE1 + mapProvider.online_url //$NON-NLS-1$
                         + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);

@@ -912,6 +912,8 @@ public class UI {
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
 
       final Composite pageNoData = new Composite(parent, SWT.NONE);
+      // use a dimmed color, default is white
+      pageNoData.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
       GridDataFactory.fillDefaults().grab(true, true).applyTo(pageNoData);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(pageNoData);
       {

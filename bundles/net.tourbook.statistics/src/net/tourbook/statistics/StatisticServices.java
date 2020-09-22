@@ -38,7 +38,7 @@ import org.eclipse.swt.graphics.RGB;
 public class StatisticServices {
 
    /**
-    * offset for tour types in the color index
+    * Offset for tour types in the color index
     */
    public static int TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
 
