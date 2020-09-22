@@ -27,7 +27,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,7 +44,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
    public static final String    ID          = "net.tourbook.preferences.PrefPageImport"; //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore  = TourbookPlugin.getPrefStore();
    private final IDialogSettings _state      = TourbookPlugin.getState(RawDataView.ID);
 
    private RawDataManager        _rawDataMgr = RawDataManager.getInstance();
@@ -260,7 +258,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
-      _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+      _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
       enableControls();
 
@@ -307,8 +305,8 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
 
       final CadenceMultiplier defaultCadence = (CadenceMultiplier) Util.getStateEnum(_state,
-            RawDataView.STATE_DEFAULT_CADENCE,
-            RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
       _comboDefaultCadence.setSelection(defaultCadence);
    }
@@ -319,18 +317,18 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
-      final CadenceMultiplier defaultCadence = _comboDefaultCadence.getSelectedCadence();
+      final CadenceMultiplier defaultCadenceMultiplier = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
-      Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE, defaultCadence);
+      Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER, defaultCadenceMultiplier);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
-      _rawDataMgr.setState_DefaultCadence(defaultCadence);
+      _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
    }
 }

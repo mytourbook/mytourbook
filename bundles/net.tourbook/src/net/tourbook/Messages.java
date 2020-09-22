@@ -518,8 +518,10 @@ public class Messages extends NLS {
    public static String        App_measurement_metric;
    public static String        App_measurement_tooltip;
 
-   public static String        App_People_item_all;
-   public static String        App_People_tooltip;
+   public static String        App_Cadence_Invalid;
+   public static String        App_Cadence_None;
+   public static String        App_Cadence_Rpm;
+   public static String        App_Cadence_Spm;
 
    public static String        App_Default_PersonFirstName;
 
@@ -541,6 +543,9 @@ public class Messages extends NLS {
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
+
+   public static String        App_People_item_all;
+   public static String        App_People_tooltip;
 
    public static String        App_SortDirection_Ascending;
    public static String        App_SortDirection_Descending;
@@ -838,11 +843,6 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_delete_markers_title;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
-
-   public static String        App_Cadence_None;
-   public static String        App_Cadence_Rpm;
-   public static String        App_Cadence_Spm;
-   public static String        App_Cadence_Invalid;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,13 +35,13 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
-	private Menu			_menu;
+   private Menu          _menu;
 
    private ActionSetNone _actionSetNone;
    private ActionSetRpm  _actionSetRpm;
    private ActionSetSpm  _actionSetSpm;
 
-	private ITourProvider	_tourProvider;
+   private ITourProvider _tourProvider;
 
    private class ActionSetNone extends Action {
 
@@ -55,62 +55,62 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
       }
    }
 
-	private class ActionSetRpm extends Action {
+   private class ActionSetRpm extends Action {
 
-		public ActionSetRpm() {
+      public ActionSetRpm() {
 
-			super(Messages.Action_Cadence_Set_Rpm, AS_CHECK_BOX);
-		}
+         super(Messages.Action_Cadence_Set_Rpm, AS_CHECK_BOX);
+      }
 
-		@Override
-		public void run() {
-			setCadenceMultiplier(1.0f);
-		}
-	}
+      @Override
+      public void run() {
+         setCadenceMultiplier(1.0f);
+      }
+   }
 
-	private class ActionSetSpm extends Action {
+   private class ActionSetSpm extends Action {
 
-		public ActionSetSpm() {
-			super(Messages.Action_Cadence_Set_Spm, AS_CHECK_BOX);
-		}
+      public ActionSetSpm() {
+         super(Messages.Action_Cadence_Set_Spm, AS_CHECK_BOX);
+      }
 
-		@Override
-		public void run() {
-			setCadenceMultiplier(2.0f);
-		}
-	}
+      @Override
+      public void run() {
+         setCadenceMultiplier(2.0f);
+      }
+   }
 
-	public SubMenu_SetCadence(final ITourProvider tourViewer) {
+   public SubMenu_SetCadence(final ITourProvider tourViewer) {
 
-		super(Messages.Action_Cadence_Set, AS_DROP_DOWN_MENU);
+      super(Messages.Action_Cadence_Set, AS_DROP_DOWN_MENU);
 
-		setMenuCreator(this);
+      setMenuCreator(this);
 
-		_tourProvider = tourViewer;
+      _tourProvider = tourViewer;
 
       _actionSetNone = new ActionSetNone();
       _actionSetRpm = new ActionSetRpm();
       _actionSetSpm = new ActionSetSpm();
-	}
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		if (_menu != null) {
-			_menu.dispose();
-			_menu = null;
-		}
-	}
+      if (_menu != null) {
+         _menu.dispose();
+         _menu = null;
+      }
+   }
 
-	private void enableActions() {
+   private void enableActions() {
 
-		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       int numNone = 0;
-		int numSpm = 0;
-		int numRpm = 0;
+      int numSpm = 0;
+      int numRpm = 0;
 
-		for (final TourData tourData : selectedTours) {
+      for (final TourData tourData : selectedTours) {
 
          switch ((int) tourData.getCadenceMultiplier()) {
          case 0:
@@ -123,73 +123,73 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
             numSpm++;
             break;
          }
-		}
+      }
 
       _actionSetRpm.setChecked(numRpm > 0);
       _actionSetSpm.setChecked(numSpm > 0);
       _actionSetNone.setChecked(numNone > 0);
-	}
+   }
 
-	private void fillMenu(final Menu menu) {
+   private void fillMenu(final Menu menu) {
       new ActionContributionItem(_actionSetNone).fill(menu, -1);
-		new ActionContributionItem(_actionSetRpm).fill(menu, -1);
-		new ActionContributionItem(_actionSetSpm).fill(menu, -1);
-	}
+      new ActionContributionItem(_actionSetRpm).fill(menu, -1);
+      new ActionContributionItem(_actionSetSpm).fill(menu, -1);
+   }
 
-	@Override
-	public Menu getMenu(final Control parent) {
-		return null;
-	}
+   @Override
+   public Menu getMenu(final Control parent) {
+      return null;
+   }
 
-	@Override
-	public Menu getMenu(final Menu parent) {
+   @Override
+   public Menu getMenu(final Menu parent) {
 
-		dispose();
+      dispose();
 
-		_menu = new Menu(parent);
+      _menu = new Menu(parent);
 
-		// Add listener to repopulate the menu each time
-		_menu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuShown(final MenuEvent e) {
+      // Add listener to repopulate the menu each time
+      _menu.addMenuListener(new MenuAdapter() {
+         @Override
+         public void menuShown(final MenuEvent e) {
 
-				// dispose old menu items
-				for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-					menuItem.dispose();
-				}
+            // dispose old menu items
+            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
+               menuItem.dispose();
+            }
 
-				fillMenu(_menu);
+            fillMenu(_menu);
 
-				enableActions();
-			}
-		});
+            enableActions();
+         }
+      });
 
-		return _menu;
-	}
+      return _menu;
+   }
 
-	private void setCadenceMultiplier(final float cadenceMultiplier) {
+   private void setCadenceMultiplier(final float cadenceMultiplier) {
 
 //		 * 1.0f = Revolutions per minute (RPM)
 //		 * 2.0f = Steps per minute (SPM)
 
-		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-		final ArrayList<TourData> modifiedTours = new ArrayList<>();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
-		for (final TourData tourData : selectedTours) {
+      for (final TourData tourData : selectedTours) {
 
-			if (tourData.getCadenceMultiplier() != cadenceMultiplier) {
+         if (tourData.getCadenceMultiplier() != cadenceMultiplier) {
 
-				// cadence multiplier is not the same
+            // cadence multiplier is not the same
 
-				tourData.setCadenceMultiplier(cadenceMultiplier);
+            tourData.setCadenceMultiplier(cadenceMultiplier);
 
-				modifiedTours.add(tourData);
-			}
-		}
+            modifiedTours.add(tourData);
+         }
+      }
 
-		if (modifiedTours.size() > 0) {
-			TourManager.saveModifiedTours(modifiedTours);
-		}
-	}
+      if (modifiedTours.size() > 0) {
+         TourManager.saveModifiedTours(modifiedTours);
+      }
+   }
 
 }

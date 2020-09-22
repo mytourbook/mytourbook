@@ -822,7 +822,11 @@ public class EasyImportManager {
                      EasyConfig.TOUR_TYPE_AVG_SPEED_DEFAULT,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
-               speedVertex.cadence = (CadenceMultiplier) Util.getXmlEnum(xmlSpeed, ATTR_IL_TOUR_TYPE_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+
+               speedVertex.cadenceMultiplier = (CadenceMultiplier) Util.getXmlEnum(xmlSpeed,
+                     ATTR_IL_TOUR_TYPE_CADENCE,
+                     RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
                speedVertices.add(speedVertex);
             }
          }
@@ -834,7 +838,8 @@ public class EasyImportManager {
          importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
          importLauncher.oneTourTypeCadence = (CadenceMultiplier) Util.getXmlEnum(xmlConfig,
                ATTR_IL_TOUR_TYPE_CADENCE,
-               RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+               RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
       } else {
 
          // this is the default, tour type is not set
@@ -1180,7 +1185,7 @@ public class EasyImportManager {
 
                   Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
                   xmlSpeedVertex.putFloat(ATTR_AVG_SPEED, speedVertex.avgSpeed);
-                  Util.setXmlEnum(xmlSpeedVertex, ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence);
+                  Util.setXmlEnum(xmlSpeedVertex, ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadenceMultiplier);
                }
             }
 
@@ -1209,7 +1214,7 @@ public class EasyImportManager {
    private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
       String tourTypeName = UI.EMPTY_STRING;
-      CadenceMultiplier tourTypeCadence = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
+      CadenceMultiplier tourTypeCadence = RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT;
 
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
@@ -1235,7 +1240,7 @@ public class EasyImportManager {
             if (tourAvgSpeed <= speedTourType.avgSpeed) {
 
                tourTypeId = speedTourType.tourTypeId;
-               tourTypeCadence = speedTourType.cadence;
+               tourTypeCadence = speedTourType.cadenceMultiplier;
                break;
             }
          }

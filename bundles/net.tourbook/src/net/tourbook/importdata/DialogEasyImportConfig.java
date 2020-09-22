@@ -134,28 +134,28 @@ import org.joda.time.PeriodType;
  */
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
-   private static final String          ID                                = "DialogEasyImportConfig";            //$NON-NLS-1$
+   private static final String          ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
-   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                     //$NON-NLS-1$
+   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                        //$NON-NLS-1$
    //
-   private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";    //$NON-NLS-1$
-   private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";         //$NON-NLS-1$
+   private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
+   private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
+   private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
+   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
+   private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";       //$NON-NLS-1$
+   private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";            //$NON-NLS-1$
    //
-   private static final String          DATA_KEY_TOUR_TYPE_ID             = "DATA_KEY_TOUR_TYPE_ID";             //$NON-NLS-1$
-   private static final String          DATA_KEY_SPEED_TOUR_TYPE_INDEX    = "DATA_KEY_SPEED_TOUR_TYPE_INDEX";    //$NON-NLS-1$
+   private static final String          DATA_KEY_TOUR_TYPE_ID             = "DATA_KEY_TOUR_TYPE_ID";                //$NON-NLS-1$
+   private static final String          DATA_KEY_SPEED_TOUR_TYPE_INDEX    = "DATA_KEY_SPEED_TOUR_TYPE_INDEX";       //$NON-NLS-1$
    //
    private static final int             CONTROL_DECORATION_WIDTH          = 6;
-   private static final String          CSS_PX                            = "px";                                //$NON-NLS-1$
+   private static final String          CSS_PX                            = "px";                                   //$NON-NLS-1$
    //
    private final IPreferenceStore       _prefStore                        = TourbookPlugin.getPrefStore();
    private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
-   private final IDialogSettings        _stateIC                          = TourbookPlugin.getState(ID + "_IC"); //$NON-NLS-1$
-   private final IDialogSettings        _stateIL                          = TourbookPlugin.getState(ID + "_IL"); //$NON-NLS-1$
-   private final IDialogSettings        _stateRDV                         = TourbookPlugin.getState(RawDataView.ID);
+   private final IDialogSettings        _stateIC                          = TourbookPlugin.getState(ID + "_IC");    //$NON-NLS-1$
+   private final IDialogSettings        _stateIL                          = TourbookPlugin.getState(ID + "_IL");    //$NON-NLS-1$
+   private final IDialogSettings        _stateRawDataView                 = TourbookPlugin.getState(RawDataView.ID);
    //
    private IPropertyChangeListener      _prefChangeListener;
    //
@@ -235,41 +235,41 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Composite         _parent;
-   private Composite         _speedTourType_OuterContainer;
-   private Composite         _speedTourType_Container;
-   private Composite         _icViewerContainer;
-   private Composite         _ilViewerContainer;
-   private ScrolledComposite _speedTourType_ScrolledContainer;
+   private Composite            _parent;
+   private Composite            _speedTourType_OuterContainer;
+   private Composite            _speedTourType_Container;
+   private Composite            _icViewerContainer;
+   private Composite            _ilViewerContainer;
+   private ScrolledComposite    _speedTourType_ScrolledContainer;
    //
-   private PageBook          _pagebookTourType;
+   private PageBook             _pagebookTourType;
    //
-   private Label             _pageTourType_NoTourType;
-   private Composite         _pageTourType_OneForAll;
-   private Composite         _pageTourType_BySpeed;
+   private Label                _pageTourType_NoTourType;
+   private Composite            _pageTourType_OneForAll;
+   private Composite            _pageTourType_BySpeed;
    //
-   private Button            _chkDash_DisplayAbsoluteFilePath;
-   private Button            _chkDash_LiveUpdate;
-   private Button            _chkIC_CreateBackup;
-   private Button            _chkIC_DeleteDeviceFiles;
-   private Button            _chkIC_ImportFiles;
-   private Button            _chkIC_TurnOffWatching;
-   private Button            _chkIL_AdjustTemperature;
-   private Button            _chkIL_RetrieveWeatherData;
-   private Button            _chkIL_SaveTour;
-   private Button            _chkIL_ShowInDashboard;
-   private Button            _chkIL_SetLastMarker;
-   private Button            _chkIL_SetTourType;
+   private Button               _chkDash_DisplayAbsoluteFilePath;
+   private Button               _chkDash_LiveUpdate;
+   private Button               _chkIC_CreateBackup;
+   private Button               _chkIC_DeleteDeviceFiles;
+   private Button               _chkIC_ImportFiles;
+   private Button               _chkIC_TurnOffWatching;
+   private Button               _chkIL_AdjustTemperature;
+   private Button               _chkIL_RetrieveWeatherData;
+   private Button               _chkIL_SaveTour;
+   private Button               _chkIL_ShowInDashboard;
+   private Button               _chkIL_SetLastMarker;
+   private Button               _chkIL_SetTourType;
    //
-   private Button            _btnIC_Duplicate;
-   private Button            _btnIC_New;
-   private Button            _btnIC_Remove;
-   private Button            _btnIC_SelectBackupFolder;
-   private Button            _btnIC_SelectDeviceFolder;
-   private Button            _btnIL_Duplicate;
-   private Button            _btnIL_New;
-   private Button            _btnIL_NewOne;
-   private Button            _btnIL_Remove;
+   private Button               _btnIC_Duplicate;
+   private Button               _btnIC_New;
+   private Button               _btnIC_Remove;
+   private Button               _btnIC_SelectBackupFolder;
+   private Button               _btnIC_SelectDeviceFolder;
+   private Button               _btnIL_Duplicate;
+   private Button               _btnIL_New;
+   private Button               _btnIL_NewOne;
+   private Button               _btnIL_Remove;
    //
    private Combo                _comboIC_BackupFolder;
    private Combo                _comboIC_DeviceFolder;
@@ -278,51 +278,51 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ComboViewerCadence   _comboIL_One_TourType_Cadence;
    private ComboViewerCadence[] _comboTT_Cadence;
    //
-   private Image             _imageFileSystem;
+   private Image                _imageFileSystem;
    //
-   private Label             _lblIC_FileSystemImage;
-   private Label             _lblIC_ConfigName;
-   private Label             _lblIC_BackupFolder;
-   private Label             _lblIC_DeleteFilesInfo;
-   private Label             _lblIC_DeviceFolder;
-   private Label             _lblIL_AvgTemperature;
-   private Label             _lblIL_AvgTemperature_Unit;
-   private Label             _lblIL_ConfigDescription;
-   private Label             _lblIL_ConfigName;
-   private Label             _lblIL_LastMarker;
-   private Label             _lblIL_LastMarkerDistanceUnit;
-   private Label             _lblIL_LastMarkerText;
-   private Label             _lblIL_One_TourTypeIcon;
-   private Label             _lblIL_One_TourTypeCadenceLabel;
-   private Label             _lblIL_TemperatureAdjustmentDuration;
-   private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
-   private Label[]           _lblTT_Speed_SpeedUnit;
-   private Label[]           _lblTT_Speed_TourTypeIcon;
+   private Label                _lblIC_FileSystemImage;
+   private Label                _lblIC_ConfigName;
+   private Label                _lblIC_BackupFolder;
+   private Label                _lblIC_DeleteFilesInfo;
+   private Label                _lblIC_DeviceFolder;
+   private Label                _lblIL_AvgTemperature;
+   private Label                _lblIL_AvgTemperature_Unit;
+   private Label                _lblIL_ConfigDescription;
+   private Label                _lblIL_ConfigName;
+   private Label                _lblIL_LastMarker;
+   private Label                _lblIL_LastMarkerDistanceUnit;
+   private Label                _lblIL_LastMarkerText;
+   private Label                _lblIL_One_TourTypeIcon;
+   private Label                _lblIL_One_TourTypeCadenceLabel;
+   private Label                _lblIL_TemperatureAdjustmentDuration;
+   private Label                _lblIL_TemperatureAdjustmentDuration_Unit;
+   private Label[]              _lblTT_Speed_SpeedUnit;
+   private Label[]              _lblTT_Speed_TourTypeIcon;
    //
-   private Link[]            _linkTT_Speed_TourType;
-   private Link              _linkTT_One_TourType;
-   private Link              _linkIC_LocalFolderPath;
-   private Link              _linkIC_DeviceFolderPath;
-   private Link              _linkIC_ILActions;
+   private Link[]               _linkTT_Speed_TourType;
+   private Link                 _linkTT_One_TourType;
+   private Link                 _linkIC_LocalFolderPath;
+   private Link                 _linkIC_DeviceFolderPath;
+   private Link                 _linkIC_ILActions;
    //
-   private Spinner           _spinnerDash_AnimationCrazinessFactor;
-   private Spinner           _spinnerDash_AnimationDuration;
-   private Spinner           _spinnerDash_BgOpacity;
-   private Spinner           _spinnerDash_NumHTiles;
-   private Spinner           _spinnerDash_StateTooltipWidth;
-   private Spinner           _spinnerDash_TileSize;
-   private Spinner           _spinnerIL_AvgTemperature;
-   private Spinner           _spinnerIL_LastMarkerDistance;
-   private Spinner           _spinnerIL_TemperatureAdjustmentDuration;
-   private Spinner[]         _spinnerTT_Speed_AvgSpeed;
+   private Spinner              _spinnerDash_AnimationCrazinessFactor;
+   private Spinner              _spinnerDash_AnimationDuration;
+   private Spinner              _spinnerDash_BgOpacity;
+   private Spinner              _spinnerDash_NumHTiles;
+   private Spinner              _spinnerDash_StateTooltipWidth;
+   private Spinner              _spinnerDash_TileSize;
+   private Spinner              _spinnerIL_AvgTemperature;
+   private Spinner              _spinnerIL_LastMarkerDistance;
+   private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
+   private Spinner[]            _spinnerTT_Speed_AvgSpeed;
    //
-   private TabFolder         _tabFolderEasy;
+   private TabFolder            _tabFolderEasy;
    //
-   private Text              _txtIC_DeviceFiles;
-   private Text              _txtIC_ConfigName;
-   private Text              _txtIL_ConfigDescription;
-   private Text              _txtIL_ConfigName;
-   private Text              _txtIL_LastMarker;
+   private Text                 _txtIC_DeviceFiles;
+   private Text                 _txtIC_ConfigName;
+   private Text                 _txtIL_ConfigDescription;
+   private Text                 _txtIL_ConfigName;
+   private Text                 _txtIL_LastMarker;
 
    private class ActionIL_NewOneTourType extends Action {
 
@@ -2046,7 +2046,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 
-         final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+         final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
+               RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
+               RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
          _comboIL_One_TourType_Cadence.setSelection(cadence);
       }
 
@@ -2187,9 +2189,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
             final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
 
-            final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRDV,
-                  RawDataView.STATE_DEFAULT_CADENCE,
-                  RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+            final CadenceMultiplier cadence = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
+                  RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
+                  RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
             comboCadence.setSelection(cadence);
 
             /*
@@ -4510,7 +4512,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                final SpeedTourType speedTourType = new SpeedTourType();
 
                speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-               speedTourType.cadence = comboCadence.getSelectedCadence();
+               speedTourType.cadenceMultiplier = comboCadence.getSelectedCadence();
 
                final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
                if (tourTypeId instanceof Long) {
@@ -4721,8 +4723,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      labelTourTypeIcon.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
                   }
 
-                  if (speedTT.cadence != null) {
-                     comboCadence.setSelection(speedTT.cadence);
+                  if (speedTT.cadenceMultiplier != null) {
+                     comboCadence.setSelection(speedTT.cadenceMultiplier);
                   }
 
                   // keep references

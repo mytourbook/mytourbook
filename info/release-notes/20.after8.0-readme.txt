@@ -64,7 +64,8 @@ Changes
 Fixes   
 =====
 
-* Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration (rtdog)
+* Tour Log (rtdog)
+  - Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration
 
 * Tour Book View
   - Tour tag filter caused SQL exception in flat layout view https://github.com/wolfgang-ch/mytourbook/issues/220
