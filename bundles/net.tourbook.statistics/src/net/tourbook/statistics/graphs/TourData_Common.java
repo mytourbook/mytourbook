@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,85 +22,89 @@ import net.tourbook.data.TourType;
  */
 public abstract class TourData_Common {
 
-	long[][]				typeIds;
-	int[][]				typeColorIndex;
+   long[][]          typeIds;
+   int[][]           typeColorIndex;
 
-	float[][]			altitudeLow;
-	float[][]			altitudeHigh;
+   float[][]         altitudeLow;
+   float[][]         altitudeHigh;
 
-	float[][]			distanceLow;
-	float[][]			distanceHigh;
+   float[][]         distanceLow;
+   float[][]         distanceHigh;
 
-	float[][]			numToursLow;
-	float[][]			numToursHigh;
+   float[][]         numToursLow;
+   float[][]         numToursHigh;
 
-	private float[][]	_durationTimeLowFloat;
-	private float[][]	_durationTimeHighFloat;
+   private float[][] _durationTimeLowFloat;
+   private float[][] _durationTimeHighFloat;
 
-	int[][]				recordingTime;
-	int[][]				drivingTime;
-	int[][]				breakTime;
+   int[][]           elapsedTime;
+   int[][]           recordedTime;
+   int[][]           pausedTime;
+   int[][]           movingTime;
+   int[][]           breakTime;
 
-	/**
-	 * Contains the used {@link TourType} ID or -1 when not available. This data has the same length
-	 * as the other common data.
-	 */
-	long[]				usedTourTypeIds;
+   String            statisticValuesRaw;
 
-	public float[][] getDurationTimeHighFloat() {
-		return _durationTimeHighFloat;
-	}
+   /**
+    * Contains the used {@link TourType} ID or -1 when not available. This data has the same length
+    * as the other common data.
+    */
+   long[]            usedTourTypeIds;
 
-	public float[][] getDurationTimeLowFloat() {
-		return _durationTimeLowFloat;
-	}
+   public float[][] getDurationTimeHighFloat() {
+      return _durationTimeHighFloat;
+   }
 
-	/**
-	 * Set time values and convert it from int to float.
-	 *
-	 * @param timeHigh
-	 */
-	public void setDurationTimeHigh(final int[][] timeHigh) {
+   public float[][] getDurationTimeLowFloat() {
+      return _durationTimeLowFloat;
+   }
 
-		if (timeHigh.length == 0 || timeHigh[0].length == 0) {
-			_durationTimeHighFloat = new float[0][0];
-			return;
-		}
+   /**
+    * Set time values and convert it from int to float.
+    *
+    * @param timeHigh
+    */
+   public void setDurationTimeHigh(final int[][] timeHigh) {
 
-		_durationTimeHighFloat = new float[timeHigh.length][timeHigh[0].length];
+      if (timeHigh.length == 0 || timeHigh[0].length == 0) {
+         _durationTimeHighFloat = new float[0][0];
+         return;
+      }
 
-		for (int outerIndex = 0; outerIndex < timeHigh.length; outerIndex++) {
+      _durationTimeHighFloat = new float[timeHigh.length][timeHigh[0].length];
 
-			final int innerLength = timeHigh[outerIndex].length;
+      for (int outerIndex = 0; outerIndex < timeHigh.length; outerIndex++) {
 
-			for (int innerIndex = 0; innerIndex < innerLength; innerIndex++) {
-				_durationTimeHighFloat[outerIndex][innerIndex] = timeHigh[outerIndex][innerIndex];
-			}
-		}
-	}
+         final int innerLength = timeHigh[outerIndex].length;
 
-	/**
-	 * Set time values and convert it from int to float.
-	 *
-	 * @param timeHigh
-	 */
-	public void setDurationTimeLow(final int[][] timeLow) {
+         for (int innerIndex = 0; innerIndex < innerLength; innerIndex++) {
+            _durationTimeHighFloat[outerIndex][innerIndex] = timeHigh[outerIndex][innerIndex];
+         }
+      }
+   }
 
-		if (timeLow.length == 0 || timeLow[0].length == 0) {
-			_durationTimeLowFloat = new float[0][0];
-			return;
-		}
+   /**
+    * Set time values and convert it from int to float.
+    *
+    * @param timeHigh
+    */
+   public void setDurationTimeLow(final int[][] timeLow) {
 
-		_durationTimeLowFloat = new float[timeLow.length][timeLow[0].length];
+      if (timeLow.length == 0 || timeLow[0].length == 0) {
+         _durationTimeLowFloat = new float[0][0];
+         return;
+      }
 
-		for (int outerIndex = 0; outerIndex < timeLow.length; outerIndex++) {
+      _durationTimeLowFloat = new float[timeLow.length][timeLow[0].length];
 
-			final int innerLength = timeLow[outerIndex].length;
+      for (int outerIndex = 0; outerIndex < timeLow.length; outerIndex++) {
 
-			for (int innerIndex = 0; innerIndex < innerLength; innerIndex++) {
-				_durationTimeLowFloat[outerIndex][innerIndex] = timeLow[outerIndex][innerIndex];
-			}
-		}
-	}
+         final int innerLength = timeLow[outerIndex].length;
+
+         for (int innerIndex = 0; innerIndex < innerLength; innerIndex++) {
+            _durationTimeLowFloat[outerIndex][innerIndex] = timeLow[outerIndex][innerIndex];
+         }
+      }
+   }
 
 }

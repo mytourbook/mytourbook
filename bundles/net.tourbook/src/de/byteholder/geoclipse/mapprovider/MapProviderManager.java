@@ -19,7 +19,6 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.map.TileImageCache;
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom.PART_TYPE;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -43,6 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;

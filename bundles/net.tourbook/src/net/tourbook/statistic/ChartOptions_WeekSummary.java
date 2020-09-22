@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.statistic;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -48,9 +49,11 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 
    private Button _rdoChartType_BarAdjacent;
    private Button _rdoChartType_BarStacked;
-   private Button _rdoDuration_BreakTime;
+   private Button _rdoDuration_ElapsedTime;
+   private Button _rdoDuration_RecordedTime;
+   private Button _rdoDuration_PausedTime;
    private Button _rdoDuration_MovingTime;
-   private Button _rdoDuration_RecordingTime;
+   private Button _rdoDuration_BreakTime;
 
    @Override
    public void createUI(final Composite parent) {
@@ -109,7 +112,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
-             * Moving, recording + break time
+             * Moving, elapsed + break time
              */
             final Composite timeContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()
@@ -120,11 +123,27 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
             {
                {
                   /*
-                   * Recording time
+                   * Elapsed time
                    */
-                  _rdoDuration_RecordingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordingTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordingTime);
-                  _rdoDuration_RecordingTime.addSelectionListener(_defaultSelectionListener);
+                  _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+                  _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Recorded time
+                   */
+                  _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+                  _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Paused time
+                   */
+                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
                   /*
@@ -139,7 +158,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                    * Break time
                    */
                   _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
@@ -189,7 +208,9 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 
       _rdoDuration_MovingTime.setEnabled(isShowDuration);
       _rdoDuration_BreakTime.setEnabled(isShowDuration);
-      _rdoDuration_RecordingTime.setEnabled(isShowDuration);
+      _rdoDuration_ElapsedTime.setEnabled(isShowDuration);
+      _rdoDuration_RecordedTime.setEnabled(isShowDuration);
+      _rdoDuration_PausedTime.setEnabled(isShowDuration);
    }
 
    private void initUI(final Composite parent) {
@@ -235,7 +256,9 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
             DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -258,7 +281,9 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
             DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -280,14 +305,20 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
                   : ChartDataSerie.CHART_TYPE_BAR_STACKED);
 
       // duration time
-      _prefStore.setValue(ITourbookPreferences.STAT_WEEK_DURATION_TIME,
+      String selectedDurationType = UI.EMPTY_STRING;
 
-            _rdoDuration_BreakTime.getSelection()
-                  ? DurationTime.BREAK.name()
+      if (_rdoDuration_BreakTime.getSelection()) {
+         selectedDurationType = DurationTime.BREAK.name();
+      } else if (_rdoDuration_MovingTime.getSelection()) {
+         selectedDurationType = DurationTime.MOVING.name();
+      } else if (_rdoDuration_RecordedTime.getSelection()) {
+         selectedDurationType = DurationTime.RECORDED.name();
+      } else if (_rdoDuration_PausedTime.getSelection()) {
+         selectedDurationType = DurationTime.PAUSED.name();
+      } else if (_rdoDuration_ElapsedTime.getSelection()) {
+         selectedDurationType = DurationTime.ELAPSED.name();
+      }
 
-                  : _rdoDuration_MovingTime.getSelection()
-                        ? DurationTime.MOVING.name()
-
-                        : DurationTime.RECORDING.name());
+      _prefStore.setValue(ITourbookPreferences.STAT_WEEK_DURATION_TIME, selectedDurationType);
    }
 }

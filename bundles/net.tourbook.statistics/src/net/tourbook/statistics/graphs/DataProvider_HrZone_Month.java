@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -27,7 +28,6 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class DataProvider_HrZone_Month extends DataProvider {
 
@@ -197,33 +197,54 @@ public class DataProvider_HrZone_Month extends DataProvider {
          SQL.showException(e, sql);
       }
 
-      if (isLogStatisticValues) {
-         logValues();
-      }
+      setStatisticValues();
 
       return _monthData;
    }
 
-   private void logValues() {
+   private void setStatisticValues() {
 
-      System.out.println("\n" //$NON-NLS-1$
+      final StringBuilder sb = new StringBuilder();
 
-            + "month-year," //$NON-NLS-1$
-            + "     zone1," //$NON-NLS-1$
-            + "     zone2," //$NON-NLS-1$
-            + "     zone3," //$NON-NLS-1$
-            + "     zone4," //$NON-NLS-1$
-            + "     zone5," //$NON-NLS-1$
-            + "     zone6," //$NON-NLS-1$
-            + "     zone7," //$NON-NLS-1$
-            + "     zone8," //$NON-NLS-1$
-            + "     zone9," //$NON-NLS-1$
-            + "    zone10," //$NON-NLS-1$
+      sb.append(UI.EMPTY_STRING
 
-            + "      sum-sec," //$NON-NLS-1$
-            + " sum-hh-mm-ss" //$NON-NLS-1$
+            + "Year," //$NON-NLS-1$
+            + " Month," //$NON-NLS-1$
+            + "     Zone1," //$NON-NLS-1$
+            + "      Zone2," //$NON-NLS-1$
+            + "      Zone3," //$NON-NLS-1$
+            + "      Zone4," //$NON-NLS-1$
+            + "      Zone5," //$NON-NLS-1$
+            + "      Zone6," //$NON-NLS-1$
+            + "      Zone7," //$NON-NLS-1$
+            + "      Zone8," //$NON-NLS-1$
+            + "      Zone9," //$NON-NLS-1$
+            + "     Zone10," //$NON-NLS-1$
 
-            + ""); //$NON-NLS-1$
+            + "      Summary," //$NON-NLS-1$
+            + "       Summary" //$NON-NLS-1$
+
+            + NL);
+
+      sb.append(UI.EMPTY_STRING
+
+            + "    ," //$NON-NLS-1$
+            + "     ," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+            + "        (s)," //$NON-NLS-1$
+
+            + "          (s)," //$NON-NLS-1$
+            + "    (hh:mm:ss)" //$NON-NLS-1$
+
+            + NL);
 
       final int[][] hrZoneValues = _monthData.hrZoneValues;
       final int numMonths = hrZoneValues[0].length;
@@ -243,14 +264,21 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
 
-         System.out.println(String.format(UI.EMPTY_STRING
+         sb.append(String.format(UI.EMPTY_STRING
 
-               + "%5d-%d," //$NON-NLS-1$
-               + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d," //$NON-NLS-1$
-               + "%13d,%13s", //$NON-NLS-1$
+               // year, month
+               + "%4d, %5d," //$NON-NLS-1$
 
-               month,
+               // zone 1...10
+               + "%10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d," //$NON-NLS-1$
+
+               // summaries
+               + "%13d, %13s" //$NON-NLS-1$
+
+               + NL,
+
                year,
+               month,
 
                hrZoneValues[0][monthIndex],
                hrZoneValues[1][monthIndex],
@@ -269,7 +297,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
          ));
       }
 
-      System.out.println();
+      _monthData.statisticValuesRaw = sb.toString();
    }
 
 }

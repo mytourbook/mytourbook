@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistic;
+
+import de.byteholder.geoclipse.map.UI;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -50,9 +52,11 @@ public class ChartOptions_Training implements IStatisticOptions {
    private Button           _chkShowAvgSpeed;
    private Button           _chkShowAvgPace;
 
-   private Button           _rdoDuration_BreakTime;
+   private Button           _rdoDuration_ElapsedTime;
+   private Button           _rdoDuration_RecordedTime;
+   private Button           _rdoDuration_PausedTime;
    private Button           _rdoDuration_MovingTime;
-   private Button           _rdoDuration_RecordingTime;
+   private Button           _rdoDuration_BreakTime;
 
    private TrainingPrefKeys _prefKeys;
 
@@ -160,7 +164,7 @@ public class ChartOptions_Training implements IStatisticOptions {
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
-             * Moving, recording + break time
+             * Moving, elapsed + break time
              */
             final Composite timeContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()
@@ -171,11 +175,27 @@ public class ChartOptions_Training implements IStatisticOptions {
             {
                {
                   /*
-                   * Recording time
+                   * Elapsed time
                    */
-                  _rdoDuration_RecordingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordingTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordingTime);
-                  _rdoDuration_RecordingTime.addSelectionListener(_defaultSelectionListener);
+                  _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+                  _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Recorded time
+                   */
+                  _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+                  _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Paused time
+                   */
+                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
                   /*
@@ -190,7 +210,7 @@ public class ChartOptions_Training implements IStatisticOptions {
                    * Break time
                    */
                   _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
@@ -232,8 +252,9 @@ public class ChartOptions_Training implements IStatisticOptions {
 
       _rdoDuration_MovingTime.setEnabled(isShowDuration);
       _rdoDuration_BreakTime.setEnabled(isShowDuration);
-      _rdoDuration_RecordingTime.setEnabled(isShowDuration);
-
+      _rdoDuration_ElapsedTime.setEnabled(isShowDuration);
+      _rdoDuration_RecordedTime.setEnabled(isShowDuration);
+      _rdoDuration_PausedTime.setEnabled(isShowDuration);
    }
 
    private void initUI(final Composite parent) {
@@ -273,7 +294,9 @@ public class ChartOptions_Training implements IStatisticOptions {
       final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getDefaultString(_prefKeys.durationTime), DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
@@ -295,7 +318,9 @@ public class ChartOptions_Training implements IStatisticOptions {
       final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getString(_prefKeys.durationTime), DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
@@ -315,15 +340,21 @@ public class ChartOptions_Training implements IStatisticOptions {
       _prefStore.setValue(_prefKeys.isShow_Duration, _chkShowDuration.getSelection());
 
       // duration time
-      _prefStore.setValue(_prefKeys.durationTime,
+      String selectedDurationType = UI.EMPTY_STRING;
 
-            _rdoDuration_BreakTime.getSelection()
-                  ? DurationTime.BREAK.name()
+      if (_rdoDuration_BreakTime.getSelection()) {
+         selectedDurationType = DurationTime.BREAK.name();
+      } else if (_rdoDuration_MovingTime.getSelection()) {
+         selectedDurationType = DurationTime.MOVING.name();
+      } else if (_rdoDuration_RecordedTime.getSelection()) {
+         selectedDurationType = DurationTime.RECORDED.name();
+      } else if (_rdoDuration_PausedTime.getSelection()) {
+         selectedDurationType = DurationTime.PAUSED.name();
+      } else if (_rdoDuration_ElapsedTime.getSelection()) {
+         selectedDurationType = DurationTime.ELAPSED.name();
+      }
 
-                  : _rdoDuration_MovingTime.getSelection()
-                        ? DurationTime.MOVING.name()
-
-                        : DurationTime.RECORDING.name());
+      _prefStore.setValue(_prefKeys.durationTime, selectedDurationType);
 
       _prefStore.setValue(_prefKeys.isShow_TrainingEffect, _chkShow_TrainingEffect.getSelection());
       _prefStore.setValue(_prefKeys.isShow_TrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());

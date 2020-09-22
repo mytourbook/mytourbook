@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -126,6 +126,15 @@ public class SerieData implements Serializable {
    public int[] powerSerie;
    public int[] deviceMarker;
 
+   /**
+    * An array containing the start time of each pause (in milliseconds)
+    */
+   public long[] pausedTime_Start;
+   /**
+    * An array containing the end time of each pause (in milliseconds)
+    */
+   public long[] pausedTime_End;
+
    @Override
    public String toString() {
 
@@ -173,6 +182,8 @@ public class SerieData implements Serializable {
             + "   temperatureSerie           " + (temperatureSerie != null       ? Arrays.toString(Arrays.copyOf(temperatureSerie,        Math.min(temperatureSerie.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   speedSerie                 " + (speedSerie != null             ? Arrays.toString(Arrays.copyOf(speedSerie,              Math.min(speedSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   powerSerie                 " + (powerSerie != null             ? Arrays.toString(Arrays.copyOf(powerSerie,              Math.min(powerSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   pausedTime_Start           " + (pausedTime_Start != null       ? Arrays.toString(Arrays.copyOf(pausedTime_Start,        Math.min(pausedTime_Start.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   pausedTime_End             " + (pausedTime_End != null         ? Arrays.toString(Arrays.copyOf(pausedTime_End,          Math.min(pausedTime_End.length, maxLen)))        : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
             + "   deviceMarker               " + (deviceMarker != null           ? Arrays.toString(Arrays.copyOf(deviceMarker,            Math.min(deviceMarker.length, maxLen)))          : UI.EMPTY_STRING) ; //$NON-NLS-1$
    }

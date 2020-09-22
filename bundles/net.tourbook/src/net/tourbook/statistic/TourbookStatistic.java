@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -335,11 +335,19 @@ public abstract class TourbookStatistic {
 
       if (durationTime == DurationTime.BREAK) {
 
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Break);
+
+      } else if (durationTime == DurationTime.ELAPSED) {
+
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Elapsed);
+
+      } else if (durationTime == DurationTime.PAUSED) {
+
          yData_Duration.setYTitle(Messages.Graph_Label_Time_Paused);
 
-      } else if (durationTime == DurationTime.RECORDING) {
+      } else if (durationTime == DurationTime.RECORDED) {
 
-         yData_Duration.setYTitle(Messages.Graph_Label_Time_Recording);
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Recorded);
 
       } else {
 

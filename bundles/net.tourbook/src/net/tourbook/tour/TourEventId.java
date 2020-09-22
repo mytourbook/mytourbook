@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
+import net.tourbook.statistic.Selection_StatisticValues;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -108,4 +109,9 @@ public enum TourEventId {
     */
    MAP_SHOW_GEO_GRID,
 
+   /**
+    * This event is fired when a statistic is updated, the event data contains the
+    * {@link Selection_StatisticValues}.
+    */
+   STATISTIC_VALUES,
 }

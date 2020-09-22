@@ -61,7 +61,7 @@ public class PrintTourPDF extends PrintTourExtension {
    private String formatStartDate(final TourData _tourData) {
 
       final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
-      final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourRecordingTime());
+      final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourDeviceTime_Elapsed());
 
       return String.format(
             net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,

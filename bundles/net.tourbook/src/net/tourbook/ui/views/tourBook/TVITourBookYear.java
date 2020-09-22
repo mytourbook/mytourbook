@@ -171,7 +171,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
             /*
              * Fixed "java.time.LocalDate cannot be cast to java.time.ZonedDateTime" exception with
-             * this special date/time contruction
+             * this special date/time construction
              */
             LocalDate categoryDate;
             final LocalDate tourWeekLocal = tourWeek.toLocalDate();

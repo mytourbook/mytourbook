@@ -281,16 +281,23 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
+         final String sqlSortingFieldsRaw = createSql_Sorting_Fields();
+
          if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
 
             // tags are combined with OR
 
             final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
+            String sqlSortingFields_1 = sqlSortingFieldsRaw;
+            if (sqlSortingFields_1.length() > 0) {
+               sqlSortingFields_1 += UI.COMMA_SPACE + NL;
+            }
+
             sql = NL
 
                   + "SELECT DISTINCT TourId," + NL //                                                    //$NON-NLS-1$
-                  + "   " + createSql_Sorting_Fields() + "," + NL//                                      //$NON-NLS-1$
+                  + "   " + sqlSortingFields_1 //                                                        //$NON-NLS-1$
                   + "   jTdataTtag.TourTag_tagId" + NL //                                                //$NON-NLS-1$
 
                   + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                       //$NON-NLS-1$
@@ -315,16 +322,21 @@ public class NatTable_DataLoader {
             final SQLFilter sqlFilter = new SQLFilter();
             final SQLData sqlCombineTagsWithAnd = TourTagFilterSqlJoinBuilder.createSql_CombineTagsWithAnd();
 
+            String sqlSortingFields_2 = sqlSortingFieldsRaw;
+            if (sqlSortingFields_2.length() > 0) {
+               sqlSortingFields_2 = UI.COMMA_SPACE + sqlSortingFields_2 + NL;
+            }
+
             sql = NL
 
-                  + " SELECT DISTINCT TourId," + NL //                                                   //$NON-NLS-1$
-                  + "   " + createSql_Sorting_Fields() + NL //                                           //$NON-NLS-1$
+                  + " SELECT DISTINCT TourId" + NL //                                                    //$NON-NLS-1$
+                  + "   " + sqlSortingFields_2 //                                                        //$NON-NLS-1$
 
                   + " FROM" + NL //                                                                      //$NON-NLS-1$
                   + " ( SELECT" + NL //                                                                  //$NON-NLS-1$
                   + "      TourId," + NL //                                                              //$NON-NLS-1$
-                  + "      jTdataTtag.TourTag_tagId," + NL //                                            //$NON-NLS-1$
-                  + "      " + createSql_Sorting_Fields() + NL
+                  + "      jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
+                  + "      " + sqlSortingFields_2
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
                   + "   " + sqlCombineTagsWithAnd.getSqlString()
                   + "   AS jTdataTtag" + NL //                                                           //$NON-NLS-1$
@@ -838,10 +850,13 @@ public class NatTable_DataLoader {
       /*
        * TIME
        */
-      case TableColumnFactory.TIME_DRIVING_TIME_ID:                  return "tourDrivingTime";                 //$NON-NLS-1$
-      case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:          return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_RECORDING_TIME_ID:                return "tourRecordingTime";               //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:          return "tourDeviceTime_Elapsed";          //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_RECORDED_TIME_ID:         return "tourDeviceTime_Recorded";         //$NON-NLS-1$
+      case TableColumnFactory.TIME__DEVICE_PAUSED_TIME_ID:           return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:         return "tourComputedTime_Moving";         //$NON-NLS-1$
+      case TableColumnFactory.TIME__COMPUTED_BREAK_TIME_ID:          return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE_ID: return FIELD_WITHOUT_SORTING;
+
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields

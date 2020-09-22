@@ -96,8 +96,8 @@ public class TourFilterManager {
    private static final String TOUR_DATA_TOUR_LOCATION_START     = "TourData.tourStartPlace";                                       //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_LOCATION_END       = "TourData.tourEndPlace";                                         //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_DISTANCE           = "TourData.tourDistance";                                         //$NON-NLS-1$
-   private static final String TOUR_DATA_TOUR_DRIVING_TIME       = "TourData.tourDrivingTime";                                      //$NON-NLS-1$
-   private static final String TOUR_DATA_TOUR_RECORDING_TIME     = "TourData.tourRecordingTime";                                    //$NON-NLS-1$
+   private static final String TOUR_DATA_TOUR_MOVING_TIME        = "TourData.tourComputedTime_Moving";                              //$NON-NLS-1$
+   private static final String TOUR_DATA_TOUR_ELAPSED_TIME       = "TourData.tourDeviceTime_Elapsed";                               //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_START_TIME         = "TourData.tourStartTime";                                        //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_TITLE              = "TourData.tourTitle";                                            //$NON-NLS-1$
 
@@ -566,23 +566,23 @@ public class TourFilterManager {
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_RecordingTime)
-                  .fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
+                  .name(Messages.Tour_Filter_Field_DeviceTime_Elapsed)
+                  .fieldId(TourFilterFieldId.TIME_ELAPSED_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .pageIncrement(60));
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_DrivingTime)
-                  .fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
+                  .name(Messages.Tour_Filter_Field_ComputedTime_Moving)
+                  .fieldId(TourFilterFieldId.TIME_MOVING_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .pageIncrement(60));
 
       allConfigs.add(
             TourFilterFieldConfig //
-                  .name(Messages.Tour_Filter_Field_BreakTime)
+                  .name(Messages.Tour_Filter_Field_ComputedTime_Break)
                   .fieldId(TourFilterFieldId.TIME_BREAK_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
@@ -937,18 +937,18 @@ public class TourFilterManager {
             break;
 
          case TIME_BREAK_TIME:
-            sql = "(TourData.tourRecordingTime - TourData.tourDrivingTime)"; //$NON-NLS-1$
+            sql = "(TourData.tourDeviceTime_Elapsed - TourData.tourComputedTime_Moving)"; //$NON-NLS-1$
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
             break;
 
-         case TIME_DRIVING_TIME:
-            sql = TOUR_DATA_TOUR_DRIVING_TIME;
+         case TIME_MOVING_TIME:
+            sql = TOUR_DATA_TOUR_MOVING_TIME;
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 
             break;
 
-         case TIME_RECORDING_TIME:
-            sql = TOUR_DATA_TOUR_RECORDING_TIME;
+         case TIME_ELAPSED_TIME:
+            sql = TOUR_DATA_TOUR_ELAPSED_TIME;
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
             break;
 
