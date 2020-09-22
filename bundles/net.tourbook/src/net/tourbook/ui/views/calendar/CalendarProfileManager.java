@@ -308,12 +308,11 @@ public class CalendarProfileManager {
    private static final DataFormatter   _weekFormatter_Time_Moving;
    private static final DataFormatter   _weekFormatter_Time_Break;
    static final DataFormatter[]         allTourContentFormatter;
-
    static final DataFormatter[]         allWeekFormatter;
-   private static final IValueFormatter _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
 
 // SET_FORMATTING_OFF
 
+   private static final IValueFormatter   _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
    private static final IValueFormatter   _valueFormatter_Number_1_1            = new ValueFormatter_Number_1_1(false);
    private static final IValueFormatter   _valueFormatter_Number_1_2            = new ValueFormatter_Number_1_2(false);
    private static final IValueFormatter   _valueFormatter_Number_1_3            = new ValueFormatter_Number_1_3(false);
@@ -618,7 +617,6 @@ public class CalendarProfileManager {
     * Contains all calendar profiles which are loaded from a xml file.
     */
    private static final ArrayList<CalendarProfile> _allCalendarProfiles       = new ArrayList<>();
-
    private static final ArrayList<CalendarProfile> _allDefaultDefaultProfiles = new ArrayList<>();
    static {
       createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
