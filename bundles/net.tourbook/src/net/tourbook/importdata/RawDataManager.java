@@ -125,17 +125,12 @@ public class RawDataManager {
 
    static final ComboEnumEntry<?>[] ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-<<<<<<< HEAD
+
    private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
    private static CadenceMultiplier           _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
-=======
-   private static boolean           _importState_IsAutoOpenImportLog     = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean           _importState_IsIgnoreInvalidFile     = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean           _importState_IsSetBodyWeight         = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
 
->>>>>>> upstream/main
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
