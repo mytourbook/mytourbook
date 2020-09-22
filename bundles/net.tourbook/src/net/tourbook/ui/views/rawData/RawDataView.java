@@ -90,6 +90,7 @@ import net.tourbook.preferences.PrefPageImport;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -194,96 +195,101 @@ import org.joda.time.PeriodType;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-   public static final String  ID                                         = "net.tourbook.views.rawData.RawDataView";                         //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-   private static final String COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+
+// SET_FORMATTING_ON
+
+   public static final String ID = "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+
    // db state
-   private static final String IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";                                       //$NON-NLS-1$
-   private static final String IMAGE_DATABASE                             = "IMAGE_DATABASE";                                                 //$NON-NLS-1$
-   private static final String IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";                                    //$NON-NLS-1$
-   private static final String IMAGE_DELETE                               = "IMAGE_DELETE";                                                   //$NON-NLS-1$
-   private static final String IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                                         //$NON-NLS-1$
-   // import state
-   private static final String IMAGE_STATE_DELETE                         = "IMAGE_STATE_DELETE";                                             //$NON-NLS-1$
-   private static final String IMAGE_STATE_MOVED                          = "IMAGE_STATE_MOVED";                                              //$NON-NLS-1$
-   // OLD UI
-   private static final String IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                                            //$NON-NLS-1$
-   private static final String IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";                                     //$NON-NLS-1$
-   private static final String IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                                        //$NON-NLS-1$
-   private static final String IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                                                   //$NON-NLS-1$
-   //
-   private static final String HTML_TD                                    = "<td>";                                                           //$NON-NLS-1$
-   private static final String HTML_TD_SPACE                              = "<td ";                                                           //$NON-NLS-1$
-   private static final String HTML_TD_END                                = "</td>";                                                          //$NON-NLS-1$
-   private static final String HTML_TR                                    = "<tr>";                                                           //$NON-NLS-1$
-   private static final String HTML_TR_END                                = "</tr>";                                                          //$NON-NLS-1$
-   //
-   private static final String JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                                           //$NON-NLS-1$
-   //
-   private static final String WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                                                //$NON-NLS-1$
-//   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                                            //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                                                //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                                           //$NON-NLS-1$
-   //
-   private static final String CSS_IMPORT_BACKGROUND                      = "div.import-background";                                          //$NON-NLS-1$
-   private static final String CSS_IMPORT_TILE                            = "a.import-tile";                                                  //$NON-NLS-1$
-   //
-   private static final String STATE_IMPORTED_FILENAMES                   = "importedFilenames";                                              //$NON-NLS-1$
-   private static final String STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                                            //$NON-NLS-1$
-   //
-   public static final String  STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                                           //$NON-NLS-1$
-   public static final boolean STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
-   public static final String  STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";                                     //$NON-NLS-1$
-   public static final boolean STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
-   public static final String  STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                                         //$NON-NLS-1$
-   public static final boolean STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
-   public static final String  STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";                             //$NON-NLS-1$
-   public static final boolean STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
-   private static final String STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";                         //$NON-NLS-1$
-   public static final String  STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                                                  //$NON-NLS-1$
-   public static final boolean STATE_IS_MERGE_TRACKS_DEFAULT              = false;
-   public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
-   public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
-   public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
-   public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
-   //
-   private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
+   private static final String           IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";               //$NON-NLS-1$
+   private static final String           IMAGE_DATABASE                             = "IMAGE_DATABASE";                         //$NON-NLS-1$
 
+   private static final String           IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";            //$NON-NLS-1$
+   private static final String           IMAGE_DELETE                               = "IMAGE_DELETE";                           //$NON-NLS-1$
+   private static final String           IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                 //$NON-NLS-1$
+   // import state
+   private static final String           IMAGE_STATE_DELETE                         = "IMAGE_STATE_DELETE";                     //$NON-NLS-1$
+   private static final String           IMAGE_STATE_MOVED                          = "IMAGE_STATE_MOVED";                      //$NON-NLS-1$
+   // OLD UI
+   private static final String           IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                    //$NON-NLS-1$
+   private static final String           IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";             //$NON-NLS-1$
+   private static final String           IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                //$NON-NLS-1$
+   private static final String           IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                           //$NON-NLS-1$
+   //
+   private static final String           HTML_TD                                    = "<td>";                                   //$NON-NLS-1$
+   private static final String           HTML_TD_SPACE                              = "<td ";                                   //$NON-NLS-1$
+   private static final String           HTML_TD_END                                = "</td>";                                  //$NON-NLS-1$
+   private static final String           HTML_TR                                    = "<tr>";                                   //$NON-NLS-1$
+   private static final String           HTML_TR_END                                = "</tr>";                                  //$NON-NLS-1$
+   //
+   private static final String           JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                   //$NON-NLS-1$
+   //
+   private static final String           WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                        //$NON-NLS-1$
+   //   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                    //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                        //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                   //$NON-NLS-1$
+   //
+   private static final String           CSS_IMPORT_BACKGROUND                      = "div.import-background";                  //$NON-NLS-1$
+   private static final String           CSS_IMPORT_TILE                            = "a.import-tile";                          //$NON-NLS-1$
+   //
+   private static final String           STATE_IMPORTED_FILENAMES                   = "importedFilenames";                      //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                    //$NON-NLS-1$
+   //
+   public static final String            STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                   //$NON-NLS-1$
+   public static final boolean           STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
+   public static final String            STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";             //$NON-NLS-1$
+   public static final boolean           STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
+   public static final String            STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                 //$NON-NLS-1$
+   public static final boolean           STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
+   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
+   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
+   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
+   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
+   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
+   public static final String            STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                    //$NON-NLS-1$
+   public static final boolean           STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String            STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                        //$NON-NLS-1$
+   public static final boolean           STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
+   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
+   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
+   //
+   private static final String           HREF_TOKEN                                 = "#";                                      //$NON-NLS-1$
+   private static final String           PAGE_ABOUT_BLANK                           = "about:blank";                            //$NON-NLS-1$
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                                 = "http://dummy";                                                   //$NON-NLS-1$
-
-   private static final String HTML_STYLE_TITLE_VERTICAL_PADDING          = "style='padding-top:10px;'";                                      //$NON-NLS-1$
-
-   private static String       ACTION_DEVICE_IMPORT                       = "DeviceImport";                                                   //$NON-NLS-1$
-   private static String       ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                                                    //$NON-NLS-1$
-   private static final String ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                                                //$NON-NLS-1$
-   private static final String ACTION_OLD_UI                              = "OldUI";                                                          //$NON-NLS-1$
-   private static final String ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                                           //$NON-NLS-1$
-   private static final String ACTION_SERIAL_PORT_DIRECTLY                = "SerialPortDirectly";                                             //$NON-NLS-1$
-   private static final String ACTION_SETUP_EASY_IMPORT                   = "SetupEasyImport";                                                //$NON-NLS-1$
+   private static final String           HTTP_DUMMY                                 = "http://dummy";                           //$NON-NLS-1$
+   private static final String           HTML_STYLE_TITLE_VERTICAL_PADDING          = "style='padding-top:10px;'";              //$NON-NLS-1$
+   private static String                 ACTION_DEVICE_IMPORT                       = "DeviceImport";                           //$NON-NLS-1$
+   private static String                 ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                            //$NON-NLS-1$
+   private static final String           ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                        //$NON-NLS-1$
+   private static final String           ACTION_OLD_UI                              = "OldUI";                                  //$NON-NLS-1$
+   private static final String           ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                   //$NON-NLS-1$
+   private static final String           ACTION_SERIAL_PORT_DIRECTLY                = "SerialPortDirectly";                     //$NON-NLS-1$
+   private static final String           ACTION_SETUP_EASY_IMPORT                   = "SetupEasyImport";                        //$NON-NLS-1$
    //
-   private static final String DOM_CLASS_DEVICE_ON                        = "deviceOn";                                                       //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_OFF                       = "deviceOff";                                                      //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_ON_ANIMATED               = "deviceOnAnimated";                                               //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_OFF_ANIMATED              = "deviceOffAnimated";                                              //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_ON                        = "deviceOn";                               //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_OFF                       = "deviceOff";                              //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_ON_ANIMATED               = "deviceOnAnimated";                       //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_OFF_ANIMATED              = "deviceOffAnimated";                      //$NON-NLS-1$
    //
-   private static final String DOM_ID_DEVICE_ON_OFF                       = "deviceOnOff";                                                    //$NON-NLS-1$
-   private static final String DOM_ID_DEVICE_STATE                        = "deviceState";                                                    //$NON-NLS-1$
-   private static final String DOM_ID_IMPORT_CONFIG                       = "importConfig";                                                   //$NON-NLS-1$
-   private static final String DOM_ID_IMPORT_TILES                        = "importTiles";                                                    //$NON-NLS-1$
+   private static final String           DOM_ID_DEVICE_ON_OFF                       = "deviceOnOff";                            //$NON-NLS-1$
+   private static final String           DOM_ID_DEVICE_STATE                        = "deviceState";                            //$NON-NLS-1$
+   private static final String           DOM_ID_IMPORT_CONFIG                       = "importConfig";                           //$NON-NLS-1$
+   private static final String           DOM_ID_IMPORT_TILES                        = "importTiles";                            //$NON-NLS-1$
    //
-   private static String       HREF_ACTION_DEVICE_IMPORT;
-   private static String       HREF_ACTION_DEVICE_WATCHING_ON_OFF;
-   private static String       HREF_ACTION_IMPORT_FROM_FILES;
-   private static String       HREF_ACTION_OLD_UI;
-   private static String       HREF_ACTION_SERIAL_PORT_CONFIGURED;
-   private static String       HREF_ACTION_SERIAL_PORT_DIRECTLY;
-   private static String       HREF_ACTION_SETUP_EASY_IMPORT;
+   private static String                 HREF_ACTION_DEVICE_IMPORT;
+   private static String                 HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+   private static String                 HREF_ACTION_IMPORT_FROM_FILES;
+   private static String                 HREF_ACTION_OLD_UI;
+   private static String                 HREF_ACTION_SERIAL_PORT_CONFIGURED;
+   private static String                 HREF_ACTION_SERIAL_PORT_DIRECTLY;
 
+   private static String                 HREF_ACTION_SETUP_EASY_IMPORT;
    static {
 
       HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
@@ -294,15 +300,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
       HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
    }
-
-   private static boolean                 _isStopWatchingStoresThread;
-   public static volatile ReentrantLock   THREAD_WATCHER_LOCK             = new ReentrantLock();
+   private static boolean               _isStopWatchingStoresThread;
+   public static volatile ReentrantLock THREAD_WATCHER_LOCK = new ReentrantLock();
+   //
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    //
    private RawDataManager                 _rawDataMgr                     = RawDataManager.getInstance();
+
    private TableViewer                    _tourViewer;
    private TableViewerTourInfoToolTip     _tourInfoToolTip;
    private ColumnManager                  _columnManager;
@@ -1866,10 +1873,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          if (oneTourType != null) {
 
             final String ttName = oneTourType.getName();
+            final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
 
             // show this text only when the name is different
             if (!tileName.equals(ttName)) {
-               ttText.append(ttName);
+               ttText.append(ttName + " (" + ttCadence.getNlsLabel() + ")");
             }
          }
       }
@@ -2256,7 +2264,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * Eclipse 3.8 with Linux has only a limited css3 support -> DISABLED
           */
          if (UI.IS_WIN) {
-
             webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS3);
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
@@ -4285,7 +4292,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
       setWatcher_Off();
-
       easyConfig.setActiveImportConfig(selectedConfig);
       _isDeviceStateValid = false;
       updateUI_2_Dashboard();
@@ -4605,6 +4611,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // restore: set body weight status before the tours are imported
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+
+      final CadenceMultiplier defaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state,
+            STATE_DEFAULT_CADENCE_MULTIPLIER,
+            STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+      _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
 
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
@@ -5283,6 +5294,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // activate store watching
       _isWatchingStores.set(true);
+
+      // activate folder watching
+      thread_WatchFolders(true);
    }
 
    private void thread_FolderWatcher_Deactivate() {
@@ -5369,7 +5383,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
             }
          } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
+            // TourLogManager.logEx(e); // This is expected condition, don't need to log.
          } finally {
             _folderWatcher = null;
             _watchingFolderThread = null;

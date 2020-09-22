@@ -38,6 +38,12 @@ New
 Improvements
 ============
 
+* Improved Cadence Support (rtdog)
+  - Added new cadence type "none" for tours with no cadence
+  - Added default cadence assignment during Easy Import Launcher when setting tour type
+  - Created import preference for default cadence to use during import launcher configuration
+  - Added language support for cadence type names (none/rpm/spm)
+
 * Flat Tour Book View
   - Show markers and tags columns with the saved content (no dummy text)
   
@@ -60,6 +66,9 @@ Changes
 
 Fixes   
 =====
+
+* Tour Log (rtdog)
+  - Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration
 
 * Tour Book View
   - Tour tag filter caused SQL exception in flat layout view https://github.com/wolfgang-ch/mytourbook/issues/220
