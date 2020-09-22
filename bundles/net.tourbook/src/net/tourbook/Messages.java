@@ -22,6 +22,7 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
+   public static String        Action_Cadence_Set_None;
    public static String        Action_Cadence_Set_Rpm;
    public static String        Action_Cadence_Set_Spm;
 
@@ -517,8 +518,10 @@ public class Messages extends NLS {
    public static String        App_measurement_metric;
    public static String        App_measurement_tooltip;
 
-   public static String        App_People_item_all;
-   public static String        App_People_tooltip;
+   public static String        App_Cadence_Invalid;
+   public static String        App_Cadence_None;
+   public static String        App_Cadence_Rpm;
+   public static String        App_Cadence_Spm;
 
    public static String        App_Default_PersonFirstName;
 
@@ -540,6 +543,9 @@ public class Messages extends NLS {
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
+
+   public static String        App_People_item_all;
+   public static String        App_People_tooltip;
 
    public static String        App_SortDirection_Ascending;
    public static String        App_SortDirection_Descending;
@@ -1892,6 +1898,8 @@ public class Messages extends NLS {
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles;
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
    public static String PrefPage_Import_Checkbox_SetBodyWeight;
+   public static String PrefPage_Import_Default_Cadence;
+   public static String PrefPage_Import_Default_Cadence_Tooltip;
 
    public static String PrefPage_ViewActions_Group;
    public static String PrefPage_ViewActions_Label_DoubleClick;

@@ -86,6 +86,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.DialogEditTimeSlicesValues;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourSaveListener;
@@ -98,6 +99,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -179,7 +181,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -589,8 +590,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private Combo             _comboTitle;
    //
-   private Button            _rdoCadence_Rpm;
-   private Button            _rdoCadence_Spm;
+   private ComboViewerCadence _comboCadence;
    //
    private CLabel            _lblCloudIcon;
    private CLabel            _lblTourType;
@@ -4551,17 +4551,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
             _firstColumnControls.add(label);
 
-            final Composite radioContainer = new Composite(container, SWT.NONE);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(radioContainer);
-            {
-               // ratio: rpm
-               _rdoCadence_Rpm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Rpm, SWT.RADIO);
-               _rdoCadence_Rpm.addSelectionListener(_selectionListener);
+            _comboCadence = new ComboViewerCadence(container);
+            _comboCadence.addSelectionChangedListener(new ISelectionChangedListener() {
+               @Override
+               public void selectionChanged(final SelectionChangedEvent event) {
 
-               // radio: spm
-               _rdoCadence_Spm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Spm, SWT.RADIO);
-               _rdoCadence_Spm.addSelectionListener(_selectionListener);
-            }
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+
+                  updateModel_FromUI();
+                  setTourDirty();
+               }
+            });
          }
       }
    }
@@ -6347,8 +6349,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);
 
-      _rdoCadence_Rpm.setEnabled(canEdit);
-      _rdoCadence_Spm.setEnabled(canEdit);
+      _comboCadence.getCombo().setEnabled(canEdit);
 
       _dtTourDate.setEnabled(canEdit);
       _dtStartTime.setEnabled(canEdit);
@@ -8322,8 +8323,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
          _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
-
-         _tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
+         _tourData.setCadenceMultiplier(_comboCadence.getSelectedCadence().getMultiplier());
 
          /*
           * Weather
@@ -8966,10 +8966,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
-      final float cadence = _tourData.getCadenceMultiplier();
-      final boolean isSpm = cadence == 2.0f;
-      _rdoCadence_Rpm.setSelection(!isSpm);
-      _rdoCadence_Spm.setSelection(isSpm);
+      final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int)_tourData.getCadenceMultiplier());
+      _comboCadence.setSelection(cadence);
 
       /*
        * layout container to resize labels
