@@ -38,6 +38,9 @@ Improvements
 * Flat Tour Book View
   - Show markers and tags columns with the saved content (no dummy text)
   
+* Tour Book View
+  - Reimport keeps manually selected paths during a session and tries to reuse it for subsequent files when necessary.
+  
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
     In the previous version, tags were combined with OR, so a tour was displayed when it contained ONE of the selected tags. 
