@@ -1513,9 +1513,10 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
-
    public static String        Pref_Appearance_Label_AutoOpenTagging_Tooltip;
    public static String        Pref_Appearance_Label_AutoOpenTaggingDelay;
+   public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption;
+   public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
    public static String        Pref_Appearance_Radio_UseRecordedTime;
@@ -1735,8 +1736,6 @@ public class Messages extends NLS {
 
    public static String        pref_appearance_number_of_recent_tags;
    public static String        pref_appearance_number_of_recent_tags_tooltip;
-   public static String        pref_appearance_paceandspeed_computation_option;
-   public static String        pref_appearance_paceandspeed_computation_option_tooltip;
    public static String        pref_appearance_showMemoryMonitor;
    public static String        pref_appearance_showMemoryMonitor_message;
    public static String        pref_appearance_showMemoryMonitor_title;
