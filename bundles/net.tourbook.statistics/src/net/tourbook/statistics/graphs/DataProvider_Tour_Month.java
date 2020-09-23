@@ -108,10 +108,14 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                   + "      StartYear," + NL //                                                  //$NON-NLS-1$
                   + "      StartMonth," + NL //                                                 //$NON-NLS-1$
+
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
-                  + "      TourDeviceTime_Elapsed,  " + NL //$NON-NLS-1$
-                  + "      TourComputedTime_Moving, " + NL //$NON-NLS-1$
+
+                  + "      TourDeviceTime_Elapsed," + NL //                                     //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                                    //$NON-NLS-1$
+                  + "      TourDeviceTime_Paused," + NL //                                      //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
 
                   + "      TourType_TypeId" + NL //                                             //$NON-NLS-1$
 
@@ -147,15 +151,20 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                + "   StartYear," + NL //                                   1  //$NON-NLS-1$
                + "   StartMonth," + NL //                                  2  //$NON-NLS-1$
+
                + "   SUM(TourDistance)," + NL //                           3  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                              4  //$NON-NLS-1$
-               + "   " + createSQL_SumDurationTime(durationTime) + NL //   5  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 6  //$NON-NLS-1$
-               + "   SUM(TourComputedTime_Moving)," + NL //                7  //$NON-NLS-1$
-               + "   SUM(1)," + NL //                                      8  //$NON-NLS-1$
-               + "   TourType_TypeId," + NL //                             9  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Recorded)," + NL //                10 //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Paused)" + NL //                   11 //$NON-NLS-1$
+
+               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded)," + NL //                6  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)," + NL //                  7  //$NON-NLS-1$
+               + "   SUM(TourComputedTime_Moving)," + NL //                8  //$NON-NLS-1$
+
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //   9  //$NON-NLS-1$
+
+               + "   TourType_TypeId," + NL //                             10 //$NON-NLS-1$
+
+               + "   SUM(1)" + NL //                                       11 //$NON-NLS-1$
 
                + fromTourData
 
@@ -215,15 +224,19 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             final int dbValue_Year                 = result.getInt(1);
             final int dbValue_Month                = result.getInt(2);
+
             final int dbValue_Distance             = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
             final int dbValue_Altitude             = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-            final int dbValue_Duration             = result.getInt(5);
-            final int dbValue_ElapsedTime          = result.getInt(6);
-            final int dbValue_MovingTime           = result.getInt(7);
-            final int dbValue_NumTours             = result.getInt(8);
-            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(9);
-            final int dbValue_RecordedTime         = result.getInt(10);
-            final int dbValue_PausedTime           = result.getInt(11);
+
+            final int dbValue_ElapsedTime          = result.getInt(5);
+            final int dbValue_RecordedTime         = result.getInt(6);
+            final int dbValue_PausedTime           = result.getInt(7);
+            final int dbValue_MovingTime           = result.getInt(8);
+            final int dbValue_Duration             = result.getInt(9);
+
+            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(10);
+
+            final int dbValue_NumTours             = result.getInt(11);
 
 // SET_FORMATTING_ON
 

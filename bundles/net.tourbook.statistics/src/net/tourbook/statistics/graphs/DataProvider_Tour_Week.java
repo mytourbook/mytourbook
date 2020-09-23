@@ -119,10 +119,14 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                   + "      StartWeekYear," + NL //                                                       //$NON-NLS-1$
                   + "      StartWeek," + NL //                                                           //$NON-NLS-1$
+
+                  + "      TourDeviceTime_Elapsed," + NL //                                              //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                                             //$NON-NLS-1$
+                  + "      TourDeviceTime_Paused," + NL //                                               //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                             //$NON-NLS-1$
+
                   + "      TourDistance," + NL //                                                        //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                           //$NON-NLS-1$
-                  + "      TourDeviceTime_Elapsed,  " + NL //$NON-NLS-1$
-                  + "      TourComputedTime_Moving, " + NL //$NON-NLS-1$
 
                   + "      TourType_TypeId" + NL //                                                      //$NON-NLS-1$
 
@@ -159,17 +163,18 @@ public class DataProvider_Tour_Week extends DataProvider {
                + "   StartWeekYear," + NL //                                  1  //$NON-NLS-1$
                + "   StartWeek," + NL //                                      2  //$NON-NLS-1$
 
-               + "   SUM(TourDistance)," + NL //                              3  //$NON-NLS-1$
-               + "   SUM(TourAltUp)," + NL //                                 4  //$NON-NLS-1$
-               + "   " + createSQL_SumDurationTime(durationTime) + NL //      5  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Elapsed), " + NL //                   6  //$NON-NLS-1$
+               + "   TourType_TypeId," + NL //                                3  //$NON-NLS-1$
+
+               + "   SUM(TourDeviceTime_Elapsed)," + NL //                    4  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded)," + NL //                   5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)," + NL //                     6  //$NON-NLS-1$
                + "   SUM(TourComputedTime_Moving)," + NL //                   7  //$NON-NLS-1$
-               + "   SUM(1),                   " + NL //                      8  //$NON-NLS-1$
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //      8  //$NON-NLS-1$
 
-               + "   TourType_TypeId,          " + NL //                      9  //$NON-NLS-1$
+               + "   SUM(TourDistance)," + NL //                              9  //$NON-NLS-1$
+               + "   SUM(TourAltUp)," + NL //                                 10 //$NON-NLS-1$
 
-               + "   SUM(TourDeviceTime_Recorded),    " + NL //               10 //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Paused)       " + NL //               11 //$NON-NLS-1$
+               + "   SUM(1)" + NL //                                          11 //$NON-NLS-1$
 
                + fromTourData
 
@@ -177,18 +182,19 @@ public class DataProvider_Tour_Week extends DataProvider {
                + "ORDER BY StartWeekYear, StartWeek" + NL //                     //$NON-NLS-1$
          ;
 
-         final float[][] dbDistance = new float[numTourTypes][numWeeks];
-         final float[][] dbAltitude = new float[numTourTypes][numWeeks];
-         final float[][] dbNumTours = new float[numTourTypes][numWeeks];
+         final long[][] allDbTypeIds = new long[numTourTypes][numWeeks];
 
-         final int[][] dbDurationTime = new int[numTourTypes][numWeeks];
-         final int[][] dbElapsedTime = new int[numTourTypes][numWeeks];
-         final int[][] dbRecordedTime = new int[numTourTypes][numWeeks];
-         final int[][] dbPausedTime = new int[numTourTypes][numWeeks];
-         final int[][] dbMovingTime = new int[numTourTypes][numWeeks];
-         final int[][] dbBreakTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbDurationTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbElapsedTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbRecordedTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbPausedTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbMovingTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbBreakTime = new int[numTourTypes][numWeeks];
 
-         final long[][] dbTypeIds = new long[numTourTypes][numWeeks];
+         final float[][] allDbDistance = new float[numTourTypes][numWeeks];
+         final float[][] allDbElevation = new float[numTourTypes][numWeeks];
+
+         final float[][] allDbNumTours = new float[numTourTypes][numWeeks];
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -243,8 +249,8 @@ public class DataProvider_Tour_Week extends DataProvider {
              * Convert type id to the type index in the tour types list which is also the color
              * index
              */
+            final Long dbTypeIdObject = (Long) result.getObject(3);
             int colorIndex = 0;
-            final Long dbTypeIdObject = (Long) result.getObject(9);
             if (dbTypeIdObject != null) {
                final long dbTypeId = dbTypeIdObject;
                for (int typeIndex = 0; typeIndex < allActiveTourTypes.length; typeIndex++) {
@@ -254,53 +260,59 @@ public class DataProvider_Tour_Week extends DataProvider {
                   }
                }
             }
-
             final long dbTypeId = dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject;
 
-            dbTypeIds[colorIndex][weekIndex] = dbTypeId;
+            final int dbElapsedTime = result.getInt(4);
+            final int dbRecordedTime = result.getInt(5);
+            final int dbPausedTime = result.getInt(6);
+            final int dbMovingTime = result.getInt(7);
 
-            dbDistance[colorIndex][weekIndex] = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
-            dbAltitude[colorIndex][weekIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-            dbDurationTime[colorIndex][weekIndex] = result.getInt(5);
+            final int dbDurationTime = result.getInt(8);
 
-            final int elapsedTime = result.getInt(6);
-            final int movingTime = result.getInt(7);
-            final int numTours = result.getInt(8);
-            final int recordedTime = result.getInt(10);
-            final int pausedTime = result.getInt(11);
+            final int dbDistance = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
+            final int dbElevation = (int) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
 
-            dbNumTours[colorIndex][weekIndex] = numTours;
+            final int numTours = result.getInt(11);
 
-            dbElapsedTime[colorIndex][weekIndex] = elapsedTime;
-            dbRecordedTime[colorIndex][weekIndex] = recordedTime;
-            dbPausedTime[colorIndex][weekIndex] = pausedTime;
-            dbMovingTime[colorIndex][weekIndex] = movingTime;
-            dbBreakTime[colorIndex][weekIndex] = elapsedTime - movingTime;
+            allDbTypeIds[colorIndex][weekIndex] = dbTypeId;
+
+            allDbElapsedTime[colorIndex][weekIndex] = dbElapsedTime;
+            allDbRecordedTime[colorIndex][weekIndex] = dbRecordedTime;
+            allDbPausedTime[colorIndex][weekIndex] = dbPausedTime;
+            allDbMovingTime[colorIndex][weekIndex] = dbMovingTime;
+            allDbBreakTime[colorIndex][weekIndex] = dbElapsedTime - dbMovingTime;
+            allDbDurationTime[colorIndex][weekIndex] = dbDurationTime;
+
+            allDbDistance[colorIndex][weekIndex] = dbDistance;
+            allDbElevation[colorIndex][weekIndex] = dbElevation;
+
+            allDbNumTours[colorIndex][weekIndex] = numTours;
          }
 
-         _tourWeekData.typeIds = dbTypeIds;
 
          _tourWeekData.years = _years;
          _tourWeekData.yearWeeks = _yearWeeks;
          _tourWeekData.yearDays = _yearDays;
 
+         _tourWeekData.typeIds = allDbTypeIds;
+
+         _tourWeekData.elapsedTime = allDbElapsedTime;
+         _tourWeekData.recordedTime = allDbRecordedTime;
+         _tourWeekData.pausedTime = allDbPausedTime;
+         _tourWeekData.movingTime = allDbMovingTime;
+         _tourWeekData.breakTime = allDbBreakTime;
+
          _tourWeekData.setDurationTimeLow(new int[numTourTypes][numWeeks]);
-         _tourWeekData.setDurationTimeHigh(dbDurationTime);
+         _tourWeekData.setDurationTimeHigh(allDbDurationTime);
 
          _tourWeekData.distanceLow = new float[numTourTypes][numWeeks];
-         _tourWeekData.distanceHigh = dbDistance;
+         _tourWeekData.distanceHigh = allDbDistance;
 
          _tourWeekData.altitudeLow = new float[numTourTypes][numWeeks];
-         _tourWeekData.altitudeHigh = dbAltitude;
-
-         _tourWeekData.elapsedTime = dbElapsedTime;
-         _tourWeekData.recordedTime = dbRecordedTime;
-         _tourWeekData.pausedTime = dbPausedTime;
-         _tourWeekData.movingTime = dbMovingTime;
-         _tourWeekData.breakTime = dbBreakTime;
+         _tourWeekData.altitudeHigh = allDbElevation;
 
          _tourWeekData.numToursLow = new float[numTourTypes][numWeeks];
-         _tourWeekData.numToursHigh = dbNumTours;
+         _tourWeekData.numToursHigh = allDbNumTours;
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
