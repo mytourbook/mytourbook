@@ -482,8 +482,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             _pausedTime_End.add(element.endTime);
          }
 
-         tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
-         tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
@@ -515,9 +514,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             tourData.computeTourMovingTime();
          }
 
-         final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-         tourData.setTourDeviceTime_Paused(totalTourTimerPauses);
-         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();
 

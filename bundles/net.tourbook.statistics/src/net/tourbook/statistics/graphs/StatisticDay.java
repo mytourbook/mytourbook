@@ -302,10 +302,10 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       final float distance = _tourDayData.allDistance[valueIndex];
-      final float speed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
 
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final int time = isPaceFromRecordedTime ? recordedTime : movingTime;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final int time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
+      final float speed = time == 0 ? 0 : distance / (time / 3.6f);
       final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
       final StringBuilder toolTipFormat = new StringBuilder();
@@ -744,6 +744,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   statContext.statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
+
+      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

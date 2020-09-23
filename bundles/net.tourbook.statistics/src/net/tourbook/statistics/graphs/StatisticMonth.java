@@ -578,6 +578,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
+      statContext.outStatisticValuesRaw = _tourMonthData.statisticValuesRaw;
+
       _isDuration_ReloadData = false;
 
       StatisticServices.setBarNames(statContext, _tourMonthData.usedTourTypeIds, _barOrderStart);

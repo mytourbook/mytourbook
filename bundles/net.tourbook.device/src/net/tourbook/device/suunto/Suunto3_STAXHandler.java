@@ -283,8 +283,6 @@ public class Suunto3_STAXHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
-      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
-
       setDistanceSerie(tourData);
 
       // after all data are added, the tour id can be created
@@ -298,6 +296,9 @@ public class Suunto3_STAXHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
+
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();

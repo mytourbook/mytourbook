@@ -38,6 +38,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
    static ZonedDateTime       calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+
    /**
     * All tour fields in the tourbook view, the first field is <code>tourId</code> which can be
     * prefixed with <code>DISTINCT</code>
@@ -45,10 +46,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    public static final String SQL_ALL_TOUR_FIELDS;
 
    public static final String SQL_ALL_OTHER_FIELDS;
-
    public static final int    SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
-   static final String        SQL_SUM_COLUMNS;
 
+   static final String        SQL_SUM_COLUMNS;
    static final String        SQL_SUM_FIELDS;
    static {
 
@@ -640,9 +640,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final long dbDistance = tourItem.colTourDistance;
       final long dbRecordedTime = tourItem.colTourDeviceTime_Recorded;
       final long dbMovingTime = tourItem.colTourComputedTime_Moving;
-      tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final long time = isPaceFromRecordedTime ? dbRecordedTime : dbMovingTime;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? dbRecordedTime : dbMovingTime;
+      tourItem.colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000 / dbDistance;
 
       tourItem.colTourComputedTime_Break = tourItem.colTourDeviceTime_Elapsed - tourItem.colTourComputedTime_Moving;
@@ -675,11 +675,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colMaxSpeed                      = result.getFloat(startIndex + 6);
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? colTourDeviceTime_Recorded : colTourComputedTime_Moving;
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed                      = colTourComputedTime_Moving == 0 ? 0 : 3.6f * colTourDistance / colTourComputedTime_Moving;
-
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final long time = isPaceFromRecordedTime ? colTourDeviceTime_Recorded : colTourComputedTime_Moving;
+      colAvgSpeed                      = time == 0 ? 0 : 3.6f * colTourDistance / time;
       colAvgPace                       = colTourDistance == 0 ? 0 : time * 1000f / colTourDistance;
 
       colMaxAltitude                   = result.getLong(startIndex + 7);

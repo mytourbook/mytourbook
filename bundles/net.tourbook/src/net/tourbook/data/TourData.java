@@ -80,6 +80,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
@@ -675,7 +676,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 1.0f = Revolutions per minute (RPM) <br>
     * 2.0f = Steps per minute (SPM)
     */
-   private float                  cadenceMultiplier               = 1.0f;
+   private float                  cadenceMultiplier               = RawDataManager.getCadenceMultiplierDefaultValue().getMultiplier();
 
    /**
     * When <code>1</code> then a stride sensor is available.
@@ -3890,7 +3891,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeGeo_Bounds() {
 
-      if (latitudeSerie == null || longitudeSerie == null) {
+      if (latitudeSerie == null || longitudeSerie == null || latitudeSerie.length == 0 || longitudeSerie.length == 0) {
          return;
       }
 
@@ -6714,10 +6715,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
 
-      final long totalTourTimerPauses = getTotalTourTimerPauses();
-
-      setTourDeviceTime_Recorded(getTourDeviceTime_Elapsed() - totalTourTimerPauses);
-      setTourDeviceTime_Paused(totalTourTimerPauses);
+      setTourDeviceTime_Paused(getTotalTourTimerPauses());
    }
 
    /**
@@ -6869,7 +6867,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private int getBreakTime() {
 
-      if (timeSerie == null) {
+      if (timeSerie == null || timeSerie.length == 0) {
          return 0;
       }
 
@@ -8336,7 +8334,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tzId;
    }
 
-   public long getTotalTourTimerPauses() {
+   private long getTotalTourTimerPauses() {
 
       if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
             pausedTime_End == null || pausedTime_End.length == 0) {

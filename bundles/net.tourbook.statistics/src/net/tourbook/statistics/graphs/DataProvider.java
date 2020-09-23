@@ -18,26 +18,13 @@ package net.tourbook.statistics.graphs;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-   static final char           NL                             = net.tourbook.common.UI.NEW_LINE;
-
-   private static final String SYS_PROP__LOG_STATISTIC_VALUES = "logStatisticValues";
-   static final boolean        isLogStatisticValues           = System.getProperty(SYS_PROP__LOG_STATISTIC_VALUES) != null;
-
-   static {
-
-      if (isLogStatisticValues) {
-
-         Util.logSystemProperty_IsEnabled(DataProvider.class,
-               SYS_PROP__LOG_STATISTIC_VALUES,
-               "Statistic values are logged"); //$NON-NLS-1$
-      }
-   }
+   static final char    NL        = net.tourbook.common.UI.NEW_LINE;
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
@@ -62,6 +49,41 @@ public abstract class DataProvider {
     * number of weeks in a year
     */
    int[]                _yearWeeks;
+
+   static String createSQL_SumDurationTime(final DurationTime durationTime) {
+
+      String sqlSumDurationTime = null;
+
+      switch (durationTime) {
+      case BREAK:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
+         break;
+
+      case ELAPSED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
+         break;
+
+      case PAUSED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
+         break;
+
+      case RECORDED:
+
+         sqlSumDurationTime = "SUM(TourDeviceTime_Recorded),"; //$NON-NLS-1$
+         break;
+
+      case MOVING:
+      default:
+         // this is also the old implementation for the duration values
+         sqlSumDurationTime = "SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
+         break;
+      }
+
+      return sqlSumDurationTime;
+   }
 
    /**
     * @param finalYear

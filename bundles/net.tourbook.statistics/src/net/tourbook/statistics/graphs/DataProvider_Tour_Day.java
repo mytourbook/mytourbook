@@ -269,8 +269,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   TourStartTime," + NL //                         4  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                            5  //$NON-NLS-1$
 
-               + "   TourComputedTime_Moving," + NL //  6     //$NON-NLS-1$
-               + "   TourDeviceTime_Elapsed," + NL //  7     //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //               6  //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //                7  //$NON-NLS-1$
 
                + "   TourDistance," + NL //                          8  //$NON-NLS-1$
                + "   TourAltUp," + NL //                             9  //$NON-NLS-1$
@@ -282,10 +282,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   training_TrainingPerformance," + NL //          14 //$NON-NLS-1$
 
                + "   TourType_typeId," + NL //                       15 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId," + NL //               16 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId," + NL //              16 //$NON-NLS-1$
 
-               + "   TourDeviceTime_Recorded," + NL //  17    //$NON-NLS-1$
-               + "   TourDeviceTime_Paused" + NL //  18    //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded," + NL //               17 //$NON-NLS-1$
+               + "   TourDeviceTime_Paused" + NL //                  18 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -294,7 +294,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
                + "WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause()
+               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
                + "ORDER BY TourStartTime" + NL; //                                              //$NON-NLS-1$
 
@@ -302,6 +302,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          final TIntArrayList dbAllYears = new TIntArrayList();
          final TIntArrayList dbAllMonths = new TIntArrayList();
+         final TIntArrayList dbAllDays = new TIntArrayList();
          final TIntArrayList dbAllYearsDOY = new TIntArrayList(); // DOY...Day Of Year
 
          final TIntArrayList dbAllTourStartTime = new TIntArrayList();
@@ -369,8 +370,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                final long dbStartTimeMilli            = result.getLong(4);
                final String dbTimeZoneId              = result.getString(5);
 
-               final int dbMovingTime = result.getInt(6);
-               final int dbElapsedTime = result.getInt(7);
+               final int dbMovingTime                 = result.getInt(6);
+               final int dbElapsedTime                = result.getInt(7);
 
                final float dbDistance                 = result.getFloat(8);
                final int dbAltitudeUp                 = result.getInt(9);
@@ -384,8 +385,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                final Object dbTypeIdObject            = result.getObject(15);
 
-               final int dbRecordedTime = result.getInt(17);
-               final int dbPausedTime = result.getInt(18);
+               final int dbRecordedTime               = result.getInt(17);
+               final int dbPausedTime                 = result.getInt(18);
 
 // SET_FORMATTING_ON
 
@@ -419,6 +420,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                dbAllYears.add(dbTourYear);
                dbAllMonths.add(zonedStartDateTime.getMonthValue());
+               dbAllDays.add(zonedStartDateTime.getDayOfMonth());
                dbAllYearsDOY.add(yearDOYs + tourDOY);
                dbAllTourStartWeek.add(dbTourStartWeek);
 
@@ -601,6 +603,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.yearValues = dbAllYears.toArray();
          _tourDayData.monthValues = dbAllMonths.toArray();
+         _tourDayData.dayValues = dbAllDays.toArray();
          _tourDayData.setDoyValues(allYearsDOY);
          _tourDayData.weekValues = dbAllTourStartWeek.toArray();
 
@@ -652,72 +655,80 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;
 
+         setStatisticValues();
+
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      }
-
-      if (isLogStatisticValues) {
-         logValues();
       }
 
       return _tourDayData;
    }
 
-   private void logValues() {
+   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
 
-      System.out.println();
-      System.out.println();
+      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
+      _isAdjustSamePosition = isAdjustmentSamePosition;
+   }
 
-      final String part_1_1 = "Year Month DOY       Duration       Altitude           Distance              Speed           Pace"; //$NON-NLS-1$
-      final String part_1_2 = "                        (sec)            (m)                (m)             (km/h)       (min/km)"; //$NON-NLS-1$
+   private void setStatisticValues() {
 
-      final String part_2_1 = "       Training       Training       Training"; //$NON-NLS-1$
-      final String part_2_2 = "          Aerob        Anaerob    Performance"; //$NON-NLS-1$
+      final StringBuilder sb = new StringBuilder();
 
-      System.out.println(part_1_1 + part_2_1);
-      System.out.println(part_1_2 + part_2_2);
+      final String headerLine1_1 =
+            "Year, Month, Day, DOY,      , Duration,      , Altitude,          , Distance,            ,  Speed,          , Pace,"; //$NON-NLS-1$
+      final String headerLine2_1 =
+            "    ,      ,    ,    ,      ,      (s),      ,      (m),          ,      (m),            , (km/h),      , (min/km),"; //$NON-NLS-1$
 
-      System.out.println();
+      final String headerLine1_2 = "      , Training,      , Training,      , Training"; //$NON-NLS-1$
+      final String headerLine2_2 = "         , Aerob,       , Anaerob,   , Performance"; //$NON-NLS-1$
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            // date
+            + "%4d,   %3d, %3d, %3d," //$NON-NLS-1$
+
+            // duration
+            + "  %6.0f, %6.0f," //$NON-NLS-1$
+
+            // altitude
+            + "  %6.0f, %6.0f," //$NON-NLS-1$
+
+            // distance
+            + "  %8.0f, %8.0f," //$NON-NLS-1$
+
+            // speed
+            + "  %8.2f, %8.2f," //$NON-NLS-1$
+
+            // pace
+            + "  %6.2f, %6.2f," //$NON-NLS-1$
+
+            // training aerob
+            + "  %6.1f, %6.1f," //$NON-NLS-1$
+
+            // training anaerob
+            + "  %6.1f, %6.1f," //$NON-NLS-1$
+
+            // training performance
+            + "  %6.2f, %6.2f" //$NON-NLS-1$
+
+            + NL;
+
+      sb.append(headerLine1_1 + headerLine1_2 + NL);
+      sb.append(headerLine2_1 + headerLine2_2 + NL);
 
       final float[] durationLow = _tourDayData.getDurationLowFloat();
       final float[] durationHigh = _tourDayData.getDurationHighFloat();
       final int[] doyValues = _tourDayData.getDoyValues();
 
-      for (int dataIndex = 0; dataIndex < durationLow.length; dataIndex++) {
+      final int numDataItems = durationLow.length;
 
-         System.out.println(String.format(UI.EMPTY_STRING
+      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
 
-               // date
-               + "%4d %3d %5d" //$NON-NLS-1$
-
-               // duration
-               + "  %6.0f %6.0f" //$NON-NLS-1$
-
-               // altitude
-               + "  %6.0f %6.0f" //$NON-NLS-1$
-
-               // distance
-               + "  %8.0f %8.0f" //$NON-NLS-1$
-
-               // speed
-               + "  %8.2f %8.2f" //$NON-NLS-1$
-
-               // pace
-               + "  %6.2f %6.2f" //$NON-NLS-1$
-
-               // training aerob
-               + "  %6.1f %6.1f" //$NON-NLS-1$
-
-               // training anaerob
-               + "  %6.1f %6.1f" //$NON-NLS-1$
-
-               // training performance
-               + "  %6.2f %6.2f" //$NON-NLS-1$
-
-               ,
+         sb.append(String.format(valueFormatting,
 
                _tourDayData.yearValues[dataIndex],
                _tourDayData.monthValues[dataIndex],
+               _tourDayData.dayValues[dataIndex],
                doyValues[dataIndex],
 
                durationLow[dataIndex],
@@ -741,16 +752,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                _tourDayData.trainingEffect_Anaerob_High[dataIndex],
                _tourDayData.trainingPerformance_Low[dataIndex],
                _tourDayData.trainingPerformance_High[dataIndex]
-
+         //
          ));
       }
 
-      System.out.println();
-   }
-
-   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
-
-      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
-      _isAdjustSamePosition = isAdjustmentSamePosition;
+      _tourDayData.statisticValuesRaw = sb.toString();
    }
 }

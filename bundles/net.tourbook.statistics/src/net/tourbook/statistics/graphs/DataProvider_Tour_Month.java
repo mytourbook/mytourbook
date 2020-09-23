@@ -139,36 +139,6 @@ public class DataProvider_Tour_Month extends DataProvider {
             ;
          }
 
-         String sqlDurationTime = null;
-
-         switch (durationTime) {
-         case BREAK:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
-            break;
-
-         case ELAPSED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
-            break;
-
-         case PAUSED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
-            break;
-
-         case RECORDED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Recorded),"; //$NON-NLS-1$
-            break;
-
-         case MOVING:
-         default:
-            // this is also the old implementation for the duration values
-            sqlDurationTime = "SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
-            break;
-         }
-
          sql = NL +
 
                "SELECT" + NL //                                               //$NON-NLS-1$
@@ -177,13 +147,13 @@ public class DataProvider_Tour_Month extends DataProvider {
                + "   StartMonth," + NL //                                  2  //$NON-NLS-1$
                + "   SUM(TourDistance)," + NL //                           3  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                              4  //$NON-NLS-1$
-               + "   " + sqlDurationTime + NL //                           5  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Elapsed), " + NL //       6 //$NON-NLS-1$
-               + "   SUM(TourComputedTime_Moving)," + NL //       7 //$NON-NLS-1$
-               + "   SUM(1),                   " + NL //       8 //$NON-NLS-1$
-               + "   TourType_TypeId,          " + NL //       9 //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Recorded),    " + NL //      10 //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Paused)       " + NL //      11 //$NON-NLS-1$
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //   5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 6  //$NON-NLS-1$
+               + "   SUM(TourComputedTime_Moving)," + NL //                7  //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                      8  //$NON-NLS-1$
+               + "   TourType_TypeId," + NL //                             9  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded)," + NL //                10 //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)" + NL //                   11 //$NON-NLS-1$
 
                + fromTourData
 
@@ -236,12 +206,12 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_Distance             = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
             final int dbValue_Altitude             = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
             final int dbValue_Duration             = result.getInt(5);
-            final int dbValue_ElapsedTime = result.getInt(6);
-            final int dbValue_MovingTime = result.getInt(7);
+            final int dbValue_ElapsedTime          = result.getInt(6);
+            final int dbValue_MovingTime           = result.getInt(7);
             final int dbValue_NumTours             = result.getInt(8);
             final Long dbValue_TourTypeIdObject    = (Long) result.getObject(9);
-            final int dbValue_RecordedTime = result.getInt(10);
-            final int dbValue_PausedTime = result.getInt(11);
+            final int dbValue_RecordedTime         = result.getInt(10);
+            final int dbValue_PausedTime           = result.getInt(11);
 
 // SET_FORMATTING_ON
 
@@ -268,9 +238,12 @@ public class DataProvider_Tour_Month extends DataProvider {
                   ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
                   : TourType.TOUR_TYPE_IS_NOT_USED;
 
-            final long typeId = dbValue_TourTypeIdObject == null ? noTourTypeId : dbValue_TourTypeIdObject;
+            final long typeId = dbValue_TourTypeIdObject == null
+                  ? noTourTypeId
+                  : dbValue_TourTypeIdObject;
 
             dbTypeIds[colorIndex][monthIndex] = typeId;
+            usedTourTypeIds[colorIndex] = typeId;
 
             dbAltitude[colorIndex][monthIndex] = dbValue_Altitude;
             dbDistance[colorIndex][monthIndex] = dbValue_Distance;
@@ -284,7 +257,6 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             dbNumTours[colorIndex][monthIndex] = dbValue_NumTours;
 
-            usedTourTypeIds[colorIndex] = typeId;
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_ElapsedTime;
 
          }
@@ -415,7 +387,89 @@ public class DataProvider_Tour_Month extends DataProvider {
          SQL.showException(e, sql);
       }
 
+      setStatisticValues();
+
       return _tourMonthData;
    }
 
+   private void setStatisticValues() {
+
+      final boolean isShowNoTourTypes = _activeTourTypeFilter.showUndefinedTourTypes();
+      final long noTourTypeId = isShowNoTourTypes
+            ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
+            : TourType.TOUR_TYPE_IS_NOT_USED;
+
+//      final long typeId = dbValue_TourTypeIdObject == null ? noTourTypeId : dbValue_TourTypeIdObject;
+//      dbTypeIds[colorIndex][monthIndex] = typeId;
+
+      final long[][] typeIds = _tourMonthData.typeIds;
+      final long[] usedTourTypeIds = _tourMonthData.usedTourTypeIds;
+
+      final StringBuilder sb = new StringBuilder();
+
+      final String headerLine1 = "Year, Month,  Tour Type,            Elapsed, Moving,  Break, Elevation, Distance, Tours"; //$NON-NLS-1$
+      final String headerLine2 = "    ,      ,  ,                         (s),    (s),    (s),       (m),      (m),   (#), "; //$NON-NLS-1$
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            // date
+            + "%4d,   %3d," //$NON-NLS-1$
+
+            // tour type
+            + "  %-20s,"//$NON-NLS-1$
+
+            // duration
+            + "  %6d, %6d, %6d," //$NON-NLS-1$
+
+            // elevation/distance
+            + "    %6.0f,   %6.0f," //$NON-NLS-1$
+
+            // #tours
+            + "  %4.0f" //$NON-NLS-1$
+
+            + NL;
+
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
+
+      final float[][] numTours = _tourMonthData.numToursHigh;
+      final int numMonths = numTours[0].length;
+      final int firstYear = _lastYear - _numberOfYears + 1;
+
+      for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
+
+         final int yearIndex = monthIndex / 12;
+         final int year = firstYear + yearIndex;
+
+         final int month = (monthIndex % 12) + 1;
+
+         for (int tourTypeIndex = 0; tourTypeIndex < numTours.length; tourTypeIndex++) {
+
+            final long tourTypeId = typeIds[tourTypeIndex][monthIndex];
+            final String tourTypeName = TourDatabase.getTourTypeName(tourTypeId);
+
+            sb.append(String.format(valueFormatting,
+
+                  year,
+                  month,
+
+                  tourTypeName,
+
+                  _tourMonthData.elapsedTime[tourTypeIndex][monthIndex],
+                  _tourMonthData.recordedTime[tourTypeIndex][monthIndex],
+                  _tourMonthData.breakTime[tourTypeIndex][monthIndex],
+
+                  _tourMonthData.altitudeHigh[tourTypeIndex][monthIndex],
+                  _tourMonthData.distanceHigh[tourTypeIndex][monthIndex],
+
+                  _tourMonthData.numToursHigh[tourTypeIndex][monthIndex]
+
+            ));
+         }
+
+         sb.append(NL);
+      }
+
+      _tourMonthData.statisticValuesRaw = sb.toString();
+   }
 }

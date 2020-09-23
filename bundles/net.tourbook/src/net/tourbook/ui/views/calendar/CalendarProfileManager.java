@@ -308,12 +308,11 @@ public class CalendarProfileManager {
    private static final DataFormatter   _weekFormatter_Time_Moving;
    private static final DataFormatter   _weekFormatter_Time_Break;
    static final DataFormatter[]         allTourContentFormatter;
-
    static final DataFormatter[]         allWeekFormatter;
-   private static final IValueFormatter _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
 
 // SET_FORMATTING_OFF
 
+   private static final IValueFormatter   _valueFormatter_Number_1_0 = new ValueFormatter_Number_1_0(false);
    private static final IValueFormatter   _valueFormatter_Number_1_1            = new ValueFormatter_Number_1_1(false);
    private static final IValueFormatter   _valueFormatter_Number_1_2            = new ValueFormatter_Number_1_2(false);
    private static final IValueFormatter   _valueFormatter_Number_1_3            = new ValueFormatter_Number_1_3(false);
@@ -618,7 +617,6 @@ public class CalendarProfileManager {
     * Contains all calendar profiles which are loaded from a xml file.
     */
    private static final ArrayList<CalendarProfile> _allCalendarProfiles       = new ArrayList<>();
-
    private static final ArrayList<CalendarProfile> _allDefaultDefaultProfiles = new ArrayList<>();
    static {
       createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
@@ -1200,8 +1198,9 @@ public class CalendarProfileManager {
 
             if (data.movingTime > 0 && data.distance > 0) {
 
-               final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-               final int time = isPaceFromRecordedTime ? data.recordedTime : data.movingTime;
+               final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(
+                     ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+               final int time = isPaceAndSpeedFromRecordedTime ? data.recordedTime : data.movingTime;
 
                final float pace = data.distance == 0
                      ? 0
@@ -1354,11 +1353,15 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.distance > 0 && data.movingTime > 0) {
+            final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(
+                  ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+            final int time = isPaceAndSpeedFromRecordedTime ? data.recordedTime : data.movingTime;
+
+            if (data.distance > 0 && time > 0) {
 
                float speed = data.distance == 0
                      ? 0
-                     : data.distance / (data.movingTime / 3.6f);
+                     : data.distance / (time / 3.6f);
 
                //convert to the current measurement system
                speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;

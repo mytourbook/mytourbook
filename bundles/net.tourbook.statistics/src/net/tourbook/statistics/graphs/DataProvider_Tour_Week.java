@@ -152,36 +152,6 @@ public class DataProvider_Tour_Week extends DataProvider {
             ;
          }
 
-         String sqlDurationTime = null;
-
-         switch (durationTime) {
-         case BREAK:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
-            break;
-
-         case ELAPSED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Elapsed),"; //$NON-NLS-1$
-            break;
-
-         case PAUSED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
-            break;
-
-         case RECORDED:
-
-            sqlDurationTime = " SUM(TourDeviceTime_Recorded),"; //$NON-NLS-1$
-            break;
-
-         case MOVING:
-         default:
-            // this is also the old implementation for the duration values
-            sqlDurationTime = " SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
-            break;
-         }
-
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                //$NON-NLS-1$
@@ -191,20 +161,20 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + "   SUM(TourDistance)," + NL //                              3  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                                 4  //$NON-NLS-1$
-               + "   " + sqlDurationTime + NL //                              5  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Elapsed), " + NL //      6 //$NON-NLS-1$
-               + "   SUM(TourComputedTime_Moving)," + NL //      7 //$NON-NLS-1$
-               + "   SUM(1),                   " + NL //      8 //$NON-NLS-1$
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //      5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Elapsed), " + NL //                   6  //$NON-NLS-1$
+               + "   SUM(TourComputedTime_Moving)," + NL //                   7  //$NON-NLS-1$
+               + "   SUM(1),                   " + NL //                      8  //$NON-NLS-1$
 
-               + "   TourType_TypeId,          " + NL //      9 //$NON-NLS-1$
+               + "   TourType_TypeId,          " + NL //                      9  //$NON-NLS-1$
 
-               + "   SUM(TourDeviceTime_Recorded),    " + NL //     10 //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Paused)       " + NL //     11 //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded),    " + NL //               10 //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)       " + NL //               11 //$NON-NLS-1$
 
                + fromTourData
 
-               + "GROUP BY StartWeekYear, StartWeek, tourType_typeId" + NL // //$NON-NLS-1$
-               + "ORDER BY StartWeekYear, StartWeek" + NL //                  //$NON-NLS-1$
+               + "GROUP BY StartWeekYear, StartWeek, tourType_typeId" + NL //    //$NON-NLS-1$
+               + "ORDER BY StartWeekYear, StartWeek" + NL //                     //$NON-NLS-1$
          ;
 
          final float[][] dbDistance = new float[numTourTypes][numWeeks];

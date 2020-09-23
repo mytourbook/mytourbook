@@ -28,6 +28,7 @@ public class TourData_Day {
 
    int[]                          yearValues;
    int[]                          monthValues;
+   int[]                          dayValues;
    int[]                          weekValues;
 
    private int[]                  _doyValues;
@@ -74,6 +75,8 @@ public class TourData_Day {
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;
+
+   String                         statisticValuesRaw;
 
    /**
     * Contains the tags for the tour where the key is the tour ID

@@ -22,6 +22,7 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
+   public static String        Action_Cadence_Set_None;
    public static String        Action_Cadence_Set_Rpm;
    public static String        Action_Cadence_Set_Spm;
 
@@ -517,8 +518,10 @@ public class Messages extends NLS {
    public static String        App_measurement_metric;
    public static String        App_measurement_tooltip;
 
-   public static String        App_People_item_all;
-   public static String        App_People_tooltip;
+   public static String        App_Cadence_Invalid;
+   public static String        App_Cadence_None;
+   public static String        App_Cadence_Rpm;
+   public static String        App_Cadence_Spm;
 
    public static String        App_Default_PersonFirstName;
 
@@ -540,6 +543,9 @@ public class Messages extends NLS {
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
+
+   public static String        App_People_item_all;
+   public static String        App_People_tooltip;
 
    public static String        App_SortDirection_Ascending;
    public static String        App_SortDirection_Descending;
@@ -947,6 +953,10 @@ public class Messages extends NLS {
    public static String        Image__assignMergedTour_disabled;
    public static String        Image__chart_analyzer;
    public static String        Image__collapse_all;
+   public static String        Image__Copy;
+   public static String        Image__Copy_Disabled;
+   public static String        Image__CSVFormat;
+   public static String        Image__CSVFormat_Disabled;
    public static String        Image__database;
    public static String        Image__database_other_person;
    public static String        Image__delete;
@@ -1137,13 +1147,14 @@ public class Messages extends NLS {
    public static String        Image__TourSegments_Disabled;
    public static String        Image__TourTagFilter;
    public static String        Image__TourTagFilter_Disabled;
-
    public static String        Image__TourTags;
    public static String        Image__undo_edit;
    public static String        Image__undo_edit_disabled;
    public static String        Image__undo_tour_type_filter;
    public static String        Image__undo_tour_type_filter_system;
    public static String        Image__view_compare_wizard;
+   public static String        Image__ZeroValues;
+   public static String        Image__ZeroValues_Disabled;
    public static String        Image__ZoomFitGraph;
    public static String        Image__ZoomCentered;
 
@@ -1500,7 +1511,7 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
-   public static String        Pref_Appearance_Group_PaceDisplay;
+   public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
 
    public static String        Pref_Appearance_Label_AutoOpenTagging_Tooltip;
@@ -1724,8 +1735,8 @@ public class Messages extends NLS {
 
    public static String        pref_appearance_number_of_recent_tags;
    public static String        pref_appearance_number_of_recent_tags_tooltip;
-   public static String        pref_appearance_pace_computation_option;
-   public static String        pref_appearance_pace_computation_option_tooltip;
+   public static String        pref_appearance_paceandspeed_computation_option;
+   public static String        pref_appearance_paceandspeed_computation_option_tooltip;
    public static String        pref_appearance_showMemoryMonitor;
    public static String        pref_appearance_showMemoryMonitor_message;
    public static String        pref_appearance_showMemoryMonitor_title;
@@ -1887,6 +1898,8 @@ public class Messages extends NLS {
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles;
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
    public static String PrefPage_Import_Checkbox_SetBodyWeight;
+   public static String PrefPage_Import_Default_Cadence;
+   public static String PrefPage_Import_Default_Cadence_Tooltip;
 
    public static String PrefPage_ViewActions_Group;
    public static String PrefPage_ViewActions_Label_DoubleClick;
@@ -2699,6 +2712,12 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Type_Surfing;
 
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
+
+   public static String Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip;
+   public static String Tour_StatisticValues_Action_CSVFormat_Tooltip;
+   public static String Tour_StatisticValues_Action_ShowZeroValued_Tooltip;
+   public static String Tour_StatisticValues_Info_DataAreCopied;
+   public static String Tour_StatisticValues_Label_NoData;
 
    public static String Tour_SubMenu_Cadence;
    public static String Tour_SubMenu_Elevation;
