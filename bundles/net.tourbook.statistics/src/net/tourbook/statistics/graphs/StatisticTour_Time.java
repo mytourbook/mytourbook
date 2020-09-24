@@ -621,6 +621,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData);
 
+      statContext.outStatisticValuesRaw = _tourTimeData.statisticValuesRaw;
+
       // reset min/max values
       if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {
          _minMaxKeeper.resetMinMax();

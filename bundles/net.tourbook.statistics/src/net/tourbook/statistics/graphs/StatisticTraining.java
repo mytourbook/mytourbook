@@ -856,6 +856,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
             durationTime);
 
+      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
+
       _isDuration_ReloadData = false;
 
       // reset min/max values

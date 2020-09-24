@@ -250,6 +250,9 @@ public class DataProvider_HrZone_Month extends DataProvider {
       final int numMonths = hrZoneValues[0].length;
       final int firstYear = _lastYear - _numberOfYears + 1;
 
+      // setup previous year
+      int prevYear = firstYear;
+
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
 
          final int yearIndex = monthIndex / 12;
@@ -263,6 +266,12 @@ public class DataProvider_HrZone_Month extends DataProvider {
          }
 
          final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
+
+         // group by year
+         if (year != prevYear) {
+            prevYear = year;
+            sb.append(NL);
+         }
 
          sb.append(String.format(UI.EMPTY_STRING
 

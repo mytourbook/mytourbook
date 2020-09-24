@@ -54,6 +54,8 @@ public class TourData_Time {
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;
 
+   String                         statisticValuesRaw;
+
    /**
     * Contains the tags for the tour, key is the tour ID
     */
