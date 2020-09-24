@@ -120,20 +120,23 @@ public class DataProvider_Tour_Time extends DataProvider {
                + "   StartYear," + NL //                                         2  //$NON-NLS-1$
                + "   StartMonth," + NL //                                        3  //$NON-NLS-1$
                + "   StartWeek," + NL //                                         4  //$NON-NLS-1$
+
                + "   TourStartTime," + NL //                                     5  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                                        6  //$NON-NLS-1$
-               + "   TourDeviceTime_Elapsed," //7 //$NON-NLS-1$
-               + "   TourComputedTime_Moving,"//8 //$NON-NLS-1$
 
-               + "   TourDistance," + NL //                                      9  //$NON-NLS-1$
-               + "   TourAltUp," + NL //                                         10 //$NON-NLS-1$
-               + "   TourTitle," + NL //                                         11 //$NON-NLS-1$
-               + "   TourDescription," + NL //                                   12 //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //                            7  //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded," + NL //                           8  //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //                           9  //$NON-NLS-1$
 
-               + "   TourType_typeId," + NL //                                   13 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId," + NL //                           14 //$NON-NLS-1$
+               + "   TourDistance," + NL //                                      10 //$NON-NLS-1$
+               + "   TourAltUp," + NL //                                         11 //$NON-NLS-1$
 
-               + "   TourDeviceTime_Recorded" //15 //$NON-NLS-1$
+               + "   TourTitle," + NL //                                         12 //$NON-NLS-1$
+               + "   TourDescription," + NL //                                   13 //$NON-NLS-1$
+
+               + "   TourType_typeId," + NL //                                   14 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId" + NL //                           15 //$NON-NLS-1$
+
 
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //           //$NON-NLS-1$
 
@@ -187,7 +190,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(14);
+            final Object dbTagId = result.getObject(15);
 
             if (dbTourId == lastTourId) {
 
@@ -212,16 +215,18 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                final long dbStartTimeMilli      = result.getLong(5);
                final String dbTimeZoneId        = result.getString(6);
-               final int dbElapsedTime = result.getInt(7);
-               final int dbRecordedTime = result.getInt(15);
-               final int dbMovingTime = result.getInt(8);
 
-               final float dbDistance           = result.getFloat(9);
-               final int dbAltitudeUp           = result.getInt(10);
+               final int dbElapsedTime          = result.getInt(7);
+               final int dbRecordedTime         = result.getInt(8);
+               final int dbMovingTime           = result.getInt(9);
 
-               final String dbTourTitle         = result.getString(11);
-               final String dbDescription       = result.getString(12);
-               final Object dbTypeIdObject      = result.getObject(13);
+               final float dbDistance           = result.getFloat(10);
+               final int dbAltitudeUp           = result.getInt(11);
+
+               final String dbTourTitle         = result.getString(12);
+               final String dbDescription       = result.getString(13);
+
+               final Object dbTypeIdObject      = result.getObject(14);
 
 // SET_FORMATTING_ON
 
@@ -243,6 +248,8 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourStartDateTime.add(zonedStartDateTime);
                allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
                allTourStartTime.add(startDayTime);
+               allTourEndTime.add((startDayTime + dbRecordedTime));
+
                allTourDeviceTime_Elapsed.add(dbElapsedTime);
                allTourDeviceTime_Recorded.add(dbRecordedTime);
                allTourComputedTime_Moving.add(dbMovingTime);
