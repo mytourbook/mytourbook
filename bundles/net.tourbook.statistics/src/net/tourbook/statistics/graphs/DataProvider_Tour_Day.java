@@ -269,23 +269,23 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   TourStartTime," + NL //                         4  //$NON-NLS-1$
                + "   TimeZoneId," + NL //                            5  //$NON-NLS-1$
 
-               + "   TourComputedTime_Moving," + NL //               6  //$NON-NLS-1$
-               + "   TourDeviceTime_Elapsed," + NL //                7  //$NON-NLS-1$
+               + "   TourDeviceTime_Elapsed," + NL //                6  //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded," + NL //               7  //$NON-NLS-1$
+               + "   TourDeviceTime_Paused," + NL //                 8  //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //               9  //$NON-NLS-1$
 
-               + "   TourDistance," + NL //                          8  //$NON-NLS-1$
-               + "   TourAltUp," + NL //                             9  //$NON-NLS-1$
-               + "   TourTitle," + NL //                             10 //$NON-NLS-1$
-               + "   TourDescription," + NL //                       11 //$NON-NLS-1$
+               + "   TourDistance," + NL //                          10 //$NON-NLS-1$
+               + "   TourAltUp," + NL //                             11 //$NON-NLS-1$
+               + "   TourTitle," + NL //                             12 //$NON-NLS-1$
+               + "   TourDescription," + NL //                       13 //$NON-NLS-1$
 
-               + "   training_TrainingEffect_Aerob," + NL //         12 //$NON-NLS-1$
-               + "   training_TrainingEffect_Anaerob," + NL //       13 //$NON-NLS-1$
-               + "   training_TrainingPerformance," + NL //          14 //$NON-NLS-1$
+               + "   training_TrainingEffect_Aerob," + NL //         14 //$NON-NLS-1$
+               + "   training_TrainingEffect_Anaerob," + NL //       15 //$NON-NLS-1$
+               + "   training_TrainingPerformance," + NL //          16 //$NON-NLS-1$
 
-               + "   TourType_typeId," + NL //                       15 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId," + NL //              16 //$NON-NLS-1$
+               + "   TourType_typeId," + NL //                       17 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId" + NL //               18 //$NON-NLS-1$
 
-               + "   TourDeviceTime_Recorded," + NL //               17 //$NON-NLS-1$
-               + "   TourDeviceTime_Paused" + NL //                  18 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -310,11 +310,11 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TIntArrayList dbAllTourStartWeek = new TIntArrayList();
          final ArrayList<ZonedDateTime> dbAllTourStartDateTime = new ArrayList<>();
 
-         final TIntArrayList dbAllTourDuration = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Elapsed = new TIntArrayList();
-         final TIntArrayList dbAllTourComputedTime_Moving = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
+         final TIntArrayList dbAllTourComputedTime_Moving = new TIntArrayList();
+         final TIntArrayList dbAllTourDuration = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
          final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
@@ -348,7 +348,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          while (result.next()) {
 
             final long dbTourId = result.getLong(1);
-            final Object dbTagId = result.getObject(16);
+            final Object dbTagId = result.getObject(18);
 
             if (dbTourId == lastTourId) {
 
@@ -370,23 +370,22 @@ public class DataProvider_Tour_Day extends DataProvider {
                final long dbStartTimeMilli            = result.getLong(4);
                final String dbTimeZoneId              = result.getString(5);
 
-               final int dbMovingTime                 = result.getInt(6);
-               final int dbElapsedTime                = result.getInt(7);
+               final int dbElapsedTime                = result.getInt(6);
+               final int dbRecordedTime               = result.getInt(7);
+               final int dbPausedTime                 = result.getInt(8);
+               final int dbMovingTime                 = result.getInt(9);
 
-               final float dbDistance                 = result.getFloat(8);
-               final int dbAltitudeUp                 = result.getInt(9);
+               final float dbDistance                 = result.getFloat(10);
+               final int dbAltitudeUp                 = result.getInt(11);
 
-               final String dbTourTitle               = result.getString(10);
-               final String dbDescription             = result.getString(11);
+               final String dbTourTitle               = result.getString(12);
+               final String dbDescription             = result.getString(13);
 
-               final float trainingEffect             = result.getFloat(12);
-               final float trainingEffect_Anaerobic   = result.getFloat(13);
-               final float trainingPerformance        = result.getFloat(14);
+               final float trainingEffect             = result.getFloat(14);
+               final float trainingEffect_Anaerobic   = result.getFloat(15);
+               final float trainingPerformance        = result.getFloat(16);
 
-               final Object dbTypeIdObject            = result.getObject(15);
-
-               final int dbRecordedTime               = result.getInt(17);
-               final int dbPausedTime                 = result.getInt(18);
+               final Object dbTypeIdObject            = result.getObject(17);
 
 // SET_FORMATTING_ON
 

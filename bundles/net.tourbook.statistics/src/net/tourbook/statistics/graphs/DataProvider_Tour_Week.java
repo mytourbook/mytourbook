@@ -206,11 +206,11 @@ public class DataProvider_Tour_Week extends DataProvider {
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final int dbYear = result.getInt(1);
-            final int dbWeek = result.getInt(2);
+            final int dbValue_Year = result.getInt(1);
+            final int dbValue_Week = result.getInt(2);
 
             // get number of weeks for the current year in the db
-            final int dbYearIndex = numberOfYears - (lastYear - dbYear + 1);
+            final int dbYearIndex = numberOfYears - (lastYear - dbValue_Year + 1);
             int allWeeks = 0;
             for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                if (yearIndex > 0) {
@@ -218,7 +218,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                }
             }
 
-            final int weekIndex = allWeeks + dbWeek - 1;
+            final int weekIndex = allWeeks + dbValue_Week - 1;
 
             if (weekIndex < 0) {
 
@@ -245,14 +245,31 @@ public class DataProvider_Tour_Week extends DataProvider {
                continue;
             }
 
+// SET_FORMATTING_OFF
+
+            final Long dbValue_TypeIdObject     = (Long) result.getObject(3);
+
+            final int dbValue_ElapsedTime       = result.getInt(4);
+            final int dbValue_RecordedTime      = result.getInt(5);
+            final int dbValue_PausedTime        = result.getInt(6);
+            final int dbValue_MovingTime        = result.getInt(7);
+
+            final int dbValue_DurationTime      = result.getInt(8);
+
+            final int dbValue_Distance          = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
+            final int dbValue_Elevation         = (int) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
+
+            final int dbValue_NumTours          = result.getInt(11);
+
+// SET_FORMATTING_ON
+
             /*
              * Convert type id to the type index in the tour types list which is also the color
              * index
              */
-            final Long dbTypeIdObject = (Long) result.getObject(3);
             int colorIndex = 0;
-            if (dbTypeIdObject != null) {
-               final long dbTypeId = dbTypeIdObject;
+            if (dbValue_TypeIdObject != null) {
+               final long dbTypeId = dbValue_TypeIdObject;
                for (int typeIndex = 0; typeIndex < allActiveTourTypes.length; typeIndex++) {
                   if (dbTypeId == allActiveTourTypes[typeIndex].getTypeId()) {
                      colorIndex = colorOffset + typeIndex;
@@ -260,33 +277,21 @@ public class DataProvider_Tour_Week extends DataProvider {
                   }
                }
             }
-            final long dbTypeId = dbTypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbTypeIdObject;
-
-            final int dbElapsedTime = result.getInt(4);
-            final int dbRecordedTime = result.getInt(5);
-            final int dbPausedTime = result.getInt(6);
-            final int dbMovingTime = result.getInt(7);
-
-            final int dbDurationTime = result.getInt(8);
-
-            final int dbDistance = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
-            final int dbElevation = (int) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
-
-            final int numTours = result.getInt(11);
+            final long dbTypeId = dbValue_TypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbValue_TypeIdObject;
 
             allDbTypeIds[colorIndex][weekIndex] = dbTypeId;
 
-            allDbElapsedTime[colorIndex][weekIndex] = dbElapsedTime;
-            allDbRecordedTime[colorIndex][weekIndex] = dbRecordedTime;
-            allDbPausedTime[colorIndex][weekIndex] = dbPausedTime;
-            allDbMovingTime[colorIndex][weekIndex] = dbMovingTime;
-            allDbBreakTime[colorIndex][weekIndex] = dbElapsedTime - dbMovingTime;
-            allDbDurationTime[colorIndex][weekIndex] = dbDurationTime;
+            allDbElapsedTime[colorIndex][weekIndex] = dbValue_ElapsedTime;
+            allDbRecordedTime[colorIndex][weekIndex] = dbValue_RecordedTime;
+            allDbPausedTime[colorIndex][weekIndex] = dbValue_PausedTime;
+            allDbMovingTime[colorIndex][weekIndex] = dbValue_MovingTime;
+            allDbBreakTime[colorIndex][weekIndex] = dbValue_ElapsedTime - dbValue_MovingTime;
+            allDbDurationTime[colorIndex][weekIndex] = dbValue_DurationTime;
 
-            allDbDistance[colorIndex][weekIndex] = dbDistance;
-            allDbElevation[colorIndex][weekIndex] = dbElevation;
+            allDbDistance[colorIndex][weekIndex] = dbValue_Distance;
+            allDbElevation[colorIndex][weekIndex] = dbValue_Elevation;
 
-            allDbNumTours[colorIndex][weekIndex] = numTours;
+            allDbNumTours[colorIndex][weekIndex] = dbValue_NumTours;
          }
 
 
