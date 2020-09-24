@@ -49,26 +49,26 @@ public class StatisticContext {
     */
    public int            statNumberOfYears;
 
-   public boolean        isRefreshData               = false;
+   public boolean        isRefreshData;
 
    /**
     * Contains the state if bar reordering is supported by the statistic or not, default is
     * <code>false</code>.
     */
-   public boolean        outIsBarReorderingSupported = false;
+   public boolean        outIsBarReorderingSupported;
 
    /**
     * Is <code>true</code> when bar names in the statistic UI must be updated with data from
     * {@link #outBarNames} and {@link #outVerticalBarIndex}.
     */
-   public boolean        outIsUpdateBarNames         = false;
+   public boolean        outIsUpdateBarNames;
 
    /**
     * When stacked charts are displayed, the stacked parts can be resorted vertically.
     * <p>
     * This contains the names of the bars or <code>null</code> when bars are not available.
     */
-   public String[]       outBarNames                 = null;
+   public String[]       outBarNames;
 
    /**
     * Index which bar should be selected in the combo box.
