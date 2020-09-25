@@ -61,10 +61,10 @@ public class DataProvider_Tour_Year extends DataProvider {
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourDataYear;
@@ -74,10 +74,10 @@ public class DataProvider_Tour_Year extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
-         _lastYear = lastYear;
-         _numberOfYears = numYears;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
 
          // get the tour types
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
@@ -268,9 +268,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_ElapsedTime;
          }
 
-         final int[] years = new int[_numberOfYears];
+         final int[] years = new int[statistic_NumberOfYears];
          int yearIndex = 0;
-         for (int currentYear = _lastYear - _numberOfYears + 1; currentYear <= _lastYear; currentYear++) {
+         for (int currentYear = statistic_LastYear - statistic_NumberOfYears + 1; currentYear <= statistic_LastYear; currentYear++) {
             years[yearIndex++] = currentYear;
          }
          _tourDataYear.years = years;

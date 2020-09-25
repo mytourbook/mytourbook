@@ -28,6 +28,10 @@ public abstract class DataProvider {
 
 // SET_FORMATTING_OFF
 
+   /*
+    * Labels/formatting for statistic values
+    */
+
    static final String HEAD1_DATE_YEAR                      = "Year,";           //$NON-NLS-1$
    static final String HEAD2_DATE_YEAR                      = "    ,";           //$NON-NLS-1$
    static final String VALUE_DATE_YEAR                      = "%4d,";            //$NON-NLS-1$
@@ -132,27 +136,30 @@ public abstract class DataProvider {
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-   TourPerson           _activePerson;
-   TourTypeFilter       _activeTourTypeFilter;
+   TourPerson           statistic_ActivePerson;
+   TourTypeFilter       statistic_ActiveTourTypeFilter;
 
-   int                  _lastYear;
+   int                  statistic_LastYear;
 
-   int                  _numberOfYears;
+   /**
+    * Number of years
+    */
+   int                  statistic_NumberOfYears;
 
    /**
     * All years numbers, e.g. 2016, 2017, ... 2020
     */
-   int[]                allYearNumbers;
+   int[]                allYear_Numbers;
 
    /**
     * Number of days in a year
     */
-   int[]                allYearDays;
+   int[]                allYear_NumDays;
 
    /**
     * Number of weeks in a year
     */
-   int[]                allYearWeeks;
+   int[]                allYear_NumWeeks;
 
    static String createSQL_SumDurationTime(final DurationTime durationTime) {
 
@@ -213,20 +220,20 @@ public abstract class DataProvider {
    /**
     * @param currentYear
     * @param numberOfYears
-    * @return Returns the number of days between {@link #_lastYear} and currentYear
+    * @return Returns the number of days between {@link #statistic_LastYear} and currentYear
     */
    int getYearDOYs(final int selectedYear) {
 
       int yearDOYs = 0;
       int yearIndex = 0;
 
-      for (int currentYear = _lastYear - _numberOfYears + 1; currentYear < selectedYear; currentYear++) {
+      for (int currentYear = statistic_LastYear - statistic_NumberOfYears + 1; currentYear < selectedYear; currentYear++) {
 
          if (currentYear == selectedYear) {
             return yearDOYs;
          }
 
-         yearDOYs += allYearDays[yearIndex];
+         yearDOYs += allYear_NumDays[yearIndex];
 
          yearIndex++;
       }
@@ -237,25 +244,24 @@ public abstract class DataProvider {
    /**
     * Get different data for each year, data are set into <br>
     * <br>
-    * All years in {@link #allYearNumbers} <br>
-    * Number of day's in {@link #allYearDays} <br>
-    * Number of week's in {@link #allYearWeeks}
+    * All years in {@link #allYear_Numbers} <br>
+    * Number of day's in {@link #allYear_NumDays} <br>
+    * Number of week's in {@link #allYear_NumWeeks}
     */
-   void initYearNumbers() {
+   void setupYearNumbers() {
 
-      allYearNumbers = new int[_numberOfYears];
-      allYearDays = new int[_numberOfYears];
-      allYearWeeks = new int[_numberOfYears];
+      allYear_Numbers = new int[statistic_NumberOfYears];
+      allYear_NumDays = new int[statistic_NumberOfYears];
+      allYear_NumWeeks = new int[statistic_NumberOfYears];
 
-      final int firstYear = _lastYear - _numberOfYears + 1;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
       int yearIndex = 0;
 
-      for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
+      for (int currentYear = firstYear; currentYear <= statistic_LastYear; currentYear++) {
 
-         allYearNumbers[yearIndex] = currentYear;
-
-         allYearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
-         allYearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
+         allYear_Numbers[yearIndex] = currentYear;
+         allYear_NumDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
+         allYear_NumWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
 
          yearIndex++;
       }

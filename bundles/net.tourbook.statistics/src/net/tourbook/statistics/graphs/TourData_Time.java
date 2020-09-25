@@ -21,43 +21,43 @@ import java.util.HashMap;
 
 public class TourData_Time {
 
-   long[]                         tourIds;
-   long[]                         typeIds;
+   int[]                          allYear_Numbers;
+   int                            numDaysInAllYears;
 
-   int[]                          typeColorIndex;
+   long[]                         allTourIds;
+   long[]                         allTypeIds;
+
+   int[]                          allTypeColorIndices;
 
    /**
-    * number for all days in each year
+    * Number for all days in each year
     */
-   int[]                          yearDays;
+   int[]                          allYear_NumDays;
 
-   int[]                          years;
-   int                            allDaysInAllYears;
+   int[]                          allTourYearValues;
+   int[]                          allTourMonthValues;
+   int[]                          allTourDOYValues;
+   int[]                          allWeekValues;
 
-   int[]                          tourYearValues;
-   int[]                          tourMonthValues;
-   int[]                          tourDOYValues;
-   int[]                          weekValues;
+   int[]                          allTourTimeStartValues;
+   int[]                          allTourTimeEndValues;
+   ArrayList<ZonedDateTime>       allTourStartDateTimes;
+   ArrayList<String>              allTourTimeZoneOffsets;
 
-   int[]                          tourTimeStartValues;
-   int[]                          tourTimeEndValues;
-   ArrayList<ZonedDateTime>       tourStartDateTimes;
-   ArrayList<String>              tourTimeZoneOffset;
+   int[]                          allTourElevationValues;
+   int[]                          allTourDistanceValues;
 
-   int[]                          tourAltitudeValues;
-   int[]                          tourDistanceValues;
+   int[]                          allTourDeviceTime_ElapsedValues;
+   int[]                          allTourDeviceTime_RecordedValues;
+   int[]                          allTourComputedTime_MovingValues;
 
-   int[]                          tourDeviceTime_ElapsedValues;
-   int[]                          tourDeviceTime_RecordedValues;
-   int[]                          tourComputedTime_MovingValues;
-
-   ArrayList<String>              tourTitle;
-   ArrayList<String>              tourDescription;
+   ArrayList<String>              allTourTitles;
+   ArrayList<String>              allTourDescriptions;
 
    String                         statisticValuesRaw;
 
    /**
     * Contains the tags for the tour, key is the tour ID
     */
-   HashMap<Long, ArrayList<Long>> tagIds;
+   HashMap<Long, ArrayList<Long>> allTagIds;
 }

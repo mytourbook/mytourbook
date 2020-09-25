@@ -79,10 +79,10 @@ public class DataProvider_Tour_Time extends DataProvider {
                                  final boolean isForceUpdate) {
 
       // don't reload data which are already here
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && _lastYear == lastYear
-            && _numberOfYears == numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && statistic_LastYear == lastYear
+            && statistic_NumberOfYears == numberOfYears
             && isForceUpdate == false) {
          return _tourDataTime;
       }
@@ -91,13 +91,13 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
 
-         _lastYear = lastYear;
-         _numberOfYears = numberOfYears;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numberOfYears;
 
-         initYearNumbers();
+         setupYearNumbers();
 
          int colorOffset = 0;
          if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -294,9 +294,9 @@ public class DataProvider_Tour_Time extends DataProvider {
          }
 
          // get number of days for all years
-         int yearDays = 0;
-         for (final int doy : allYearDays) {
-            yearDays += doy;
+         int numDaysInAllYears = 0;
+         for (final int doy : allYear_NumDays) {
+            numDaysInAllYears += doy;
          }
 
          /*
@@ -304,36 +304,36 @@ public class DataProvider_Tour_Time extends DataProvider {
           */
          _tourDataTime = new TourData_Time();
 
-         _tourDataTime.tourIds = allTourIds.toArray();
+         _tourDataTime.allTourIds = allTourIds.toArray();
 
-         _tourDataTime.typeIds = allTypeIds.toArray();
-         _tourDataTime.typeColorIndex = allTypeColorIndex.toArray();
+         _tourDataTime.allTypeIds = allTypeIds.toArray();
+         _tourDataTime.allTypeColorIndices = allTypeColorIndex.toArray();
 
-         _tourDataTime.tagIds = allTagIds;
+         _tourDataTime.allTagIds = allTagIds;
 
-         _tourDataTime.allDaysInAllYears = yearDays;
-         _tourDataTime.yearDays = allYearDays;
-         _tourDataTime.years = allYearNumbers;
+         _tourDataTime.numDaysInAllYears = numDaysInAllYears;
+         _tourDataTime.allYear_NumDays = allYear_NumDays;
+         _tourDataTime.allYear_Numbers = allYear_Numbers;
 
-         _tourDataTime.tourYearValues = allTourYear.toArray();
-         _tourDataTime.tourMonthValues = allTourMonths.toArray();
-         _tourDataTime.tourDOYValues = allYearsDOY.toArray();
-         _tourDataTime.weekValues = allTourStartWeek.toArray();
+         _tourDataTime.allTourYearValues = allTourYear.toArray();
+         _tourDataTime.allTourMonthValues = allTourMonths.toArray();
+         _tourDataTime.allTourDOYValues = allYearsDOY.toArray();
+         _tourDataTime.allWeekValues = allTourStartWeek.toArray();
 
-         _tourDataTime.tourTimeStartValues = allTourStartTime.toArray();
-         _tourDataTime.tourTimeZoneOffset = allTourTimeOffset;
-         _tourDataTime.tourTimeEndValues = allTourEndTime.toArray();
-         _tourDataTime.tourStartDateTimes = allTourStartDateTime;
+         _tourDataTime.allTourTimeStartValues = allTourStartTime.toArray();
+         _tourDataTime.allTourTimeZoneOffsets = allTourTimeOffset;
+         _tourDataTime.allTourTimeEndValues = allTourEndTime.toArray();
+         _tourDataTime.allTourStartDateTimes = allTourStartDateTime;
 
-         _tourDataTime.tourDistanceValues = allDistance.toArray();
-         _tourDataTime.tourAltitudeValues = allAltitudeUp.toArray();
+         _tourDataTime.allTourDistanceValues = allDistance.toArray();
+         _tourDataTime.allTourElevationValues = allAltitudeUp.toArray();
 
-         _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
-         _tourDataTime.tourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
-         _tourDataTime.tourComputedTime_MovingValues = allTourComputedTime_Moving.toArray();
+         _tourDataTime.allTourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
+         _tourDataTime.allTourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
+         _tourDataTime.allTourComputedTime_MovingValues = allTourComputedTime_Moving.toArray();
 
-         _tourDataTime.tourTitle = allTourTitle;
-         _tourDataTime.tourDescription = allTourDescription;
+         _tourDataTime.allTourTitles = allTourTitle;
+         _tourDataTime.allTourDescriptions = allTourDescription;
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
@@ -352,87 +352,166 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       final StringBuilder sb = new StringBuilder();
 
-      final String headerLine1_1 =
-            "Year, Month, Day, DOY,      , Duration,      , Altitude,          , Distance,            ,  Speed,          , Pace,"; //$NON-NLS-1$
-      final String headerLine2_1 =
-            "    ,      ,    ,    ,      ,      (s),      ,      (m),          ,      (m),            , (km/h),      , (min/km),"; //$NON-NLS-1$
+      final String headerLine1 = UI.EMPTY_STRING
 
-      final String headerLine1_2 = "      , Training,      , Training,      , Training"; //$NON-NLS-1$
-      final String headerLine2_2 = "         , Aerob,       , Anaerob,   , Performance"; //$NON-NLS-1$
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+            + HEAD1_DATE_DAY
+            + HEAD1_DATE_DOY
+
+            + HEAD1_DEVICE_TIME_ELAPSED
+            + HEAD1_DEVICE_TIME_RECORDED
+            + HEAD1_DEVICE_TIME_PAUSED
+
+            + HEAD1_COMPUTED_TIME_MOVING
+            + HEAD1_COMPUTED_TIME_BREAK
+
+            + HEAD1_DURATION_LOW
+            + HEAD1_DURATION_HIGH
+            + HEAD1_ELEVATION_LOW
+            + HEAD1_ELEVATION_HIGH
+            + HEAD1_DISTANCE_LOW
+            + HEAD1_DISTANCE_HIGH
+            + HEAD1_SPEED_LOW
+            + HEAD1_SPEED_HIGH
+            + HEAD1_PACE_LOW
+            + HEAD1_PACE_HIGH
+
+            + HEAD1_TRAINING_AEROB_LOW
+            + HEAD1_TRAINING_AEROB_HIGH
+            + HEAD1_TRAINING_ANAEROB_LOW
+            + HEAD1_TRAINING_ANAEROB_HIGH
+            + HEAD1_TRAINING_PERFORMANCE_LOW
+            + HEAD1_TRAINING_PERFORMANCE_HIGH;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+            + HEAD2_DATE_DAY
+            + HEAD2_DATE_DOY
+
+            + HEAD2_DEVICE_TIME_ELAPSED
+            + HEAD2_DEVICE_TIME_RECORDED
+            + HEAD2_DEVICE_TIME_PAUSED
+
+            + HEAD2_COMPUTED_TIME_MOVING
+            + HEAD2_COMPUTED_TIME_BREAK
+
+            + HEAD2_DURATION_LOW
+            + HEAD2_DURATION_HIGH
+            + HEAD2_ELEVATION_LOW
+            + HEAD2_ELEVATION_HIGH
+            + HEAD2_DISTANCE_LOW
+            + HEAD2_DISTANCE_HIGH
+
+            + HEAD2_SPEED_LOW
+            + HEAD2_SPEED_HIGH
+            + HEAD2_PACE_LOW
+            + HEAD2_PACE_HIGH
+
+            + HEAD2_TRAINING_AEROB_LOW
+            + HEAD2_TRAINING_AEROB_HIGH
+            + HEAD2_TRAINING_ANAEROB_LOW
+            + HEAD2_TRAINING_ANAEROB_HIGH
+            + HEAD2_TRAINING_PERFORMANCE_LOW
+            + HEAD2_TRAINING_PERFORMANCE_HIGH
+
+      ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
             // date
-            + "%4d,   %3d, %3d, %3d," //$NON-NLS-1$
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+            + VALUE_DATE_DAY
+            + VALUE_DATE_DOY
 
-            // duration
-            + "  %6.0f, %6.0f," //$NON-NLS-1$
-
-            // altitude
-            + "  %6.0f, %6.0f," //$NON-NLS-1$
-
-            // distance
-            + "  %8.0f, %8.0f," //$NON-NLS-1$
-
-            // speed
-            + "  %8.2f, %8.2f," //$NON-NLS-1$
-
-            // pace
-            + "  %6.2f, %6.2f," //$NON-NLS-1$
-
-            // training aerob
-            + "  %6.1f, %6.1f," //$NON-NLS-1$
-
-            // training anaerob
-            + "  %6.1f, %6.1f," //$NON-NLS-1$
-
-            // training performance
-            + "  %6.2f, %6.2f" //$NON-NLS-1$
+//            // device time
+//            + VALUE_DEVICE_TIME_ELAPSED
+//            + VALUE_DEVICE_TIME_RECORDED
+////            + VALUE_DEVICE_TIME_PAUSED
+//
+//            // computed time
+//            + VALUE_COMPUTED_TIME_MOVING
+//            + VALUE_COMPUTED_TIME_BREAK
+//
+//            + VALUE_ELEVATION_HIGH
+//            + VALUE_DISTANCE_HIGH
 
             + NL;
 
-      sb.append(headerLine1_1 + headerLine1_2 + NL);
-      sb.append(headerLine2_1 + headerLine2_2 + NL);
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
 
-//      final float[] durationLow = _tourDayData.getDurationLowFloat();
-//      final float[] durationHigh = _tourDayData.getDurationHighFloat();
-//      final int[] doyValues = _tourDayData.getDoyValues();
+      final int numDataItems = _tourDataTime.allTourDistanceValues.length;
+
+      // set initial value
+      int prevMonth = numDataItems > 0 ? _tourDataTime.allTourMonthValues[0] : 0;
+
+      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
+
+         final int month = _tourDataTime.allTourMonthValues[dataIndex];
+
+         // group by month
+         if (month != prevMonth) {
+            prevMonth = month;
+            sb.append(NL);
+         }
+
+         final int elapsedTime = _tourDataTime.allTourDeviceTime_ElapsedValues[dataIndex];
+         final int movingTime = _tourDataTime.allTourComputedTime_MovingValues[dataIndex];
+         final int breakTime = elapsedTime - movingTime;
+
+         sb.append(String.format(valueFormatting,
+
+               _tourDataTime.allYear_Numbers[dataIndex],
+               month,
+               _tourDataTime.allYear_NumDays[dataIndex],
+               _tourDataTime.allTourDOYValues[dataIndex]
+
+//               elapsedTime,
+//               _tourDataTime.allTourDeviceTime_RecordedValues[dataIndex],
 //
-//      final int numDataItems = durationLow.length;
+//               movingTime,
+//               breakTime,
 //
-//      for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
+//               _tourDataTime.allTourDistanceValues[dataIndex],
+//               _tourDataTime.allTourElevationValues[dataIndex]
+
+         ));
+      }
+
+//      _tourDataTime.allTourIds = allTourIds.toArray();
 //
-//         sb.append(String.format(valueFormatting,
+//      _tourDataTime.allTypeIds = allTypeIds.toArray();
+//      _tourDataTime.allTypeColorIndices = allTypeColorIndex.toArray();
 //
-//               _tourDayData.yearValues[dataIndex],
-//               _tourDayData.monthValues[dataIndex],
-//               _tourDayData.dayValues[dataIndex],
-//               doyValues[dataIndex],
+//      _tourDataTime.allTagIds = allTagIds;
 //
-//               durationLow[dataIndex],
-//               durationHigh[dataIndex],
+//      _tourDataTime.allDaysInAllYears = yearDays;
+//      _tourDataTime.allYearDays = allYearDays;
+//      _tourDataTime.allYearNumbers = allYearNumbers;
 //
-//               _tourDayData.altitude_Low[dataIndex],
-//               _tourDayData.altitude_High[dataIndex],
+//      _tourDataTime.allTourYearValues = allTourYear.toArray();
+//      _tourDataTime.allTourMonthValues = allTourMonths.toArray();
+//      _tourDataTime.allTourDOYValues = allYearsDOY.toArray();
+//      _tourDataTime.allWeekValues = allTourStartWeek.toArray();
 //
-//               _tourDayData.distance_Low[dataIndex],
-//               _tourDayData.distance_High[dataIndex],
+//      _tourDataTime.allTourTimeStartValues = allTourStartTime.toArray();
+//      _tourDataTime.allTourTimeZoneOffsets = allTourTimeOffset;
+//      _tourDataTime.allTourTimeEndValues = allTourEndTime.toArray();
+//      _tourDataTime.allTourStartDateTimes = allTourStartDateTime;
 //
-//               _tourDayData.avgSpeed_Low[dataIndex],
-//               _tourDayData.avgSpeed_High[dataIndex],
+//      _tourDataTime.allTourDistanceValues = allDistance.toArray();
+//      _tourDataTime.allTourElevationValues = allAltitudeUp.toArray();
 //
-//               _tourDayData.avgPace_Low[dataIndex],
-//               _tourDayData.avgPace_High[dataIndex],
+//      _tourDataTime.allTourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
+//      _tourDataTime.allTourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
+//      _tourDataTime.allTourComputedTime_MovingValues = allTourComputedTime_Moving.toArray();
 //
-//               _tourDayData.trainingEffect_Aerob_Low[dataIndex],
-//               _tourDayData.trainingEffect_Aerob_High[dataIndex],
-//               _tourDayData.trainingEffect_Anaerob_Low[dataIndex],
-//               _tourDayData.trainingEffect_Anaerob_High[dataIndex],
-//               _tourDayData.trainingPerformance_Low[dataIndex],
-//               _tourDayData.trainingPerformance_High[dataIndex]
-//         //
-//         ));
-//      }
+//      _tourDataTime.allTourTitles = allTourTitle;
+//      _tourDataTime.allTourDescriptions = allTourDescription;
 
       _tourDataTime.statisticValuesRaw = sb.toString();
    }

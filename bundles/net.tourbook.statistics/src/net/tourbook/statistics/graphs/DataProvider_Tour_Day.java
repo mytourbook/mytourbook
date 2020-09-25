@@ -195,10 +195,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                            final DurationTime durationTime) {
 
       // don't reload data which are already available
-      if (person == _activePerson
-            && tourTypeFilter == _activeTourTypeFilter
-            && lastYear == _lastYear
-            && numberOfYears == _numberOfYears
+      if (person == statistic_ActivePerson
+            && tourTypeFilter == statistic_ActiveTourTypeFilter
+            && lastYear == statistic_LastYear
+            && numberOfYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourDayData;
@@ -208,13 +208,13 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
 
-         _lastYear = lastYear;
-         _numberOfYears = numberOfYears;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numberOfYears;
 
-         initYearNumbers();
+         setupYearNumbers();
 
          int colorOffset = 0;
          if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -592,7 +592,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          // get number of days for all years
          int yearDays = 0;
-         for (final int doy : allYearDays) {
+         for (final int doy : allYear_NumDays) {
             yearDays += doy;
          }
 
@@ -607,8 +607,8 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allWeeks = dbAllTourStartWeek.toArray();
 
          _tourDayData.allDaysInAllYears = yearDays;
-         _tourDayData.allYearDays = allYearDays;
-         _tourDayData.allYearNumbers = allYearNumbers;
+         _tourDayData.allYearDays = allYear_NumDays;
+         _tourDayData.allYearNumbers = allYear_Numbers;
 
          _tourDayData.allTypeIds = allTypeIds.toArray();
          _tourDayData.allTypeColorIndices = allTypeColorIndex.toArray();

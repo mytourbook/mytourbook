@@ -58,10 +58,10 @@ public class DataProvider_Tour_Week extends DataProvider {
                              final DurationTime durationTime) {
 
       // when the data for the year are already loaded, all is done
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numberOfYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numberOfYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourWeekData;
@@ -71,13 +71,13 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
 
-         _lastYear = lastYear;
-         _numberOfYears = numberOfYears;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numberOfYears;
 
-         initYearNumbers();
+         setupYearNumbers();
 
          _tourWeekData = new TourData_Week();
 
@@ -86,7 +86,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          final TourType[] allActiveTourTypes = allActiveTourTypesList.toArray(new TourType[allActiveTourTypesList.size()]);
 
          int numWeeks = 0;
-         for (final int weeks : allYearWeeks) {
+         for (final int weeks : allYear_NumWeeks) {
             numWeeks += weeks;
          }
 
@@ -214,7 +214,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             int allWeeks = 0;
             for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                if (yearIndex > 0) {
-                  allWeeks += allYearWeeks[yearIndex - 1];
+                  allWeeks += allYear_NumWeeks[yearIndex - 1];
                }
             }
 
@@ -295,9 +295,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          }
 
 
-         _tourWeekData.years = allYearNumbers;
-         _tourWeekData.yearWeeks = allYearWeeks;
-         _tourWeekData.yearDays = allYearDays;
+         _tourWeekData.years = allYear_Numbers;
+         _tourWeekData.yearWeeks = allYear_NumWeeks;
+         _tourWeekData.yearDays = allYear_NumDays;
 
          _tourWeekData.typeIds = allDbTypeIds;
 

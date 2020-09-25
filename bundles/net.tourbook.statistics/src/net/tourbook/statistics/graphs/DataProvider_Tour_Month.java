@@ -62,10 +62,10 @@ public class DataProvider_Tour_Month extends DataProvider {
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourMonthData;
@@ -76,10 +76,10 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
-         _lastYear = lastYear;
-         _numberOfYears = numYears;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
 
          // get the tour types
          final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
@@ -462,7 +462,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final float[][] numTours = _tourMonthData.numToursHigh;
       final int numMonths = numTours[0].length;
-      final int firstYear = _lastYear - _numberOfYears + 1;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
 
       // loop: all months + years
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
