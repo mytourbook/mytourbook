@@ -42,7 +42,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Day extends DataProvider {
-
    private static DataProvider_Tour_Day _instance;
 
    private TourData_Day                 _tourDayData;
@@ -593,48 +592,48 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          // get number of days for all years
          int yearDays = 0;
-         for (final int doy : _yearDays) {
+         for (final int doy : allYearDays) {
             yearDays += doy;
          }
 
          _tourDayData = new TourData_Day();
 
-         _tourDayData.tourIds = dbAllTourIds.toArray();
+         _tourDayData.allTourIds = dbAllTourIds.toArray();
 
-         _tourDayData.yearValues = dbAllYears.toArray();
-         _tourDayData.monthValues = dbAllMonths.toArray();
-         _tourDayData.dayValues = dbAllDays.toArray();
+         _tourDayData.allYears = dbAllYears.toArray();
+         _tourDayData.allMonths = dbAllMonths.toArray();
+         _tourDayData.allDays = dbAllDays.toArray();
          _tourDayData.setDoyValues(allYearsDOY);
-         _tourDayData.weekValues = dbAllTourStartWeek.toArray();
+         _tourDayData.allWeeks = dbAllTourStartWeek.toArray();
 
          _tourDayData.allDaysInAllYears = yearDays;
-         _tourDayData.yearDays = _yearDays;
-         _tourDayData.years = _years;
+         _tourDayData.allYearDays = allYearDays;
+         _tourDayData.allYearNumbers = allYearNumbers;
 
-         _tourDayData.typeIds = allTypeIds.toArray();
-         _tourDayData.typeColorIndex = allTypeColorIndex.toArray();
+         _tourDayData.allTypeIds = allTypeIds.toArray();
+         _tourDayData.allTypeColorIndices = allTypeColorIndex.toArray();
 
          _tourDayData.tagIds = allTagIds;
 
          _tourDayData.setDurationLow(duration_Low);
          _tourDayData.setDurationHigh(duration_High);
 
-         _tourDayData.altitude_Low = altitude_Low;
-         _tourDayData.altitude_High = altitude_High;
-         _tourDayData.distance_Low = distance_Low;
-         _tourDayData.distance_High = distance_High;
+         _tourDayData.allElevation_Low = altitude_Low;
+         _tourDayData.allElevation_High = altitude_High;
+         _tourDayData.allDistance_Low = distance_Low;
+         _tourDayData.allDistance_High = distance_High;
 
-         _tourDayData.avgPace_Low = avgPace_Low;
-         _tourDayData.avgPace_High = avgPace_High;
-         _tourDayData.avgSpeed_Low = avgSpeed_Low;
-         _tourDayData.avgSpeed_High = avgSpeed_High;
+         _tourDayData.allAvgPace_Low = avgPace_Low;
+         _tourDayData.allAvgPace_High = avgPace_High;
+         _tourDayData.allAvgSpeed_Low = avgSpeed_Low;
+         _tourDayData.allAvgSpeed_High = avgSpeed_High;
 
-         _tourDayData.trainingEffect_Aerob_Low = trainEffect_Aerob_Low;
-         _tourDayData.trainingEffect_Aerob_High = trainEffect_Aerob_High;
-         _tourDayData.trainingEffect_Anaerob_Low = trainEffect_Anaerob_Low;
-         _tourDayData.trainingEffect_Anaerob_High = trainEffect_Anaerob_High;
-         _tourDayData.trainingPerformance_Low = trainPerformance_Low;
-         _tourDayData.trainingPerformance_High = trainPerformance_High;
+         _tourDayData.allTrainingEffect_Aerob_Low = trainEffect_Aerob_Low;
+         _tourDayData.allTrainingEffect_Aerob_High = trainEffect_Aerob_High;
+         _tourDayData.allTrainingEffect_Anaerob_Low = trainEffect_Anaerob_Low;
+         _tourDayData.allTrainingEffect_Anaerob_High = trainEffect_Anaerob_High;
+         _tourDayData.allTrainingPerformance_Low = trainPerformance_Low;
+         _tourDayData.allTrainingPerformance_High = trainPerformance_High;
 
          _tourDayData.allStartTime = dbAllTourStartTime.toArray();
          _tourDayData.allEndTime = dbAllTourEndTime.toArray();
@@ -652,8 +651,8 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allDeviceTime_Paused = dbAllTourDeviceTime_Paused.toArray();
          _tourDayData.allComputedTime_Moving = dbAllTourComputedTime_Moving.toArray();
 
-         _tourDayData.tourTitle = dbAllTourTitle;
-         _tourDayData.tourDescription = dbAllTourDescription;
+         _tourDayData.allTourTitles = dbAllTourTitle;
+         _tourDayData.allTourDescriptions = dbAllTourDescription;
 
          setStatisticValues();
 
@@ -674,58 +673,113 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final StringBuilder sb = new StringBuilder();
 
-// SET_FORMATTING_OFF
+      final String headerLine1 = UI.EMPTY_STRING
 
-      final String headerLine1_1 = "Year, Month, Day, DOY, Elapsed, Recorded, Paused, Moving,  Break,"; //                                //$NON-NLS-1$
-      final String headerLine2_1 = "    ,      ,    ,    ,     (s),      (s),    (s),    (s),    (s),"; //                                //$NON-NLS-1$
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+            + HEAD1_DATE_DAY
+            + HEAD1_DATE_DOY
 
-      final String headerLine1_2 = "      , Duration,      , Altitude,          , Distance,            ,  Speed,          , Pace,"; //    //$NON-NLS-1$
-      final String headerLine2_2 = "      ,      (s),      ,      (m),          ,      (m),            , (km/h),      , (min/km),"; //    //$NON-NLS-1$
+            + HEAD1_DEVICE_TIME_ELAPSED
+            + HEAD1_DEVICE_TIME_RECORDED
+            + HEAD1_DEVICE_TIME_PAUSED
 
-      final String headerLine1_3 = "      , Training,      , Training,      , Training"; //                                               //$NON-NLS-1$
-      final String headerLine2_3 = "         , Aerob,       , Anaerob,   , Performance"; //                                               //$NON-NLS-1$
+            + HEAD1_COMPUTED_TIME_MOVING
+            + HEAD1_COMPUTED_TIME_BREAK
 
-// SET_FORMATTING_ON
+            + HEAD1_DURATION_LOW
+            + HEAD1_DURATION_HIGH
+            + HEAD1_ELEVATION_LOW
+            + HEAD1_ELEVATION_HIGH
+            + HEAD1_DISTANCE_LOW
+            + HEAD1_DISTANCE_HIGH
+            + HEAD1_SPEED_LOW
+            + HEAD1_SPEED_HIGH
+            + HEAD1_PACE_LOW
+            + HEAD1_PACE_HIGH
+
+            + HEAD1_TRAINING_AEROB_LOW
+            + HEAD1_TRAINING_AEROB_HIGH
+            + HEAD1_TRAINING_ANAEROB_LOW
+            + HEAD1_TRAINING_ANAEROB_HIGH
+            + HEAD1_TRAINING_PERFORMANCE_LOW
+            + HEAD1_TRAINING_PERFORMANCE_HIGH;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+            + HEAD2_DATE_DAY
+            + HEAD2_DATE_DOY
+
+            + HEAD2_DEVICE_TIME_ELAPSED
+            + HEAD2_DEVICE_TIME_RECORDED
+            + HEAD2_DEVICE_TIME_PAUSED
+
+            + HEAD2_COMPUTED_TIME_MOVING
+            + HEAD2_COMPUTED_TIME_BREAK
+
+            + HEAD2_DURATION_LOW
+            + HEAD2_DURATION_HIGH
+            + HEAD2_ELEVATION_LOW
+            + HEAD2_ELEVATION_HIGH
+            + HEAD2_DISTANCE_LOW
+            + HEAD2_DISTANCE_HIGH
+
+            + HEAD2_SPEED_LOW
+            + HEAD2_SPEED_HIGH
+            + HEAD2_PACE_LOW
+            + HEAD2_PACE_HIGH
+
+            + HEAD2_TRAINING_AEROB_LOW
+            + HEAD2_TRAINING_AEROB_HIGH
+            + HEAD2_TRAINING_ANAEROB_LOW
+            + HEAD2_TRAINING_ANAEROB_HIGH
+            + HEAD2_TRAINING_PERFORMANCE_LOW
+            + HEAD2_TRAINING_PERFORMANCE_HIGH
+
+      ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
             // date
-            + "%4d,   %3d, %3d, %3d," //$NON-NLS-1$
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+            + VALUE_DATE_DAY
+            + VALUE_DATE_DOY
 
             // device time
-            + "  %6d,   %6d, %6d," //$NON-NLS-1$
+            + VALUE_DEVICE_TIME_ELAPSED
+            + VALUE_DEVICE_TIME_RECORDED
+            + VALUE_DEVICE_TIME_PAUSED
 
             // computed time
-            + " %6d, %6d," //$NON-NLS-1$
+            + VALUE_COMPUTED_TIME_MOVING
+            + VALUE_COMPUTED_TIME_BREAK
 
-            // elevation
-            + "  %6.0f, %6.0f," //$NON-NLS-1$
+            + VALUE_DURATION_LOW
+            + VALUE_DURATION_HIGH
+            + VALUE_ELEVATION_LOW
+            + VALUE_ELEVATION_HIGH
+            + VALUE_DISTANCE_LOW
+            + VALUE_DISTANCE_HIGH
 
-            // altitude
-            + "  %6.0f, %6.0f," //$NON-NLS-1$
+            + VALUE_SPEED_LOW
+            + VALUE_SPEED_HIGH
+            + VALUE_PACE_LOW
+            + VALUE_PACE_HIGH
 
-            // distance
-            + "  %8.0f, %8.0f," //$NON-NLS-1$
-
-            // speed
-            + "  %8.2f, %8.2f," //$NON-NLS-1$
-
-            // pace
-            + "  %6.2f, %6.2f," //$NON-NLS-1$
-
-            // training aerob
-            + "  %6.1f, %6.1f," //$NON-NLS-1$
-
-            // training anaerob
-            + "  %6.1f, %6.1f," //$NON-NLS-1$
-
-            // training performance
-            + "  %6.2f, %6.2f" //$NON-NLS-1$
+            + VALUE_TRAINING_AEROB_LOW
+            + VALUE_TRAINING_AEROB_HIGH
+            + VALUE_TRAINING_ANAEROB_LOW
+            + VALUE_TRAINING_ANAEROB_HIGH
+            + VALUE_TRAINING_PERFORMANCE_LOW
+            + VALUE_TRAINING_PERFORMANCE_HIGH
 
             + NL;
 
-      sb.append(headerLine1_1 + headerLine1_2 + headerLine1_3 + NL);
-      sb.append(headerLine2_1 + headerLine2_2 + headerLine2_3 + NL);
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
 
       final float[] durationLow = _tourDayData.getDurationLowFloat();
       final float[] durationHigh = _tourDayData.getDurationHighFloat();
@@ -734,15 +788,15 @@ public class DataProvider_Tour_Day extends DataProvider {
       final int numDataItems = durationLow.length;
 
       // set initial value
-      int prevMonth = numDataItems > 0 ? _tourDayData.monthValues[0] : 0;
+      int prevMonth = numDataItems > 0 ? _tourDayData.allMonths[0] : 0;
 
       for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
 
-         final int monthValue = _tourDayData.monthValues[dataIndex];
+         final int month = _tourDayData.allMonths[dataIndex];
 
          // group by month
-         if (monthValue != prevMonth) {
-            prevMonth = monthValue;
+         if (month != prevMonth) {
+            prevMonth = month;
             sb.append(NL);
          }
 
@@ -752,9 +806,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          sb.append(String.format(valueFormatting,
 
-               _tourDayData.yearValues[dataIndex],
-               monthValue,
-               _tourDayData.dayValues[dataIndex],
+               _tourDayData.allYears[dataIndex],
+               month,
+               _tourDayData.allDays[dataIndex],
                doyValues[dataIndex],
 
                elapsedTime,
@@ -766,24 +820,24 @@ public class DataProvider_Tour_Day extends DataProvider {
                durationLow[dataIndex],
                durationHigh[dataIndex],
 
-               _tourDayData.altitude_Low[dataIndex],
-               _tourDayData.altitude_High[dataIndex],
+               _tourDayData.allElevation_Low[dataIndex],
+               _tourDayData.allElevation_High[dataIndex],
 
-               _tourDayData.distance_Low[dataIndex],
-               _tourDayData.distance_High[dataIndex],
+               _tourDayData.allDistance_Low[dataIndex],
+               _tourDayData.allDistance_High[dataIndex],
 
-               _tourDayData.avgSpeed_Low[dataIndex],
-               _tourDayData.avgSpeed_High[dataIndex],
+               _tourDayData.allAvgSpeed_Low[dataIndex],
+               _tourDayData.allAvgSpeed_High[dataIndex],
 
-               _tourDayData.avgPace_Low[dataIndex],
-               _tourDayData.avgPace_High[dataIndex],
+               _tourDayData.allAvgPace_Low[dataIndex],
+               _tourDayData.allAvgPace_High[dataIndex],
 
-               _tourDayData.trainingEffect_Aerob_Low[dataIndex],
-               _tourDayData.trainingEffect_Aerob_High[dataIndex],
-               _tourDayData.trainingEffect_Anaerob_Low[dataIndex],
-               _tourDayData.trainingEffect_Anaerob_High[dataIndex],
-               _tourDayData.trainingPerformance_Low[dataIndex],
-               _tourDayData.trainingPerformance_High[dataIndex]
+               _tourDayData.allTrainingEffect_Aerob_Low[dataIndex],
+               _tourDayData.allTrainingEffect_Aerob_High[dataIndex],
+               _tourDayData.allTrainingEffect_Anaerob_Low[dataIndex],
+               _tourDayData.allTrainingEffect_Anaerob_High[dataIndex],
+               _tourDayData.allTrainingPerformance_Low[dataIndex],
+               _tourDayData.allTrainingPerformance_High[dataIndex]
 
          ));
       }

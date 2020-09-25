@@ -213,13 +213,13 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _statTimeSumColorIndex = new int[colorLength][timeLength];
 
       // loop: all tours
-      for (int tourIndex = 0; tourIndex < tourDayData.distance_High.length; tourIndex++) {
+      for (int tourIndex = 0; tourIndex < tourDayData.allDistance_High.length; tourIndex++) {
 
          int unitIndex;
-         final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
+         final int typeColorIndex = tourDayData.allTypeColorIndices[tourIndex];
 
-         final int diffDistance = (int) ((tourDayData.distance_High[tourIndex] - tourDayData.distance_Low[tourIndex] + 500) / 1000);
-         final int diffAltitude = (int) (tourDayData.altitude_High[tourIndex] - tourDayData.altitude_Low[tourIndex]);
+         final int diffDistance = (int) ((tourDayData.allDistance_High[tourIndex] - tourDayData.allDistance_Low[tourIndex] + 500) / 1000);
+         final int diffAltitude = (int) (tourDayData.allElevation_High[tourIndex] - tourDayData.allElevation_Low[tourIndex]);
          final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData
                .getDurationLowFloat()[tourIndex]);
 

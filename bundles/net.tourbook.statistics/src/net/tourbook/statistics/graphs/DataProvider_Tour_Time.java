@@ -295,7 +295,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          // get number of days for all years
          int yearDays = 0;
-         for (final int doy : _yearDays) {
+         for (final int doy : allYearDays) {
             yearDays += doy;
          }
 
@@ -312,8 +312,8 @@ public class DataProvider_Tour_Time extends DataProvider {
          _tourDataTime.tagIds = allTagIds;
 
          _tourDataTime.allDaysInAllYears = yearDays;
-         _tourDataTime.yearDays = _yearDays;
-         _tourDataTime.years = _years;
+         _tourDataTime.yearDays = allYearDays;
+         _tourDataTime.years = allYearNumbers;
 
          _tourDataTime.tourYearValues = allTourYear.toArray();
          _tourDataTime.tourMonthValues = allTourMonths.toArray();

@@ -24,7 +24,111 @@ import net.tourbook.ui.TourTypeFilter;
 
 public abstract class DataProvider {
 
-   static final char    NL        = net.tourbook.common.UI.NEW_LINE;
+   static final char NL = net.tourbook.common.UI.NEW_LINE;
+
+// SET_FORMATTING_OFF
+
+   static final String HEAD1_DATE_YEAR                      = "Year,";           //$NON-NLS-1$
+   static final String HEAD2_DATE_YEAR                      = "    ,";           //$NON-NLS-1$
+   static final String VALUE_DATE_YEAR                      = "%4d,";            //$NON-NLS-1$
+
+   static final String HEAD1_DATE_MONTH                     = " Month,";         //$NON-NLS-1$
+   static final String HEAD2_DATE_MONTH                     = "      ,";         //$NON-NLS-1$
+   static final String VALUE_DATE_MONTH                     = "   %3d,";         //$NON-NLS-1$
+
+   static final String HEAD1_DATE_DAY                       = " Day,";           //$NON-NLS-1$
+   static final String HEAD2_DATE_DAY                       = "    ,";           //$NON-NLS-1$
+   static final String VALUE_DATE_DAY                       = " %3d,";           //$NON-NLS-1$
+
+   static final String HEAD1_DATE_DOY                       = " DOY,";           //$NON-NLS-1$
+   static final String HEAD2_DATE_DOY                       = "    ,";           //$NON-NLS-1$
+   static final String VALUE_DATE_DOY                       = " %3d,";           //$NON-NLS-1$
+
+   static final String HEAD1_DEVICE_TIME_ELAPSED            = " Elapsed,";       //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_ELAPSED            = "     (s),";       //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_ELAPSED            = "  %6d,";          //$NON-NLS-1$
+
+   static final String HEAD1_DEVICE_TIME_RECORDED           = " Recorded,";      //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_RECORDED           = "      (s),";      //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_RECORDED           = "   %6d,";         //$NON-NLS-1$
+
+   static final String HEAD1_DEVICE_TIME_PAUSED             = " Paused,";        //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_PAUSED             = "    (s),";        //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_PAUSED             = " %6d,";           //$NON-NLS-1$
+
+   static final String HEAD1_COMPUTED_TIME_MOVING           = " Moving,";        //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_MOVING           = "    (s),";        //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_MOVING           = " %6d,";           //$NON-NLS-1$
+
+   static final String HEAD1_COMPUTED_TIME_BREAK            = "  Break,";        //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_BREAK            = "    (s),";        //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_BREAK            = " %6d,";           //$NON-NLS-1$
+
+   static final String HEAD1_DURATION_LOW                   = "      ,";         //$NON-NLS-1$
+   static final String HEAD2_DURATION_LOW                   = "      ,";         //$NON-NLS-1$
+   static final String VALUE_DURATION_LOW                   = "  %6.0f,";        //$NON-NLS-1$
+
+   static final String HEAD1_DURATION_HIGH                  = " Duration,";      //$NON-NLS-1$
+   static final String HEAD2_DURATION_HIGH                  = "      (s),";      //$NON-NLS-1$
+   static final String VALUE_DURATION_HIGH                  = " %6.0f,";         //$NON-NLS-1$
+
+   static final String HEAD1_ELEVATION_LOW                  = "      ,";         //$NON-NLS-1$
+   static final String HEAD2_ELEVATION_LOW                  = "      ,";         //$NON-NLS-1$
+   static final String VALUE_ELEVATION_LOW                  = "   %6.0f,";       //$NON-NLS-1$
+
+   static final String HEAD1_ELEVATION_HIGH                 = " Elevation,";     //$NON-NLS-1$
+   static final String HEAD2_ELEVATION_HIGH                 = "       (m),";     //$NON-NLS-1$
+   static final String VALUE_ELEVATION_HIGH                 = " %6.0f,";         //$NON-NLS-1$
+
+   static final String HEAD1_DISTANCE_LOW                   = "          ,";     //$NON-NLS-1$
+   static final String HEAD2_DISTANCE_LOW                   = "          ,";     //$NON-NLS-1$
+   static final String VALUE_DISTANCE_LOW                   = "  %8.0f,";        //$NON-NLS-1$
+
+   static final String HEAD1_DISTANCE_HIGH                  = " Distance,";      //$NON-NLS-1$
+   static final String HEAD2_DISTANCE_HIGH                  = "      (m),";      //$NON-NLS-1$
+   static final String VALUE_DISTANCE_HIGH                  = " %8.0f,";         //$NON-NLS-1$
+
+   static final String HEAD1_SPEED_LOW                      = "         ,";      //$NON-NLS-1$
+   static final String HEAD2_SPEED_LOW                      = "         ,";      //$NON-NLS-1$
+   static final String VALUE_SPEED_LOW                      = " %7.2f,";         //$NON-NLS-1$
+
+   static final String HEAD1_SPEED_HIGH                     = "  Speed,";        //$NON-NLS-1$
+   static final String HEAD2_SPEED_HIGH                     = " (km/h),";        //$NON-NLS-1$
+   static final String VALUE_SPEED_HIGH                     = " %7.2f,";         //$NON-NLS-1$
+
+   static final String HEAD1_PACE_LOW                       = "          ,";     //$NON-NLS-1$
+   static final String HEAD2_PACE_LOW                       = "      ,";         //$NON-NLS-1$
+   static final String VALUE_PACE_LOW                       = "  %6.2f,";        //$NON-NLS-1$
+
+   static final String HEAD1_PACE_HIGH                      = " Pace,";          //$NON-NLS-1$
+   static final String HEAD2_PACE_HIGH                      = " (min/km),";      //$NON-NLS-1$
+   static final String VALUE_PACE_HIGH                      = " %6.2f,";         //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_AEROB_LOW             = "      ,";         //$NON-NLS-1$
+   static final String HEAD2_TRAINING_AEROB_LOW             = "         ,";      //$NON-NLS-1$
+   static final String VALUE_TRAINING_AEROB_LOW             = "  %6.1f,";        //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_AEROB_HIGH            = " Training,";      //$NON-NLS-1$
+   static final String HEAD2_TRAINING_AEROB_HIGH            = " Aerob,";         //$NON-NLS-1$
+   static final String VALUE_TRAINING_AEROB_HIGH            = " %6.1f,";         //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_ANAEROB_LOW           = "      ,";         //$NON-NLS-1$
+   static final String HEAD2_TRAINING_ANAEROB_LOW           = "       ,";        //$NON-NLS-1$
+   static final String VALUE_TRAINING_ANAEROB_LOW           = "  %6.1f,";        //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_ANAEROB_HIGH          = " Training,";      //$NON-NLS-1$
+   static final String HEAD2_TRAINING_ANAEROB_HIGH          = " Anaerob,";       //$NON-NLS-1$
+   static final String VALUE_TRAINING_ANAEROB_HIGH          = " %6.1f,";         //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_PERFORMANCE_LOW       = "      ,";         //$NON-NLS-1$
+   static final String HEAD2_TRAINING_PERFORMANCE_LOW       = "   ,";            //$NON-NLS-1$
+   static final String VALUE_TRAINING_PERFORMANCE_LOW       = "  %6.2f,";        //$NON-NLS-1$
+
+   static final String HEAD1_TRAINING_PERFORMANCE_HIGH      = " Training";       //$NON-NLS-1$
+   static final String HEAD2_TRAINING_PERFORMANCE_HIGH      = " Performance";    //$NON-NLS-1$
+   static final String VALUE_TRAINING_PERFORMANCE_HIGH      = " %6.2f";          //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
@@ -36,19 +140,19 @@ public abstract class DataProvider {
    int                  _numberOfYears;
 
    /**
-    * all years
+    * All years numbers, e.g. 2016, 2017, ... 2020
     */
-   int[]                _years;
+   int[]                allYearNumbers;
 
    /**
-    * number of days in a year
+    * Number of days in a year
     */
-   int[]                _yearDays;
+   int[]                allYearDays;
 
    /**
-    * number of weeks in a year
+    * Number of weeks in a year
     */
-   int[]                _yearWeeks;
+   int[]                allYearWeeks;
 
    static String createSQL_SumDurationTime(final DurationTime durationTime) {
 
@@ -122,7 +226,7 @@ public abstract class DataProvider {
             return yearDOYs;
          }
 
-         yearDOYs += _yearDays[yearIndex];
+         yearDOYs += allYearDays[yearIndex];
 
          yearIndex++;
       }
@@ -133,25 +237,25 @@ public abstract class DataProvider {
    /**
     * Get different data for each year, data are set into <br>
     * <br>
-    * All years in {@link #years} <br>
-    * Number of day's in {@link #_yearDays} <br>
-    * Number of week's in {@link #_yearWeeks}
+    * All years in {@link #allYearNumbers} <br>
+    * Number of day's in {@link #allYearDays} <br>
+    * Number of week's in {@link #allYearWeeks}
     */
    void initYearNumbers() {
 
-      _years = new int[_numberOfYears];
-      _yearDays = new int[_numberOfYears];
-      _yearWeeks = new int[_numberOfYears];
+      allYearNumbers = new int[_numberOfYears];
+      allYearDays = new int[_numberOfYears];
+      allYearWeeks = new int[_numberOfYears];
 
       final int firstYear = _lastYear - _numberOfYears + 1;
       int yearIndex = 0;
 
       for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
-         _years[yearIndex] = currentYear;
+         allYearNumbers[yearIndex] = currentYear;
 
-         _yearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
-         _yearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
+         allYearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
+         allYearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
 
          yearIndex++;
       }

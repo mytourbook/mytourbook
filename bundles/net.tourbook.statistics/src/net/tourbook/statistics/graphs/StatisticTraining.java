@@ -119,7 +119,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
                      final long modifiedTourId = modifiedTourData.getTourId();
 
-                     final long[] tourIds = _tourDayData.tourIds;
+                     final long[] tourIds = _tourDayData.allTourIds;
                      for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
 
                         final long tourId = tourIds[tourIdIndex];
@@ -127,7 +127,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
                         if (tourId == modifiedTourId) {
 
                            // set new tour title
-                           _tourDayData.tourTitle.set(tourIdIndex, modifiedTourData.getTourTitle());
+                           _tourDayData.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
 
                            break;
                         }
@@ -150,7 +150,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final double[] segmentEnd = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
-      final int[] allYearDays = tourTimeData.yearDays;
+      final int[] allYearDays = tourTimeData.allYearDays;
       final int oldestYear = _currentYear - _numberOfYears + 1;
       int yearDaysSum = 0;
 
@@ -171,8 +171,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       chartSegments.segmentEndValue = segmentEnd;
       chartSegments.segmentTitle = segmentTitle;
 
-      chartSegments.years = tourTimeData.years;
-      chartSegments.yearDays = tourTimeData.yearDays;
+      chartSegments.years = tourTimeData.allYearNumbers;
+      chartSegments.yearDays = tourTimeData.allYearDays;
       chartSegments.allValues = tourTimeData.allDaysInAllYears;
 
       return chartSegments;
@@ -203,9 +203,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       _chart.addBarSelectionListener(new IBarSelectionListener() {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
-            if (_tourDayData.typeIds.length > 0) {
+            if (_tourDayData.allTypeIds.length > 0) {
 
-               _selectedTourId = _tourDayData.tourIds[valueIndex];
+               _selectedTourId = _tourDayData.allTourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                if (StatisticView.isInUpdateUI()) {
@@ -240,7 +240,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-            _selectedTourId = _tourDayData.tourIds[valueIndex];
+            _selectedTourId = _tourDayData.allTourIds[valueIndex];
             _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
             ActionEditQuick.doAction(StatisticTraining.this);
@@ -261,7 +261,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
                   if (barChartSelection.serieIndex != -1) {
 
-                     _selectedTourId = _tourDayData.tourIds[barChartSelection.valueIndex];
+                     _selectedTourId = _tourDayData.allTourIds[barChartSelection.valueIndex];
                      _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                      ActionEditQuick.doAction(StatisticTraining.this);
@@ -286,11 +286,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          return null;
       }
 
-      final long tooltipTourId = _tourDayData.tourIds[valueIndex];
+      final long tooltipTourId = _tourDayData.allTourIds[valueIndex];
 
-      final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.typeIds[valueIndex]);
+      final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.allTypeIds[valueIndex]);
       final String tourTags = TourDatabase.getTagNames(_tourDayData.tagIds.get(tooltipTourId));
-      final String tourDescription = _tourDayData.tourDescription.get(valueIndex)
+      final String tourDescription = _tourDayData.allTourDescriptions.get(valueIndex)
             .replace(
                   net.tourbook.ui.UI.SYSTEM_NEW_LINE,
                   UI.NEW_LINE1);
@@ -426,7 +426,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       );
 
       // set title
-      String tourTitle = _tourDayData.tourTitle.get(valueIndex);
+      String tourTitle = _tourDayData.allTourTitles.get(valueIndex);
       if (tourTitle == null || tourTitle.trim().length() == 0) {
          tourTitle = tourTypeName;
       }
@@ -458,8 +458,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.altitude_Low,
-            _tourDayData.altitude_High);
+            _tourDayData.allElevation_Low,
+            _tourDayData.allElevation_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
       yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -467,7 +467,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
@@ -479,8 +479,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.avgPace_Low,
-            _tourDayData.avgPace_High);
+            _tourDayData.allAvgPace_Low,
+            _tourDayData.allAvgPace_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_PACE);
       yData.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -488,7 +488,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
@@ -500,8 +500,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.avgSpeed_Low,
-            _tourDayData.avgSpeed_High);
+            _tourDayData.allAvgSpeed_Low,
+            _tourDayData.allAvgSpeed_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_SPEED);
       yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -509,7 +509,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
@@ -524,8 +524,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.distance_Low,
-            _tourDayData.distance_High);
+            _tourDayData.allDistance_Low,
+            _tourDayData.allDistance_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
@@ -534,7 +534,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
       yData.setValueDivisor(1000);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
@@ -558,7 +558,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       _yData_Duration.setAllValueColors(0);
       _yData_Duration.setShowYSlider(true);
       _yData_Duration.setVisibleMinValue(0);
-      _yData_Duration.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      _yData_Duration.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
@@ -573,15 +573,15 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.trainingEffect_Aerob_Low,
-            _tourDayData.trainingEffect_Aerob_High);
+            _tourDayData.allTrainingEffect_Aerob_Low,
+            _tourDayData.allTrainingEffect_Aerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRAINING_EFFECT_AEROB);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRAINING_EFFECT_AEROB, _activeTourTypeFilter);
@@ -596,15 +596,15 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.trainingEffect_Anaerob_Low,
-            _tourDayData.trainingEffect_Anaerob_High);
+            _tourDayData.allTrainingEffect_Anaerob_Low,
+            _tourDayData.allTrainingEffect_Anaerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      yData.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TRAINING_EFFECT_ANAEROB);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TRAINING_EFFECT_ANAEROB, _activeTourTypeFilter);
@@ -619,15 +619,15 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       _yData_TrainingPerformance = new ChartDataYSerie(
             chartType,
-            _tourDayData.trainingPerformance_Low,
-            _tourDayData.trainingPerformance_High);
+            _tourDayData.allTrainingPerformance_Low,
+            _tourDayData.allTrainingPerformance_High);
 
       _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
       _yData_TrainingPerformance.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       _yData_TrainingPerformance.setAllValueColors(0);
       _yData_TrainingPerformance.setShowYSlider(true);
       _yData_TrainingPerformance.setVisibleMinValue(0);
-      _yData_TrainingPerformance.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      _yData_TrainingPerformance.setColorIndex(new int[][] { _tourDayData.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(_yData_TrainingPerformance, GraphColorManager.PREF_GRAPH_TRAINING_PERFORMANCE);
       StatisticServices.setTourTypeColors(_yData_TrainingPerformance, GraphColorManager.PREF_GRAPH_TRAINING_PERFORMANCE, _activeTourTypeFilter);
@@ -717,8 +717,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          final int valueIndex = ((SelectionBarChart) selection).valueIndex;
 
          // check array bounds
-         if (valueIndex < _tourDayData.tourIds.length) {
-            state.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
+         if (valueIndex < _tourDayData.allTourIds.length) {
+            state.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDayData.allTourIds[valueIndex]));
          }
       }
    }
@@ -726,7 +726,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    @Override
    public boolean selectTour(final Long tourId) {
 
-      final long[] tourIds = _tourDayData.tourIds;
+      final long[] tourIds = _tourDayData.allTourIds;
       final boolean selectedItems[] = new boolean[tourIds.length];
       boolean isSelected = false;
 
@@ -801,7 +801,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          if (barChartSelection.serieIndex != -1) {
 
             int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _tourDayData.tourIds;
+            final long[] tourIds = _tourDayData.allTourIds;
 
             if (tourIds.length > 0) {
 

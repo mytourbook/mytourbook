@@ -86,7 +86,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          final TourType[] allActiveTourTypes = allActiveTourTypesList.toArray(new TourType[allActiveTourTypesList.size()]);
 
          int numWeeks = 0;
-         for (final int weeks : _yearWeeks) {
+         for (final int weeks : allYearWeeks) {
             numWeeks += weeks;
          }
 
@@ -214,7 +214,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             int allWeeks = 0;
             for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                if (yearIndex > 0) {
-                  allWeeks += _yearWeeks[yearIndex - 1];
+                  allWeeks += allYearWeeks[yearIndex - 1];
                }
             }
 
@@ -295,9 +295,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          }
 
 
-         _tourWeekData.years = _years;
-         _tourWeekData.yearWeeks = _yearWeeks;
-         _tourWeekData.yearDays = _yearDays;
+         _tourWeekData.years = allYearNumbers;
+         _tourWeekData.yearWeeks = allYearWeeks;
+         _tourWeekData.yearDays = allYearDays;
 
          _tourWeekData.typeIds = allDbTypeIds;
 
