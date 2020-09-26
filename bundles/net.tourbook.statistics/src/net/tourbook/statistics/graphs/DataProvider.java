@@ -44,6 +44,10 @@ public abstract class DataProvider {
    static final String HEAD2_DATE_DAY                       = "    ,";           //$NON-NLS-1$
    static final String VALUE_DATE_DAY                       = " %3d,";           //$NON-NLS-1$
 
+   static final String HEAD1_DATE_WEEK                       = " Week,";         //$NON-NLS-1$
+   static final String HEAD2_DATE_WEEK                       = "     ,";         //$NON-NLS-1$
+   static final String VALUE_DATE_WEEK                       = "   %2d,";        //$NON-NLS-1$
+
    static final String HEAD1_DATE_DOY                       = " DOY,";           //$NON-NLS-1$
    static final String HEAD2_DATE_DOY                       = "    ,";           //$NON-NLS-1$
    static final String VALUE_DATE_DOY                       = " %3d,";           //$NON-NLS-1$
@@ -76,13 +80,13 @@ public abstract class DataProvider {
    static final String HEAD2_DURATION_HIGH                  = "      (s),";      //$NON-NLS-1$
    static final String VALUE_DURATION_HIGH                  = " %6.0f,";         //$NON-NLS-1$
 
-   static final String HEAD1_ELEVATION_LOW                  = "      ,";         //$NON-NLS-1$
-   static final String HEAD2_ELEVATION_LOW                  = "      ,";         //$NON-NLS-1$
+   static final String HEAD1_ELEVATION_LOW                  = "         ,";      //$NON-NLS-1$
+   static final String HEAD2_ELEVATION_LOW                  = "         ,";      //$NON-NLS-1$
    static final String VALUE_ELEVATION_LOW                  = "   %6.0f,";       //$NON-NLS-1$
 
    static final String HEAD1_ELEVATION_HIGH                 = " Elevation,";     //$NON-NLS-1$
    static final String HEAD2_ELEVATION_HIGH                 = "       (m),";     //$NON-NLS-1$
-   static final String VALUE_ELEVATION_HIGH                 = " %6.0f,";         //$NON-NLS-1$
+   static final String VALUE_ELEVATION_HIGH                 = "    %6.0f,";      //$NON-NLS-1$
 
    static final String HEAD1_DISTANCE_LOW                   = "          ,";     //$NON-NLS-1$
    static final String HEAD2_DISTANCE_LOW                   = "          ,";     //$NON-NLS-1$

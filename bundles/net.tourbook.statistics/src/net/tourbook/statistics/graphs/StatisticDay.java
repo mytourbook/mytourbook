@@ -602,6 +602,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    }
 
    @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
+   }
+
+   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
@@ -745,7 +750,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
+      statContext.outRawStatisticValues = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

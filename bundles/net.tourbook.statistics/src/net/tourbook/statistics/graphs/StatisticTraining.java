@@ -680,6 +680,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
+   }
+
+   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
@@ -856,7 +861,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
             durationTime);
 
-      statContext.outStatisticValuesRaw = _tourDayData.statisticValuesRaw;
+      statContext.outRawStatisticValues = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

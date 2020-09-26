@@ -703,7 +703,9 @@ public class DataProvider_Tour_Day extends DataProvider {
             + HEAD1_TRAINING_ANAEROB_LOW
             + HEAD1_TRAINING_ANAEROB_HIGH
             + HEAD1_TRAINING_PERFORMANCE_LOW
-            + HEAD1_TRAINING_PERFORMANCE_HIGH;
+            + HEAD1_TRAINING_PERFORMANCE_HIGH
+
+      ;
 
       final String headerLine2 = UI.EMPTY_STRING
 
@@ -742,18 +744,15 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            // date
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
             + VALUE_DATE_DAY
             + VALUE_DATE_DOY
 
-            // device time
             + VALUE_DEVICE_TIME_ELAPSED
             + VALUE_DEVICE_TIME_RECORDED
             + VALUE_DEVICE_TIME_PAUSED
 
-            // computed time
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
@@ -776,7 +775,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + VALUE_TRAINING_PERFORMANCE_LOW
             + VALUE_TRAINING_PERFORMANCE_HIGH
 
-            + NL;
+      ;
 
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
@@ -840,6 +839,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                _tourDayData.allTrainingPerformance_High[dataIndex]
 
          ));
+
+         sb.append(NL);
       }
 
       _tourDayData.statisticValuesRaw = sb.toString();

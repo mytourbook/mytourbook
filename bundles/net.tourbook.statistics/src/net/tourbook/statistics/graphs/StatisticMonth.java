@@ -358,6 +358,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
    }
 
    @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
+   }
+
+   @Override
    public void preferencesHasChanged() {
 
       updateStatistic();
@@ -578,7 +583,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      statContext.outStatisticValuesRaw = _tourMonthData.statisticValuesRaw;
+      statContext.outRawStatisticValues = _tourMonthData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

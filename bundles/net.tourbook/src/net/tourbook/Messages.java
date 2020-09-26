@@ -2717,6 +2717,7 @@ public class Messages extends NLS {
    public static String Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip;
    public static String Tour_StatisticValues_Action_CSVFormat_Tooltip;
    public static String Tour_StatisticValues_Action_GroupValues_Tooltip;
+   public static String Tour_StatisticValues_Action_OpenPreferences_Tooltip;
    public static String Tour_StatisticValues_Action_ShowZeroValued_Tooltip;
    public static String Tour_StatisticValues_Info_DataAreCopied;
    public static String Tour_StatisticValues_Label_NoData;

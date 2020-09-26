@@ -34,27 +34,29 @@ public class TourData_Time {
     */
    int[]                          allYear_NumDays;
 
-   int[]                          allTourYearValues;
-   int[]                          allTourMonthValues;
-   int[]                          allTourDOYValues;
-   int[]                          allWeekValues;
+   int[]                          allTourYears;
+   int[]                          allTourMonths;
+   int[]                          allTourDays;
 
-   int[]                          allTourTimeStartValues;
-   int[]                          allTourTimeEndValues;
+   int[]                          allTourDOYs;
+   int[]                          allWeeks;
+
+   int[]                          allTourTimeStart;
+   int[]                          allTourTimeEnd;
    ArrayList<ZonedDateTime>       allTourStartDateTimes;
    ArrayList<String>              allTourTimeZoneOffsets;
 
-   int[]                          allTourElevationValues;
-   int[]                          allTourDistanceValues;
+   float[]                        allTourElevations;
+   float[]                        allTourDistances;
 
-   int[]                          allTourDeviceTime_ElapsedValues;
-   int[]                          allTourDeviceTime_RecordedValues;
-   int[]                          allTourComputedTime_MovingValues;
+   int[]                          allTourDeviceTime_Elapsed;
+   int[]                          allTourDeviceTime_Recorded;
+   int[]                          allTourComputedTime_Moving;
 
    ArrayList<String>              allTourTitles;
    ArrayList<String>              allTourDescriptions;
 
-   String                         statisticValuesRaw;
+   String                         rawStatisticValues;
 
    /**
     * Contains the tags for the tour, key is the tour ID

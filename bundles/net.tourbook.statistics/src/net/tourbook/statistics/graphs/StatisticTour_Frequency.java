@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,6 +58,8 @@ import org.eclipse.ui.IViewSite;
 public class StatisticTour_Frequency extends TourbookStatistic {
 
    private final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
+
+   private StatisticContext         _statContext;
 
    private IPropertyChangeListener  _statTourFrequency_PrefChangeListener;
 
@@ -600,6 +602,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    }
 
    @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
+   }
+
+   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
@@ -791,6 +798,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    @Override
    public void updateStatistic(final StatisticContext statContext) {
+
+      _statContext = statContext;
 
       _activePerson = statContext.appPerson;
       _activeTourTypeFilter = statContext.appTourTypeFilter;

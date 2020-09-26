@@ -253,6 +253,11 @@ public abstract class TourbookStatistic {
       return null;
    }
 
+   /**
+    * @return Returns the statistic context
+    */
+   public abstract StatisticContext getStatisticContext();
+
    public Composite getUIControl() {
       return _container;
    }

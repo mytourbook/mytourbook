@@ -15,20 +15,20 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import java.util.regex.Pattern;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageAppearance;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -38,11 +38,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -50,39 +48,27 @@ import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
 
-   public static final String            ID                        = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
+   public static final String                 ID                        = "net.tourbook.statistic.StatisticValuesView"; //$NON-NLS-1$
 
-   private static final String           STATE_IS_GROUP_VALUES     = "STATE_IS_GROUP_VALUES";                      //$NON-NLS-1$
-   private static final String           STATE_IS_SHOW_CSV_FORMAT  = "STATE_IS_SHOW_CSV_FORMAT";                   //$NON-NLS-1$
-   private static final String           STATE_IS_SHOW_ZERO_VALUES = "STATE_IS_SHOW_ZERO_VALUES";                  //$NON-NLS-1$
+   private static final String                STATE_IS_GROUP_VALUES     = "STATE_IS_GROUP_VALUES";                      //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_CSV_FORMAT  = "STATE_IS_SHOW_CSV_FORMAT";                   //$NON-NLS-1$
+   private static final String                STATE_IS_SHOW_ZERO_VALUES = "STATE_IS_SHOW_ZERO_VALUES";                  //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore      _prefStore                = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings       _state                    = TourbookPlugin.getState(ID);
 
-// SET_FORMATTING_OFF
+   private IPropertyChangeListener            _prefChangeListener;
+   private ITourEventListener                 _tourEventListener;
 
-   private static final Pattern PATTERN_FIELDS           = Pattern.compile(",");                                            //$NON-NLS-1$
-   private static final Pattern PATTERN_SPACES           = Pattern.compile("  *");                                          //$NON-NLS-1$
-   private static final Pattern PATTERN_EMPTY_LINES      = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);  //$NON-NLS-1$
+   private Selection_StatisticValues          _selection_StatisticValues;
 
-   private static final Pattern NUMBER_PATTERN_0         = Pattern.compile(" 0 ");                                          //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_END     = Pattern.compile(" 0$",     Pattern.MULTILINE);                   //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0       = Pattern.compile(" 0.0 ");                                        //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0_END   = Pattern.compile(" 0.0$",   Pattern.MULTILINE);                   //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00      = Pattern.compile(" 0.00 ");                                       //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00_END  = Pattern.compile(" 0.00$",  Pattern.MULTILINE);                   //$NON-NLS-1$
+   private Action_CopyStatValuesIntoClipboard _action_CopyIntoClipboard;
+   private Action_GroupValues                 _action_GroupValues;
+   private ActionOpenPrefDialog               _action_PrefDialog;
+   private Action_ShowCSVFormat               _action_ShowCSVFormat;
+   private Action_ShowZeroValues              _action_ShowZeroValues;
 
-//SET_FORMATTING_ON
-
-   private IPropertyChangeListener   _prefChangeListener;
-   private ITourEventListener        _tourEventListener;
-
-   private Selection_StatisticValues _selection_StatisticValues;
-
-   private Action_CopyIntoClipboard  _action_CopyIntoClipboard;
-   private Action_GroupValues        _action_GroupValues;
-   private Action_ShowCSVFormat      _action_ShowCSVFormat;
-   private Action_ShowZeroValues     _action_ShowZeroValues;
+   private boolean                            _isShowRawData;
 
    /*
     * UI controls
@@ -91,8 +77,6 @@ public class StatisticValuesView extends ViewPart {
 
    private Composite  _pageNoData;
    private Composite  _pageContent;
-
-   private Clipboard  _clipBoard;
 
    /**
     * Usinge {@link Text} or {@link StyledText}
@@ -110,9 +94,9 @@ public class StatisticValuesView extends ViewPart {
     */
    private StyledText _txtStatValues;
 
-   private class Action_CopyIntoClipboard extends Action {
+   private class Action_CopyStatValuesIntoClipboard extends Action {
 
-      Action_CopyIntoClipboard() {
+      Action_CopyStatValuesIntoClipboard() {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
@@ -160,7 +144,13 @@ public class StatisticValuesView extends ViewPart {
       }
 
       @Override
-      public void run() {
+      public void run() {}
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         _isShowRawData = UI.isCtrlKey(event);
+
          enableActions();
          updateUI();
       }
@@ -243,7 +233,11 @@ public class StatisticValuesView extends ViewPart {
 
    private void createActions() {
 
-      _action_CopyIntoClipboard = new Action_CopyIntoClipboard();
+      _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
+      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(net.tourbook.common.Messages.Image__TourOptions));
+      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(net.tourbook.common.Messages.Image__TourOptions_Disabled));
+
+      _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();
       _action_ShowZeroValues = new Action_ShowZeroValues();
       _action_GroupValues = new Action_GroupValues();
@@ -282,8 +276,6 @@ public class StatisticValuesView extends ViewPart {
 
    private void createUI(final Composite parent) {
 
-      _clipBoard = new Clipboard(parent.getDisplay());
-
       _pageBook = new PageBook(parent, SWT.NONE);
 
       _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.Tour_StatisticValues_Label_NoStatistic);
@@ -310,8 +302,6 @@ public class StatisticValuesView extends ViewPart {
 
    @Override
    public void dispose() {
-
-      _clipBoard.dispose();
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -342,48 +332,10 @@ public class StatisticValuesView extends ViewPart {
       tbm.add(_action_GroupValues);
       tbm.add(_action_ShowCSVFormat);
       tbm.add(_action_CopyIntoClipboard);
+      tbm.add(_action_PrefDialog);
 
       // setup actions
       tbm.update(true);
-   }
-
-   private String formatStatValues(String statValues, final boolean isCSVFormat, final boolean isRemoveZeros, final boolean isGroupValues) {
-
-      if (isCSVFormat) {
-
-         // remove spaces always
-         statValues = PATTERN_SPACES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
-
-         // remove empty lines always
-         statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
-
-      } else {
-
-         // remove field separator
-         statValues = PATTERN_FIELDS.matcher(statValues).replaceAll(UI.EMPTY_STRING);
-
-         // remove empty lines
-         if (isGroupValues == false) {
-            statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
-         }
-
-         // remove zeros
-         if (isRemoveZeros) {
-
-// SET_FORMATTING_OFF
-
-            statValues = NUMBER_PATTERN_0.          matcher(statValues).replaceAll("   ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_END.      matcher(statValues).replaceAll("  ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0.        matcher(statValues).replaceAll("     ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0_END.    matcher(statValues).replaceAll("    ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00.       matcher(statValues).replaceAll("      ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00_END.   matcher(statValues).replaceAll("     ");//$NON-NLS-1$
-
-// SET_FORMATTING_ON
-         }
-      }
-
-      return statValues;
    }
 
    private void initUI() {
@@ -397,34 +349,7 @@ public class StatisticValuesView extends ViewPart {
          return;
       }
 
-      final boolean isCSVFormat = true;
-      final boolean isGroupValues = false; // remove empty lines
-      final boolean isRemoveZeros = false;
-
-      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw, isCSVFormat, isRemoveZeros, isGroupValues);
-
-      if (statValues.length() > 0) {
-
-         final TextTransfer textTransfer = TextTransfer.getInstance();
-
-         _clipBoard.setContents(
-
-               new Object[] { statValues },
-               new Transfer[] { textTransfer }
-
-         );
-
-         // show info that data are copied
-         final IStatusLineManager statusLineMgr = getViewSite().getActionBars().getStatusLineManager();
-         statusLineMgr.setMessage(Messages.Tour_StatisticValues_Info_DataAreCopied);
-
-         _pageBook.getDisplay().timerExec(2000,
-               () -> {
-
-                  // cleanup message
-                  statusLineMgr.setMessage(null);
-               });
-      }
+      StatisticManager.copyStatisticValuesToTheClipboard(_selection_StatisticValues.statisticValuesRaw);
    }
 
    private void onSelectionChanged(final Selection_StatisticValues selection) {
@@ -471,14 +396,19 @@ public class StatisticValuesView extends ViewPart {
 
       _pageBook.showPage(_pageContent);
 
+      final boolean isShowRawData = _isShowRawData;
       final boolean isCSVFormat = _action_ShowCSVFormat.isChecked();
       final boolean isRemoveZeros = _action_ShowZeroValues.isChecked() == false;
       final boolean isGroupValues = _action_GroupValues.isChecked();
 
-      final String statValues = formatStatValues(_selection_StatisticValues.statisticValuesRaw,
+      // reset state
+      _isShowRawData = false;
+
+      final String statValues = StatisticManager.formatStatValues(_selection_StatisticValues.statisticValuesRaw,
             isCSVFormat,
             isRemoveZeros,
-            isGroupValues);
+            isGroupValues,
+            isShowRawData);
 
       // keep scroll positions
       final int topIndex = _txtStatValues.getTopIndex();

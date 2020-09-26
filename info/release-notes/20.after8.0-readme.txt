@@ -46,6 +46,9 @@ Improvements
   
 * Tour Book View
   - Reimport keeps manually selected paths during a session and tries to reuse it for subsequent files when necessary.
+
+* Statistics View
+  - New toolbar action to copy statistic values to the clipboard
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
@@ -56,6 +59,7 @@ Improvements
 * Dialog Adjust Elevation
   - Adjustment Type: "Approach elevation with SRMT data"
     New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
+
 
 
 Changes  

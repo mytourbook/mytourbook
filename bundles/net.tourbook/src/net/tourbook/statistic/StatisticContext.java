@@ -78,7 +78,7 @@ public class StatisticContext {
    /**
     * Contains the statistic values on which the statistic graph is based.
     */
-   public String         outStatisticValuesRaw;
+   public String         outRawStatisticValues;
 
    /**
     * @param person
