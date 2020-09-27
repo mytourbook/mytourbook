@@ -31,18 +31,7 @@ import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_HrZone_Month extends DataProvider {
 
-   private static DataProvider_HrZone_Month _instance;
-
-   private TourData_MonthHrZones            _monthData;
-
-   private DataProvider_HrZone_Month() {}
-
-   public static DataProvider_HrZone_Month getInstance() {
-      if (_instance == null) {
-         _instance = new DataProvider_HrZone_Month();
-      }
-      return _instance;
-   }
+   private TourData_MonthHrZones _monthData;
 
    TourData_MonthHrZones getMonthData(final TourPerson person,
                                       final TourTypeFilter tourTypeFilter,
@@ -198,12 +187,18 @@ public class DataProvider_HrZone_Month extends DataProvider {
          SQL.showException(e, sql);
       }
 
-      setStatisticValues();
-
       return _monthData;
    }
 
-   private void setStatisticValues() {
+   String getRawStatisticValues() {
+
+      if (_monthData == null) {
+         return null;
+      }
+
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
 
       final StringBuilder sb = new StringBuilder();
 
@@ -307,7 +302,10 @@ public class DataProvider_HrZone_Month extends DataProvider {
          ));
       }
 
-      _monthData.statisticValuesRaw = sb.toString();
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
 
 }

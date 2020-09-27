@@ -54,8 +54,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
    private final static IPreferenceStore _prefStoreCommon = CommonActivator.getPrefStore();
 
-   private StatisticContext              _statContext;
-
    private Chart                         _chart;
    private String                        _chartType;
    private final MinMaxKeeper_YData      _minMaxKeeper    = new MinMaxKeeper_YData();
@@ -495,11 +493,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
-   }
-
-   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statYoungestYear, _statNumberOfYears));
@@ -520,8 +513,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
    @Override
    public void updateStatistic(final StatisticContext statContext) {
-
-      _statContext = statContext;
 
       _chartType = _prefStore.getString(ITourbookPreferences.STAT_WEEK_CHART_TYPE);
 

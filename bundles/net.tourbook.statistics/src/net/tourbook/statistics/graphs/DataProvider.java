@@ -151,6 +151,11 @@ public abstract class DataProvider {
    int                  statistic_NumberOfYears;
 
    /**
+    *
+    */
+   String               statistic_RawStatisticValues;
+
+   /**
     * All years numbers, e.g. 2016, 2017, ... 2020
     */
    int[]                allYear_Numbers;

@@ -59,7 +59,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    private final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private StatisticContext         _statContext;
+   private TourData_Day             _tourDay_Data;
+   private DataProvider_Tour_Day    _tourDay_DataProvider            = new DataProvider_Tour_Day();
 
    private IPropertyChangeListener  _statTourFrequency_PrefChangeListener;
 
@@ -104,8 +105,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    private TourTypeFilter           _activeTourTypeFilter;
 
    private boolean                  _isSynchScaleEnabled;
-
-   private TourData_Day             _tourDayData;
 
    /*
     * UI controls
@@ -602,8 +601,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
+   public String getRawStatisticValues() {
+      return _tourDay_DataProvider.getRawStatisticValues();
    }
 
    @Override
@@ -799,30 +798,29 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    @Override
    public void updateStatistic(final StatisticContext statContext) {
 
-      _statContext = statContext;
-
       _activePerson = statContext.appPerson;
       _activeTourTypeFilter = statContext.appTourTypeFilter;
       _currentYear = statContext.statFirstYear;
       _numberOfYears = statContext.statNumberOfYears;
 
-      _tourDayData = DataProvider_Tour_Day.getInstance()
-            .getDayData(
-                  statContext.appPerson,
-                  statContext.appTourTypeFilter,
-                  statContext.statFirstYear,
-                  statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData,
+      _tourDay_Data = _tourDay_DataProvider.getDayData(
 
-                  // this may need to be customized as in the other statistics
-                  DurationTime.MOVING);
+            statContext.appPerson,
+            statContext.appTourTypeFilter,
+            statContext.statFirstYear,
+            statContext.statNumberOfYears,
+
+            isDataDirtyWithReset() || statContext.isRefreshData,
+
+            // this may need to be customized as in the other statistics
+            DurationTime.MOVING);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
          resetMinMaxKeeper(false);
       }
 
-      createStatisticData(_tourDayData);
+      createStatisticData(_tourDay_Data);
 
       updateChartDistance(
             _chartDistanceCounter,

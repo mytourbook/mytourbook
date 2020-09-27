@@ -76,11 +76,6 @@ public class StatisticContext {
    public int            outVerticalBarIndex;
 
    /**
-    * Contains the statistic values on which the statistic graph is based.
-    */
-   public String         outRawStatisticValues;
-
-   /**
     * @param person
     *           Active person or <code>null</code> when no person (all people) is selected
     * @param activeTourTypeFilter

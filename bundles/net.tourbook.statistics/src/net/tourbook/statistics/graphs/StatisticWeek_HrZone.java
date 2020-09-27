@@ -225,11 +225,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
-   }
-
-   @Override
    public void preferencesHasChanged() {
       updateStatistic();
    }
@@ -451,8 +446,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
                   _statYoungestYear,
                   _statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData);
-
-      statContext.outRawStatisticValues = _tourWeekData.statisticValuesRaw;
 
       setupBars_10_HrZoneOrder(isNewPerson);
       setupBars_20_BarNames(statContext);

@@ -37,20 +37,7 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
-   private static DataProvider_Tour_Month _instance;
-
-   private TourData_Month                 _tourMonthData;
-
-   private DataProvider_Tour_Month() {}
-
-   public static DataProvider_Tour_Month getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Month();
-      }
-
-      return _instance;
-   }
+   private TourData_Month _tourMonthData;
 
    TourData_Month getMonthData(final TourPerson person,
                                final TourTypeFilter tourTypeFilter,
@@ -411,20 +398,26 @@ public class DataProvider_Tour_Month extends DataProvider {
          SQL.showException(e, sql);
       }
 
-      setStatisticValues(numUsedTourTypes);
+      _tourMonthData.numUsedTourTypes = numUsedTourTypes;
 
       return _tourMonthData;
    }
 
-   private void setStatisticValues(final int numUsedTourTypes) {
+   String getRawStatisticValues() {
 
-      if (numUsedTourTypes == 0) {
+      if (_tourMonthData == null) {
+         return null;
+      }
+
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
+
+      if (_tourMonthData.numUsedTourTypes == 0) {
 
          // there are no real data -> show info
 
-         _tourMonthData.statisticValuesRaw = Messages.Tour_StatisticValues_Label_NoData;
-
-         return;
+         return Messages.Tour_StatisticValues_Label_NoData;
       }
 
       final long[][] allTourTypeIds = _tourMonthData.typeIds;
@@ -533,6 +526,9 @@ public class DataProvider_Tour_Month extends DataProvider {
          }
       }
 
-      _tourMonthData.statisticValuesRaw = sb.toString();
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
 }

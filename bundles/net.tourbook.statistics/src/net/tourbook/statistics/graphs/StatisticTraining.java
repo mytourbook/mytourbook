@@ -76,6 +76,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private static final String         NL                                 = UI.NEW_LINE1;
    private static final String         NL2                                = NL + NL;
 
+   private TourData_Day                _tourDayData;
+   private DataProvider_Tour_Day       _tourDay_DataProvider              = new DataProvider_Tour_Day();
+
    private TourTypeFilter              _activeTourTypeFilter;
    private TourPerson                  _activePerson;
 
@@ -89,7 +92,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private StatisticContext            _statContext;
 
    private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
-   private TourData_Day                _tourDayData;
 
    private ChartDataYSerie             _yData_Duration;
    private ChartDataYSerie             _yData_TrainingPerformance;
@@ -680,11 +682,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
-   }
-
-   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
@@ -819,8 +816,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          }
       }
 
-      final DataProvider_Tour_Day tourDayDataProvider = DataProvider_Tour_Day.getInstance();
-
       boolean isAvgValue = false;
 
       DurationTime durationTime = DurationTime.MOVING;
@@ -837,7 +832,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
-         tourDayDataProvider.setGraphContext(isAvgValue, false);
+         _tourDay_DataProvider.setGraphContext(isAvgValue, false);
 
       } else if (this instanceof StatisticTraining_Line) {
 
@@ -850,18 +845,16 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
-         tourDayDataProvider.setGraphContext(isAvgValue, true);
+         _tourDay_DataProvider.setGraphContext(isAvgValue, true);
       }
 
-      _tourDayData = tourDayDataProvider.getDayData(
+      _tourDayData = _tourDay_DataProvider.getDayData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
             statContext.statFirstYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
             durationTime);
-
-      statContext.outRawStatisticValues = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

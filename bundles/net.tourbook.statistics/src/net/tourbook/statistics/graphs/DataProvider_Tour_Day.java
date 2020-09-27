@@ -42,23 +42,11 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Day extends DataProvider {
-   private static DataProvider_Tour_Day _instance;
 
-   private TourData_Day                 _tourDayData;
+   private TourData_Day _tourDayData;
 
-   private boolean                      _isAdjustSamePosition;
-   private boolean                      _isShowTrainingPerformance_AvgValue;
-
-   private DataProvider_Tour_Day() {}
-
-   public static DataProvider_Tour_Day getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Day();
-      }
-
-      return _instance;
-   }
+   private boolean      _isAdjustSamePosition;
+   private boolean      _isShowTrainingPerformance_AvgValue;
 
    private void adjustValues(final TFloatArrayList dbAllValues,
                              final float[] lowValues,
@@ -203,6 +191,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          return _tourDayData;
       }
+
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
       String sql = null;
 
@@ -654,8 +645,6 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTourTitles = dbAllTourTitle;
          _tourDayData.allTourDescriptions = dbAllTourDescription;
 
-         setStatisticValues();
-
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       }
@@ -663,13 +652,15 @@ public class DataProvider_Tour_Day extends DataProvider {
       return _tourDayData;
    }
 
-   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
+   String getRawStatisticValues() {
 
-      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
-      _isAdjustSamePosition = isAdjustmentSamePosition;
-   }
+      if (_tourDayData == null) {
+         return null;
+      }
 
-   private void setStatisticValues() {
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
 
       final StringBuilder sb = new StringBuilder();
 
@@ -843,6 +834,15 @@ public class DataProvider_Tour_Day extends DataProvider {
          sb.append(NL);
       }
 
-      _tourDayData.statisticValuesRaw = sb.toString();
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
+   }
+
+   public void setGraphContext(final boolean isShowTrainingPerformance_AvgValue, final boolean isAdjustmentSamePosition) {
+
+      _isShowTrainingPerformance_AvgValue = isShowTrainingPerformance_AvgValue;
+      _isAdjustSamePosition = isAdjustmentSamePosition;
    }
 }

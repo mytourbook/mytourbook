@@ -43,7 +43,7 @@ public abstract class TourData_Common {
    int[][]           movingTime;
    int[][]           breakTime;
 
-   String            statisticValuesRaw;
+   int               numUsedTourTypes;
 
    /**
     * Contains the used {@link TourType} ID or -1 when not available. This data has the same length

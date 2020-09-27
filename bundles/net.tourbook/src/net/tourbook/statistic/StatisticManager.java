@@ -216,6 +216,23 @@ public class StatisticManager {
    }
 
    /**
+    * Get statistic values from the statistic view.
+    *
+    * @return
+    */
+   static String getRawStatisticValues() {
+
+      final StatisticView statisticView = getStatisticView();
+
+      if (statisticView != null && statisticView.getActiveStatistic() != null) {
+
+         return statisticView.getActiveStatistic().getRawStatisticValues();
+      }
+
+      return null;
+   }
+
+   /**
     * This method is synchronized to conform to FindBugs
     *
     * @return Returns statistics from the extension registry in the sort order of the registry

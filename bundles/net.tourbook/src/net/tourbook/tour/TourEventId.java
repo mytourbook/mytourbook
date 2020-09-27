@@ -18,7 +18,6 @@ package net.tourbook.tour;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.statistic.Selection_StatisticValues;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
