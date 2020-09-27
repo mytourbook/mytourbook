@@ -658,6 +658,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
+   public String getRawStatisticValues() {
+      return _tourDay_DataProvider.getRawStatisticValues();
+   }
+
+   @Override
    public Long getSelectedTour() {
       return _selectedTourId;
    }

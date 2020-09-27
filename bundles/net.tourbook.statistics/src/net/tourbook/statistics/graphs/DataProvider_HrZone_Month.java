@@ -51,6 +51,9 @@ public class DataProvider_HrZone_Month extends DataProvider {
          return _monthData;
       }
 
+      // reset cached values
+      statistic_RawStatisticValues = null;
+
       String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {

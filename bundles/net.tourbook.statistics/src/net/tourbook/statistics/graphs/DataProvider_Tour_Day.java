@@ -374,7 +374,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                final float trainingEffect_Anaerobic   = result.getFloat(15);
                final float trainingPerformance        = result.getFloat(16);
 
-               final Object dbTypeIdObject            = result.getObject(17);
+               final Long dbValue_TourTypeIdObject    = (Long) result.getObject(17);
 
 // SET_FORMATTING_ON
 
@@ -454,9 +454,9 @@ public class DataProvider_Tour_Day extends DataProvider {
                int colorIndex = 0;
                long dbTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-               if (dbTypeIdObject instanceof Long) {
+               if (dbValue_TourTypeIdObject instanceof Long) {
 
-                  dbTypeId = (Long) dbTypeIdObject;
+                  dbTypeId = dbValue_TourTypeIdObject;
 
                   for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
                      if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
@@ -777,6 +777,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final int numDataItems = durationLow.length;
 
+      final long[] allTourTypeIds = _tourDayData.allTypeIds;
+//      final long[] allUsedTourTypeIds = _tourDayData.usedTourTypeIds;
+
       // set initial value
       int prevMonth = numDataItems > 0 ? _tourDayData.allMonths[0] : 0;
 
@@ -800,6 +803,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                month,
                _tourDayData.allDays[dataIndex],
                doyValues[dataIndex],
+
+//               tourTypeName,
 
                elapsedTime,
                _tourDayData.allDeviceTime_Recorded[dataIndex],

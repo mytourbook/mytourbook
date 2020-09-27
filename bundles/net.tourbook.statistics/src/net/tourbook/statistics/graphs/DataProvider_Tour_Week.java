@@ -35,19 +35,24 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Week extends DataProvider {
 
-   private static DataProvider_Tour_Week _instance;
+   private TourData_Week _tourWeekData;
 
-   private TourData_Week                 _tourWeekData;
+   String getRawStatisticValues() {
 
-   private DataProvider_Tour_Week() {}
-
-   public static DataProvider_Tour_Week getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Week();
+      if (_tourWeekData == null) {
+         return null;
       }
 
-      return _instance;
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
 
    TourData_Week getWeekData(final TourPerson person,
@@ -66,6 +71,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 
          return _tourWeekData;
       }
+
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
       String sql = null;
 
@@ -293,7 +301,6 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             allDbNumTours[colorIndex][weekIndex] = dbValue_NumTours;
          }
-
 
          _tourWeekData.years = allYear_Numbers;
          _tourWeekData.yearWeeks = allYear_NumWeeks;

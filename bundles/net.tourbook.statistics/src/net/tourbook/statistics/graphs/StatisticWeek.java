@@ -52,11 +52,14 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticWeek extends TourbookStatistic {
 
-   private final static IPreferenceStore _prefStoreCommon = CommonActivator.getPrefStore();
+   private final static IPreferenceStore _prefStoreCommon       = CommonActivator.getPrefStore();
+
+   private TourData_Week                 _tourWeek_Data;
+   private DataProvider_Tour_Week        _tourWeek_DataProvider = new DataProvider_Tour_Week();
 
    private Chart                         _chart;
    private String                        _chartType;
-   private final MinMaxKeeper_YData      _minMaxKeeper    = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData      _minMaxKeeper          = new MinMaxKeeper_YData();
 
    private TourPerson                    _appPerson;
    private TourTypeFilter                _appTourTypeFilter;
@@ -66,12 +69,11 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
    private boolean                       _isSynchScaleEnabled;
 
-   private final DateFormat              _dateFormatter   = DateFormat.getDateInstance(DateFormat.FULL);
+   private final DateFormat              _dateFormatter         = DateFormat.getDateInstance(DateFormat.FULL);
 
-   private TourData_Week                 _tourWeekData;
    private ChartDataYSerie               _yData_Duration;
 
-   private Calendar                      _tooltipCalendar = GregorianCalendar.getInstance();
+   private Calendar                      _tooltipCalendar       = GregorianCalendar.getInstance();
    private int                           _firstDayOfWeek;
    private int                           _minimalDaysInFirstWeek;
 
@@ -91,7 +93,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
-      final int[] yearWeeks = _tourWeekData.yearWeeks;
+      final int[] yearWeeks = _tourWeek_Data.yearWeeks;
 
       int weekCounter = 0;
       int yearIndex = 0;
@@ -113,9 +115,9 @@ public abstract class StatisticWeek extends TourbookStatistic {
       weekSegments.segmentEndValue = segmentEnd;
       weekSegments.segmentTitle = segmentTitle;
 
-      weekSegments.years = _tourWeekData.years;
+      weekSegments.years = _tourWeek_Data.years;
       weekSegments.yearWeeks = yearWeeks;
-      weekSegments.yearDays = _tourWeekData.yearDays;
+      weekSegments.yearDays = _tourWeek_Data.yearDays;
 
       return weekSegments;
    }
@@ -187,10 +189,10 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final String beginDate = _dateFormatter.format(dateStart);
       final String endDate = _dateFormatter.format(dateEnd);
 
-      final Integer elapsedTime = _tourWeekData.elapsedTime[serieIndex][valueIndex];
-      final Integer recordedTime = _tourWeekData.recordedTime[serieIndex][valueIndex];
-      final Integer pausedTime = _tourWeekData.pausedTime[serieIndex][valueIndex];
-      final Integer movingTime = _tourWeekData.movingTime[serieIndex][valueIndex];
+      final Integer elapsedTime = _tourWeek_Data.elapsedTime[serieIndex][valueIndex];
+      final Integer recordedTime = _tourWeek_Data.recordedTime[serieIndex][valueIndex];
+      final Integer pausedTime = _tourWeek_Data.pausedTime[serieIndex][valueIndex];
+      final Integer movingTime = _tourWeek_Data.movingTime[serieIndex][valueIndex];
       final int breakTime = elapsedTime - movingTime;
 
       final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _appTourTypeFilter);
@@ -241,10 +243,10 @@ public abstract class StatisticWeek extends TourbookStatistic {
             beginDate,
             endDate,
             //
-            _tourWeekData.distanceHigh[serieIndex][valueIndex] / 1000,
+            _tourWeek_Data.distanceHigh[serieIndex][valueIndex] / 1000,
             UI.UNIT_LABEL_DISTANCE,
             //
-            (int) _tourWeekData.altitudeHigh[serieIndex][valueIndex],
+            (int) _tourWeek_Data.altitudeHigh[serieIndex][valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
             elapsedTime / 3600,
@@ -262,7 +264,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
             breakTime / 3600,
             (breakTime % 3600) / 60,
             //
-            (int) _tourWeekData.numToursHigh[serieIndex][valueIndex]
+            (int) _tourWeek_Data.numToursHigh[serieIndex][valueIndex]
       //
       ).toString();
 
@@ -279,7 +281,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
    private double[] createWeekData() {
 
-      final int weekCounter = _tourWeekData.altitudeHigh[0].length;
+      final int weekCounter = _tourWeek_Data.altitudeHigh[0].length;
       final double allWeeks[] = new double[weekCounter];
 
       for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
@@ -307,8 +309,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeekData.altitudeLow,
-            _tourWeekData.altitudeHigh);
+            _tourWeek_Data.altitudeLow,
+            _tourWeek_Data.altitudeHigh);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
       yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -318,8 +320,32 @@ public abstract class StatisticWeek extends TourbookStatistic {
       yData.setShowYSlider(true);
 
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _tourWeek_Data.typeIds, _appTourTypeFilter);
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartDataModel.addYData(yData);
+   }
+
+   void createYData_Distance(final ChartDataModel chartDataModel) {
+
+      // distance
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            getChartType(_chartType),
+            _tourWeek_Data.distanceLow,
+            _tourWeek_Data.distanceHigh);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+      yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAllValueColors(0);
+      yData.setValueDivisor(1000);
+      yData.setVisibleMinValue(0);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _tourWeek_Data.typeIds, _appTourTypeFilter);
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
 
       chartDataModel.addYData(yData);
    }
@@ -398,38 +424,14 @@ public abstract class StatisticWeek extends TourbookStatistic {
 //      );
 //   }
 
-   void createYData_Distance(final ChartDataModel chartDataModel) {
-
-      // distance
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            getChartType(_chartType),
-            _tourWeekData.distanceLow,
-            _tourWeekData.distanceHigh);
-
-      yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-      yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setAllValueColors(0);
-      yData.setValueDivisor(1000);
-      yData.setVisibleMinValue(0);
-      yData.setShowYSlider(true);
-
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-
-      chartDataModel.addYData(yData);
-   }
-
    void createYData_Duration(final ChartDataModel chartDataModel) {
 
       // duration
       _yData_Duration = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeekData.getDurationTimeLowFloat(),
-            _tourWeekData.getDurationTimeHighFloat());
+            _tourWeek_Data.getDurationTimeLowFloat(),
+            _tourWeek_Data.getDurationTimeHighFloat());
 
       _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
       _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
@@ -439,7 +441,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _yData_Duration.setShowYSlider(true);
 
       StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(_yData_Duration, _tourWeekData.typeIds, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(_yData_Duration, _tourWeek_Data.typeIds, _appTourTypeFilter);
       StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
 
       chartDataModel.addYData(_yData_Duration);
@@ -455,8 +457,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeekData.numToursLow,
-            _tourWeekData.numToursHigh);
+            _tourWeek_Data.numToursLow,
+            _tourWeek_Data.numToursHigh);
 
       yData.setYTitle(Messages.LABEL_GRAPH_NUMBER_OF_TOURS);
       yData.setUnitLabel(Messages.NUMBERS_UNIT);
@@ -465,7 +467,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _tourWeek_Data.typeIds, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
    }
@@ -490,6 +492,11 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
       _tooltipCalendar.setFirstDayOfWeek(_firstDayOfWeek);
       _tooltipCalendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);
+   }
+
+   @Override
+   public String getRawStatisticValues() {
+      return _tourWeek_DataProvider.getRawStatisticValues();
    }
 
    @Override
@@ -525,14 +532,13 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _statYoungestYear = statContext.statFirstYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourWeekData = DataProvider_Tour_Week.getInstance()
-            .getWeekData(
-                  _appPerson,
-                  _appTourTypeFilter,
-                  _statYoungestYear,
-                  _statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
-                  durationTime);
+      _tourWeek_Data = _tourWeek_DataProvider.getWeekData(
+            _appPerson,
+            _appTourTypeFilter,
+            _statYoungestYear,
+            _statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
+            durationTime);
 
       _isDuration_ReloadData = false;
 

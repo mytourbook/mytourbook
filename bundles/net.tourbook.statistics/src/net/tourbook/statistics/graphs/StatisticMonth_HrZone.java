@@ -48,25 +48,26 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
 
-   private TourPerson               _appPerson;
-   private TourTypeFilter           _appTourTypeFilter;
+   private TourData_MonthHrZones     _tourMonth_Data;
+   private DataProvider_HrZone_Month _tourMonth_DataProvider = new DataProvider_HrZone_Month();
 
-   private int                      _statYoungestYear;
-   private int                      _statNumberOfYears;
+   private TourPerson                _appPerson;
+   private TourTypeFilter            _appTourTypeFilter;
 
-   private Chart                    _chart;
-   private final MinMaxKeeper_YData _minMaxKeeper = new MinMaxKeeper_YData();
-   private IChartInfoProvider       _tooltipProvider;
+   private int                       _statYoungestYear;
+   private int                       _statNumberOfYears;
 
-   private boolean                  _isSynchScaleEnabled;
+   private Chart                     _chart;
+   private final MinMaxKeeper_YData  _minMaxKeeper           = new MinMaxKeeper_YData();
+   private IChartInfoProvider        _tooltipProvider;
 
-   private TourData_MonthHrZones    _tourMonthData;
+   private boolean                   _isSynchScaleEnabled;
 
-   private int                      _barOrderStart;
+   private int                       _barOrderStart;
 
-   private TourPersonHRZone[]       _personHrZones;
-   private TourPersonHRZone[]       _resortedPersonHrZones;
-   private int[][]                  _resortedHrZoneValues;
+   private TourPersonHRZone[]        _personHrZones;
+   private TourPersonHRZone[]        _resortedPersonHrZones;
+   private int[][]                   _resortedHrZoneValues;
 
    public StatisticMonth_HrZone() {
       super();
@@ -139,9 +140,9 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 
       // set x-axis
 
-      final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonthData));
+      final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonth_Data));
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
-      xData.setChartSegments(createChartSegments(_tourMonthData));
+      xData.setChartSegments(createChartSegments(_tourMonth_Data));
 
       chartDataModel.setXData(xData);
    }
@@ -215,6 +216,11 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    }
 
    @Override
+   public String getRawStatisticValues() {
+      return _tourMonth_DataProvider.getRawStatisticValues();
+   }
+
+   @Override
    public void preferencesHasChanged() {
       updateStatistic();
    }
@@ -228,7 +234,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       _resortedPersonHrZones = new TourPersonHRZone[maxBarLength];
 
       int resortedIndex = 0;
-      final int[][] monthHrZoneValues = _tourMonthData.hrZoneValues;
+      final int[][] monthHrZoneValues = _tourMonth_Data.hrZoneValues;
 
       if (_barOrderStart >= maxBarLength) {
 
@@ -294,7 +300,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       _barOrderStart = selectedIndex;
 
       final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
-      final int[][] weekHrZoneValues = _tourMonthData.hrZoneValues;
+      final int[][] weekHrZoneValues = _tourMonth_Data.hrZoneValues;
 
       /*
        * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
@@ -327,7 +333,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    private void setupBars_10_HrZoneOrder(final boolean isNewPerson) {
 
       final ArrayList<TourPersonHRZone> originalPersonHrZones = _appPerson.getHrZonesSorted();
-      final int[][] weekHrZoneValues = _tourMonthData.hrZoneValues;
+      final int[][] weekHrZoneValues = _tourMonth_Data.hrZoneValues;
 
       /*
        * ensure that only available person HR zones are displayed, _tourWeekData.hrZones contains
@@ -362,7 +368,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    private void setupBars_20_BarNames(final StatisticContext statContext) {
 
       final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
-      final int maxSerieSize = Math.min(personHrZones.size(), _tourMonthData.hrZoneValues.length);
+      final int maxSerieSize = Math.min(personHrZones.size(), _tourMonth_Data.hrZoneValues.length);
 
       if (personHrZones == null || maxSerieSize == 0) {
          statContext.outIsUpdateBarNames = true;
@@ -414,7 +420,6 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    @Override
    public void updateStatistic(final StatisticContext statContext) {
 
-
       /*
        * check if required data are available
        */
@@ -440,7 +445,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       _statYoungestYear = statContext.statFirstYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourMonthData = DataProvider_HrZone_Month.getInstance().getMonthData(
+      _tourMonth_Data = _tourMonth_DataProvider.getMonthData(
             _appPerson,
             _appTourTypeFilter,
             _statYoungestYear,
