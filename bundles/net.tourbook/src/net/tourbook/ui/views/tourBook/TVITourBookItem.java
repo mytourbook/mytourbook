@@ -183,13 +183,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             // -------- AVERAGE ALTITUDE CHANGE -----------
             + "avgAltitudeChange, " //                            85    //$NON-NLS-1$
 
-            // -------- TOUR DATA -----------
+            // -------- TIME -----------
             + "tourDeviceTime_Recorded, " //                      86    //$NON-NLS-1$
-            + "tourDeviceTime_Paused " //                         87    //$NON-NLS-1$
+            + "tourDeviceTime_Paused, " //                        87    //$NON-NLS-1$
+
+            // computed break time
+            + "(tourDeviceTime_Elapsed - tourComputedTime_Moving) " // 88    //$NON-NLS-1$
 
       ;
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 88;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 89;
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
             /////////////////////////////////////////////////////////////////////////
@@ -590,8 +593,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // -------- TOUR DATA -----------
 
-      tourItem.colTourDeviceTime_Recorded    = result.getLong(86);
-      tourItem.colTourDeviceTime_Paused    = result.getLong(87);
+      tourItem.colTourDeviceTime_Recorded             = result.getLong(86);
+      tourItem.colTourDeviceTime_Paused               = result.getLong(87);
 
 // SET_FORMATTING_ON
 
