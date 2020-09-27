@@ -42,6 +42,8 @@ Improvements
   - Added language support for cadence type names (none/rpm/spm)
 
 * Flat Tour Book View
+  - Sort also by
+    - Computed break time
   - Show markers and tags columns with the saved content (no dummy text)
   
 * Tour Book View
