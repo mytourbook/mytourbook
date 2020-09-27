@@ -591,10 +591,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourItem.colAltitude_AvgChange                  = result.getLong(85);
 
-      // -------- TOUR DATA -----------
+      // -------- TIME -----------
 
       tourItem.colTourDeviceTime_Recorded             = result.getLong(86);
       tourItem.colTourDeviceTime_Paused               = result.getLong(87);
+      tourItem.colTourComputedTime_Break              = result.getLong(88);
 
 // SET_FORMATTING_ON
 
@@ -647,8 +648,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final long time = isPaceAndSpeedFromRecordedTime ? dbRecordedTime : dbMovingTime;
       tourItem.colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : time * 1000 / dbDistance;
-
-      tourItem.colTourComputedTime_Break = tourItem.colTourDeviceTime_Elapsed - tourItem.colTourComputedTime_Moving;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourItem.scrambleData();
