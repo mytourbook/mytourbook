@@ -333,7 +333,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       }
 
       // Double clicking on an item should always return only 1 element.
-      final Metadata item = ((Metadata) selection.toArray()[0]);
+      final Metadata item = ((Metadata) selectionArray[0]);
       final String itemPath = item.getPathDisplay();
 
       if (item instanceof FolderMetadata) {
