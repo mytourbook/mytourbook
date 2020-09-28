@@ -315,8 +315,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final float speed = time == 0 ? 0 : distance / (time / 3.6f);
       final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
-      final float training_Effect = _tourDayData.allTraining_Effect[valueIndex];
-      final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerobic[valueIndex];
+      final float training_Effect_Aerob = _tourDayData.allTraining_Effect_Aerob[valueIndex];
+      final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerob[valueIndex];
       final float training_Performance = _tourDayData.allTraining_Performance[valueIndex];
 
       final StringBuilder toolTipFormat = new StringBuilder();
@@ -368,7 +368,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             UI.UNIT_LABEL_DISTANCE,
 
             // altitude
-            (int) _tourDayData.allAltitude[valueIndex],
+            (int) _tourDayData.allElevation[valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
 
             // start time
@@ -414,7 +414,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             UI.UNIT_LABEL_PACE,
 
             // training
-            training_Effect,
+            training_Effect_Aerob,
             training_Effect_Anaerobic,
             training_Performance,
 
@@ -575,8 +575,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingEffect_Aerob_Low,
-            _tourDayData.allTrainingEffect_Aerob_High);
+            _tourDayData.allTraining_Effect_Aerob_Low,
+            _tourDayData.allTraining_Effect_Aerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -598,8 +598,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingEffect_Anaerob_Low,
-            _tourDayData.allTrainingEffect_Anaerob_High);
+            _tourDayData.allTraining_Effect_Anaerob_Low,
+            _tourDayData.allTraining_Effect_Anaerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -621,8 +621,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       _yData_TrainingPerformance = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingPerformance_Low,
-            _tourDayData.allTrainingPerformance_High);
+            _tourDayData.allTraining_Performance_Low,
+            _tourDayData.allTraining_Performance_High);
 
       _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
       _yData_TrainingPerformance.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);

@@ -442,8 +442,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD1_COMPUTED_TIME_MOVING
             + HEAD1_COMPUTED_TIME_BREAK
 
-            + HEAD1_ELEVATION_HIGH
-            + HEAD1_DISTANCE_HIGH
+            + HEAD1_ELEVATION
+            + HEAD1_DISTANCE
 
             + HEAD1_TOUR__NUMBER_OF_TOURS
 
@@ -463,8 +463,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD2_COMPUTED_TIME_MOVING
             + HEAD2_COMPUTED_TIME_BREAK
 
-            + HEAD2_ELEVATION_HIGH
-            + HEAD2_DISTANCE_HIGH
+            + HEAD2_ELEVATION
+            + HEAD2_DISTANCE
 
             + HEAD2_TOUR__NUMBER_OF_TOURS
 
@@ -484,8 +484,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
-            + VALUE_ELEVATION_HIGH
-            + VALUE_DISTANCE_HIGH
+            + VALUE_ELEVATION
+            + VALUE_DISTANCE
 
             + VALUE_TOUR__NUMBER_OF_TOURS
 

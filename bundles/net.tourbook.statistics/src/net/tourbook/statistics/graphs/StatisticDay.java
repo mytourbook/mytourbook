@@ -368,7 +368,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             UI.UNIT_LABEL_DISTANCE,
             //
             // altitude
-            (int) _tourDay_Data.allAltitude[valueIndex],
+            (int) _tourDay_Data.allElevation[valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
             // start time

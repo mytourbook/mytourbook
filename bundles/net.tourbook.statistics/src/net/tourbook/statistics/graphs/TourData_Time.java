@@ -51,6 +51,7 @@ public class TourData_Time {
 
    int[]                          allTourDeviceTime_Elapsed;
    int[]                          allTourDeviceTime_Recorded;
+   int[]                          allTourDeviceTime_Paused;
    int[]                          allTourComputedTime_Moving;
 
    ArrayList<String>              allTourTitles;

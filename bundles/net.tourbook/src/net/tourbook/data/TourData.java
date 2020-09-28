@@ -301,6 +301,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private long                  tourDeviceTime_Elapsed;
 
    /**
+    * Total recorded time in seconds
+    */
+   @XmlElement
+   private long                  tourDeviceTime_Recorded;
+
+   /**
+    * Total paused time in seconds
+    *
+    * This number could come from a direct value or from {@link tourTimerPauses}
+    */
+   @XmlElement
+   private long                  tourDeviceTime_Paused;
+
+   /**
     * Total moving time in seconds
     *
     * @since Is long since db version 22, before it was int
@@ -313,21 +327,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @XmlElement
    private String                timeZoneId;
-
-   /**
-    * Total paused time in seconds
-    *
-    * This number could come from a direct value or from {@link tourTimerPauses}
-    */
-   @XmlElement
-   private long                  tourDeviceTime_Paused;
-
-
-   /**
-    * Total recorded time in seconds
-    */
-   @XmlElement
-   private long                  tourDeviceTime_Recorded;
 
    // ############################################# DISTANCE #############################################
 

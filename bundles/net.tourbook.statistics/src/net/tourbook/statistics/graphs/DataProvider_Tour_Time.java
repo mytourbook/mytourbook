@@ -64,17 +64,18 @@ public class DataProvider_Tour_Time extends DataProvider {
             + HEAD1_DATE_MONTH
             + HEAD1_DATE_DAY
             + HEAD1_DATE_WEEK
-            + HEAD1_DATE_DOY
+
+            + HEAD1_TOUR_TYPE
 
             + HEAD1_DEVICE_TIME_ELAPSED
             + HEAD1_DEVICE_TIME_RECORDED
-//            + HEAD1_DEVICE_TIME_PAUSED
+            + HEAD1_DEVICE_TIME_PAUSED
 
             + HEAD1_COMPUTED_TIME_MOVING
             + HEAD1_COMPUTED_TIME_BREAK
 
-            + HEAD1_DISTANCE_HIGH
-            + HEAD1_ELEVATION_HIGH
+            + HEAD1_DISTANCE
+            + HEAD1_ELEVATION
 
       ;
 
@@ -84,17 +85,18 @@ public class DataProvider_Tour_Time extends DataProvider {
             + HEAD2_DATE_MONTH
             + HEAD2_DATE_DAY
             + HEAD2_DATE_WEEK
-            + HEAD2_DATE_DOY
+
+            + HEAD2_TOUR_TYPE
 
             + HEAD2_DEVICE_TIME_ELAPSED
             + HEAD2_DEVICE_TIME_RECORDED
-//            + HEAD2_DEVICE_TIME_PAUSED
+            + HEAD2_DEVICE_TIME_PAUSED
 
             + HEAD2_COMPUTED_TIME_MOVING
             + HEAD2_COMPUTED_TIME_BREAK
 
-            + HEAD2_DISTANCE_HIGH
-            + HEAD2_ELEVATION_HIGH
+            + HEAD2_DISTANCE
+            + HEAD2_ELEVATION
 
       ;
 
@@ -103,19 +105,19 @@ public class DataProvider_Tour_Time extends DataProvider {
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
             + VALUE_DATE_DAY
-
             + VALUE_DATE_WEEK
-            + VALUE_DATE_DOY
+
+            + VALUE_TOUR_TYPE
 
             + VALUE_DEVICE_TIME_ELAPSED
             + VALUE_DEVICE_TIME_RECORDED
-//            + VALUE_DEVICE_TIME_PAUSED
+            + VALUE_DEVICE_TIME_PAUSED
 
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
-            + VALUE_DISTANCE_HIGH
-            + VALUE_ELEVATION_HIGH
+            + VALUE_DISTANCE
+            + VALUE_ELEVATION
 
       ;
 
@@ -147,11 +149,12 @@ public class DataProvider_Tour_Time extends DataProvider {
                month,
                _tourDataTime.allTourDays[dataIndex],
                _tourDataTime.allWeeks[dataIndex],
-               _tourDataTime.allTourDOYs[dataIndex] + 1,
+
+               TourDatabase.getTourTypeName(_tourDataTime.allTypeIds[dataIndex]),
 
                elapsedTime,
                _tourDataTime.allTourDeviceTime_Recorded[dataIndex],
-               // paused time is not yet loaded !!!
+               _tourDataTime.allTourDeviceTime_Paused[dataIndex],
 
                movingTime,
                breakTime,
@@ -163,14 +166,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          sb.append(NL);
       }
-
-//      _tourDataTime.allTourTimeStart = allTourStartTime.toArray();
-//      _tourDataTime.allTourTimeEnd = allTourEndTime.toArray();
-//      _tourDataTime.allTourTimeZoneOffsets = allTourTimeOffset;
-//      _tourDataTime.allTourStartDateTimes = allTourStartDateTime;
-//
-//      _tourDataTime.allTourTitles = allTourTitle;
-//      _tourDataTime.allTourDescriptions = allTourDescription;
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
@@ -250,16 +245,17 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                + "   TourDeviceTime_Elapsed," + NL //                            7  //$NON-NLS-1$
                + "   TourDeviceTime_Recorded," + NL //                           8  //$NON-NLS-1$
-               + "   TourComputedTime_Moving," + NL //                           9  //$NON-NLS-1$
+               + "   TourDeviceTime_Paused," + NL //                             9  //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //                           10 //$NON-NLS-1$
 
-               + "   TourDistance," + NL //                                      10 //$NON-NLS-1$
-               + "   TourAltUp," + NL //                                         11 //$NON-NLS-1$
+               + "   TourDistance," + NL //                                      11 //$NON-NLS-1$
+               + "   TourAltUp," + NL //                                         12 //$NON-NLS-1$
 
-               + "   TourTitle," + NL //                                         12 //$NON-NLS-1$
-               + "   TourDescription," + NL //                                   13 //$NON-NLS-1$
+               + "   TourTitle," + NL //                                         13 //$NON-NLS-1$
+               + "   TourDescription," + NL //                                   14 //$NON-NLS-1$
 
-               + "   TourType_typeId," + NL //                                   14 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId" + NL //                           15 //$NON-NLS-1$
+               + "   TourType_typeId," + NL //                                   15 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId" + NL //                           16 //$NON-NLS-1$
 
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //           //$NON-NLS-1$
 
@@ -287,6 +283,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
          final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
+         final TIntArrayList allTourDeviceTime_Paused = new TIntArrayList();
          final TIntArrayList allTourComputedTime_Moving = new TIntArrayList();
 
          final TFloatArrayList allDistances = new TFloatArrayList();
@@ -342,15 +339,16 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                final int dbElapsedTime          = result.getInt(7);
                final int dbRecordedTime         = result.getInt(8);
-               final int dbMovingTime           = result.getInt(9);
+               final int dbPausedTime           = result.getInt(9);
+               final int dbMovingTime           = result.getInt(10);
 
-               final float dbDistance           = result.getFloat(10);
-               final int dbAltitudeUp           = result.getInt(11);
+               final float dbDistance           = result.getFloat(11);
+               final int dbAltitudeUp           = result.getInt(12);
 
-               final String dbTourTitle         = result.getString(12);
-               final String dbDescription       = result.getString(13);
+               final String dbTourTitle         = result.getString(13);
+               final String dbDescription       = result.getString(14);
 
-               final Object dbTypeIdObject      = result.getObject(14);
+               final Object dbTypeIdObject      = result.getObject(15);
 
 // SET_FORMATTING_ON
 
@@ -380,6 +378,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                allTourDeviceTime_Elapsed.add(dbElapsedTime);
                allTourDeviceTime_Recorded.add(dbRecordedTime);
+               allTourDeviceTime_Paused.add(dbPausedTime);
                allTourComputedTime_Moving.add(dbMovingTime);
 
                allDistances.add(dbDistance / UI.UNIT_VALUE_DISTANCE);
@@ -461,6 +460,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          _tourDataTime.allTourDeviceTime_Elapsed = allTourDeviceTime_Elapsed.toArray();
          _tourDataTime.allTourDeviceTime_Recorded = allTourDeviceTime_Recorded.toArray();
+         _tourDataTime.allTourDeviceTime_Paused = allTourDeviceTime_Paused.toArray();
          _tourDataTime.allTourComputedTime_Moving = allTourComputedTime_Moving.toArray();
 
          _tourDataTime.allTourTitles = allTourTitle;

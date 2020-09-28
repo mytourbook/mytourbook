@@ -987,20 +987,30 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hh, (time / 3600)).toString();
+      return _formatter.format(Messages.Format_hh,
+
+            time / 3600
+
+      ).toString();
    }
 
    public static String format_hh_mm(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            time / 3600,
+            time % 3600 / 60
+
+      ).toString();
    }
 
    /**
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
+    *           ini seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -1015,24 +1025,24 @@ public class UI {
 
          // display hours
 
-         return _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         return _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
       }
    }
 
@@ -1040,18 +1050,17 @@ public class UI {
     * force hours to be displayed
     *
     * @param time
+    *           in seconds
     * @return
     */
    public static String format_hhh_mm_ss(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(
-                  Messages.Format_hhmmss,
-                  (time / 3600),
-                  ((time % 3600) / 60),
-                  ((time % 3600) % 60))
+      return _formatter.format(Messages.Format_hhmmss,
+            (time / 3600),
+            ((time % 3600) / 60),
+            ((time % 3600) % 60))
             .toString();
    }
 
@@ -1065,7 +1074,12 @@ public class UI {
 
       final long timeAbs = time < 0 ? 0 - time : time;
 
-      return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            timeAbs / 60,
+            timeAbs % 60
+
+      ).toString();
    }
 
    public static String format_yyyymmdd_hhmmss(final int year,
@@ -1077,16 +1091,16 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  year,
-                  month,
-                  day,
-                  hour,
-                  minute,
-                  second)//
-            .toString();
+      return _formatter.format(Messages.Format_yyyymmdd_hhmmss,
+
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second
+
+      ).toString();
    }
 
    public static String FormatDoubleMinMax(final double value) {
@@ -1138,24 +1152,24 @@ public class UI {
 
          // display hours
 
-         timeText = _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         timeText = _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       }
 
