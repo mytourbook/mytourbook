@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.FontFieldEditorExtended;
+import net.tourbook.statistic.StatisticValuesView;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -94,6 +95,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
+   }
+
+   @Override
+   public void applyData(final Object data) {
+
+      if (StatisticValuesView.ID.equals(data)) {
+
+         // set focus to log font
+
+         _valueFontEditor.setFocus();
+      }
    }
 
    @Override

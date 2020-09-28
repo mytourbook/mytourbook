@@ -353,6 +353,11 @@ public abstract class StatisticYear extends TourbookStatistic {
    }
 
    @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
+   }
+
+   @Override
    public void preferencesHasChanged() {
       updateStatistic();
    }
@@ -571,7 +576,7 @@ public abstract class StatisticYear extends TourbookStatistic {
                   isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      statContext.outStatisticValuesRaw = _tourYearData.statisticValuesRaw;
+      statContext.outRawStatisticValues = _tourYearData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

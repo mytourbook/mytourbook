@@ -16,8 +16,11 @@
 package net.tourbook.statistic;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -26,9 +29,29 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.widgets.Display;
 
 public class StatisticManager {
+
+// SET_FORMATTING_OFF
+
+   private static final Pattern PATTERN_FIELDS           = Pattern.compile(",");                                            //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACES           = Pattern.compile("  *");                                          //$NON-NLS-1$
+   private static final Pattern PATTERN_EMPTY_LINES      = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);  //$NON-NLS-1$
+
+   private static final Pattern NUMBER_PATTERN_0         = Pattern.compile(" 0 ");                                          //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_END     = Pattern.compile(" 0$",     Pattern.MULTILINE);                   //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0       = Pattern.compile(" 0.0 ");                                        //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0_END   = Pattern.compile(" 0.0$",   Pattern.MULTILINE);                   //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00      = Pattern.compile(" 0.00 ");                                       //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_END  = Pattern.compile(" 0.00$",  Pattern.MULTILINE);                   //$NON-NLS-1$
+
+//SET_FORMATTING_ON
 
    private static ArrayList<TourbookStatistic> _statisticExtensionPoints;
 
@@ -36,6 +59,161 @@ public class StatisticManager {
     * Keeps reference to the statistic view, is <code>null</code> when statistic view is closed.
     */
    private static StatisticView                _statisticView;
+
+   /**
+    * Join 2 header lines into 1 line
+    */
+   private static String convertHeaderLines(final String rawStatisticValues) {
+
+      final Object[] allStatValueLines = rawStatisticValues.lines().toArray();
+
+      final int numAllLines = allStatValueLines.length;
+
+      final String line1 = numAllLines > 0 ? (String) allStatValueLines[0] : null;
+      final String line2 = numAllLines > 1 ? (String) allStatValueLines[1] : null;
+
+      if (line1 == null || line2 == null) {
+         return rawStatisticValues;
+      }
+
+      final String line1_NoSpaces = PATTERN_SPACES.matcher(line1).replaceAll(UI.EMPTY_STRING);
+      final String line2_NoSpaces = PATTERN_SPACES.matcher(line2).replaceAll(UI.EMPTY_STRING);
+
+      final String[] allLine1_Fields = PATTERN_FIELDS.split(line1_NoSpaces);
+      final String[] allLine2_Fields = PATTERN_FIELDS.split(line2_NoSpaces);
+
+      final int numFields = allLine1_Fields.length;
+
+      final StringBuilder sbHeader = new StringBuilder();
+
+      for (int lineIndex = 0; lineIndex < numFields; lineIndex++) {
+
+         final String line1_Field = allLine1_Fields[lineIndex];
+         final String line2_Field = allLine2_Fields[lineIndex];
+
+         sbHeader.append(line1_Field);
+
+         if (line2_Field.length() > 0) {
+            sbHeader.append(UI.SPACE);
+            sbHeader.append(line2_Field);
+         }
+
+         if (lineIndex < numFields - 1) {
+            sbHeader.append(UI.SYMBOL_COMMA);
+         }
+      }
+      final String joinedHeader = sbHeader.toString();
+
+      // create final stat value string
+      final StringBuilder sbAll = new StringBuilder();
+
+      sbAll.append(joinedHeader);
+      sbAll.append(UI.NEW_LINE);
+
+      for (int lineIndex = 2; lineIndex < numAllLines; lineIndex++) {
+         sbAll.append(allStatValueLines[lineIndex]);
+         sbAll.append(UI.NEW_LINE);
+      }
+
+      final String statValuesWithNewHeader = sbAll.toString();
+
+      return statValuesWithNewHeader;
+   }
+
+   static void copyStatisticValuesToTheClipboard(final String rawStatisticValues) {
+
+      final boolean isCSVFormat = true;
+      final boolean isGroupValues = false; // remove empty lines
+      final boolean isRemoveZeros = false;
+      final boolean isShowRawData = false;
+
+      final String statValues = formatStatValues(rawStatisticValues,
+            isCSVFormat,
+            isRemoveZeros,
+            isGroupValues,
+            isShowRawData);
+
+      final Display display = Display.getDefault();
+
+      if (statValues.length() > 0) {
+
+         final TextTransfer textTransfer = TextTransfer.getInstance();
+
+         final Clipboard clipBoard = new Clipboard(display);
+         {
+            clipBoard.setContents(
+
+                  new Object[] { statValues },
+                  new Transfer[] { textTransfer }
+
+            );
+         }
+         clipBoard.dispose();
+
+         final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+         if (statusLineMgr != null) {
+
+            // show info that data are copied
+            statusLineMgr.setMessage(Messages.Tour_StatisticValues_Info_DataAreCopied);
+
+            display.timerExec(2000,
+                  () -> {
+
+                     // cleanup message
+                     statusLineMgr.setMessage(null);
+                  });
+         }
+      }
+   }
+
+   public static String formatStatValues(String statValues,
+                                         final boolean isCSVFormat,
+                                         final boolean isRemoveZeros,
+                                         final boolean isGroupValues,
+                                         final boolean isShowRawData) {
+
+      if (isShowRawData) {
+
+         // do not reformat values
+
+      } else if (isCSVFormat) {
+
+         final String statValuesWithNewHeader = convertHeaderLines(statValues);
+
+         // always remove spaces
+         statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.EMPTY_STRING);
+
+         // always remove empty lines
+         statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+
+      } else {
+
+         // remove field separator
+         statValues = PATTERN_FIELDS.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+
+         // remove empty lines
+         if (isGroupValues == false) {
+            statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+         }
+
+         // remove zeros
+         if (isRemoveZeros) {
+
+// SET_FORMATTING_OFF
+
+            statValues = NUMBER_PATTERN_0.          matcher(statValues).replaceAll("   ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_END.      matcher(statValues).replaceAll("  ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0.        matcher(statValues).replaceAll("     ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0_END.    matcher(statValues).replaceAll("    ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00.       matcher(statValues).replaceAll("      ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00_END.   matcher(statValues).replaceAll("     ");//$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+
+      return statValues;
+   }
 
    /**
     * This method is synchronized to conform to FindBugs

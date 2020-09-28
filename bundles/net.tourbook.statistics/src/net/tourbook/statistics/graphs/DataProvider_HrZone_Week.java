@@ -52,10 +52,10 @@ public class DataProvider_HrZone_Week extends DataProvider {
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
          return _weekData;
       }
@@ -64,17 +64,17 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
 
-         _lastYear = lastYear;
-         _numberOfYears = numYears;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
 
-         initYearNumbers();
+         setupYearNumbers();
 
          final int maxZones = 10; // hr zones: 0...9
          int numberOfWeeks = 0;
-         for (final int weeks : _yearWeeks) {
+         for (final int weeks : allYear_NumWeeks) {
             numberOfWeeks += weeks;
          }
 
@@ -186,7 +186,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
                int allWeeks = 0;
                for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                   if (yearIndex > 0) {
-                     allWeeks += _yearWeeks[yearIndex - 1];
+                     allWeeks += allYear_NumWeeks[yearIndex - 1];
                   }
                }
 
@@ -207,9 +207,9 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
          _weekData.hrZoneValues = dbHrZoneValues;
 
-         _weekData.years = _years;
-         _weekData.yearWeeks = _yearWeeks;
-         _weekData.yearDays = _yearDays;
+         _weekData.years = allYear_Numbers;
+         _weekData.yearWeeks = allYear_NumWeeks;
+         _weekData.yearDays = allYear_NumDays;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
@@ -305,7 +305,10 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
       int yearIndex = 0;
       int prevSumWeeks = 0;
-      int sumYearWeeks = _yearWeeks[yearIndex];
+      int sumYearWeeks = allYear_NumWeeks[yearIndex];
+
+      // setup previous year
+      int prevYear = allYear_Numbers[0];
 
       for (int weekIndex = 0; weekIndex < numWeeks; weekIndex++) {
 
@@ -317,17 +320,15 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
             // advance to the next year
 
-//            System.out.println();
-
             yearIndex++;
 
-            final int yearWeeks = _yearWeeks[yearIndex];
+            final int yearWeeks = allYear_NumWeeks[yearIndex];
 
             prevSumWeeks = sumYearWeeks;
             sumYearWeeks += yearWeeks;
          }
 
-         final int year = _years[yearIndex];
+         final int year = allYear_Numbers[yearIndex];
          final int week = weekIndex - prevSumWeeks;
 
          int sumSeconds = 0;
@@ -336,6 +337,12 @@ public class DataProvider_HrZone_Week extends DataProvider {
          }
 
          final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
+
+         // group by year
+         if (year != prevYear) {
+            prevYear = year;
+            sb.append(NL);
+         }
 
          sb.append(String.format(valueFormatting,
 

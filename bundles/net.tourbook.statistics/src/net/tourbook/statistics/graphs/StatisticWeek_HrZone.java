@@ -73,6 +73,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private String[]                 _barNames;
 
+   private StatisticContext         _statContext;
+
    public StatisticWeek_HrZone() {
       super();
    }
@@ -220,6 +222,11 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_WEEK_HR_ZONE;
+   }
+
+   @Override
+   public StatisticContext getStatisticContext() {
+      return _statContext;
    }
 
    @Override
@@ -410,6 +417,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    @Override
    public void updateStatistic(final StatisticContext statContext) {
 
+      _statContext = statContext;
+
       /*
        * check if required data are available
        */
@@ -443,7 +452,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
                   _statNumberOfYears,
                   isDataDirtyWithReset() || statContext.isRefreshData);
 
-      statContext.outStatisticValuesRaw = _tourWeekData.statisticValuesRaw;
+      statContext.outRawStatisticValues = _tourWeekData.statisticValuesRaw;
 
       setupBars_10_HrZoneOrder(isNewPerson);
       setupBars_20_BarNames(statContext);

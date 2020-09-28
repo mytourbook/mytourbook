@@ -61,10 +61,10 @@ public class DataProvider_Tour_Year extends DataProvider {
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourDataYear;
@@ -74,10 +74,10 @@ public class DataProvider_Tour_Year extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
-         _lastYear = lastYear;
-         _numberOfYears = numYears;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
 
          // get the tour types
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
@@ -105,12 +105,16 @@ public class DataProvider_Tour_Year extends DataProvider {
                   + "      DISTINCT TourId," + NL //                                            //$NON-NLS-1$
 
                   + "      StartYear," + NL //                                                  //$NON-NLS-1$
-                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
-                  + "      TourAltUp," + NL //                                                  //$NON-NLS-1$
-                  + "      TourDeviceTime_Elapsed,  " + NL //$NON-NLS-1$
-                  + "      TourComputedTime_Moving, " + NL //$NON-NLS-1$
 
-                  + "      TourType_TypeId" + NL //                                             //$NON-NLS-1$
+                  + "      TourType_TypeId," + NL //                                            //$NON-NLS-1$
+
+                  + "      TourDeviceTime_Elapsed," + NL //                                     //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                                    //$NON-NLS-1$
+                  + "      TourDeviceTime_Paused," + NL //                                      //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
+
+                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
+                  + "      TourAltUp" + NL //                                                   //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
 
@@ -144,15 +148,18 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                + "   StartYear," + NL //                                   1  //$NON-NLS-1$
 
-               + "   SUM(TourDistance)," + NL //                           2  //$NON-NLS-1$
-               + "   SUM(TourAltUp)," + NL //                              3  //$NON-NLS-1$
-               + "   " + createSQL_SumDurationTime(durationTime) + NL //   4  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 5  //$NON-NLS-1$
+               + "   TourType_TypeId," + NL //                             2  //$NON-NLS-1$
+
+               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 3  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded)," + NL //                4  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)," + NL //                  5  //$NON-NLS-1$
                + "   SUM(TourComputedTime_Moving)," + NL //                6  //$NON-NLS-1$
-               + "   SUM(1)," + NL //                                      7  //$NON-NLS-1$
-               + "   TourType_TypeId," + NL //                             8  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Recorded)," + NL //                9  //$NON-NLS-1$
-               + "   SUM(TourDeviceTime_Paused)" + NL //                   10 //$NON-NLS-1$
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //   7  //$NON-NLS-1$
+
+               + "   SUM(TourDistance)," + NL //                           8  //$NON-NLS-1$
+               + "   SUM(TourAltUp)," + NL //                              9  //$NON-NLS-1$
+
+               + "   SUM(1)" + NL //                                       10 //$NON-NLS-1$
 
                + fromTourData
 
@@ -199,15 +206,19 @@ public class DataProvider_Tour_Year extends DataProvider {
 // SET_FORMATTING_OFF
 
             final int dbValue_ResultYear           = result.getInt(1);
-            final int dbValue_Altitude             = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
-            final int dbValue_Distance             = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Duration             = result.getInt(4);
-            final int dbValue_ElapsedTime          = result.getInt(5);
+
+            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(2);
+
+            final int dbValue_ElapsedTime          = result.getInt(3);
+            final int dbValue_RecordedTime         = result.getInt(4);
+            final int dbValue_PausedTime           = result.getInt(5);
             final int dbValue_MovingTime           = result.getInt(6);
-            final int dbValue_NumTours             = result.getInt(7);
-            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(8);
-            final int dbValue_RecordedTime         = result.getInt(9);
-            final int dbValue_PausedTime           = result.getInt(10);
+            final int dbValue_Duration             = result.getInt(7);
+
+            final int dbValue_Altitude             = (int) (result.getInt(8) / UI.UNIT_VALUE_ALTITUDE);
+            final int dbValue_Distance             = (int) ((result.getInt(9) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
+
+            final int dbValue_NumTours             = result.getInt(10);
 
 // SET_FORMATTING_ON
 
@@ -257,9 +268,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_ElapsedTime;
          }
 
-         final int[] years = new int[_numberOfYears];
+         final int[] years = new int[statistic_NumberOfYears];
          int yearIndex = 0;
-         for (int currentYear = _lastYear - _numberOfYears + 1; currentYear <= _lastYear; currentYear++) {
+         for (int currentYear = statistic_LastYear - statistic_NumberOfYears + 1; currentYear <= statistic_LastYear; currentYear++) {
             years[yearIndex++] = currentYear;
          }
          _tourDataYear.years = years;

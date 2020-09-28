@@ -53,11 +53,12 @@ public class DataProvider_HrZone_Month extends DataProvider {
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
+
          return _monthData;
       }
 
@@ -65,11 +66,11 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         _activePerson = person;
-         _activeTourTypeFilter = tourTypeFilter;
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
 
-         _lastYear = lastYear;
-         _numberOfYears = numYears;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
 
          _monthData = new TourData_MonthHrZones();
 
@@ -133,26 +134,26 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                                      //$NON-NLS-1$
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-               + "   StartYear," + NL //                                            1  //$NON-NLS-1$
-               + "   StartMonth," + NL //                                           2  //$NON-NLS-1$
+               + "   StartYear," + NL //                                                     1  //$NON-NLS-1$
+               + "   StartMonth," + NL //                                                    2  //$NON-NLS-1$
 
-               + "   SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END)," + NL //   3  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END)," + NL //   4  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END)," + NL //   5  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END)," + NL //   6  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END)," + NL //   7  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END)," + NL //   8  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END)," + NL //   9  //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END)," + NL //   10 //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //   11 //$NON-NLS-1$
-               + "   SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //    12 //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone0 > 0 THEN hrZone0 ELSE 0 END)," + NL //            3  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone1 > 0 THEN hrZone1 ELSE 0 END)," + NL //            4  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone2 > 0 THEN hrZone2 ELSE 0 END)," + NL //            5  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone3 > 0 THEN hrZone3 ELSE 0 END)," + NL //            6  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone4 > 0 THEN hrZone4 ELSE 0 END)," + NL //            7  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone5 > 0 THEN hrZone5 ELSE 0 END)," + NL //            8  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone6 > 0 THEN hrZone6 ELSE 0 END)," + NL //            9  //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone7 > 0 THEN hrZone7 ELSE 0 END)," + NL //            10 //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone8 > 0 THEN hrZone8 ELSE 0 END)," + NL //            11 //$NON-NLS-1$
+               + "   SUM(CASE WHEN hrZone9 > 0 THEN hrZone9 ELSE 0 END)" + NL //             12 //$NON-NLS-1$
 
                + fromTourData
 
-               + "GROUP BY StartYear, StartMonth" + NL //                              //$NON-NLS-1$
-               + "ORDER BY StartYear, StartMonth" + NL //                              //$NON-NLS-1$
+               + "GROUP BY StartYear, StartMonth" + NL //                                       //$NON-NLS-1$
+               + "ORDER BY StartYear, StartMonth" + NL //                                       //$NON-NLS-1$
          ;
 
          final int maxZones = 10; // hr zones: 0...9
@@ -248,7 +249,10 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
       final int[][] hrZoneValues = _monthData.hrZoneValues;
       final int numMonths = hrZoneValues[0].length;
-      final int firstYear = _lastYear - _numberOfYears + 1;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+
+      // setup previous year
+      int prevYear = firstYear;
 
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
 
@@ -263,6 +267,12 @@ public class DataProvider_HrZone_Month extends DataProvider {
          }
 
          final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
+
+         // group by year
+         if (year != prevYear) {
+            prevYear = year;
+            sb.append(NL);
+         }
 
          sb.append(String.format(UI.EMPTY_STRING
 

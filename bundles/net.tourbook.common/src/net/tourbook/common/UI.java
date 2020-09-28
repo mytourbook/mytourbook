@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -84,7 +86,11 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -159,14 +165,14 @@ public class UI {
 
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
+   public static final String       SYMBOL_COMMA                  = ",";        //$NON-NLS-1$
    public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
-   // this looks ugly "\u2551";
-   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$
+   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$   // this looks ugly "\u2551";
    public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
    public static final String       SYMBOL_EXCLAMATION_POINT      = "!";        //$NON-NLS-1$
    public static final String       SYMBOL_GREATER_THAN           = ">";        //$NON-NLS-1$
    public static final String       SYMBOL_LESS_THAN              = "<";        //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
    public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
    public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
    public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
@@ -1301,6 +1307,37 @@ public class UI {
       return LINK_TAG_START + url + LINK_TAG_END;
    }
 
+   /**
+    * @return Returns the {@link StatusLineManager} of the current active part or <code>null</code>
+    *         when not available.
+    */
+   public static IStatusLineManager getStatusLineManager() {
+
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+      final IWorkbenchPart activePart = activePage.getActivePart();
+      if (activePart instanceof IViewPart) {
+
+         final IViewPart viewPart = (IViewPart) activePart;
+
+         return viewPart.getViewSite().getActionBars().getStatusLineManager();
+      }
+
+      final IWorkbenchPart activeEditor = activePage.getActiveEditor();
+      if (activeEditor instanceof IEditorSite) {
+
+         final IEditorSite editorSite = (IEditorSite) activeEditor;
+
+         return editorSite.getActionBars().getStatusLineManager();
+      }
+
+      return null;
+   }
+
+   /**
+    * @param event
+    * @return Returns <code>true</code> when <Ctrl> key is pressed.
+    */
    public static boolean isCtrlKey(final Event event) {
 
       boolean isCtrlKey;
