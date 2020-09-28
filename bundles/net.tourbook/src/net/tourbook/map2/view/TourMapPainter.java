@@ -2019,8 +2019,8 @@ public class TourMapPainter extends MapPainter {
     * create an image for the tour marker
     *
     * @param device
+    * @param markerLabel
     * @param markerBounds
-    * @param tourMarker
     * @return
     */
    private Image drawTourMarkerImage(final Device device, final String markerLabel, final Rectangle markerBounds) {
@@ -2096,6 +2096,78 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
+    * create an image for the tour pause
+    *
+    * @param device
+    * @param pauseDuration
+    * @param pauseBounds
+    * @return
+    */
+   private Image drawTourPauseImage(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
+
+      final int bannerWidth = pauseBounds.x;
+      final int bannerHeight = pauseBounds.y;
+      final int bannerWidth2 = bannerWidth / 2;
+
+      final int markerImageWidth = pauseBounds.width;
+      final int markerImageHeight = pauseBounds.height;
+
+      final int arcSize = 5;
+
+      final RGB rgbTransparent = Map.getTransparentRGB();
+
+      final ImageData markerImageData = new ImageData(//
+            markerImageWidth,
+            markerImageHeight,
+            24,
+            new PaletteData(0xff, 0xff00, 0xff0000));
+
+      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
+
+      final Image markerImage = new Image(device, markerImageData);
+      final Rectangle markerImageBounds = markerImage.getBounds();
+
+      final Color transparentColor = new Color(device, rgbTransparent);
+      final Color bannerColor = new Color(device, 0xFF, 0xFF, 0xFF);
+      final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
+
+      final GC gc = new GC(markerImage);
+
+      {
+         // fill transparent color
+         gc.setBackground(transparentColor);
+         gc.fillRectangle(markerImageBounds);
+
+         gc.setBackground(bannerColor);
+         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+         // draw banner border
+         gc.setForeground(bannerBorderColor);
+         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+         // draw text
+         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
+
+         // draw pole
+         gc.setForeground(bannerBorderColor);
+         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
+         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+         gc.setForeground(bannerColor);
+         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
+      }
+
+      gc.dispose();
+
+      bannerColor.dispose();
+      bannerBorderColor.dispose();
+      transparentColor.dispose();
+
+      return markerImage;
+   }
+
+   /**
     * @param gcTile
     * @param map
     * @param tile
@@ -2150,7 +2222,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
+         final Image tourMarkerImage = drawTourPauseImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;
