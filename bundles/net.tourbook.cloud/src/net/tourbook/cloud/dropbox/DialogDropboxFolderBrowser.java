@@ -22,6 +22,7 @@ import com.dropbox.core.v2.files.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
@@ -265,7 +266,9 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
          @Override
          public Object[] getElements(final Object inputElement) {
-            return _folderList.toArray();
+            final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).collect(Collectors
+                  .toList()).toArray();
+            return sortedElements;
          }
 
          @Override
