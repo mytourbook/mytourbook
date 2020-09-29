@@ -419,7 +419,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setTourDistance(_currentActivity.distance);
 
          tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
-         tourData.setTourDeviceTime_Recorded(_currentActivity.duration);
          tourData.setTourComputedTime_Moving(_currentActivity.duration);
          isComputeMovingTime = false;
 
