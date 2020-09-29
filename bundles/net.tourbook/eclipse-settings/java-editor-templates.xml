@@ -346,10 +346,12 @@ ${imp:import(javax.annotation.PreDestroy)}
 	${cursor}
 }</template><template autoinsert="false" context="java-members" deleted="false" description="public static method" enabled="true" id="org.eclipse.jdt.ui.templates.public_static_method" name="public_static_method">public static ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java" deleted="false" description="runnable" enabled="true" id="org.eclipse.jdt.ui.templates.runnable" name="runnable">new Runnable() {
+}</template><template autoinsert="false" context="java" deleted="false" description="runnable BEFORE lambda" enabled="true" id="org.eclipse.jdt.ui.templates.runnable" name="runnable">new Runnable() {
 	public void run() {
 		${line_selection}
 	}
+}</template><template autoinsert="true" context="java" deleted="false" description="runnable WITH lambda" enabled="true" name="runnable">() -&gt; {&#13;
+   ${cursor}&#13;
 }</template><template autoinsert="false" context="swt-statements" deleted="false" description="new SashForm" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.sashform" name="SashForm">${type:newType(org.eclipse.swt.custom.SashForm)} ${sash:newName(org.eclipse.swt.custom.SashForm)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.HORIZONTAL, SWT.VERTICAL)});
 ${sash}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));
 ${imp:import(org.eclipse.swt.SWT)}${cursor}
