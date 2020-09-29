@@ -76,6 +76,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * Note: It seems that the Suunto 9 watch creates multiple files for a given activity
     * when this activity exceeds 10h. This is from my own experience and not any official
     * documentation.
+    * 09/29/2020: I confirm that the Suunto 9 creates a file for every 10h of activity.
+    * This week-end, I did a single activity that lasted 23h and in the end the watch created 3
+    * files.
     *
     * @param filePath
     *           The absolute path of a given activity.

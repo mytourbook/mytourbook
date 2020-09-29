@@ -1369,7 +1369,7 @@ public class TourMapPainter extends MapPainter {
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
 
-               final long pauseDuration = Math.round((float) (pausedTime_End - pausedTime_Start) / 1000);
+               final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
@@ -1444,7 +1444,7 @@ public class TourMapPainter extends MapPainter {
                continue;
             }
 
-            final long pauseDuration = Math.round((float) (endTime - startTime) / 1000);
+            final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
             // draw tour pause
             if (drawTourPauses(

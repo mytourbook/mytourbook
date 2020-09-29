@@ -8345,7 +8345,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          totalTourTimerPauses += pausedTime_End[index] - pausedTime_Start[index];
       }
 
-      return totalTourTimerPauses / 1000;
+      return Math.round(totalTourTimerPauses / 1000f);
    }
 
    /**
