@@ -43,6 +43,7 @@ public class StatisticManager {
    private static final Pattern PATTERN_FIELDS           = Pattern.compile(",");                                            //$NON-NLS-1$
    private static final Pattern PATTERN_SPACES           = Pattern.compile("  *");                                          //$NON-NLS-1$
    private static final Pattern PATTERN_EMPTY_LINES      = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);  //$NON-NLS-1$
+   private static final Pattern PATTERN_SPLIT_LINES            = Pattern.compile("\\R",      Pattern.MULTILINE);                    //$NON-NLS-1$
 
    private static final Pattern NUMBER_PATTERN_0         = Pattern.compile(" 0 ");                                          //$NON-NLS-1$
    private static final Pattern NUMBER_PATTERN_0_END     = Pattern.compile(" 0$",     Pattern.MULTILINE);                   //$NON-NLS-1$
@@ -65,7 +66,7 @@ public class StatisticManager {
     */
    private static String convertHeaderLines(final String rawStatisticValues) {
 
-      final Object[] allStatValueLines = rawStatisticValues.lines().toArray();
+      final String[] allStatValueLines = PATTERN_SPLIT_LINES.split(rawStatisticValues);
 
       final int numAllLines = allStatValueLines.length;
 
@@ -181,7 +182,7 @@ public class StatisticManager {
          final String statValuesWithNewHeader = convertHeaderLines(statValues);
 
          // always remove spaces
-         statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.EMPTY_STRING);
+         statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.SPACE1);
 
          // always remove empty lines
          statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
