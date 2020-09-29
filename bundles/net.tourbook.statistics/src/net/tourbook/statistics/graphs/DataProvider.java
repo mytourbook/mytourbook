@@ -28,10 +28,11 @@ public abstract class DataProvider {
 
 // SET_FORMATTING_OFF
 
-   /*
-    * Labels and formatting for statistic values
-    */
+   // labels and formatting for statistic values
 
+   /*
+    * Date
+    */
    static final String HEAD1_DATE_YEAR                      = "Year,";                    //$NON-NLS-1$
    static final String HEAD2_DATE_YEAR                      = "    ,";                    //$NON-NLS-1$
    static final String VALUE_DATE_YEAR                      = "%4d,";                     //$NON-NLS-1$
@@ -52,6 +53,9 @@ public abstract class DataProvider {
    static final String HEAD2_DATE_DOY                       = "    ,";                    //$NON-NLS-1$
    static final String VALUE_DATE_DOY                       = " %3d,";                    //$NON-NLS-1$
 
+   /*
+    * Time
+    */
    static final String HEAD1_DEVICE_TIME_ELAPSED            = " Elapsed,";                //$NON-NLS-1$
    static final String HEAD2_DEVICE_TIME_ELAPSED            = "     (s),";                //$NON-NLS-1$
    static final String VALUE_DEVICE_TIME_ELAPSED            = "  %6d,";                   //$NON-NLS-1$
@@ -72,10 +76,6 @@ public abstract class DataProvider {
    static final String HEAD2_COMPUTED_TIME_BREAK            = "    (s),";                 //$NON-NLS-1$
    static final String VALUE_COMPUTED_TIME_BREAK            = " %6d,";                    //$NON-NLS-1$
 
-   static final String HEAD1_DURATION                       = " Duration,";               //$NON-NLS-1$
-   static final String HEAD2_DURATION                       = "      (s),";               //$NON-NLS-1$
-   static final String VALUE_DURATION                       = "   %6.0f,";                  //$NON-NLS-1$
-
    static final String HEAD1_ELEVATION                      = " Elevation,";              //$NON-NLS-1$
    static final String HEAD2_ELEVATION                      = "       (m),";              //$NON-NLS-1$
    static final String VALUE_ELEVATION                      = "    %6.0f,";               //$NON-NLS-1$
@@ -84,33 +84,42 @@ public abstract class DataProvider {
    static final String HEAD2_DISTANCE                       = "      (m),";               //$NON-NLS-1$
    static final String VALUE_DISTANCE                       = " %8.0f,";                  //$NON-NLS-1$
 
+   /*
+    * Speed
+    */
    static final String HEAD1_SPEED                          = "  Speed,";                 //$NON-NLS-1$
    static final String HEAD2_SPEED                          = " (km/h),";                 //$NON-NLS-1$
-   static final String VALUE_SPEED                          = "      %7.2f,";                  //$NON-NLS-1$
+   static final String VALUE_SPEED                          = "%7.2f,";                   //$NON-NLS-1$
 
-   static final String HEAD1_PACE                           = "     Pace,";                   //$NON-NLS-1$
+   static final String HEAD1_PACE                           = "     Pace,";               //$NON-NLS-1$
    static final String HEAD2_PACE                           = " (min/km),";               //$NON-NLS-1$
-   static final String VALUE_PACE                           = "   %6.2f,";                  //$NON-NLS-1$
+   static final String VALUE_PACE                           = "   %6.2f,";                //$NON-NLS-1$
 
+   /*
+    * Training
+    */
    static final String HEAD1_TRAINING_AEROB                 = " Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_AEROB                 = "    Aerob,";                  //$NON-NLS-1$
-   static final String VALUE_TRAINING_AEROB                 = " %6.1f,";                  //$NON-NLS-1$
+   static final String HEAD2_TRAINING_AEROB                 = "    Aerob,";               //$NON-NLS-1$
+   static final String VALUE_TRAINING_AEROB                 = "   %6.1f,";                //$NON-NLS-1$
 
    static final String HEAD1_TRAINING_ANAEROB               = " Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_ANAEROB               = "  Anaerob,";                //$NON-NLS-1$
-   static final String VALUE_TRAINING_ANAEROB               = " %6.1f,";                  //$NON-NLS-1$
+   static final String HEAD2_TRAINING_ANAEROB               = "  Anaerob,";               //$NON-NLS-1$
+   static final String VALUE_TRAINING_ANAEROB               = "   %6.1f,";                //$NON-NLS-1$
 
-   static final String HEAD1_TRAINING_PERFORMANCE           = "    Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_PERFORMANCE           = " Performance,";            //$NON-NLS-1$
-   static final String VALUE_TRAINING_PERFORMANCE           = " %6.2f,";                  //$NON-NLS-1$
+   static final String HEAD1_TRAINING_PERFORMANCE           = " Training,";               //$NON-NLS-1$
+   static final String HEAD2_TRAINING_PERFORMANCE           = "  Perform,";               //$NON-NLS-1$
+   static final String VALUE_TRAINING_PERFORMANCE           = "   %6.2f,";                //$NON-NLS-1$
 
-   static final String HEAD1_TOUR__NUMBER_OF_TOURS          = "  Tours,";                 //$NON-NLS-1$
-   static final String HEAD2_TOUR__NUMBER_OF_TOURS          = "    (#),";                 //$NON-NLS-1$
-   static final String VALUE_TOUR__NUMBER_OF_TOURS          = " %6.0f,";                  //$NON-NLS-1$
+   /*
+    * Tour
+    */
+   static final String HEAD1_NUMBER_OF_TOURS                = "  Tours,";                 //$NON-NLS-1$
+   static final String HEAD2_NUMBER_OF_TOURS                = "    (#),";                 //$NON-NLS-1$
+   static final String VALUE_NUMBER_OF_TOURS                = " %6.0f,";                  //$NON-NLS-1$
 
    static final String HEAD1_TOUR_TYPE                      = " TourType            ,";   //$NON-NLS-1$
    static final String HEAD2_TOUR_TYPE                      = "                     ,";   //$NON-NLS-1$
-   static final String VALUE_TOUR_TYPE                      = " %-20.20s,";               //$NON-NLS-1$
+   static final String VALUE_TOUR_TYPE                      = " %-20.20s,";               //$NON-NLS-1$  // truncate 20+ characters to force column layout
 
 // SET_FORMATTING_ON
 

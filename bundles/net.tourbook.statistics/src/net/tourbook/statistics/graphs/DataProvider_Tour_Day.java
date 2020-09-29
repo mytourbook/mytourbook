@@ -683,9 +683,8 @@ public class DataProvider_Tour_Day extends DataProvider {
             + HEAD1_COMPUTED_TIME_MOVING
             + HEAD1_COMPUTED_TIME_BREAK
 
-            + HEAD1_DURATION
-            + HEAD1_ELEVATION
             + HEAD1_DISTANCE
+            + HEAD1_ELEVATION
 
             + HEAD1_SPEED
             + HEAD1_PACE
@@ -712,9 +711,8 @@ public class DataProvider_Tour_Day extends DataProvider {
             + HEAD2_COMPUTED_TIME_MOVING
             + HEAD2_COMPUTED_TIME_BREAK
 
-            + HEAD2_DURATION
-            + HEAD2_ELEVATION
             + HEAD2_DISTANCE
+            + HEAD2_ELEVATION
 
             + HEAD2_SPEED
             + HEAD2_PACE
@@ -741,9 +739,8 @@ public class DataProvider_Tour_Day extends DataProvider {
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
-            + VALUE_DURATION
-            + VALUE_ELEVATION
             + VALUE_DISTANCE
+            + VALUE_ELEVATION
 
             + VALUE_SPEED
             + VALUE_PACE
@@ -757,10 +754,8 @@ public class DataProvider_Tour_Day extends DataProvider {
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-      final float[] durationLow = _tourDayData.getDurationLowFloat();
-      final float[] durationHigh = _tourDayData.getDurationHighFloat();
 
-      final int numDataItems = durationLow.length;
+      final int numDataItems = _tourDayData.allDays.length;
 
       // set initial value
       int prevMonth = numDataItems > 0 ? _tourDayData.allMonths[0] : 0;
@@ -794,11 +789,8 @@ public class DataProvider_Tour_Day extends DataProvider {
                movingTime,
                breakTime,
 
-               durationLow[dataIndex],
-               durationHigh[dataIndex],
-
-               _tourDayData.allElevation[dataIndex],
                _tourDayData.allDistance[dataIndex],
+               _tourDayData.allElevation[dataIndex],
 
                _tourDayData.allAvgSpeed[dataIndex],
                _tourDayData.allAvgPace[dataIndex],

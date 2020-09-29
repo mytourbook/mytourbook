@@ -423,9 +423,6 @@ public class DataProvider_Tour_Month extends DataProvider {
          return Messages.Tour_StatisticValues_Label_NoData;
       }
 
-      final long[][] allTourTypeIds = _tourMonthData.typeIds;
-      final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
-
       final StringBuilder sb = new StringBuilder();
 
       final String headerLine1 = UI.EMPTY_STRING
@@ -445,7 +442,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD1_ELEVATION
             + HEAD1_DISTANCE
 
-            + HEAD1_TOUR__NUMBER_OF_TOURS
+            + HEAD1_NUMBER_OF_TOURS
 
       ;
 
@@ -466,7 +463,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD2_ELEVATION
             + HEAD2_DISTANCE
 
-            + HEAD2_TOUR__NUMBER_OF_TOURS
+            + HEAD2_NUMBER_OF_TOURS
 
       ;
 
@@ -487,7 +484,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             + VALUE_ELEVATION
             + VALUE_DISTANCE
 
-            + VALUE_TOUR__NUMBER_OF_TOURS
+            + VALUE_NUMBER_OF_TOURS
 
       ;
 
@@ -497,6 +494,9 @@ public class DataProvider_Tour_Month extends DataProvider {
       final float[][] numTours = _tourMonthData.numToursHigh;
       final int numMonths = numTours[0].length;
       final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+
+      final long[][] allTourTypeIds = _tourMonthData.typeIds;
+      final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
 
       // loop: all months + years
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {

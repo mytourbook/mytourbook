@@ -20,7 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import net.tourbook.Messages;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -47,7 +49,157 @@ public class DataProvider_Tour_Week extends DataProvider {
          return statistic_RawStatisticValues;
       }
 
+      if (_tourWeekData.numToursHigh.length == 0) {
+
+         // there are no real data -> show info
+
+         return Messages.Tour_StatisticValues_Label_NoData;
+      }
+
       final StringBuilder sb = new StringBuilder();
+
+      final String headerLine1 = UI.EMPTY_STRING
+
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+
+            + HEAD1_TOUR_TYPE
+
+            + HEAD1_DEVICE_TIME_ELAPSED
+            + HEAD1_DEVICE_TIME_RECORDED
+            + HEAD1_DEVICE_TIME_PAUSED
+
+            + HEAD1_COMPUTED_TIME_MOVING
+            + HEAD1_COMPUTED_TIME_BREAK
+
+            + HEAD1_ELEVATION
+            + HEAD1_DISTANCE
+
+            + HEAD1_NUMBER_OF_TOURS
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+
+            + HEAD2_TOUR_TYPE
+
+            + HEAD2_DEVICE_TIME_ELAPSED
+            + HEAD2_DEVICE_TIME_RECORDED
+            + HEAD2_DEVICE_TIME_PAUSED
+
+            + HEAD2_COMPUTED_TIME_MOVING
+            + HEAD2_COMPUTED_TIME_BREAK
+
+            + HEAD2_ELEVATION
+            + HEAD2_DISTANCE
+
+            + HEAD2_NUMBER_OF_TOURS
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+
+            + VALUE_TOUR_TYPE
+
+            + VALUE_DEVICE_TIME_ELAPSED
+            + VALUE_DEVICE_TIME_RECORDED
+            + VALUE_DEVICE_TIME_PAUSED
+
+            + VALUE_COMPUTED_TIME_MOVING
+            + VALUE_COMPUTED_TIME_BREAK
+
+            + VALUE_ELEVATION
+            + VALUE_DISTANCE
+
+            + VALUE_NUMBER_OF_TOURS
+
+      ;
+
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
+
+      final float[][] numTours = _tourWeekData.numToursHigh;
+      final int numMonths = numTours[0].length;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+      int prevYear = firstYear;
+
+      final long[][] allTourTypeIds = _tourWeekData.typeIds;
+      final long[] allUsedTourTypeIds = _tourWeekData.usedTourTypeIds;
+
+      // loop: all months + years
+      for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
+
+         final int yearIndex = monthIndex / 12;
+         final int year = firstYear + yearIndex;
+
+         final int month = (monthIndex % 12) + 1;
+
+         // loop: all tour types
+         for (int tourTypeIndex = 0; tourTypeIndex < numTours.length; tourTypeIndex++) {
+
+            final long tourTypeId = allTourTypeIds[tourTypeIndex][monthIndex];
+
+            /*
+             * Check if this type is used
+             */
+            String tourTypeName = UI.EMPTY_STRING;
+
+            boolean isDataForTourType = false;
+
+            for (final long usedTourTypeIdValue : allUsedTourTypeIds) {
+               if (usedTourTypeIdValue == tourTypeId) {
+
+                  isDataForTourType = usedTourTypeIdValue != TourType.TOUR_TYPE_IS_NOT_USED;
+
+                  tourTypeName = isDataForTourType
+                        ? TourDatabase.getTourTypeName(tourTypeId)
+                        : UI.EMPTY_STRING;
+
+                  break;
+               }
+            }
+
+            if (isDataForTourType) {
+
+               sb.append(String.format(valueFormatting,
+
+                     year,
+                     month,
+
+                     tourTypeName,
+
+                     _tourWeekData.elapsedTime[tourTypeIndex][monthIndex],
+                     _tourWeekData.recordedTime[tourTypeIndex][monthIndex],
+                     _tourWeekData.pausedTime[tourTypeIndex][monthIndex],
+
+                     _tourWeekData.movingTime[tourTypeIndex][monthIndex],
+                     _tourWeekData.breakTime[tourTypeIndex][monthIndex],
+
+                     _tourWeekData.altitudeHigh[tourTypeIndex][monthIndex],
+                     _tourWeekData.distanceHigh[tourTypeIndex][monthIndex],
+
+                     _tourWeekData.numToursHigh[tourTypeIndex][monthIndex]
+
+               ));
+
+               sb.append(NL);
+            }
+         }
+
+         // group values
+         if (year != prevYear) {
+
+            prevYear = year;
+
+            sb.append(NL);
+         }
+      }
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
@@ -191,6 +343,14 @@ public class DataProvider_Tour_Week extends DataProvider {
          ;
 
          final long[][] allDbTypeIds = new long[numTourTypes][numWeeks];
+         final long[] usedTourTypeIds = new long[numTourTypes];
+
+         /*
+          * Initialize tour types, when there are 0 tours for some years/months, a tour
+          * type 0 could be a valid tour type which is the default values for native arrays
+          * -> wrong tour type
+          */
+         Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
          final int[][] allDbDurationTime = new int[numTourTypes][numWeeks];
          final int[][] allDbElapsedTime = new int[numTourTypes][numWeeks];
@@ -288,6 +448,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             final long dbTypeId = dbValue_TypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbValue_TypeIdObject;
 
             allDbTypeIds[colorIndex][weekIndex] = dbTypeId;
+            usedTourTypeIds[colorIndex] = dbTypeId;
 
             allDbElapsedTime[colorIndex][weekIndex] = dbValue_ElapsedTime;
             allDbRecordedTime[colorIndex][weekIndex] = dbValue_RecordedTime;
@@ -307,6 +468,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.yearDays = allYear_NumDays;
 
          _tourWeekData.typeIds = allDbTypeIds;
+         _tourWeekData.usedTourTypeIds = usedTourTypeIds;
 
          _tourWeekData.elapsedTime = allDbElapsedTime;
          _tourWeekData.recordedTime = allDbRecordedTime;

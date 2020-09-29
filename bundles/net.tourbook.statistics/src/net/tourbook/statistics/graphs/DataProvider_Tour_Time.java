@@ -70,7 +70,6 @@ public class DataProvider_Tour_Time extends DataProvider {
             + HEAD1_DEVICE_TIME_ELAPSED
             + HEAD1_DEVICE_TIME_RECORDED
             + HEAD1_DEVICE_TIME_PAUSED
-
             + HEAD1_COMPUTED_TIME_MOVING
             + HEAD1_COMPUTED_TIME_BREAK
 
@@ -91,7 +90,6 @@ public class DataProvider_Tour_Time extends DataProvider {
             + HEAD2_DEVICE_TIME_ELAPSED
             + HEAD2_DEVICE_TIME_RECORDED
             + HEAD2_DEVICE_TIME_PAUSED
-
             + HEAD2_COMPUTED_TIME_MOVING
             + HEAD2_COMPUTED_TIME_BREAK
 
@@ -112,7 +110,6 @@ public class DataProvider_Tour_Time extends DataProvider {
             + VALUE_DEVICE_TIME_ELAPSED
             + VALUE_DEVICE_TIME_RECORDED
             + VALUE_DEVICE_TIME_PAUSED
-
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
@@ -155,7 +152,6 @@ public class DataProvider_Tour_Time extends DataProvider {
                elapsedTime,
                _tourDataTime.allTourDeviceTime_Recorded[dataIndex],
                _tourDataTime.allTourDeviceTime_Paused[dataIndex],
-
                movingTime,
                breakTime,
 

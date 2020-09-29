@@ -38,20 +38,25 @@ import org.eclipse.swt.widgets.Display;
 
 public class StatisticManager {
 
+   private static final String FIELD_DELIMITER = ","; //$NON-NLS-1$
+
 // SET_FORMATTING_OFF
 
-   private static final Pattern PATTERN_EMPTY_LINES            = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);    //$NON-NLS-1$
-   private static final Pattern PATTERN_FIELD_DELIMITER        = Pattern.compile(",");                                              //$NON-NLS-1$
-   private static final Pattern PATTERN_LAST_FIELD_DELIMITER   = Pattern.compile(",$",       Pattern.MULTILINE);                    //$NON-NLS-1$
-   private static final Pattern PATTERN_SPACES                 = Pattern.compile("  *");                                            //$NON-NLS-1$
-   private static final Pattern PATTERN_SPLIT_LINES            = Pattern.compile("\\R",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_EMPTY_LINES                  = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);    //$NON-NLS-1$
+   private static final Pattern PATTERN_FIELD_DELIMITER              = Pattern.compile(",");                                              //$NON-NLS-1$
+   private static final Pattern PATTERN_FIELD_DELIMITER_WITH_SPACE   = Pattern.compile(", ");                                             //$NON-NLS-1$
+   private static final Pattern PATTERN_LAST_FIELD_DELIMITER         = Pattern.compile(",$",       Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACES                       = Pattern.compile("  *");                                            //$NON-NLS-1$
+   private static final Pattern PATTERN_SPLIT_LINES                  = Pattern.compile("\\R",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACE_WITH_FIELD_DELIMITER   = Pattern.compile(" ,");                                             //$NON-NLS-1$
 
-   private static final Pattern NUMBER_PATTERN_0               = Pattern.compile(" 0 ");                                            //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_END           = Pattern.compile(" 0$",      Pattern.MULTILINE);                    //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0             = Pattern.compile(" 0.0 ");                                          //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0_END         = Pattern.compile(" 0.0$",    Pattern.MULTILINE);                    //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00            = Pattern.compile(" 0.00 ");                                         //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00_END        = Pattern.compile(" 0.00$",   Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0                     = Pattern.compile(" 0 ");                                            //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_END                 = Pattern.compile(" 0$",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0                   = Pattern.compile(" 0.0 ");                                          //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0_END               = Pattern.compile(" 0.0$",    Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00                  = Pattern.compile(" 0.00 ");                                         //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_END              = Pattern.compile(" 0.00$",   Pattern.MULTILINE);                    //$NON-NLS-1$
+
 
 //SET_FORMATTING_ON
 
@@ -190,8 +195,14 @@ public class StatisticManager {
 
          final String statValuesWithNewHeader = convertHeaderLines(statValues);
 
-         // remove all spaces
+         // remove spaces but keep one space
          statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.SPACE1);
+
+         // replace delimiter + space -> delimiter
+         statValues = PATTERN_FIELD_DELIMITER_WITH_SPACE.matcher(statValues).replaceAll(FIELD_DELIMITER);
+
+         // replace space + delimiter -> delimiter
+         statValues = PATTERN_SPACE_WITH_FIELD_DELIMITER.matcher(statValues).replaceAll(FIELD_DELIMITER);
 
          // remove all empty lines
          statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
