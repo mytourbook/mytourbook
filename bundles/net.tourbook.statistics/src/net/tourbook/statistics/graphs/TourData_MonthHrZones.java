@@ -21,6 +21,4 @@ class TourData_MonthHrZones {
     * HR zones values in seconds.
     */
    public int[][] hrZoneValues;
-
-   String         statisticValuesRaw;
 }

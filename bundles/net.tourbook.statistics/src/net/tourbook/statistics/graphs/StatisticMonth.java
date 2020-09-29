@@ -56,9 +56,12 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
 
-   private static final char        NL            = UI.NEW_LINE;
+   private static final char        NL                      = UI.NEW_LINE;
 
-   private final IPreferenceStore   _prefStore    = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore              = TourbookPlugin.getPrefStore();
+
+   private TourData_Month           _tourMonth_Data;
+   private DataProvider_Tour_Month  _tourMonth_DataProvider = new DataProvider_Tour_Month();
 
    private TourPerson               _appPerson;
    private TourTypeFilter           _appTourTypeFilter;
@@ -68,13 +71,12 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private Chart                    _chart;
    private String                   _chartType;
-   private final MinMaxKeeper_YData _minMaxKeeper = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData _minMaxKeeper           = new MinMaxKeeper_YData();
 
    private boolean                  _isSynchScaleEnabled;
 
    private StatisticContext         _statContext;
 
-   private TourData_Month           _tourMonthData;
    private ChartDataYSerie          _yData_Duration;
 
    private int                      _barOrderStart;
@@ -167,10 +169,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-      final Integer elapsedTime = _tourMonthData.elapsedTime[serieIndex][valueIndex];
-      final Integer recordedTime = _tourMonthData.recordedTime[serieIndex][valueIndex];
-      final Integer pausedTime = _tourMonthData.pausedTime[serieIndex][valueIndex];
-      final Integer movingTime = _tourMonthData.movingTime[serieIndex][valueIndex];
+      final Integer elapsedTime = _tourMonth_Data.elapsedTime[serieIndex][valueIndex];
+      final Integer recordedTime = _tourMonth_Data.recordedTime[serieIndex][valueIndex];
+      final Integer pausedTime = _tourMonth_Data.pausedTime[serieIndex][valueIndex];
+      final Integer movingTime = _tourMonth_Data.movingTime[serieIndex][valueIndex];
       final int breakTime = elapsedTime - movingTime;
 
       /*
@@ -246,9 +248,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
    void createXData_Months(final ChartDataModel chartDataModel) {
 
       // set the x-axis
-      final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonthData));
+      final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonth_Data));
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_MONTH);
-      xData.setChartSegments(createChartSegments(_tourMonthData));
+      xData.setChartSegments(createChartSegments(_tourMonth_Data));
 
       chartDataModel.setXData(xData);
    }
@@ -358,8 +360,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
+   public String getRawStatisticValues() {
+      return _tourMonth_DataProvider.getRawStatisticValues();
    }
 
    @Override
@@ -375,7 +377,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
     */
    private void reorderStatData() {
 
-      final int barLength = _tourMonthData.altitudeHigh.length;
+      final int barLength = _tourMonth_Data.altitudeHigh.length;
 
       _resortedTypeIds = new long[barLength][];
 
@@ -408,16 +410,16 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       int resortedIndex = 0;
 
-      final long[][] typeIds = _tourMonthData.typeIds;
+      final long[][] typeIds = _tourMonth_Data.typeIds;
 
-      final float[][] altitudeLowValues = _tourMonthData.altitudeLow;
-      final float[][] altitudeHighValues = _tourMonthData.altitudeHigh;
-      final float[][] distanceLowValues = _tourMonthData.distanceLow;
-      final float[][] distanceHighValues = _tourMonthData.distanceHigh;
-      final float[][] numToursLowValues = _tourMonthData.numToursLow;
-      final float[][] numToursHighValues = _tourMonthData.numToursHigh;
-      final float[][] timeLowValues = _tourMonthData.getDurationTimeLowFloat();
-      final float[][] timeHighValues = _tourMonthData.getDurationTimeHighFloat();
+      final float[][] altitudeLowValues = _tourMonth_Data.altitudeLow;
+      final float[][] altitudeHighValues = _tourMonth_Data.altitudeHigh;
+      final float[][] distanceLowValues = _tourMonth_Data.distanceLow;
+      final float[][] distanceHighValues = _tourMonth_Data.distanceHigh;
+      final float[][] numToursLowValues = _tourMonth_Data.numToursLow;
+      final float[][] numToursHighValues = _tourMonth_Data.numToursHigh;
+      final float[][] timeLowValues = _tourMonth_Data.getDurationTimeLowFloat();
+      final float[][] timeHighValues = _tourMonth_Data.getDurationTimeHighFloat();
 
       if (_barOrderStart >= barLength) {
 
@@ -574,20 +576,17 @@ public abstract class StatisticMonth extends TourbookStatistic {
       _statFirstYear = statContext.statFirstYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourMonthData = DataProvider_Tour_Month.getInstance()
-            .getMonthData(
-                  _appPerson,
-                  _appTourTypeFilter,
-                  _statFirstYear,
-                  _statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
-                  durationTime);
-
-      statContext.outRawStatisticValues = _tourMonthData.statisticValuesRaw;
+      _tourMonth_Data = _tourMonth_DataProvider.getMonthData(
+            _appPerson,
+            _appTourTypeFilter,
+            _statFirstYear,
+            _statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
+            durationTime);
 
       _isDuration_ReloadData = false;
 
-      StatisticServices.setBarNames(statContext, _tourMonthData.usedTourTypeIds, _barOrderStart);
+      StatisticServices.setBarNames(statContext, _tourMonth_Data.usedTourTypeIds, _barOrderStart);
       reorderStatData();
 
       // reset min/max values

@@ -36,19 +36,24 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Year extends DataProvider {
 
-   private static DataProvider_Tour_Year _instance;
+   private TourData_Year _tourYearData;
 
-   private TourData_Year                 _tourDataYear;
+   String getRawStatisticValues() {
 
-   private DataProvider_Tour_Year() {}
-
-   public static DataProvider_Tour_Year getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Year();
+      if (_tourYearData == null) {
+         return null;
       }
 
-      return _instance;
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
 
    TourData_Year getYearData(final TourPerson person,
@@ -67,8 +72,11 @@ public class DataProvider_Tour_Year extends DataProvider {
             && numYears == statistic_NumberOfYears
             && refreshData == false) {
 
-         return _tourDataYear;
+         return _tourYearData;
       }
+
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
       String sql = null;
 
@@ -83,7 +91,7 @@ public class DataProvider_Tour_Year extends DataProvider {
          final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
          final TourType[] allTourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-         _tourDataYear = new TourData_Year();
+         _tourYearData = new TourData_Year();
 
          String fromTourData;
 
@@ -273,7 +281,7 @@ public class DataProvider_Tour_Year extends DataProvider {
          for (int currentYear = statistic_LastYear - statistic_NumberOfYears + 1; currentYear <= statistic_LastYear; currentYear++) {
             years[yearIndex++] = currentYear;
          }
-         _tourDataYear.years = years;
+         _tourYearData.years = years;
 
          /*
           * Remove not used tour types
@@ -321,26 +329,26 @@ public class DataProvider_Tour_Year extends DataProvider {
 
             // there are NO data, create dummy data that the UI do not fail
 
-            _tourDataYear.typeIds = new long[1][1];
-            _tourDataYear.usedTourTypeIds = new long[] { TourType.TOUR_TYPE_IS_NOT_USED };
+            _tourYearData.typeIds = new long[1][1];
+            _tourYearData.usedTourTypeIds = new long[] { TourType.TOUR_TYPE_IS_NOT_USED };
 
-            _tourDataYear.altitudeLow = new float[1][numYears];
-            _tourDataYear.altitudeHigh = new float[1][numYears];
+            _tourYearData.altitudeLow = new float[1][numYears];
+            _tourYearData.altitudeHigh = new float[1][numYears];
 
-            _tourDataYear.distanceLow = new float[1][numYears];
-            _tourDataYear.distanceHigh = new float[1][numYears];
+            _tourYearData.distanceLow = new float[1][numYears];
+            _tourYearData.distanceHigh = new float[1][numYears];
 
-            _tourDataYear.setDurationTimeLow(new int[1][numYears]);
-            _tourDataYear.setDurationTimeHigh(new int[1][numYears]);
+            _tourYearData.setDurationTimeLow(new int[1][numYears]);
+            _tourYearData.setDurationTimeHigh(new int[1][numYears]);
 
-            _tourDataYear.elapsedTime = new int[1][numYears];
-            _tourDataYear.recordedTime = new int[1][numYears];
-            _tourDataYear.pausedTime = new int[1][numYears];
-            _tourDataYear.movingTime = new int[1][numYears];
-            _tourDataYear.breakTime = new int[1][numYears];
+            _tourYearData.elapsedTime = new int[1][numYears];
+            _tourYearData.recordedTime = new int[1][numYears];
+            _tourYearData.pausedTime = new int[1][numYears];
+            _tourYearData.movingTime = new int[1][numYears];
+            _tourYearData.breakTime = new int[1][numYears];
 
-            _tourDataYear.numToursLow = new float[1][numYears];
-            _tourDataYear.numToursHigh = new float[1][numYears];
+            _tourYearData.numToursLow = new float[1][numYears];
+            _tourYearData.numToursHigh = new float[1][numYears];
 
          } else {
 
@@ -373,32 +381,32 @@ public class DataProvider_Tour_Year extends DataProvider {
                usedNumTours[index] = (float[]) numToursWithData.get(index);
             }
 
-            _tourDataYear.typeIds = usedTypeIds;
-            _tourDataYear.usedTourTypeIds = usedTourTypeIds;
+            _tourYearData.typeIds = usedTypeIds;
+            _tourYearData.usedTourTypeIds = usedTourTypeIds;
 
-            _tourDataYear.altitudeLow = new float[numUsedTourTypes][numYears];
-            _tourDataYear.altitudeHigh = usedAltitude;
+            _tourYearData.altitudeLow = new float[numUsedTourTypes][numYears];
+            _tourYearData.altitudeHigh = usedAltitude;
 
-            _tourDataYear.distanceLow = new float[numUsedTourTypes][numYears];
-            _tourDataYear.distanceHigh = usedDistance;
+            _tourYearData.distanceLow = new float[numUsedTourTypes][numYears];
+            _tourYearData.distanceHigh = usedDistance;
 
-            _tourDataYear.setDurationTimeLow(new int[numUsedTourTypes][numYears]);
-            _tourDataYear.setDurationTimeHigh(usedDuration);
+            _tourYearData.setDurationTimeLow(new int[numUsedTourTypes][numYears]);
+            _tourYearData.setDurationTimeHigh(usedDuration);
 
-            _tourDataYear.elapsedTime = usedElapsedTime;
-            _tourDataYear.recordedTime = usedRecordedTime;
-            _tourDataYear.pausedTime = usedPausedTime;
-            _tourDataYear.movingTime = usedMovingTime;
-            _tourDataYear.breakTime = usedBreakTime;
+            _tourYearData.elapsedTime = usedElapsedTime;
+            _tourYearData.recordedTime = usedRecordedTime;
+            _tourYearData.pausedTime = usedPausedTime;
+            _tourYearData.movingTime = usedMovingTime;
+            _tourYearData.breakTime = usedBreakTime;
 
-            _tourDataYear.numToursLow = new float[numUsedTourTypes][numYears];
-            _tourDataYear.numToursHigh = usedNumTours;
+            _tourYearData.numToursLow = new float[numUsedTourTypes][numYears];
+            _tourYearData.numToursHigh = usedNumTours;
          }
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
       }
 
-      return _tourDataYear;
+      return _tourYearData;
    }
 }

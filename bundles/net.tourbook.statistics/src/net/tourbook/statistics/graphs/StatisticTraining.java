@@ -76,6 +76,9 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private static final String         NL                                 = UI.NEW_LINE1;
    private static final String         NL2                                = NL + NL;
 
+   private TourData_Day                _tourDayData;
+   private DataProvider_Tour_Day       _tourDay_DataProvider              = new DataProvider_Tour_Day();
+
    private TourTypeFilter              _activeTourTypeFilter;
    private TourPerson                  _activePerson;
 
@@ -89,7 +92,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private StatisticContext            _statContext;
 
    private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
-   private TourData_Day                _tourDayData;
 
    private ChartDataYSerie             _yData_Duration;
    private ChartDataYSerie             _yData_TrainingPerformance;
@@ -313,8 +315,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final float speed = time == 0 ? 0 : distance / (time / 3.6f);
       final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
-      final float training_Effect = _tourDayData.allTraining_Effect[valueIndex];
-      final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerobic[valueIndex];
+      final float training_Effect_Aerob = _tourDayData.allTraining_Effect_Aerob[valueIndex];
+      final float training_Effect_Anaerobic = _tourDayData.allTraining_Effect_Anaerob[valueIndex];
       final float training_Performance = _tourDayData.allTraining_Performance[valueIndex];
 
       final StringBuilder toolTipFormat = new StringBuilder();
@@ -366,7 +368,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             UI.UNIT_LABEL_DISTANCE,
 
             // altitude
-            (int) _tourDayData.allAltitude[valueIndex],
+            (int) _tourDayData.allElevation[valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
 
             // start time
@@ -412,7 +414,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             UI.UNIT_LABEL_PACE,
 
             // training
-            training_Effect,
+            training_Effect_Aerob,
             training_Effect_Anaerobic,
             training_Performance,
 
@@ -573,8 +575,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingEffect_Aerob_Low,
-            _tourDayData.allTrainingEffect_Aerob_High);
+            _tourDayData.allTraining_Effect_Aerob_Low,
+            _tourDayData.allTraining_Effect_Aerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -596,8 +598,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingEffect_Anaerob_Low,
-            _tourDayData.allTrainingEffect_Anaerob_High);
+            _tourDayData.allTraining_Effect_Anaerob_Low,
+            _tourDayData.allTraining_Effect_Anaerob_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -619,8 +621,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       _yData_TrainingPerformance = new ChartDataYSerie(
             chartType,
-            _tourDayData.allTrainingPerformance_Low,
-            _tourDayData.allTrainingPerformance_High);
+            _tourDayData.allTraining_Performance_Low,
+            _tourDayData.allTraining_Performance_High);
 
       _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE);
       _yData_TrainingPerformance.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -656,6 +658,11 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
+   public String getRawStatisticValues() {
+      return _tourDay_DataProvider.getRawStatisticValues();
+   }
+
+   @Override
    public Long getSelectedTour() {
       return _selectedTourId;
    }
@@ -677,11 +684,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       selectedTours.add(TourManager.getInstance().getTourData(_selectedTourId));
 
       return selectedTours;
-   }
-
-   @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
    }
 
    @Override
@@ -819,8 +821,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          }
       }
 
-      final DataProvider_Tour_Day tourDayDataProvider = DataProvider_Tour_Day.getInstance();
-
       boolean isAvgValue = false;
 
       DurationTime durationTime = DurationTime.MOVING;
@@ -837,7 +837,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
-         tourDayDataProvider.setGraphContext(isAvgValue, false);
+         _tourDay_DataProvider.setGraphContext(isAvgValue, false);
 
       } else if (this instanceof StatisticTraining_Line) {
 
@@ -850,18 +850,16 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
-         tourDayDataProvider.setGraphContext(isAvgValue, true);
+         _tourDay_DataProvider.setGraphContext(isAvgValue, true);
       }
 
-      _tourDayData = tourDayDataProvider.getDayData(
+      _tourDayData = _tourDay_DataProvider.getDayData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
             statContext.statFirstYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
             durationTime);
-
-      statContext.outRawStatisticValues = _tourDayData.statisticValuesRaw;
 
       _isDuration_ReloadData = false;
 

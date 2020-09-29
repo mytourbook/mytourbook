@@ -60,8 +60,6 @@ public class StatisticValuesView extends ViewPart {
    private IPropertyChangeListener            _prefChangeListener;
    private ITourEventListener                 _tourEventListener;
 
-   private Selection_StatisticValues          _selection_StatisticValues;
-
    private Action_CopyStatValuesIntoClipboard _action_CopyIntoClipboard;
    private Action_GroupValues                 _action_GroupValues;
    private ActionOpenPrefDialog               _action_PrefDialog;
@@ -216,9 +214,12 @@ public class StatisticValuesView extends ViewPart {
 
                clearView();
 
-            } else if ((eventId == TourEventId.STATISTIC_VALUES) && eventData instanceof Selection_StatisticValues) {
+            } else if ((eventId == TourEventId.STATISTIC_VALUES)) {
 
-               onSelectionChanged((Selection_StatisticValues) eventData);
+               // new statistic values are retrieved from the StatisticManager
+
+               updateUI();
+               enableActions();
             }
          }
       };
@@ -260,15 +261,6 @@ public class StatisticValuesView extends ViewPart {
       enableActions();
 
       showInvalidPage();
-
-      // get last statistic values from the statistic view
-      final StatisticView statisticView = StatisticManager.getStatisticView();
-      if (statisticView != null && statisticView.getStatisticValuesRaw() != null) {
-
-         final String statisticValuesRaw = statisticView.getStatisticValuesRaw();
-
-         _selection_StatisticValues = new Selection_StatisticValues(statisticValuesRaw);
-      }
 
       updateUI();
       enableActions();
@@ -312,8 +304,10 @@ public class StatisticValuesView extends ViewPart {
 
    private void enableActions() {
 
+      final String rawStatisticValues = StatisticManager.getRawStatisticValues();
+
       final boolean isCSVFormat = _action_ShowCSVFormat.isChecked();
-      final boolean isStatValuesAvailable = _selection_StatisticValues != null && _selection_StatisticValues.statisticValuesRaw != null;
+      final boolean isStatValuesAvailable = rawStatisticValues != null;
 
       _action_CopyIntoClipboard.setEnabled(isStatValuesAvailable);
       _action_GroupValues.setEnabled(isStatValuesAvailable && !isCSVFormat);
@@ -344,20 +338,14 @@ public class StatisticValuesView extends ViewPart {
 
    private void onAction_CopyIntoClipboard() {
 
+      final String rawStatValues = StatisticManager.getRawStatisticValues();
+
       // ensure data are available
-      if (_selection_StatisticValues == null || _selection_StatisticValues.statisticValuesRaw == null) {
+      if (rawStatValues == null) {
          return;
       }
 
-      StatisticManager.copyStatisticValuesToTheClipboard(_selection_StatisticValues.statisticValuesRaw);
-   }
-
-   private void onSelectionChanged(final Selection_StatisticValues selection) {
-
-      _selection_StatisticValues = selection;
-
-      updateUI();
-      enableActions();
+      StatisticManager.copyStatisticValuesToTheClipboard(rawStatValues);
    }
 
    private void restoreState() {
@@ -388,7 +376,9 @@ public class StatisticValuesView extends ViewPart {
 
    private void updateUI() {
 
-      if (_selection_StatisticValues == null || _selection_StatisticValues.statisticValuesRaw == null) {
+      final String rawStatValues = StatisticManager.getRawStatisticValues();
+
+      if (rawStatValues == null) {
 
          showInvalidPage();
          return;
@@ -404,7 +394,7 @@ public class StatisticValuesView extends ViewPart {
       // reset state
       _isShowRawData = false;
 
-      final String statValues = StatisticManager.formatStatValues(_selection_StatisticValues.statisticValuesRaw,
+      final String statValues = StatisticManager.formatStatValues(rawStatValues,
             isCSVFormat,
             isRemoveZeros,
             isGroupValues,

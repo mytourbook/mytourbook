@@ -51,12 +51,11 @@ public class TourData_Time {
 
    int[]                          allTourDeviceTime_Elapsed;
    int[]                          allTourDeviceTime_Recorded;
+   int[]                          allTourDeviceTime_Paused;
    int[]                          allTourComputedTime_Moving;
 
    ArrayList<String>              allTourTitles;
    ArrayList<String>              allTourDescriptions;
-
-   String                         rawStatisticValues;
 
    /**
     * Contains the tags for the tour, key is the tour ID

@@ -69,6 +69,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
    private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
+   private TourData_Time               _tourTime_Data;
+   private DataProvider_Tour_Time      _tourTime_DataProvider             = new DataProvider_Tour_Time();
+
    private TourPerson                  _activePerson;
    private TourTypeFilter              _activeTourTypeFiler;
    private int                         _currentYear;
@@ -80,8 +83,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
    private StatisticTourToolTip        _tourToolTip;
    private TourInfoIconToolTipProvider _tourInfoToolTipProvider           = new TourInfoIconToolTipProvider();
-
-   private TourData_Time               _tourTimeData;
 
    private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
    private boolean                     _ifIsSynchScaleEnabled;
@@ -152,7 +153,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          @Override
          public void selectionChanged(final int serieIndex, int valueIndex) {
 
-            final long[] tourIds = _tourTimeData.allTourIds;
+            final long[] tourIds = _tourTime_Data.allTourIds;
 
             if (tourIds != null && tourIds.length > 0) {
 
@@ -163,7 +164,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               DataProvider_Tour_Time.getInstance().setSelectedTourId(_selectedTourId);
+               _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
 
                // don't fire an event when preferences are updated
                if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
@@ -185,13 +186,13 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       _chart.addDoubleClickListener(new IBarSelectionListener() {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
-            final long[] tourIds = _tourTimeData.allTourIds;
+            final long[] tourIds = _tourTime_Data.allTourIds;
             if (tourIds.length > 0) {
 
                _selectedTourId = tourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               DataProvider_Tour_Time.getInstance().setSelectedTourId(_selectedTourId);
+               _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
 
                ActionEditQuick.doAction(StatisticTour_Time.this);
             }
@@ -212,7 +213,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
                   if (barChartSelection.serieIndex != -1) {
 
-                     _selectedTourId = _tourTimeData.allTourIds[barChartSelection.valueIndex];
+                     _selectedTourId = _tourTime_Data.allTourIds[barChartSelection.valueIndex];
                      _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                      ActionEditQuick.doAction(StatisticTour_Time.this);
@@ -226,7 +227,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
    private ChartToolTipInfo createToolTipInfo(int valueIndex) {
 
-      final int[] tourDOYValues = _tourTimeData.allTourDOYs;
+      final int[] tourDOYValues = _tourTime_Data.allTourDOYs;
 
       if (valueIndex >= tourDOYValues.length) {
          valueIndex -= tourDOYValues.length;
@@ -239,33 +240,33 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       /*
        * set calendar day/month/year
        */
-      final long tooltipTourId = _tourTimeData.allTourIds[valueIndex];
+      final long tooltipTourId = _tourTime_Data.allTourIds[valueIndex];
 
-      final String tourTypeName = TourDatabase.getTourTypeName(_tourTimeData.allTypeIds[valueIndex]);
-      final String tourTags = TourDatabase.getTagNames(_tourTimeData.allTagIds.get(tooltipTourId));
-      final String tourDescription = _tourTimeData.allTourDescriptions.get(valueIndex).replace(
+      final String tourTypeName = TourDatabase.getTourTypeName(_tourTime_Data.allTypeIds[valueIndex]);
+      final String tourTags = TourDatabase.getTagNames(_tourTime_Data.allTagIds.get(tooltipTourId));
+      final String tourDescription = _tourTime_Data.allTourDescriptions.get(valueIndex).replace(
             net.tourbook.ui.UI.SYSTEM_NEW_LINE,
             UI.NEW_LINE1);
 
-      final int[] startValue = _tourTimeData.allTourTimeStart;
-      final int[] endValue = _tourTimeData.allTourTimeEnd;
+      final int[] startValue = _tourTime_Data.allTourTimeStart;
+      final int[] endValue = _tourTime_Data.allTourTimeEnd;
 
-      final int elapsedTime = _tourTimeData.allTourDeviceTime_Elapsed[valueIndex];
-      final int recordedTime = _tourTimeData.allTourDeviceTime_Recorded[valueIndex];
+      final int elapsedTime = _tourTime_Data.allTourDeviceTime_Elapsed[valueIndex];
+      final int recordedTime = _tourTime_Data.allTourDeviceTime_Recorded[valueIndex];
       final int pausedTime = elapsedTime - recordedTime;
-      final int movingTime = _tourTimeData.allTourComputedTime_Moving[valueIndex];
+      final int movingTime = _tourTime_Data.allTourComputedTime_Moving[valueIndex];
       final int breakTime = elapsedTime - movingTime;
 
-      final ZonedDateTime zdtTourStart = _tourTimeData.allTourStartDateTimes.get(valueIndex);
+      final ZonedDateTime zdtTourStart = _tourTime_Data.allTourStartDateTimes.get(valueIndex);
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
-      final float distance = _tourTimeData.allTourDistances[valueIndex];
+      final float distance = _tourTime_Data.allTourDistances[valueIndex];
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final int time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
       final float speed = time == 0 ? 0 : distance / (time / 3.6f);
       final float pace = distance == 0 ? 0 : time * 1000 / distance;
 
-      final String tourTimeZoneOffset = _tourTimeData.allTourTimeZoneOffsets.get(valueIndex);
+      final String tourTimeZoneOffset = _tourTime_Data.allTourTimeZoneOffsets.get(valueIndex);
 
       final StringBuilder toolTipFormat = new StringBuilder();
       toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //		%s - %s - %s - CW %d
@@ -322,7 +323,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
             distance / 1000,
             UI.UNIT_LABEL_DISTANCE,
             //
-            (int) _tourTimeData.allTourElevations[valueIndex],
+            (int) _tourTime_Data.allTourElevations[valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
             // start time
@@ -375,7 +376,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       /*
        * create tool tip info
        */
-      String tourTitle = _tourTimeData.allTourTitles.get(valueIndex);
+      String tourTitle = _tourTime_Data.allTourTitles.get(valueIndex);
       if (tourTitle == null || tourTitle.trim().length() == 0) {
          tourTitle = tourTypeName;
       }
@@ -402,6 +403,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    }
 
    @Override
+   public String getRawStatisticValues() {
+
+      return _tourTime_DataProvider.getRawStatisticValues();
+   }
+
+   @Override
    public Long getSelectedTour() {
       return _selectedTourId;
    }
@@ -423,11 +430,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       selectedTours.add(TourManager.getInstance().getTourData(_selectedTourId));
 
       return selectedTours;
-   }
-
-   @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
    }
 
    @Override
@@ -458,12 +460,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       }
 
       final ISelection selection = _chart.getSelection();
-      if (_tourTimeData != null
-            && _tourTimeData.allTourIds != null
-            && _tourTimeData.allTourIds.length > 0
+      if (_tourTime_Data != null
+            && _tourTime_Data.allTourIds != null
+            && _tourTime_Data.allTourIds.length > 0
             && selection instanceof SelectionBarChart) {
 
-         final Long selectedTourId = _tourTimeData.allTourIds[((SelectionBarChart) selection).valueIndex];
+         final Long selectedTourId = _tourTime_Data.allTourIds[((SelectionBarChart) selection).valueIndex];
 
          viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
       }
@@ -472,7 +474,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    @Override
    public boolean selectTour(final Long tourId) {
 
-      final long[] tourIds = _tourTimeData.allTourIds;
+      final long[] tourIds = _tourTime_Data.allTourIds;
 
       if (tourIds.length == 0) {
          _selectedTourId = null;
@@ -544,24 +546,24 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
       // set the x-axis
-      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(_tourTimeData.allTourDOYs));
+      final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(_tourTime_Data.allTourDOYs));
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
       xData.setVisibleMaxValue(_currentYear);
-      xData.setChartSegments(createChartSegments(_tourTimeData));
+      xData.setChartSegments(createChartSegments(_tourTime_Data));
       chartModel.setXData(xData);
 
       // set the bar low/high data
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            Util.convertIntToFloat(_tourTimeData.allTourTimeStart),
-            Util.convertIntToFloat(_tourTimeData.allTourTimeEnd));
+            Util.convertIntToFloat(_tourTime_Data.allTourTimeStart),
+            Util.convertIntToFloat(_tourTime_Data.allTourTimeEnd));
       yData.setYTitle(Messages.LABEL_GRAPH_DAYTIME);
       yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
       yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_24H);
       yData.setYAxisDirection(false);
       yData.setShowYSlider(true);
 
-      yData.setColorIndex(new int[][] { _tourTimeData.allTypeColorIndices });
+      yData.setColorIndex(new int[][] { _tourTime_Data.allTypeColorIndices });
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFiler);
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 
@@ -606,10 +608,10 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       if (selection instanceof SelectionBarChart) {
          final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-         if (barChartSelection.serieIndex != -1 && _tourTimeData != null) {
+         if (barChartSelection.serieIndex != -1 && _tourTime_Data != null) {
 
             int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _tourTimeData.allTourIds;
+            final long[] tourIds = _tourTime_Data.allTourIds;
 
             if (tourIds.length > 0) {
                if (selectedValueIndex >= tourIds.length) {
@@ -621,14 +623,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          }
       }
 
-      _tourTimeData = DataProvider_Tour_Time.getInstance().getTourTimeData(
+      _tourTime_Data = _tourTime_DataProvider.getTourTimeData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
             statContext.statFirstYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData);
-
-      statContext.outRawStatisticValues = _tourTimeData.rawStatisticValues;
 
       // reset min/max values
       if (_ifIsSynchScaleEnabled == false && statContext.isRefreshData) {

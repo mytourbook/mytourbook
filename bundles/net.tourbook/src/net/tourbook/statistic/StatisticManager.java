@@ -38,18 +38,25 @@ import org.eclipse.swt.widgets.Display;
 
 public class StatisticManager {
 
+   private static final String FIELD_DELIMITER = ","; //$NON-NLS-1$
+
 // SET_FORMATTING_OFF
 
-   private static final Pattern PATTERN_FIELDS           = Pattern.compile(",");                                            //$NON-NLS-1$
-   private static final Pattern PATTERN_SPACES           = Pattern.compile("  *");                                          //$NON-NLS-1$
-   private static final Pattern PATTERN_EMPTY_LINES      = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);  //$NON-NLS-1$
+   private static final Pattern PATTERN_EMPTY_LINES                  = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);    //$NON-NLS-1$
+   private static final Pattern PATTERN_FIELD_DELIMITER              = Pattern.compile(",");                                              //$NON-NLS-1$
+   private static final Pattern PATTERN_FIELD_DELIMITER_WITH_SPACE   = Pattern.compile(", ");                                             //$NON-NLS-1$
+   private static final Pattern PATTERN_LAST_FIELD_DELIMITER         = Pattern.compile(",$",       Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACES                       = Pattern.compile("  *");                                            //$NON-NLS-1$
+   private static final Pattern PATTERN_SPLIT_LINES                  = Pattern.compile("\\R",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_SPACE_WITH_FIELD_DELIMITER   = Pattern.compile(" ,");                                             //$NON-NLS-1$
 
-   private static final Pattern NUMBER_PATTERN_0         = Pattern.compile(" 0 ");                                          //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_END     = Pattern.compile(" 0$",     Pattern.MULTILINE);                   //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0       = Pattern.compile(" 0.0 ");                                        //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0_END   = Pattern.compile(" 0.0$",   Pattern.MULTILINE);                   //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00      = Pattern.compile(" 0.00 ");                                       //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00_END  = Pattern.compile(" 0.00$",  Pattern.MULTILINE);                   //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0                     = Pattern.compile(" 0 ");                                            //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_END                 = Pattern.compile(" 0$",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0                   = Pattern.compile(" 0.0 ");                                          //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0_END               = Pattern.compile(" 0.0$",    Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00                  = Pattern.compile(" 0.00 ");                                         //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_END              = Pattern.compile(" 0.00$",   Pattern.MULTILINE);                    //$NON-NLS-1$
+
 
 //SET_FORMATTING_ON
 
@@ -61,11 +68,11 @@ public class StatisticManager {
    private static StatisticView                _statisticView;
 
    /**
-    * Join 2 header lines into 1 line
+    * Joins two header lines into one line, csv has only one header line
     */
    private static String convertHeaderLines(final String rawStatisticValues) {
 
-      final Object[] allStatValueLines = rawStatisticValues.lines().toArray();
+      final String[] allStatValueLines = PATTERN_SPLIT_LINES.split(rawStatisticValues);
 
       final int numAllLines = allStatValueLines.length;
 
@@ -79,17 +86,25 @@ public class StatisticManager {
       final String line1_NoSpaces = PATTERN_SPACES.matcher(line1).replaceAll(UI.EMPTY_STRING);
       final String line2_NoSpaces = PATTERN_SPACES.matcher(line2).replaceAll(UI.EMPTY_STRING);
 
-      final String[] allLine1_Fields = PATTERN_FIELDS.split(line1_NoSpaces);
-      final String[] allLine2_Fields = PATTERN_FIELDS.split(line2_NoSpaces);
+      final String[] allLine1_Fields = PATTERN_FIELD_DELIMITER.split(line1_NoSpaces);
+      final String[] allLine2_Fields = PATTERN_FIELD_DELIMITER.split(line2_NoSpaces);
 
       final int numFields = allLine1_Fields.length;
+      final int numLine2Fields = allLine2_Fields.length;
 
       final StringBuilder sbHeader = new StringBuilder();
 
-      for (int lineIndex = 0; lineIndex < numFields; lineIndex++) {
+      for (int fieldIndex = 0; fieldIndex < numFields; fieldIndex++) {
 
-         final String line1_Field = allLine1_Fields[lineIndex];
-         final String line2_Field = allLine2_Fields[lineIndex];
+         final String line1_Field = allLine1_Fields[fieldIndex];
+         final String line2_Field;
+
+         // Pattern.split() removes empty String items which caused an ArrayIndexOutOfBoundsException
+         if (fieldIndex < numLine2Fields) {
+            line2_Field = allLine2_Fields[fieldIndex];
+         } else {
+            line2_Field = UI.SYMBOL_COMMA;
+         }
 
          sbHeader.append(line1_Field);
 
@@ -98,7 +113,7 @@ public class StatisticManager {
             sbHeader.append(line2_Field);
          }
 
-         if (lineIndex < numFields - 1) {
+         if (fieldIndex < numFields - 1) {
             sbHeader.append(UI.SYMBOL_COMMA);
          }
       }
@@ -180,16 +195,25 @@ public class StatisticManager {
 
          final String statValuesWithNewHeader = convertHeaderLines(statValues);
 
-         // always remove spaces
-         statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.EMPTY_STRING);
+         // remove spaces but keep one space
+         statValues = PATTERN_SPACES.matcher(statValuesWithNewHeader).replaceAll(UI.SPACE1);
 
-         // always remove empty lines
+         // replace delimiter + space -> delimiter
+         statValues = PATTERN_FIELD_DELIMITER_WITH_SPACE.matcher(statValues).replaceAll(FIELD_DELIMITER);
+
+         // replace space + delimiter -> delimiter
+         statValues = PATTERN_SPACE_WITH_FIELD_DELIMITER.matcher(statValues).replaceAll(FIELD_DELIMITER);
+
+         // remove all empty lines
          statValues = PATTERN_EMPTY_LINES.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+
+         // remove field delimiter at the end
+         statValues = PATTERN_LAST_FIELD_DELIMITER.matcher(statValues).replaceAll(UI.EMPTY_STRING);
 
       } else {
 
          // remove field separator
-         statValues = PATTERN_FIELDS.matcher(statValues).replaceAll(UI.EMPTY_STRING);
+         statValues = PATTERN_FIELD_DELIMITER.matcher(statValues).replaceAll(UI.EMPTY_STRING);
 
          // remove empty lines
          if (isGroupValues == false) {
@@ -201,18 +225,35 @@ public class StatisticManager {
 
 // SET_FORMATTING_OFF
 
-            statValues = NUMBER_PATTERN_0.          matcher(statValues).replaceAll("   ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_END.      matcher(statValues).replaceAll("  ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0.        matcher(statValues).replaceAll("     ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0_END.    matcher(statValues).replaceAll("    ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00.       matcher(statValues).replaceAll("      ");//$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00_END.   matcher(statValues).replaceAll("     ");//$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0.          matcher(statValues).replaceAll("   ");      //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_END.      matcher(statValues).replaceAll("  ");       //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0.        matcher(statValues).replaceAll("     ");    //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0_END.    matcher(statValues).replaceAll("    ");     //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00.       matcher(statValues).replaceAll("      ");   //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00_END.   matcher(statValues).replaceAll("     ");    //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
       }
 
       return statValues;
+   }
+
+   /**
+    * Get statistic values from the statistic view.
+    *
+    * @return
+    */
+   static String getRawStatisticValues() {
+
+      final StatisticView statisticView = getStatisticView();
+
+      if (statisticView != null && statisticView.getActiveStatistic() != null) {
+
+         return statisticView.getActiveStatistic().getRawStatisticValues();
+      }
+
+      return null;
    }
 
    /**

@@ -37,20 +37,7 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
-   private static DataProvider_Tour_Month _instance;
-
-   private TourData_Month                 _tourMonthData;
-
-   private DataProvider_Tour_Month() {}
-
-   public static DataProvider_Tour_Month getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Month();
-      }
-
-      return _instance;
-   }
+   private TourData_Month _tourMonthData;
 
    TourData_Month getMonthData(final TourPerson person,
                                final TourTypeFilter tourTypeFilter,
@@ -70,6 +57,9 @@ public class DataProvider_Tour_Month extends DataProvider {
 
          return _tourMonthData;
       }
+
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
       String sql = null;
       int numUsedTourTypes = 0;
@@ -171,10 +161,10 @@ public class DataProvider_Tour_Month extends DataProvider {
                + "ORDER BY StartYear, StartMonth" + NL //                    //$NON-NLS-1$
          ;
 
-         final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
+         final boolean isShowUndefinedTourTypes = tourTypeFilter.showUndefinedTourTypes();
 
          int colorOffset = 0;
-         if (isShowNoTourTypes) {
+         if (isShowUndefinedTourTypes) {
             colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
          }
 
@@ -258,7 +248,7 @@ public class DataProvider_Tour_Month extends DataProvider {
                }
             }
 
-            final long noTourTypeId = isShowNoTourTypes
+            final long noTourTypeId = isShowUndefinedTourTypes
                   ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
                   : TourType.TOUR_TYPE_IS_NOT_USED;
 
@@ -411,58 +401,102 @@ public class DataProvider_Tour_Month extends DataProvider {
          SQL.showException(e, sql);
       }
 
-      setStatisticValues(numUsedTourTypes);
+      _tourMonthData.numUsedTourTypes = numUsedTourTypes;
 
       return _tourMonthData;
    }
 
-   private void setStatisticValues(final int numUsedTourTypes) {
+   String getRawStatisticValues() {
 
-      if (numUsedTourTypes == 0) {
+      if (_tourMonthData == null) {
+         return null;
+      }
+
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
+
+      if (_tourMonthData.numUsedTourTypes == 0) {
 
          // there are no real data -> show info
 
-         _tourMonthData.statisticValuesRaw = Messages.Tour_StatisticValues_Label_NoData;
-
-         return;
+         return Messages.Tour_StatisticValues_Label_NoData;
       }
-
-      final long[][] allTourTypeIds = _tourMonthData.typeIds;
-      final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
 
       final StringBuilder sb = new StringBuilder();
 
-      final String headerLine1 = "Year, Month,  Tour Type,            Elapsed, Recorded, Paused, Moving,  Break, Elevation,    Distance, Tours"; //$NON-NLS-1$
-      final String headerLine2 = "    ,      ,  ,                         (s),      (s),    (s),    (s),    (s),       (m),         (m),   (#), "; //$NON-NLS-1$
+      final String headerLine1 = UI.EMPTY_STRING
+
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+
+            + HEAD1_TOUR_TYPE
+
+            + HEAD1_DEVICE_TIME_ELAPSED
+            + HEAD1_DEVICE_TIME_RECORDED
+            + HEAD1_DEVICE_TIME_PAUSED
+
+            + HEAD1_COMPUTED_TIME_MOVING
+            + HEAD1_COMPUTED_TIME_BREAK
+
+            + HEAD1_ELEVATION
+            + HEAD1_DISTANCE
+
+            + HEAD1_NUMBER_OF_TOURS
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+
+            + HEAD2_TOUR_TYPE
+
+            + HEAD2_DEVICE_TIME_ELAPSED
+            + HEAD2_DEVICE_TIME_RECORDED
+            + HEAD2_DEVICE_TIME_PAUSED
+
+            + HEAD2_COMPUTED_TIME_MOVING
+            + HEAD2_COMPUTED_TIME_BREAK
+
+            + HEAD2_ELEVATION
+            + HEAD2_DISTANCE
+
+            + HEAD2_NUMBER_OF_TOURS
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+
+            + VALUE_TOUR_TYPE
+
+            + VALUE_DEVICE_TIME_ELAPSED
+            + VALUE_DEVICE_TIME_RECORDED
+            + VALUE_DEVICE_TIME_PAUSED
+
+            + VALUE_COMPUTED_TIME_MOVING
+            + VALUE_COMPUTED_TIME_BREAK
+
+            + VALUE_ELEVATION
+            + VALUE_DISTANCE
+
+            + VALUE_NUMBER_OF_TOURS
+
+      ;
 
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-      final String valueFormatting = UI.EMPTY_STRING
-
-            // date
-            + "%4d,   %3d," //$NON-NLS-1$
-
-            // tour type
-            + "  %-20s,"//$NON-NLS-1$
-
-            // device time
-            + "  %6d,   %6d, %6d," //$NON-NLS-1$
-
-            // computed time
-            + " %6d, %6d," //$NON-NLS-1$
-
-            // elevation/distance
-            + "    %6.0f,   %9.0f," //$NON-NLS-1$
-
-            // #tours
-            + "  %4.0f" //$NON-NLS-1$
-
-            + NL;
-
       final float[][] numTours = _tourMonthData.numToursHigh;
       final int numMonths = numTours[0].length;
       final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+
+      final long[][] allTourTypeIds = _tourMonthData.typeIds;
+      final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
 
       // loop: all months + years
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
@@ -482,7 +516,6 @@ public class DataProvider_Tour_Month extends DataProvider {
             /*
              * Check if this type is used
              */
-
             String tourTypeName = UI.EMPTY_STRING;
 
             boolean isDataForTourType = false;
@@ -524,6 +557,8 @@ public class DataProvider_Tour_Month extends DataProvider {
                      _tourMonthData.numToursHigh[tourTypeIndex][monthIndex]
 
                ));
+
+               sb.append(NL);
             }
          }
 
@@ -533,6 +568,10 @@ public class DataProvider_Tour_Month extends DataProvider {
          }
       }
 
-      _tourMonthData.statisticValuesRaw = sb.toString();
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
+
 }

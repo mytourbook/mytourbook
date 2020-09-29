@@ -246,17 +246,18 @@ public abstract class TourbookStatistic {
    protected abstract String getGridPrefPrefix();
 
    /**
+    * @return Returns the statistic values, these values are created on demand because they can use
+    *         some 100 ms, depending on the statistic.
+    */
+   public abstract String getRawStatisticValues();
+
+   /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the
     *         selected tour or <code>null</code> otherwise.
     */
    public Long getSelectedTour() {
       return null;
    }
-
-   /**
-    * @return Returns the statistic context
-    */
-   public abstract StatisticContext getStatisticContext();
 
    public Composite getUIControl() {
       return _container;

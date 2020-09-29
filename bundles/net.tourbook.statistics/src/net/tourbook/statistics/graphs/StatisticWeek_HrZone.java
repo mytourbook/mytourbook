@@ -50,6 +50,9 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private static final String      STATE_HR_ZONE_WEEK_BAR_ORDERING_START = "STATE_HR_ZONE_WEEK_BAR_ORDERING_START"; //$NON-NLS-1$
 
+   private TourData_WeekHrZones     _tourWeekData;
+   private DataProvider_HrZone_Week _tourWeek_DataProvider                = new DataProvider_HrZone_Week();
+
    private TourPerson               _appPerson;
    private TourTypeFilter           _appTourTypeFilter;
    private int                      _statYoungestYear;
@@ -62,8 +65,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    private final MinMaxKeeper_YData _minMaxKeeper                         = new MinMaxKeeper_YData();
    private boolean                  _isSynchScaleEnabled;
 
-   private TourData_WeekHrZones     _tourWeekData;
-
    private int                      _barOrderStart;
 
    private TourPersonHRZone[]       _personHrZones;
@@ -72,8 +73,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    private int[][]                  _resortedHrZoneValues;
 
    private String[]                 _barNames;
-
-   private StatisticContext         _statContext;
 
    public StatisticWeek_HrZone() {
       super();
@@ -225,8 +224,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    }
 
    @Override
-   public StatisticContext getStatisticContext() {
-      return _statContext;
+   public String getRawStatisticValues() {
+      return _tourWeek_DataProvider.getRawStatisticValues();
    }
 
    @Override
@@ -417,8 +416,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    @Override
    public void updateStatistic(final StatisticContext statContext) {
 
-      _statContext = statContext;
-
       /*
        * check if required data are available
        */
@@ -444,15 +441,12 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
       _statYoungestYear = statContext.statFirstYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourWeekData = DataProvider_HrZone_Week.getInstance()
-            .getWeekData(
-                  _appPerson,
-                  _appTourTypeFilter,
-                  _statYoungestYear,
-                  _statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData);
-
-      statContext.outRawStatisticValues = _tourWeekData.statisticValuesRaw;
+      _tourWeekData = _tourWeek_DataProvider.getWeekData(
+            _appPerson,
+            _appTourTypeFilter,
+            _statYoungestYear,
+            _statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData);
 
       setupBars_10_HrZoneOrder(isNewPerson);
       setupBars_20_BarNames(statContext);

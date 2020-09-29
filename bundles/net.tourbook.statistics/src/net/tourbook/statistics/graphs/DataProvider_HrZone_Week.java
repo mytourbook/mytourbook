@@ -30,17 +30,24 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_HrZone_Week extends DataProvider {
 
-   private static DataProvider_HrZone_Week _instance;
+   private TourData_WeekHrZones _weekData;
 
-   private TourData_WeekHrZones            _weekData;
+   String getRawStatisticValues() {
 
-   private DataProvider_HrZone_Week() {}
-
-   public static DataProvider_HrZone_Week getInstance() {
-      if (_instance == null) {
-         _instance = new DataProvider_HrZone_Week();
+      if (_weekData == null) {
+         return null;
       }
-      return _instance;
+
+      if (statistic_RawStatisticValues != null) {
+         return statistic_RawStatisticValues;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+
+      return statistic_RawStatisticValues;
    }
 
    TourData_WeekHrZones getWeekData(final TourPerson person,
@@ -57,8 +64,12 @@ public class DataProvider_HrZone_Week extends DataProvider {
             && lastYear == statistic_LastYear
             && numYears == statistic_NumberOfYears
             && refreshData == false) {
+
          return _weekData;
       }
+
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
       String sql = null;
 
