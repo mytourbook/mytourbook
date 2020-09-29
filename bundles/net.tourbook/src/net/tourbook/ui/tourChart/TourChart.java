@@ -2251,7 +2251,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
-    * create the layer which displays the tour pauses
+    * Creates the layer which displays the tour pauses
     *
     * @param isForcedPauses
     *           When <code>true</code> the pauses must be drawn, otherwise
