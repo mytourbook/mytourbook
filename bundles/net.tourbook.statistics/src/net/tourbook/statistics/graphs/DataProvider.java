@@ -141,7 +141,7 @@ public abstract class DataProvider {
    String               statistic_RawStatisticValues;
 
    /**
-    * All years numbers, e.g. 2016, 2017, ... 2020
+    * All years numbers (Jahreszahl), e.g. 2016, 2017, ... 2020
     */
    int[]                allYear_Numbers;
 
@@ -244,6 +244,31 @@ public abstract class DataProvider {
     */
    void setupYearNumbers() {
 
+      /**
+       * Log num weeks in a year, 2012 has 54 weeks but computed value is 52 !
+       * <code>
+       *
+       * 2012 - number of weeks: 52
+       *
+       *            day  week  week
+       *                   no  year
+       *
+       *       1.1.2012    52  2011
+       *       5.1.2012     1  2012
+       *     25.12.2012    52  2012
+       *     31.12.2012     1  2013
+       *
+       * </code>
+       */
+//      final WeekFields cw = TimeTools.calendarWeek;
+//      final TemporalField weekOfWeekBasedYear = cw.weekOfWeekBasedYear();
+//      final TemporalField weekBasedYear = cw.weekBasedYear();
+//
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+
       allYear_Numbers = new int[statistic_NumberOfYears];
       allYear_NumDays = new int[statistic_NumberOfYears];
       allYear_NumWeeks = new int[statistic_NumberOfYears];
@@ -253,9 +278,60 @@ public abstract class DataProvider {
 
       for (int currentYear = firstYear; currentYear <= statistic_LastYear; currentYear++) {
 
+         final int numOfWeeksInCurrentYear = TimeTools.getNumberOfWeeksWithYear(currentYear);
+
+//         if (currentYear == firstYear) {
+//
+//            // add one week when first day's of the first year are in a week of the previous year, e.g. 1.1.2012
+//
+//            final LocalDate jan_1_1 = LocalDate.of(currentYear, 1, 1);
+//            final int jan_1_1_Week = jan_1_1.get(weekOfWeekBasedYear);
+//
+//            if (jan_1_1_Week > 10) {
+//               numOfWeeksInCurrentYear++;
+//            }
+//         }
+//
+//         if (currentYear == statistic_LastYear) {
+//
+//            // add one week when the last day's of the last year are in the next year, e.g. 31.12.2012
+//
+//            final LocalDate dez_31_12 = LocalDate.of(currentYear, 12, 31);
+//            final int dez_31_12_Week = dez_31_12.get(weekOfWeekBasedYear);
+//
+//            if (dez_31_12_Week < 10) {
+//               numOfWeeksInCurrentYear++;
+//            }
+//         }
+
          allYear_Numbers[yearIndex] = currentYear;
          allYear_NumDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
-         allYear_NumWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
+         allYear_NumWeeks[yearIndex] = numOfWeeksInCurrentYear;
+
+//         final LocalDate jan_1_1 = LocalDate.of(currentYear, 1, 1);
+//         final LocalDate jan_1_5 = LocalDate.of(currentYear, 1, 5);
+//         final LocalDate dez_31_12 = LocalDate.of(currentYear, 12, 31);
+//         final LocalDate dez_25_12 = LocalDate.of(currentYear, 12, 25);
+//
+//         final int jan_1_1_Week = jan_1_1.get(weekOfWeekBasedYear);
+//         final int jan_1_1_Year = jan_1_1.get(weekBasedYear);
+//
+//         final int jan_1_5_Week = jan_1_5.get(weekOfWeekBasedYear);
+//         final int jan_1_5_Year = jan_1_5.get(weekBasedYear);
+//
+//         final int dez_31_12_Week = dez_31_12.get(weekOfWeekBasedYear);
+//         final int dez_31_12_Year = dez_31_12.get(weekBasedYear);
+//
+//         final int dez_25_12_Week = dez_25_12.get(weekOfWeekBasedYear);
+//         final int dez_25_12_Year = dez_25_12.get(weekBasedYear);
+//
+//         System.out.println();
+//         System.out.println("" + currentYear + " - num weeks:" + allYear_NumWeeks[yearIndex]);
+//         System.out.println("     1.1. " + jan_1_1_Week + " / " + jan_1_1_Year);
+//         System.out.println("     5.1. " + jan_1_5_Week + " / " + jan_1_5_Year);
+//         System.out.println("   25.12. " + dez_25_12_Week + " / " + dez_25_12_Year);
+//         System.out.println("   31.12. " + dez_31_12_Week + " / " + dez_31_12_Year);
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
          yearIndex++;
       }

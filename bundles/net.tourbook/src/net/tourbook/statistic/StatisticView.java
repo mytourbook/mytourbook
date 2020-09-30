@@ -252,7 +252,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
                   || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+
+            // first day of week has changed
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
                _activePerson = TourbookPlugin.getActivePerson();
                _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();

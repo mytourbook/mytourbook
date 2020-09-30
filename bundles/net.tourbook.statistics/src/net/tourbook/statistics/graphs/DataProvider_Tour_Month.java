@@ -272,7 +272,6 @@ public class DataProvider_Tour_Month extends DataProvider {
             dbNumTours[colorIndex][monthIndex] = dbValue_NumTours;
 
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_ElapsedTime;
-
          }
 
          /*
