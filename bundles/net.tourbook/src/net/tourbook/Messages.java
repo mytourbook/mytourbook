@@ -2495,7 +2495,6 @@ public class Messages extends NLS {
 
    public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
-   public static String Tour_Book_Combo_year_tooltip;
    public static String Tour_Book_Label_chart_title;
    public static String Tour_Book_Label_Total;
    public static String Tour_Book_Monitor_CollateSubtask;
@@ -2713,6 +2712,7 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Type_Surfing;
 
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
+   public static String Tour_Statistic_Combo_Year_Tooltip;
 
    public static String Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip;
    public static String Tour_StatisticValues_Action_CSVFormat_Tooltip;
