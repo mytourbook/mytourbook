@@ -224,8 +224,8 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    }
 
    @Override
-   public String getRawStatisticValues() {
-      return _tourWeek_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourWeek_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override

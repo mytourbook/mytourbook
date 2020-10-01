@@ -658,8 +658,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    }
 
    @Override
-   public String getRawStatisticValues() {
-      return _tourDay_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourDay_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override

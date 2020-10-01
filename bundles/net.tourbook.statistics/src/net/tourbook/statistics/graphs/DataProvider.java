@@ -31,11 +31,18 @@ public abstract class DataProvider {
    // labels and formatting for statistic values
 
    /*
+    * Data
+    */
+   static final String HEAD1_DATA_NUMBER                    = "     #,";                       //$NON-NLS-1$
+   static final String HEAD2_DATA_NUMBER                    = "      ,";                  //$NON-NLS-1$
+   static final String VALUE_DATA_NUMBER                    = "%6d,";                     //$NON-NLS-1$
+
+   /*
     * Date
     */
-   static final String HEAD1_DATE_YEAR                      = "Year,";                    //$NON-NLS-1$
+   static final String HEAD1_DATE_YEAR                      = " Year,";                    //$NON-NLS-1$
    static final String HEAD2_DATE_YEAR                      = "    ,";                    //$NON-NLS-1$
-   static final String VALUE_DATE_YEAR                      = "%4d,";                     //$NON-NLS-1$
+   static final String VALUE_DATE_YEAR                      = " %4d,";                     //$NON-NLS-1$
 
    static final String HEAD1_DATE_MONTH                     = " Month,";                  //$NON-NLS-1$
    static final String HEAD2_DATE_MONTH                     = "      ,";                  //$NON-NLS-1$
@@ -117,6 +124,10 @@ public abstract class DataProvider {
    static final String HEAD2_NUMBER_OF_TOURS                = "    (#),";                 //$NON-NLS-1$
    static final String VALUE_NUMBER_OF_TOURS                = " %6.0f,";                  //$NON-NLS-1$
 
+   static final String HEAD1_TOUR_TITLE                     = " Title,";                  //$NON-NLS-1$
+   static final String HEAD2_TOUR_TITLE                     = ",";                        //$NON-NLS-1$
+   static final String VALUE_TOUR_TITLE                     = " %s,";                     //$NON-NLS-1$  // do not truncate, it is displaye at the end
+
    static final String HEAD1_TOUR_TYPE                      = " TourType            ,";   //$NON-NLS-1$
    static final String HEAD2_TOUR_TYPE                      = "                     ,";   //$NON-NLS-1$
    static final String VALUE_TOUR_TYPE                      = " %-20.20s,";               //$NON-NLS-1$  // truncate 20+ characters to force column layout
@@ -139,6 +150,11 @@ public abstract class DataProvider {
     *
     */
    String               statistic_RawStatisticValues;
+
+   /**
+    *
+    */
+   boolean              statistic_isShowSequenceNumbers;
 
    /**
     * All years numbers (Jahreszahl), e.g. 2016, 2017, ... 2020

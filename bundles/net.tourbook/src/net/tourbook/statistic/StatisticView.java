@@ -663,7 +663,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          return;
       }
 
-      final String statValues = _activeStatistic.getRawStatisticValues();
+      final String statValues = _activeStatistic.getRawStatisticValues(false);
 
       // ensure data are available
       if (statValues == null) {

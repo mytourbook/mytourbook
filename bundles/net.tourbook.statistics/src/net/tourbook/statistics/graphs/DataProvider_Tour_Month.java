@@ -405,13 +405,13 @@ public class DataProvider_Tour_Month extends DataProvider {
       return _tourMonthData;
    }
 
-   String getRawStatisticValues() {
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_tourMonthData == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
@@ -569,6 +569,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }

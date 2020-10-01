@@ -216,8 +216,8 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
    }
 
    @Override
-   public String getRawStatisticValues() {
-      return _tourMonth_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourMonth_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override

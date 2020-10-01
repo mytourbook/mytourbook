@@ -46,13 +46,13 @@ public class DataProvider_Tour_Time extends DataProvider {
 
    private TourData_Time _tourDataTime;
 
-   public String getRawStatisticValues() {
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_tourDataTime == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
@@ -165,6 +165,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }
