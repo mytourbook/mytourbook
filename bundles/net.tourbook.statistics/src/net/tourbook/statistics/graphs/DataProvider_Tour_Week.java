@@ -345,13 +345,10 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + "   SUM(1)" + NL //                                          11 //$NON-NLS-1$
 
-//               + "   tourStartTime" + NL //                                  1  //$NON-NLS-1$
-
                + fromTourData
 
                + "GROUP BY StartWeekYear, StartWeek, tourType_typeId" + NL //    //$NON-NLS-1$
                + "ORDER BY StartWeekYear, StartWeek" + NL //                     //$NON-NLS-1$
-//               + "ORDER BY tourStartTime" + NL //                                //$NON-NLS-1$
          ;
 
          final long[][] allDbTypeIds = new long[numTourTypes][numAllWeeks];
