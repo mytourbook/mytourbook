@@ -1358,6 +1358,7 @@ public class TourMapPainter extends MapPainter {
          final ArrayList<List<Long>> allTourPauses = tourData.multiTourPauses;
          int currentTourPauseIndex = 0;
          int pauseCounter = 0;
+         final int[] timeSerie = tourData.timeSerie;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
             tourStartTime = multipleTourStartTime[tourIndex];
@@ -1373,12 +1374,12 @@ public class TourMapPainter extends MapPainter {
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
-                  previousTourElapsedTime = tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+                  previousTourElapsedTime = timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
                }
 
-               for (; tourSerieIndex < tourData.timeSerie.length; ++tourSerieIndex) {
+               for (; tourSerieIndex < timeSerie.length; ++tourSerieIndex) {
 
-                  final long currentTime = tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+                  final long currentTime = timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
 
                   if (currentTime >= pausedTime_Start) {
                      break;
@@ -1421,16 +1422,17 @@ public class TourMapPainter extends MapPainter {
          int pauseCounter = 0;
          int serieIndex = 0;
 
+         final int[] timeSerie = tourData.timeSerie;
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
             final long startTime = pausedTime_Start[index];
             final long endTime = pausedTime_End[index];
 
-            for (int timeSerieIndex = serieIndex; timeSerieIndex < tourData.timeSerie.length; ++timeSerieIndex) {
+            for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
 
-               final long currentTime = tourData.timeSerie[timeSerieIndex] * 1000 + tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[timeSerieIndex] * 1000 + tourData.getTourStartTimeMS();
 
-               if (currentTime == startTime || currentTime > startTime) {
+               if (currentTime >= startTime) {
                   serieIndex = timeSerieIndex;
                   break;
                }

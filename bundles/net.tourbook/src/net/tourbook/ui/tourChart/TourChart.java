@@ -2393,7 +2393,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                final long currentTime = timeSerie[serieIndex] * 1000 + _tourData.getTourStartTimeMS();
 
-               if (currentTime == pausedTime_Start[index] || currentTime > pausedTime_Start[index]) {
+               if (currentTime >= pausedTime_Start[index]) {
                   break;
                }
             }
