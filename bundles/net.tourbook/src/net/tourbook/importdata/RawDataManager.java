@@ -157,7 +157,6 @@ public class RawDataManager {
    private static HashSet<IPath>           _allPreviousReimportFolders         = new HashSet<>();
    private static IPath                    _previousReimportFolder;
 
-
    /**
     * contains the device data imported from the device/file
     */
@@ -854,13 +853,18 @@ public class RawDataManager {
 
                final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-               MessageDialog.openInformation(
+               final boolean okPressed = MessageDialog.openConfirm(
                      activeShell,
                      NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
                      NLS.bind(
                            Messages.Import_Data_Dialog_GetReimportedFilePath_Message, //
                            tourDateTimeShort,
                            tourDateTimeShort));
+
+               //The user doesn't want to look for a new file path for the current tour.
+               if (!okPressed) {
+                  return;
+               }
 
             } else {
 
