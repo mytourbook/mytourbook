@@ -355,8 +355,8 @@ public abstract class StatisticYear extends TourbookStatistic {
    }
 
    @Override
-   public String getRawStatisticValues() {
-      return _tourYear_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourYear_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override

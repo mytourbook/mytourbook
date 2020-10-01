@@ -403,9 +403,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    }
 
    @Override
-   public String getRawStatisticValues() {
-
-      return _tourTime_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourTime_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override

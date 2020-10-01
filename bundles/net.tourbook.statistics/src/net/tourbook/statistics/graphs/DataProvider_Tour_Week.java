@@ -39,13 +39,13 @@ public class DataProvider_Tour_Week extends DataProvider {
 
    private TourData_Week _tourWeekData;
 
-   String getRawStatisticValues() {
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_tourWeekData == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
@@ -61,7 +61,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       final String headerLine1 = UI.EMPTY_STRING
 
             + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
+            + HEAD1_DATE_WEEK
 
             + HEAD1_TOUR_TYPE
 
@@ -82,7 +82,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       final String headerLine2 = UI.EMPTY_STRING
 
             + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
+            + HEAD2_DATE_WEEK
 
             + HEAD2_TOUR_TYPE
 
@@ -103,7 +103,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       final String valueFormatting = UI.EMPTY_STRING
 
             + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
+            + VALUE_DATE_WEEK
 
             + VALUE_TOUR_TYPE
 
@@ -124,26 +124,44 @@ public class DataProvider_Tour_Week extends DataProvider {
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-      final float[][] numTours = _tourWeekData.numToursHigh;
-      final int numMonths = numTours[0].length;
+      final float[][] allNumTours = _tourWeekData.numToursHigh;
+      final int numAllWeeks = allNumTours[0].length;
       final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
       int prevYear = firstYear;
 
       final long[][] allTourTypeIds = _tourWeekData.typeIds;
       final long[] allUsedTourTypeIds = _tourWeekData.usedTourTypeIds;
 
-      // loop: all months + years
-      for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
+      int yearIndex = 0;
+      int prevSumWeeks = 0;
+      int sumYearWeeks = allYear_NumWeeks[yearIndex];
 
-         final int yearIndex = monthIndex / 12;
-         final int year = firstYear + yearIndex;
+      // loop: all weeks in all years
+      for (int weekIndex = 0; weekIndex < numAllWeeks; weekIndex++) {
 
-         final int month = (monthIndex % 12) + 1;
+         if (weekIndex < sumYearWeeks) {
+
+            // is still in the same year
+
+         } else {
+
+            // advance to the next year
+
+            yearIndex++;
+
+            final int yearWeeks = allYear_NumWeeks[yearIndex];
+
+            prevSumWeeks = sumYearWeeks;
+            sumYearWeeks += yearWeeks;
+         }
+
+         final int year = allYear_Numbers[yearIndex];
+         final int week = weekIndex - prevSumWeeks;
 
          // loop: all tour types
-         for (int tourTypeIndex = 0; tourTypeIndex < numTours.length; tourTypeIndex++) {
+         for (int tourTypeIndex = 0; tourTypeIndex < allNumTours.length; tourTypeIndex++) {
 
-            final long tourTypeId = allTourTypeIds[tourTypeIndex][monthIndex];
+            final long tourTypeId = allTourTypeIds[tourTypeIndex][weekIndex];
 
             /*
              * Check if this type is used
@@ -165,44 +183,47 @@ public class DataProvider_Tour_Week extends DataProvider {
                }
             }
 
-            if (isDataForTourType) {
+            final float numTours = _tourWeekData.numToursHigh[tourTypeIndex][weekIndex];
+
+            if (isDataForTourType && numTours > 0) {
+
+               // group values
+               if (year != prevYear) {
+
+                  prevYear = year;
+
+                  sb.append(NL);
+               }
 
                sb.append(String.format(valueFormatting,
 
                      year,
-                     month,
+                     week + 1,
 
                      tourTypeName,
 
-                     _tourWeekData.elapsedTime[tourTypeIndex][monthIndex],
-                     _tourWeekData.recordedTime[tourTypeIndex][monthIndex],
-                     _tourWeekData.pausedTime[tourTypeIndex][monthIndex],
+                     _tourWeekData.elapsedTime[tourTypeIndex][weekIndex],
+                     _tourWeekData.recordedTime[tourTypeIndex][weekIndex],
+                     _tourWeekData.pausedTime[tourTypeIndex][weekIndex],
 
-                     _tourWeekData.movingTime[tourTypeIndex][monthIndex],
-                     _tourWeekData.breakTime[tourTypeIndex][monthIndex],
+                     _tourWeekData.movingTime[tourTypeIndex][weekIndex],
+                     _tourWeekData.breakTime[tourTypeIndex][weekIndex],
 
-                     _tourWeekData.altitudeHigh[tourTypeIndex][monthIndex],
-                     _tourWeekData.distanceHigh[tourTypeIndex][monthIndex],
+                     _tourWeekData.altitudeHigh[tourTypeIndex][weekIndex],
+                     _tourWeekData.distanceHigh[tourTypeIndex][weekIndex],
 
-                     _tourWeekData.numToursHigh[tourTypeIndex][monthIndex]
+                     numTours
 
                ));
 
                sb.append(NL);
             }
          }
-
-         // group values
-         if (year != prevYear) {
-
-            prevYear = year;
-
-            sb.append(NL);
-         }
       }
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }
@@ -245,9 +266,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          final ArrayList<TourType> allActiveTourTypesList = TourDatabase.getActiveTourTypes();
          final TourType[] allActiveTourTypes = allActiveTourTypesList.toArray(new TourType[allActiveTourTypesList.size()]);
 
-         int numWeeks = 0;
+         int numAllWeeks = 0;
          for (final int weeks : allYear_NumWeeks) {
-            numWeeks += weeks;
+            numAllWeeks += weeks;
          }
 
          int colorOffset = 0;
@@ -342,27 +363,27 @@ public class DataProvider_Tour_Week extends DataProvider {
                + "ORDER BY StartWeekYear, StartWeek" + NL //                     //$NON-NLS-1$
          ;
 
-         final long[][] allDbTypeIds = new long[numTourTypes][numWeeks];
-         final long[] usedTourTypeIds = new long[numTourTypes];
+         final long[][] allDbTypeIds = new long[numTourTypes][numAllWeeks];
+         final long[] allUsedTourTypeIds = new long[numTourTypes];
 
          /*
           * Initialize tour types, when there are 0 tours for some years/months, a tour
           * type 0 could be a valid tour type which is the default values for native arrays
           * -> wrong tour type
           */
-         Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
+         Arrays.fill(allUsedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
-         final int[][] allDbDurationTime = new int[numTourTypes][numWeeks];
-         final int[][] allDbElapsedTime = new int[numTourTypes][numWeeks];
-         final int[][] allDbRecordedTime = new int[numTourTypes][numWeeks];
-         final int[][] allDbPausedTime = new int[numTourTypes][numWeeks];
-         final int[][] allDbMovingTime = new int[numTourTypes][numWeeks];
-         final int[][] allDbBreakTime = new int[numTourTypes][numWeeks];
+         final int[][] allDbDurationTime = new int[numTourTypes][numAllWeeks];
+         final int[][] allDbElapsedTime = new int[numTourTypes][numAllWeeks];
+         final int[][] allDbRecordedTime = new int[numTourTypes][numAllWeeks];
+         final int[][] allDbPausedTime = new int[numTourTypes][numAllWeeks];
+         final int[][] allDbMovingTime = new int[numTourTypes][numAllWeeks];
+         final int[][] allDbBreakTime = new int[numTourTypes][numAllWeeks];
 
-         final float[][] allDbDistance = new float[numTourTypes][numWeeks];
-         final float[][] allDbElevation = new float[numTourTypes][numWeeks];
+         final float[][] allDbDistance = new float[numTourTypes][numAllWeeks];
+         final float[][] allDbElevation = new float[numTourTypes][numAllWeeks];
 
-         final float[][] allDbNumTours = new float[numTourTypes][numWeeks];
+         final float[][] allDbNumTours = new float[numTourTypes][numAllWeeks];
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -374,11 +395,11 @@ public class DataProvider_Tour_Week extends DataProvider {
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final int dbValue_Year = result.getInt(1);
-            final int dbValue_Week = result.getInt(2);
+            final int dbValue_CW_Year = result.getInt(1);
+            final int dbValue_CW_Week = result.getInt(2);
 
             // get number of weeks for the current year in the db
-            final int dbYearIndex = numberOfYears - (lastYear - dbValue_Year + 1);
+            final int dbYearIndex = numberOfYears - (lastYear - dbValue_CW_Year + 1);
             int allWeeks = 0;
             for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                if (yearIndex > 0) {
@@ -386,7 +407,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                }
             }
 
-            final int weekIndex = allWeeks + dbValue_Week - 1;
+            final int weekIndex = allWeeks + dbValue_CW_Week - 1;
 
             if (weekIndex < 0) {
 
@@ -398,7 +419,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                continue;
             }
 
-            if (weekIndex >= numWeeks) {
+            if (weekIndex >= numAllWeeks) {
 
                /**
                 * This problem occurred but is not yet fully fixed, it needs more investigation.
@@ -448,7 +469,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             final long dbTypeId = dbValue_TypeIdObject == null ? TourDatabase.ENTITY_IS_NOT_SAVED : dbValue_TypeIdObject;
 
             allDbTypeIds[colorIndex][weekIndex] = dbTypeId;
-            usedTourTypeIds[colorIndex] = dbTypeId;
+            allUsedTourTypeIds[colorIndex] = dbTypeId;
 
             allDbElapsedTime[colorIndex][weekIndex] = dbValue_ElapsedTime;
             allDbRecordedTime[colorIndex][weekIndex] = dbValue_RecordedTime;
@@ -468,7 +489,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.yearDays = allYear_NumDays;
 
          _tourWeekData.typeIds = allDbTypeIds;
-         _tourWeekData.usedTourTypeIds = usedTourTypeIds;
+         _tourWeekData.usedTourTypeIds = allUsedTourTypeIds;
 
          _tourWeekData.elapsedTime = allDbElapsedTime;
          _tourWeekData.recordedTime = allDbRecordedTime;
@@ -476,16 +497,16 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.movingTime = allDbMovingTime;
          _tourWeekData.breakTime = allDbBreakTime;
 
-         _tourWeekData.setDurationTimeLow(new int[numTourTypes][numWeeks]);
+         _tourWeekData.setDurationTimeLow(new int[numTourTypes][numAllWeeks]);
          _tourWeekData.setDurationTimeHigh(allDbDurationTime);
 
-         _tourWeekData.distanceLow = new float[numTourTypes][numWeeks];
+         _tourWeekData.distanceLow = new float[numTourTypes][numAllWeeks];
          _tourWeekData.distanceHigh = allDbDistance;
 
-         _tourWeekData.altitudeLow = new float[numTourTypes][numWeeks];
+         _tourWeekData.altitudeLow = new float[numTourTypes][numAllWeeks];
          _tourWeekData.altitudeHigh = allDbElevation;
 
-         _tourWeekData.numToursLow = new float[numTourTypes][numWeeks];
+         _tourWeekData.numToursLow = new float[numTourTypes][numAllWeeks];
          _tourWeekData.numToursHigh = allDbNumTours;
 
       } catch (final SQLException e) {

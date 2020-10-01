@@ -252,7 +252,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
                   || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+
+            // first day of week has changed
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
                _activePerson = TourbookPlugin.getActivePerson();
                _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
@@ -450,7 +454,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
              */
 
             _comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setToolTipText(Messages.Tour_Statistic_Combo_Year_Tooltip);
             _comboYear.setVisibleItemCount(50);
 
             GridDataFactory
@@ -659,7 +663,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          return;
       }
 
-      final String statValues = _activeStatistic.getRawStatisticValues();
+      final String statValues = _activeStatistic.getRawStatisticValues(false);
 
       // ensure data are available
       if (statValues == null) {

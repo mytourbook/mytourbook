@@ -193,13 +193,13 @@ public class DataProvider_HrZone_Month extends DataProvider {
       return _monthData;
    }
 
-   String getRawStatisticValues() {
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_monthData == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
@@ -307,6 +307,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }

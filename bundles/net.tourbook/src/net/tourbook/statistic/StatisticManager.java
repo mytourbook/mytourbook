@@ -242,15 +242,16 @@ public class StatisticManager {
    /**
     * Get statistic values from the statistic view.
     *
+    * @param isShowSequenceNumbers
     * @return
     */
-   static String getRawStatisticValues() {
+   static String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       final StatisticView statisticView = getStatisticView();
 
       if (statisticView != null && statisticView.getActiveStatistic() != null) {
 
-         return statisticView.getActiveStatistic().getRawStatisticValues();
+         return statisticView.getActiveStatistic().getRawStatisticValues(isShowSequenceNumbers);
       }
 
       return null;

@@ -655,19 +655,19 @@ public class DataProvider_Tour_Day extends DataProvider {
       return _tourDayData;
    }
 
-   String getRawStatisticValues() {
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_tourDayData == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
-      final StringBuilder sb = new StringBuilder();
-
       final String headerLine1 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
 
             + HEAD1_DATE_YEAR
             + HEAD1_DATE_MONTH
@@ -693,9 +693,13 @@ public class DataProvider_Tour_Day extends DataProvider {
             + HEAD1_TRAINING_ANAEROB
             + HEAD1_TRAINING_PERFORMANCE
 
+            + HEAD1_TOUR_TITLE
+
       ;
 
       final String headerLine2 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
 
             + HEAD2_DATE_YEAR
             + HEAD2_DATE_MONTH
@@ -721,9 +725,11 @@ public class DataProvider_Tour_Day extends DataProvider {
             + HEAD2_TRAINING_ANAEROB
             + HEAD2_TRAINING_PERFORMANCE
 
-      ;
+            + HEAD2_TOUR_TITLE;
 
       final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
@@ -749,12 +755,13 @@ public class DataProvider_Tour_Day extends DataProvider {
             + VALUE_TRAINING_ANAEROB
             + VALUE_TRAINING_PERFORMANCE
 
-      ;
+            + VALUE_TOUR_TITLE;
 
+      final StringBuilder sb = new StringBuilder();
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-
+      int sequenceNumber = 0;
       final int numDataItems = _tourDayData.allDays.length;
 
       // set initial value
@@ -774,7 +781,19 @@ public class DataProvider_Tour_Day extends DataProvider {
          final int movingTime = _tourDayData.allComputedTime_Moving[dataIndex];
          final int breakTime = elapsedTime - movingTime;
 
+         String tourTitle = _tourDayData.allTourTitles.get(dataIndex);
+         if (tourTitle == null) {
+            tourTitle = UI.EMPTY_STRING;
+         }
+
+         Object sequenceNumberValue = UI.EMPTY_STRING;
+         if (isShowSequenceNumbers) {
+            sequenceNumberValue = ++sequenceNumber;
+         }
+
          sb.append(String.format(valueFormatting,
+
+               sequenceNumberValue,
 
                _tourDayData.allYears[dataIndex],
                month,
@@ -797,7 +816,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                _tourDayData.allTraining_Effect_Aerob[dataIndex],
                _tourDayData.allTraining_Effect_Anaerob[dataIndex],
-               _tourDayData.allTraining_Performance[dataIndex]
+               _tourDayData.allTraining_Performance[dataIndex],
+
+               tourTitle
 
          ));
 
@@ -806,6 +827,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }

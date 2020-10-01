@@ -32,13 +32,13 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
    private TourData_WeekHrZones _weekData;
 
-   String getRawStatisticValues() {
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
       if (_weekData == null) {
          return null;
       }
 
-      if (statistic_RawStatisticValues != null) {
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
          return statistic_RawStatisticValues;
       }
 
@@ -46,6 +46,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
 
       // cache values
       statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
 
       return statistic_RawStatisticValues;
    }

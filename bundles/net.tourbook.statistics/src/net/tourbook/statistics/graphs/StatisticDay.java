@@ -580,8 +580,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    }
 
    @Override
-   public String getRawStatisticValues() {
-      return _tourDay_DataProvider.getRawStatisticValues();
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourDay_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override
