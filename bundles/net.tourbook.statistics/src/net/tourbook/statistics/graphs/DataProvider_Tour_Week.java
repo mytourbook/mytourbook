@@ -19,10 +19,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.tourbook.Messages;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -60,8 +64,11 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD1_DATE_YEAR
             + HEAD1_DATE_WEEK
+            + HEAD1_DATE_WEEK_START
 
             + HEAD1_TOUR_TYPE
 
@@ -81,8 +88,11 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       final String headerLine2 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD2_DATE_YEAR
             + HEAD2_DATE_WEEK
+            + HEAD2_DATE_WEEK_START
 
             + HEAD2_TOUR_TYPE
 
@@ -102,8 +112,11 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+
             + VALUE_DATE_YEAR
             + VALUE_DATE_WEEK
+            + VALUE_DATE_WEEK_START
 
             + VALUE_TOUR_TYPE
 
@@ -135,6 +148,33 @@ public class DataProvider_Tour_Week extends DataProvider {
       int yearIndex = 0;
       int prevSumWeeks = 0;
       int sumYearWeeks = allYear_NumWeeks[yearIndex];
+
+      int sequenceNumber = 0;
+
+      /*
+       * Week start day
+       */
+      final WeekFields calendarWeek = TimeTools.calendarWeek;
+      final TemporalField weekOfWeekBasedYear = calendarWeek.weekOfWeekBasedYear();
+      final TemporalField dayOfWeek = calendarWeek.dayOfWeek();
+
+      // first day in the statistic calendar
+      final LocalDate jan_1_1 = LocalDate.of(firstYear, 1, 1);
+
+      final int jan_1_1_DayOfWeek = jan_1_1.get(dayOfWeek) - 1;
+
+      final int jan_1_1_WeekOfYear = jan_1_1.get(weekOfWeekBasedYear);
+      LocalDate firstStatisticDay;
+
+      if (jan_1_1_WeekOfYear > 33) {
+
+         // the week from 1.1.January is from the last year -> this is not displayed
+         firstStatisticDay = jan_1_1.plusDays(7 - jan_1_1_DayOfWeek);
+
+      } else {
+
+         firstStatisticDay = jan_1_1.minusDays(jan_1_1_DayOfWeek);
+      }
 
       // loop: all weeks in all years
       for (int weekIndex = 0; weekIndex < numAllWeeks; weekIndex++) {
@@ -195,10 +235,21 @@ public class DataProvider_Tour_Week extends DataProvider {
                   sb.append(NL);
                }
 
+               Object sequenceNumberValue = UI.EMPTY_STRING;
+               if (isShowSequenceNumbers) {
+                  sequenceNumberValue = ++sequenceNumber;
+               }
+
+               final LocalDate valueStatisticDay = firstStatisticDay.plusWeeks(weekIndex);
+               final String weekStartDay = TimeTools.Formatter_Date_S.format(valueStatisticDay);
+
                sb.append(String.format(valueFormatting,
+
+                     sequenceNumberValue,
 
                      year,
                      week + 1,
+                     weekStartDay,
 
                      tourTypeName,
 

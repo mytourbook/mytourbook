@@ -313,6 +313,7 @@ public class StatisticValuesView extends ViewPart {
 
          _txtStatValues = new StyledText(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtStatValues.setFont(net.tourbook.ui.UI.getLogFont());
+         _txtStatValues.setTabs(1);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtStatValues);
       }
    }
@@ -415,9 +416,17 @@ public class StatisticValuesView extends ViewPart {
 
    private void updateUI() {
 
+      final boolean isCSVFormat = _action_ShowCSVFormat.isChecked();
       final boolean isShowSequenceNumbers = _action_ShowSequenceNumbers.isChecked();
 
-      final String rawStatValues = StatisticManager.getRawStatisticValues(isShowSequenceNumbers);
+      boolean isCreateSequenceNumbers = isShowSequenceNumbers;
+      if (isCSVFormat) {
+
+         // CSV do not need sequence numbers
+         isCreateSequenceNumbers = false;
+      }
+
+      final String rawStatValues = StatisticManager.getRawStatisticValues(isCreateSequenceNumbers);
 
       if (rawStatValues == null) {
 
@@ -428,7 +437,6 @@ public class StatisticValuesView extends ViewPart {
       _pageBook.showPage(_pageContent);
 
       final boolean isShowRawData = _isShowRawData;
-      final boolean isCSVFormat = _action_ShowCSVFormat.isChecked();
       final boolean isRemoveZeros = _action_ShowZeroValues.isChecked() == false;
       final boolean isGroupValues = _action_GroupValues.isChecked();
 

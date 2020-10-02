@@ -426,6 +426,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD1_DATE_YEAR
             + HEAD1_DATE_MONTH
 
@@ -447,6 +449,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine2 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD2_DATE_YEAR
             + HEAD2_DATE_MONTH
 
@@ -467,6 +471,8 @@ public class DataProvider_Tour_Month extends DataProvider {
       ;
 
       final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
@@ -496,6 +502,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final long[][] allTourTypeIds = _tourMonthData.typeIds;
       final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
+
+      int sequenceNumber = 0;
 
       // loop: all months + years
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
@@ -536,7 +544,14 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                isDataInTourType = true;
 
+               Object sequenceNumberValue = UI.EMPTY_STRING;
+               if (isShowSequenceNumbers) {
+                  sequenceNumberValue = ++sequenceNumber;
+               }
+
                sb.append(String.format(valueFormatting,
+
+                     sequenceNumberValue,
 
                      year,
                      month,
