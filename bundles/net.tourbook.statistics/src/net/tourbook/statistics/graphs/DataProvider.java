@@ -33,9 +33,9 @@ public abstract class DataProvider {
    /*
     * Data
     */
-   static final String HEAD1_DATA_NUMBER                    = "     #\t ";                //$NON-NLS-1$
-   static final String HEAD2_DATA_NUMBER                    = "      \t ";                //$NON-NLS-1$
-   static final String VALUE_DATA_NUMBER                    = "%6d\t ";                   //$NON-NLS-1$
+   static final String HEAD1_DATA_NUMBER                    = "     #  \t ";                //$NON-NLS-1$
+   static final String HEAD2_DATA_NUMBER                    = "        \t ";                //$NON-NLS-1$
+   static final String VALUE_DATA_NUMBER                    = "%6d\t   ";                   //$NON-NLS-1$
 
    /*
     * Date
@@ -67,33 +67,33 @@ public abstract class DataProvider {
    /*
     * Time
     */
-   static final String HEAD1_DEVICE_TIME_ELAPSED            = " Elapsed\t";               //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_ELAPSED            = "     (s)\t";               //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_ELAPSED            = "  %6d\t";                  //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_ELAPSED            = "    Elapsed\t";               //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_ELAPSED            = "        (s)\t";               //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_ELAPSED            = " %10d\t";                  //$NON-NLS-1$
 
-   static final String HEAD1_DEVICE_TIME_RECORDED           = " Recorded\t";              //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_RECORDED           = "      (s)\t";              //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_RECORDED           = "   %6d\t";                 //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_RECORDED           = "   Recorded\t";              //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_RECORDED           = "        (s)\t";              //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_RECORDED           = " %10d\t";                 //$NON-NLS-1$
 
-   static final String HEAD1_DEVICE_TIME_PAUSED             = " Paused\t";                //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_PAUSED             = "    (s)\t";                //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_PAUSED             = " %6d\t";                   //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_PAUSED             = "     Paused\t";                //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_PAUSED             = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_PAUSED             = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_COMPUTED_TIME_MOVING           = " Moving\t";                //$NON-NLS-1$
-   static final String HEAD2_COMPUTED_TIME_MOVING           = "    (s)\t";                //$NON-NLS-1$
-   static final String VALUE_COMPUTED_TIME_MOVING           = " %6d\t";                   //$NON-NLS-1$
+   static final String HEAD1_COMPUTED_TIME_MOVING           = "     Moving\t";                //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_MOVING           = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_MOVING           = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_COMPUTED_TIME_BREAK            = "  Break\t";                //$NON-NLS-1$
-   static final String HEAD2_COMPUTED_TIME_BREAK            = "    (s)\t";                //$NON-NLS-1$
-   static final String VALUE_COMPUTED_TIME_BREAK            = " %6d\t";                   //$NON-NLS-1$
+   static final String HEAD1_COMPUTED_TIME_BREAK            = "      Break\t";                //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_BREAK            = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_BREAK            = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_ELEVATION                      = " Elevation\t";             //$NON-NLS-1$
-   static final String HEAD2_ELEVATION                      = "       (m)\t";             //$NON-NLS-1$
-   static final String VALUE_ELEVATION                      = "    %6.0f\t";              //$NON-NLS-1$
+   static final String HEAD1_ELEVATION                      = "  Elevation\t";             //$NON-NLS-1$
+   static final String HEAD2_ELEVATION                      = "        (m)\t";             //$NON-NLS-1$
+   static final String VALUE_ELEVATION                      = " %10.0f\t";              //$NON-NLS-1$
 
-   static final String HEAD1_DISTANCE                       = " Distance\t";              //$NON-NLS-1$
-   static final String HEAD2_DISTANCE                       = "      (m)\t";              //$NON-NLS-1$
-   static final String VALUE_DISTANCE                       = " %8.0f\t";                 //$NON-NLS-1$
+   static final String HEAD1_DISTANCE                       = "   Distance\t";              //$NON-NLS-1$
+   static final String HEAD2_DISTANCE                       = "        (m)\t";              //$NON-NLS-1$
+   static final String VALUE_DISTANCE                       = " %10.0f\t";                 //$NON-NLS-1$
 
    /*
     * Speed
@@ -105,6 +105,30 @@ public abstract class DataProvider {
    static final String HEAD1_PACE                           = "     Pace\t";              //$NON-NLS-1$
    static final String HEAD2_PACE                           = " (min/km)\t";              //$NON-NLS-1$
    static final String VALUE_PACE                           = "   %6.2f\t";               //$NON-NLS-1$
+
+   /*
+    * HR Zones
+    */
+   static final String HEAD1_HR_ZONE_1                      = "     Zone 1\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_2                      = "     Zone 2\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_3                      = "     Zone 3\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_4                      = "     Zone 4\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_5                      = "     Zone 5\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_6                      = "     Zone 6\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_7                      = "     Zone 7\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_8                      = "     Zone 8\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_9                      = "     Zone 9\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_10                     = "    Zone 10\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_SUMMARY                     = "       Summary\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_SUMMARY_SECONDS             = "           (s)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_SUMMARY_SECONDS             = " %13d\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_SUMMARY_HHMMSS              = "    (hh:mm:ss)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_SUMMARY_HHMMSS              = " %13s\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_ZONE                        = "        (s)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_ZONE                        = " %10d\t";              //$NON-NLS-1$
 
    /*
     * Training

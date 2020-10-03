@@ -45,17 +45,20 @@ public class StatisticManager {
    private static final Pattern PATTERN_EMPTY_LINES                  = Pattern.compile("^(?:[\t ]*(?:\r?\n|\r))+", Pattern.MULTILINE);    //$NON-NLS-1$
    private static final Pattern PATTERN_FIELD_DELIMITER              = Pattern.compile("\t");                                             //$NON-NLS-1$
    private static final Pattern PATTERN_FIELD_DELIMITER_WITH_SPACE   = Pattern.compile("\t ");                                            //$NON-NLS-1$
-   private static final Pattern PATTERN_LAST_FIELD_DELIMITER         = Pattern.compile("\t$",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_LAST_FIELD_DELIMITER         = Pattern.compile("\t$",         Pattern.MULTILINE);                    //$NON-NLS-1$
    private static final Pattern PATTERN_SPACES                       = Pattern.compile("  *");                                            //$NON-NLS-1$
-   private static final Pattern PATTERN_SPLIT_LINES                  = Pattern.compile("\\R",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern PATTERN_SPLIT_LINES                  = Pattern.compile("\\R",         Pattern.MULTILINE);                    //$NON-NLS-1$
    private static final Pattern PATTERN_SPACE_WITH_FIELD_DELIMITER   = Pattern.compile(" \t");                                            //$NON-NLS-1$
 
    private static final Pattern NUMBER_PATTERN_0                     = Pattern.compile(" 0 ");                                            //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_END                 = Pattern.compile(" 0$",      Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_END                 = Pattern.compile(" 0$",         Pattern.MULTILINE);                    //$NON-NLS-1$
    private static final Pattern NUMBER_PATTERN_0_0                   = Pattern.compile(" 0.0 ");                                          //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_0_END               = Pattern.compile(" 0.0$",    Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_0_END               = Pattern.compile(" 0.0$",       Pattern.MULTILINE);                    //$NON-NLS-1$
    private static final Pattern NUMBER_PATTERN_0_00                  = Pattern.compile(" 0.00 ");                                         //$NON-NLS-1$
-   private static final Pattern NUMBER_PATTERN_0_00_END              = Pattern.compile(" 0.00$",   Pattern.MULTILINE);                    //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_END              = Pattern.compile(" 0.00$",      Pattern.MULTILINE);                    //$NON-NLS-1$
+
+   private static final Pattern NUMBER_PATTERN_0_00_00               = Pattern.compile(" 0:00:00 ");                                            //$NON-NLS-1$
+   private static final Pattern NUMBER_PATTERN_0_00_00_END           = Pattern.compile(" 0:00:00$",   Pattern.MULTILINE);                    //$NON-NLS-1$
 
 
 //SET_FORMATTING_ON
@@ -226,12 +229,16 @@ public class StatisticManager {
 
 // SET_FORMATTING_OFF
 
-            statValues = NUMBER_PATTERN_0.          matcher(statValues).replaceAll("   ");      //$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_END.      matcher(statValues).replaceAll("  ");       //$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0.        matcher(statValues).replaceAll("     ");    //$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_0_END.    matcher(statValues).replaceAll("    ");     //$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00.       matcher(statValues).replaceAll("      ");   //$NON-NLS-1$
-            statValues = NUMBER_PATTERN_0_00_END.   matcher(statValues).replaceAll("     ");    //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0.            matcher(statValues).replaceAll("   ");       //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_END.        matcher(statValues).replaceAll("  ");        //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0.          matcher(statValues).replaceAll("     ");     //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_0_END.      matcher(statValues).replaceAll("    ");      //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00.         matcher(statValues).replaceAll("      ");    //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00_END.     matcher(statValues).replaceAll("     ");     //$NON-NLS-1$
+
+            //                                                                         0:00:00
+            statValues = NUMBER_PATTERN_0_00_00.      matcher(statValues).replaceAll("        ");  //$NON-NLS-1$
+            statValues = NUMBER_PATTERN_0_00_00_END.  matcher(statValues).replaceAll("       ");   //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

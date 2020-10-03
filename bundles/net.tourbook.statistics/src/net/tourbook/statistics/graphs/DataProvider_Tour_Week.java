@@ -152,7 +152,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       int sequenceNumber = 0;
 
       /*
-       * Week start day
+       * Set week start day
        */
       final WeekFields calendarWeek = TimeTools.calendarWeek;
       final TemporalField weekOfWeekBasedYear = calendarWeek.weekOfWeekBasedYear();
@@ -418,7 +418,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          final long[] allUsedTourTypeIds = new long[numTourTypes];
 
          /*
-          * Initialize tour types, when there are 0 tours for some years/months, a tour
+          * Initialize tour types, when there are 0 tours for some years/weeks, a tour
           * type 0 could be a valid tour type which is the default values for native arrays
           * -> wrong tour type
           */

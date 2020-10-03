@@ -19,7 +19,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
@@ -42,8 +46,191 @@ public class DataProvider_HrZone_Week extends DataProvider {
          return statistic_RawStatisticValues;
       }
 
-      final StringBuilder sb = new StringBuilder();
+      final String headerLine1 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_WEEK
+            + HEAD1_DATE_WEEK_START
+
+            + HEAD1_HR_ZONE_1
+            + HEAD1_HR_ZONE_2
+            + HEAD1_HR_ZONE_3
+            + HEAD1_HR_ZONE_4
+            + HEAD1_HR_ZONE_5
+            + HEAD1_HR_ZONE_6
+            + HEAD1_HR_ZONE_7
+            + HEAD1_HR_ZONE_8
+            + HEAD1_HR_ZONE_9
+            + HEAD1_HR_ZONE_10
+
+            + HEAD1_HR_SUMMARY
+            + HEAD1_HR_SUMMARY
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_WEEK
+            + HEAD2_DATE_WEEK_START
+
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+
+            + HEAD2_HR_SUMMARY_SECONDS
+            + HEAD2_HR_SUMMARY_HHMMSS
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_WEEK
+            + VALUE_DATE_WEEK_START
+
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+
+            + VALUE_HR_SUMMARY_SECONDS
+            + VALUE_HR_SUMMARY_HHMMSS
+
+      ;
+
+      final StringBuilder sb = new StringBuilder();
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
+
+      final int[][] hrZoneValues = _weekData.hrZoneValues;
+      final int numWeeks = hrZoneValues[0].length;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+      int prevYear = firstYear;
+
+      int yearIndex = 0;
+      int prevSumWeeks = 0;
+      int sumYearWeeks = allYear_NumWeeks[yearIndex];
+
+      int sequenceNumber = 0;
+
+      /*
+       * Set week start day
+       */
+      final WeekFields calendarWeek = TimeTools.calendarWeek;
+      final TemporalField weekOfWeekBasedYear = calendarWeek.weekOfWeekBasedYear();
+      final TemporalField dayOfWeek = calendarWeek.dayOfWeek();
+
+      // first day in the statistic calendar
+      final LocalDate jan_1_1 = LocalDate.of(firstYear, 1, 1);
+
+      final int jan_1_1_DayOfWeek = jan_1_1.get(dayOfWeek) - 1;
+
+      final int jan_1_1_WeekOfYear = jan_1_1.get(weekOfWeekBasedYear);
+      LocalDate firstStatisticDay;
+
+      if (jan_1_1_WeekOfYear > 33) {
+
+         // the week from 1.1.January is from the last year -> this is not displayed
+         firstStatisticDay = jan_1_1.plusDays(7 - jan_1_1_DayOfWeek);
+
+      } else {
+
+         firstStatisticDay = jan_1_1.minusDays(jan_1_1_DayOfWeek);
+      }
+
+      for (int weekIndex = 0; weekIndex < numWeeks; weekIndex++) {
+
+         if (weekIndex < sumYearWeeks) {
+
+            // is still in the same year
+
+         } else {
+
+            // advance to the next year
+
+            yearIndex++;
+
+            final int yearWeeks = allYear_NumWeeks[yearIndex];
+
+            prevSumWeeks = sumYearWeeks;
+            sumYearWeeks += yearWeeks;
+         }
+
+         final int year = allYear_Numbers[yearIndex];
+         final int week = weekIndex - prevSumWeeks;
+
+         int sumSeconds = 0;
+         for (final int[] hrZoneValue : hrZoneValues) {
+            sumSeconds += hrZoneValue[weekIndex];
+         }
+
+         if (sumSeconds > 0) {
+
+            final String sumHHMMSS = net.tourbook.common.UI.format_hhh_mm_ss(sumSeconds);
+
+            Object sequenceNumberValue = UI.EMPTY_STRING;
+            if (isShowSequenceNumbers) {
+               sequenceNumberValue = ++sequenceNumber;
+            }
+
+            final LocalDate valueStatisticDay = firstStatisticDay.plusWeeks(weekIndex);
+            final String weekStartDay = TimeTools.Formatter_Date_S.format(valueStatisticDay);
+
+            // group values
+            if (year != prevYear) {
+
+               prevYear = year;
+
+               sb.append(NL);
+            }
+
+            sb.append(String.format(valueFormatting,
+
+                  sequenceNumberValue,
+
+                  year,
+                  week + 1,
+                  weekStartDay,
+
+                  hrZoneValues[0][weekIndex],
+                  hrZoneValues[1][weekIndex],
+                  hrZoneValues[2][weekIndex],
+                  hrZoneValues[3][weekIndex],
+                  hrZoneValues[4][weekIndex],
+                  hrZoneValues[5][weekIndex],
+                  hrZoneValues[6][weekIndex],
+                  hrZoneValues[7][weekIndex],
+                  hrZoneValues[8][weekIndex],
+                  hrZoneValues[9][weekIndex],
+
+                  sumSeconds,
+                  sumHHMMSS
+
+            ));
+
+            sb.append(NL);
+         }
+      }
       // cache values
       statistic_RawStatisticValues = sb.toString();
       statistic_isShowSequenceNumbers = isShowSequenceNumbers;
@@ -190,11 +377,11 @@ public class DataProvider_HrZone_Week extends DataProvider {
             final ResultSet result = prepStmt.executeQuery();
             while (result.next()) {
 
-               final int dbYear = result.getInt(1);
-               final int dbWeek = result.getInt(2);
+               final int dbValue_CW_Year = result.getInt(1);
+               final int dbValue_CW_Week = result.getInt(2);
 
                // get number of weeks for the current year in the db
-               final int dbYearIndex = numYears - (lastYear - dbYear + 1);
+               final int dbYearIndex = numYears - (lastYear - dbValue_CW_Year + 1);
                int allWeeks = 0;
                for (int yearIndex = 0; yearIndex <= dbYearIndex; yearIndex++) {
                   if (yearIndex > 0) {
@@ -202,7 +389,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
                   }
                }
 
-               final int weekIndex = allWeeks + dbWeek - 1;
+               final int weekIndex = allWeeks + dbValue_CW_Week - 1;
 
                dbHrZoneValues[0][weekIndex] = result.getInt(3);
                dbHrZoneValues[1][weekIndex] = result.getInt(4);
