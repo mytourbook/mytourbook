@@ -120,6 +120,7 @@ public class RawDataManager {
    private static final String           LOG_REIMPORT_ONLY_TOURTIMERPAUSES     = Messages.Log_Reimport_Only_TourTimerPauses;
    private static final String           LOG_REIMPORT_ONLY_TRAINING            = Messages.Log_Reimport_Only_Training;
    private static final String           LOG_REIMPORT_TOUR                     = Messages.Log_Reimport_Tour;
+   private static final String           LOG_REIMPORT_TOUR_SKIPPED             = Messages.Log_Reimport_Tour_Skipped;
 
    private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
@@ -564,6 +565,9 @@ public class RawDataManager {
                       * User canceled file dialog -> continue with next file, it is possible that a
                       * tour file could not be reselected because it is not available any more
                       */
+                     TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+                           NLS.bind(LOG_REIMPORT_TOUR_SKIPPED,
+                                 oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
                      continue;
                   }
 
@@ -896,12 +900,17 @@ public class RawDataManager {
 
                   if (reimportFilePathName[0] == null) {
 
-                     MessageDialog.openInformation(
+                     final boolean okPressed = MessageDialog.openConfirm(
                            activeShell,
                            Messages.import_data_dlg_reimport_title,
                            NLS.bind(
                                  Messages.Import_Data_Dialog_GetAlternativePath_Message,
                                  savedImportFilePathName));
+
+                     //The user doesn't want to look for a new file path for the current tour.
+                     if (!okPressed) {
+                        return;
+                     }
                   }
                }
             }
