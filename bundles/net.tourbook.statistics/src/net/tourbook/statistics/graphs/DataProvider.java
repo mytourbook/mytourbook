@@ -33,104 +33,132 @@ public abstract class DataProvider {
    /*
     * Data
     */
-   static final String HEAD1_DATA_NUMBER                    = "     #,";                       //$NON-NLS-1$
-   static final String HEAD2_DATA_NUMBER                    = "      ,";                  //$NON-NLS-1$
-   static final String VALUE_DATA_NUMBER                    = "%6d,";                     //$NON-NLS-1$
+   static final String HEAD1_DATA_NUMBER                    = "     #  \t ";                //$NON-NLS-1$
+   static final String HEAD2_DATA_NUMBER                    = "        \t ";                //$NON-NLS-1$
+   static final String VALUE_DATA_NUMBER                    = "%6d\t   ";                   //$NON-NLS-1$
 
    /*
     * Date
     */
-   static final String HEAD1_DATE_YEAR                      = " Year,";                    //$NON-NLS-1$
-   static final String HEAD2_DATE_YEAR                      = "    ,";                    //$NON-NLS-1$
-   static final String VALUE_DATE_YEAR                      = " %4d,";                     //$NON-NLS-1$
+   static final String HEAD1_DATE_YEAR                      = "Year\t";                   //$NON-NLS-1$
+   static final String HEAD2_DATE_YEAR                      = "    \t";                   //$NON-NLS-1$
+   static final String VALUE_DATE_YEAR                      = "%4d\t";                    //$NON-NLS-1$
 
-   static final String HEAD1_DATE_MONTH                     = " Month,";                  //$NON-NLS-1$
-   static final String HEAD2_DATE_MONTH                     = "      ,";                  //$NON-NLS-1$
-   static final String VALUE_DATE_MONTH                     = "   %3d,";                  //$NON-NLS-1$
+   static final String HEAD1_DATE_MONTH                     = " Month\t";                 //$NON-NLS-1$
+   static final String HEAD2_DATE_MONTH                     = "      \t";                 //$NON-NLS-1$
+   static final String VALUE_DATE_MONTH                     = "   %3d\t";                 //$NON-NLS-1$
 
-   static final String HEAD1_DATE_DAY                       = " Day,";                    //$NON-NLS-1$
-   static final String HEAD2_DATE_DAY                       = "    ,";                    //$NON-NLS-1$
-   static final String VALUE_DATE_DAY                       = " %3d,";                    //$NON-NLS-1$
+   static final String HEAD1_DATE_DAY                       = " Day\t";                   //$NON-NLS-1$
+   static final String HEAD2_DATE_DAY                       = "    \t";                   //$NON-NLS-1$
+   static final String VALUE_DATE_DAY                       = " %3d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_DATE_WEEK                      = " Week,";                   //$NON-NLS-1$
-   static final String HEAD2_DATE_WEEK                      = "     ,";                   //$NON-NLS-1$
-   static final String VALUE_DATE_WEEK                      = "   %2d,";                  //$NON-NLS-1$
+   static final String HEAD1_DATE_WEEK                      = " Week\t";                  //$NON-NLS-1$
+   static final String HEAD2_DATE_WEEK                      = "     \t";                  //$NON-NLS-1$
+   static final String VALUE_DATE_WEEK                      = "   %2d\t";                 //$NON-NLS-1$
 
-   static final String HEAD1_DATE_DOY                       = " DOY,";                    //$NON-NLS-1$
-   static final String HEAD2_DATE_DOY                       = "    ,";                    //$NON-NLS-1$
-   static final String VALUE_DATE_DOY                       = " %3d,";                    //$NON-NLS-1$
+   static final String HEAD1_DATE_WEEK_START                = "    First\t";              //$NON-NLS-1$
+   static final String HEAD2_DATE_WEEK_START                = "      Day\t";              //$NON-NLS-1$
+   static final String VALUE_DATE_WEEK_START                = " %8.8s\t";                 //$NON-NLS-1$
+
+   static final String HEAD1_DATE_DOY                       = " DOY\t";                   //$NON-NLS-1$
+   static final String HEAD2_DATE_DOY                       = "    \t";                   //$NON-NLS-1$
+   static final String VALUE_DATE_DOY                       = " %3d\t";                   //$NON-NLS-1$
 
    /*
     * Time
     */
-   static final String HEAD1_DEVICE_TIME_ELAPSED            = " Elapsed,";                //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_ELAPSED            = "     (s),";                //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_ELAPSED            = "  %6d,";                   //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_ELAPSED            = "    Elapsed\t";               //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_ELAPSED            = "        (s)\t";               //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_ELAPSED            = " %10d\t";                  //$NON-NLS-1$
 
-   static final String HEAD1_DEVICE_TIME_RECORDED           = " Recorded,";               //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_RECORDED           = "      (s),";               //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_RECORDED           = "   %6d,";                  //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_RECORDED           = "   Recorded\t";              //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_RECORDED           = "        (s)\t";              //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_RECORDED           = " %10d\t";                 //$NON-NLS-1$
 
-   static final String HEAD1_DEVICE_TIME_PAUSED             = " Paused,";                 //$NON-NLS-1$
-   static final String HEAD2_DEVICE_TIME_PAUSED             = "    (s),";                 //$NON-NLS-1$
-   static final String VALUE_DEVICE_TIME_PAUSED             = " %6d,";                    //$NON-NLS-1$
+   static final String HEAD1_DEVICE_TIME_PAUSED             = "     Paused\t";                //$NON-NLS-1$
+   static final String HEAD2_DEVICE_TIME_PAUSED             = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_DEVICE_TIME_PAUSED             = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_COMPUTED_TIME_MOVING           = " Moving,";                 //$NON-NLS-1$
-   static final String HEAD2_COMPUTED_TIME_MOVING           = "    (s),";                 //$NON-NLS-1$
-   static final String VALUE_COMPUTED_TIME_MOVING           = " %6d,";                    //$NON-NLS-1$
+   static final String HEAD1_COMPUTED_TIME_MOVING           = "     Moving\t";                //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_MOVING           = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_MOVING           = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_COMPUTED_TIME_BREAK            = "  Break,";                 //$NON-NLS-1$
-   static final String HEAD2_COMPUTED_TIME_BREAK            = "    (s),";                 //$NON-NLS-1$
-   static final String VALUE_COMPUTED_TIME_BREAK            = " %6d,";                    //$NON-NLS-1$
+   static final String HEAD1_COMPUTED_TIME_BREAK            = "      Break\t";                //$NON-NLS-1$
+   static final String HEAD2_COMPUTED_TIME_BREAK            = "        (s)\t";                //$NON-NLS-1$
+   static final String VALUE_COMPUTED_TIME_BREAK            = " %10d\t";                   //$NON-NLS-1$
 
-   static final String HEAD1_ELEVATION                      = " Elevation,";              //$NON-NLS-1$
-   static final String HEAD2_ELEVATION                      = "       (m),";              //$NON-NLS-1$
-   static final String VALUE_ELEVATION                      = "    %6.0f,";               //$NON-NLS-1$
+   static final String HEAD1_ELEVATION                      = "  Elevation\t";             //$NON-NLS-1$
+   static final String HEAD2_ELEVATION                      = "        (m)\t";             //$NON-NLS-1$
+   static final String VALUE_ELEVATION                      = " %10.0f\t";              //$NON-NLS-1$
 
-   static final String HEAD1_DISTANCE                       = " Distance,";               //$NON-NLS-1$
-   static final String HEAD2_DISTANCE                       = "      (m),";               //$NON-NLS-1$
-   static final String VALUE_DISTANCE                       = " %8.0f,";                  //$NON-NLS-1$
+   static final String HEAD1_DISTANCE                       = "   Distance\t";              //$NON-NLS-1$
+   static final String HEAD2_DISTANCE                       = "        (m)\t";              //$NON-NLS-1$
+   static final String VALUE_DISTANCE                       = " %10.0f\t";                 //$NON-NLS-1$
 
    /*
     * Speed
     */
-   static final String HEAD1_SPEED                          = "  Speed,";                 //$NON-NLS-1$
-   static final String HEAD2_SPEED                          = " (km/h),";                 //$NON-NLS-1$
-   static final String VALUE_SPEED                          = "%7.2f,";                   //$NON-NLS-1$
+   static final String HEAD1_SPEED                          = "  Speed\t";                //$NON-NLS-1$
+   static final String HEAD2_SPEED                          = " (km/h)\t";                //$NON-NLS-1$
+   static final String VALUE_SPEED                          = "%7.2f\t";                  //$NON-NLS-1$
 
-   static final String HEAD1_PACE                           = "     Pace,";               //$NON-NLS-1$
-   static final String HEAD2_PACE                           = " (min/km),";               //$NON-NLS-1$
-   static final String VALUE_PACE                           = "   %6.2f,";                //$NON-NLS-1$
+   static final String HEAD1_PACE                           = "     Pace\t";              //$NON-NLS-1$
+   static final String HEAD2_PACE                           = " (min/km)\t";              //$NON-NLS-1$
+   static final String VALUE_PACE                           = "   %6.2f\t";               //$NON-NLS-1$
+
+   /*
+    * HR Zones
+    */
+   static final String HEAD1_HR_ZONE_1                      = "     Zone 1\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_2                      = "     Zone 2\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_3                      = "     Zone 3\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_4                      = "     Zone 4\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_5                      = "     Zone 5\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_6                      = "     Zone 6\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_7                      = "     Zone 7\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_8                      = "     Zone 8\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_9                      = "     Zone 9\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_ZONE_10                     = "    Zone 10\t";              //$NON-NLS-1$
+   static final String HEAD1_HR_SUMMARY                     = "       Summary\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_SUMMARY_SECONDS             = "           (s)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_SUMMARY_SECONDS             = " %13d\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_SUMMARY_HHMMSS              = "    (hh:mm:ss)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_SUMMARY_HHMMSS              = " %13s\t";              //$NON-NLS-1$
+
+   static final String HEAD2_HR_ZONE                        = "        (s)\t";              //$NON-NLS-1$
+   static final String VALUE_HR_ZONE                        = " %10d\t";              //$NON-NLS-1$
 
    /*
     * Training
     */
-   static final String HEAD1_TRAINING_AEROB                 = " Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_AEROB                 = "    Aerob,";               //$NON-NLS-1$
-   static final String VALUE_TRAINING_AEROB                 = "   %6.1f,";                //$NON-NLS-1$
+   static final String HEAD1_TRAINING_AEROB                 = " Training\t";              //$NON-NLS-1$
+   static final String HEAD2_TRAINING_AEROB                 = "    Aerob\t";              //$NON-NLS-1$
+   static final String VALUE_TRAINING_AEROB                 = "   %6.1f\t";               //$NON-NLS-1$
 
-   static final String HEAD1_TRAINING_ANAEROB               = " Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_ANAEROB               = "  Anaerob,";               //$NON-NLS-1$
-   static final String VALUE_TRAINING_ANAEROB               = "   %6.1f,";                //$NON-NLS-1$
+   static final String HEAD1_TRAINING_ANAEROB               = " Training\t";              //$NON-NLS-1$
+   static final String HEAD2_TRAINING_ANAEROB               = "  Anaerob\t";              //$NON-NLS-1$
+   static final String VALUE_TRAINING_ANAEROB               = "   %6.1f\t";               //$NON-NLS-1$
 
-   static final String HEAD1_TRAINING_PERFORMANCE           = " Training,";               //$NON-NLS-1$
-   static final String HEAD2_TRAINING_PERFORMANCE           = "  Perform,";               //$NON-NLS-1$
-   static final String VALUE_TRAINING_PERFORMANCE           = "   %6.2f,";                //$NON-NLS-1$
+   static final String HEAD1_TRAINING_PERFORMANCE           = " Training\t";              //$NON-NLS-1$
+   static final String HEAD2_TRAINING_PERFORMANCE           = "  Perform\t";              //$NON-NLS-1$
+   static final String VALUE_TRAINING_PERFORMANCE           = "   %6.2f\t";               //$NON-NLS-1$
 
    /*
     * Tour
     */
-   static final String HEAD1_NUMBER_OF_TOURS                = "  Tours,";                 //$NON-NLS-1$
-   static final String HEAD2_NUMBER_OF_TOURS                = "    (#),";                 //$NON-NLS-1$
-   static final String VALUE_NUMBER_OF_TOURS                = " %6.0f,";                  //$NON-NLS-1$
+   static final String HEAD1_NUMBER_OF_TOURS                = "  Tours\t";                //$NON-NLS-1$
+   static final String HEAD2_NUMBER_OF_TOURS                = "    (#)\t";                //$NON-NLS-1$
+   static final String VALUE_NUMBER_OF_TOURS                = " %6.0f\t";                 //$NON-NLS-1$
 
-   static final String HEAD1_TOUR_TITLE                     = " Title,";                  //$NON-NLS-1$
-   static final String HEAD2_TOUR_TITLE                     = ",";                        //$NON-NLS-1$
-   static final String VALUE_TOUR_TITLE                     = " %s,";                     //$NON-NLS-1$  // do not truncate, it is displaye at the end
+   static final String HEAD1_TOUR_TITLE                     = " Title\t";                 //$NON-NLS-1$
+   static final String HEAD2_TOUR_TITLE                     = "\t";                       //$NON-NLS-1$
+   static final String VALUE_TOUR_TITLE                     = " %s\t";                    //$NON-NLS-1$  // do not truncate text, it is displayed at the end
 
-   static final String HEAD1_TOUR_TYPE                      = " TourType            ,";   //$NON-NLS-1$
-   static final String HEAD2_TOUR_TYPE                      = "                     ,";   //$NON-NLS-1$
-   static final String VALUE_TOUR_TYPE                      = " %-20.20s,";               //$NON-NLS-1$  // truncate 20+ characters to force column layout
+   static final String HEAD1_TOUR_TYPE                      = " TourType            \t";  //$NON-NLS-1$
+   static final String HEAD2_TOUR_TYPE                      = "                     \t";  //$NON-NLS-1$
+   static final String VALUE_TOUR_TYPE                      = " %-20.20s\t";              //$NON-NLS-1$  // truncate 20+ characters to force column layout
 
 // SET_FORMATTING_ON
 

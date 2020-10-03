@@ -194,7 +194,6 @@ public class DataProvider_Tour_Month extends DataProvider {
           * -> wrong tour type
           */
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
-
          for (final long[] allTypeIds : dbTypeIds) {
             Arrays.fill(allTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
          }
@@ -422,9 +421,9 @@ public class DataProvider_Tour_Month extends DataProvider {
          return Messages.Tour_StatisticValues_Label_NoData;
       }
 
-      final StringBuilder sb = new StringBuilder();
-
       final String headerLine1 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
 
             + HEAD1_DATE_YEAR
             + HEAD1_DATE_MONTH
@@ -447,6 +446,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine2 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD2_DATE_YEAR
             + HEAD2_DATE_MONTH
 
@@ -468,6 +469,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
 
@@ -487,6 +490,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       ;
 
+      final StringBuilder sb = new StringBuilder();
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
@@ -497,6 +501,8 @@ public class DataProvider_Tour_Month extends DataProvider {
       final long[][] allTourTypeIds = _tourMonthData.typeIds;
       final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
 
+      int sequenceNumber = 0;
+
       // loop: all months + years
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
 
@@ -505,7 +511,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
          final int month = (monthIndex % 12) + 1;
 
-         boolean isDataInTourType = false;
+         boolean isMonthData = false;
 
          // loop: all tour types
          for (int tourTypeIndex = 0; tourTypeIndex < numTours.length; tourTypeIndex++) {
@@ -534,9 +540,16 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             if (isDataForTourType) {
 
-               isDataInTourType = true;
+               isMonthData = true;
+
+               Object sequenceNumberValue = UI.EMPTY_STRING;
+               if (isShowSequenceNumbers) {
+                  sequenceNumberValue = ++sequenceNumber;
+               }
 
                sb.append(String.format(valueFormatting,
+
+                     sequenceNumberValue,
 
                      year,
                      month,
@@ -562,7 +575,7 @@ public class DataProvider_Tour_Month extends DataProvider {
          }
 
          // group values
-         if (isDataInTourType) {
+         if (isMonthData) {
             sb.append(NL);
          }
       }

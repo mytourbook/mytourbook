@@ -203,47 +203,78 @@ public class DataProvider_HrZone_Month extends DataProvider {
          return statistic_RawStatisticValues;
       }
 
+      final String headerLine1 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+
+            + HEAD1_HR_ZONE_1
+            + HEAD1_HR_ZONE_2
+            + HEAD1_HR_ZONE_3
+            + HEAD1_HR_ZONE_4
+            + HEAD1_HR_ZONE_5
+            + HEAD1_HR_ZONE_6
+            + HEAD1_HR_ZONE_7
+            + HEAD1_HR_ZONE_8
+            + HEAD1_HR_ZONE_9
+            + HEAD1_HR_ZONE_10
+
+            + HEAD1_HR_SUMMARY
+            + HEAD1_HR_SUMMARY
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+            + HEAD2_HR_ZONE
+
+            + HEAD2_HR_SUMMARY_SECONDS
+            + HEAD2_HR_SUMMARY_HHMMSS
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+            + VALUE_HR_ZONE
+
+            + VALUE_HR_SUMMARY_SECONDS
+            + VALUE_HR_SUMMARY_HHMMSS
+
+      ;
+
       final StringBuilder sb = new StringBuilder();
-
-      sb.append(UI.EMPTY_STRING
-
-            + "Year," //$NON-NLS-1$
-            + " Month," //$NON-NLS-1$
-            + "     Zone1," //$NON-NLS-1$
-            + "      Zone2," //$NON-NLS-1$
-            + "      Zone3," //$NON-NLS-1$
-            + "      Zone4," //$NON-NLS-1$
-            + "      Zone5," //$NON-NLS-1$
-            + "      Zone6," //$NON-NLS-1$
-            + "      Zone7," //$NON-NLS-1$
-            + "      Zone8," //$NON-NLS-1$
-            + "      Zone9," //$NON-NLS-1$
-            + "     Zone10," //$NON-NLS-1$
-
-            + "      Summary," //$NON-NLS-1$
-            + "       Summary" //$NON-NLS-1$
-
-            + NL);
-
-      sb.append(UI.EMPTY_STRING
-
-            + "    ," //$NON-NLS-1$
-            + "     ," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-            + "        (s)," //$NON-NLS-1$
-
-            + "          (s)," //$NON-NLS-1$
-            + "    (hh:mm:ss)" //$NON-NLS-1$
-
-            + NL);
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
 
       final int[][] hrZoneValues = _monthData.hrZoneValues;
       final int numMonths = hrZoneValues[0].length;
@@ -251,6 +282,8 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
       // setup previous year
       int prevYear = firstYear;
+
+      int sequenceNumber = 0;
 
       for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
 
@@ -272,18 +305,14 @@ public class DataProvider_HrZone_Month extends DataProvider {
             sb.append(NL);
          }
 
-         sb.append(String.format(UI.EMPTY_STRING
+         Object sequenceNumberValue = UI.EMPTY_STRING;
+         if (isShowSequenceNumbers) {
+            sequenceNumberValue = ++sequenceNumber;
+         }
 
-               // year, month
-               + "%4d, %5d," //$NON-NLS-1$
+         sb.append(String.format(valueFormatting,
 
-               // zone 1...10
-               + "%10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d, %10d," //$NON-NLS-1$
-
-               // summaries
-               + "%13d, %13s" //$NON-NLS-1$
-
-               + NL,
+               sequenceNumberValue,
 
                year,
                month,
@@ -303,6 +332,8 @@ public class DataProvider_HrZone_Month extends DataProvider {
                sumHHMMSS
 
          ));
+
+         sb.append(NL);
       }
 
       // cache values

@@ -60,6 +60,8 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD1_DATE_YEAR
             + HEAD1_DATE_MONTH
             + HEAD1_DATE_DAY
@@ -80,6 +82,8 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       final String headerLine2 = UI.EMPTY_STRING
 
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
             + HEAD2_DATE_YEAR
             + HEAD2_DATE_MONTH
             + HEAD2_DATE_DAY
@@ -99,6 +103,8 @@ public class DataProvider_Tour_Time extends DataProvider {
       ;
 
       final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
@@ -126,6 +132,8 @@ public class DataProvider_Tour_Time extends DataProvider {
       // set initial value
       int prevMonth = numDataItems > 0 ? _tourDataTime.allTourMonths[0] : 0;
 
+      int sequenceNumber = 0;
+
       for (int dataIndex = 0; dataIndex < numDataItems; dataIndex++) {
 
          final int month = _tourDataTime.allTourMonths[dataIndex];
@@ -140,7 +148,14 @@ public class DataProvider_Tour_Time extends DataProvider {
          final int movingTime = _tourDataTime.allTourComputedTime_Moving[dataIndex];
          final int breakTime = elapsedTime - movingTime;
 
+         Object sequenceNumberValue = UI.EMPTY_STRING;
+         if (isShowSequenceNumbers) {
+            sequenceNumberValue = ++sequenceNumber;
+         }
+
          sb.append(String.format(valueFormatting,
+
+               sequenceNumberValue,
 
                _tourDataTime.allTourYears[dataIndex],
                month,
