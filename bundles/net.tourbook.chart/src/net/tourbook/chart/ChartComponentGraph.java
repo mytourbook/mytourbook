@@ -332,7 +332,8 @@ public class ChartComponentGraph extends Canvas {
    private int                        _hoveredBarValueIndex;
    private boolean                    _isHoveredBarDirty;
 
-   private ToolTipV1                  _hoveredBarToolTip;
+   private Bar_ToolTip                _hoveredBar_ToolTip;
+   private ToolTipV1                  _hoveredBarToolTip_OLD;
 
    private boolean                    _isHoveredLineVisible        = false;
    private int                        _hoveredValuePointIndex      = -1;
@@ -506,7 +507,8 @@ public class ChartComponentGraph extends Canvas {
       _xSliderOnTop = _xSliderB;
       _xSliderOnBottom = _xSliderA;
 
-      _hoveredBarToolTip = new ToolTipV1(_chart);
+      _hoveredBar_ToolTip = new Bar_ToolTip(_chart);
+      _hoveredBarToolTip_OLD = new ToolTipV1(_chart);
 
       addListener();
       createContextMenu();
@@ -968,7 +970,9 @@ public class ChartComponentGraph extends Canvas {
 
             actionSelectBars();
 
-            _hoveredBarToolTip.toolTip_20_Hide();
+            _hoveredBar_ToolTip.hide();
+            _hoveredBarToolTip_OLD.toolTip_20_Hide();
+
             hideTooltip();
 
             // get cursor location relativ to this graph canvas
@@ -5910,7 +5914,8 @@ public class ChartComponentGraph extends Canvas {
                   _hoveredBarSerieIndex = serieIndex;
                   _hoveredBarValueIndex = valueIndex;
 
-                  _hoveredBarToolTip.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
+                  _hoveredBar_ToolTip.show(location);
+                  _hoveredBarToolTip_OLD.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
 
                   isBarHit = true;
                   break;
@@ -5928,7 +5933,8 @@ public class ChartComponentGraph extends Canvas {
 
       if (isBarHit == false) {
 
-         _hoveredBarToolTip.toolTip_20_Hide();
+         _hoveredBarToolTip_OLD.toolTip_20_Hide();
+         _hoveredBar_ToolTip.hide();
 
          if (_hoveredBarSerieIndex != -1) {
 
@@ -6260,7 +6266,8 @@ public class ChartComponentGraph extends Canvas {
       _gridColor = Util.disposeResource(_gridColor);
       _gridColorMajor = Util.disposeResource(_gridColorMajor);
 
-      _hoveredBarToolTip.dispose();
+      _hoveredBar_ToolTip.dispose();
+      _hoveredBarToolTip_OLD.dispose();
 
       _colorCache.dispose();
    }
@@ -6748,7 +6755,8 @@ public class ChartComponentGraph extends Canvas {
 
       _chart.onExternalMouseExit(event.time);
 
-      _hoveredBarToolTip.toolTip_20_Hide();
+      _hoveredBar_ToolTip.hide();
+      _hoveredBarToolTip_OLD.toolTip_20_Hide();
 
       boolean isRedraw = false;
 
@@ -7883,7 +7891,8 @@ public class ChartComponentGraph extends Canvas {
       }
 
       // hide previous tooltip
-      _hoveredBarToolTip.toolTip_20_Hide();
+      _hoveredBar_ToolTip.hide();
+      _hoveredBarToolTip_OLD.toolTip_20_Hide();
 
       // force the graph to be repainted
       redraw();

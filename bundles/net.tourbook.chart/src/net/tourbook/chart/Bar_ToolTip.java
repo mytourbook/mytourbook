@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,22 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.calendar;
+package net.tourbook.chart;
 
-import java.util.ArrayList;
-
-import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.common.util.TourToolTip;
-import net.tourbook.data.TourData;
-import net.tourbook.tour.TourInfoUI;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.calendar.CalendarGraph.CalendarSelectItem;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -40,23 +30,20 @@ import org.eclipse.swt.widgets.Event;
  * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
-public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
+public class Bar_ToolTip extends ToolTip {
 
-   private final TourInfoUI   _tourInfoUI = new TourInfoUI();
+   private final TourInfoUI _tourInfoUI = new TourInfoUI();
 
-   private Long               _tourId;
-   private TourData           _tourData;
+   private Control          _ttControl;
 
-   private Control            _ttControl;
+   private Chart            _chart;
 
-   private CalendarGraph      _calendarGraph;
-   private CalendarView       _calendarView;
+   public Bar_ToolTip(final Chart chart) {
 
-   private CalendarSelectItem _hoveredItem;
+      super(chart, NO_RECREATE, false);
 
-   public CalendarTourInfoToolTip(final CalendarView calendarView) {
-
-      super(calendarView.getCalendarGraph(), NO_RECREATE, false);
+      _chart = chart;
+      _ttControl = chart;
 
       _calendarView = calendarView;
 
@@ -65,11 +52,6 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
       setHideOnMouseDown(false);
       setPopupDelay(20);
-   }
-
-   @Override
-   public void afterHideToolTip() {
-      // not used
    }
 
    @Override
@@ -188,19 +170,6 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
    }
 
    @Override
-   public ArrayList<TourData> getSelectedTours() {
-
-      if (_tourData == null) {
-         return null;
-      }
-
-      final ArrayList<TourData> list = new ArrayList<>();
-      list.add(_tourData);
-
-      return list;
-   }
-
-   @Override
    protected Object getToolTipArea(final Event event) {
 
       // Ensure that the tooltip is hidden when the cell is left
@@ -209,30 +178,8 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
       return ttArea;
    }
 
-   @Override
-   public void hideToolTip() {
-      hide();
-   }
-
-   @Override
-   public void paint(final GC gc, final Rectangle clientArea) {
-      // not used
-   }
-
-   @Override
-   public boolean setHoveredLocation(final int x, final int y) {
-
-      // not used
-      return false;
-   }
-
    public void setNoTourTooltip(final String noTourTooltip) {
       _tourInfoUI.setNoTourTooltip(noTourTooltip);
-   }
-
-   @Override
-   public void setTourToolTip(final TourToolTip tourToolTip) {
-      // not used
    }
 
    @Override
