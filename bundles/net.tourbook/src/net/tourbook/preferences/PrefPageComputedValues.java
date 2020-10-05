@@ -70,14 +70,14 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String GRAPH_LABEL_CADENCE_UNIT = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+   private static final String GRAPH_LABEL_CADENCE_UNIT          = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 
-   public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues"; //$NON-NLS-1$
+   public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues";    //$NON-NLS-1$
 
    public static final String  URL_DOUGLAS_PEUCKER_ALGORITHM     =
-         "https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";                             //$NON-NLS-1$
+         "https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";                                //$NON-NLS-1$
 
-   private static final String STATE_COMPUTED_VALUE_SELECTED_TAB = "computedValue.selectedTab";                       //$NON-NLS-1$
+   private static final String STATE_COMPUTED_VALUE_SELECTED_TAB = "computedValue.selectedTab";                          //$NON-NLS-1$
 
    /*
     * contains the tab folder index
@@ -945,17 +945,17 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          @Override
          public boolean computeTourValues(final TourData oldTourData) {
 
-            final int tourRecordingTime = (int) oldTourData.getTourRecordingTime();
+            final int tourElapsedTime = (int) oldTourData.getTourDeviceTime_Elapsed();
 
             // get old break time
-            final int tourDrivingTime = (int) oldTourData.getTourDrivingTime();
-            oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
+            final int tourMovingTime = (int) oldTourData.getTourComputedTime_Moving();
+            oldBreakTime[0] += tourElapsedTime - tourMovingTime;
 
             // force the break time to be recomputed with the current values which are already store in the pref store
             oldTourData.setBreakTimeSerie(null);
 
             // recompute break time
-            oldTourData.computeTourDrivingTime();
+            oldTourData.computeTourMovingTime();
 
             return true;
          }
@@ -978,11 +978,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             if (savedTourData != null) {
 
                // get new value
-               final int tourRecordingTime = (int) savedTourData.getTourRecordingTime();
+               final int tourElapsedTime = (int) savedTourData.getTourDeviceTime_Elapsed();
 
                // get old break time
-               final int tourDrivingTime = (int) savedTourData.getTourDrivingTime();
-               newBreakTime[0] += tourRecordingTime - tourDrivingTime;
+               final int tourMovingTime = (int) savedTourData.getTourComputedTime_Moving();
+               newBreakTime[0] += tourElapsedTime - tourMovingTime;
 
                subTaskText = NLS.bind(
                      Messages.Compute_BreakTime_ForAllTour_Job_SubTask, //

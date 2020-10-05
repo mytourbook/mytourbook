@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.filter.SQLFilterData;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
@@ -103,7 +103,7 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
-         sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
+         sb.append(" AND TourData.NumberOfPhotos > 0\n"); //$NON-NLS-1$
       }
 
       /*
@@ -121,10 +121,10 @@ public class SQLFilter {
       /*
        * App Filter: Tour data
        */
-      final SQLFilterData tourSqlData = TourFilterManager.getSQL();
+      final SQLData tourSqlData = TourFilterManager.getSQL();
       if (tourSqlData != null) {
 
-         sb.append(tourSqlData.getWhereString());
+         sb.append(tourSqlData.getSqlString());
          _parameters.addAll(tourSqlData.getParameters());
       }
 
@@ -133,10 +133,10 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.GeoLocation)) {
 
-         final SQLFilterData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
+         final SQLData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
          if (tourSqlGeoData != null) {
 
-            sb.append(tourSqlGeoData.getWhereString());
+            sb.append(tourSqlGeoData.getSqlString());
             _parameters.addAll(tourSqlGeoData.getParameters());
          }
       }
@@ -146,16 +146,19 @@ public class SQLFilter {
        */
       _isTagFilterActive = false;
 
-      if (appFilter.contains(SQLAppFilter.Tag)) {
+      if (TourTagFilterManager.isTourTagFilterEnabled() && TourTagFilterManager.getSelectedProfile().isOrOperator) {
 
-         final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
+         if (appFilter.contains(SQLAppFilter.Tag)) {
 
-         if (tourTagSqlData != null) {
+            final SQLData tourTagSqlData = TourTagFilterManager.getSQL_WherePart();
 
-            _isTagFilterActive = true;
+            if (tourTagSqlData != null) {
 
-            sb.append(tourTagSqlData.getWhereString());
-            _parameters.addAll(tourTagSqlData.getParameters());
+               _isTagFilterActive = true;
+
+               sb.append(tourTagSqlData.getSqlString());
+               _parameters.addAll(tourTagSqlData.getParameters());
+            }
          }
       }
 
@@ -172,6 +175,10 @@ public class SQLFilter {
 
    /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
+    *         ...
+    *         <p>
+    *         This WHERE clause contains the tag filter sql statements ONLY, when a tag filter is
+    *         enabled and the tag's are combined with OR.
     *         ...
     */
    public String getWhereClause() {
@@ -194,9 +201,10 @@ public class SQLFilter {
     * @param statement
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
+    * @return Returns the last parameter index +1 which was used for setting parameters
     * @throws SQLException
     */
-   public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
+   public int setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
       int parameterIndex = startIndex;
 
@@ -234,6 +242,8 @@ public class SQLFilter {
       }
 
       _lastParameterIndex = parameterIndex;
+
+      return parameterIndex;
    }
 
    @Override

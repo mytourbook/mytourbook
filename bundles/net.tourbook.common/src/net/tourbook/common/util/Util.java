@@ -1620,7 +1620,7 @@ public class Util {
     *
     * @param memento
     * @param listKeyName
-    * @return
+    * @return Returns an array with long values or an empty array when values are not available
     */
    public static long[] getXmlLongArray(final XMLMemento memento, final String listKeyName) {
 
@@ -1755,6 +1755,25 @@ public class Util {
       final File file = new File(fileName);
 
       return file.isDirectory();
+   }
+
+   public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
+
+      System.out.println(UI.timeStampNano()
+            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
+            + " - System property \"" + propertyName + "\" is enabled -> " //$NON-NLS-1$ //$NON-NLS-2$
+            + propertyDescription);
+   }
+
+   public static void logSystemProperty_Value(final Class<?> clazz,
+                                              final String propertyName,
+                                              final String propertyValue,
+                                              final String propertyDescription) {
+
+      System.out.println(UI.timeStampNano()
+            + " [" + clazz.getSimpleName() + "]" //$NON-NLS-1$ //$NON-NLS-2$
+            + " - System property \"" + propertyName + "=" + propertyValue + "\" -> " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + propertyDescription);
    }
 
    /**

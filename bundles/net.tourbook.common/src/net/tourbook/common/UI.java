@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -83,7 +86,11 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -158,14 +165,14 @@ public class UI {
 
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
+   public static final String       SYMBOL_COMMA                  = ",";        //$NON-NLS-1$
    public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
-   // this looks ugly "\u2551";
-   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$
+   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$   // this looks ugly "\u2551";
    public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
    public static final String       SYMBOL_EXCLAMATION_POINT      = "!";        //$NON-NLS-1$
    public static final String       SYMBOL_GREATER_THAN           = ">";        //$NON-NLS-1$
    public static final String       SYMBOL_LESS_THAN              = "<";        //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
    public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
    public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
    public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
@@ -512,12 +519,14 @@ public class UI {
    /**
     * Number of horizontal dialog units per character, value <code>4</code>.
     */
-   private static final int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
+   private static final int    HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
 
    /**
     * Number of vertical dialog units per character, value <code>8</code>.
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
@@ -525,7 +534,17 @@ public class UI {
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
     */
-   public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
+   public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
+
+   static {
+
+      if (IS_SCRAMBLE_DATA) {
+
+         Util.logSystemProperty_IsEnabled(UI.class,
+               SYS_PROP__SCRAMBLE_DATA,
+               "Visible data are scrambled"); //$NON-NLS-1$
+      }
+   }
 
    /**
     * @param sash
@@ -899,6 +918,8 @@ public class UI {
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
 
       final Composite pageNoData = new Composite(parent, SWT.NONE);
+      // use a dimmed color, default is white
+      pageNoData.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
       GridDataFactory.fillDefaults().grab(true, true).applyTo(pageNoData);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(pageNoData);
       {
@@ -966,20 +987,30 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hh, (time / 3600)).toString();
+      return _formatter.format(Messages.Format_hh,
+
+            time / 3600
+
+      ).toString();
    }
 
    public static String format_hh_mm(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            time / 3600,
+            time % 3600 / 60
+
+      ).toString();
    }
 
    /**
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
+    *           ini seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -994,24 +1025,24 @@ public class UI {
 
          // display hours
 
-         return _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         return _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
       }
    }
 
@@ -1019,18 +1050,17 @@ public class UI {
     * force hours to be displayed
     *
     * @param time
+    *           in seconds
     * @return
     */
    public static String format_hhh_mm_ss(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(
-                  Messages.Format_hhmmss,
-                  (time / 3600),
-                  ((time % 3600) / 60),
-                  ((time % 3600) % 60))
+      return _formatter.format(Messages.Format_hhmmss,
+            (time / 3600),
+            ((time % 3600) / 60),
+            ((time % 3600) % 60))
             .toString();
    }
 
@@ -1044,7 +1074,12 @@ public class UI {
 
       final long timeAbs = time < 0 ? 0 - time : time;
 
-      return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            timeAbs / 60,
+            timeAbs % 60
+
+      ).toString();
    }
 
    public static String format_yyyymmdd_hhmmss(final int year,
@@ -1056,16 +1091,16 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  year,
-                  month,
-                  day,
-                  hour,
-                  minute,
-                  second)//
-            .toString();
+      return _formatter.format(Messages.Format_yyyymmdd_hhmmss,
+
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second
+
+      ).toString();
    }
 
    public static String FormatDoubleMinMax(final double value) {
@@ -1117,24 +1152,24 @@ public class UI {
 
          // display hours
 
-         timeText = _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         timeText = _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       }
 
@@ -1286,6 +1321,37 @@ public class UI {
       return LINK_TAG_START + url + LINK_TAG_END;
    }
 
+   /**
+    * @return Returns the {@link StatusLineManager} of the current active part or <code>null</code>
+    *         when not available.
+    */
+   public static IStatusLineManager getStatusLineManager() {
+
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+      final IWorkbenchPart activePart = activePage.getActivePart();
+      if (activePart instanceof IViewPart) {
+
+         final IViewPart viewPart = (IViewPart) activePart;
+
+         return viewPart.getViewSite().getActionBars().getStatusLineManager();
+      }
+
+      final IWorkbenchPart activeEditor = activePage.getActiveEditor();
+      if (activeEditor instanceof IEditorSite) {
+
+         final IEditorSite editorSite = (IEditorSite) activeEditor;
+
+         return editorSite.getActionBars().getStatusLineManager();
+      }
+
+      return null;
+   }
+
+   /**
+    * @param event
+    * @return Returns <code>true</code> when <Ctrl> key is pressed.
+    */
    public static boolean isCtrlKey(final Event event) {
 
       boolean isCtrlKey;

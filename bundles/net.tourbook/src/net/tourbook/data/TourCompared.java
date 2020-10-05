@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public class TourCompared {
    private int   startYear;
 
    private float tourSpeed;
-   private int   tourRecordingTime;
+   private int   tourDeviceTime_Elapsed;
 
    /**
     * @since Db version 28
@@ -91,10 +91,6 @@ public class TourCompared {
       return tourId;
    }
 
-   public int getTourRecordingTime() {
-      return tourRecordingTime;
-   }
-
    public float getTourSpeed() {
       return tourSpeed;
    }
@@ -123,12 +119,12 @@ public class TourCompared {
       tourDate = new Date(timeInMillis);
    }
 
-   public void setTourId(final long tourId) {
-      this.tourId = tourId;
+   public void setTourDeviceTime_Elapsed(final int tourDeviceTime_Elapsed) {
+      this.tourDeviceTime_Elapsed = tourDeviceTime_Elapsed;
    }
 
-   public void setTourRecordingTime(final int tourRecordingTime) {
-      this.tourRecordingTime = tourRecordingTime;
+   public void setTourId(final long tourId) {
+      this.tourId = tourId;
    }
 
    public void setTourSpeed(final float speed) {

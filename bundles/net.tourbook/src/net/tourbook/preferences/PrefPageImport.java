@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.tour.CadenceMultiplier;
+import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -62,6 +64,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    private Label              _lblInvalidFilesInfo;
 
    private PreferenceLinkArea _linkBodyWeight;
+   private ComboViewerCadence _comboDefaultCadence;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -190,6 +193,31 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(_linkBodyWeight.getControl());
          }
+
+         {
+            /*
+             * Tour type cadence default
+             */
+            final Composite cadenceContainer = new Composite(parent, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cadenceContainer);
+
+            final Label lblDefaultCadence = new Label(cadenceContainer, SWT.FILL | SWT.LEFT);
+
+            lblDefaultCadence.setText(Messages.PrefPage_Import_Default_Cadence);
+
+            _comboDefaultCadence = new ComboViewerCadence(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+            /*
+             * Label:
+             */
+            final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
+            lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_Cadence_Tooltip);
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(lblDefaultCadenceInfo);
+         }
       }
    }
 
@@ -230,6 +258,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
+      _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
       enableControls();
 
@@ -274,6 +303,12 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT,
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
+
+      final CadenceMultiplier defaultCadence = (CadenceMultiplier) Util.getStateEnum(_state,
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
+            RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+
+      _comboDefaultCadence.setSelection(defaultCadence);
    }
 
    private void saveState() {
@@ -282,15 +317,18 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
+      final CadenceMultiplier defaultCadenceMultiplier = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
+      Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER, defaultCadenceMultiplier);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+      _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
    }
 }

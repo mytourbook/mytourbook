@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,40 +21,44 @@ import java.util.HashMap;
 
 public class TourData_Time {
 
-	long[]							tourIds;
-	long[]							typeIds;
+   int[]                          allYear_Numbers;
+   int                            numDaysInAllYears;
 
-	int[]							typeColorIndex;
+   long[]                         allTourIds;
+   long[]                         allTypeIds;
 
-	/**
-	 * number for all days in each year
-	 */
-	int[]							yearDays;
+   int[]                          allTypeColorIndices;
 
-	int[]							years;
-	int								allDaysInAllYears;
+   /**
+    * Number for all days in each year
+    */
+   int[]                          allYear_NumDays;
 
-	int[]							tourYearValues;
-	int[]							tourMonthValues;
-	int[]							tourDOYValues;
-	int[]							weekValues;
+   int[]                          allTourYears;
+   int[]                          allTourMonths;
+   int[]                          allTourDays;
 
-	int[]							tourTimeStartValues;
-	int[]							tourTimeEndValues;
-	ArrayList<ZonedDateTime>		tourStartDateTimes;
-	ArrayList<String>				tourTimeZoneOffset;
+   int[]                          allTourDOYs;
+   int[]                          allWeeks;
 
-	int[]							tourAltitudeValues;
-	int[]							tourDistanceValues;
+   int[]                          allTourTimeStart;
+   int[]                          allTourTimeEnd;
+   ArrayList<ZonedDateTime>       allTourStartDateTimes;
+   ArrayList<String>              allTourTimeZoneOffsets;
 
-	int[]							tourRecordingTimeValues;
-	int[]							tourDrivingTimeValues;
+   float[]                        allTourElevations;
+   float[]                        allTourDistances;
 
-	ArrayList<String>				tourTitle;
-	ArrayList<String>				tourDescription;
+   int[]                          allTourDeviceTime_Elapsed;
+   int[]                          allTourDeviceTime_Recorded;
+   int[]                          allTourDeviceTime_Paused;
+   int[]                          allTourComputedTime_Moving;
 
-	/**
-	 * Contains the tags for the tour, key is the tour ID
-	 */
-	HashMap<Long, ArrayList<Long>>	tagIds;
+   ArrayList<String>              allTourTitles;
+   ArrayList<String>              allTourDescriptions;
+
+   /**
+    * Contains the tags for the tour, key is the tour ID
+    */
+   HashMap<Long, ArrayList<Long>> allTagIds;
 }

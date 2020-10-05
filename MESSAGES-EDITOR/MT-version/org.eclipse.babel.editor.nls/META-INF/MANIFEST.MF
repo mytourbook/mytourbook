@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Babel Nls Fragment
 Bundle-SymbolicName: org.eclipse.babel.editor.nls
-Bundle-Version: 1.0.0
-Fragment-Host: org.eclipse.babel.editor;bundle-version="1.0.0"
+Bundle-Version: 1.0.3.2020-09-21-MT
+Fragment-Host: org.eclipse.babel.editor;bundle-version="1.0.3"

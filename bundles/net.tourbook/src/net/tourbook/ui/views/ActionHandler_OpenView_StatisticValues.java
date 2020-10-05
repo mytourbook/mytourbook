@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,37 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour.filter;
+package net.tourbook.ui.views;
 
-import java.util.ArrayList;
+import net.tourbook.common.util.Util;
+import net.tourbook.statistic.StatisticValuesView;
 
-public class SQLFilterData {
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-	private String				_whereString;
-	private ArrayList<Object>	_parameters;
+public class ActionHandler_OpenView_StatisticValues extends AbstractHandler {
 
-	public SQLFilterData(final String whereString, final ArrayList<Object> parameters) {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		_whereString = whereString;
-		_parameters = parameters;
-	}
+      Util.showView(StatisticValuesView.ID, true);
 
-	public ArrayList<Object> getParameters() {
-		return _parameters;
-	}
+      return null;
+   }
 
-	public String getWhereString() {
-		return _whereString;
-	}
-
-	@Override
-	public String toString() {
-
-		return "SQLFilterData [\n" // //$NON-NLS-1$
-
-				+ ("_whereString=" + _whereString + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_parameters=" + _parameters + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ "]"; //$NON-NLS-1$
-	}
 }

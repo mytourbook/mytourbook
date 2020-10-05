@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.FontFieldEditorExtended;
+import net.tourbook.statistic.StatisticValuesView;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -87,10 +88,24 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner                 _spinnerRecentTags;
    private Spinner                 _spinnerAutoOpenDelay;
 
+   private Button                  _rdoDeviceTime_Recorded;
+   private Button                  _rdoComputedTime_Moving;
+
    private FontFieldEditorExtended _valueFontEditor;
 
    public PrefPageAppearance() {
 //		noDefaultAndApplyButton();
+   }
+
+   @Override
+   public void applyData(final Object data) {
+
+      if (StatisticValuesView.ID.equals(data)) {
+
+         // set focus to log font
+
+         _valueFontEditor.setFocus();
+      }
    }
 
    @Override
@@ -113,15 +128,40 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       GridLayoutFactory.fillDefaults().applyTo(_uiContainer);
       {
 
-         createUI_10_Tagging(_uiContainer);
-         createUI_20_LogFont(_uiContainer);
-         createUI_30_OtherOptions(_uiContainer);
+         createUI_10_PaceAndSpeedDisplay(_uiContainer);
+         createUI_20_Tagging(_uiContainer);
+         createUI_30_LogFont(_uiContainer);
+         createUI_40_OtherOptions(_uiContainer);
       }
 
       return _uiContainer;
    }
 
-   private void createUI_10_Tagging(final Composite parent) {
+   private void createUI_10_PaceAndSpeedDisplay(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      {
+         /*
+          * Time to use for pace and speed computation
+          */
+         final Label label = new Label(group, NONE);
+         label.setText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption);
+         label.setToolTipText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip);
+
+         // Moving time
+         _rdoComputedTime_Moving = new Button(group, SWT.RADIO);
+         _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
+
+         // Recorded time
+         _rdoDeviceTime_Recorded = new Button(group, SWT.RADIO);
+         _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
+      }
+   }
+
+   private void createUI_20_Tagging(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
@@ -197,7 +237,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_20_LogFont(final Composite parent) {
+   private void createUI_30_LogFont(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(THEME_FONT_LOGGING);
@@ -229,7 +269,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
    }
 
-   private void createUI_30_OtherOptions(final Composite parent) {
+   private void createUI_40_OtherOptions(final Composite parent) {
 
       {
          /*
@@ -363,6 +403,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      _rdoDeviceTime_Recorded.setSelection(isPaceAndSpeedFromRecordedTime);
+      _rdoComputedTime_Moving.setSelection(!isPaceAndSpeedFromRecordedTime);
+
       super.performDefaults();
 
       // this do not work, I have no idea why, but with the apply button it works :-(
@@ -417,6 +461,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.setPreferenceStore(_prefStore);
       _valueFontEditor.load();
 
+      _rdoDeviceTime_Recorded.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME));
+      _rdoComputedTime_Moving.setSelection(!_rdoDeviceTime_Recorded.getSelection());
    }
 
    private void saveState() {
@@ -428,5 +474,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, _spinnerAutoOpenDelay.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
+
+      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
    }
 }

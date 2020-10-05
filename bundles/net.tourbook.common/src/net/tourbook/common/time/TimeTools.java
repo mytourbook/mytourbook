@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -146,6 +146,7 @@ public class TimeTools {
     * The date must not be in the first or last week of the year.
     */
    private static LocalDate               _dateToGetNumOfWeeks = LocalDate.of(2000, 5, 5);
+
    static {
 
       Formatter_Time_ISO = new DateTimeFormatterBuilder()
@@ -160,7 +161,7 @@ public class TimeTools {
             .toFormatter();
 
       DURATION_FORMATTER = new PeriodFormatterBuilder()
-            //
+
             .appendHours()
             .appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
 
@@ -194,6 +195,7 @@ public class TimeTools {
             Formatter_Month_Full.format(Month.NOVEMBER),
             Formatter_Month_Full.format(Month.DECEMBER)
       };
+
       /*
        * Create week day names. Found no better solution, the old API contained
        * "DateFormatSymbols.getInstance().getShortWeekdays()"
@@ -451,7 +453,8 @@ public class TimeTools {
 
    /**
     * @param year
-    * @return Returns the number of weeks in a year.
+    * @return Returns the number of weeks in a year, this do NOT include weeks which are belonging
+    *         to other week years, e.g. 1.1.2012 is week 52 in weekyear 2011
     */
    public static int getNumberOfWeeksWithYear(final int year) {
 

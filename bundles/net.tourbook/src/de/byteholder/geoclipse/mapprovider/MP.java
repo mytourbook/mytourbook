@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -85,11 +85,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *
     * Technical Usage Requirements
     *
-    * - Valid HTTP User-Agent identifying application. Faking another app’s User-Agent WILL get you blocked.
+    * - Valid HTTP User-Agent identifying application. Faking another app's User-Agent WILL get you blocked.
     * - If known, a valid HTTP Referer.
-    * - DO NOT send no-cache headers. (“Cache-Control: no-cache”, “Pragma: no-cache” etc.)
+    * - DO NOT send no-cache headers. ("Cache-Control: no-cache", "Pragma: no-cache" etc.)
     * - Cache Tile downloads locally according to HTTP Expiry Header, alternatively a minimum of 7 days.
-    * - Maximum of 2 download threads. (Unmodified web browsers’ download thread limits are acceptable.)
+    * - Maximum of 2 download threads. (Unmodified web browsers' download thread limits are acceptable.)
     *
     * </code>
     */
@@ -255,7 +255,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * When <code>true</code> then the map provider is a layer for a specific topic with transparent
-    * background which should be displyed over a map.
+    * background which should be displayed over a map.
     */
    private boolean       _isTransparentLayer;
 
@@ -801,8 +801,8 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    }
 
    /**
-    * @return Returns the folder where tile files will be cached relativ to the common offline image
-    *         path
+    * @return Returns the folder where tile files will be cached relative to the common offline
+    *         image path
     */
    public String getOfflineFolder() {
       return _offlineFolder;
@@ -887,7 +887,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
             /*
              * tile image is available, this is the shortest path to check if an image for a tile
-             * position is availabe
+             * position is available
              */
 
             return tile;
@@ -903,7 +903,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
             StatusUtil.log("Internal error: Tile with loading error should not be in the tile cache 1: " //$NON-NLS-1$
                   + tile.getTileKey());
 
-            // ensure the error do not occure again for this tile
+            // ensure the error do not occur again for this tile
             _tileCache.remove(tileKey);
             _errorTiles.add(tileKey, tile);
 
@@ -927,7 +927,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
                   + tile.getTileKey());
          }
 
-         // ensure the error do not occure again for this tile
+         // ensure the error do not occur again for this tile
          _tileCache.remove(tileKey);
 
          return errorTile;
@@ -1090,7 +1090,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * @return Returns the map provider user agent or <code>null</code> when not available. This user
     *         agent is set in the http header when a tile image is downloaded.
     *         <p>
-    *         This was nessesary to conform to OpenStreetMap policy.
+    *         This was necessary to conform to OpenStreetMap policy.
     */
    public String getUserAgent() {
       return null;
@@ -1416,7 +1416,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _mapProviderId = mapProviderId;
 
       /*
-       * !!! very importand !!! the factory id must be set in the superclass to make the tile
+       * !!! very important !!! the factory id must be set in the superclass to make the tile
        * factory info unique, otherwise factorId is null and all created custom tile factory infos
        * cannot be distinguished with the equals/hashcode methods
        */
@@ -1472,7 +1472,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    }
 
    /**
-    * Sets the folder where offline images are saved, this folder is relativ to the common offline
+    * Sets the folder where offline images are saved, this folder is relative to the common offline
     * folder path
     *
     * @param offlineFolder

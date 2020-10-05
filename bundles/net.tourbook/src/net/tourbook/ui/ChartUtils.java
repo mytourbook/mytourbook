@@ -36,9 +36,11 @@ public class ChartUtils {
          return null;
       }
 
-      if (selectedYearIndex < 0 || selectedYearIndex >= availableYears.getItemCount()) {
-         selectedYearIndex = availableYears.getItemCount() - 1;
-      }
+//      if (selectedYearIndex < 0 || selectedYearIndex >= availableYears.getItemCount()) {
+//         selectedYearIndex = availableYears.getItemCount() - 1;
+//      }
+
+      selectedYearIndex = availableYears.getItemCount() - 1;
 
       final String[] yearsToDisplayList = new String[selectedYearIndex + 1];
 
