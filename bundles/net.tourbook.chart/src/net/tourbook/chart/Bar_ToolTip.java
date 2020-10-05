@@ -15,191 +15,202 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import net.tourbook.common.util.ToolTip;
+import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 
-/**
- * Tour info tooltip, implemented custom tooltip similar like
- * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
- * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
- */
-public class Bar_ToolTip extends ToolTip {
+public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
-   private final TourInfoUI _tourInfoUI = new TourInfoUI();
+   private int _devX;
+   private int _devY;
 
-   private Control          _ttControl;
+   private int _hoveredBar_VerticalIndex;
+   private int _hoveredBar_HorizontalIndex = -1;
 
-   private Chart            _chart;
+   /*
+    * UI controls
+    */
+   private Chart _chart;
 
    public Bar_ToolTip(final Chart chart) {
 
-      super(chart, NO_RECREATE, false);
+      super(chart);
 
       _chart = chart;
-      _ttControl = chart;
 
-      _calendarView = calendarView;
+      setFadeInSteps(0);
 
-      _ttControl = calendarView.getCalendarGraph();
-      _calendarGraph = calendarView.getCalendarGraph();
+      setFadeOutSteps(0);
+      setFadeOutDelaySteps(0);
 
-      setHideOnMouseDown(false);
-      setPopupDelay(20);
+//      setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
    }
 
    @Override
-   protected void afterHideToolTip(final Event event) {
+   protected void beforeHideToolTip() {
 
-      super.afterHideToolTip(event);
+      /*
+       * This is the tricky part that the hovered marker is reset before the tooltip is closed and
+       * not when nothing is hovered. This ensures that the tooltip has a valid state.
+       */
+      _hoveredBar_HorizontalIndex = -1;
 
-      _hoveredItem = null;
    }
 
    @Override
-   public Composite createToolTipContentArea(final Event event, final Composite parent) {
+   protected boolean canShowToolTip() {
 
-      Composite container;
+      return true;
+   }
 
-      if (_tourId != null && _tourId != -1) {
+   @Override
+   protected Composite createToolTipContentArea(final Composite shell) {
 
-         // first get data from the tour id when it is set
-         _tourData = TourManager.getInstance().getTourData(_tourId);
+      return createUI(shell);
+   }
+
+   private Composite createUI(final Composite parent) {
+
+      System.out.println((System.currentTimeMillis() + " createUI()"));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
       }
-
-      if (_tourData == null) {
-
-         // there are no data available
-
-         container = _tourInfoUI.createUI_NoData(parent);
-
-         // prevent that the actions can be selected
-         setHideOnMouseDown(true);
-
-      } else {
-
-         // tour data is available
-
-         container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
-
-         _tourInfoUI.setActionsEnabled(true);
-
-         // allow the actions to be selected
-         setHideOnMouseDown(false);
-      }
-
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _tourInfoUI.dispose();
-         }
-      });
 
       return container;
    }
 
+   /**
+    * By default the tooltip is located to the left side of the tour marker point, when not visible
+    * it is displayed to the right side of the tour marker point.
+    */
    @Override
-   public Point getLocation(final Point tipSize, final Event event) {
+   public Point getToolTipLocation(final Point tipSize) {
 
-      final CalendarSelectItem hoveredItem = _calendarGraph.getHoveredTour();
+      final ChartComponentGraph graphControl = _chart.getChartComponents().getChartComponentGraph();
+      final IToolBarManager iTbm = _chart.getToolBarManager();
 
-      if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
+      final ToolBarManager tbm = (ToolBarManager) iTbm;
+      final ToolBar toolbarControl = tbm.getControl();
 
-         final Rectangle cellBounds = hoveredItem.itemRectangle;
-         final int cellWidth2 = cellBounds.width / 2;
-         final int cellHeight = cellBounds.height;
+      final int tipWidth = tipSize.x;
+      final int tipHeight = tipSize.y;
 
-         final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
-         final int devY = cellBounds.y + cellHeight;
+      final int ttPosX = _devX;
+      final int ttPosY = _devY;
 
-         /*
-          * check if the tooltip is outside of the tree, this can happen when the column is very
-          * wide and partly hidden
+      final Point ttLocationX = graphControl.toDisplay(ttPosX, ttPosY);
+      final Point ttLocationY = toolbarControl.toDisplay(ttPosX, ttPosY);
+
+      final Point ttLocation = new Point(ttLocationX.x, ttLocationY.y - 1);
+
+      /*
+       * Fixup display bounds
+       */
+      final Rectangle displayBounds = UI.getDisplayBounds(toolbarControl, ttLocation);
+      final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
+
+      final boolean isLocationInDisplay = displayBounds.contains(ttLocation);
+      final boolean isBottomInDisplay = displayBounds.contains(rightBottomBounds);
+
+      if (!(isLocationInDisplay && isBottomInDisplay)) {
+
+         final int displayX = displayBounds.x;
+         final int displayY = displayBounds.y;
+         final int displayWidth = displayBounds.width;
+
+         if (ttLocation.x < displayX) {
+            ttLocation.x = displayX;
+         }
+
+         if (rightBottomBounds.x > displayX + displayWidth) {
+            ttLocation.x = displayWidth - tipWidth;
+         }
+
+         if (ttLocation.y < displayY) {
+            // position evaluated with try and error until it fits
+            ttLocation.y = ttLocationX.y - ttPosY + graphControl.getSize().y;
+         }
+      }
+
+      return ttLocation;
+   }
+
+   /**
+    * Returns <code>true</code> when cursor is within the graph area
+    */
+   @Override
+   protected boolean isInNoHideArea(final Point displayCursorLocation) {
+
+      final ChartComponentGraph graphControl = _chart.getChartComponents().componentGraph;
+
+      final Rectangle graphBounds = graphControl.getBounds();
+      final Point graphDisplayPosition = graphControl.toDisplay(0, 0);
+
+      final Rectangle graphDisplayRect = new Rectangle(
+            graphDisplayPosition.x,
+            graphDisplayPosition.y,
+            graphBounds.width,
+            graphBounds.height);
+
+      return graphDisplayRect.contains(displayCursorLocation);
+   }
+
+   public void open(final int devX, final int devY, final int hoveredBar_VerticalIndex, final int hoveredBar_HorizontalIndex) {
+
+      boolean isKeepOpened = false;
+
+      if (_hoveredBar_HorizontalIndex != -1 && isTooltipClosing()) {
+
+         /**
+          * This case occures when the tooltip is opened but is currently closing and the mouse
+          * is moved from the tooltip back to the hovered label.
+          * <p>
+          * This prevents that when the mouse is over the hovered label but not moved, that the
+          * tooltip keeps opened.
           */
-         final Rectangle treeBounds = _ttControl.getBounds();
-         boolean isDevXAdjusted = false;
-         int devX = devXDefault;
-
-         if (devXDefault >= treeBounds.width) {
-            devX = treeBounds.width - 40;
-            isDevXAdjusted = true;
-         }
-
-         final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
-
-         Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
-         final int tipSizeWidth = tipSize.x;
-         final int tipSizeHeight = tipSize.y;
-
-         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
-
-            /*
-             * adjust horizontal position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            if (isDevXAdjusted) {
-
-               ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
-
-            } else {
-               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
-            }
-         }
-
-         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
-
-            /*
-             * adjust vertical position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
-         }
-
-         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+         isKeepOpened = true;
       }
 
-      return super.getLocation(tipSize, event);
-   }
+      final boolean isCanClose = isKeepOpened == false;
 
-   @Override
-   protected Object getToolTipArea(final Event event) {
+      if (isCanClose
+            && hoveredBar_HorizontalIndex == _hoveredBar_HorizontalIndex
+            && hoveredBar_VerticalIndex == _hoveredBar_VerticalIndex) {
 
-      // Ensure that the tooltip is hidden when the cell is left
-      final CalendarSelectItem ttArea = _hoveredItem = _calendarGraph.getHoveredTour();
+         // nothing has changed
 
-      return ttArea;
-   }
-
-   public void setNoTourTooltip(final String noTourTooltip) {
-      _tourInfoUI.setNoTourTooltip(noTourTooltip);
-   }
-
-   @Override
-   protected boolean shouldCreateToolTip(final Event event) {
-
-      if (_calendarView.isShowTourTooltip() == false) {
-         return false;
+         return;
       }
 
-      if (!super.shouldCreateToolTip(event)) {
-         return false;
-      }
+      // another bar is hovered, show tooltip
 
-      if (_hoveredItem == null || _hoveredItem.id < 0) {
-         return false;
-      }
+      _devX = devX;
+      _devY = devY;
 
-      // get tour id from hovered item
-      _tourId = _hoveredItem.id;
+      _hoveredBar_HorizontalIndex = hoveredBar_HorizontalIndex;
+      _hoveredBar_VerticalIndex = hoveredBar_VerticalIndex;
 
-      return true;
+      showToolTip();
    }
+
 }
