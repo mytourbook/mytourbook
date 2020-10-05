@@ -990,8 +990,13 @@ public class RawDataManager {
           */
 
          long previousTourTimerPauses = 0;
+         int oldAltitudeUp = 0;
+         int oldAltitudeDown = 0;
          if (reimportId == ReImport.OnlyTourTimerPauses) {
             previousTourTimerPauses = oldTourData.getTourDeviceTime_Paused();
+         } else if (reimportId == ReImport.OnlyAltitudeValues) {
+            oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+            oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
          }
 
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
@@ -1003,24 +1008,6 @@ public class RawDataManager {
          } else {
 
             isTourReImported = true;
-
-            TourLogManager.addSubLog(TourLogState.IMPORT_OK,
-                  NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                        reimportFileNamePath));
-
-            //Print the old vs new data comparison
-            String differences = UI.EMPTY_STRING;
-            if (reimportId == ReImport.OnlyTourTimerPauses) {
-
-               differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
-                     UI.format_hhh_mm_ss(previousTourTimerPauses),
-                     UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused()));
-            }
-
-            if (!StringUtils.isNullOrEmpty(differences)) {
-               TourLogManager.addSubLog(TourLogState.INFO, differences);
-            }
 
             // set re-import file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
@@ -1040,6 +1027,47 @@ public class RawDataManager {
                final TourData savedTourData = TourManager.saveModifiedTour(newTourData, false);
 
                newTourData = savedTourData;
+            }
+
+            TourLogManager.addSubLog(TourLogState.IMPORT_OK,
+                  NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                        reimportFileNamePath));
+
+            //Print the old vs new data comparison
+            String previousData = UI.EMPTY_STRING;
+            String newData = UI.EMPTY_STRING;
+            switch (reimportId) {
+
+            case OnlyAltitudeValues:
+               final String heightLabel = UI.UNIT_IS_METRIC ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+               final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+
+               previousData = UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+                     + UI.DASH
+                     + oldAltitudeDown
+                     + heightLabel;
+               newData = UI.SYMBOL_PLUS + newAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+                     + UI.DASH + newAltitudeDown
+                     + heightLabel;
+               break;
+            case OnlyTourTimerPauses:
+               previousData = UI.format_hhh_mm_ss(previousTourTimerPauses);
+               newData = UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused());
+               break;
+
+            default:
+               break;
+            }
+
+            if (!StringUtils.isNullOrEmpty(previousData) &&
+                  !StringUtils.isNullOrEmpty(newData)) {
+
+               TourLogManager.addSubLog(TourLogState.INFO,
+                     NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
+                           previousData,
+                           newData));
             }
 
             // check if tour is displayed in the import view
