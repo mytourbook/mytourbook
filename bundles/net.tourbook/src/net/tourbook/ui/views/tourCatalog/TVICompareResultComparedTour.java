@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,12 +52,12 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
    int                normalizedStartIndex = -1;
    int                normalizedEndIndex   = -1;
 
-   int                compareDrivingTime;
-   int                compareRecordingTime;
+   int                compareMovingTime;
+   int                compareElapsedTime;
 
    float              compareDistance;
    float              compareSpeed;
-   int                timeIntervall;
+   int                timeInterval;
 
    /**
     * Metric or imperial altimeter (VAM)
@@ -73,7 +73,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
    int   dbEndIndex;
 
    float dbSpeed;
-   int   dbRecordingTime;
+   int   dbElapsedTime;
 
    /*
     * the moved... fields contain the position of the compared tour when the user moved the

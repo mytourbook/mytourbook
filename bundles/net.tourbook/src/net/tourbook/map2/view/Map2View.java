@@ -95,6 +95,7 @@ import net.tourbook.map2.action.ActionShowSliderInMap;
 import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
+import net.tourbook.map2.action.ActionShowTourPauses;
 import net.tourbook.map2.action.ActionShowWayPoints;
 import net.tourbook.map2.action.ActionSyncMapWithOtherMap;
 import net.tourbook.map2.action.ActionSyncMapWithPhoto;
@@ -234,6 +235,7 @@ public class Map2View extends ViewPart implements
 
    private static final String   MEMENTO_SHOW_START_END_IN_MAP                         = "action.show-start-end-in-map";                       //$NON-NLS-1$
    private static final String   MEMENTO_SHOW_TOUR_MARKER                              = "action.show-tour-marker";                            //$NON-NLS-1$
+   private static final String   MEMENTO_SHOW_TOUR_PAUSES                              = "action.show-tour-pauses";                            //$NON-NLS-1$
    static final String           MEMENTO_SHOW_SLIDER_IN_MAP                            = "action.show-slider-in-map";                          //$NON-NLS-1$
    static final boolean          MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT                    = true;
    private static final String   MEMENTO_SHOW_SLIDER_IN_LEGEND                         = "action.show-slider-in-legend";                       //$NON-NLS-1$
@@ -451,6 +453,7 @@ public class Map2View extends ViewPart implements
    private ActionShowTour                 _actionShowTour;
    private ActionShowTourInfoInMap        _actionShowTourInfoInMap;
    private ActionShowTourMarker           _actionShowTourMarker;
+   private ActionShowTourPauses           _actionShowTourPauses;
    private ActionShowWayPoints            _actionShowWayPoints;
    private ActionSyncZoomLevelAdjustment  _actionSyncZoomLevelAdjustment;
    private ActionSyncMapWithOtherMap      _actionSyncMap_WithOtherMap;
@@ -790,6 +793,14 @@ public class Map2View extends ViewPart implements
    public void actionSetShowTourMarkerInMap() {
 
       _tourPainterConfig.isShowTourMarker = _actionShowTourMarker.isChecked();
+
+      _map.disposeOverlayImageCache();
+      _map.paint();
+   }
+
+   public void actionSetShowTourPausesInMap() {
+
+      _tourPainterConfig.isShowTourPauses = _actionShowTourPauses.isChecked();
 
       _map.disposeOverlayImageCache();
       _map.paint();
@@ -1480,6 +1491,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour = new ActionShowTour();
       _actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
       _actionShowTourMarker = new ActionShowTourMarker(this);
+      _actionShowTourPauses = new ActionShowTourPauses(this);
       _actionShowWayPoints = new ActionShowWayPoints(this);
 
       _actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
@@ -1817,6 +1829,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourInfoInMap.setEnabled(isOneTour);
       _actionShowTour.setEnabled(_isTourOrWayPoint);
       _actionShowTourMarker.setEnabled(_isTourOrWayPoint);
+      _actionShowTourPauses.setEnabled(_isTourOrWayPoint);
       _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
       _actionZoom_Centered.setEnabled(isTourAvailable);
       _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
@@ -1940,6 +1953,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(new Separator());
       menuMgr.add(_actionCreateTourMarkerFromMap);
       menuMgr.add(_actionShowTourMarker);
+      menuMgr.add(_actionShowTourPauses);
       menuMgr.add(_actionShowWayPoints);
       menuMgr.add(_actionShowPOI);
       menuMgr.add(_actionShowStartEndInMap);
@@ -3418,6 +3432,11 @@ public class Map2View extends ViewPart implements
       _actionShowTourMarker.setChecked(isShowMarker);
       _tourPainterConfig.isShowTourMarker = isShowMarker;
 
+      // show tour pauses
+      final boolean isShowPauses = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_PAUSES, true);
+      _actionShowTourPauses.setChecked(isShowPauses);
+      _tourPainterConfig.isShowTourPauses = isShowPauses;
+
       // checkbox: show way points
       final boolean isShowWayPoints = Util.getStateBoolean(_state, MEMENTO_SHOW_WAY_POINTS, true);
       _actionShowWayPoints.setChecked(isShowWayPoints);
@@ -3680,6 +3699,7 @@ public class Map2View extends ViewPart implements
       _state.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
       _state.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
       _state.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
+      _state.put(MEMENTO_SHOW_TOUR_PAUSES, _actionShowTourPauses.isChecked());
       _state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
       _state.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
 

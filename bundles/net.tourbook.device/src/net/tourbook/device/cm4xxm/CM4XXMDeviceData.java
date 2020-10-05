@@ -173,14 +173,14 @@ public class CM4XXMDeviceData {
       out.println("Total altitude up bike2:   " + totalAltitudeUp2 + " m"); //$NON-NLS-1$ //$NON-NLS-2$
       out.println("Total travel time bike 1:     " //$NON-NLS-1$
             + totalTravelTimeHour1
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + totalTravelTimeMin1
-            + ":" + totalTravelTimeSec1); //$NON-NLS-1$
+            + UI.SYMBOL_COLON + totalTravelTimeSec1);
       out.println("Total travel time bike 2:     " //$NON-NLS-1$
             + totalTravelTimeHour2
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + totalTravelTimeMin2
-            + ":" + totalTravelTimeSec2); //$NON-NLS-1$
+            + UI.SYMBOL_COLON + totalTravelTimeSec2);
       out.println();
       out.println("Offset last DD record:   " + offsetDDRecord); //$NON-NLS-1$
       out.println("Offset next free memory: " + offsetNextMemory); //$NON-NLS-1$

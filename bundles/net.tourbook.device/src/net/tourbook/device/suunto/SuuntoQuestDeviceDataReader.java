@@ -34,8 +34,6 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
-   public static final String  TAG_MOVESCOUNT     = UI.EMPTY_STRING;
-
    private static final String DOCTYPE_XML        = "<!doctype xml>"; //$NON-NLS-1$
    private static final String MOVESCOUNT_TAG     = "<movescount";    //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES = "<samples>";      //$NON-NLS-1$
@@ -73,12 +71,12 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    }
 
    /**
-    * Check if the file is a valid Suunto XML file by checking some tags.
+    * Check if the file is a valid Suunto Quest XML file by checking some tags.
     *
     * @param importFilePath
     * @return Returns <code>true</code> when the file contains Suunto content.
     */
-   private boolean isSuuntoXMLFile(final String importFilePath) {
+   private boolean isValidSuuntoXMLFile(final String importFilePath) {
 
       try (final FileInputStream inputStream = new FileInputStream(importFilePath);
             final BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
@@ -119,7 +117,7 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      if (isSuuntoXMLFile(importFilePath) == false) {
+      if (isValidSuuntoXMLFile(importFilePath) == false) {
          return false;
       }
 
@@ -152,6 +150,6 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      return isSuuntoXMLFile(fileName);
+      return isValidSuuntoXMLFile(fileName);
    }
 }

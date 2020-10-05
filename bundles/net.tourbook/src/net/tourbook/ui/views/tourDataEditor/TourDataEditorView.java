@@ -86,6 +86,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.DialogEditTimeSlicesValues;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourSaveListener;
@@ -98,6 +99,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -179,7 +181,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -589,8 +590,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private Combo             _comboTitle;
    //
-   private Button            _rdoCadence_Rpm;
-   private Button            _rdoCadence_Spm;
+   private ComboViewerCadence _comboCadence;
    //
    private CLabel            _lblCloudIcon;
    private CLabel            _lblTourType;
@@ -649,9 +649,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text              _txtDistance;
    private Text              _txtWeather;
    //
-   private TimeDuration      _timeDriving;
-   private TimeDuration      _timePaused;
-   private TimeDuration      _timeRecording;
+   private TimeDuration      _deviceTime_Elapsed;                  // Total time of the activity
+   private TimeDuration      _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
+   private TimeDuration      _deviceTime_Paused;                   // Time where the user deliberately paused the device
+   private TimeDuration      _computedTime_Moving;                 // Computed time moving
+   private TimeDuration      _computedTime_Break;                  // Computed time stopped
 
    private Menu              _swimViewer_ContextMenu;
    private Menu              _timeViewer_ContextMenu;
@@ -1461,11 +1463,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tab1Container.setRedraw(true);
       }
 
-      public void setTime(final int recordingTime) {
+      public void setTime(final int elapsedTime) {
 
-         final int hours = recordingTime / 3600;
-         final int minutes = (recordingTime % 3600) / 60;
-         final int seconds = (recordingTime % 3600) % 60;
+         final int hours = elapsedTime / 3600;
+         final int minutes = (elapsedTime % 3600) / 60;
+         final int seconds = (elapsedTime % 3600) % 60;
 
          _txtTime.setText(String.format(timeFormat, hours, minutes, seconds));
 
@@ -2876,7 +2878,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       };
 
       /*
-       * listener for recording/driving/paused time
+       * listener for elapsed/moving/paused time
        */
       _tourTimeListener = new SelectionAdapter() {
          @Override
@@ -3586,40 +3588,76 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_128_DateTime_Col2(final Composite section) {
 
-      final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      final Composite container = new Composite(section, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(COLUMN_SPACING, 0)
+            .applyTo(container);
       {
+         final Composite container_Left = _tk.createComposite(container);
+         GridDataFactory.fillDefaults().applyTo(container_Left);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container_Left);
+         {
+            {
+               /*
+                * Elapsed time
+                */
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_elapsed_time);
+               _secondColumnControls.add(label);
+
+               _deviceTime_Elapsed = new TimeDuration(container_Left);
+            }
+            {
+               /*
+                * Recorded time
+                */
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_recorded_time);
+               _secondColumnControls.add(label);
+
+               _deviceTime_Recorded = new TimeDuration(container_Left);
+            }
+            {
+               /*
+                * Paused time
+                */
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_paused_time);
+               _secondColumnControls.add(label);
+
+               _deviceTime_Paused = new TimeDuration(container_Left);
+            }
+         }
+
+         final Composite container_Right = _tk.createComposite(container);
+         GridDataFactory.fillDefaults()
+
+               // align to the bottom that recorded/paused and moving/break time are at the same vertical position
+               .align(SWT.FILL, SWT.END)
+
+               .applyTo(container_Right);
+
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container_Right);
          {
             /*
-             * recording time
+             * Moving time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_recording_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_moving_time);
             _secondColumnControls.add(label);
 
-            _timeRecording = new TimeDuration(container);
+            _computedTime_Moving = new TimeDuration(container_Right);
          }
 
          {
             /*
-             * paused time
+             * Break time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_paused_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_break_time);
             _secondColumnControls.add(label);
 
-            _timePaused = new TimeDuration(container);
-         }
-
-         {
-            /*
-             * driving time
-             */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_driving_time);
-            _secondColumnControls.add(label);
-
-            _timeDriving = new TimeDuration(container);
+            _computedTime_Break = new TimeDuration(container_Right);
          }
       }
+
    }
 
    private void createUI_Section_129_DateTime_TimeZone(final Composite parent) {
@@ -4513,17 +4551,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
             _firstColumnControls.add(label);
 
-            final Composite radioContainer = new Composite(container, SWT.NONE);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(radioContainer);
-            {
-               // ratio: rpm
-               _rdoCadence_Rpm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Rpm, SWT.RADIO);
-               _rdoCadence_Rpm.addSelectionListener(_selectionListener);
+            _comboCadence = new ComboViewerCadence(container);
+            _comboCadence.addSelectionChangedListener(new ISelectionChangedListener() {
+               @Override
+               public void selectionChanged(final SelectionChangedEvent event) {
 
-               // radio: spm
-               _rdoCadence_Spm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Spm, SWT.RADIO);
-               _rdoCadence_Spm.addSelectionListener(_selectionListener);
-            }
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+
+                  updateModel_FromUI();
+                  setTourDirty();
+               }
+            });
          }
       }
    }
@@ -5574,11 +5614,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Column: Paused time
+    * Column: Break time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_IS_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -6309,8 +6349,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);
 
-      _rdoCadence_Rpm.setEnabled(canEdit);
-      _rdoCadence_Spm.setEnabled(canEdit);
+      _comboCadence.getCombo().setEnabled(canEdit);
 
       _dtTourDate.setEnabled(canEdit);
       _dtStartTime.setEnabled(canEdit);
@@ -6319,9 +6358,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkRemoveTimeZone.setEnabled(canEdit);
       _linkGeoTimeZone.setEnabled(canEdit && isGeoAvailable);
 
-      _timeRecording.setEditMode(isManualAndEdit);
-      _timePaused.setEditMode(isManualAndEdit);
-      _timeDriving.setEditMode(isManualAndEdit);
+      _deviceTime_Elapsed.setEditMode(isManualAndEdit);
+      _deviceTime_Recorded.setEditMode(isManualAndEdit);
+      _deviceTime_Paused.setEditMode(isManualAndEdit);
+      _computedTime_Moving.setEditMode(isManualAndEdit);
+      _computedTime_Break.setEditMode(isManualAndEdit);
 
       // distance can be edited when no distance time slices are available
       _txtDistance.setEnabled(canEdit && isDistanceSerie == false);
@@ -6636,11 +6677,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is imported
 
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourRecordingTime(0);
+            _tourData.setTourDeviceTime_Elapsed(0);
          } else {
-            _tourData.setTourRecordingTime(_serieTime[_serieTime.length - 1]);
+            _tourData.setTourDeviceTime_Elapsed(_serieTime[_serieTime.length - 1]);
          }
-         _tourData.computeTourDrivingTime();
+         _tourData.computeTourMovingTime();
 
          if ((_serieDistance == null) || (_serieDistance.length == 0)) {
             // disabled because distance can be edited when distance serie is not available
@@ -7818,7 +7859,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          updateModel_FromUI();
 
          _tourData.computeAltitudeUpDown();
-         _tourData.computeTourDrivingTime();
+         _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
          /*
@@ -8282,8 +8323,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
          _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
-
-         _tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
+         _tourData.setCadenceMultiplier(_comboCadence.getSelectedCadence().getMultiplier());
 
          /*
           * Weather
@@ -8407,8 +8447,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            _tourData.setTourRecordingTime(_timeRecording.getTime());
-            _tourData.setTourDrivingTime(_timeDriving.getTime());
+            _tourData.setTourDeviceTime_Elapsed(_deviceTime_Elapsed.getTime());
+            _tourData.setTourDeviceTime_Recorded(_deviceTime_Recorded.getTime());
+            _tourData.setTourDeviceTime_Paused(_deviceTime_Paused.getTime());
+            _tourData.setTourComputedTime_Moving(_computedTime_Moving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {
@@ -8682,7 +8724,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             sb.append(refTour.getStartValueIndex());
             sb.append(UI.DASH_WITH_SPACE);
             sb.append(refTour.getEndValueIndex());
-            sb.append(")"); //$NON-NLS-1$
+            sb.append(UI.SYMBOL_BRACKET_RIGHT);
 
             final int[] oneRange = _refTourRange[refCounter];
             oneRange[0] = refTour.getStartValueIndex();
@@ -8863,14 +8905,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtAltitudeUp.setText(Integer.toString((int) (altitudeUp / _unitValueAltitude)));
       _txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
-      // tour time's
-      final int recordingTime = (int) _tourData.getTourRecordingTime();
-      final int drivingTime = (int) _tourData.getTourDrivingTime();
-      final int pausedTime = recordingTime - drivingTime;
+      // tour times
+      final int elapsedTime = (int) _tourData.getTourDeviceTime_Elapsed();
+      final int movingTime = (int) _tourData.getTourComputedTime_Moving();
+      final int recordedTime = (int) _tourData.getTourDeviceTime_Recorded();
+      final int pausedTime = (int) _tourData.getTourDeviceTime_Paused();
 
-      _timeRecording.setTime(recordingTime);
-      _timeDriving.setTime(drivingTime);
-      _timePaused.setTime(pausedTime);
+      _deviceTime_Elapsed.setTime(elapsedTime);
+      _deviceTime_Recorded.setTime(recordedTime);
+      _deviceTime_Paused.setTime(pausedTime);
+      _computedTime_Moving.setTime(movingTime);
+      _computedTime_Break.setTime(elapsedTime - movingTime);
 
       /*
        * Time zone
@@ -8921,10 +8966,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
-      final float cadence = _tourData.getCadenceMultiplier();
-      final boolean isSpm = cadence == 2.0f;
-      _rdoCadence_Rpm.setSelection(!isSpm);
-      _rdoCadence_Spm.setSelection(isSpm);
+      final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int)_tourData.getCadenceMultiplier());
+      _comboCadence.setSelection(cadence);
 
       /*
        * layout container to resize labels
@@ -8986,76 +9029,114 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Validate tour recording/driving/paused time
+    * Validate tour elapsed/recorded/paused/moving/break time
     */
    private void updateUI_Time(final Widget widget) {
 
       /*
        * check if a time control is currently used
        */
-      if ((widget == _timeRecording._spinHours
-            || widget == _timeRecording._spinMinutes
-            || widget == _timeRecording._spinSeconds
-            || widget == _timeDriving._spinHours
-            || widget == _timeDriving._spinMinutes
-            || widget == _timeDriving._spinSeconds
-            || widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes || widget == _timePaused._spinSeconds) == false) {
+      if ((widget == _deviceTime_Elapsed._spinHours
+            || widget == _deviceTime_Elapsed._spinMinutes
+            || widget == _deviceTime_Elapsed._spinSeconds
+            || widget == _deviceTime_Recorded._spinHours
+            || widget == _deviceTime_Recorded._spinMinutes
+            || widget == _deviceTime_Recorded._spinSeconds
+            || widget == _deviceTime_Paused._spinHours
+            || widget == _deviceTime_Paused._spinMinutes
+            || widget == _deviceTime_Paused._spinSeconds
+            || widget == _computedTime_Moving._spinHours
+            || widget == _computedTime_Moving._spinMinutes
+            || widget == _computedTime_Moving._spinSeconds
+            || widget == _computedTime_Break._spinHours
+            || widget == _computedTime_Break._spinMinutes
+            || widget == _computedTime_Break._spinSeconds) == false) {
 
          return;
       }
 
-      int recTime = _timeRecording.getTime();
-      int pausedTime = _timePaused.getTime();
-      int driveTime = _timeDriving.getTime();
+      int elapsedTime = _deviceTime_Elapsed.getTime();
+      int recordedTime = _deviceTime_Recorded.getTime();
+      int pausedTime = _deviceTime_Paused.getTime();
+      int breakTime = _computedTime_Break.getTime();
+      int movingTime = _computedTime_Moving.getTime();
 
-      if (recTime < 0) {
-         recTime = -recTime - 1;
+      if (elapsedTime < 0) {
+         elapsedTime = -elapsedTime - 1;
       }
-      if (pausedTime < 0) {
-         pausedTime = 0;
+      if (breakTime < 0) {
+         breakTime = 0;
       }
 
-      if (widget == _timeRecording._spinHours
-            || widget == _timeRecording._spinMinutes
-            || widget == _timeRecording._spinSeconds) {
+      if (widget == _deviceTime_Elapsed._spinHours
+            || widget == _deviceTime_Elapsed._spinMinutes
+            || widget == _deviceTime_Elapsed._spinSeconds) {
+         // elapsed time is modified
 
-         // recording time is modified
-
-         if (pausedTime > recTime) {
-            pausedTime = recTime;
+         if (breakTime > elapsedTime) {
+            breakTime = elapsedTime;
+         }
+         if (pausedTime > elapsedTime) {
+            pausedTime = elapsedTime;
          }
 
-         driveTime = recTime - pausedTime;
+         movingTime = elapsedTime - breakTime;
+         recordedTime = elapsedTime - pausedTime;
 
-      } else if (widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes
-            || widget == _timePaused._spinSeconds) {
+      } else if (widget == _deviceTime_Recorded._spinHours
+            || widget == _deviceTime_Recorded._spinMinutes
+            || widget == _deviceTime_Recorded._spinSeconds) {
+         // recorded time is modified
 
+         if (recordedTime > elapsedTime) {
+            elapsedTime = recordedTime;
+            movingTime = elapsedTime - breakTime;
+         }
+         pausedTime = elapsedTime - recordedTime;
+
+      } else if (widget == _deviceTime_Paused._spinHours
+            || widget == _deviceTime_Paused._spinMinutes
+            || widget == _deviceTime_Paused._spinSeconds) {
          // paused time is modified
 
-         if (pausedTime > recTime) {
-            recTime = pausedTime;
+         if (pausedTime > elapsedTime) {
+            elapsedTime = pausedTime;
+            movingTime = elapsedTime - breakTime;
          }
 
-         driveTime = recTime - pausedTime;
+         recordedTime = elapsedTime - pausedTime;
 
-      } else if (widget == _timeDriving._spinHours
-            || widget == _timeDriving._spinMinutes
-            || widget == _timeDriving._spinSeconds) {
+      } else if (widget == _computedTime_Break._spinHours
+            || widget == _computedTime_Break._spinMinutes
+            || widget == _computedTime_Break._spinSeconds) {
+         // break time is modified
 
-         // driving time is modified
-
-         if (driveTime > recTime) {
-            recTime = driveTime;
+         if (breakTime > elapsedTime) {
+            elapsedTime = breakTime;
+            recordedTime = elapsedTime - pausedTime;
          }
 
-         pausedTime = recTime - driveTime;
+         movingTime = elapsedTime - breakTime;
+
+      } else if (widget == _computedTime_Moving._spinHours
+            || widget == _computedTime_Moving._spinMinutes
+            || widget == _computedTime_Moving._spinSeconds) {
+         // moving time is modified
+
+         if (movingTime > elapsedTime) {
+            elapsedTime = movingTime;
+            recordedTime = elapsedTime - pausedTime;
+         }
+         breakTime = elapsedTime - movingTime;
+
       }
 
-      _timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
-      _timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
-      _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+      _deviceTime_Elapsed.setTime(elapsedTime / 3600, ((elapsedTime % 3600) / 60), ((elapsedTime % 3600) % 60));
+      _deviceTime_Recorded.setTime(recordedTime / 3600, ((recordedTime % 3600) / 60), ((recordedTime % 3600) % 60));
+      _deviceTime_Paused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+      _computedTime_Moving.setTime(movingTime / 3600, ((movingTime % 3600) / 60), ((movingTime % 3600) % 60));
+      _computedTime_Break.setTime(breakTime / 3600, ((breakTime % 3600) / 60), ((breakTime % 3600) % 60));
+
    }
 
    private void updateUI_TimeZone() {

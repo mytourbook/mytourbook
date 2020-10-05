@@ -223,8 +223,8 @@ public class HAC4DeviceData {
       out.println("Pulse 2 upper bound:		" + pulse2UpperBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
       out.println("Pulse 2 lower bound:		" + pulse2LowerBound + " bpm"); //$NON-NLS-1$ //$NON-NLS-2$
       out.println();
-      out.println("1. Count down:			" + count1min + ":" + count1sec); //$NON-NLS-1$ //$NON-NLS-2$
-      out.println("2. Count down:			" + count2min + ":" + count2sec); //$NON-NLS-1$ //$NON-NLS-2$
+      out.println("1. Count down:			" + count1min + UI.SYMBOL_COLON + count1sec); //$NON-NLS-1$
+      out.println("2. Count down:			" + count2min + UI.SYMBOL_COLON + count2sec); //$NON-NLS-1$
       out.println();
       out.println("Total distance:			" + ((totalDistanceHigh * (2 ^ 16)) + totalDistanceLow) //$NON-NLS-1$
             + " km"); //$NON-NLS-1$
@@ -232,9 +232,9 @@ public class HAC4DeviceData {
       out.println("Total altitude down:		" + totalAltitudeDown + " m"); //$NON-NLS-1$ //$NON-NLS-2$
       out.println("Total travel time: 		" //$NON-NLS-1$
             + ((totalTravelTimeHourHigh * 100) + totalTravelTimeHourLow)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + totalTravelTimeMin
-            + ":" + totalTravelTimeSec); //$NON-NLS-1$
+            + UI.SYMBOL_COLON + totalTravelTimeSec);
       out.println();
       out.println("Offset last CC record:		" + offsetCCRecord); //$NON-NLS-1$
       out.println("Offset last DD record:		" + offsetDDRecord); //$NON-NLS-1$

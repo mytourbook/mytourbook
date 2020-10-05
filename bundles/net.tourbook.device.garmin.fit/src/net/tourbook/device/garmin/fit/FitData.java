@@ -85,12 +85,14 @@ public class FitData {
    private final List<GearData>    _allGearData          = new ArrayList<>();
    private final List<SwimData>    _allSwimData          = new ArrayList<>();
    private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
+   private List<Long>              _pausedTime_Start     = new ArrayList<>();
+   private final List<Long>        _pausedTime_End       = new ArrayList<>();
 
    private TimeData                _current_TimeData;
+
    private TimeData                _previous_TimeData;
 
    private TourMarker              _current_TourMarker;
-
    private long                    _timeDiffMS;
 
    public FitData(final FitDataReader fitDataReader,
@@ -240,6 +242,14 @@ public class FitData {
       _tourData.setTourStartTime(zonedStartTime);
 
       _tourData.createTimeSeries(_allTimeData, false);
+
+      _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      final long tourDeviceTimePaused = _tourData.getTourDeviceTime_Paused();
+      if (tourDeviceTimePaused > 0) {
+         //For the tours with pauses, we set the recorded time again as the elapsed time might have changed (+- few seconds)
+         //after the time series were created.
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
+      }
 
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -545,6 +555,14 @@ public class FitData {
 
    public List<GearData> getGearData() {
       return _allGearData;
+   }
+
+   public List<Long> getPausedTime_End() {
+      return _pausedTime_End;
+   }
+
+   public List<Long> getPausedTime_Start() {
+      return _pausedTime_Start;
    }
 
    public List<SwimData> getSwimData() {

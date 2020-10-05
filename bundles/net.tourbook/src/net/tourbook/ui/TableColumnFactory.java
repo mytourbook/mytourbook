@@ -216,18 +216,23 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME;
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS;
 
-   public static final TableColumnFactory TIME_BREAK_TIME;
+   public static final TableColumnFactory TIME__DEVICE_ELAPSED_TIME;
+   public static final String             TIME__DEVICE_ELAPSED_TIME_ID                       = "TIME__DEVICE_ELAPSED_TIME";                       //$NON-NLS-1$
+   public static final TableColumnFactory TIME__DEVICE_ELAPSED_TIME_TOTAL;
+   public static final TableColumnFactory TIME__DEVICE_RECORDED_TIME;
+   public static final String             TIME__DEVICE_RECORDED_TIME_ID                      = "TIME__DEVICE_RECORDED_TIME";                      //$NON-NLS-1$
+   public static final TableColumnFactory TIME__DEVICE_PAUSED_TIME;
+   public static final String             TIME__DEVICE_PAUSED_TIME_ID                        = "TIME__DEVICE_PAUSED_TIME";                        //$NON-NLS-1$
+   public static final TableColumnFactory TIME__COMPUTED_MOVING_TIME;
+   public static final String             TIME__COMPUTED_MOVING_TIME_ID                      = "TIME__COMPUTED_MOVING_TIME";                      //$NON-NLS-1$
+   public static final TableColumnFactory TIME__COMPUTED_BREAK_TIME;
+   public static final String             TIME__COMPUTED_BREAK_TIME_ID                       = "TIME__COMPUTED_BREAK_TIME";                       //$NON-NLS-1$
+   public static final TableColumnFactory TIME__COMPUTED_BREAK_TIME_RELATIVE;
+   public static final String             TIME__COMPUTED_BREAK_TIME_RELATIVE_ID              = "TIME__COMPUTED_BREAK_TIME_RELATIVE";              //$NON-NLS-1$
+
+   public static final TableColumnFactory TIME_IS_BREAK_TIME;
    public static final TableColumnFactory TIME_DATE;
    public static final String             TIME_DATE_ID                                       = "TIME_DATE";                                       //$NON-NLS-1$
-   public static final TableColumnFactory TIME_DRIVING_TIME;
-   public static final String             TIME_DRIVING_TIME_ID                               = "TIME_DRIVING_TIME_ID";                            //$NON-NLS-1$
-   public static final TableColumnFactory TIME_PAUSED_TIME;
-   public static final String             TIME_PAUSED_TIME_ID                                = "TIME_PAUSED_TIME";                                //$NON-NLS-1$
-   public static final TableColumnFactory TIME_PAUSED_TIME_RELATIVE;
-   public static final String             TIME_PAUSED_TIME_RELATIVE_ID                       = "TIME_PAUSED_TIME_RELATIVE";                       //$NON-NLS-1$
-   public static final TableColumnFactory TIME_RECORDING_TIME;
-   public static final String             TIME_RECORDING_TIME_ID                             = "TIME_RECORDING_TIME";                             //$NON-NLS-1$
-   public static final TableColumnFactory TIME_RECORDING_TIME_TOTAL;
    public static final TableColumnFactory TIME_TIME_ZONE;
    public static final String             TIME_TIME_ZONE_ID                                  = "TIME_TIME_ZONE";                                  //$NON-NLS-1$
    public static final TableColumnFactory TIME_TIME_ZONE_DIFFERENCE;
@@ -2883,13 +2888,13 @@ public abstract class TableColumnFactory {
        * Time
        */
 
-      TIME_BREAK_TIME = new TableColumnFactory() {
+      TIME_IS_BREAK_TIME = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3053,20 +3058,20 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_DRIVING_TIME = new TableColumnFactory() {
+      TIME__COMPUTED_BREAK_TIME = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_DRIVING_TIME_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__COMPUTED_BREAK_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_break_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_break_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_break_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_break_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -3078,13 +3083,38 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_PAUSED_TIME = new TableColumnFactory() {
+      TIME__COMPUTED_MOVING_TIME = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_PAUSED_TIME_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__COMPUTED_MOVING_TIME_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_moving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_moving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_moving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_moving_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TIME__DEVICE_PAUSED_TIME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__DEVICE_PAUSED_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3103,19 +3133,19 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_PAUSED_TIME_RELATIVE = new TableColumnFactory() {
+      TIME__COMPUTED_BREAK_TIME_RELATIVE = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_PAUSED_TIME_RELATIVE_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__COMPUTED_BREAK_TIME_RELATIVE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_paused_time_relative_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_paused_relative_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_paused_relative_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_relative_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_break_time_relative_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_break_relative_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_break_relative_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_break_time_relative_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -3123,20 +3153,20 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_RECORDING_TIME = new TableColumnFactory() {
+      TIME__DEVICE_RECORDED_TIME = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_RECORDING_TIME_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__DEVICE_RECORDED_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -3148,22 +3178,47 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TIME_RECORDING_TIME_TOTAL = new TableColumnFactory() {
+      TIME__DEVICE_ELAPSED_TIME = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_RECORDING_TIME_TOTAL", SWT.TRAIL); //$NON-NLS-1$
-
-            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_recording_time;
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME__DEVICE_ELAPSED_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_timeTotal_label);
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TIME__DEVICE_ELAPSED_TIME_TOTAL = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME__DEVICE_ELAPSED_TIME_TOTAL", SWT.TRAIL); //$NON-NLS-1$
+
+            final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE + Messages.ColumnFactory_elapsed_time;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_timeTotal_label);
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_timeTotal_tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_timeTotal_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(

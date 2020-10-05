@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,9 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    private final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
+   private TourData_Day             _tourDay_Data;
+   private DataProvider_Tour_Day    _tourDay_DataProvider            = new DataProvider_Tour_Day();
+
    private IPropertyChangeListener  _statTourFrequency_PrefChangeListener;
 
    private final MinMaxKeeper_YData _minMaxKeeperStatAltitudeCounter = new MinMaxKeeper_YData();
@@ -102,8 +105,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    private TourTypeFilter           _activeTourTypeFilter;
 
    private boolean                  _isSynchScaleEnabled;
-
-   private TourData_Day             _tourDayData;
 
    /*
     * UI controls
@@ -213,13 +214,13 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _statTimeSumColorIndex = new int[colorLength][timeLength];
 
       // loop: all tours
-      for (int tourIndex = 0; tourIndex < tourDayData.distance_High.length; tourIndex++) {
+      for (int tourIndex = 0; tourIndex < tourDayData.allDistance_High.length; tourIndex++) {
 
          int unitIndex;
-         final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
+         final int typeColorIndex = tourDayData.allTypeColorIndices[tourIndex];
 
-         final int diffDistance = (int) ((tourDayData.distance_High[tourIndex] - tourDayData.distance_Low[tourIndex] + 500) / 1000);
-         final int diffAltitude = (int) (tourDayData.altitude_High[tourIndex] - tourDayData.altitude_Low[tourIndex]);
+         final int diffDistance = (int) ((tourDayData.allDistance_High[tourIndex] - tourDayData.allDistance_Low[tourIndex] + 500) / 1000);
+         final int diffAltitude = (int) (tourDayData.allElevation_High[tourIndex] - tourDayData.allElevation_Low[tourIndex]);
          final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData
                .getDurationLowFloat()[tourIndex]);
 
@@ -600,6 +601,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    }
 
    @Override
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourDay_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
+   }
+
+   @Override
    public void preferencesHasChanged() {
 
       updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
@@ -797,23 +803,24 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _currentYear = statContext.statFirstYear;
       _numberOfYears = statContext.statNumberOfYears;
 
-      _tourDayData = DataProvider_Tour_Day.getInstance()
-            .getDayData(
-                  statContext.appPerson,
-                  statContext.appTourTypeFilter,
-                  statContext.statFirstYear,
-                  statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData,
+      _tourDay_Data = _tourDay_DataProvider.getDayData(
 
-                  // this may need to be customized as in the other statistics
-                  DurationTime.MOVING);
+            statContext.appPerson,
+            statContext.appTourTypeFilter,
+            statContext.statFirstYear,
+            statContext.statNumberOfYears,
+
+            isDataDirtyWithReset() || statContext.isRefreshData,
+
+            // this may need to be customized as in the other statistics
+            DurationTime.MOVING);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
          resetMinMaxKeeper(false);
       }
 
-      createStatisticData(_tourDayData);
+      createStatisticData(_tourDay_Data);
 
       updateChartDistance(
             _chartDistanceCounter,

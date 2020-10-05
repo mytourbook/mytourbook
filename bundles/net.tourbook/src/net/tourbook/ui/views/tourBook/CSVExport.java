@@ -107,12 +107,14 @@ public class CSVExport {
    private static final String HEADER_SURFING_NUMBER_OF_EVENTS                        = "SURFING Number of surfing events";                 //$NON-NLS-1$
 
    private static final String HEADER_TIME_DAY                                        = "TIME Day";                                         //$NON-NLS-1$
+   private static final String HEADER_TIME_ELAPSED_TIME                               = "TIME Elapsed time (%s)";                           //$NON-NLS-1$
+   private static final String HEADER_TIME_ISO_DATE_TIME                              = "TIME ISO8601";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_MONTH                                      = "TIME Month";                                       //$NON-NLS-1$
    private static final String HEADER_TIME_MOVING_TIME                                = "TIME Moving time (%s)";                            //$NON-NLS-1$
-   private static final String HEADER_TIME_ISO_DATE_TIME                              = "TIME ISO8601";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_PAUSED_TIME                                = "TIME Paused time (%s)";                            //$NON-NLS-1$
-   private static final String HEADER_TIME_PAUSED_TIME_RELATIVE                       = "TIME Relative paused time (%)";                    //$NON-NLS-1$
-   private static final String HEADER_TIME_RECORDING_TIME                             = "TIME Recording time (%s)";                         //$NON-NLS-1$
+   private static final String HEADER_TIME_BREAK_TIME                                 = "TIME Break time (%s)";                             //$NON-NLS-1$
+   private static final String HEADER_TIME_BREAK_TIME_RELATIVE                        = "TIME Relative break time (%)";                     //$NON-NLS-1$
+   private static final String HEADER_TIME_RECORDED_TIME                              = "TIME Recorded time (%s)";                          //$NON-NLS-1$
    private static final String HEADER_TIME_TOUR_START_TIME                            = "TIME Tour start time";                             //$NON-NLS-1$
    private static final String HEADER_TIME_WEEK                                       = "TIME Week";                                        //$NON-NLS-1$
    private static final String HEADER_TIME_WEEK_YEAR                                  = "TIME Week year";                                   //$NON-NLS-1$
@@ -342,13 +344,17 @@ public class CSVExport {
       csvHeader(sb,                 HEADER_TIME_WEEKDAY);
       csvHeader(sb,                 HEADER_TIME_WEEK_YEAR);
 
-      csvHeader(sb, String.format(  HEADER_TIME_RECORDING_TIME,        Messages.App_Unit_Seconds_Small));
-      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_ELAPSED_TIME,        Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_RECORDED_TIME,           Messages.App_Unit_Seconds_Small));
       csvHeader(sb, String.format(  HEADER_TIME_PAUSED_TIME,           Messages.App_Unit_Seconds_Small));
-      csvHeader(sb,                 HEADER_TIME_PAUSED_TIME_RELATIVE);
-      csvHeader(sb, String.format(  HEADER_TIME_RECORDING_TIME,        CSV_EXPORT_DURATION_HHH_MM_SS));
-      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_BREAK_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb,                 HEADER_TIME_BREAK_TIME_RELATIVE);
+      csvHeader(sb, String.format(  HEADER_TIME_ELAPSED_TIME,        CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_RECORDED_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
       csvHeader(sb, String.format(  HEADER_TIME_PAUSED_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_BREAK_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
 
 // SET_FORMATTING_ON
 
@@ -760,47 +766,67 @@ public class CSVExport {
 
       /////////////////////////////////////////////////////////////////////////////////////////////
 
-      csvField(sb, tviItem.colTourRecordingTime); // HEADER_TIME_RECORDING_TIME
-      csvField(sb, tviItem.colTourDrivingTime); // HEADER_TIME_MOVING_TIME
-      csvField(sb, tviItem.colPausedTime); // HEADER_TIME_PAUSED_TIME
+      csvField(sb, tviItem.colTourDeviceTime_Elapsed); // HEADER_TIME_ELAPSED_TIME
+      csvField(sb, tviItem.colTourDeviceTime_Recorded); // HEADER_TIME_RECORDED_TIME
+      csvField(sb, tviItem.colTourDeviceTime_Paused); // HEADER_TIME_PAUSED_TIME
+      csvField(sb, tviItem.colTourComputedTime_Moving); // HEADER_TIME_MOVING_TIME
+      csvField(sb, tviItem.colTourComputedTime_Break); // HEADER_TIME_BREAK_TIME
 
-      { // HEADER_TIME_PAUSED_TIME_RELATIVE
+      { // HEADER_TIME_BREAK_TIME_RELATIVE
 
-         final long colPausedTime = tviItem.colPausedTime;
-         final long dbPausedTime = colPausedTime;
-         final long dbRecordingTime = tviItem.colTourRecordingTime;
-         final float relativePausedTime = dbRecordingTime == 0 //
+         final long colBreakTime = tviItem.colTourComputedTime_Break;
+         final long dbPausedTime = colBreakTime;
+         final long dbElapsedTime = tviItem.colTourDeviceTime_Elapsed;
+         final float relativePausedTime = dbElapsedTime == 0 //
                ? 0
-               : (float) dbPausedTime / dbRecordingTime * 100;
+               : (float) dbPausedTime / dbElapsedTime * 100;
          if (relativePausedTime != 0) {
             sb.append(_nf1.format(relativePausedTime));
          }
          sb.append(UI.TAB);
       }
 
-      { // HEADER_TIME_RECORDING_TIME hhh:mm:ss
+      { // HEADER_TIME_ELAPSED_TIME hhh:mm:ss
 
-         final long colRecordingTime = (tviItem).colTourRecordingTime;
-         if (colRecordingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colRecordingTime));
+         final long colElapsedTime = (tviItem).colTourDeviceTime_Elapsed;
+         if (colElapsedTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colElapsedTime));
          }
          sb.append(UI.TAB);
       }
 
-      { // HEADER_TIME_MOVING_TIME hhh:mm:ss
+      { // HEADER_TIME_RECORDED_TIME hhh:mm:ss
 
-         final long colDrivingTime = tviItem.colTourDrivingTime;
-         if (colDrivingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colDrivingTime));
+         final long colTourDeviceTime_Recorded = (tviItem).colTourDeviceTime_Recorded;
+         if (colTourDeviceTime_Recorded != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourDeviceTime_Recorded));
          }
          sb.append(UI.TAB);
       }
 
       { // HEADER_TIME_PAUSED_TIME hhh:mm:ss
 
-         final long colPausedTime = tviItem.colPausedTime;
-         if (colPausedTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colPausedTime));
+         final long colTourDeviceTime_Paused = (tviItem).colTourDeviceTime_Paused;
+         if (colTourDeviceTime_Paused != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourDeviceTime_Paused));
+         }
+         sb.append(UI.TAB);
+      }
+
+      { // HEADER_TIME_MOVING_TIME hhh:mm:ss
+
+         final long colMovingTime = tviItem.colTourComputedTime_Moving;
+         if (colMovingTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colMovingTime));
+         }
+         sb.append(UI.TAB);
+      }
+
+      { // HEADER_TIME_BREAK_TIME hhh:mm:ss
+
+         final long colBreakTime = tviItem.colTourComputedTime_Break;
+         if (colBreakTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colBreakTime));
          }
          sb.append(UI.TAB);
       }

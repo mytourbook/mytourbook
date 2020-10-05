@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,10 +22,12 @@ public class TourSegment {
    public int     serieIndex_Start;
    public int     serieIndex_End;
 
-   public int     time_Recording;
+   public int     deviceTime_Elapsed;
+   public int     deviceTime_Recorded;
+   public int     deviceTime_Paused;
+   public int     computedTime_Moving;
+   public int     computedTime_Break;
 
-   public int     time_Driving;
-   public int     time_Break;
    public int     time_Total;
 
    public float   distance_Diff;
@@ -66,11 +68,6 @@ public class TourSegment {
             + "serieIndex_Start " + serieIndex_Start + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "serieIndex_End   " + serieIndex_End + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-//            + "time_Recording=" + time_Recording + "\n"
-//            + "time_Driving=" + time_Driving + "\n"
-//            + "time_Break=" + time_Break + "\n"
-//            + "time_Total=" + time_Total + "\n"
-//
 //            + "distance_Diff=" + distance_Diff + "\n"
 //            + "distance_Total=" + distance_Total + "\n"
 //

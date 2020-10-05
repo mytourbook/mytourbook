@@ -16,8 +16,6 @@
 
 package net.tourbook.ui;
 
-import de.byteholder.geoclipse.map.UI;
-
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -206,10 +204,10 @@ public class MessageManager implements IMessageManager {
                      ltext = ((CLabel) label).getText();
                   }
                   if (ltext != null) {
-                     if (!ltext.endsWith(":")) { //$NON-NLS-1$
+                     if (!ltext.endsWith(net.tourbook.common.UI.SYMBOL_COLON)) {
                         return ltext + ": "; //$NON-NLS-1$
                      }
-                     return ltext + " "; //$NON-NLS-1$
+                     return ltext + net.tourbook.common.UI.SPACE1;
                   }
                }
                break;

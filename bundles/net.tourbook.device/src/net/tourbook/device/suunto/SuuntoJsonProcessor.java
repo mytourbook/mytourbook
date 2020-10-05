@@ -47,8 +47,8 @@ import org.json.JSONObject;
 public class SuuntoJsonProcessor {
 
    public static final String  DeviceName      = "Suunto Spartan/9"; //$NON-NLS-1$
-   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
    public static final String  TAG_SAMPLE      = "Sample";           //$NON-NLS-1$
+   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
    public static final String  TAG_EVENTS      = "Events";           //$NON-NLS-1$
    public static final String  TAG_TIMEISO8601 = "TimeISO8601";      //$NON-NLS-1$
    public static final String  TAG_ATTRIBUTES  = "Attributes";       //$NON-NLS-1$
@@ -61,8 +61,8 @@ public class SuuntoJsonProcessor {
    public static final String  TAG_GPSALTITUDE = "GPSAltitude";      //$NON-NLS-1$
    public static final String  TAG_LATITUDE    = "Latitude";         //$NON-NLS-1$
    public static final String  TAG_LONGITUDE   = "Longitude";        //$NON-NLS-1$
-   private static final String TAG_TYPE        = "Start";            //$NON-NLS-1$
-   private static final String TAG_START       = "Type";             //$NON-NLS-1$
+   private static final String TAG_START       = "Start";            //$NON-NLS-1$
+   private static final String TAG_TYPE        = "Type";             //$NON-NLS-1$
    private static final String TAG_PAUSE       = "Pause";            //$NON-NLS-1$
    private static final String TAG_HR          = "HR";               //$NON-NLS-1$
    private static final String TAG_RR          = "R-R";              //$NON-NLS-1$
@@ -82,10 +82,11 @@ public class SuuntoJsonProcessor {
    private static final String TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
    private static final String Stroke               = "Stroke";                                        //$NON-NLS-1$
    private static final String Turn                 = "Turn";                                          //$NON-NLS-1$
-   private static final String Type                 = "Type";                                          //$NON-NLS-1$
    private static int          previousTotalLengths = 0;
 
    private ArrayList<TimeData> _sampleList;
+   private ArrayList<Long>     _pausedTime_Start;
+   private ArrayList<Long>     _pausedTime_End;
    private int                 _numLaps;
    final IPreferenceStore      _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -136,6 +137,7 @@ public class SuuntoJsonProcessor {
       final Iterator<TimeData> sampleListIterator = activityData.iterator();
       long previousAbsoluteTime = 0;
       while (sampleListIterator.hasNext()) {
+
          final TimeData currentTimeData = sampleListIterator.next();
 
          // Removing the entries that don't have GPS data
@@ -152,7 +154,7 @@ public class SuuntoJsonProcessor {
       }
 
       // If the activity contains laps, we need to close the last lap.
-      if (_numLaps != 0) {
+      if (_numLaps > 0) {
          final TimeData lastTimeData = activityData.get(activityData.size() - 1);
          lastTimeData.marker = 1;
          lastTimeData.markerLabel = Integer.toString(++_numLaps);
@@ -183,6 +185,8 @@ public class SuuntoJsonProcessor {
                                   final TourData activityToReUse,
                                   final ArrayList<TimeData> sampleListToReUse) {
       _sampleList = new ArrayList<>();
+      _pausedTime_Start = new ArrayList<>();
+      _pausedTime_End = new ArrayList<>();
 
       JSONArray samples = null;
       try {
@@ -254,14 +258,14 @@ public class SuuntoJsonProcessor {
          reusePreviousTimeEntry = false;
          TimeData timeData = null;
 
-         ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
-         currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
+         final ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
+         ZonedDateTime adjustedCurrentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
          // Rounding to the nearest second.
          if (Character.getNumericValue(sampleTime.charAt(20)) >= 5) {
-            currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
+            adjustedCurrentZonedDateTime = adjustedCurrentZonedDateTime.plusSeconds(1);
          }
 
-         final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
+         final long currentTime = adjustedCurrentZonedDateTime.toInstant().toEpochMilli();
 
          if (currentSampleData.toString().contains(TAG_RR)) {
             BuildRRDataList(_allRRData, currentSampleSml);
@@ -296,15 +300,14 @@ public class SuuntoJsonProcessor {
          }
 
          if (currentSampleData.contains(TAG_PAUSE)) {
-            if (!isPaused) {
-               if (currentSampleData.contains(Boolean.TRUE.toString())) {
-                  isPaused = true;
-                  pauseStartTime = currentZonedDateTime;
-               }
-            } else {
-               if (currentSampleData.contains(Boolean.FALSE.toString())) {
-                  isPaused = false;
-               }
+            if (!isPaused && currentSampleData.contains(Boolean.TRUE.toString())) {
+               isPaused = true;
+               pauseStartTime = currentZonedDateTime;
+            } else if (currentSampleData.contains(Boolean.FALSE.toString())) {
+               isPaused = false;
+
+               _pausedTime_Start.add(pauseStartTime.toInstant().toEpochMilli());
+               _pausedTime_End.add(currentZonedDateTime.toInstant().toEpochMilli());
             }
          }
 
@@ -319,6 +322,7 @@ public class SuuntoJsonProcessor {
          if (currentSampleData.contains(TAG_LAP) &&
                (currentSampleData.contains(TAG_MANUAL) ||
                      currentSampleData.contains(TAG_DISTANCE))) {
+
             timeData.marker = 1;
             timeData.markerLabel = Integer.toString(++_numLaps);
             if (!reusePreviousTimeEntry) {
@@ -384,6 +388,9 @@ public class SuuntoJsonProcessor {
       TryComputeHeartRateData(_sampleList, _allRRData, _rrDataStartTime);
 
       tourData.createTimeSeries(_sampleList, true);
+
+      tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 
@@ -602,7 +609,7 @@ public class SuuntoJsonProcessor {
 
       final String swimmingType = TryRetrieveStringElementValue(
             swimmingSample,
-            Type);
+            TAG_TYPE);
 
       switch (swimmingType) {
       case Stroke:

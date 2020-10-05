@@ -94,12 +94,15 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory SURFING_MIN_TIME_DURATION;
    public static final TreeColumnFactory SURFING_NUMBER_OF_EVENTS;
 
+   public static final TreeColumnFactory TIME__DEVICE_ELAPSED_TIME;
+   public static final TreeColumnFactory TIME__DEVICE_RECORDED_TIME;
+   public static final TreeColumnFactory TIME__DEVICE_PAUSED_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_MOVING_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_MOVING_TIME_NO_CATEGORY;
+   public static final TreeColumnFactory TIME__COMPUTED_BREAK_TIME;
+   public static final TreeColumnFactory TIME__COMPUTED_BREAK_TIME_RELATIVE;
+
    public static final TreeColumnFactory TIME_DATE;
-   public static final TreeColumnFactory TIME_DRIVING_TIME;
-   public static final TreeColumnFactory TIME_DRIVING_TIME_NO_CATEGORY;
-   public static final TreeColumnFactory TIME_PAUSED_TIME;
-   public static final TreeColumnFactory TIME_PAUSED_TIME_RELATIVE;
-   public static final TreeColumnFactory TIME_RECORDING_TIME;
    public static final TreeColumnFactory TIME_TIME_ZONE;
    public static final TreeColumnFactory TIME_TIME_ZONE_DIFFERENCE;
    public static final TreeColumnFactory TIME_TOUR_START_TIME;
@@ -1592,19 +1595,19 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_DRIVING_TIME = new TreeColumnFactory() {
+      TIME__COMPUTED_MOVING_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_DRIVING_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_moving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_moving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_moving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_moving_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -1617,19 +1620,19 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_DRIVING_TIME_NO_CATEGORY = new TreeColumnFactory() {
+      TIME__COMPUTED_MOVING_TIME_NO_CATEGORY = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_DRIVING_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_MOVING_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_driving_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_moving_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_moving_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_moving_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_moving_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(
@@ -1641,12 +1644,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_PAUSED_TIME = new TreeColumnFactory() {
+      TIME__DEVICE_PAUSED_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_PAUSED_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_PAUSED_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -1666,19 +1669,44 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_PAUSED_TIME_RELATIVE = new TreeColumnFactory() {
+      TIME__COMPUTED_BREAK_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_PAUSED_TIME_RELATIVE", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_paused_time_relative_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_paused_relative_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_paused_relative_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_relative_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_break_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_break_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_break_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_break_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(//
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TIME__COMPUTED_BREAK_TIME_RELATIVE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__COMPUTED_BREAK_TIME_RELATIVE", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_break_time_relative_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_break_relative_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_break_relative_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_break_time_relative_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1686,19 +1714,44 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      TIME_RECORDING_TIME = new TreeColumnFactory() {
+      TIME__DEVICE_RECORDED_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_RECORDING_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_RECORDED_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(//
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TIME__DEVICE_ELAPSED_TIME = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME__DEVICE_ELAPSED_TIME", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_elapsed_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_elapsed_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_elapsed_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
             colDef.setValueFormats(//
@@ -1867,7 +1920,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
             colDef.setColumnHeaderText(Messages.ColumnFactory_tour_numbers);
-            colDef.setColumnLabel(Messages.ColumnFactory_tour_numbers_lable);
+            colDef.setColumnLabel(Messages.ColumnFactory_tour_numbers_label);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
