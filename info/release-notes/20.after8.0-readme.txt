@@ -62,8 +62,11 @@ Improvements
     These unchecked tags can be deleted with the DELETE key in the "Selected Tags" or by unchecking it in "Available Tags"
 
 * Dialog Adjust Elevation
-  - Adjustment Type: "Approach elevation with SRMT data"
+  - Adjustment Type: "Approach elevation with SRTM data"
     New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
+
+* Dropbox (Frederic)
+  - Dropbox file/folder dialog: Sorting alphabetically the Dropbox folders and files
 
 
 Changes  
