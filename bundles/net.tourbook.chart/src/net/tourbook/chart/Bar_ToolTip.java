@@ -20,22 +20,17 @@ import net.tourbook.common.tooltip.AnimatedToolTipShell2;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
-   private int _devX;
-   private int _devY;
+   private Rectangle _barRectangle;
 
-   private int _hoveredBar_VerticalIndex;
-   private int _hoveredBar_HorizontalIndex = -1;
+   private int       _hoveredBar_VerticalIndex;
+   private int       _hoveredBar_HorizontalIndex = -1;
 
    /*
     * UI controls
@@ -50,10 +45,10 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
       setFadeInSteps(0);
 
-      setFadeOutSteps(0);
-      setFadeOutDelaySteps(0);
+      setFadeOutSteps(20);
+      setFadeOutDelaySteps(20);
 
-//      setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
+      setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
    }
 
    @Override
@@ -70,33 +65,30 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
    @Override
    protected boolean canShowToolTip() {
 
-      return true;
+      if (_hoveredBar_HorizontalIndex != -1 && getChartInfoProvider() != null) {
+         return true;
+      }
+
+      return false;
    }
 
    @Override
-   protected Composite createToolTipContentArea(final Composite shell) {
+   protected void createToolTipContentArea(final Composite shell) {
 
-      return createUI(shell);
-   }
+      // get the method which computes the bar info
 
-   private Composite createUI(final Composite parent) {
+      final IChartInfoProvider toolTipInfoProvider = getChartInfoProvider();
 
-      System.out.println((System.currentTimeMillis() + " createUI()"));
-// TODO remove SYSTEM.OUT.PRINTLN
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText("Bar Tooltip\n\n"
-               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
-               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
-
+      if (toolTipInfoProvider == null) {
+         return;
       }
 
-      return container;
+      toolTipInfoProvider.createToolTipUI(shell, _hoveredBar_HorizontalIndex, _hoveredBar_VerticalIndex);
+   }
+
+   private IChartInfoProvider getChartInfoProvider() {
+
+      return (IChartInfoProvider) _chart.getChartDataModel().getCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER);
    }
 
    /**
@@ -113,10 +105,10 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
       final ToolBar toolbarControl = tbm.getControl();
 
       final int tipWidth = tipSize.x;
-      final int tipHeight = tipSize.y;
+//      final int tipHeight = tipSize.y;
 
-      final int ttPosX = _devX;
-      final int ttPosY = _devY;
+      final int ttPosX = _barRectangle.x + _barRectangle.width;
+      final int ttPosY = _barRectangle.y;
 
       final Point ttLocationX = graphControl.toDisplay(ttPosX, ttPosY);
       final Point ttLocationY = toolbarControl.toDisplay(ttPosX, ttPosY);
@@ -175,7 +167,7 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
       return graphDisplayRect.contains(displayCursorLocation);
    }
 
-   public void open(final int devX, final int devY, final int hoveredBar_VerticalIndex, final int hoveredBar_HorizontalIndex) {
+   public void open(final Rectangle barInfoFocusRectangle, final int hoveredBar_VerticalIndex, final int hoveredBar_HorizontalIndex) {
 
       boolean isKeepOpened = false;
 
@@ -204,8 +196,7 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
       // another bar is hovered, show tooltip
 
-      _devX = devX;
-      _devY = devY;
+      _barRectangle = barInfoFocusRectangle;
 
       _hoveredBar_HorizontalIndex = hoveredBar_HorizontalIndex;
       _hoveredBar_VerticalIndex = hoveredBar_VerticalIndex;

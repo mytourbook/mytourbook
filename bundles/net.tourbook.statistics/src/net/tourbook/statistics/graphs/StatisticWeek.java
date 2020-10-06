@@ -43,8 +43,11 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticWeek extends TourbookStatistic {
@@ -122,13 +125,18 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
       _chartInfoProvider = new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticWeek.this.createToolTipUI(parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(serieIndex, valueIndex);
          }
       };
    }
-
    private ChartToolTipInfo createToolTipInfo(final int colorIndex, final int weekIndex) {
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -251,6 +259,21 @@ public abstract class StatisticWeek extends TourbookStatistic {
       toolTipInfo.setLabel(toolTipLabel);
 
       return toolTipInfo;
+   }
+
+   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
    }
 
    private double[] createWeekData() {

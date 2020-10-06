@@ -55,12 +55,15 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticTour_Time extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
@@ -389,6 +392,21 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       return toolTipInfo;
    }
 
+   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
+   }
+
    @Override
    public int getEnabledGridOptions() {
 
@@ -510,10 +528,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
       return isSelected;
    }
-
    private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
       final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Time.this.createToolTipUI(parent, serieIndex, valueIndex);
+         }
 
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {

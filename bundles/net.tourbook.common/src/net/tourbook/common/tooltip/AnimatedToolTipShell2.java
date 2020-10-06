@@ -936,7 +936,7 @@ public abstract class AnimatedToolTipShell2 {
     *           the parent of the content area
     * @return the content area created
     */
-   protected abstract Composite createToolTipContentArea(Composite shell);
+   protected abstract void createToolTipContentArea(Composite shell);
 
    /**
     * Create a shell but do not display it

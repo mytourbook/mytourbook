@@ -465,6 +465,21 @@ public class YearStatisticView extends ViewPart {
       return toolTipInfo;
    }
 
+   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
+   }
+
    private void createUI(final Composite parent) {
 
       _pageBook = new PageBook(parent, SWT.NONE);
@@ -894,7 +909,6 @@ public class YearStatisticView extends ViewPart {
          yearIndex++;
       }
    }
-
    /**
     * show statistic for several years
     *
@@ -1039,6 +1053,12 @@ public class YearStatisticView extends ViewPart {
        */
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
+            YearStatisticView.this.createToolTipUI(parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(valueIndex);
