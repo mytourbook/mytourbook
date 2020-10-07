@@ -31,6 +31,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -45,9 +46,12 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticYear extends TourbookStatistic {
@@ -94,7 +98,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
    ChartStatisticSegments createChartSegments(final TourData_Year tourDataYear) {
 
-      final int yearCounter = tourDataYear.altitudeHigh[0].length;
+      final int yearCounter = tourDataYear.elevationUp_High[0].length;
 
       final double segmentStart[] = new double[_statNumberOfYears];
       final double segmentEnd[] = new double[_statNumberOfYears];
@@ -221,6 +225,24 @@ public abstract class StatisticYear extends TourbookStatistic {
       return toolTipInfo;
    }
 
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
+   }
+
    void createXData_Year(final ChartDataModel chartDataModel) {
 
       // set the x-axis
@@ -332,7 +354,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
    private double[] createYearData(final TourData_Year tourDataYear) {
 
-      final int yearCounter = tourDataYear.altitudeHigh[0].length;
+      final int yearCounter = tourDataYear.elevationUp_High[0].length;
       final double allYears[] = new double[yearCounter];
 
       for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
@@ -371,7 +393,7 @@ public abstract class StatisticYear extends TourbookStatistic {
     */
    private void reorderStatData() {
 
-      final int barLength = _tourYear_Data.altitudeHigh.length;
+      final int barLength = _tourYear_Data.elevationUp_High.length;
 
       _resortedTypeIds = new long[barLength][];
 
@@ -406,8 +428,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       final long[][] typeIds = _tourYear_Data.typeIds;
 
-      final float[][] altitudeLowValues = _tourYear_Data.altitudeLow;
-      final float[][] altitudeHighValues = _tourYear_Data.altitudeHigh;
+      final float[][] altitudeLowValues = _tourYear_Data.elevationUp_Low;
+      final float[][] altitudeHighValues = _tourYear_Data.elevationUp_High;
       final float[][] distanceLowValues = _tourYear_Data.distanceLow;
       final float[][] distanceHighValues = _tourYear_Data.distanceHigh;
       final float[][] numToursLowValues = _tourYear_Data.numToursLow;
@@ -526,6 +548,12 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticYear.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(serieIndex, valueIndex);

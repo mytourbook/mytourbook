@@ -260,7 +260,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                      _tourWeekData.movingTime[tourTypeIndex][weekIndex],
                      _tourWeekData.breakTime[tourTypeIndex][weekIndex],
 
-                     _tourWeekData.altitudeHigh[tourTypeIndex][weekIndex],
+                     _tourWeekData.elevationUp_High[tourTypeIndex][weekIndex],
                      _tourWeekData.distanceHigh[tourTypeIndex][weekIndex],
 
                      numTours
@@ -554,8 +554,8 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.distanceLow = new float[numTourTypes][numAllWeeks];
          _tourWeekData.distanceHigh = allDbDistance;
 
-         _tourWeekData.altitudeLow = new float[numTourTypes][numAllWeeks];
-         _tourWeekData.altitudeHigh = allDbElevation;
+         _tourWeekData.elevationUp_Low = new float[numTourTypes][numAllWeeks];
+         _tourWeekData.elevationUp_High = allDbElevation;
 
          _tourWeekData.numToursLow = new float[numTourTypes][numAllWeeks];
          _tourWeekData.numToursHigh = allDbNumTours;

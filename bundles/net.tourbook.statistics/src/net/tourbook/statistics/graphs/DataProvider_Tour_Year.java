@@ -192,7 +192,7 @@ public class DataProvider_Tour_Year extends DataProvider {
                      _tourYearData.movingTime[tourTypeIndex][yearIndex],
                      _tourYearData.breakTime[tourTypeIndex][yearIndex],
 
-                     _tourYearData.altitudeHigh[tourTypeIndex][yearIndex],
+                     _tourYearData.elevationUp_High[tourTypeIndex][yearIndex],
                      _tourYearData.distanceHigh[tourTypeIndex][yearIndex],
 
                      _tourYearData.numToursHigh[tourTypeIndex][yearIndex]
@@ -501,8 +501,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourYearData.typeIds = new long[1][1];
             _tourYearData.usedTourTypeIds = new long[] { TourType.TOUR_TYPE_IS_NOT_USED };
 
-            _tourYearData.altitudeLow = new float[1][numYears];
-            _tourYearData.altitudeHigh = new float[1][numYears];
+            _tourYearData.elevationUp_Low = new float[1][numYears];
+            _tourYearData.elevationUp_High = new float[1][numYears];
 
             _tourYearData.distanceLow = new float[1][numYears];
             _tourYearData.distanceHigh = new float[1][numYears];
@@ -553,8 +553,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourYearData.typeIds = usedTypeIds;
             _tourYearData.usedTourTypeIds = usedTourTypeIds;
 
-            _tourYearData.altitudeLow = new float[numTourTypes_WithData][numYears];
-            _tourYearData.altitudeHigh = usedElevation;
+            _tourYearData.elevationUp_Low = new float[numTourTypes_WithData][numYears];
+            _tourYearData.elevationUp_High = usedElevation;
 
             _tourYearData.distanceLow = new float[numTourTypes_WithData][numYears];
             _tourYearData.distanceHigh = usedDistance;

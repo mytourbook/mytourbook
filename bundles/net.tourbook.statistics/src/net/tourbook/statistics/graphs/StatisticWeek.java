@@ -32,6 +32,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -43,8 +44,11 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticWeek extends TourbookStatistic {
@@ -122,13 +126,18 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 
       _chartInfoProvider = new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticWeek.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(serieIndex, valueIndex);
          }
       };
    }
-
    private ChartToolTipInfo createToolTipInfo(final int colorIndex, final int weekIndex) {
 
       final int oldestYear = _statYoungestYear - _statNumberOfYears + 1;
@@ -220,7 +229,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
             _tourWeek_Data.distanceHigh[colorIndex][weekIndex] / 1000,
             UI.UNIT_LABEL_DISTANCE,
             //
-            (int) _tourWeek_Data.altitudeHigh[colorIndex][weekIndex],
+            (int) _tourWeek_Data.elevationUp_High[colorIndex][weekIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
             elapsedTime / 3600,
@@ -253,9 +262,27 @@ public abstract class StatisticWeek extends TourbookStatistic {
       return toolTipInfo;
    }
 
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
+   }
+
    private double[] createWeekData() {
 
-      final int weekCounter = _tourWeek_Data.altitudeHigh[0].length;
+      final int weekCounter = _tourWeek_Data.elevationUp_High[0].length;
       final double allWeeks[] = new double[weekCounter];
 
       for (int weekIndex = 0; weekIndex < weekCounter; weekIndex++) {
@@ -283,8 +310,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeek_Data.altitudeLow,
-            _tourWeek_Data.altitudeHigh);
+            _tourWeek_Data.elevationUp_Low,
+            _tourWeek_Data.elevationUp_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
       yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
