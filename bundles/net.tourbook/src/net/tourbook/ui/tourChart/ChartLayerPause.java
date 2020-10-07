@@ -101,7 +101,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
    /**
-    * This paints the pause(s) for the current graph config.
+    * This paints the pause(s) for the current graph configuration.
     */
    @Override
    public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
@@ -162,9 +162,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          final int devXPauseTopLeft = _devXPause - pausePointSize2;
          final int devYPauseTopLeft = _devYPause - pausePointSize2;
 
-         chartLabel.devXMarker = devXPauseTopLeft;
-         chartLabel.devYMarker = devYPauseTopLeft;
-
          /*
           * Draw pause point
           */
@@ -182,12 +179,7 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          final int labelWidth = labelExtend.x;
          final int labelHeight = labelExtend.y;
 
-         adjustLabelPosition(//
-               chartLabel,
-               devYTop,
-               devYBottom,
-               labelWidth,
-               labelHeight);
+         adjustLabelPosition(chartLabel, devYTop, devYBottom, labelWidth, labelHeight);
 
          // add an additional offset which is defined for all pauses in the pause properties slideout
          _devXPause += chartLabel.labelXOffset;
@@ -228,7 +220,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
          // keep painted positions to identify and paint hovered positions
          chartLabel.devIsVertical = _isVertical;
-         chartLabel.devMarkerPointSize = PAUSE_POINT_SIZE;
          chartLabel.devHoverSize = PAUSE_HOVER_SIZE;
          chartLabel.devYBottom = devYBottom;
          chartLabel.devYTop = devYTop;
@@ -253,7 +244,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
    }
 
    public void setChartPauseConfig(final ChartPauseConfig chartPauseConfig) {
-
       _cpc = chartPauseConfig;
    }
 }
