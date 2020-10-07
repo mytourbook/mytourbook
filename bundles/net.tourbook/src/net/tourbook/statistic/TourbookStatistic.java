@@ -34,6 +34,8 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
+   protected static final String TOOLTIP_TITLE_FORMAT                       = "%s ● %s %d";                                 //$NON-NLS-1$
+
    protected static final String STATE_SELECTED_TOUR_ID                     = "STATE_SELECTED_TOUR_ID";                     //$NON-NLS-1$
 
    protected static final String STATE_BAR_ORDERING_MONTH_ALTITUDE          = "STATE_BAR_ORDERING_MONTH_ALTITUDE";          //$NON-NLS-1$
@@ -244,6 +246,14 @@ public abstract class TourbookStatistic {
     * @return Returns a prefix which is used to access the grid preferences in the pref store.
     */
    protected abstract String getGridPrefPrefix();
+
+   /**
+    * @param isShowSequenceNumbers
+    *           Show sequence numbers in the first column
+    * @return Returns the statistic values, these values are created on demand because they can use
+    *         some 100 ms, depending on the statistic.
+    */
+   public abstract String getRawStatisticValues(boolean isShowSequenceNumbers);
 
    /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the

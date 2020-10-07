@@ -21,62 +21,61 @@ import java.util.HashMap;
 
 public class TourData_Day {
 
-   long[]                         tourIds;
+   long[]                         allTourIds;
 
-   long[]                         typeIds;
-   int[]                          typeColorIndex;
+   long[]                         allTypeIds;
+   int[]                          allTypeColorIndices;
 
-   int[]                          yearValues;
-   int[]                          monthValues;
-   int[]                          dayValues;
-   int[]                          weekValues;
-
-   private int[]                  _doyValues;
-   private double[]               _doyValuesDouble;
-
-   int[]                          years;
-   int[]                          yearDays;
-   int                            allDaysInAllYears;
-
-   float[]                        altitude_Low;
-   float[]                        altitude_High;
-   float[]                        avgPace_Low;
-   float[]                        avgPace_High;
-   float[]                        avgSpeed_Low;
-   float[]                        avgSpeed_High;
-   float[]                        distance_Low;
-   float[]                        distance_High;
-
-   float[]                        trainingEffect_Aerob_Low;
-   float[]                        trainingEffect_Aerob_High;
-   float[]                        trainingEffect_Anaerob_Low;
-   float[]                        trainingEffect_Anaerob_High;
-   float[]                        trainingPerformance_Low;
-   float[]                        trainingPerformance_High;
-
-   private float[]                _durationLowFloat;
-   private float[]                _durationHighFloat;
-
-   int[]                          allDeviceTime_Elapsed;
-   int[]                          allComputedTime_Moving;
-   int[]                          allDeviceTime_Recorded;
-   int[]                          allDeviceTime_Paused;
+   int[]                          allYears;
+   int[]                          allMonths;
+   int[]                          allDays;
+   int[]                          allWeeks;
 
    int[]                          allStartTime;
    int[]                          allEndTime;
    ArrayList<ZonedDateTime>       allStartDateTimes;
 
+   int[]                          allDeviceTime_Elapsed;
+   int[]                          allDeviceTime_Recorded;
+   int[]                          allDeviceTime_Paused;
+   int[]                          allComputedTime_Moving;
+
+   private float[]                _allDurationLowFloat;
+   private float[]                _allDurationHighFloat;
+
+   private int[]                  _allDoys;
+   private double[]               _allDoyDoubles;
+
+   int[]                          allYearNumbers;
+   int[]                          allYearDays;
+   int                            allDaysInAllYears;
+
    float[]                        allDistance;
-   float[]                        allAltitude;
+   float[]                        allDistance_Low;
+   float[]                        allDistance_High;
+   float[]                        allElevation;
+   float[]                        allElevation_Low;
+   float[]                        allElevation_High;
 
-   float[]                        allTraining_Effect;
-   float[]                        allTraining_Effect_Anaerobic;
+   float[]                        allAvgPace;
+   float[]                        allAvgPace_Low;
+   float[]                        allAvgPace_High;
+   float[]                        allAvgSpeed;
+   float[]                        allAvgSpeed_Low;
+   float[]                        allAvgSpeed_High;
+
+   float[]                        allTraining_Effect_Aerob;
+   float[]                        allTraining_Effect_Aerob_Low;
+   float[]                        allTraining_Effect_Aerob_High;
+   float[]                        allTraining_Effect_Anaerob;
+   float[]                        allTraining_Effect_Anaerob_Low;
+   float[]                        allTraining_Effect_Anaerob_High;
    float[]                        allTraining_Performance;
+   float[]                        allTraining_Performance_Low;
+   float[]                        allTraining_Performance_High;
 
-   ArrayList<String>              tourTitle;
-   ArrayList<String>              tourDescription;
-
-   String                         statisticValuesRaw;
+   ArrayList<String>              allTourTitles;
+   ArrayList<String>              allTourDescriptions;
 
    /**
     * Contains the tags for the tour where the key is the tour ID
@@ -84,46 +83,46 @@ public class TourData_Day {
    HashMap<Long, ArrayList<Long>> tagIds;
 
    public int[] getDoyValues() {
-      return _doyValues;
+      return _allDoys;
    }
 
    public double[] getDoyValuesDouble() {
-      return _doyValuesDouble;
+      return _allDoyDoubles;
    }
 
    public float[] getDurationHighFloat() {
-      return _durationHighFloat;
+      return _allDurationHighFloat;
    }
 
    public float[] getDurationLowFloat() {
-      return _durationLowFloat;
+      return _allDurationLowFloat;
    }
 
    public void setDoyValues(final int[] doyValues) {
 
-      _doyValues = doyValues;
-      _doyValuesDouble = new double[doyValues.length];
+      _allDoys = doyValues;
+      _allDoyDoubles = new double[doyValues.length];
 
       for (int valueIndex = 0; valueIndex < doyValues.length; valueIndex++) {
-         _doyValuesDouble[valueIndex] = doyValues[valueIndex];
+         _allDoyDoubles[valueIndex] = doyValues[valueIndex];
       }
    }
 
    public void setDurationHigh(final int[] timeHigh) {
 
-      _durationHighFloat = new float[timeHigh.length];
+      _allDurationHighFloat = new float[timeHigh.length];
 
       for (int valueIndex = 0; valueIndex < timeHigh.length; valueIndex++) {
-         _durationHighFloat[valueIndex] = timeHigh[valueIndex];
+         _allDurationHighFloat[valueIndex] = timeHigh[valueIndex];
       }
    }
 
    public void setDurationLow(final int[] timeLow) {
 
-      _durationLowFloat = new float[timeLow.length];
+      _allDurationLowFloat = new float[timeLow.length];
 
       for (int valueIndex = 0; valueIndex < timeLow.length; valueIndex++) {
-         _durationLowFloat[valueIndex] = timeLow[valueIndex];
+         _allDurationLowFloat[valueIndex] = timeLow[valueIndex];
       }
    }
 

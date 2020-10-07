@@ -148,10 +148,9 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       // compute average speed/pace, prevent divide by 0
       final long dbDistance = result.getLong(startIndex + 7);
 
-      colAvgSpeed = colMovingTime == 0 ? 0 : 3.6f * dbDistance / colMovingTime;
-
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      final long time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
+      colAvgSpeed = time == 0 ? 0 : 3.6f * dbDistance / time;
       colAvgPace = dbDistance == 0 ? 0 : time * 1000f / dbDistance;
 
       colMaxAltitude = result.getLong(startIndex + 8);

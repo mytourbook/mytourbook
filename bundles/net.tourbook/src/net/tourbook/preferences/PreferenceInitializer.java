@@ -390,7 +390,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // heap is not displayed by default since version 11.7
       store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, false);
 
-      store.setDefault(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME, true);
+      store.setDefault(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
       store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, true);
       store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, true);
       store.setDefault(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, 500);

@@ -179,11 +179,10 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       colRecordedTime = result.getLong(startIndex + 11);
 
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      long time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
       // prevent divide by 0
-      // 3.6 * SUM(TOURDISTANCE) / SUM(tourComputedTime_Moving)
-      colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
-      final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-      long time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+      colAvgSpeed = (time == 0 ? 0 : 3.6f * colDistance / time);
       colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
@@ -206,9 +205,9 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          colAvgCadence = UI.scrambleNumbers(colAvgCadence);
          colAvgTemperature = UI.scrambleNumbers(colAvgTemperature);
 
+         time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
          // prevent divide by 0
-         colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
-         time = isPaceFromRecordedTime ? colRecordedTime : colMovingTime;
+         colAvgSpeed = (time == 0 ? 0 : 3.6f * colDistance / time);
          colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
       }
    }

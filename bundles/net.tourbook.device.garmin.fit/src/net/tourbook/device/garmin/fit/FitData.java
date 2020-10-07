@@ -17,9 +17,7 @@ package net.tourbook.device.garmin.fit;
 
 import com.garmin.fit.SessionMesg;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -245,10 +243,13 @@ public class FitData {
 
       _tourData.createTimeSeries(_allTimeData, false);
 
-      //We set the recorded time again as the elapsed time might have changed (+- few seconds)
-      //after the time series were created.
-      final long tourDeviceTime_Paused = _tourData.getTourDeviceTime_Paused();
-      _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - tourDeviceTime_Paused);
+      _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      final long tourDeviceTimePaused = _tourData.getTourDeviceTime_Paused();
+      if (tourDeviceTimePaused > 0) {
+         //For the tours with pauses, we set the recorded time again as the elapsed time might have changed (+- few seconds)
+         //after the time series were created.
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
+      }
 
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -280,8 +281,6 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
-
-         finalizeTour_TimerPauses(_tourData);
       }
    }
 
@@ -473,50 +472,6 @@ public class FitData {
       final Set<TourMarker> tourTourMarkers = new HashSet<>(validatedTourMarkers);
 
       tourData.setTourMarkers(tourTourMarkers);
-   }
-
-   private void finalizeTour_TimerPauses(final TourData tourData) {
-
-      if (_pausedTime_Start.size() == 0) {
-         return;
-      }
-
-      if (_pausedTime_Start.size() != _pausedTime_End.size()) {
-         _pausedTime_Start = _pausedTime_Start.subList(0, _pausedTime_End.size());
-      }
-
-      tourData.setPausedTime_Start(_pausedTime_Start.stream().mapToLong(l -> l).toArray());
-      tourData.setPausedTime_End(_pausedTime_End.stream().mapToLong(l -> l).toArray());
-
-      final long pausedTime = tourData.getTotalTourTimerPauses();
-      tourData.setTourDeviceTime_Paused(pausedTime);
-
-      // dump paused time
-      final boolean isDebug = false;
-      if (isDebug) {
-
-         System.out.println();
-         System.out.println("Start,End,Diff");
-
-         for (int timeIndex = 0; timeIndex < _pausedTime_Start.size(); timeIndex++) {
-
-            final Long startTime = _pausedTime_Start.get(timeIndex);
-            final Long endTime = _pausedTime_End.get(timeIndex);
-
-            final LocalDateTime dtStart = TimeTools.toLocalDateTime(startTime);
-            final LocalDateTime dtEnd = TimeTools.toLocalDateTime(endTime);
-
-            final long diff = ChronoUnit.MILLIS.between(dtStart, dtEnd);
-            final LocalDateTime dtDiff = TimeTools.toLocalDateTime(diff);
-
-            System.out.println(String.format("%s,%s,%s",
-                  dtStart.format(TimeTools.Formatter_Time_M),
-                  dtEnd.format(TimeTools.Formatter_Time_M),
-                  dtDiff.format(TimeTools.Formatter_Time_M)
-
-            ));
-         }
-      }
    }
 
    private void finalizeTour_Type(final TourData tourData) {

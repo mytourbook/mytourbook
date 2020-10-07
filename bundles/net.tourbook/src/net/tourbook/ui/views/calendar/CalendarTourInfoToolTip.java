@@ -42,217 +42,217 @@ import org.eclipse.swt.widgets.Event;
  */
 public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
 
-	private final TourInfoUI	_tourInfoUI	= new TourInfoUI();
+   private final TourInfoUI   _tourInfoUI = new TourInfoUI();
 
-	private Long				_tourId;
-	private TourData			_tourData;
+   private Long               _tourId;
+   private TourData           _tourData;
 
-	private Control				_ttControl;
+   private Control            _ttControl;
 
-	private CalendarGraph		_calendarGraph;
-	private CalendarView		_calendarView;
+   private CalendarGraph      _calendarGraph;
+   private CalendarView       _calendarView;
 
-	private CalendarSelectItem	_hoveredItem;
+   private CalendarSelectItem _hoveredItem;
 
-	public CalendarTourInfoToolTip(final CalendarView calendarView) {
+   public CalendarTourInfoToolTip(final CalendarView calendarView) {
 
-		super(calendarView.getCalendarGraph(), NO_RECREATE, false);
+      super(calendarView.getCalendarGraph(), NO_RECREATE, false);
 
-		_calendarView = calendarView;
+      _calendarView = calendarView;
 
-		_ttControl = calendarView.getCalendarGraph();
-		_calendarGraph = calendarView.getCalendarGraph();
+      _ttControl = calendarView.getCalendarGraph();
+      _calendarGraph = calendarView.getCalendarGraph();
 
-		setHideOnMouseDown(false);
-		setPopupDelay(20);
-	}
+      setHideOnMouseDown(false);
+      setPopupDelay(20);
+   }
 
-	@Override
-	public void afterHideToolTip() {
-		// not used
-	}
+   @Override
+   public void afterHideToolTip() {
+      // not used
+   }
 
-	@Override
-	protected void afterHideToolTip(final Event event) {
+   @Override
+   protected void afterHideToolTip(final Event event) {
 
-		super.afterHideToolTip(event);
+      super.afterHideToolTip(event);
 
-		_hoveredItem = null;
-	}
+      _hoveredItem = null;
+   }
 
-	@Override
-	public Composite createToolTipContentArea(final Event event, final Composite parent) {
+   @Override
+   public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-		Composite container;
+      Composite container;
 
-		if (_tourId != null && _tourId != -1) {
+      if (_tourId != null && _tourId != -1) {
 
-			// first get data from the tour id when it is set
-			_tourData = TourManager.getInstance().getTourData(_tourId);
-		}
+         // first get data from the tour id when it is set
+         _tourData = TourManager.getInstance().getTourData(_tourId);
+      }
 
-		if (_tourData == null) {
+      if (_tourData == null) {
 
-			// there are no data available
+         // there are no data available
 
-			container = _tourInfoUI.createUI_NoData(parent);
+         container = _tourInfoUI.createUI_NoData(parent);
 
-			// prevent that the actions can be selected
-			setHideOnMouseDown(true);
+         // prevent that the actions can be selected
+         setHideOnMouseDown(true);
 
-		} else {
+      } else {
 
-			// tour data is available
+         // tour data is available
 
-			container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
+         container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
 
-			_tourInfoUI.setActionsEnabled(true);
+         _tourInfoUI.setActionsEnabled(true);
 
-			// allow the actions to be selected
-			setHideOnMouseDown(false);
-		}
+         // allow the actions to be selected
+         setHideOnMouseDown(false);
+      }
 
-		parent.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				_tourInfoUI.dispose();
-			}
-		});
+      parent.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _tourInfoUI.dispose();
+         }
+      });
 
-		return container;
-	}
+      return container;
+   }
 
-	@Override
-	public Point getLocation(final Point tipSize, final Event event) {
+   @Override
+   public Point getLocation(final Point tipSize, final Event event) {
 
-		final CalendarSelectItem hoveredItem = _calendarGraph.getHoveredTour();
+      final CalendarSelectItem hoveredItem = _calendarGraph.getHoveredTour();
 
-		if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
+      if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
 
-			final Rectangle cellBounds = hoveredItem.itemRectangle;
-			final int cellWidth2 = cellBounds.width / 2;
-			final int cellHeight = cellBounds.height;
+         final Rectangle cellBounds = hoveredItem.itemRectangle;
+         final int cellWidth2 = cellBounds.width / 2;
+         final int cellHeight = cellBounds.height;
 
-			final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
-			final int devY = cellBounds.y + cellHeight;
+         final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
+         final int devY = cellBounds.y + cellHeight;
 
-			/*
-			 * check if the tooltip is outside of the tree, this can happen when the column is very
-			 * wide and partly hidden
-			 */
-			final Rectangle treeBounds = _ttControl.getBounds();
-			boolean isDevXAdjusted = false;
-			int devX = devXDefault;
+         /*
+          * check if the tooltip is outside of the tree, this can happen when the column is very
+          * wide and partly hidden
+          */
+         final Rectangle treeBounds = _ttControl.getBounds();
+         boolean isDevXAdjusted = false;
+         int devX = devXDefault;
 
-			if (devXDefault >= treeBounds.width) {
-				devX = treeBounds.width - 40;
-				isDevXAdjusted = true;
-			}
+         if (devXDefault >= treeBounds.width) {
+            devX = treeBounds.width - 40;
+            isDevXAdjusted = true;
+         }
 
-			final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
+         final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
 
-			Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
-			final int tipSizeWidth = tipSize.x;
-			final int tipSizeHeight = tipSize.y;
+         Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
+         final int tipSizeWidth = tipSize.x;
+         final int tipSizeHeight = tipSize.y;
 
-			if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
+         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
 
-				/*
-				 * adjust horizontal position, it is outside of the display, prevent default
-				 * repositioning
-				 */
+            /*
+             * adjust horizontal position, it is outside of the display, prevent default
+             * repositioning
+             */
 
-				if (isDevXAdjusted) {
+            if (isDevXAdjusted) {
 
-					ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
+               ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
 
-				} else {
-					ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
-				}
-			}
+            } else {
+               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
+            }
+         }
 
-			if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
 
-				/*
-				 * adjust vertical position, it is outside of the display, prevent default
-				 * repositioning
-				 */
+            /*
+             * adjust vertical position, it is outside of the display, prevent default
+             * repositioning
+             */
 
-				ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
-			}
+            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
+         }
 
-			return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
-		}
+         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+      }
 
-		return super.getLocation(tipSize, event);
-	}
+      return super.getLocation(tipSize, event);
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-		if (_tourData == null) {
-			return null;
-		}
+      if (_tourData == null) {
+         return null;
+      }
 
-		final ArrayList<TourData> list = new ArrayList<>();
-		list.add(_tourData);
+      final ArrayList<TourData> list = new ArrayList<>();
+      list.add(_tourData);
 
-		return list;
-	}
+      return list;
+   }
 
-	@Override
-	protected Object getToolTipArea(final Event event) {
+   @Override
+   protected Object getToolTipArea(final Event event) {
 
-		// Ensure that the tooltip is hidden when the cell is left
-		final CalendarSelectItem ttArea = _hoveredItem = _calendarGraph.getHoveredTour();
+      // Ensure that the tooltip is hidden when the cell is left
+      final CalendarSelectItem ttArea = _hoveredItem = _calendarGraph.getHoveredTour();
 
-		return ttArea;
-	}
+      return ttArea;
+   }
 
-	@Override
-	public void hideToolTip() {
-		hide();
-	}
+   @Override
+   public void hideToolTip() {
+      hide();
+   }
 
-	@Override
-	public void paint(final GC gc, final Rectangle clientArea) {
-		// not used
-	}
+   @Override
+   public void paint(final GC gc, final Rectangle clientArea) {
+      // not used
+   }
 
-	@Override
-	public boolean setHoveredLocation(final int x, final int y) {
+   @Override
+   public boolean setHoveredLocation(final int x, final int y) {
 
-		// not used
-		return false;
-	}
+      // not used
+      return false;
+   }
 
-	public void setNoTourTooltip(final String noTourTooltip) {
-		_tourInfoUI.setNoTourTooltip(noTourTooltip);
-	}
+   public void setNoTourTooltip(final String noTourTooltip) {
+      _tourInfoUI.setNoTourTooltip(noTourTooltip);
+   }
 
-	@Override
-	public void setTourToolTip(final TourToolTip tourToolTip) {
-		// not used
-	}
+   @Override
+   public void setTourToolTip(final TourToolTip tourToolTip) {
+      // not used
+   }
 
-	@Override
-	protected boolean shouldCreateToolTip(final Event event) {
+   @Override
+   protected boolean shouldCreateToolTip(final Event event) {
 
-		if (_calendarView.isShowTourTooltip() == false) {
-			return false;
-		}
+      if (_calendarView.isShowTourTooltip() == false) {
+         return false;
+      }
 
-		if (!super.shouldCreateToolTip(event)) {
-			return false;
-		}
+      if (!super.shouldCreateToolTip(event)) {
+         return false;
+      }
 
-		if (_hoveredItem == null || _hoveredItem.id < 0) {
-			return false;
-		}
+      if (_hoveredItem == null || _hoveredItem.id < 0) {
+         return false;
+      }
 
-		// get tour id from hovered item
-		_tourId = _hoveredItem.id;
+      // get tour id from hovered item
+      _tourId = _hoveredItem.id;
 
-		return true;
-	}
+      return true;
+   }
 }

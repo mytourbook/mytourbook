@@ -301,6 +301,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private long                  tourDeviceTime_Elapsed;
 
    /**
+    * Total recorded time in seconds
+    */
+   @XmlElement
+   private long                  tourDeviceTime_Recorded;
+
+   /**
+    * Total paused time in seconds
+    *
+    * This number could come from a direct value or from {@link tourTimerPauses}
+    */
+   @XmlElement
+   private long                  tourDeviceTime_Paused;
+
+   /**
     * Total moving time in seconds
     *
     * @since Is long since db version 22, before it was int
@@ -313,21 +327,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @XmlElement
    private String                timeZoneId;
-
-   /**
-    * Total paused time in seconds
-    *
-    * This number could come from a direct value or from {@link tourTimerPauses}
-    */
-   @XmlElement
-   private long                  tourDeviceTime_Paused;
-
-
-   /**
-    * Total recorded time in seconds
-    */
-   @XmlElement
-   private long                  tourDeviceTime_Recorded;
 
    // ############################################# DISTANCE #############################################
 
@@ -6715,10 +6714,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
 
-      final long totalTourTimerPauses = getTotalTourTimerPauses();
-
-      setTourDeviceTime_Recorded(getTourDeviceTime_Elapsed() - totalTourTimerPauses);
-      setTourDeviceTime_Paused(totalTourTimerPauses);
+      setTourDeviceTime_Paused(getTotalTourTimerPauses());
    }
 
    /**
@@ -8337,7 +8333,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tzId;
    }
 
-   public long getTotalTourTimerPauses() {
+   private long getTotalTourTimerPauses() {
 
       if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
             pausedTime_End == null || pausedTime_End.length == 0) {

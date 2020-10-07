@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,37 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.ui.action;
 
-import org.eclipse.jface.viewers.ISelection;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.IToolTipProvider;
 
-/**
- * Contains tours which has been deleted in the database or removed from a view (tours in the import
- * view which are not saved but removed)
- */
-public class Selection_StatisticValues implements ISelection {
+public class Action_ToolTip_EditPreferences extends ActionOpenPrefDialog {
 
-   String statisticValuesRaw;
+   private final IToolTipProvider _ttProvider;
 
-   public Selection_StatisticValues(final String statisticValuesRaw) {
+   public Action_ToolTip_EditPreferences(final IToolTipProvider tourToolTipProvider,
+                                         final String text,
+                                         final String prefPageId) {
 
-      super();
+      super(text, prefPageId);
 
-      this.statisticValuesRaw = statisticValuesRaw;
+      _ttProvider = tourToolTipProvider;
    }
 
    @Override
-   public boolean isEmpty() {
-      return false;
+   public void run() {
+
+      _ttProvider.hideToolTip();
+
+      super.run();
    }
-
-   @Override
-   public String toString() {
-
-      return "Selection_StatisticValues\n" //$NON-NLS-1$
-            + "[\n" //$NON-NLS-1$
-            + "statisticValues=" + statisticValuesRaw + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "]"; //$NON-NLS-1$
-   }
-
 }

@@ -25,8 +25,8 @@ public abstract class TourData_Common {
    long[][]          typeIds;
    int[][]           typeColorIndex;
 
-   float[][]         altitudeLow;
-   float[][]         altitudeHigh;
+   float[][]         elevationUp_Low;
+   float[][]         elevationUp_High;
 
    float[][]         distanceLow;
    float[][]         distanceHigh;
@@ -43,7 +43,7 @@ public abstract class TourData_Common {
    int[][]           movingTime;
    int[][]           breakTime;
 
-   String            statisticValuesRaw;
+   int               numUsedTourTypes;
 
    /**
     * Contains the used {@link TourType} ID or -1 when not available. This data has the same length

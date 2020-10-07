@@ -50,6 +50,7 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -118,8 +119,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
     * contains the statistics in the same sort order as the statistic combo box
     */
    private ArrayList<TourbookStatistic> _allStatisticProvider;
-   private ActionStatisticOptions       _actionStatisticOptions;
-   private ActionSynchChartScale        _actionSynchChartScale;
+   private Action_StatisticOptions      _action_StatisticOptions;
+   private ActionSynchChartScale        _action_SynchChartScale;
 
    private boolean                      _isSynchScaleEnabled;
    private boolean                      _isVerticalOrderDisabled;
@@ -129,23 +130,41 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private PixelConverter               _pc;
 
-   private String                       _statisticValuesRaw;
-
    /*
     * UI controls
     */
-   private Combo                    _comboYear;
-   private Combo                    _comboStatistics;
-   private Combo                    _comboNumberOfYears;
-   private Combo                    _comboBarVerticalOrder;
+   private Combo                              _comboYear;
+   private Combo                              _comboStatistics;
+   private Combo                              _comboNumberOfYears;
+   private Combo                              _comboBarVerticalOrder;
 
-   private Composite                _statContainer;
+   private Composite                          _statContainer;
 
-   private PageBook                 _pageBookStatistic;
+   private PageBook                           _pageBookStatistic;
 
-   private SlideoutStatisticOptions _slideoutStatisticOptions;
+   private SlideoutStatisticOptions           _slideoutStatisticOptions;
 
-   private class ActionStatisticOptions extends ActionToolbarSlideout {
+   private Action_CopyStatValuesIntoClipboard _action_CopyStatValuesIntoClipboard;
+
+   private class Action_CopyStatValuesIntoClipboard extends Action {
+
+      Action_CopyStatValuesIntoClipboard() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_CopyIntoClipboard();
+      }
+   }
+
+   private class Action_StatisticOptions extends ActionToolbarSlideout {
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
@@ -154,7 +173,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          return _slideoutStatisticOptions;
       }
-
    }
 
    public static boolean isInUpdateUI() {
@@ -234,7 +252,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
                   || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+
+            // first day of week has changed
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
                _activePerson = TourbookPlugin.getActivePerson();
                _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
@@ -344,8 +366,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void createActions() {
 
-      _actionStatisticOptions = new ActionStatisticOptions();
-      _actionSynchChartScale = new ActionSynchChartScale(this);
+      _action_CopyStatValuesIntoClipboard = new Action_CopyStatValuesIntoClipboard();
+      _action_StatisticOptions = new Action_StatisticOptions();
+      _action_SynchChartScale = new ActionSynchChartScale(this);
    }
 
    @Override
@@ -431,7 +454,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
              */
 
             _comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setToolTipText(Messages.Tour_Statistic_Combo_Year_Tooltip);
             _comboYear.setVisibleItemCount(50);
 
             GridDataFactory
@@ -443,7 +466,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _comboYear.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+                  onSelectYear(true);
                }
             });
          }
@@ -466,7 +489,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+                  onSelectYear(true);
                }
             });
          }
@@ -515,15 +538,16 @@ public class StatisticView extends ViewPart implements ITourProvider {
       super.dispose();
    }
 
-   private void fireEvent_StatisticValues(final StatisticContext statContext) {
+   private void fireEvent_StatisticValues() {
 
-      // keep values that the statistic values view can show these values when it is opened
-      _statisticValuesRaw = statContext.outStatisticValuesRaw;
+      TourManager.fireEvent(TourEventId.STATISTIC_VALUES, null, this);
+   }
 
-      TourManager.fireEventWithCustomData(
-            TourEventId.STATISTIC_VALUES,
-            new Selection_StatisticValues(_statisticValuesRaw),
-            this);
+   /**
+    * @return Returns the active statistic
+    */
+   TourbookStatistic getActiveStatistic() {
+      return _activeStatistic;
    }
 
    /**
@@ -621,13 +645,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
       }
    }
 
-   /**
-    * @return Returns the statistic values from the currently displayed statistic graph.
-    */
-   public String getStatisticValuesRaw() {
-      return _statisticValuesRaw;
-   }
-
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
@@ -638,6 +655,22 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
       }
       gc.dispose();
+   }
+
+   private void onAction_CopyIntoClipboard() {
+
+      if (_activeStatistic == null) {
+         return;
+      }
+
+      final String statValues = _activeStatistic.getRawStatisticValues(false);
+
+      // ensure data are available
+      if (statValues == null) {
+         return;
+      }
+
+      StatisticManager.copyStatisticValuesToTheClipboard(statValues);
    }
 
    private void onSelectBarVerticalOrder() {
@@ -658,7 +691,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       updateStatistic_10_NoReload();
    }
 
-   private void onSelectYear() {
+   private void onSelectYear(final boolean isUpdateStatistic) {
 
       final int selectedItem = _comboYear.getSelectionIndex();
 
@@ -689,7 +722,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
-         updateStatistic_10_NoReload();
+         if (isUpdateStatistic) {
+            updateStatistic_10_NoReload();
+         }
       }
    }
 
@@ -844,7 +879,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       refreshYearCombobox();
       selectYear(defaultYear);
       // We trigger the update of _comboNumberOfYears
-      onSelectYear();
+      onSelectYear(false);
 
       // select number of years
       final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
@@ -988,7 +1023,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       selectYear(-1);
 
       // update number of years is _comboNumberOfYears
-      onSelectYear();
+      onSelectYear(false);
 
       // tell all existing statistics the data have changed
       for (final TourbookStatistic statistic : getAvailableStatistics()) {
@@ -1013,7 +1048,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
       updateStatistic_20_PostRefresh(statContext);
 
-      fireEvent_StatisticValues(statContext);
+      fireEvent_StatisticValues();
    }
 
    /**
@@ -1048,7 +1083,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       updateStatistic_20_PostRefresh(statContext);
       updateUI_Toolbar();
 
-      fireEvent_StatisticValues(statContext);
+      fireEvent_StatisticValues();
    }
 
    private void updateStatistic_20_PostRefresh(final StatisticContext statContext) {
@@ -1137,8 +1172,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
       tbm.removeAll();
 
-      tbm.add(_actionSynchChartScale);
-      tbm.add(_actionStatisticOptions);
+      tbm.add(_action_SynchChartScale);
+      tbm.add(_action_CopyStatValuesIntoClipboard);
+      tbm.add(_action_StatisticOptions);
 
       // add actions from the statistic
       _activeStatistic.updateToolBar();

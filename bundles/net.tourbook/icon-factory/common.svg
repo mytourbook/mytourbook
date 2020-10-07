@@ -3670,14 +3670,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.627416"
-     inkscape:cx="269.27014"
-     inkscape:cy="21.522637"
+     inkscape:cx="195.33539"
+     inkscape:cy="62.406394"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1954"
-     inkscape:window-height="1220"
-     inkscape:window-x="133"
+     inkscape:window-width="1845"
+     inkscape:window-height="873"
+     inkscape:window-x="73"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
@@ -3745,6 +3745,28 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline">
+    <ellipse
+       ry="4.000093"
+       rx="4"
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\today.png"
+       cy="62.000092"
+       cx="188"
+       id="path1956-8"
+       style="display:inline;opacity:1;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.700002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    <rect
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\today.png"
+       rx="0"
+       ry="0"
+       y="54"
+       x="180"
+       height="16"
+       width="15.99999"
+       id="rect4525-1-0-2-8-3-8-3"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.99;fill:none;stroke:none;stroke-width:0;marker:none;enable-background:accumulate;fill-opacity:1" />
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
@@ -7752,40 +7774,33 @@
        id="path1991-6-0-3-6-3"
        d="m 240,24.64999 10.99999,10e-6"
        style="display:inline;fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <g
+    <path
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 255.95762,9.00064 h -11 v 10.998836 h 11 z"
+       id="path1768-1-9-5-1-0-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
-       id="g5514"
-       transform="translate(-9.5454541e-6,-39.99999)">
-      <path
-         inkscape:export-ydpi="95.999863"
-         inkscape:export-xdpi="95.999863"
-         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
-         sodipodi:nodetypes="ccccc"
-         inkscape:connector-curvature="0"
-         id="path1768-1-9-5-1-0-1"
-         d="m 255.95763,49.00063 h -11 v 10.998836 h 11 z"
-         style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         style="display:inline;fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 245.35003,48.999989 -2e-5,11"
-         id="path1991-6-3-6-7-9"
-         inkscape:connector-curvature="0"
-         sodipodi:nodetypes="cc"
-         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
-         inkscape:export-xdpi="95.999863"
-         inkscape:export-ydpi="95.999863" />
-      <path
-         inkscape:export-ydpi="95.999863"
-         inkscape:export-xdpi="95.999863"
-         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
-         sodipodi:nodetypes="cc"
-         inkscape:connector-curvature="0"
-         id="path1991-6-0-8-6-2-3"
-         d="m 245.00001,59.64998 11,1e-5"
-         style="display:inline;fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    </g>
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path1991-6-3-6-7-9"
+       d="m 245.35002,8.999999 -2e-5,11"
+       style="display:inline;fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="display:inline;fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 245,19.64999 11,10e-6"
+       id="path1991-6-0-8-6-2-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-copy.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
     <path
        style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.999985px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 280.00001,10 v 14 h 16 V 10 Z"
@@ -7822,5 +7837,141 @@
          x="288.45502"
          y="20.319147"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.9907px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:1">0.0</tspan></text>
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4471-81-5-8-1-8-9-4-0-0-5"
+       width="15.999969"
+       height="15.999999"
+       x="300"
+       y="9.000001"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-ydpi="96.000092" />
+    <g
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+       transform="rotate(180,308,137)"
+       id="g2428"
+       style="stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none">
+      <rect
+         inkscape:export-ydpi="96.000092"
+         inkscape:export-xdpi="96.000092"
+         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+         y="250"
+         x="300"
+         height="5.0000105"
+         width="16"
+         id="rect5680-4-4"
+         style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+      <path
+         style="fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 300,254.65002 h 16"
+         id="path2420"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <g
+       inkscape:export-ydpi="96.000092"
+       inkscape:export-xdpi="96.000092"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+       style="stroke-width:0.7;stroke-miterlimit:4;stroke-dasharray:none"
+       id="g2428-6"
+       transform="translate(0,-240.00001)">
+      <rect
+         style="fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+         id="rect5680-4-4-8"
+         width="16"
+         height="5.0000105"
+         x="300"
+         y="250"
+         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+         inkscape:export-xdpi="96.000092"
+         inkscape:export-ydpi="96.000092" />
+      <path
+         sodipodi:nodetypes="cc"
+         id="path2420-5"
+         d="m 300,254.65001 h 16"
+         style="fill:none;stroke:#435800;stroke-width:0.7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-group-values.png"
+         inkscape:export-xdpi="96.000092"
+         inkscape:export-ydpi="96.000092" />
+    </g>
+    <path
+       inkscape:export-ydpi="95.999863"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-sequence-number.png"
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path1768-1-5-7-7-4"
+       d="M 320,10.000001 V 24 h 16 V 10.000001 Z"
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:0.999985px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.99;fill:none;fill-opacity:1;stroke:#535353;stroke-width:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4525-1-0-2-33-0-9-6-1-0-6-4"
+       width="15.99999"
+       height="16"
+       x="320"
+       y="9"
+       ry="0"
+       rx="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-sequence-number.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
+    <text
+       transform="scale(0.87680304,1.140507)"
+       inkscape:export-ydpi="95.999863"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\app-sequence-number.png"
+       id="text5289-8-3"
+       y="18.40239"
+       x="365.47092"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.0308px;line-height:18.8078px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;display:inline;fill:#435800;fill-opacity:1;stroke:none;stroke-width:0.999997"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.0308px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.999997"
+         y="18.40239"
+         x="365.47092"
+         id="tspan5287-3-2"
+         sodipodi:role="line">123</tspan></text>
+    <rect
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\today.png"
+       rx="0"
+       ry="0"
+       y="54"
+       x="180"
+       height="16"
+       width="15.99999"
+       id="rect4525-7-1-0-6-6-3-3"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.99;fill:none;stroke:#3a9b00;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;enable-background:accumulate" />
+    <rect
+       transform="scale(1,-1)"
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\synch-views.png"
+       y="-70.000008"
+       x="205.00674"
+       height="16.000015"
+       width="15.999991"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-1"
+       style="opacity:0.99;fill:none;stroke:none" />
+    <path
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\today.png"
+       sodipodi:nodetypes="ccc"
+       inkscape:connector-curvature="0"
+       id="rect17705-1-1-8"
+       d="m 191.72259,54.284836 -3.72261,3.634893 -3.72255,-3.634893"
+       style="fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+    <path
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="m 184.2774,69.713507 3.72262,-3.53224 3.72255,3.53224"
+       id="rect17705-1-1-8-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\today.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
 </svg>

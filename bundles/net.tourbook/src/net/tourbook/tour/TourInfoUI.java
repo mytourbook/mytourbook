@@ -38,7 +38,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
+import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
@@ -119,19 +119,19 @@ public class TourInfoUI {
    /*
     * Actions
     */
-   private ActionCloseTooltip                _actionCloseTooltip;
-   private ActionTourToolTip_EditTour        _actionEditTour;
-   private ActionTourToolTip_EditQuick       _actionEditQuick;
-   private ActionTourToolTip_EditPreferences _actionPrefDialog;
+   private ActionCloseTooltip             _actionCloseTooltip;
+   private ActionTourToolTip_EditTour     _actionEditTour;
+   private ActionTourToolTip_EditQuick    _actionEditQuick;
+   private Action_ToolTip_EditPreferences _actionPrefDialog;
 
-   private boolean                           _isActionsVisible = false;
+   private boolean                        _isActionsVisible = false;
 
    /**
     * Tour which is displayed in the tool tip
     */
-   private TourData                          _tourData;
+   private TourData                       _tourData;
 
-   private String                            _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
+   private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
 
    /*
     * fields which are optionally displayed when they are not null
@@ -160,7 +160,7 @@ public class TourInfoUI {
    private Text              _txtWeather;
 
    private CLabel            _lblClouds;
-   private CLabel            _lblTourType;
+   private CLabel            _lblTourType_Image;
 
    private Label             _lblAltitudeUp;
    private Label             _lblAltitudeUpUnit;
@@ -403,13 +403,13 @@ public class TourInfoUI {
           */
          if (_uiTourTypeName != null) {
 
-            _lblTourType = new CLabel(container, SWT.NONE);
+            _lblTourType_Image = new CLabel(container, SWT.NONE);
             GridDataFactory
                   .swtDefaults()//
                   .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_lblTourType);
-            _lblTourType.setForeground(_fgColor);
-            _lblTourType.setBackground(_bgColor);
+                  .applyTo(_lblTourType_Image);
+            _lblTourType_Image.setForeground(_fgColor);
+            _lblTourType_Image.setBackground(_bgColor);
          }
 
          /*
@@ -458,7 +458,7 @@ public class TourInfoUI {
 
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-         _actionPrefDialog = new ActionTourToolTip_EditPreferences(_tourToolTipProvider,
+         _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
                Messages.Tour_Tooltip_Action_EditFormatPreferences,
                PrefPageAppearanceDisplayFormat.ID);
 
@@ -1313,9 +1313,9 @@ public class TourInfoUI {
       /*
        * upper/lower part
        */
-      if (_lblTourType != null && _lblTourType.isDisposed() == false) {
-         _lblTourType.setToolTipText(_uiTourTypeName);
-         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, false);
+      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+         _lblTourType_Image.setToolTipText(_uiTourTypeName);
+         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType_Image, false);
       }
 
       String tourTitle = _tourData.getTourTitle();

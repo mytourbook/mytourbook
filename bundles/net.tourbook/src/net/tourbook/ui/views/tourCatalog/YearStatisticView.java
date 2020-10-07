@@ -38,6 +38,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -463,6 +464,24 @@ public class YearStatisticView extends ViewPart {
       toolTipInfo.setLabel(ttText);
 
       return toolTipInfo;
+   }
+
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
    }
 
    private void createUI(final Composite parent) {
@@ -894,7 +913,6 @@ public class YearStatisticView extends ViewPart {
          yearIndex++;
       }
    }
-
    /**
     * show statistic for several years
     *
@@ -1039,6 +1057,12 @@ public class YearStatisticView extends ViewPart {
        */
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            YearStatisticView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(valueIndex);

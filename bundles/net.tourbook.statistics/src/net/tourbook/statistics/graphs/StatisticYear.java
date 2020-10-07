@@ -31,6 +31,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -45,16 +46,22 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticYear extends TourbookStatistic {
 
-   private static final String      STRING_SEPARATOR = " - ";                        //$NON-NLS-1$
+   private static final String      STRING_SEPARATOR       = " - ";                        //$NON-NLS-1$
 
-   private final IPreferenceStore   _prefStore       = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore             = TourbookPlugin.getPrefStore();
+
+   private TourData_Year            _tourYear_Data;
+   private DataProvider_Tour_Year   _tourYear_DataProvider = new DataProvider_Tour_Year();
 
    private StatisticContext         _statContext;
 
@@ -67,8 +74,7 @@ public abstract class StatisticYear extends TourbookStatistic {
    private Chart                    _chart;
    private String                   _chartType;
 
-   private final MinMaxKeeper_YData _minMaxKeeper    = new MinMaxKeeper_YData();
-   private TourData_Year            _tourYearData;
+   private final MinMaxKeeper_YData _minMaxKeeper          = new MinMaxKeeper_YData();
    private ChartDataYSerie          _yData_Duration;
 
    private boolean                  _isSynchScaleEnabled;
@@ -92,7 +98,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
    ChartStatisticSegments createChartSegments(final TourData_Year tourDataYear) {
 
-      final int yearCounter = tourDataYear.altitudeHigh[0].length;
+      final int yearCounter = tourDataYear.elevationUp_High[0].length;
 
       final double segmentStart[] = new double[_statNumberOfYears];
       final double segmentEnd[] = new double[_statNumberOfYears];
@@ -130,10 +136,10 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
-      final int elapsedTime = _tourYearData.elapsedTime[serieIndex][valueIndex];
-      final int recordedTime = _tourYearData.recordedTime[serieIndex][valueIndex];
-      final int pausedTime = _tourYearData.pausedTime[serieIndex][valueIndex];
-      final int movingTime = _tourYearData.movingTime[serieIndex][valueIndex];
+      final int elapsedTime = _tourYear_Data.elapsedTime[serieIndex][valueIndex];
+      final int recordedTime = _tourYear_Data.recordedTime[serieIndex][valueIndex];
+      final int pausedTime = _tourYear_Data.pausedTime[serieIndex][valueIndex];
+      final int movingTime = _tourYear_Data.movingTime[serieIndex][valueIndex];
       final int breakTime = elapsedTime - movingTime;
 
       /*
@@ -219,12 +225,30 @@ public abstract class StatisticYear extends TourbookStatistic {
       return toolTipInfo;
    }
 
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
+      }
+   }
+
    void createXData_Year(final ChartDataModel chartDataModel) {
 
       // set the x-axis
-      final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_tourYearData));
+      final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_tourYear_Data));
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_YEAR);
-      xData.setChartSegments(createChartSegments(_tourYearData));
+      xData.setChartSegments(createChartSegments(_tourYear_Data));
       chartDataModel.setXData(xData);
    }
 
@@ -330,7 +354,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
    private double[] createYearData(final TourData_Year tourDataYear) {
 
-      final int yearCounter = tourDataYear.altitudeHigh[0].length;
+      final int yearCounter = tourDataYear.elevationUp_High[0].length;
       final double allYears[] = new double[yearCounter];
 
       for (int yearIndex = 0; yearIndex < yearCounter; yearIndex++) {
@@ -353,6 +377,11 @@ public abstract class StatisticYear extends TourbookStatistic {
    }
 
    @Override
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourYear_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
+   }
+
+   @Override
    public void preferencesHasChanged() {
       updateStatistic();
    }
@@ -364,7 +393,7 @@ public abstract class StatisticYear extends TourbookStatistic {
     */
    private void reorderStatData() {
 
-      final int barLength = _tourYearData.altitudeHigh.length;
+      final int barLength = _tourYear_Data.elevationUp_High.length;
 
       _resortedTypeIds = new long[barLength][];
 
@@ -397,16 +426,16 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       int resortedIndex = 0;
 
-      final long[][] typeIds = _tourYearData.typeIds;
+      final long[][] typeIds = _tourYear_Data.typeIds;
 
-      final float[][] altitudeLowValues = _tourYearData.altitudeLow;
-      final float[][] altitudeHighValues = _tourYearData.altitudeHigh;
-      final float[][] distanceLowValues = _tourYearData.distanceLow;
-      final float[][] distanceHighValues = _tourYearData.distanceHigh;
-      final float[][] numToursLowValues = _tourYearData.numToursLow;
-      final float[][] numToursHighValues = _tourYearData.numToursHigh;
-      final float[][] timeLowValues = _tourYearData.getDurationTimeLowFloat();
-      final float[][] timeHighValues = _tourYearData.getDurationTimeHighFloat();
+      final float[][] altitudeLowValues = _tourYear_Data.elevationUp_Low;
+      final float[][] altitudeHighValues = _tourYear_Data.elevationUp_High;
+      final float[][] distanceLowValues = _tourYear_Data.distanceLow;
+      final float[][] distanceHighValues = _tourYear_Data.distanceHigh;
+      final float[][] numToursLowValues = _tourYear_Data.numToursLow;
+      final float[][] numToursHighValues = _tourYear_Data.numToursHigh;
+      final float[][] timeLowValues = _tourYear_Data.getDurationTimeLowFloat();
+      final float[][] timeHighValues = _tourYear_Data.getDurationTimeHighFloat();
 
       if (_barOrderStart >= barLength) {
 
@@ -519,6 +548,12 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticYear.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+
          @Override
          public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
             return createToolTipInfo(serieIndex, valueIndex);
@@ -562,20 +597,17 @@ public abstract class StatisticYear extends TourbookStatistic {
       _statFirstYear = statContext.statFirstYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourYearData = DataProvider_Tour_Year.getInstance()
-            .getYearData(
-                  statContext.appPerson,
-                  statContext.appTourTypeFilter,
-                  statContext.statFirstYear,
-                  statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
-                  durationTime);
-
-      statContext.outStatisticValuesRaw = _tourYearData.statisticValuesRaw;
+      _tourYear_Data = _tourYear_DataProvider.getYearData(
+            statContext.appPerson,
+            statContext.appTourTypeFilter,
+            statContext.statFirstYear,
+            statContext.statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
+            durationTime);
 
       _isDuration_ReloadData = false;
 
-      StatisticServices.setBarNames(statContext, _tourYearData.usedTourTypeIds, _barOrderStart);
+      StatisticServices.setBarNames(statContext, _tourYear_Data.usedTourTypeIds, _barOrderStart);
       reorderStatData();
 
       // reset min/max values

@@ -2927,8 +2927,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final boolean isPaceFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACE_FROM_RECORDED_TIME);
-            final long time = isPaceFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
+            final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+            final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
@@ -2958,12 +2958,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourComputedTime_Moving();
+
+            final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+            final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
-            if (movingTime != 0) {
-               value = tourDistance / movingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            if (time != 0) {
+               value = tourDistance / time * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
