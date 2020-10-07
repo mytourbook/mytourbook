@@ -25,8 +25,8 @@ public abstract class TourData_Common {
    long[][]          typeIds;
    int[][]           typeColorIndex;
 
-   float[][]         altitudeLow;
-   float[][]         altitudeHigh;
+   float[][]         elevationUp_Low;
+   float[][]         elevationUp_High;
 
    float[][]         distanceLow;
    float[][]         distanceHigh;

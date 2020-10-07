@@ -30,6 +30,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -309,8 +310,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(parent, serieIndex, valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
 
          @Override
@@ -375,8 +376,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(parent, serieIndex, valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
 
          @Override
@@ -443,8 +444,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(parent, serieIndex, valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
 
          @Override
@@ -501,7 +502,15 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       });
    }
 
-   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+   private Composite createToolTipUI(final int serieIndex, final int valueIndex) {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -514,11 +523,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
 
       }
-   }
-
-   private Composite createToolTipUI(final int serieIndex, final int valueIndex) {
-      // TODO Auto-generated method stub
-      return null;
    }
 
    /**

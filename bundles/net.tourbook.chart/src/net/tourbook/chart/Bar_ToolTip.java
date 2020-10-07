@@ -17,20 +17,18 @@ package net.tourbook.chart;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
+import net.tourbook.common.util.IToolTipProvider;
 
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.ToolBar;
 
-public class Bar_ToolTip extends AnimatedToolTipShell2 {
+public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
 
    private Rectangle _barRectangle;
 
-   private int       _hoveredBar_VerticalIndex;
-   private int       _hoveredBar_HorizontalIndex = -1;
+   private int       _hoveredBar_Serie_VerticalIndex;
+   private int       _hoveredBar_Value_HorizontalIndex = -1;
 
    /*
     * UI controls
@@ -43,10 +41,10 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
       _chart = chart;
 
-      setFadeInSteps(0);
+      setFadeInSteps(2);
 
-      setFadeOutSteps(20);
-      setFadeOutDelaySteps(20);
+      setFadeOutSteps(10);
+      setFadeOutDelaySteps(30);
 
       setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
    }
@@ -58,14 +56,14 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
        * This is the tricky part that the hovered marker is reset before the tooltip is closed and
        * not when nothing is hovered. This ensures that the tooltip has a valid state.
        */
-      _hoveredBar_HorizontalIndex = -1;
+      _hoveredBar_Value_HorizontalIndex = -1;
 
    }
 
    @Override
    protected boolean canShowToolTip() {
 
-      if (_hoveredBar_HorizontalIndex != -1 && getChartInfoProvider() != null) {
+      if (_hoveredBar_Value_HorizontalIndex != -1 && getChartInfoProvider() != null) {
          return true;
       }
 
@@ -83,7 +81,7 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
          return;
       }
 
-      toolTipInfoProvider.createToolTipUI(shell, _hoveredBar_HorizontalIndex, _hoveredBar_VerticalIndex);
+      toolTipInfoProvider.createToolTipUI(this, shell, _hoveredBar_Serie_VerticalIndex, _hoveredBar_Value_HorizontalIndex);
    }
 
    private IChartInfoProvider getChartInfoProvider() {
@@ -99,52 +97,59 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
    public Point getToolTipLocation(final Point tipSize) {
 
       final ChartComponentGraph graphControl = _chart.getChartComponents().getChartComponentGraph();
-      final IToolBarManager iTbm = _chart.getToolBarManager();
-
-      final ToolBarManager tbm = (ToolBarManager) iTbm;
-      final ToolBar toolbarControl = tbm.getControl();
 
       final int tipWidth = tipSize.x;
-//      final int tipHeight = tipSize.y;
 
-      final int ttPosX = _barRectangle.x + _barRectangle.width;
-      final int ttPosY = _barRectangle.y;
+      final int barWidth = _barRectangle.width;
+      final int barHeight = _barRectangle.height;
 
-      final Point ttLocationX = graphControl.toDisplay(ttPosX, ttPosY);
-      final Point ttLocationY = toolbarControl.toDisplay(ttPosX, ttPosY);
+      final int barHeightOffset = Math.min(15, barHeight / 3);
 
-      final Point ttLocation = new Point(ttLocationX.x, ttLocationY.y - 1);
+      final int ttPosX = _barRectangle.x + barWidth;
+      final int ttPosY = _barRectangle.y + barHeight - barHeightOffset;
+
+      final Point displayTTLocation = graphControl.toDisplay(ttPosX, ttPosY);
 
       /*
        * Fixup display bounds
        */
-      final Rectangle displayBounds = UI.getDisplayBounds(toolbarControl, ttLocation);
-      final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
+      final Rectangle displayBounds = UI.getDisplayBounds(graphControl, displayTTLocation);
+      final Point rightBottomBounds = new Point(tipSize.x + displayTTLocation.x, tipSize.y + displayTTLocation.y);
 
-      final boolean isLocationInDisplay = displayBounds.contains(ttLocation);
-      final boolean isBottomInDisplay = displayBounds.contains(rightBottomBounds);
+      final boolean isLocationInDisplay = displayBounds.contains(displayTTLocation);
+      final boolean isRightBottomInDisplay = displayBounds.contains(rightBottomBounds);
 
-      if (!(isLocationInDisplay && isBottomInDisplay)) {
+      if (!isLocationInDisplay || !isRightBottomInDisplay) {
 
          final int displayX = displayBounds.x;
          final int displayY = displayBounds.y;
          final int displayWidth = displayBounds.width;
 
-         if (ttLocation.x < displayX) {
-            ttLocation.x = displayX;
+         if (displayTTLocation.x < displayX) {
+            displayTTLocation.x = displayX;
          }
 
          if (rightBottomBounds.x > displayX + displayWidth) {
-            ttLocation.x = displayWidth - tipWidth;
+            displayTTLocation.x = displayTTLocation.x - tipWidth - barWidth;
          }
 
-         if (ttLocation.y < displayY) {
+         if (displayTTLocation.y < displayY) {
             // position evaluated with try and error until it fits
-            ttLocation.y = ttLocationX.y - ttPosY + graphControl.getSize().y;
+            displayTTLocation.y = displayTTLocation.y - ttPosY + graphControl.getSize().y;
          }
       }
 
-      return ttLocation;
+      return displayTTLocation;
+   }
+
+   @Override
+   public void hideToolTip() {
+
+      /*
+       * MUST be hidden this way otherwise hide() would close another dialog which is opening..
+       */
+
+      hideNow();
    }
 
    /**
@@ -167,11 +172,11 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
       return graphDisplayRect.contains(displayCursorLocation);
    }
 
-   public void open(final Rectangle barInfoFocusRectangle, final int hoveredBar_VerticalIndex, final int hoveredBar_HorizontalIndex) {
+   public void open(final Rectangle barInfoFocusRectangle, final int serieIndex, final int valueIndex) {
 
       boolean isKeepOpened = false;
 
-      if (_hoveredBar_HorizontalIndex != -1 && isTooltipClosing()) {
+      if (_hoveredBar_Value_HorizontalIndex != -1 && isTooltipClosing()) {
 
          /**
           * This case occures when the tooltip is opened but is currently closing and the mouse
@@ -186,8 +191,8 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
       final boolean isCanClose = isKeepOpened == false;
 
       if (isCanClose
-            && hoveredBar_HorizontalIndex == _hoveredBar_HorizontalIndex
-            && hoveredBar_VerticalIndex == _hoveredBar_VerticalIndex) {
+            && valueIndex == _hoveredBar_Value_HorizontalIndex
+            && serieIndex == _hoveredBar_Serie_VerticalIndex) {
 
          // nothing has changed
 
@@ -198,8 +203,8 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 {
 
       _barRectangle = barInfoFocusRectangle;
 
-      _hoveredBar_HorizontalIndex = hoveredBar_HorizontalIndex;
-      _hoveredBar_VerticalIndex = hoveredBar_VerticalIndex;
+      _hoveredBar_Serie_VerticalIndex = serieIndex;
+      _hoveredBar_Value_HorizontalIndex = valueIndex;
 
       showToolTip();
    }

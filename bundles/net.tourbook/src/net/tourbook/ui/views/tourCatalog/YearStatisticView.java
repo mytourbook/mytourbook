@@ -38,6 +38,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -465,7 +466,10 @@ public class YearStatisticView extends ViewPart {
       return toolTipInfo;
    }
 
-   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1055,8 +1059,8 @@ public class YearStatisticView extends ViewPart {
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
-            YearStatisticView.this.createToolTipUI(parent, serieIndex, valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            YearStatisticView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
 
          @Override

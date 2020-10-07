@@ -34,6 +34,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -443,7 +444,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       return tt1;
    }
 
-   private void createToolTipUI(final Composite parent, final int _hoveredBar_VerticalIndex, final int _hoveredBar_HorizontalIndex) {
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -781,8 +785,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTraining.this.createToolTipUI(parent, serieIndex, valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTraining.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
 
          @Override

@@ -5910,14 +5910,12 @@ public class ChartComponentGraph extends Canvas {
                // test if the mouse is within a bar focus rectangle
                if (barFocusRectangle != null && barFocusRectangle.contains(devX, devY)) {
 
-//                  final Rectangle barRectangle = drawingData.getBarRectangles()[serieIndex][valueIndex];
-
                   // keep the hovered bar index
                   _hoveredBarSerieIndex = serieIndex;
                   _hoveredBarValueIndex = valueIndex;
 
                   _hoveredBar_ToolTip.open(barFocusRectangle, serieIndex, valueIndex);
-                  _hoveredBarToolTip_OLD.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
+//                  _hoveredBarToolTip_OLD.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
 
                   isBarHit = true;
                   break;

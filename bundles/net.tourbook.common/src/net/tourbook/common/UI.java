@@ -1058,9 +1058,9 @@ public class UI {
       _formatterSB.setLength(0);
 
       return _formatter.format(Messages.Format_hhmmss,
-            (time / 3600),
-            ((time % 3600) / 60),
-            ((time % 3600) % 60))
+            time / 3600,
+            (time % 3600) / 60,
+            (time % 3600) % 60)
             .toString();
    }
 

@@ -13,19 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.ui.action;
 
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipProvider;
 
-import org.eclipse.swt.widgets.Composite;
+public class Action_ToolTip_EditPreferences extends ActionOpenPrefDialog {
 
-/**
- * Is used when information should be provided, e.g. when the mouse will hover a bar in the bar
- * chart
- */
-public interface IChartInfoProvider {
+   private final IToolTipProvider _ttProvider;
 
-   void createToolTipUI(IToolTipProvider toolTipProvider, Composite parent, int serieIndex, int valueIndex);
+   public Action_ToolTip_EditPreferences(final IToolTipProvider tourToolTipProvider,
+                                         final String text,
+                                         final String prefPageId) {
 
-   ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex);
+      super(text, prefPageId);
+
+      _ttProvider = tourToolTipProvider;
+   }
+
+   @Override
+   public void run() {
+
+      _ttProvider.hideToolTip();
+
+      super.run();
+   }
 }
