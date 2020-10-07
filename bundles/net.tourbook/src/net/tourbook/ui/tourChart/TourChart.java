@@ -2239,13 +2239,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
       chartLabel.serieIndex = xAxisSerieIndex;
 
-      chartLabel.markerLabel = pauseDuration;
-      chartLabel.isDescription = true;
-      chartLabel.visualPosition = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
-      chartLabel.type = ChartLabel.MARKER_TYPE_DEVICE;
-      chartLabel.visualType = ChartLabel.VISIBLE_TYPE_DEFAULT;
-
-      chartLabel.isVisible = true;
+      chartLabel.pauseDuration = pauseDuration;
 
       return chartLabel;
    }
