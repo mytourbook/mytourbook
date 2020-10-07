@@ -147,17 +147,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
          //
 //       overlapChecker.setupNext(validRect, true);
 
-         if (chartLabel.isVisible == false) {
-
-            continue;
-         }
-
-         if (chartLabel.isDescription == false) {
-
-            // skip pause which do not have a description
-            continue;
-         }
-
          final float yValue = yValues[chartLabel.serieIndex];
          final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
 
