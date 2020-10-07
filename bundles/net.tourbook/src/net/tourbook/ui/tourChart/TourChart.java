@@ -373,7 +373,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private I2ndAltiLayer             _layer2ndAlti;
    private ChartLayerMarker          _layerMarker;
    private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
-   private ChartLayerMarker          _layerPause;
+   private ChartLayerPause           _layerPause;
    private ChartLayerPhoto           _layerPhoto;
    private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
    private ChartLayerSegmentValue    _layerTourSegmenterOther;
@@ -2269,42 +2269,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // pauses layer is visible
 
-      final ChartMarkerConfig cmc = new ChartMarkerConfig();
-
-      cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
-      cmc.isShowAbsoluteValues = _tcc.isShowAbsoluteValues;
-      cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
-      cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
-      cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
-      cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
-      cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
-      cmc.isShowSignImage = _tcc.isShowSignImage;
-      cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
-
-      cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
-      cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
-
-      cmc.markerHoverSize = _tcc.markerHoverSize;
-      cmc.markerLabelOffset = _tcc.markerLabelOffset;
-      cmc.markerPointSize = _tcc.markerPointSize;
-      cmc.markerSignImageSize = _tcc.markerSignImageSize;
-
-      cmc.markerColorDefault = _tcc.markerColorDefault;
-      cmc.markerColorDevice = _tcc.markerColorDevice;
-      cmc.markerColorHidden = _tcc.markerColorHidden;
+      final ChartPauseConfig cpc = new ChartPauseConfig();
 
       if (_layerPause == null) {
 
-         // setup marker layer, a layer is created only once
+         // setup pause layer, a layer is created only once
 
-         _layerPause = new ChartLayerMarker(this);
+         _layerPause = new ChartLayerPause(this);
 
          // set overlay painter
          addChartOverlay(_layerPause);
-
       }
 
-      _layerPause.setChartMarkerConfig(cmc);
+      _layerPause.setChartPauseConfig(cpc);
 
       // set data serie for the x-axis
       final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
@@ -2363,7 +2340,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                         tourSerieIndex,
                         0);
 
-                  cmc.chartLabels.add(chartLabel);
+                  cpc.chartLabels.add(chartLabel);
                }
 
                ++relativeTourPauseIndex;
@@ -2404,7 +2381,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   serieIndex,
                   0);
 
-            cmc.chartLabels.add(chartLabel);
+            cpc.chartLabels.add(chartLabel);
          }
       }
    }
