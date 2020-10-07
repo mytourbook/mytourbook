@@ -34,13 +34,10 @@ import org.eclipse.swt.widgets.Display;
 public class ChartLayerPause implements IChartLayer, IChartOverlay {
 
    private int              LABEL_OFFSET;
-   private int              PAUSE_HOVER_SIZE;
    private int              PAUSE_POINT_SIZE;
 
    private TourChart        _tourChart;
    private ChartPauseConfig _cpc;
-
-   private boolean          _isVertical;
 
    private int              _devXPause;
    private int              _devYPause;
@@ -95,7 +92,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2 + 0;
 
       //LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED:
-      _isVertical = false;
       _devXPause -= labelWidth / 2;
       _devYPause -= labelHeight + LABEL_OFFSET + pausePointSize2;
    }
@@ -109,7 +105,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final Device display = gc.getDevice();
 
       PAUSE_POINT_SIZE = pc.convertVerticalDLUsToPixels(2);
-      PAUSE_HOVER_SIZE = pc.convertVerticalDLUsToPixels(4);
       LABEL_OFFSET = pc.convertVerticalDLUsToPixels(2);
 
       final int pausePointSize2 = PAUSE_POINT_SIZE / 2;
@@ -212,18 +207,8 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devYPause = devYTop;
          }
 
-         // keep painted positions to identify and paint hovered positions
-         chartLabel.paintedLabel = new Rectangle(_devXPause, _devYPause, labelWidth, labelHeight);
-
          // draw label
          gc.drawText(chartLabel.pauseDuration, _devXPause, _devYPause, true);
-
-         // keep painted positions to identify and paint hovered positions
-         chartLabel.devIsVertical = _isVertical;
-         chartLabel.devHoverSize = PAUSE_HOVER_SIZE;
-         chartLabel.devYBottom = devYBottom;
-         chartLabel.devYTop = devYTop;
-         chartLabel.devGraphWidth = devVisibleChartWidth;
       }
 
       colorDefault.dispose();
