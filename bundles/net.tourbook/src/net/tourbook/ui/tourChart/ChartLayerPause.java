@@ -126,21 +126,14 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
       final Color colorDevice = new Color(display, new RGB(0xff, 0x0, 0x80));
       final Color colorHidden = new Color(display, new RGB(0x24, 0x9C, 0xFF));
 
+      final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(2);
+
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
 
       /*
        * Draw pause point and label
        */
       for (final ChartLabel chartLabel : _cpc.chartLabels) {
-         //TODO FB somewhere here, use the overlap checker to avoid overlapping pauses
-         //TODO FB
-//       final Rectangle validRect = overlapChecker.getValidRect(
-//             pauseBounds,
-//             true, //isValueUp,
-//             10, //textHeightWithBorder,
-//             pauseDurationText);
-         //
-//       overlapChecker.setupNext(validRect, true);
 
          final float yValue = yValues[chartLabel.serieIndex];
          final int devYGraph = (int) ((yValue - graphYBottom) * scaleY) - 0;
@@ -207,8 +200,44 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
             _devYPause = devYTop;
          }
 
-         // draw label
-         gc.drawText(chartLabel.pauseDuration, _devXPause, _devYPause, true);
+         final String pauseDurationText = chartLabel.pauseDuration;
+         final Point textExtent = gc.textExtent(pauseDurationText);
+         final int textWidth = textExtent.x;
+         final int textHeight = textExtent.y;
+         final int borderWidth = 5;
+         final int borderWidth2 = 2 * borderWidth;
+         final int borderHeight = 0;
+         final int borderHeight2 = 2 * borderHeight;
+         final int textHeightWithBorder = textHeight + borderHeight2;
+
+         /*
+          * Ensure the value text do not overlap, if possible :-)
+          */
+         final Rectangle textRect = new Rectangle(//
+               _devXPause,
+               _devYPause,
+               textWidth + borderWidth2,
+               textHeightWithBorder);
+
+         final Rectangle validRect = overlapChecker.getValidRect(
+               textRect,
+               true,
+               textHeightWithBorder,
+               pauseDurationText);
+
+         overlapChecker.setupNext(validRect, true);
+
+         // don't draw over the graph borders
+         if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
+
+            // keep current valid rectangle
+            overlapChecker.setupNext(validRect, true);
+
+            gc.setAlpha(0xff);
+
+            // draw label
+            gc.drawText(pauseDurationText, validRect.x, validRect.y, true);
+         }
       }
 
       colorDefault.dispose();
