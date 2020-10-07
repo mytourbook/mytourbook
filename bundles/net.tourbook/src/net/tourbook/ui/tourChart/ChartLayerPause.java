@@ -225,8 +225,6 @@ public class ChartLayerPause implements IChartLayer, IChartOverlay {
                textHeightWithBorder,
                pauseDurationText);
 
-         overlapChecker.setupNext(validRect, true);
-
          // don't draw over the graph borders
          if (validRect != null && validRect.y > devYTop && validRect.y + textHeight < devYBottom) {
 
