@@ -87,7 +87,8 @@ Fixes
   - Several SQL exception's when view is not sorted by a column
   
 * Statistic View
-  - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015   
+  - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015
+  - Month/year statistic shows the wrong time values in the tooltip when the tour types are resorted
 
 * GPX/TCX Export
   - Fixed total distance issue https://sourceforge.net/p/mytourbook/discussion/622811/thread/fd281c265a/?limit=25#c72b 

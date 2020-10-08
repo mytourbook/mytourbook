@@ -154,6 +154,14 @@ public class StatisticTooltipUI_Summary {
       _actionCloseTooltip = new ActionCloseTooltip();
    }
 
+   /**
+    * @param parent
+    * @param toolTipProvider
+    * @param tourData_Month
+    * @param toolTipTitle
+    * @param serieIndex
+    * @param valueIndex
+    */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
                           final TourData_Month tourData_Month,
@@ -173,7 +181,7 @@ public class StatisticTooltipUI_Summary {
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 
       // setup tour type
-      _tourTypeId = _tourData_Month.typeIds[serieIndex][valueIndex];
+      _tourTypeId = _tourData_Month.typeIds_Resorted[serieIndex][valueIndex];
       _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
       _isTourTypeImageAvailable = _tourTypeId >= 0;
 
@@ -557,24 +565,25 @@ public class StatisticTooltipUI_Summary {
 
 // SET_FORMATTING_OFF
 
-      final long deviceTime_Elapsed          = _tourData_Month.elapsedTime[_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Elapsed_Total    = computeTotals(_tourData_Month.elapsedTime,_valueIndex);
-      final long deviceTime_Recorded         = _tourData_Month.recordedTime[_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Recorded_Total   = computeTotals(_tourData_Month.recordedTime,_valueIndex);
-      final long deviceTime_Paused           = _tourData_Month.pausedTime[_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Paused_Total     = computeTotals(_tourData_Month.pausedTime,_valueIndex);
-      final long computedTime_Moving         = _tourData_Month.movingTime[_tourType_SerieIndex][_valueIndex];
-      final long computedTime_Moving_Total   = computeTotals(_tourData_Month.movingTime,_valueIndex);
+      final long deviceTime_Elapsed          = _tourData_Month.elapsedTime_Resorted    [_tourType_SerieIndex][_valueIndex];
+      final long deviceTime_Recorded         = _tourData_Month.recordedTime_Resorted   [_tourType_SerieIndex][_valueIndex];
+      final long deviceTime_Paused           = _tourData_Month.pausedTime_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final long computedTime_Moving         = _tourData_Month.movingTime_Resorted     [_tourType_SerieIndex][_valueIndex];
       final long computedTime_Break          = deviceTime_Elapsed - computedTime_Moving;
+
+      final long deviceTime_Elapsed_Total    = computeTotals(_tourData_Month.elapsedTime_Resorted,    _valueIndex);
+      final long deviceTime_Recorded_Total   = computeTotals(_tourData_Month.recordedTime_Resorted,   _valueIndex);
+      final long deviceTime_Paused_Total     = computeTotals(_tourData_Month.pausedTime_Resorted,     _valueIndex);
+      final long computedTime_Moving_Total   = computeTotals(_tourData_Month.movingTime_Resorted,     _valueIndex);
       final long computedTime_Break_Total    = deviceTime_Elapsed_Total - computedTime_Moving_Total;
 
-      final float distance                   = _tourData_Month.distanceHigh[_tourType_SerieIndex][_valueIndex];
-      final float distance_Total             = computeTotals(_tourData_Month.distanceHigh,_valueIndex);
-      final float elevationUp                = _tourData_Month.elevationUp_High[_tourType_SerieIndex][_valueIndex];
-      final float elevationUp_Total          = computeTotals(_tourData_Month.elevationUp_High,_valueIndex);
+      final float distance                   = _tourData_Month.distanceHigh_Resorted         [_tourType_SerieIndex][_valueIndex];
+      final float elevationUp                = _tourData_Month.elevationUp_High_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final int numTours                     = (int)(_tourData_Month.numToursHigh_Resorted   [_tourType_SerieIndex][_valueIndex] + 0.5f);
 
-      final int numTours                     = (int) (_tourData_Month.numToursHigh[_tourType_SerieIndex][_valueIndex] + 0.5f);
-      final int numTours_Total               = (int) (computeTotals(_tourData_Month.numToursHigh,_valueIndex) + 0.5f);
+      final float distance_Total             = computeTotals(_tourData_Month.distanceHigh_Resorted,         _valueIndex);
+      final float elevationUp_Total          = computeTotals(_tourData_Month.elevationUp_High_Resorted,     _valueIndex);
+      final int numTours_Total               = (int)(computeTotals(_tourData_Month.numToursHigh_Resorted,   _valueIndex) + 0.5f);
 
 // SET_FORMATTING_ON
 
