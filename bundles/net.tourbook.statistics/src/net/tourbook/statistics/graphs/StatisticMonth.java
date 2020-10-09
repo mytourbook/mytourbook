@@ -270,20 +270,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-      final String tourTypeName = StatisticServices.getTourTypeName(
-            hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex,
-            _resortedTypeIds,
-            _appTourTypeFilter);
-
-      final StringBuilder sbTitle = new StringBuilder();
-
-      if (tourTypeName != null && tourTypeName.length() > 0) {
-         sbTitle.append(tourTypeName);
-      }
-
       final String toolTipTitle = String.format(TOOLTIP_TITLE_FORMAT,
-            sbTitle,
             monthText,
             monthDate.getYear());
 

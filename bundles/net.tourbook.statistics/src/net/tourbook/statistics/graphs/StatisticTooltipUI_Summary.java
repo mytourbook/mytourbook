@@ -83,29 +83,30 @@ public class StatisticTooltipUI_Summary {
     */
    private Composite _ttContainer;
 
+   private Label     _lblColumnHeader_TourType;
    private Label     _lblTitle;
    private CLabel    _lblTourType_Image;
 
    private Label     _lblDeviceTime_Elapsed;
-   private Label     _lblDeviceTime_Elapsed_Total;
+   private Label     _lblDeviceTime_Elapsed_Summary;
    private Label     _lblDeviceTime_Paused;
-   private Label     _lblDeviceTime_Paused_Total;
+   private Label     _lblDeviceTime_Paused_Summary;
    private Label     _lblDeviceTime_Recorded;
-   private Label     _lblDeviceTime_Recorded_Total;
+   private Label     _lblDeviceTime_Recorded_Summary;
 
    private Label     _lblComputedTime_Break;
-   private Label     _lblComputedTime_Break_Total;
+   private Label     _lblComputedTime_Break_Summary;
    private Label     _lblComputedTime_Moving;
-   private Label     _lblComputedTime_Moving_Total;
+   private Label     _lblComputedTime_Moving_Summary;
 
    private Label     _lblDistance;
-   private Label     _lblDistance_Total;
+   private Label     _lblDistance_Summary;
    private Label     _lblDistance_Unit;
    private Label     _lblElevationUp;
-   private Label     _lblElevationUp_Total;
+   private Label     _lblElevationUp_Summary;
    private Label     _lblElevationUp_Unit;
    private Label     _lblNumberOfTours;
-   private Label     _lblNumberOfTours_Total;
+   private Label     _lblNumberOfTours_Summary;
 
    private class ActionCloseTooltip extends Action {
 
@@ -123,7 +124,7 @@ public class StatisticTooltipUI_Summary {
       }
    }
 
-   private float computeTotals(final float[][] allDataSeries, final int valueIndex) {
+   private float computeSummary(final float[][] allDataSeries, final int valueIndex) {
 
       float summary = 0;
 
@@ -134,7 +135,7 @@ public class StatisticTooltipUI_Summary {
       return summary;
    }
 
-   private int computeTotals(final int[][] allDataSeries, final int valueIndex) {
+   private int computeSummary(final int[][] allDataSeries, final int valueIndex) {
 
       int summary = 0;
 
@@ -322,38 +323,16 @@ public class StatisticTooltipUI_Summary {
 
    private void createUI_18_ColumnHeader(final Composite parent) {
 
-      /*
-       * 1st row
-       */
-
-      // column 1
-      createUI_Label(parent, UI.EMPTY_STRING);
-
-      // column 2
-      final Label lblBar = createUI_Label(parent, "Hovered", SWT.TRAIL);
-      lblBar.setFont(FONT_BOLD);
+      // column 1+2
+      _lblColumnHeader_TourType = createUI_Label(parent, UI.EMPTY_STRING);
+      _lblColumnHeader_TourType.setFont(FONT_BOLD);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(_lblColumnHeader_TourType);
 
       // column 3
-      final Label lblTotal = createUI_Label(parent, "Month", SWT.TRAIL);
-      lblTotal.setFont(FONT_BOLD);
-      GridDataFactory.fillDefaults().indent(30, 0).applyTo(lblTotal);
-
-      // column 4
-      createUI_Label(parent, UI.EMPTY_STRING);
-
-      /*
-       * 2nd row
-       */
-
-      // column 1
-      createUI_Label(parent, UI.EMPTY_STRING);
-
-      // column 2
-      final Label lblBar2 = createUI_Label(parent, "Tour Type", SWT.TRAIL);
-      lblBar2.setFont(FONT_BOLD);
-
-      // column 3
-      final Label lblTotal2 = createUI_Label(parent, "Total", SWT.TRAIL);
+      final Label lblTotal2 = createUI_Label(parent, Messages.Statistic_Tooltip_Label_ColumnHeader_Month, SWT.TRAIL);
       lblTotal2.setFont(FONT_BOLD);
       GridDataFactory.fillDefaults().indent(30, 0).applyTo(lblTotal2);
 
@@ -370,7 +349,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(parent, Messages.Tour_Tooltip_Label_ElapsedTime);
 
          _lblDeviceTime_Elapsed = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Elapsed_Total = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblDeviceTime_Elapsed_Summary = createUI_LabelValue(parent, SWT.TRAIL);
          final Label lblDeviceTime_Elapsed_Hour = createUI_Label(parent, Messages.Tour_Tooltip_Label_Hour);
 
          // force this column to take the rest of the space
@@ -384,7 +363,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(parent, Messages.Tour_Tooltip_Label_RecordedTime);
 
          _lblDeviceTime_Recorded = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Recorded_Total = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblDeviceTime_Recorded_Summary = createUI_LabelValue(parent, SWT.TRAIL);
          createUI_Label(parent, Messages.Tour_Tooltip_Label_Hour);
       }
 
@@ -395,7 +374,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(parent, Messages.Tour_Tooltip_Label_PausedTime);
 
          _lblDeviceTime_Paused = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Paused_Total = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblDeviceTime_Paused_Summary = createUI_LabelValue(parent, SWT.TRAIL);
          createUI_Label(parent, Messages.Tour_Tooltip_Label_Hour);
       }
 
@@ -406,7 +385,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(parent, Messages.Tour_Tooltip_Label_MovingTime);
 
          _lblComputedTime_Moving = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblComputedTime_Moving_Total = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblComputedTime_Moving_Summary = createUI_LabelValue(parent, SWT.TRAIL);
          createUI_Label(parent, Messages.Tour_Tooltip_Label_Hour);
       }
 
@@ -417,7 +396,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(parent, Messages.Tour_Tooltip_Label_BreakTime);
 
          _lblComputedTime_Break = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblComputedTime_Break_Total = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblComputedTime_Break_Summary = createUI_LabelValue(parent, SWT.TRAIL);
          createUI_Label(parent, Messages.Tour_Tooltip_Label_Hour);
       }
 
@@ -432,7 +411,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
 
          _lblDistance = createUI_LabelValue(container, SWT.TRAIL);
-         _lblDistance_Total = createUI_LabelValue(container, SWT.TRAIL);
+         _lblDistance_Summary = createUI_LabelValue(container, SWT.TRAIL);
          _lblDistance_Unit = createUI_LabelValue(container, SWT.LEAD);
       }
 
@@ -443,7 +422,7 @@ public class StatisticTooltipUI_Summary {
          createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
 
          _lblElevationUp = createUI_LabelValue(container, SWT.TRAIL);
-         _lblElevationUp_Total = createUI_LabelValue(container, SWT.TRAIL);
+         _lblElevationUp_Summary = createUI_LabelValue(container, SWT.TRAIL);
          _lblElevationUp_Unit = createUI_LabelValue(container, SWT.LEAD);
       }
    }
@@ -456,7 +435,7 @@ public class StatisticTooltipUI_Summary {
       createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
 
       _lblNumberOfTours = createUI_LabelValue(container, SWT.TRAIL);
-      _lblNumberOfTours_Total = createUI_LabelValue(container, SWT.TRAIL);
+      _lblNumberOfTours_Summary = createUI_LabelValue(container, SWT.TRAIL);
       createUI_LabelValue(container, SWT.LEAD);
 
    }
@@ -563,30 +542,6 @@ public class StatisticTooltipUI_Summary {
 
    private void updateUI() {
 
-// SET_FORMATTING_OFF
-
-      final long deviceTime_Elapsed          = _tourData_Month.elapsedTime_Resorted    [_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Recorded         = _tourData_Month.recordedTime_Resorted   [_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Paused           = _tourData_Month.pausedTime_Resorted     [_tourType_SerieIndex][_valueIndex];
-      final long computedTime_Moving         = _tourData_Month.movingTime_Resorted     [_tourType_SerieIndex][_valueIndex];
-      final long computedTime_Break          = deviceTime_Elapsed - computedTime_Moving;
-
-      final long deviceTime_Elapsed_Total    = computeTotals(_tourData_Month.elapsedTime_Resorted,    _valueIndex);
-      final long deviceTime_Recorded_Total   = computeTotals(_tourData_Month.recordedTime_Resorted,   _valueIndex);
-      final long deviceTime_Paused_Total     = computeTotals(_tourData_Month.pausedTime_Resorted,     _valueIndex);
-      final long computedTime_Moving_Total   = computeTotals(_tourData_Month.movingTime_Resorted,     _valueIndex);
-      final long computedTime_Break_Total    = deviceTime_Elapsed_Total - computedTime_Moving_Total;
-
-      final float distance                   = _tourData_Month.distanceHigh_Resorted         [_tourType_SerieIndex][_valueIndex];
-      final float elevationUp                = _tourData_Month.elevationUp_High_Resorted     [_tourType_SerieIndex][_valueIndex];
-      final int numTours                     = (int)(_tourData_Month.numToursHigh_Resorted   [_tourType_SerieIndex][_valueIndex] + 0.5f);
-
-      final float distance_Total             = computeTotals(_tourData_Month.distanceHigh_Resorted,         _valueIndex);
-      final float elevationUp_Total          = computeTotals(_tourData_Month.elevationUp_High_Resorted,     _valueIndex);
-      final int numTours_Total               = (int)(computeTotals(_tourData_Month.numToursHigh_Resorted,   _valueIndex) + 0.5f);
-
-// SET_FORMATTING_ON
-
       // tour type image
       if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
 
@@ -599,30 +554,54 @@ public class StatisticTooltipUI_Summary {
       }
 
       _lblTitle.setText(_toolTipTitle);
+      _lblColumnHeader_TourType.setText(_tourTypeName);
 
 // SET_FORMATTING_OFF
 
-      _lblDeviceTime_Elapsed        .setText(FormatManager.formatElapsedTime(deviceTime_Elapsed));
-      _lblDeviceTime_Elapsed_Total  .setText(FormatManager.formatElapsedTime(deviceTime_Elapsed_Total));
-      _lblDeviceTime_Recorded       .setText(FormatManager.formatMovingTime(deviceTime_Recorded));
-      _lblDeviceTime_Recorded_Total .setText(FormatManager.formatMovingTime(deviceTime_Recorded_Total));
-      _lblDeviceTime_Paused         .setText(FormatManager.formatPausedTime(deviceTime_Paused));
-      _lblDeviceTime_Paused_Total   .setText(FormatManager.formatPausedTime(deviceTime_Paused_Total));
-      _lblComputedTime_Moving       .setText(FormatManager.formatMovingTime(computedTime_Moving));
-      _lblComputedTime_Moving_Total .setText(FormatManager.formatMovingTime(computedTime_Moving_Total));
-      _lblComputedTime_Break        .setText(FormatManager.formatPausedTime(computedTime_Break));
-      _lblComputedTime_Break_Total  .setText(FormatManager.formatPausedTime(computedTime_Break_Total));
+      final long deviceTime_Elapsed                   = _tourData_Month.elapsedTime_Resorted    [_tourType_SerieIndex][_valueIndex];
+      final long deviceTime_Recorded                  = _tourData_Month.recordedTime_Resorted   [_tourType_SerieIndex][_valueIndex];
+      final long deviceTime_Paused                    = _tourData_Month.pausedTime_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final long computedTime_Moving                  = _tourData_Month.movingTime_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final long computedTime_Break                   = deviceTime_Elapsed - computedTime_Moving;
 
-      _lblDistance                  .setText(FormatManager.formatDistance(distance / 1000.0));
-      _lblDistance_Total            .setText(FormatManager.formatDistance(distance_Total / 1000.0));
-      _lblDistance_Unit             .setText(UI.UNIT_LABEL_DISTANCE);
+      final long deviceTime_Elapsed_Summary           = computeSummary(_tourData_Month.elapsedTime_Resorted,    _valueIndex);
+      final long deviceTime_Recorded_Summary          = computeSummary(_tourData_Month.recordedTime_Resorted,   _valueIndex);
+      final long deviceTime_Paused_Summary            = computeSummary(_tourData_Month.pausedTime_Resorted,     _valueIndex);
+      final long computedTime_Moving_Summary          = computeSummary(_tourData_Month.movingTime_Resorted,     _valueIndex);
+      final long computedTime_Break_Summary           = deviceTime_Elapsed_Summary - computedTime_Moving_Summary;
 
-      _lblElevationUp               .setText(Integer.toString((int) (elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-      _lblElevationUp_Total         .setText(Integer.toString((int) (elevationUp_Total / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-      _lblElevationUp_Unit          .setText(UI.UNIT_LABEL_ALTITUDE);
+      final float distance                            = _tourData_Month.distanceHigh_Resorted         [_tourType_SerieIndex][_valueIndex];
+      final float elevationUp                         = _tourData_Month.elevationUp_High_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final int numTours                              = (int)(_tourData_Month.numToursHigh_Resorted   [_tourType_SerieIndex][_valueIndex] + 0.5f);
 
-      _lblNumberOfTours             .setText(Integer.toString(numTours));
-      _lblNumberOfTours_Total       .setText(Integer.toString(numTours_Total));
+      final float distance_Summary                    = computeSummary(_tourData_Month.distanceHigh_Resorted,         _valueIndex);
+      final float elevationUp_Summary                 = computeSummary(_tourData_Month.elevationUp_High_Resorted,     _valueIndex);
+      final int numTours_Summary                      = (int)(computeSummary(_tourData_Month.numToursHigh_Resorted,   _valueIndex) + 0.5f);
+
+      final float elevationUp_WithMeasurement         = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+      _lblDeviceTime_Elapsed           .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed));
+      _lblDeviceTime_Elapsed_Summary   .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed_Summary));
+      _lblDeviceTime_Recorded          .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded));
+      _lblDeviceTime_Recorded_Summary  .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded_Summary));
+      _lblDeviceTime_Paused            .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused));
+      _lblDeviceTime_Paused_Summary    .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused_Summary));
+      _lblComputedTime_Moving          .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving));
+      _lblComputedTime_Moving_Summary  .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving_Summary));
+      _lblComputedTime_Break           .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
+      _lblComputedTime_Break_Summary   .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break_Summary));
+
+      _lblDistance                     .setText(FormatManager.formatDistance_Summary      (distance / 1000.0));
+      _lblDistance_Summary             .setText(FormatManager.formatDistance_Summary      (distance_Summary / 1000.0));
+      _lblDistance_Unit                .setText(UI.UNIT_LABEL_DISTANCE);
+
+      _lblElevationUp                  .setText(FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
+      _lblElevationUp_Summary          .setText(FormatManager.formatElevation_Summary     (elevationUp_Summary_WithMeasurement));
+      _lblElevationUp_Unit             .setText(UI.UNIT_LABEL_ALTITUDE);
+
+      _lblNumberOfTours                .setText(Integer.toString(numTours));
+      _lblNumberOfTours_Summary        .setText(Integer.toString(numTours_Summary));
 
 // SET_FORMATTING_ON
    }

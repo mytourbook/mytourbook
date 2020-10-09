@@ -1544,6 +1544,10 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Label_Power;
    public static String        Pref_DisplayFormat_Label_Pulse;
    public static String        Pref_DisplayFormat_Label_Speed;
+   public static String        Pref_DisplayFormat_Tab_MultipleTours;
+   public static String        Pref_DisplayFormat_Tab_MultipleTours_Tooltip;
+   public static String        Pref_DisplayFormat_Tab_OneTour;
+   public static String        Pref_DisplayFormat_Tab_OneTour_Tooltip;
 
    public static String        Pref_general_imperial_unit_fahrenheit;
    public static String        Pref_general_imperial_unit_feet;

@@ -55,6 +55,7 @@ Improvements
 * Statistics View
   - New toolbar action: Copy statistic values to the clipboard
   - Show totals in the tooltip for all tour types in one time unit - https://sourceforge.net/p/mytourbook/feature-requests/180/
+  - Values in the statistic tooltip can be formatted differently than tour tooltips values
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
