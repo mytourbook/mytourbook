@@ -55,6 +55,7 @@ Improvements
 * Statistics View
   - New toolbar action: Copy statistic values to the clipboard
   - Show totals in the tooltip for all tour types in one time unit - https://sourceforge.net/p/mytourbook/feature-requests/180/
+  - Values in the statistic tooltip can be formatted differently than tour tooltips values
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
@@ -90,7 +91,8 @@ Fixes
   - Several SQL exception's when view is not sorted by a column
   
 * Statistic View
-  - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015   
+  - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015
+  - Month/year statistic shows the wrong time values in the tooltip when the tour types are resorted
 
 * GPX/TCX Export
   - Fixed total distance issue https://sourceforge.net/p/mytourbook/discussion/622811/thread/fd281c265a/?limit=25#c72b 

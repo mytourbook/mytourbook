@@ -78,7 +78,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private StatisticContext         _statContext;
 
-   private ChartDataYSerie          _yData_Duration;
+   private ChartDataYSerie          _yData_DurationTime;
 
    private int                      _barOrderStart;
 
@@ -90,8 +90,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
    private float[][]                _resortedDistance_High;
    private float[][]                _resortedNumTours_Low;
    private float[][]                _resortedNumTours_High;
-   private float[][]                _resortedTime_Low;
-   private float[][]                _resortedTime_High;
+
+   private float[][]                _resortedDurationTime_Low;
+   private float[][]                _resortedDurationTime_High;
 
    public boolean canTourBeVisible() {
       return false;
@@ -269,22 +270,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-      final long typeId = _resortedTypeIds[hoveredBar_SerieIndex][hoveredBar_ValueIndex];
-
-      final String tourTypeName = StatisticServices.getTourTypeName(
-            hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex,
-            _resortedTypeIds,
-            _appTourTypeFilter);
-
-      final StringBuilder sbTitle = new StringBuilder();
-
-      if (tourTypeName != null && tourTypeName.length() > 0) {
-         sbTitle.append(tourTypeName);
-      }
-
       final String toolTipTitle = String.format(TOOLTIP_TITLE_FORMAT,
-            sbTitle,
             monthText,
             monthDate.getYear());
 
@@ -356,24 +342,24 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    void createYData_Duration(final ChartDataModel chartDataModel) {
 
-      // duration
+      // duration time
 
-      _yData_Duration = new ChartDataYSerie(
+      _yData_DurationTime = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _resortedTime_Low,
-            _resortedTime_High);
+            _resortedDurationTime_Low,
+            _resortedDurationTime_High);
 
-      _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
-      _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-      _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-      _yData_Duration.setShowYSlider(true);
+      _yData_DurationTime.setYTitle(Messages.LABEL_GRAPH_TIME);
+      _yData_DurationTime.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+      _yData_DurationTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      _yData_DurationTime.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(_yData_Duration, _resortedTypeIds, _appTourTypeFilter);
+      StatisticServices.setDefaultColors(_yData_DurationTime, GraphColorManager.PREF_GRAPH_TIME);
+      StatisticServices.setTourTypeColors(_yData_DurationTime, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(_yData_DurationTime, _resortedTypeIds, _appTourTypeFilter);
 
-      chartDataModel.addYData(_yData_Duration);
+      chartDataModel.addYData(_yData_DurationTime);
    }
 
    /**
@@ -431,84 +417,122 @@ public abstract class StatisticMonth extends TourbookStatistic {
     */
    private void reorderStatData() {
 
-      final int barLength = _tourMonth_Data.elevationUp_High.length;
+// SET_FORMATTING_OFF
 
-      _resortedTypeIds = new long[barLength][];
+      final int numBars = _tourMonth_Data.elevationUp_High.length;
 
-      _resortedElevation_Low = new float[barLength][];
-      _resortedElevation_High = new float[barLength][];
-      _resortedDistance_Low = new float[barLength][];
-      _resortedDistance_High = new float[barLength][];
-      _resortedNumTours_Low = new float[barLength][];
-      _resortedNumTours_High = new float[barLength][];
-      _resortedTime_Low = new float[barLength][];
-      _resortedTime_High = new float[barLength][];
+      _resortedTypeIds                    = new long[numBars][];
+
+      _resortedElevation_Low              = new float[numBars][];
+      _resortedElevation_High             = new float[numBars][];
+      _resortedDistance_Low               = new float[numBars][];
+      _resortedDistance_High              = new float[numBars][];
+
+      _resortedNumTours_Low               = new float[numBars][];
+      _resortedNumTours_High              = new float[numBars][];
+
+      _resortedDurationTime_Low           = new float[numBars][];
+      _resortedDurationTime_High          = new float[numBars][];
+
+      _tourMonth_Data.typeIds_Resorted          = _resortedTypeIds;
+      _tourMonth_Data.elevationUp_High_Resorted = _resortedElevation_High;
+      _tourMonth_Data.distanceHigh_Resorted     = _resortedDistance_High;
+      _tourMonth_Data.numToursHigh_Resorted     = _resortedNumTours_High;
 
       if (_statContext.outBarNames == null) {
 
          // there are no data available, create dummy data that the UI do not fail
 
-         _resortedTypeIds = new long[1][1];
+         _resortedTypeIds           = new long[1][1];
 
-         _resortedElevation_Low = new float[1][1];
-         _resortedElevation_High = new float[1][1];
-         _resortedDistance_Low = new float[1][1];
-         _resortedDistance_High = new float[1][1];
-         _resortedNumTours_Low = new float[1][1];
-         _resortedNumTours_High = new float[1][1];
-         _resortedTime_Low = new float[1][1];
-         _resortedTime_High = new float[1][1];
+         _resortedElevation_Low     = new float[1][1];
+         _resortedElevation_High    = new float[1][1];
+         _resortedDistance_Low      = new float[1][1];
+         _resortedDistance_High     = new float[1][1];
+         _resortedNumTours_Low      = new float[1][1];
+         _resortedNumTours_High     = new float[1][1];
+
+         _resortedDurationTime_Low  = new float[1][1];
+         _resortedDurationTime_High = new float[1][1];
 
          return;
       }
 
       int resortedIndex = 0;
 
-      final long[][] typeIds = _tourMonth_Data.typeIds;
+      final long[][] typeIds              = _tourMonth_Data.typeIds;
 
-      final float[][] altitudeLowValues = _tourMonth_Data.elevationUp_Low;
-      final float[][] altitudeHighValues = _tourMonth_Data.elevationUp_High;
-      final float[][] distanceLowValues = _tourMonth_Data.distanceLow;
-      final float[][] distanceHighValues = _tourMonth_Data.distanceHigh;
-      final float[][] numToursLowValues = _tourMonth_Data.numToursLow;
-      final float[][] numToursHighValues = _tourMonth_Data.numToursHigh;
-      final float[][] timeLowValues = _tourMonth_Data.getDurationTimeLowFloat();
-      final float[][] timeHighValues = _tourMonth_Data.getDurationTimeHighFloat();
+      final float[][] elevation_Low       = _tourMonth_Data.elevationUp_Low;
+      final float[][] elevation_High      = _tourMonth_Data.elevationUp_High;
+      final float[][] distanceLow         = _tourMonth_Data.distanceLow;
+      final float[][] distance_High       = _tourMonth_Data.distanceHigh;
+      final float[][] numTours_Low        = _tourMonth_Data.numToursLow;
+      final float[][] numTours_High       = _tourMonth_Data.numToursHigh;
 
-      if (_barOrderStart >= barLength) {
+      final float[][] durationTime_Low    = _tourMonth_Data.getDurationTimeLowFloat();
+      final float[][] durationTime_High   = _tourMonth_Data.getDurationTimeHighFloat();
 
-         final int barOrderStart = _barOrderStart % barLength;
+      final int[][] elapsedTime           = _tourMonth_Data.elapsedTime;
+      final int[][] recordedTime          = _tourMonth_Data.recordedTime;
+      final int[][] pausedTime            = _tourMonth_Data.pausedTime;
+      final int[][] movingTime            = _tourMonth_Data.movingTime;
+      final int[][] breakTime             = _tourMonth_Data.breakTime;
+
+      final int[][] resorted_ElapsedTime  = _tourMonth_Data.elapsedTime_Resorted    = new int[numBars][];
+      final int[][] resorted_RecordedTime = _tourMonth_Data.recordedTime_Resorted   = new int[numBars][];
+      final int[][] resorted_PausedTime   = _tourMonth_Data.pausedTime_Resorted     = new int[numBars][];
+      final int[][] resorted_MovingTime   = _tourMonth_Data.movingTime_Resorted     = new int[numBars][];
+      final int[][] resorted_BreakTime    = _tourMonth_Data.breakTime_Resorted      = new int[numBars][];
+
+      if (_barOrderStart >= numBars) {
+
+         final int barOrderStart = _barOrderStart % numBars;
 
          // set types starting from the sequence start
          for (int serieIndex = barOrderStart; serieIndex >= 0; serieIndex--) {
 
-            _resortedTypeIds[resortedIndex] = typeIds[serieIndex];
+            _resortedTypeIds[resortedIndex]           = typeIds[serieIndex];
 
-            _resortedElevation_Low[resortedIndex] = altitudeLowValues[serieIndex];
-            _resortedElevation_High[resortedIndex] = altitudeHighValues[serieIndex];
-            _resortedDistance_Low[resortedIndex] = distanceLowValues[serieIndex];
-            _resortedDistance_High[resortedIndex] = distanceHighValues[serieIndex];
-            _resortedNumTours_Low[resortedIndex] = numToursLowValues[serieIndex];
-            _resortedNumTours_High[resortedIndex] = numToursHighValues[serieIndex];
-            _resortedTime_Low[resortedIndex] = timeLowValues[serieIndex];
-            _resortedTime_High[resortedIndex] = timeHighValues[serieIndex];
+            _resortedElevation_Low[resortedIndex]     = elevation_Low[serieIndex];
+            _resortedElevation_High[resortedIndex]    = elevation_High[serieIndex];
+            _resortedDistance_Low[resortedIndex]      = distanceLow[serieIndex];
+            _resortedDistance_High[resortedIndex]     = distance_High[serieIndex];
+
+            _resortedNumTours_Low[resortedIndex]      = numTours_Low[serieIndex];
+            _resortedNumTours_High[resortedIndex]     = numTours_High[serieIndex];
+
+            _resortedDurationTime_Low[resortedIndex]  = durationTime_Low[serieIndex];
+            _resortedDurationTime_High[resortedIndex] = durationTime_High[serieIndex];
+
+            resorted_ElapsedTime[resortedIndex]       = elapsedTime[serieIndex];
+            resorted_RecordedTime[resortedIndex]      = recordedTime[serieIndex];
+            resorted_PausedTime[resortedIndex]        = pausedTime[serieIndex];
+            resorted_MovingTime[resortedIndex]        = movingTime[serieIndex];
+            resorted_BreakTime[resortedIndex]         = breakTime[serieIndex];
 
             resortedIndex++;
          }
 
          // set types starting from the last
-         for (int serieIndex = barLength - 1; resortedIndex < barLength; serieIndex--) {
+         for (int serieIndex = numBars - 1; resortedIndex < numBars; serieIndex--) {
 
-            _resortedTypeIds[resortedIndex] = typeIds[serieIndex];
+            _resortedTypeIds[resortedIndex]           = typeIds[serieIndex];
 
-            _resortedElevation_Low[resortedIndex] = altitudeLowValues[serieIndex];
-            _resortedElevation_High[resortedIndex] = altitudeHighValues[serieIndex];
-            _resortedDistance_Low[resortedIndex] = distanceLowValues[serieIndex];
-            _resortedDistance_High[resortedIndex] = distanceHighValues[serieIndex];
-            _resortedNumTours_Low[resortedIndex] = numToursLowValues[serieIndex];
-            _resortedNumTours_High[resortedIndex] = numToursHighValues[serieIndex];
-            _resortedTime_Low[resortedIndex] = timeLowValues[serieIndex];
-            _resortedTime_High[resortedIndex] = timeHighValues[serieIndex];
+            _resortedElevation_Low[resortedIndex]     = elevation_Low[serieIndex];
+            _resortedElevation_High[resortedIndex]    = elevation_High[serieIndex];
+            _resortedDistance_Low[resortedIndex]      = distanceLow[serieIndex];
+            _resortedDistance_High[resortedIndex]     = distance_High[serieIndex];
+            _resortedNumTours_Low[resortedIndex]      = numTours_Low[serieIndex];
+            _resortedNumTours_High[resortedIndex]     = numTours_High[serieIndex];
+
+            _resortedDurationTime_Low[resortedIndex]  = durationTime_Low[serieIndex];
+            _resortedDurationTime_High[resortedIndex] = durationTime_High[serieIndex];
+
+            resorted_ElapsedTime[resortedIndex]       = elapsedTime[serieIndex];
+            resorted_RecordedTime[resortedIndex]      = recordedTime[serieIndex];
+            resorted_PausedTime[resortedIndex]        = pausedTime[serieIndex];
+            resorted_MovingTime[resortedIndex]        = movingTime[serieIndex];
+            resorted_BreakTime[resortedIndex]         = breakTime[serieIndex];
 
             resortedIndex++;
          }
@@ -518,39 +542,55 @@ public abstract class StatisticMonth extends TourbookStatistic {
          final int barOrderStart = _barOrderStart;
 
          // set types starting from the sequence start
-         for (int serieIndex = barOrderStart; serieIndex < barLength; serieIndex++) {
+         for (int serieIndex = barOrderStart; serieIndex < numBars; serieIndex++) {
 
-            _resortedTypeIds[resortedIndex] = typeIds[serieIndex];
+            _resortedTypeIds[resortedIndex]           = typeIds[serieIndex];
 
-            _resortedElevation_Low[resortedIndex] = altitudeLowValues[serieIndex];
-            _resortedElevation_High[resortedIndex] = altitudeHighValues[serieIndex];
-            _resortedDistance_Low[resortedIndex] = distanceLowValues[serieIndex];
-            _resortedDistance_High[resortedIndex] = distanceHighValues[serieIndex];
-            _resortedNumTours_Low[resortedIndex] = numToursLowValues[serieIndex];
-            _resortedNumTours_High[resortedIndex] = numToursHighValues[serieIndex];
-            _resortedTime_Low[resortedIndex] = timeLowValues[serieIndex];
-            _resortedTime_High[resortedIndex] = timeHighValues[serieIndex];
+            _resortedElevation_Low[resortedIndex]     = elevation_Low[serieIndex];
+            _resortedElevation_High[resortedIndex]    = elevation_High[serieIndex];
+            _resortedDistance_Low[resortedIndex]      = distanceLow[serieIndex];
+            _resortedDistance_High[resortedIndex]     = distance_High[serieIndex];
+            _resortedNumTours_Low[resortedIndex]      = numTours_Low[serieIndex];
+            _resortedNumTours_High[resortedIndex]     = numTours_High[serieIndex];
+
+            _resortedDurationTime_Low[resortedIndex]  = durationTime_Low[serieIndex];
+            _resortedDurationTime_High[resortedIndex] = durationTime_High[serieIndex];
+
+            resorted_ElapsedTime[resortedIndex]       = elapsedTime[serieIndex];
+            resorted_RecordedTime[resortedIndex]      = recordedTime[serieIndex];
+            resorted_PausedTime[resortedIndex]        = pausedTime[serieIndex];
+            resorted_MovingTime[resortedIndex]        = movingTime[serieIndex];
+            resorted_BreakTime[resortedIndex]         = breakTime[serieIndex];
 
             resortedIndex++;
          }
 
          // set types starting from 0
-         for (int serieIndex = 0; resortedIndex < barLength; serieIndex++) {
+         for (int serieIndex = 0; resortedIndex < numBars; serieIndex++) {
 
-            _resortedTypeIds[resortedIndex] = typeIds[serieIndex];
+            _resortedTypeIds[resortedIndex]           = typeIds[serieIndex];
 
-            _resortedElevation_Low[resortedIndex] = altitudeLowValues[serieIndex];
-            _resortedElevation_High[resortedIndex] = altitudeHighValues[serieIndex];
-            _resortedDistance_Low[resortedIndex] = distanceLowValues[serieIndex];
-            _resortedDistance_High[resortedIndex] = distanceHighValues[serieIndex];
-            _resortedNumTours_Low[resortedIndex] = numToursLowValues[serieIndex];
-            _resortedNumTours_High[resortedIndex] = numToursHighValues[serieIndex];
-            _resortedTime_Low[resortedIndex] = timeLowValues[serieIndex];
-            _resortedTime_High[resortedIndex] = timeHighValues[serieIndex];
+            _resortedElevation_Low[resortedIndex]     = elevation_Low[serieIndex];
+            _resortedElevation_High[resortedIndex]    = elevation_High[serieIndex];
+            _resortedDistance_Low[resortedIndex]      = distanceLow[serieIndex];
+            _resortedDistance_High[resortedIndex]     = distance_High[serieIndex];
+            _resortedNumTours_Low[resortedIndex]      = numTours_Low[serieIndex];
+            _resortedNumTours_High[resortedIndex]     = numTours_High[serieIndex];
+
+            _resortedDurationTime_Low[resortedIndex]  = durationTime_Low[serieIndex];
+            _resortedDurationTime_High[resortedIndex] = durationTime_High[serieIndex];
+
+            resorted_ElapsedTime[resortedIndex]       = elapsedTime[serieIndex];
+            resorted_RecordedTime[resortedIndex]      = recordedTime[serieIndex];
+            resorted_PausedTime[resortedIndex]        = pausedTime[serieIndex];
+            resorted_MovingTime[resortedIndex]        = movingTime[serieIndex];
+            resorted_BreakTime[resortedIndex]         = breakTime[serieIndex];
 
             resortedIndex++;
          }
       }
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -667,8 +707,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
       }
 
       // show selected time duration
-      if (_yData_Duration != null) {
-         setGraphLabel_Duration(_yData_Duration, durationTime);
+      if (_yData_DurationTime != null) {
+         setGraphLabel_Duration(_yData_DurationTime, durationTime);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());

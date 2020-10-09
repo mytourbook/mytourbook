@@ -23,27 +23,36 @@ import net.tourbook.data.TourType;
 public abstract class TourData_Common {
 
    long[][]          typeIds;
+   long[][]          typeIds_Resorted;
+
+   int               numUsedTourTypes;
    int[][]           typeColorIndex;
 
-   float[][]         elevationUp_Low;
-   float[][]         elevationUp_High;
+   int[][]           elapsedTime;
+   int[][]           elapsedTime_Resorted;
+   int[][]           recordedTime;
+   int[][]           recordedTime_Resorted;
+   int[][]           pausedTime;
+   int[][]           pausedTime_Resorted;
+   int[][]           movingTime;
+   int[][]           movingTime_Resorted;
+   int[][]           breakTime;
+   int[][]           breakTime_Resorted;
 
    float[][]         distanceLow;
    float[][]         distanceHigh;
+   float[][]         distanceHigh_Resorted;
+
+   float[][]         elevationUp_Low;
+   float[][]         elevationUp_High;
+   float[][]         elevationUp_High_Resorted;
 
    float[][]         numToursLow;
    float[][]         numToursHigh;
+   float[][]         numToursHigh_Resorted;
 
    private float[][] _durationTimeLowFloat;
    private float[][] _durationTimeHighFloat;
-
-   int[][]           elapsedTime;
-   int[][]           recordedTime;
-   int[][]           pausedTime;
-   int[][]           movingTime;
-   int[][]           breakTime;
-
-   int               numUsedTourTypes;
 
    /**
     * Contains the used {@link TourType} ID or -1 when not available. This data has the same length
