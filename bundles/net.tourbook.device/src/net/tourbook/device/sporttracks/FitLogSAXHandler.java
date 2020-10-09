@@ -17,15 +17,19 @@ package net.tourbook.device.sporttracks;
 
 import java.io.File;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -485,14 +489,28 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
-      // when the time series were created) or if the activity has not time zone UTC offset or no start time.
+      // when the time series were created) or if the activity has no time zone UTC offset or no start time.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
             _currentActivity.hasTimeZoneUtcOffset && _currentActivity.hasStartTime) {
-         final String[] zoneIds = TimeZone.getAvailableIDs(tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000);
+
+         final int offSet = tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000;
+         final String[] ids = TimeZone.getAvailableIDs(offSet);
+
+         /*
+          * Based on this information
+          * https://stackoverflow.com/questions/57468423/java-8-time-zone-zonerulesexception-unknown
+          * -time-zone-id-est
+          * We intersect the list of ids found based on the tour offset with the list of ZoneIds
+          * because, ultimately, a ZoneId is expected {@link TourData#getTimeZoneIdWithDefault}
+          */
+         final List<String> finalZoneIds = Arrays.stream(ids)
+               .distinct()
+               .filter(ZoneId.getAvailableZoneIds()::contains)
+               .collect(Collectors.toList());
 
          //We set the first found time zone that corresponds to the activity offset
-         if (zoneIds.length > 0) {
-            tourData.setTimeZoneId(zoneIds[0]);
+         if (finalZoneIds.size() > 0) {
+            tourData.setTimeZoneId(finalZoneIds.get(0));
          }
       }
 
