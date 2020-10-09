@@ -97,6 +97,9 @@ Fixes
 * GPX/TCX Export
   - Fixed total distance issue https://sourceforge.net/p/mytourbook/discussion/622811/thread/fd281c265a/?limit=25#c72b 
 
+* FitLogEx Import (Frederic)
+  - Fixed a possible import failure for manual tours with a Time Offset
+
  
    
 Translation    
