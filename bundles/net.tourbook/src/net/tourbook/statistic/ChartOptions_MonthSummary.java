@@ -47,6 +47,8 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private Button _chkShowDistance;
    private Button _chkShowDuration;
    private Button _chkShowNumberOfTours;
+   private Button _chkShowPercentageValues;
+   private Button _chkShowSummaryValues;
    private Button _chkShowYearSeparator;
 
    private Button _rdoChartType_BarAdjacent;
@@ -57,13 +59,15 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private Button _rdoDuration_MovingTime;
    private Button _rdoDuration_BreakTime;
 
+
    @Override
    public void createUI(final Composite parent) {
 
       initUI(parent);
 
       createUI_100_Graphs(parent);
-      createUI_200_ChartType(parent);
+      createUI_200_StatisticTooltip(parent);
+      createUI_300_ChartType(parent);
    }
 
    private void createUI_100_Graphs(final Composite parent) {
@@ -194,7 +198,37 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       }
    }
 
-   private void createUI_200_ChartType(final Composite parent) {
+   private void createUI_200_StatisticTooltip(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+//      group.setText(Messages.Pref_Graphs_Group_Grid);
+      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      {
+         {
+            /*
+             * Show % values
+             */
+            _chkShowPercentageValues = new Button(group, SWT.CHECK);
+            _chkShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+            _chkShowPercentageValues.setToolTipText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues_Tooltip);
+            _chkShowPercentageValues.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show total values
+             */
+            _chkShowSummaryValues = new Button(group, SWT.CHECK);
+            _chkShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkShowSummaryValues.setToolTipText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues_Tooltip);
+            _chkShowSummaryValues.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+   }
+
+   private void createUI_300_ChartType(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
 //      group.setText(Messages.Pref_Graphs_Group_Grid);
