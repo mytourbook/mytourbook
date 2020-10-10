@@ -80,7 +80,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    private static final String         NL                                 = UI.NEW_LINE1;
    private static final String         NL2                                = NL + NL;
 
-   private TourData_Day                _tourDayData;
+   private TourStatisticData_Day                _tourDayData;
    private DataProvider_Tour_Day       _tourDay_DataProvider              = new DataProvider_Tour_Day();
 
    private TourTypeFilter              _activeTourTypeFilter;
@@ -150,7 +150,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    /**
     * create segments for the chart
     */
-   ChartStatisticSegments createChartSegments(final TourData_Day tourTimeData) {
+   ChartStatisticSegments createChartSegments(final TourStatisticData_Day tourTimeData) {
 
       final double[] segmentStart = new double[_numberOfYears];
       final double[] segmentEnd = new double[_numberOfYears];

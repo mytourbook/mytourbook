@@ -103,7 +103,7 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvid
       final int barWidth = _barRectangle.width;
       final int barHeight = _barRectangle.height;
 
-      final int barHeightOffset = Math.min(15, barHeight / 3);
+      final int barHeightOffset = Math.max(20, barHeight / 3);
 
       final int ttPosX = _barRectangle.x + barWidth;
       final int ttPosY = _barRectangle.y + barHeight - barHeightOffset;

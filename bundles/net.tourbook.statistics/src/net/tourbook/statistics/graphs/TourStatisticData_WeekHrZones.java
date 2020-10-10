@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-class TourData_WeekHrZones {
+class TourStatisticData_WeekHrZones {
 
    /**
     * HR zones values in seconds.

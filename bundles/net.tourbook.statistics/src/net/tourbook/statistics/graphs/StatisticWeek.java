@@ -55,7 +55,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
    private static final char        NL                     = UI.NEW_LINE;
 
-   private TourData_Week            _tourWeek_Data;
+   private TourStatisticData_Week            _tourWeek_Data;
    private DataProvider_Tour_Week   _tourWeek_DataProvider = new DataProvider_Tour_Week();
 
    private Chart                    _chart;
@@ -226,7 +226,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
             beginDate,
             endDate,
             //
-            _tourWeek_Data.distanceHigh[colorIndex][weekIndex] / 1000,
+            _tourWeek_Data.distance_High[colorIndex][weekIndex] / 1000,
             UI.UNIT_LABEL_DISTANCE,
             //
             (int) _tourWeek_Data.elevationUp_High[colorIndex][weekIndex],
@@ -247,7 +247,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
             breakTime / 3600,
             (breakTime % 3600) / 60,
             //
-            (int) _tourWeek_Data.numToursHigh[colorIndex][weekIndex]
+            (int) _tourWeek_Data.numTours_High[colorIndex][weekIndex]
       //
       ).toString();
 
@@ -333,8 +333,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeek_Data.distanceLow,
-            _tourWeek_Data.distanceHigh);
+            _tourWeek_Data.distance_Low,
+            _tourWeek_Data.distance_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
@@ -357,8 +357,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       _yData_Duration = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeek_Data.getDurationTimeLowFloat(),
-            _tourWeek_Data.getDurationTimeHighFloat());
+            _tourWeek_Data.durationTime_Low,
+            _tourWeek_Data.durationTime_High);
 
       _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
       _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
@@ -384,8 +384,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
-            _tourWeek_Data.numToursLow,
-            _tourWeek_Data.numToursHigh);
+            _tourWeek_Data.numTours_Low,
+            _tourWeek_Data.numTours_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_NUMBER_OF_TOURS);
       yData.setUnitLabel(Messages.NUMBERS_UNIT);

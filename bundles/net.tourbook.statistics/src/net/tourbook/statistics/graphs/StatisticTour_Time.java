@@ -73,7 +73,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
    private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
-   private TourData_Time               _tourTime_Data;
+   private TourStatisticData_Time               _tourTime_Data;
    private DataProvider_Tour_Time      _tourTime_DataProvider             = new DataProvider_Tour_Time();
 
    private TourPerson                  _activePerson;
@@ -96,7 +96,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
    /**
     * create segments for the chart
     */
-   private ChartStatisticSegments createChartSegments(final TourData_Time tourDataTime) {
+   private ChartStatisticSegments createChartSegments(final TourStatisticData_Time tourDataTime) {
 
       final double segmentStart[] = new double[_numberOfYears];
       final double segmentEnd[] = new double[_numberOfYears];

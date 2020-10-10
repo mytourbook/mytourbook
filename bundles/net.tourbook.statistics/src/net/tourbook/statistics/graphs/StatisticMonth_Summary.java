@@ -112,7 +112,7 @@ public class StatisticMonth_Summary extends StatisticMonth {
       }
 
       if (_isShowAltitude) {
-         createYData_Altitude(chartDataModel);
+         createYData_Elevation(chartDataModel);
       }
 
       if (_isShowDuration) {
