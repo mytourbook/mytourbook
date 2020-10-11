@@ -31,9 +31,9 @@ import net.tourbook.ui.TourTypeFilter;
 
 public class DataProvider_HrZone_Month extends DataProvider {
 
-   private TourData_MonthHrZones _monthData;
+   private TourStatisticData_MonthHrZones _monthData;
 
-   TourData_MonthHrZones getMonthData(final TourPerson person,
+   TourStatisticData_MonthHrZones getMonthData(final TourPerson person,
                                       final TourTypeFilter tourTypeFilter,
                                       final int lastYear,
                                       final int numYears,
@@ -64,7 +64,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numYears;
 
-         _monthData = new TourData_MonthHrZones();
+         _monthData = new TourStatisticData_MonthHrZones();
 
          String fromTourData;
 

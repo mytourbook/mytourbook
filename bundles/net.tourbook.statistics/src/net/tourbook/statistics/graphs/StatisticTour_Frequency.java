@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -61,7 +65,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    private final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private TourStatisticData_Day             _tourDay_Data;
+   private TourStatisticData_Day    _tourDay_Data;
    private DataProvider_Tour_Day    _tourDay_DataProvider            = new DataProvider_Tour_Day();
 
    private IPropertyChangeListener  _statTourFrequency_PrefChangeListener;
@@ -305,73 +309,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       return toolTipInfo;
    }
 
-   private void createToolTipProviderAltitude(final ChartDataModel chartModel) {
-
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-
-            String toolTipLabel;
-            final StringBuilder infoText = new StringBuilder();
-
-            if (valueIndex == 0) {
-
-               infoText.append(Messages.numbers_info_altitude_down);
-               infoText.append(UI.NEW_LINE);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statAltitudeUnits[valueIndex],
-                     UI.UNIT_LABEL_ALTITUDE,
-                     _statAltitudeCounterHigh[serieIndex][valueIndex],
-                     //
-                     _statAltitudeSumHigh[serieIndex][valueIndex],
-                     UI.UNIT_LABEL_ALTITUDE).toString();
-
-            } else if (valueIndex == _statAltitudeUnits.length - 1) {
-
-               infoText.append(Messages.numbers_info_altitude_up);
-               infoText.append(UI.NEW_LINE);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statAltitudeUnits[valueIndex - 1],
-                     UI.UNIT_LABEL_ALTITUDE,
-                     _statAltitudeCounterHigh[serieIndex][valueIndex],
-                     //
-                     _statAltitudeSumHigh[serieIndex][valueIndex],
-                     UI.UNIT_LABEL_ALTITUDE).toString();
-            } else {
-
-               infoText.append(Messages.numbers_info_altitude_between);
-               infoText.append(UI.NEW_LINE);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statAltitudeUnits[valueIndex - 1],
-                     _statAltitudeUnits[valueIndex],
-                     UI.UNIT_LABEL_ALTITUDE,
-                     _statAltitudeCounterHigh[serieIndex][valueIndex],
-                     //
-                     _statAltitudeSumHigh[serieIndex][valueIndex],
-                     UI.UNIT_LABEL_ALTITUDE).toString();
-            }
-
-            return createToolTipProvider(serieIndex, toolTipLabel);
-         }
-      });
-   }
-
-   private void createToolTipProviderDistance(final ChartDataModel chartModel) {
+   private void createToolTipProvider_Distance(final ChartDataModel chartModel) {
 
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
@@ -439,7 +377,73 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       });
    }
 
-   private void createToolTipProviderDuration(final ChartDataModel chartModel) {
+   private void createToolTipProvider_Elevation(final ChartDataModel chartModel) {
+
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+
+         @Override
+         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+
+            String toolTipLabel;
+            final StringBuilder infoText = new StringBuilder();
+
+            if (valueIndex == 0) {
+
+               infoText.append(Messages.numbers_info_altitude_down);
+               infoText.append(UI.NEW_LINE);
+               infoText.append(Messages.numbers_info_altitude_total);
+
+               toolTipLabel = String.format(
+                     infoText.toString(),
+                     _statAltitudeUnits[valueIndex],
+                     UI.UNIT_LABEL_ALTITUDE,
+                     _statAltitudeCounterHigh[serieIndex][valueIndex],
+                     //
+                     _statAltitudeSumHigh[serieIndex][valueIndex],
+                     UI.UNIT_LABEL_ALTITUDE).toString();
+
+            } else if (valueIndex == _statAltitudeUnits.length - 1) {
+
+               infoText.append(Messages.numbers_info_altitude_up);
+               infoText.append(UI.NEW_LINE);
+               infoText.append(Messages.numbers_info_altitude_total);
+
+               toolTipLabel = String.format(
+                     infoText.toString(),
+                     _statAltitudeUnits[valueIndex - 1],
+                     UI.UNIT_LABEL_ALTITUDE,
+                     _statAltitudeCounterHigh[serieIndex][valueIndex],
+                     //
+                     _statAltitudeSumHigh[serieIndex][valueIndex],
+                     UI.UNIT_LABEL_ALTITUDE).toString();
+            } else {
+
+               infoText.append(Messages.numbers_info_altitude_between);
+               infoText.append(UI.NEW_LINE);
+               infoText.append(Messages.numbers_info_altitude_total);
+
+               toolTipLabel = String.format(
+                     infoText.toString(),
+                     _statAltitudeUnits[valueIndex - 1],
+                     _statAltitudeUnits[valueIndex],
+                     UI.UNIT_LABEL_ALTITUDE,
+                     _statAltitudeCounterHigh[serieIndex][valueIndex],
+                     //
+                     _statAltitudeSumHigh[serieIndex][valueIndex],
+                     UI.UNIT_LABEL_ALTITUDE).toString();
+            }
+
+            return createToolTipProvider(serieIndex, toolTipLabel);
+         }
+      });
+   }
+
+   private void createToolTipProvider_TimeDuration(final ChartDataModel chartModel) {
 
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
@@ -502,15 +506,52 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       });
    }
 
-   private Composite createToolTipUI(final int serieIndex, final int valueIndex) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
+   /**
+    * @param toolTipProvider
+    * @param parent
+    * @param hoveredBar_VerticalIndex
+    *           serieIndex
+    * @param hoveredBar_HorizontalIndex
+    *           valueIndex
+    */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int _hoveredBar_VerticalIndex,
-                                final int _hoveredBar_HorizontalIndex) {
+                                final int hoveredBar_SerieIndex,
+                                final int hoveredBar_ValueIndex) {
+
+      /*
+       * Create tooltip title
+       */
+      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
+
+      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(hoveredBar_ValueIndex);
+      final String monthText = Month
+            .of(monthDate.getMonthValue())
+            .getDisplayName(TextStyle.FULL, Locale.getDefault());
+
+      final String toolTip_Title = String.format(TOOLTIP_TITLE_FORMAT, monthText, monthDate.getYear());
+      final String totalColumnHeaderTitel = monthText;
+
+      final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
+      final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
+
+      new StatisticTooltipUI_Frequency().createContentArea(
+            parent,
+            toolTipProvider,
+            _statisticData_Month,
+            hoveredBar_SerieIndex,
+            hoveredBar_ValueIndex,
+            toolTip_Title,
+            null,
+            totalColumnHeaderTitel,
+            isShowSummaryValues,
+            isShowPercentageValues);
+   }
+
+   private void createToolTipUI_Test(final IToolTipProvider toolTipProvider,
+                                     final Composite parent,
+                                     final int _hoveredBar_VerticalIndex,
+                                     final int _hoveredBar_HorizontalIndex) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -586,27 +627,23 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    private void getPreferences() {
 
-      _statDistanceUnits = getPrefUnits(
-            _prefStore,
+      _statDistanceUnits = getPrefUnits(_prefStore,
             ITourbookPreferences.STAT_DISTANCE_NUMBERS,
             ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
             ITourbookPreferences.STAT_DISTANCE_INTERVAL,
             ChartDataSerie.AXIS_UNIT_NUMBER);
 
-      _statAltitudeUnits = getPrefUnits(
-            _prefStore,
+      _statAltitudeUnits = getPrefUnits(_prefStore,
             ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
             ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
             ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
             ChartDataSerie.AXIS_UNIT_NUMBER);
 
-      _statTimeUnits = getPrefUnits(
-            _prefStore,
+      _statTimeUnits = getPrefUnits(_prefStore,
             ITourbookPreferences.STAT_DURATION_NUMBERS,
             ITourbookPreferences.STAT_DURATION_LOW_VALUE,
             ITourbookPreferences.STAT_DURATION_INTERVAL,
             ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-
    }
 
    /**
@@ -719,7 +756,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
       yData.setColorIndex(colorIndex);
 
-      createToolTipProviderAltitude(chartDataModel);
+      createToolTipProvider_Elevation(chartDataModel);
 
       if (_isSynchScaleEnabled) {
          statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -777,7 +814,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
       yData.setColorIndex(colorIndex);
 
-      createToolTipProviderDistance(chartDataModel);
+      createToolTipProvider_Distance(chartDataModel);
 
       if (_isSynchScaleEnabled) {
          statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
@@ -826,7 +863,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
       yData.setColorIndex(colorIndex);
 
-      createToolTipProviderDuration(chartDataModel);
+      createToolTipProvider_TimeDuration(chartDataModel);
 
       if (_isSynchScaleEnabled) {
          statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
