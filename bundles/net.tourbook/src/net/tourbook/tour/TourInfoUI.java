@@ -38,9 +38,9 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
+import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -458,9 +458,13 @@ public class TourInfoUI {
 
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
+
+         final Integer selectedTabFolder = new Integer(0);
+
          _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
                Messages.Tour_Tooltip_Action_EditFormatPreferences,
-               PrefPageAppearanceDisplayFormat.ID);
+               PrefPageAppearanceDisplayFormat.ID,
+               selectedTabFolder);
 
          tbm.add(_actionEditTour);
          tbm.add(_actionEditQuick);

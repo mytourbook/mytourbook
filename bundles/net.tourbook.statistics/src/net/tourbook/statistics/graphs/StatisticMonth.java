@@ -57,16 +57,14 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
 
-//   private static final String      STATISTIC_TOOLTIP_LABEL_COLUMN_HEADER_MONTH = net.tourbook.ui.Messages.Statistic_Tooltip_Label_ColumnHeader_Month;
+   private static final char        NL                           = UI.NEW_LINE;
 
-   private static final char        NL                                          = UI.NEW_LINE;
+   private static final String      TOOLTIP_TITLE_FORMAT         = "%s %d";                      //$NON-NLS-1$
 
-   private static final String      TOOLTIP_TITLE_FORMAT                        = "%s %d";                                                            //$NON-NLS-1$
-
-   private final IPreferenceStore   _prefStore                                  = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore                   = TourbookPlugin.getPrefStore();
 
    private TourStatisticData_Month  _statisticData_Month;
-   private DataProvider_Tour_Month  _statisticMonth_DataProvider                = new DataProvider_Tour_Month();
+   private DataProvider_Tour_Month  _statisticMonth_DataProvider = new DataProvider_Tour_Month();
 
    private TourPerson               _appPerson;
    private TourTypeFilter           _appTourTypeFilter;
@@ -76,7 +74,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private Chart                    _chart;
    private String                   _chartType;
-   private final MinMaxKeeper_YData _minMaxKeeper                               = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData _minMaxKeeper                = new MinMaxKeeper_YData();
 
    private boolean                  _isSynchScaleEnabled;
 
@@ -266,22 +264,24 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-      final String toolTipTitle = String.format(TOOLTIP_TITLE_FORMAT,
-            monthText,
-            monthDate.getYear());
-
-      final StatisticTooltipUI_Summary tooltipUI = new StatisticTooltipUI_Summary();
-
+      final String toolTip_Title = String.format(TOOLTIP_TITLE_FORMAT, monthText, monthDate.getYear());
       final String totalColumnHeaderTitel = monthText;
 
+      final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
+      final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
+
+      final StatisticTooltipUI_Summary tooltipUI = new StatisticTooltipUI_Summary();
       tooltipUI.createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Month,
-            toolTipTitle,
-            totalColumnHeaderTitel,
             hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex);
+            hoveredBar_ValueIndex,
+            toolTip_Title,
+            null,
+            totalColumnHeaderTitel,
+            isShowSummaryValues,
+            isShowPercentageValues);
    }
 
    void createXData_Months(final ChartDataModel chartDataModel) {

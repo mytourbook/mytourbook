@@ -24,9 +24,10 @@ public class Action_ToolTip_EditPreferences extends ActionOpenPrefDialog {
 
    public Action_ToolTip_EditPreferences(final IToolTipProvider tourToolTipProvider,
                                          final String text,
-                                         final String prefPageId) {
+                                         final String prefPageId,
+                                         final Object data) {
 
-      super(text, prefPageId);
+      super(text, prefPageId, data);
 
       _ttProvider = tourToolTipProvider;
    }

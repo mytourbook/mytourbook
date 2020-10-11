@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,8 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
    private Button _chkShowDuration;
    private Button _chkShowNumberOfTours;
    private Button _chkShowYearSeparator;
+   private Button _chkTooltip_ShowSummaryValues;
+   private Button _chkTooltip_ShowPercentageValues;
 
    private Button _rdoChartType_BarAdjacent;
    private Button _rdoChartType_BarStacked;
@@ -63,7 +65,8 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
       initUI(parent);
 
       createUI_100_Graphs(parent);
-      createUI_200_ChartType(parent);
+      createUI_200_StatisticTooltip(parent);
+      createUI_300_ChartType(parent);
    }
 
    private void createUI_100_Graphs(final Composite parent) {
@@ -194,7 +197,34 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
       }
    }
 
-   private void createUI_200_ChartType(final Composite parent) {
+   private void createUI_200_StatisticTooltip(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      {
+         {
+            /*
+             * Show total values
+             */
+            _chkTooltip_ShowSummaryValues = new Button(group, SWT.CHECK);
+            _chkTooltip_ShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkTooltip_ShowSummaryValues.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show % values
+             */
+            _chkTooltip_ShowPercentageValues = new Button(group, SWT.CHECK);
+            _chkTooltip_ShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+//          tooltip: Percentage of the bar value to the total value
+            _chkTooltip_ShowPercentageValues.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+   }
+
+   private void createUI_300_ChartType(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
 //      group.setText(Messages.Pref_Graphs_Group_Grid);
@@ -266,6 +296,9 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
       _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
       _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
 
+      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+
       _chkShowYearSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
 
       final String chartType = _prefStore.getDefaultString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
@@ -292,6 +325,9 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
       _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
       _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS));
 
+      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+
       _chkShowYearSeparator.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
 
       final String chartType = _prefStore.getString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
@@ -317,6 +353,9 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
       _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, _chkShowDuration.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
+
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, _chkTooltip_ShowSummaryValues.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, _chkShowYearSeparator.getSelection());
 

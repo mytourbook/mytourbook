@@ -56,12 +56,12 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 //   private static final String      STATISTIC_TOOLTIP_LABEL_COLUMN_HEADER_YEAR = net.tourbook.ui.Messages.Statistic_Tooltip_Label_ColumnHeader_Year;
 
-   private static final String      STRING_SEPARATOR                            = " - ";                                                              //$NON-NLS-1$
+   private static final String      STRING_SEPARATOR       = " - ";                        //$NON-NLS-1$
 
-   private final IPreferenceStore   _prefStore                                  = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore             = TourbookPlugin.getPrefStore();
 
    private TourStatisticData_Year   _statisticData_Year;
-   private DataProvider_Tour_Year   _tourYear_DataProvider                      = new DataProvider_Tour_Year();
+   private DataProvider_Tour_Year   _tourYear_DataProvider = new DataProvider_Tour_Year();
 
    private StatisticContext         _statContext;
 
@@ -74,7 +74,7 @@ public abstract class StatisticYear extends TourbookStatistic {
    private Chart                    _chart;
    private String                   _chartType;
 
-   private final MinMaxKeeper_YData _minMaxKeeper                               = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData _minMaxKeeper          = new MinMaxKeeper_YData();
    private ChartDataYSerie          _yData_Duration;
 
    private boolean                  _isSynchScaleEnabled;
@@ -232,23 +232,25 @@ public abstract class StatisticYear extends TourbookStatistic {
        * Create tooltip title
        */
       final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
-
       final LocalDate yearDate = LocalDate.of(oldestYear, 1, 1).plusYears(hoveredBar_ValueIndex);
 
       final String toolTipTitle = Integer.toString(yearDate.getYear());
-
-      final StatisticTooltipUI_Summary tooltipUI = new StatisticTooltipUI_Summary();
-
       final String totalColumnHeaderTitel = toolTipTitle;
 
-      tooltipUI.createContentArea(
+      final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
+      final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
+
+      new StatisticTooltipUI_Summary().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Year,
-            toolTipTitle,
-            totalColumnHeaderTitel,
             hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex);
+            hoveredBar_ValueIndex,
+            toolTipTitle,
+            null,
+            totalColumnHeaderTitel,
+            isShowSummaryValues,
+            isShowPercentageValues);
    }
 
    void createXData_Year(final ChartDataModel chartDataModel) {

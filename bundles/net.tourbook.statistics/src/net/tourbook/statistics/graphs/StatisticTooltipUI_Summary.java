@@ -58,11 +58,12 @@ public class StatisticTooltipUI_Summary {
    /*
     * Tooltip context
     */
-   private String                   _totalColumnHeaderTitle;
+   private String                   _summaryColumn_HeaderTitle;
    private IToolTipProvider         _toolTipProvider;
    private TourStatisticData_Common _tourData_Common;
-   private String                   _toolTipTitle;
-   private int                      _tourType_SerieIndex;
+   private String                   _toolTip_Title;
+   private String                   _toolTip_SubTitle;
+   private int                      _serieIndex;
    private int                      _valueIndex;
 
    private boolean                  _isTourTypeImageAvailable;
@@ -92,6 +93,7 @@ public class StatisticTooltipUI_Summary {
    private Composite _ttContainer;
 
    private Label     _lblColumnHeader_TourType;
+   private Label     _lblSubTitle;
    private Label     _lblTitle;
    private CLabel    _lblTourType_Image;
 
@@ -181,9 +183,12 @@ public class StatisticTooltipUI_Summary {
 
    private void createActions() {
 
+      final Integer selectedTabFolder = new Integer(1);
+
       _actionPrefDialog = new Action_ToolTip_EditPreferences(_toolTipProvider,
             Messages.Tour_Tooltip_Action_EditFormatPreferences,
-            PrefPageAppearanceDisplayFormat.ID);
+            PrefPageAppearanceDisplayFormat.ID,
+            selectedTabFolder);
 
       _actionCloseTooltip = new ActionCloseTooltip();
    }
@@ -192,28 +197,36 @@ public class StatisticTooltipUI_Summary {
     * @param parent
     * @param toolTipProvider
     * @param tourData_Month
-    * @param toolTipTitle
-    * @param totalColumnHeaderTitle
     * @param serieIndex
     * @param valueIndex
+    * @param toolTip_Title
+    * @param toolTip_SubTitle
+    * @param summaryColumn_HeaderTitle
+    * @param isShowSummary
+    * @param isShowPercentage
     */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
                           final TourStatisticData_Common tourData_Month,
-                          final String toolTipTitle,
-                          final String totalColumnHeaderTitle,
                           final int serieIndex,
-                          final int valueIndex) {
+                          final int valueIndex,
+                          final String toolTip_Title,
+                          final String toolTip_SubTitle,
+                          final String summaryColumn_HeaderTitle,
+                          final boolean isShowSummary,
+                          final boolean isShowPercentage) {
 
       _toolTipProvider = toolTipProvider;
       _tourData_Common = tourData_Month;
-      _toolTipTitle = toolTipTitle;
-      _totalColumnHeaderTitle = totalColumnHeaderTitle;
-      _tourType_SerieIndex = serieIndex;
+      _serieIndex = serieIndex;
       _valueIndex = valueIndex;
 
-      _isShowPercentage = false;
-      _isShowSummary = true;
+      _toolTip_Title = toolTip_Title;
+      _toolTip_SubTitle = toolTip_SubTitle;
+      _summaryColumn_HeaderTitle = summaryColumn_HeaderTitle;
+
+      _isShowPercentage = isShowPercentage;
+      _isShowSummary = isShowSummary;
 
       final Display display = parent.getDisplay();
 
@@ -224,6 +237,8 @@ public class StatisticTooltipUI_Summary {
       _tourTypeId = _tourData_Common.typeIds_Resorted[serieIndex][valueIndex];
       _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
       _isTourTypeImageAvailable = _tourTypeId >= 0;
+
+      initUI(parent);
 
       createActions();
       createUI(parent);
@@ -339,6 +354,13 @@ public class StatisticTooltipUI_Summary {
           */
          createUI_12_Header_Toolbar(container);
       }
+
+      if (_toolTip_SubTitle != null) {
+
+         _lblSubTitle = new Label(parent, SWT.LEAD | SWT.WRAP);
+         _lblSubTitle.setForeground(_fgColor);
+         _lblSubTitle.setBackground(_bgColor);
+      }
    }
 
    private void createUI_12_Header_Toolbar(final Composite container) {
@@ -379,7 +401,7 @@ public class StatisticTooltipUI_Summary {
          _lblColumnHeader_TourType.setFont(FONT_BOLD);
          GridDataFactory.fillDefaults()
                .span(2, 1)
-               .align(SWT.END, SWT.FILL)
+//               .align(SWT.END, SWT.FILL)
                .applyTo(_lblColumnHeader_TourType);
       }
       {
@@ -401,7 +423,7 @@ public class StatisticTooltipUI_Summary {
 
          {
             // column 5: Total
-            final Label lblTotal = createUI_Label(parent, _totalColumnHeaderTitle, SWT.TRAIL);
+            final Label lblTotal = createUI_Label(parent, _summaryColumn_HeaderTitle, SWT.TRAIL);
             lblTotal.setFont(FONT_BOLD);
             GridDataFactory.fillDefaults()
                   .indent(columnSpacing, 0)
@@ -436,7 +458,7 @@ public class StatisticTooltipUI_Summary {
          if (_isShowSummary) {
             _lblDeviceTime_Elapsed_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblDeviceTime_Elapsed_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblDeviceTime_Elapsed_Summary);
+//            GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblDeviceTime_Elapsed_Summary);
          }
       }
       {
@@ -676,6 +698,10 @@ public class StatisticTooltipUI_Summary {
 
    }
 
+   private void initUI(final Composite parent) {
+
+   }
+
    private void updateUI() {
 
       // tour type image
@@ -689,15 +715,19 @@ public class StatisticTooltipUI_Summary {
          _lblTourType_Image.setToolTipText(_tourTypeName);
       }
 
-      _lblTitle.setText(_toolTipTitle);
+      _lblTitle.setText(_toolTip_Title);
       _lblColumnHeader_TourType.setText(_tourTypeName);
+
+      if (_toolTip_SubTitle != null) {
+         _lblSubTitle.setText(_toolTip_SubTitle);
+      }
 
 // SET_FORMATTING_OFF
 
-      final long deviceTime_Elapsed                      = _tourData_Common.elapsedTime_Resorted    [_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Recorded                     = _tourData_Common.recordedTime_Resorted   [_tourType_SerieIndex][_valueIndex];
-      final long deviceTime_Paused                       = _tourData_Common.pausedTime_Resorted     [_tourType_SerieIndex][_valueIndex];
-      final long computedTime_Moving                     = _tourData_Common.movingTime_Resorted     [_tourType_SerieIndex][_valueIndex];
+      final long deviceTime_Elapsed                      = _tourData_Common.elapsedTime_Resorted    [_serieIndex][_valueIndex];
+      final long deviceTime_Recorded                     = _tourData_Common.recordedTime_Resorted   [_serieIndex][_valueIndex];
+      final long deviceTime_Paused                       = _tourData_Common.pausedTime_Resorted     [_serieIndex][_valueIndex];
+      final long computedTime_Moving                     = _tourData_Common.movingTime_Resorted     [_serieIndex][_valueIndex];
       final long computedTime_Break                      = deviceTime_Elapsed - computedTime_Moving;
 
       final long deviceTime_Elapsed_Summary              = computeSummary(_tourData_Common.elapsedTime_Resorted,    _valueIndex);
@@ -712,9 +742,9 @@ public class StatisticTooltipUI_Summary {
       final float computedTime_Moving_Percentage         = computedTime_Moving_Summary == 0 ? 0 : (float) computedTime_Moving / computedTime_Moving_Summary * 100;
       final float computedTime_Break_Percentage          = computedTime_Break_Summary  == 0 ? 0 : (float) computedTime_Break  / computedTime_Break_Summary  * 100;
 
-      final float distance                               = _tourData_Common.distance_High_Resorted    [_tourType_SerieIndex][_valueIndex];
-      final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted [_tourType_SerieIndex][_valueIndex];
-      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_tourType_SerieIndex][_valueIndex] + 0.5f;
+      final float distance                               = _tourData_Common.distance_High_Resorted    [_serieIndex][_valueIndex];
+      final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted [_serieIndex][_valueIndex];
+      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_serieIndex][_valueIndex] + 0.5f;
 
       final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
       final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
