@@ -270,8 +270,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
 
-      final StatisticTooltipUI_Summary tooltipUI = new StatisticTooltipUI_Summary();
-      tooltipUI.createContentArea(
+      new StatisticTooltipUI_Summary().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Month,

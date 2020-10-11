@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
+public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
 
    private Rectangle _barRectangle;
 
@@ -35,17 +35,17 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvid
     */
    private Chart _chart;
 
-   public Bar_ToolTip(final Chart chart) {
+   public ChartBarToolTip(final Chart chart) {
 
       super(chart);
 
       _chart = chart;
 
       setFadeInSteps(2);
-      setFadeInDelayTime(1);
+      setFadeInDelayTime(10);
 
       setFadeOutSteps(5);
-      setFadeOutDelaySteps(10);
+      setFadeOutDelaySteps(20);
 
       setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
    }

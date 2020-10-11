@@ -332,7 +332,7 @@ public class ChartComponentGraph extends Canvas {
    private int                        _hoveredBarValueIndex;
    private boolean                    _isHoveredBarDirty;
 
-   private Bar_ToolTip                _hoveredBar_ToolTip;
+   private ChartBarToolTip            _hoveredBar_ToolTip;
    private ToolTipV1                  _hoveredBarToolTip_OLD;
 
    private boolean                    _isHoveredLineVisible        = false;
@@ -507,7 +507,7 @@ public class ChartComponentGraph extends Canvas {
       _xSliderOnTop = _xSliderB;
       _xSliderOnBottom = _xSliderA;
 
-      _hoveredBar_ToolTip = new Bar_ToolTip(_chart);
+      _hoveredBar_ToolTip = new ChartBarToolTip(_chart);
       _hoveredBarToolTip_OLD = new ToolTipV1(_chart);
 
       addListener();
