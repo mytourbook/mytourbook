@@ -61,7 +61,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
    private final IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private TourData_Day             _tourDay_Data;
+   private TourStatisticData_Day             _tourDay_Data;
    private DataProvider_Tour_Day    _tourDay_DataProvider            = new DataProvider_Tour_Day();
 
    private IPropertyChangeListener  _statTourFrequency_PrefChangeListener;
@@ -177,7 +177,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
     *
     * @param tourDayData
     */
-   private void createStatisticData(final TourData_Day tourDayData) {
+   private void createStatisticData(final TourStatisticData_Day tourDayData) {
 
       int colorOffset = 0;
       if (_activeTourTypeFilter.showUndefinedTourTypes()) {

@@ -43,7 +43,7 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Day extends DataProvider {
 
-   private TourData_Day _tourDayData;
+   private TourStatisticData_Day _tourDayData;
 
    private boolean      _isAdjustSamePosition;
    private boolean      _isShowTrainingPerformance_AvgValue;
@@ -175,7 +175,7 @@ public class DataProvider_Tour_Day extends DataProvider {
       }
    }
 
-   TourData_Day getDayData(final TourPerson person,
+   TourStatisticData_Day getDayData(final TourPerson person,
                            final TourTypeFilter tourTypeFilter,
                            final int lastYear,
                            final int numberOfYears,
@@ -590,7 +590,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             yearDays += doy;
          }
 
-         _tourDayData = new TourData_Day();
+         _tourDayData = new TourStatisticData_Day();
 
          _tourDayData.allTourIds = dbAllTourIds.toArray();
 

@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
+public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
 
    private Rectangle _barRectangle;
 
@@ -35,16 +35,17 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvid
     */
    private Chart _chart;
 
-   public Bar_ToolTip(final Chart chart) {
+   public ChartBarToolTip(final Chart chart) {
 
       super(chart);
 
       _chart = chart;
 
       setFadeInSteps(2);
+      setFadeInDelayTime(10);
 
-      setFadeOutSteps(10);
-      setFadeOutDelaySteps(30);
+      setFadeOutSteps(5);
+      setFadeOutDelaySteps(20);
 
       setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
    }
@@ -103,9 +104,9 @@ public class Bar_ToolTip extends AnimatedToolTipShell2 implements IToolTipProvid
       final int barWidth = _barRectangle.width;
       final int barHeight = _barRectangle.height;
 
-      final int barHeightOffset = Math.min(15, barHeight / 3);
+      final int barHeightOffset = Math.min(20, barHeight / 3);
 
-      final int ttPosX = _barRectangle.x + barWidth;
+      final int ttPosX = _barRectangle.x + barWidth - barWidth / 3;
       final int ttPosY = _barRectangle.y + barHeight - barHeightOffset;
 
       final Point displayTTLocation = graphControl.toDisplay(ttPosX, ttPosY);

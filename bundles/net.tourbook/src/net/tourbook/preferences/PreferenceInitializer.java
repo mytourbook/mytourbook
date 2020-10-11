@@ -106,6 +106,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
@@ -114,6 +116,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
@@ -122,6 +126,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);

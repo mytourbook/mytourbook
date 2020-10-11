@@ -34,7 +34,7 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_HrZone_Week extends DataProvider {
 
-   private TourData_WeekHrZones _weekData;
+   private TourStatisticData_WeekHrZones _weekData;
 
    String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
@@ -238,7 +238,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
       return statistic_RawStatisticValues;
    }
 
-   TourData_WeekHrZones getWeekData(final TourPerson person,
+   TourStatisticData_WeekHrZones getWeekData(final TourPerson person,
                                     final TourTypeFilter tourTypeFilter,
                                     final int lastYear,
                                     final int numYears,
@@ -280,7 +280,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
          final int serieLength = maxZones;
          final int valueLength = numberOfWeeks;
 
-         _weekData = new TourData_WeekHrZones();
+         _weekData = new TourStatisticData_WeekHrZones();
 
          String sqlFromTourData;
 

@@ -19,7 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TourData_Day {
+public class TourStatisticData_Day {
 
    long[]                         allTourIds;
 

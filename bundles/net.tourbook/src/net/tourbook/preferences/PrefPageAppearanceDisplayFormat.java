@@ -133,6 +133,16 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    }
 
    @Override
+   public void applyData(final Object data) {
+
+      // data contains the folder index, this is set when the pref page is opened from a link
+
+      if (data instanceof Integer) {
+         _tabFolder.setSelection((Integer) data);
+      }
+   }
+
+   @Override
    protected Control createContents(final Composite parent) {
 
       initUI(parent);
