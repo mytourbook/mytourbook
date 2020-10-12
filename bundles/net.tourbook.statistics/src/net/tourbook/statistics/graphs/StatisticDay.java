@@ -744,7 +744,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       _activePerson = statContext.appPerson;
       _activeTourTypeFilter = statContext.appTourTypeFilter;
-      _currentYear = statContext.statFirstYear;
+      _currentYear = statContext.statSelectedYear;
       _numberOfYears = statContext.statNumberOfYears;
 
       /*
@@ -774,7 +774,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       _tourDay_Data = _tourDay_DataProvider.getDayData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
-            statContext.statFirstYear,
+            statContext.statSelectedYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
             durationTime);

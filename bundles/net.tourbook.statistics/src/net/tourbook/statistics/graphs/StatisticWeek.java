@@ -525,7 +525,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statFirstYear = statContext.statFirstYear;
+      _statFirstYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _statisticData_Week = _tourWeek_DataProvider.getWeekData(

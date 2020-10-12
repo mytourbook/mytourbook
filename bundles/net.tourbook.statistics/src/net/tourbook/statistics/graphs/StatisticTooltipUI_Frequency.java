@@ -15,16 +15,15 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.Util;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
-import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
@@ -58,20 +57,19 @@ public class StatisticTooltipUI_Frequency {
    /*
     * Tooltip context
     */
-   private String                   _summaryColumn_HeaderTitle;
-   private IToolTipProvider         _toolTipProvider;
-   private TourStatisticData_Common _tourData_Common;
-   private String                   _toolTip_Title;
-   private String                   _toolTip_SubTitle;
-   private int                      _serieIndex;
-   private int                      _valueIndex;
+   private String                      _summaryColumn_HeaderTitle;
+   private IToolTipProvider            _toolTipProvider;
+   private TourStatisticData_Frequency _statisticDate_Frequency;
+   private String                      _toolTip_Title;
+   private int                         _serieIndex;
+   private int                         _valueIndex;
 
-   private boolean                  _isTourTypeImageAvailable;
-   private long                     _tourTypeId;
-   private String                   _tourTypeName;
+   private boolean                     _isTourTypeImageAvailable;
+   private long                        _tourTypeId;
+   private String                      _tourTypeName;
 
-   private boolean                  _isShowPercentage;
-   private boolean                  _isShowSummary;
+   private boolean                     _isShowPercentage;
+   private boolean                     _isShowSummary;
 
    /*
     * Actions
@@ -93,55 +91,18 @@ public class StatisticTooltipUI_Frequency {
    private Composite _ttContainer;
 
    private Label     _lblColumnHeader_TourType;
-   private Label     _lblSubTitle;
    private Label     _lblTitle;
    private CLabel    _lblTourType_Image;
 
-   private Label     _lblDeviceTime_Elapsed;
-   private Label     _lblDeviceTime_Elapsed_Unit;
-   private Label     _lblDeviceTime_Elapsed_Summary;
-   private Label     _lblDeviceTime_Elapsed_Summary_Unit;
-   private Label     _lblDeviceTime_Elapsed_Percentage;
+   private Label     _lblData;
+   private Label     _lblDataValue;
+   private Label     _lblDataValue_Percentage;
+   private Label     _lblDataValue_Summary;
 
-   private Label     _lblDeviceTime_Recorded;
-   private Label     _lblDeviceTime_Recorded_Unit;
-   private Label     _lblDeviceTime_Recorded_Summary;
-   private Label     _lblDeviceTime_Recorded_Summary_Unit;
-   private Label     _lblDeviceTime_Recorded_Percentage;
-
-   private Label     _lblDeviceTime_Paused;
-   private Label     _lblDeviceTime_Paused_Unit;
-   private Label     _lblDeviceTime_Paused_Summary;
-   private Label     _lblDeviceTime_Paused_Summary_Unit;
-   private Label     _lblDeviceTime_Paused_Percentage;
-
-   private Label     _lblComputedTime_Moving;
-   private Label     _lblComputedTime_Moving_Unit;
-   private Label     _lblComputedTime_Moving_Summary;
-   private Label     _lblComputedTime_Moving_Summary_Unit;
-   private Label     _lblComputedTime_Moving_Percentage;
-
-   private Label     _lblComputedTime_Break;
-   private Label     _lblComputedTime_Break_Unit;
-   private Label     _lblComputedTime_Break_Summary;
-   private Label     _lblComputedTime_Break_Summary_Unit;
-   private Label     _lblComputedTime_Break_Percentage;
-
-   private Label     _lblDistance;
-   private Label     _lblDistance_Unit;
-   private Label     _lblDistance_Summary;
-   private Label     _lblDistance_Summary_Unit;
-   private Label     _lblDistance_Percentage;
-
-   private Label     _lblElevationUp;
-   private Label     _lblElevationUp_Unit;
-   private Label     _lblElevationUp_Summary;
-   private Label     _lblElevationUp_Summary_Unit;
-   private Label     _lblElevationUp_Percentage;
-
-   private Label     _lblNumberOfTours;
-   private Label     _lblNumberOfTours_Percentage;
-   private Label     _lblNumberOfTours_Summary;
+   private Label     _lblTotal;
+   private Label     _lblTotalValue;
+   private Label     _lblTotalValue_Percentage;
+   private Label     _lblTotalValue_Summary;
 
    private class ActionCloseTooltip extends Action {
 
@@ -196,7 +157,7 @@ public class StatisticTooltipUI_Frequency {
    /**
     * @param parent
     * @param toolTipProvider
-    * @param tourData_Month
+    * @param statisticData_Frequency
     * @param serieIndex
     * @param valueIndex
     * @param toolTip_Title
@@ -207,22 +168,20 @@ public class StatisticTooltipUI_Frequency {
     */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
-                          final TourStatisticData_Common tourData_Month,
+                          final TourStatisticData_Frequency statisticData_Frequency,
                           final int serieIndex,
                           final int valueIndex,
                           final String toolTip_Title,
-                          final String toolTip_SubTitle,
                           final String summaryColumn_HeaderTitle,
                           final boolean isShowSummary,
                           final boolean isShowPercentage) {
 
       _toolTipProvider = toolTipProvider;
-      _tourData_Common = tourData_Month;
+      _statisticDate_Frequency = statisticData_Frequency;
       _serieIndex = serieIndex;
       _valueIndex = valueIndex;
 
       _toolTip_Title = toolTip_Title;
-      _toolTip_SubTitle = toolTip_SubTitle;
       _summaryColumn_HeaderTitle = summaryColumn_HeaderTitle;
 
       _isShowPercentage = isShowPercentage;
@@ -234,9 +193,9 @@ public class StatisticTooltipUI_Frequency {
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 
       // setup tour type
-      _tourTypeId = _tourData_Common.typeIds_Resorted[serieIndex][valueIndex];
-      _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
-      _isTourTypeImageAvailable = _tourTypeId >= 0;
+//      _tourTypeId = _statisticDate_Frequency.typeIds_Resorted[serieIndex][valueIndex];
+//      _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
+//      _isTourTypeImageAvailable = _tourTypeId >= 0;
 
       initUI(parent);
 
@@ -299,13 +258,7 @@ public class StatisticTooltipUI_Frequency {
                createUI_18_ColumnHeader(container);
 
                createUI_Spacer_Columns(container, numColumns);
-               createUI_20_Time(container);
-
-               createUI_Spacer_Columns(container, numColumns);
-               createUI_22_Other(container);
-
-               createUI_Spacer_Columns(container, numColumns);
-               createUI_24_NumTours(container);
+               createUI_30_BarData(container);
             }
          }
       }
@@ -353,13 +306,6 @@ public class StatisticTooltipUI_Frequency {
           * Action toolbar in the top right corner
           */
          createUI_12_Header_Toolbar(container);
-      }
-
-      if (_toolTip_SubTitle != null) {
-
-         _lblSubTitle = new Label(parent, SWT.LEAD | SWT.WRAP);
-         _lblSubTitle.setForeground(_fgColor);
-         _lblSubTitle.setBackground(_bgColor);
       }
    }
 
@@ -440,158 +386,41 @@ public class StatisticTooltipUI_Frequency {
       }
    }
 
-   private void createUI_20_Time(final Composite parent) {
+   private void createUI_30_BarData(final Composite container) {
 
       {
          /*
-          * Device time: Elapsed
+          * Data
           */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_ElapsedTime);
+         _lblData = createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
 
-         _lblDeviceTime_Elapsed = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Elapsed_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblDeviceTime_Elapsed_Percentage = createUI_LabelValue(parent, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblDeviceTime_Elapsed_Summary = createUI_LabelValue(parent, SWT.TRAIL);
-            _lblDeviceTime_Elapsed_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblDeviceTime_Elapsed_Summary);
-         }
-      }
-      {
-         /*
-          * Device time: Recorded
-          */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_RecordedTime);
-
-         _lblDeviceTime_Recorded = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Recorded_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblDeviceTime_Recorded_Percentage = createUI_LabelValue(parent, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblDeviceTime_Recorded_Summary = createUI_LabelValue(parent, SWT.TRAIL);
-            _lblDeviceTime_Recorded_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-         }
-      }
-      {
-         /*
-          * Device time: Paused
-          */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_PausedTime);
-
-         _lblDeviceTime_Paused = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblDeviceTime_Paused_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblDeviceTime_Paused_Percentage = createUI_LabelValue(parent, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblDeviceTime_Paused_Summary = createUI_LabelValue(parent, SWT.TRAIL);
-            _lblDeviceTime_Paused_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-         }
-      }
-      {
-         /*
-          * Computed time: Moving
-          */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_MovingTime);
-
-         _lblComputedTime_Moving = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblComputedTime_Moving_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblComputedTime_Moving_Percentage = createUI_LabelValue(parent, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblComputedTime_Moving_Summary = createUI_LabelValue(parent, SWT.TRAIL);
-            _lblComputedTime_Moving_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-         }
-      }
-      {
-         /*
-          * Computed time: Break
-          */
-         createUI_Label(parent, Messages.Tour_Tooltip_Label_BreakTime);
-
-         _lblComputedTime_Break = createUI_LabelValue(parent, SWT.TRAIL);
-         _lblComputedTime_Break_Unit = createUI_LabelValue(parent, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblComputedTime_Break_Percentage = createUI_LabelValue(parent, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblComputedTime_Break_Summary = createUI_LabelValue(parent, SWT.TRAIL);
-            _lblComputedTime_Break_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-         }
-      }
-   }
-
-   private void createUI_22_Other(final Composite container) {
-
-      {
-         /*
-          * Distance
-          */
-         createUI_Label(container, Messages.Tour_Tooltip_Label_Distance);
-
-         _lblDistance = createUI_LabelValue(container, SWT.TRAIL);
-         _lblDistance_Unit = createUI_LabelValue(container, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblDistance_Percentage = createUI_LabelValue(container, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblDistance_Summary = createUI_LabelValue(container, SWT.TRAIL);
-            _lblDistance_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
-         }
-      }
-      {
-         /*
-          * Elevation up
-          */
-         createUI_Label(container, Messages.Tour_Tooltip_Label_AltitudeUp);
-
-         _lblElevationUp = createUI_LabelValue(container, SWT.TRAIL);
-         _lblElevationUp_Unit = createUI_LabelValue(container, SWT.LEAD);
-
-         if (_isShowPercentage) {
-            _lblElevationUp_Percentage = createUI_LabelValue(container, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblElevationUp_Summary = createUI_LabelValue(container, SWT.TRAIL);
-            _lblElevationUp_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
-         }
-      }
-   }
-
-   private void createUI_24_NumTours(final Composite container) {
-
-      {
-         /*
-          * Number of tours
-          */
-         createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
-
-         _lblNumberOfTours = createUI_LabelValue(container, SWT.TRAIL);
+         _lblDataValue = createUI_LabelValue(container, SWT.TRAIL);
          createUI_LabelValue(container, SWT.LEAD);
 
          if (_isShowPercentage) {
-            _lblNumberOfTours_Percentage = createUI_LabelValue(container, SWT.TRAIL);
+            _lblDataValue_Percentage = createUI_LabelValue(container, SWT.TRAIL);
          }
 
          if (_isShowSummary) {
-            _lblNumberOfTours_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            _lblDataValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            createUI_LabelValue(container, SWT.LEAD);
+         }
+      }
+      {
+         /*
+          * Total
+          */
+         _lblTotal = createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
+
+         _lblTotalValue = createUI_LabelValue(container, SWT.TRAIL);
+         createUI_LabelValue(container, SWT.LEAD);
+
+         if (_isShowPercentage) {
+            _lblTotalValue_Percentage = createUI_LabelValue(container, SWT.TRAIL);
+         }
+
+         if (_isShowSummary) {
+            _lblTotalValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
             createUI_LabelValue(container, SWT.LEAD);
          }
       }
@@ -705,139 +534,86 @@ public class StatisticTooltipUI_Frequency {
    private void updateUI() {
 
       // tour type image
-      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+//      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+//
+//         if (_tourTypeId < 0) {
+//            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+//         } else {
+//            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(_tourTypeId));
+//         }
+//         _lblTourType_Image.setToolTipText(_tourTypeName);
+//      }
+//
+//      _lblTitle.setText(_toolTip_Title);
+//      _lblColumnHeader_TourType.setText(_tourTypeName);
+//
+//      _lblData.setText(Messages.Statistic_Tooltip_Label_DurationTime);
+//      _lblTotal.setText(Messages.Statistic_Tooltip_Label_Total);
 
-         if (_tourTypeId < 0) {
-            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
-         } else {
-            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(_tourTypeId));
-         }
-         _lblTourType_Image.setToolTipText(_tourTypeName);
-      }
+      if (_valueIndex == 0) {
 
-      _lblTitle.setText(_toolTip_Title);
-      _lblColumnHeader_TourType.setText(_tourTypeName);
+         // first bar
 
-      if (_toolTip_SubTitle != null) {
-         _lblSubTitle.setText(_toolTip_SubTitle);
+         // Duration <%sh * %d
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_First,
+               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+
+         // Total %sh
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+
+      } else if (_valueIndex == _statisticDate_Frequency.statTime_Units.length - 1) {
+
+         // last bar
+
+         // Duration >%sh * %d
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Last,
+               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+
+         // Total %sh
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+
+      } else {
+
+         // between first and last bar
+
+         // Duration %s-%sh * %d
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Between,
+               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+
+         // Total %sh
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
       }
 
 // SET_FORMATTING_OFF
 
-      final long deviceTime_Elapsed                      = _tourData_Common.elapsedTime_Resorted    [_serieIndex][_valueIndex];
-      final long deviceTime_Recorded                     = _tourData_Common.recordedTime_Resorted   [_serieIndex][_valueIndex];
-      final long deviceTime_Paused                       = _tourData_Common.pausedTime_Resorted     [_serieIndex][_valueIndex];
-      final long computedTime_Moving                     = _tourData_Common.movingTime_Resorted     [_serieIndex][_valueIndex];
-      final long computedTime_Break                      = deviceTime_Elapsed - computedTime_Moving;
-
-      final long deviceTime_Elapsed_Summary              = computeSummary(_tourData_Common.elapsedTime_Resorted,    _valueIndex);
-      final long deviceTime_Recorded_Summary             = computeSummary(_tourData_Common.recordedTime_Resorted,   _valueIndex);
-      final long deviceTime_Paused_Summary               = computeSummary(_tourData_Common.pausedTime_Resorted,     _valueIndex);
-      final long computedTime_Moving_Summary             = computeSummary(_tourData_Common.movingTime_Resorted,     _valueIndex);
-      final long computedTime_Break_Summary              = deviceTime_Elapsed_Summary - computedTime_Moving_Summary;
-
-      final float deviceTime_Elapsed_Percentage          = deviceTime_Elapsed_Summary  == 0 ? 0 : (float) deviceTime_Elapsed  / deviceTime_Elapsed_Summary  * 100;
-      final float deviceTime_Recorded_Percentage         = deviceTime_Recorded_Summary == 0 ? 0 : (float) deviceTime_Recorded / deviceTime_Recorded_Summary * 100;
-      final float deviceTime_Paused_Percentage           = deviceTime_Paused_Summary   == 0 ? 0 : (float) deviceTime_Paused   / deviceTime_Paused_Summary   * 100;
-      final float computedTime_Moving_Percentage         = computedTime_Moving_Summary == 0 ? 0 : (float) computedTime_Moving / computedTime_Moving_Summary * 100;
-      final float computedTime_Break_Percentage          = computedTime_Break_Summary  == 0 ? 0 : (float) computedTime_Break  / computedTime_Break_Summary  * 100;
-
-      final float distance                               = _tourData_Common.distance_High_Resorted    [_serieIndex][_valueIndex];
-      final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted [_serieIndex][_valueIndex];
-      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_serieIndex][_valueIndex] + 0.5f;
-
-      final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
-      final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
-      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex) + 0.5f;
-
-      final float distance_Percentage                    = distance_Summary    == 0 ? 0 : distance    / distance_Summary      * 100;
-      final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
-      final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
-
-      final float elevationUp_WithMeasurement            = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-      final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
-      final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);
-      final String deviceTime_Paused_Percentage_Text     = deviceTime_Paused_Percentage   == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Paused_Percentage);
-      final String computedTime_Moving_Percentage_Text   = computedTime_Moving_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(computedTime_Moving_Percentage);
-      final String computedTime_Break_Percentage_Text    = computedTime_Break_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(computedTime_Break_Percentage);
-
-      final String distance_Percentage_Text              = distance_Percentage            == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(distance_Percentage);
-      final String elevationUp_Percentage_Text           = elevationUp_Percentage         == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationUp_Percentage);
-
-      final String deviceTime_Elapsed_UnitText           = deviceTime_Elapsed             == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String deviceTime_Recorded_UnitText          = deviceTime_Recorded            == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String deviceTime_Paused_UnitText            = deviceTime_Paused              == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String computedTime_Moving_UnitText          = computedTime_Moving            == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String computedTime_Break_UnitText           = computedTime_Break             == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-
-      final String deviceTime_Elapsed_Summary_UnitText   = deviceTime_Elapsed_Summary     == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String deviceTime_Recorded_Summary_UnitText  = deviceTime_Recorded_Summary    == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String deviceTime_Paused_Summary_UnitText    = deviceTime_Paused_Summary      == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String computedTime_Moving_Summary_UnitText  = computedTime_Moving_Summary    == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-      final String computedTime_Break_Summary_UnitText   = computedTime_Break_Summary     == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
-
-      _lblDeviceTime_Elapsed              .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed));
-      _lblDeviceTime_Elapsed_Unit         .setText(deviceTime_Elapsed_UnitText);
-
-      _lblDeviceTime_Recorded             .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded));
-      _lblDeviceTime_Recorded_Unit        .setText(deviceTime_Recorded_UnitText);
-
-      _lblDeviceTime_Paused               .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused));
-      _lblDeviceTime_Paused_Unit          .setText(deviceTime_Paused_UnitText);
-
-      _lblComputedTime_Moving             .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving));
-      _lblComputedTime_Moving_Unit        .setText(computedTime_Moving_UnitText);
-
-      _lblComputedTime_Break              .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
-      _lblComputedTime_Break_Unit         .setText(computedTime_Break_UnitText);
-
-      _lblDistance                        .setText(distance          == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
-      _lblDistance_Unit                   .setText(distance          == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
-
-      _lblElevationUp                     .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
-
-      _lblNumberOfTours                   .setText(Integer.toString((int) (numTours + 0.5)));
-
-      if (_isShowSummary) {
-
-         _lblDeviceTime_Elapsed_Summary      .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed_Summary));
-         _lblDeviceTime_Elapsed_Summary_Unit .setText(deviceTime_Elapsed_Summary_UnitText);
-         _lblDeviceTime_Recorded_Summary     .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded_Summary));
-         _lblDeviceTime_Recorded_Summary_Unit.setText(deviceTime_Recorded_Summary_UnitText);
-         _lblDeviceTime_Paused_Summary       .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused_Summary));
-         _lblDeviceTime_Paused_Summary_Unit  .setText(deviceTime_Paused_Summary_UnitText);
-
-         _lblComputedTime_Moving_Summary     .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving_Summary));
-         _lblComputedTime_Moving_Summary_Unit.setText(computedTime_Moving_Summary_UnitText);
-         _lblComputedTime_Break_Summary      .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break_Summary));
-         _lblComputedTime_Break_Summary_Unit .setText(computedTime_Break_Summary_UnitText);
-
-         _lblDistance_Summary                .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance_Summary / 1000.0));
-         _lblDistance_Summary_Unit           .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
-
-         _lblElevationUp_Summary             .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary_WithMeasurement));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
-
-         _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
-      }
-
-      if (_isShowPercentage) {
-
-         _lblDeviceTime_Elapsed_Percentage   .setText(deviceTime_Elapsed_Percentage_Text);
-         _lblDeviceTime_Recorded_Percentage  .setText(deviceTime_Recorded_Percentage_Text);
-         _lblDeviceTime_Paused_Percentage    .setText(deviceTime_Paused_Percentage_Text);
-
-         _lblComputedTime_Moving_Percentage  .setText(computedTime_Moving_Percentage_Text);
-         _lblComputedTime_Break_Percentage   .setText(computedTime_Break_Percentage_Text);
-
-         _lblDistance_Percentage             .setText(distance_Percentage_Text);
-         _lblElevationUp_Percentage          .setText(elevationUp_Percentage_Text);
-
-         _lblNumberOfTours_Percentage        .setText(Integer.toString((int) (numTours_Percentage + 0.5)));
-      }
+//      final float numTours                               = _statisticDate_Frequency.numTours_High_Resorted    [_serieIndex][_valueIndex] + 0.5f;
+//
+//      final float numTours_Summary                       = computeSummary(_statisticDate_Frequency.numTours_High_Resorted,      _valueIndex) + 0.5f;
+//
+//      final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
+//
+//
+//
+//      _lblNumberOfTours                   .setText(Integer.toString((int) (numTours + 0.5)));
+//
+//      if (_isShowSummary) {
+//
+//
+//         _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
+//      }
+//
+//      if (_isShowPercentage) {
+//
+//
+//         _lblNumberOfTours_Percentage        .setText(Integer.toString((int) (numTours_Percentage + 0.5)));
+//      }
 
 // SET_FORMATTING_ON
 
