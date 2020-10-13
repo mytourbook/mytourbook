@@ -319,7 +319,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       _customDataFieldDefinitions = saxHandler.getCustomDataFieldDefinitions();
       _equipments = saxHandler.getEquipments();
-      saveEquipments();
+      saveEquipmentsAsTags();
 
       _allTourTypes = TourDatabase.getAllTourTypes();
    }
@@ -1194,7 +1194,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     * @param importFilePath
     *           The file path of the FitLog or FitLogEx file
     */
-   private void saveEquipments() {
+   private void saveEquipmentsAsTags() {
 
       if (_equipments.size() == 0) {
          return;

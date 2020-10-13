@@ -29,7 +29,6 @@ public class FitLogExSAXHandler extends DefaultHandler {
    private static final String TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION  = "CustomDataFieldDefinition";                     //$NON-NLS-1$
    private static final String TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS = TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION + "s"; //$NON-NLS-1$
 
-   //FitLogEx format only
    private static final String TAG_ACTIVITY_EQUIPMENT                      = "Equipment";        //$NON-NLS-1$
    private static final String ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";             //$NON-NLS-1$
    private static final String ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";          //$NON-NLS-1$
@@ -41,9 +40,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
    private static final String ATTRIB_EQUIPMENT_PURCHASE_LOCATION          = "PurchaseLocation"; //$NON-NLS-1$
    private static final String ATTRIB_EQUIPMENT_TYPE                       = "Type";             //$NON-NLS-1$
    private static final String ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS           = "WeightKilograms";  //$NON-NLS-1$
-
    private static final String ATTRIB_EQUIPMENT_ID                         = "Id";               //$NON-NLS-1$
-   //
 
    private LinkedHashMap<String, Integer> _customDataFieldDefinitions;
    private ArrayList<Equipment>           _equipments;
@@ -51,16 +48,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
    private boolean                        _isInCustomDataFieldDefinitions;
    private boolean                        _isInEquipment;
 
-   // Equipment
-   private boolean       _isInBrand;
-   private boolean       _isInDatePurchased;
-   private boolean       _isInModel;
-   private boolean       _isInNotes;
-   private boolean       _isInPurchaseLocation;
-   private boolean       _isInPurchasePrice;
-   private boolean       _isInWeightKilograms;
-
-   private StringBuilder                  _characters = new StringBuilder(100);
+   private StringBuilder                  _characters = new StringBuilder();
 
    public FitLogExSAXHandler() {
 
@@ -71,8 +59,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInEquipment || _isInBrand || _isInModel || _isInDatePurchased || _isInNotes || _isInPurchaseLocation ||
-            _isInPurchasePrice || _isInWeightKilograms) {
+      if (_isInEquipment) {
 
          _characters.append(chars, startIndex, length);
       }
@@ -85,37 +72,23 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
          _isInCustomDataFieldDefinitions = false;
 
-      } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
+      } else if (!_isInEquipment) {
+         return;
+      }
+
+      if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
          _isInEquipment = false;
 
-      } else if (name.equals(ATTRIB_EQUIPMENT_BRAND)) {
+      } else if (name.equals(ATTRIB_EQUIPMENT_BRAND) ||
+            name.equals(ATTRIB_EQUIPMENT_MODEL) ||
+            name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED) ||
+            name.equals(ATTRIB_EQUIPMENT_NOTES) ||
+            name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION) ||
+            name.equals(ATTRIB_EQUIPMENT_TYPE) ||
+            name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
 
-         _isInBrand = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_MODEL)) {
-
-         _isInModel = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED)) {
-
-         _isInDatePurchased = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_NOTES)) {
-
-         _isInNotes = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION)) {
-
-         _isInPurchaseLocation = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_TYPE)) {
-
-         _isInPurchasePrice = false;
-
-      } else if (name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
-
-         _isInWeightKilograms = false;
+         parseEquipment(name);
       }
    }
 
@@ -127,7 +100,12 @@ public class FitLogExSAXHandler extends DefaultHandler {
       return _equipments;
    }
 
-   private void parseEquipment(final String name, final Attributes attributes) {
+   private void parseEquipment(final String name) {
+
+      final int numberOfEquipments = _equipments.size();
+      if (numberOfEquipments == 0) {
+         return;
+      }
 
       final Equipment currentEquipment = _equipments.get(_equipments.size() - 1);
 
@@ -200,46 +178,13 @@ public class FitLogExSAXHandler extends DefaultHandler {
                _customDataFieldDefinitions.put(customFieldName, 0);
             }
          }
-      } else if (_isInEquipment) {
-
-         if (_isInBrand || _isInModel || _isInDatePurchased || _isInNotes || _isInPurchaseLocation ||
-               _isInPurchasePrice || _isInWeightKilograms) {
-
-            parseEquipment(name, attributes);
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_BRAND)) {
-
-            _isInBrand = true;
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_MODEL)) {
-
-            _isInModel = true;
-            parseEquipment(name, attributes);
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED)) {
-
-            _isInDatePurchased = true;
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_NOTES)) {
-
-            _isInNotes = true;
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION)) {
-
-            _isInPurchaseLocation = true;
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_TYPE)) {
-
-            _isInPurchasePrice = true;
-
-         } else if (name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
-
-            _isInWeightKilograms = true;
-         }
-
       } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS)) {
 
          _isInCustomDataFieldDefinitions = true;
+
+      } else if (_isInEquipment) {
+
+         _characters.delete(0, _characters.length());
 
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
