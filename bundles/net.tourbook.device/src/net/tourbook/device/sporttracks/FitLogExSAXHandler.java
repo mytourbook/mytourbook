@@ -84,7 +84,8 @@ public class FitLogExSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInBrand ||
+      if (_isInEquipment ||
+            _isInBrand ||
             _isInModel ||
             _isInDatePurchased ||
             _isInExpectedLifeKilometers ||
@@ -165,6 +166,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
          currentEquipment.PurchaseLocation = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE)) {
+
          _isInPurchasePrice = false;
          currentEquipment.PurchasePrice = _characters.toString();
 
@@ -226,18 +228,25 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
          _isInCustomDataFieldDefinitions = true;
 
-      } else if (_isInEquipment) {
-
-         startElement_InEquipment(name);
-
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
+         // It's very important to test if we are in an <Equipment>
+         // element as there can be equipments within equipments as below:
+         // <Equipment Id="1">
+         //    <Equipment Id="2" partOf="1">
+         //    </Equipment>
+         // </Equipment>
+         //
          _isInEquipment = true;
 
          final Equipment newEquipment = new Equipment();
          newEquipment.Id = attributes.getValue(FitLogSAXHandler.ATTRIB_EQUIPMENT_ID);
 
          _equipments.add(newEquipment);
+
+      } else if (_isInEquipment) {
+
+         startElement_InEquipment(name);
 
       }
    }

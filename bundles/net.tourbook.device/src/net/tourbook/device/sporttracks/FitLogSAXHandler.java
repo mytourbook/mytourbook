@@ -214,6 +214,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    static public class Equipment {
 
       String Id;
+      String Name;
       String DatePurchased;
       String ExpectedLifeKilometers;
       String InUse;
@@ -259,6 +260,10 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
 
       public String getName() {
+
+         if (!StringUtils.isNullOrEmpty(Name)) {
+            return Name;
+         }
 
          final StringBuilder name = new StringBuilder();
          if (!StringUtils.isNullOrEmpty(Brand)) {
@@ -644,8 +649,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       boolean isNewTag = false;
 
-      final Set<TourTag> tourTags = new HashSet<>();
-
       HashMap<Long, TourTag> tourTagMap = TourDatabase.getAllTourTags();
       TourTag[] allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
 
@@ -655,6 +658,8 @@ public class FitLogSAXHandler extends DefaultHandler {
       if (_equipments != null && _equipments.size() > 0) {
          searchTagById = true;
       }
+
+      final Set<TourTag> tourTags = new HashSet<>();
 
       try {
 
@@ -890,6 +895,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT_ITEM)) {
 
          final Equipment newEquipment = new Equipment();
+         newEquipment.Name = attributes.getValue(ATTRIB_NAME);
          newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
 
          _currentActivity.equipmentNames.add(newEquipment);
