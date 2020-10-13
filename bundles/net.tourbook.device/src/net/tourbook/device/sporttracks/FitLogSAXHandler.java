@@ -684,7 +684,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
                final TourTag tourTag = new TourTag(tag.getName());
                // There is no notes to import as we are here in a FitLog file as
-               // FitLogEx files would not have unavailable tags
+               // FitLogEx files would not have unavailable tags since, at this
+               // point, they would be already imported.
                tourTag.setRoot(true);
 
                // persist tag
