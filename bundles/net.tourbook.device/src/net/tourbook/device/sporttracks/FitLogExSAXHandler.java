@@ -27,8 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * For FitLogEx files only:
- * We parse and save the CustomDataFieldDefinitions and equipments in order to be able to format the
- * double values to the configured
+ * We parse and save the CustomDataFieldDefinitions and equipments
  */
 public class FitLogExSAXHandler extends DefaultHandler {
 
@@ -175,6 +174,9 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
             final String customFieldOptions = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS);
 
+            /*
+             * We parse and save the field format in order to be able to format the double values
+             */
             if (!StringUtils.isNullOrEmpty(customFieldOptions)) {
 
                final String[] tokens = customFieldOptions.split("\\|"); //$NON-NLS-1$
