@@ -59,7 +59,18 @@ public class FitLogExSAXHandler extends DefaultHandler {
    private ArrayList<Equipment>           _equipments;
 
    private boolean                        _isInCustomDataFieldDefinitions;
+
    private boolean                        _isInEquipment;
+   private boolean                        _isInBrand;
+   private boolean                        _isInModel;
+   private boolean                        _isInDatePurchased;
+   private boolean                        _isInExpectedLifeKilometers;
+   private boolean                        _isInInUse;
+   private boolean                        _isInNotes;
+   private boolean                        _isInPurchaseLocation;
+   private boolean                        _isInPurchasePrice;
+   private boolean                        _isInType;
+   private boolean                        _isInWeightKilograms;
 
    private StringBuilder                  _characters                                 = new StringBuilder();
 
@@ -72,7 +83,17 @@ public class FitLogExSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInEquipment) {
+      if (_isInEquipment ||
+            _isInBrand ||
+            _isInModel ||
+            _isInDatePurchased ||
+            _isInExpectedLifeKilometers ||
+            _isInInUse ||
+            _isInNotes ||
+            _isInPurchaseLocation ||
+            _isInPurchasePrice ||
+            _isInType ||
+            _isInWeightKilograms) {
 
          _characters.append(chars, startIndex, length);
       }
@@ -85,38 +106,19 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
          _isInCustomDataFieldDefinitions = false;
 
-      } else if (!_isInEquipment) {
-         return;
       }
 
-      if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
+      if (_isInEquipment) {
+
+         endElement_InEquipment(name);
+      } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
          _isInEquipment = false;
 
-      } else if (name.equals(ATTRIB_EQUIPMENT_BRAND) ||
-            name.equals(ATTRIB_EQUIPMENT_MODEL) ||
-            name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED) ||
-            name.equals(ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS) ||
-            name.equals(ATTRIB_EQUIPMENT_IN_USE) ||
-            name.equals(ATTRIB_EQUIPMENT_NOTES) ||
-            name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION) ||
-            name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE) ||
-            name.equals(ATTRIB_EQUIPMENT_TYPE) ||
-            name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
-
-         parseEquipment(name);
       }
    }
 
-   public LinkedHashMap<String, Integer> getCustomDataFieldDefinitions() {
-      return _customDataFieldDefinitions;
-   }
-
-   public ArrayList<Equipment> getEquipments() {
-      return _equipments;
-   }
-
-   private void parseEquipment(final String name) {
+   private void endElement_InEquipment(final String name) {
 
       final int numberOfEquipments = _equipments.size();
       if (numberOfEquipments == 0) {
@@ -127,44 +129,62 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
       if (name.equals(ATTRIB_EQUIPMENT_BRAND)) {
 
+         _isInBrand = false;
+
          currentEquipment.Brand = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_MODEL)) {
 
+         _isInModel = false;
          currentEquipment.Model = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED)) {
 
+         _isInDatePurchased = false;
          currentEquipment.DatePurchased = _characters.toString().substring(0, 10);
 
       } else if (name.equals(ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS)) {
 
+         _isInExpectedLifeKilometers = false;
          currentEquipment.ExpectedLifeKilometers = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_IN_USE)) {
 
+         _isInInUse = false;
          currentEquipment.InUse = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_NOTES)) {
 
+         _isInNotes = false;
          currentEquipment.Notes = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION)) {
 
+         _isInPurchaseLocation = false;
          currentEquipment.PurchaseLocation = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE)) {
-
+         _isInPurchasePrice = false;
          currentEquipment.PurchasePrice = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_TYPE)) {
 
+         _isInType = false;
          currentEquipment.Type = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
 
+         _isInWeightKilograms = false;
          currentEquipment.WeightKilograms = _characters.toString();
       }
+   }
+
+   public LinkedHashMap<String, Integer> getCustomDataFieldDefinitions() {
+      return _customDataFieldDefinitions;
+   }
+
+   public ArrayList<Equipment> getEquipments() {
+      return _equipments;
    }
 
    @Override
@@ -207,7 +227,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
       } else if (_isInEquipment) {
 
-         _characters.delete(0, _characters.length());
+         startElement_InEquipment(name);
 
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
@@ -218,6 +238,61 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
          _equipments.add(newEquipment);
 
+      }
+   }
+
+   private void startElement_InEquipment(final String name) {
+
+      boolean isData = true;
+
+      if (name.equals(ATTRIB_EQUIPMENT_BRAND)) {
+
+         _isInBrand = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_MODEL)) {
+
+         _isInModel = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED)) {
+
+         _isInDatePurchased = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS)) {
+
+         _isInExpectedLifeKilometers = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_IN_USE)) {
+
+         _isInInUse = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_NOTES)) {
+
+         _isInNotes = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION)) {
+
+         _isInPurchaseLocation = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE)) {
+
+         _isInPurchasePrice = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_TYPE)) {
+
+         _isInType = true;
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
+
+         _isInWeightKilograms = true;
+
+      } else {
+         isData = false;
+      }
+
+      if (isData) {
+
+         // clear char buffer
+         _characters.delete(0, _characters.length());
       }
    }
 }

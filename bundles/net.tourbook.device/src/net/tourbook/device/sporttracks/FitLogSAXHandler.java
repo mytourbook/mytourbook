@@ -304,6 +304,8 @@ public class FitLogSAXHandler extends DefaultHandler {
       _newlyImportedTours = newlyImportedTours;
 
       if (isFitLogExFile) {
+         // We parse the custom field definitions and equipments
+         // separately as they can be anywhere in the file
 
          final FitLogExSAXHandler saxHandler = new FitLogExSAXHandler();
 
