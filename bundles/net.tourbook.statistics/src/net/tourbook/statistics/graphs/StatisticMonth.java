@@ -251,15 +251,15 @@ public abstract class StatisticMonth extends TourbookStatistic {
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int hoveredBar_SerieIndex,
-                                final int hoveredBar_ValueIndex) {
+                                final int serieIndex,
+                                final int valueIndex) {
 
       /*
        * Create tooltip title
        */
       final int firstYear = _statSelectedYear - _statNumberOfYears + 1;
 
-      final LocalDate monthDate = LocalDate.of(firstYear, 1, 1).plusMonths(hoveredBar_ValueIndex);
+      final LocalDate monthDate = LocalDate.of(firstYear, 1, 1).plusMonths(valueIndex);
       final String monthText = Month
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
@@ -274,8 +274,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
             parent,
             toolTipProvider,
             _statisticData_Month,
-            hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex,
+            serieIndex,
+            valueIndex,
             toolTip_Title,
             null,
             totalColumnHeaderTitel,

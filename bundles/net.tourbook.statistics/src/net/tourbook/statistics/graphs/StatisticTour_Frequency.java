@@ -315,7 +315,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex, FrequencyStatistic.DISTANCE);
          }
 
          @Override
@@ -383,7 +383,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex, FrequencyStatistic.ELEVATION);
          }
 
          @Override
@@ -449,7 +449,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            StatisticTour_Frequency.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex, FrequencyStatistic.DURATION_TIME);
          }
 
          @Override
@@ -510,44 +510,34 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    /**
     * @param toolTipProvider
     * @param parent
-    * @param hoveredBar_VerticalIndex
-    *           serieIndex
-    * @param hoveredBar_HorizontalIndex
-    *           valueIndex
+    * @param serieIndex
+    * @param valueIndex
+    * @param frequencyStatistic
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int hoveredBar_SerieIndex,
-                                final int hoveredBar_ValueIndex) {
-
-//      /*
-//       * Create tooltip title
-//       */
-//      final int firstYear = _statSelectedYear - _statNumberOfYears + 1;
-//
-//      final LocalDate monthDate = LocalDate.of(firstYear, 1, 1).plusMonths(hoveredBar_ValueIndex);
-//      final String monthText = Month
-//            .of(monthDate.getMonthValue())
-//            .getDisplayName(TextStyle.FULL, Locale.getDefault());
-//
-//      final String toolTip_Title = String.format(TOOLTIP_TITLE_FORMAT, monthText, monthDate.getYear());
-//      final String totalColumnHeaderTitel = monthText;
+                                final int serieIndex,
+                                final int valueIndex,
+                                final FrequencyStatistic frequencyStatistic) {
 
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
 
-      final String toolTip_Title = "title";
+      final String toolTip_Title = "";//StatisticServices.getTourTypeName(serieIndex, _stat_ActiveTourTypeFilter);
       final String totalColumnHeaderTitel = "column header";
 
-//      final TourStatisticData_Common _statisticData_Frequency = null;
+      final long tourTypeId = StatisticServices.getTourTypeId(serieIndex, _stat_ActiveTourTypeFilter);
 
       new StatisticTooltipUI_Frequency().createContentArea(parent,
 
             toolTipProvider,
             _statisticData_Frequency,
+            frequencyStatistic,
 
-            hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex,
+            serieIndex,
+            valueIndex,
+
+            tourTypeId,
 
             toolTip_Title,
             totalColumnHeaderTitel,

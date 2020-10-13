@@ -23,9 +23,9 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -59,7 +59,7 @@ public class StatisticTooltipUI_Frequency {
     */
    private String                      _summaryColumn_HeaderTitle;
    private IToolTipProvider            _toolTipProvider;
-   private TourStatisticData_Frequency _statisticDate_Frequency;
+   private TourStatisticData_Frequency _statisticData_Frequency;
    private String                      _toolTip_Title;
    private int                         _serieIndex;
    private int                         _valueIndex;
@@ -74,8 +74,7 @@ public class StatisticTooltipUI_Frequency {
    /*
     * Actions
     */
-   private ActionCloseTooltip             _actionCloseTooltip;
-   private Action_ToolTip_EditPreferences _actionPrefDialog;
+   private ActionCloseTooltip _actionCloseTooltip;
 
    /*
     * UI resources
@@ -88,21 +87,30 @@ public class StatisticTooltipUI_Frequency {
    /*
     * UI controls
     */
-   private Composite _ttContainer;
+   private Composite          _ttContainer;
 
-   private Label     _lblColumnHeader_TourType;
-   private Label     _lblTitle;
-   private CLabel    _lblTourType_Image;
+   private Label              _lblColumnHeader_TourType;
+   private Label              _lblTitle;
+   private CLabel             _lblTourType_Image;
 
-   private Label     _lblData;
-   private Label     _lblDataValue;
-   private Label     _lblDataValue_Percentage;
-   private Label     _lblDataValue_Summary;
+   private Label              _lblData;
+   private Label              _lblDataValue;
+   private Label              _lblDataValue_Unit;
+   private Label              _lblDataValue_Summary;
+   private Label              _lblDataValue_Summary_Unit;
+   private Label              _lblDataValue_Percentage;
 
-   private Label     _lblTotal;
-   private Label     _lblTotalValue;
-   private Label     _lblTotalValue_Percentage;
-   private Label     _lblTotalValue_Summary;
+   private Label              _lblNumberOfTours;
+   private Label              _lblNumberOfTours_Percentage;
+   private Label              _lblNumberOfTours_Summary;
+
+   private Label              _lblTotal;
+   private Label              _lblTotalValue;
+   private Label              _lblTotalValue_Unit;
+   private Label              _lblTotalValue_Summary;
+   private Label              _lblTotalValue_Summary_Unit;
+   private Label              _lblTotalValue_Percentage;
+   private FrequencyStatistic _frequencyStatistic;
 
    private class ActionCloseTooltip extends Action {
 
@@ -144,13 +152,6 @@ public class StatisticTooltipUI_Frequency {
 
    private void createActions() {
 
-      final Integer selectedTabFolder = new Integer(1);
-
-      _actionPrefDialog = new Action_ToolTip_EditPreferences(_toolTipProvider,
-            Messages.Tour_Tooltip_Action_EditFormatPreferences,
-            PrefPageAppearanceDisplayFormat.ID,
-            selectedTabFolder);
-
       _actionCloseTooltip = new ActionCloseTooltip();
    }
 
@@ -158,8 +159,10 @@ public class StatisticTooltipUI_Frequency {
     * @param parent
     * @param toolTipProvider
     * @param statisticData_Frequency
+    * @param frequencyStatistic
     * @param serieIndex
     * @param valueIndex
+    * @param tourTypeId
     * @param toolTip_Title
     * @param toolTip_SubTitle
     * @param summaryColumn_HeaderTitle
@@ -169,15 +172,19 @@ public class StatisticTooltipUI_Frequency {
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
                           final TourStatisticData_Frequency statisticData_Frequency,
+                          final FrequencyStatistic frequencyStatistic,
                           final int serieIndex,
                           final int valueIndex,
+                          final long tourTypeId,
                           final String toolTip_Title,
                           final String summaryColumn_HeaderTitle,
                           final boolean isShowSummary,
                           final boolean isShowPercentage) {
 
       _toolTipProvider = toolTipProvider;
-      _statisticDate_Frequency = statisticData_Frequency;
+      _statisticData_Frequency = statisticData_Frequency;
+      _frequencyStatistic = frequencyStatistic;
+
       _serieIndex = serieIndex;
       _valueIndex = valueIndex;
 
@@ -193,9 +200,9 @@ public class StatisticTooltipUI_Frequency {
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 
       // setup tour type
-//      _tourTypeId = _statisticDate_Frequency.typeIds_Resorted[serieIndex][valueIndex];
-//      _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
-//      _isTourTypeImageAvailable = _tourTypeId >= 0;
+      _tourTypeId = tourTypeId;
+      _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
+      _isTourTypeImageAvailable = _tourTypeId >= 0;
 
       initUI(parent);
 
@@ -259,6 +266,9 @@ public class StatisticTooltipUI_Frequency {
 
                createUI_Spacer_Columns(container, numColumns);
                createUI_30_BarData(container);
+
+               createUI_Spacer_Columns(container, numColumns);
+               createUI_32_NumTours(container);
             }
          }
       }
@@ -326,7 +336,7 @@ public class StatisticTooltipUI_Frequency {
        * Fill toolbar
        */
 
-      tbm.add(_actionPrefDialog);
+//      tbm.add(_actionPrefDialog);
 
       /**
        * The close action is ALWAYS visible, sometimes there is a bug that the tooltip do not
@@ -392,10 +402,10 @@ public class StatisticTooltipUI_Frequency {
          /*
           * Data
           */
-         _lblData = createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
+         _lblData = createUI_Label(container, UI.EMPTY_STRING);
 
          _lblDataValue = createUI_LabelValue(container, SWT.TRAIL);
-         createUI_LabelValue(container, SWT.LEAD);
+         _lblDataValue_Unit = createUI_LabelValue(container, SWT.TRAIL);
 
          if (_isShowPercentage) {
             _lblDataValue_Percentage = createUI_LabelValue(container, SWT.TRAIL);
@@ -403,17 +413,17 @@ public class StatisticTooltipUI_Frequency {
 
          if (_isShowSummary) {
             _lblDataValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
-            createUI_LabelValue(container, SWT.LEAD);
+            _lblDataValue_Summary_Unit = createUI_LabelValue(container, SWT.TRAIL);
          }
       }
       {
          /*
           * Total
           */
-         _lblTotal = createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
+         _lblTotal = createUI_Label(container, UI.EMPTY_STRING);
 
          _lblTotalValue = createUI_LabelValue(container, SWT.TRAIL);
-         createUI_LabelValue(container, SWT.LEAD);
+         _lblTotalValue_Unit = createUI_LabelValue(container, SWT.TRAIL);
 
          if (_isShowPercentage) {
             _lblTotalValue_Percentage = createUI_LabelValue(container, SWT.TRAIL);
@@ -421,6 +431,28 @@ public class StatisticTooltipUI_Frequency {
 
          if (_isShowSummary) {
             _lblTotalValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            _lblTotalValue_Summary_Unit = createUI_LabelValue(container, SWT.TRAIL);
+         }
+      }
+   }
+
+   private void createUI_32_NumTours(final Composite container) {
+
+      {
+         /*
+          * Number of tours
+          */
+         createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
+
+         _lblNumberOfTours = createUI_LabelValue(container, SWT.TRAIL);
+         createUI_LabelValue(container, SWT.LEAD);
+
+         if (_isShowPercentage) {
+            _lblNumberOfTours_Percentage = createUI_LabelValue(container, SWT.TRAIL);
+         }
+
+         if (_isShowSummary) {
+            _lblNumberOfTours_Summary = createUI_LabelValue(container, SWT.TRAIL);
             createUI_LabelValue(container, SWT.LEAD);
          }
       }
@@ -534,61 +566,34 @@ public class StatisticTooltipUI_Frequency {
    private void updateUI() {
 
       // tour type image
-//      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
-//
-//         if (_tourTypeId < 0) {
-//            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
-//         } else {
-//            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(_tourTypeId));
-//         }
-//         _lblTourType_Image.setToolTipText(_tourTypeName);
-//      }
-//
-//      _lblTitle.setText(_toolTip_Title);
-//      _lblColumnHeader_TourType.setText(_tourTypeName);
-//
-//      _lblData.setText(Messages.Statistic_Tooltip_Label_DurationTime);
-//      _lblTotal.setText(Messages.Statistic_Tooltip_Label_Total);
+      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
 
-      if (_valueIndex == 0) {
+         if (_tourTypeId < 0) {
+            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+         } else {
+            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(_tourTypeId));
+         }
+         _lblTourType_Image.setToolTipText(_tourTypeName);
+      }
 
-         // first bar
+      _lblTitle.setText(_toolTip_Title);
+      _lblColumnHeader_TourType.setText(_tourTypeName);
 
-         // Duration <%sh * %d
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_First,
-               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+      _lblData.setText(Messages.Statistic_Tooltip_Label_DurationTime);
+      _lblTotal.setText(Messages.Statistic_Tooltip_Label_Total);
 
-         // Total %sh
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+      switch (_frequencyStatistic) {
+      case DISTANCE:
 
-      } else if (_valueIndex == _statisticDate_Frequency.statTime_Units.length - 1) {
+         break;
 
-         // last bar
+      case DURATION_TIME:
+         updateUI_Statistic_DurationTime();
+         break;
 
-         // Duration >%sh * %d
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Last,
-               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+      case ELEVATION:
+         break;
 
-         // Total %sh
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-
-      } else {
-
-         // between first and last bar
-
-         // Duration %s-%sh * %d
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Between,
-               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-               Util.formatValue(_statisticDate_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-               _statisticDate_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
-
-         // Total %sh
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticDate_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
       }
 
 // SET_FORMATTING_OFF
@@ -624,5 +629,54 @@ public class StatisticTooltipUI_Frequency {
       // compute width for all controls and equalize column width for the different sections
 
       _ttContainer.layout(true, true);
+   }
+
+   private void updateUI_Statistic_DurationTime() {
+
+      _lblNumberOfTours.setText(Integer.toString(_statisticData_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+
+      if (_valueIndex == 0) {
+
+         // first bar
+
+         // Duration <%s h
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_First,
+               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+         // Total %s h
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+      } else if (_valueIndex == _statisticData_Frequency.statTime_Units.length - 1) {
+
+         // last bar
+
+         // Duration >%s
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Last,
+               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+         // Total %s
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+      } else {
+
+         // between first and last bar
+
+         // Duration %s-%s
+         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Between,
+               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+         // Total %s
+         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
+               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+      }
    }
 }
