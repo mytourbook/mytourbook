@@ -31,19 +31,20 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class FitLogExSAXHandler extends DefaultHandler {
 
-   static final String                    ATTRIB_CUSTOM_DATA_FIELD_NAME               = "name";                                          //$NON-NLS-1$
-   static final String                    ATTRIB_CUSTOM_DATA_FIELD_VALUE              = "v";                                             //$NON-NLS-1$
-   static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELDS             = "CustomDataFields";                              //$NON-NLS-1$
    static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELD              = "CustomDataField";                               //$NON-NLS-1$
-   private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION   = "CustomDataFieldDefinition";                     //$NON-NLS-1$
+   static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELDS             = TAG_ACTIVITY_CUSTOM_DATA_FIELD + "s";            //$NON-NLS-1$
+   private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION   = TAG_ACTIVITY_CUSTOM_DATA_FIELD + "Definition";   //$NON-NLS-1$
    private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS  = TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION + "s"; //$NON-NLS-1$
+   private static final String            TAG_ACTIVITY_EQUIPMENT                      = "Equipment";                                     //$NON-NLS-1$
    static final String                    TAG_ACTIVITY_HAS_START_TIME                 = "HasStartTime";                                  //$NON-NLS-1$
    static final String                    TAG_ACTIVITY_TIMEZONE_UTC_OFFSET            = "TimeZoneUtcOffset";                             //$NON-NLS-1$
 
-   private static final String            TAG_ACTIVITY_EQUIPMENT                      = "Equipment";                                     //$NON-NLS-1$
    private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";                                          //$NON-NLS-1$
    private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";                                       //$NON-NLS-1$
    private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_TRIMP   = "TRIMP";                                         //$NON-NLS-1$
+   static final String                    ATTRIB_CUSTOM_DATA_FIELD_NAME               = "name";                                          //$NON-NLS-1$
+   static final String                    ATTRIB_CUSTOM_DATA_FIELD_VALUE              = "v";                                             //$NON-NLS-1$
+
    private static final String            ATTRIB_EQUIPMENT_BRAND                      = "Brand";                                         //$NON-NLS-1$
    static final String                    ATTRIB_EQUIPMENT_DATE_PURCHASED             = "DatePurchased";                                 //$NON-NLS-1$
    static final String                    ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS   = "ExpectedLifeKilometers";                        //$NON-NLS-1$
