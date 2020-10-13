@@ -31,8 +31,14 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class FitLogExSAXHandler extends DefaultHandler {
 
+   static final String                    ATTRIB_CUSTOM_DATA_FIELD_NAME               = "name";                                          //$NON-NLS-1$
+   static final String                    ATTRIB_CUSTOM_DATA_FIELD_VALUE              = "v";                                             //$NON-NLS-1$
+   static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELDS             = "CustomDataFields";                              //$NON-NLS-1$
+   static final String                    TAG_ACTIVITY_CUSTOM_DATA_FIELD              = "CustomDataField";                               //$NON-NLS-1$
    private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION   = "CustomDataFieldDefinition";                     //$NON-NLS-1$
    private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS  = TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION + "s"; //$NON-NLS-1$
+   static final String                    TAG_ACTIVITY_HAS_START_TIME                 = "HasStartTime";                                  //$NON-NLS-1$
+   static final String                    TAG_ACTIVITY_TIMEZONE_UTC_OFFSET            = "TimeZoneUtcOffset";                             //$NON-NLS-1$
 
    private static final String            TAG_ACTIVITY_EQUIPMENT                      = "Equipment";                                     //$NON-NLS-1$
    private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";                                          //$NON-NLS-1$
@@ -48,7 +54,6 @@ public class FitLogExSAXHandler extends DefaultHandler {
    static final String                    ATTRIB_EQUIPMENT_PURCHASE_PRICE             = "PurchasePrice";                                 //$NON-NLS-1$
    static final String                    ATTRIB_EQUIPMENT_TYPE                       = "Type";                                          //$NON-NLS-1$
    static final String                    ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS           = "WeightKilograms";                               //$NON-NLS-1$
-   private static final String            ATTRIB_EQUIPMENT_ID                         = "Id";                                            //$NON-NLS-1$
 
    private LinkedHashMap<String, Integer> _customDataFieldDefinitions;
    private ArrayList<Equipment>           _equipments;
@@ -209,7 +214,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
          _isInEquipment = true;
 
          final Equipment newEquipment = new Equipment();
-         newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
+         newEquipment.Id = attributes.getValue(FitLogSAXHandler.ATTRIB_EQUIPMENT_ID);
 
          _equipments.add(newEquipment);
 
