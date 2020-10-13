@@ -18,29 +18,38 @@ package net.tourbook.device.sporttracks;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.device.sporttracks.FitLogSAXHandler.Equipment;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * For FitLogEx files only:
+ * We parse and save the CustomDataFieldDefinitions and equipments in order to be able to format the
+ * double values to the configured
+ */
 public class FitLogExSAXHandler extends DefaultHandler {
 
-   private static final String TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION  = "CustomDataFieldDefinition";                     //$NON-NLS-1$
-   private static final String TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS = TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION + "s"; //$NON-NLS-1$
+   private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION   = "CustomDataFieldDefinition";                     //$NON-NLS-1$
+   private static final String            TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS  = TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION + "s"; //$NON-NLS-1$
 
-   private static final String TAG_ACTIVITY_EQUIPMENT                      = "Equipment";        //$NON-NLS-1$
-   private static final String ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";             //$NON-NLS-1$
-   private static final String ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";          //$NON-NLS-1$
-   private static final String ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_TRIMP   = "TRIMP";            //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_BRAND                      = "Brand";            //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_DATE_PURCHASED             = "DatePurchased";    //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_MODEL                      = "Model";            //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_NOTES                      = "Notes";            //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_PURCHASE_LOCATION          = "PurchaseLocation"; //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_TYPE                       = "Type";             //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS           = "WeightKilograms";  //$NON-NLS-1$
-   private static final String ATTRIB_EQUIPMENT_ID                         = "Id";               //$NON-NLS-1$
+   private static final String            TAG_ACTIVITY_EQUIPMENT                      = "Equipment";                                     //$NON-NLS-1$
+   private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";                                          //$NON-NLS-1$
+   private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";                                       //$NON-NLS-1$
+   private static final String            ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_TRIMP   = "TRIMP";                                         //$NON-NLS-1$
+   private static final String            ATTRIB_EQUIPMENT_BRAND                      = "Brand";                                         //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_DATE_PURCHASED             = "DatePurchased";                                 //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS   = "ExpectedLifeKilometers";                        //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_IN_USE                     = "InUse";                                         //$NON-NLS-1$
+   private static final String            ATTRIB_EQUIPMENT_MODEL                      = "Model";                                         //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_NOTES                      = "Notes";                                         //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_PURCHASE_LOCATION          = "PurchaseLocation";                              //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_PURCHASE_PRICE             = "PurchasePrice";                                 //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_TYPE                       = "Type";                                          //$NON-NLS-1$
+   static final String                    ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS           = "WeightKilograms";                               //$NON-NLS-1$
+   private static final String            ATTRIB_EQUIPMENT_ID                         = "Id";                                            //$NON-NLS-1$
 
    private LinkedHashMap<String, Integer> _customDataFieldDefinitions;
    private ArrayList<Equipment>           _equipments;
@@ -48,7 +57,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
    private boolean                        _isInCustomDataFieldDefinitions;
    private boolean                        _isInEquipment;
 
-   private StringBuilder                  _characters = new StringBuilder();
+   private StringBuilder                  _characters                                 = new StringBuilder();
 
    public FitLogExSAXHandler() {
 
@@ -83,8 +92,11 @@ public class FitLogExSAXHandler extends DefaultHandler {
       } else if (name.equals(ATTRIB_EQUIPMENT_BRAND) ||
             name.equals(ATTRIB_EQUIPMENT_MODEL) ||
             name.equals(ATTRIB_EQUIPMENT_DATE_PURCHASED) ||
+            name.equals(ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS) ||
+            name.equals(ATTRIB_EQUIPMENT_IN_USE) ||
             name.equals(ATTRIB_EQUIPMENT_NOTES) ||
             name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION) ||
+            name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE) ||
             name.equals(ATTRIB_EQUIPMENT_TYPE) ||
             name.equals(ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS)) {
 
@@ -121,6 +133,14 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
          currentEquipment.DatePurchased = _characters.toString().substring(0, 10);
 
+      } else if (name.equals(ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS)) {
+
+         currentEquipment.ExpectedLifeKilometers = _characters.toString();
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_IN_USE)) {
+
+         currentEquipment.InUse = _characters.toString();
+
       } else if (name.equals(ATTRIB_EQUIPMENT_NOTES)) {
 
          currentEquipment.Notes = _characters.toString();
@@ -128,6 +148,10 @@ public class FitLogExSAXHandler extends DefaultHandler {
       } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_LOCATION)) {
 
          currentEquipment.PurchaseLocation = _characters.toString();
+
+      } else if (name.equals(ATTRIB_EQUIPMENT_PURCHASE_PRICE)) {
+
+         currentEquipment.PurchasePrice = _characters.toString();
 
       } else if (name.equals(ATTRIB_EQUIPMENT_TYPE)) {
 
@@ -145,21 +169,13 @@ public class FitLogExSAXHandler extends DefaultHandler {
 
       if (_isInCustomDataFieldDefinitions) {
 
-         /**
-          * We parse and save the CustomDataFieldDefinitions in order to be able to format the
-          * double
-          * values to the configured
-          *
-          * @param importFilePath
-          *           The file path of the FitLog or FitLogEx file
-          */
          if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION)) {
 
             final String customFieldName = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME);
 
             final String customFieldOptions = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS);
 
-            if (customFieldOptions != null && customFieldOptions.trim().length() != 0) {
+            if (!StringUtils.isNullOrEmpty(customFieldOptions)) {
 
                final String[] tokens = customFieldOptions.split("\\|"); //$NON-NLS-1$
                if (tokens.length < 2) {
