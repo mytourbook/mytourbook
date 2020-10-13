@@ -84,8 +84,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInEquipment ||
-            _isInBrand ||
+      if (_isInBrand ||
             _isInModel ||
             _isInDatePurchased ||
             _isInExpectedLifeKilometers ||
@@ -103,15 +102,16 @@ public class FitLogExSAXHandler extends DefaultHandler {
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
+      if (_isInEquipment) {
+
+         endElement_InEquipment(name);
+
+      }
+
       if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS)) {
 
          _isInCustomDataFieldDefinitions = false;
 
-      }
-
-      if (_isInEquipment) {
-
-         endElement_InEquipment(name);
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT)) {
 
          _isInEquipment = false;
@@ -126,7 +126,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
          return;
       }
 
-      final Equipment currentEquipment = _equipments.get(_equipments.size() - 1);
+      final Equipment currentEquipment = _equipments.get(numberOfEquipments - 1);
 
       if (name.equals(ATTRIB_EQUIPMENT_BRAND)) {
 
