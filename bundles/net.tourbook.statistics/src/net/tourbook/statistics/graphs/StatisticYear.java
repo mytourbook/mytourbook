@@ -240,7 +240,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
 
-      new StatisticTooltipUI_Summary().createContentArea(
+      new StatisticTooltipUI_ForCategorizedData().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Year,

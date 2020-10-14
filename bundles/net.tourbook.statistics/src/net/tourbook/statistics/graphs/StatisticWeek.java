@@ -328,7 +328,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
          toolTip_SubTitle = String.format(SUB_TITLE_2_LINES, weekBeginDate, weekEndDate);
       }
 
-      final StatisticTooltipUI_Summary tooltipUI = new StatisticTooltipUI_Summary();
+      final StatisticTooltipUI_ForCategorizedData tooltipUI = new StatisticTooltipUI_ForCategorizedData();
 
       tooltipUI.createContentArea(
             parent,

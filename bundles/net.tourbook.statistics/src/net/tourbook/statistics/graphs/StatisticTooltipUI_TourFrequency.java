@@ -43,16 +43,20 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class StatisticTooltipUI_Frequency {
+public class StatisticTooltipUI_TourFrequency {
 
-   private static final String          APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-   private static final String          IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
+   private static final String          APP_ACTION_CLOSE_TOOLTIP          = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+   private static final String          IMAGE_APP_CLOSE                   = net.tourbook.common.Messages.Image__App_Close;
 
-   private static final int             VERTICAL_LINE_SPACE      = 8;
+   private static final String          NUMBER_BETWEEN_FIRST_AND_LAST_BAR = "%d-%d";                                              //$NON-NLS-1$
+   private static final String          NUMBER_FIRST_BAR                  = "<%d";                                                //$NON-NLS-1$
+   private static final String          NUMBER_LAST_BAR                   = ">%d";                                                //$NON-NLS-1$
 
-   private static final int             SHELL_MARGIN             = 5;
+   private static final int             VERTICAL_LINE_SPACE               = 8;
 
-   private static final IValueFormatter VALUE_FORMATTER_1_0      = new ValueFormatter_Number_1_0();
+   private static final int             SHELL_MARGIN                      = 5;
+
+   private static final IValueFormatter VALUE_FORMATTER_1_0               = new ValueFormatter_Number_1_0();
 
    /*
     * Tooltip context
@@ -579,12 +583,11 @@ public class StatisticTooltipUI_Frequency {
       _lblTitle.setText(_toolTip_Title);
       _lblColumnHeader_TourType.setText(_tourTypeName);
 
-      _lblData.setText(Messages.Statistic_Tooltip_Label_DurationTime);
       _lblTotal.setText(Messages.Statistic_Tooltip_Label_Total);
 
       switch (_frequencyStatistic) {
       case DISTANCE:
-
+         updateUI_Statistic_Distance();
          break;
 
       case DURATION_TIME:
@@ -592,6 +595,7 @@ public class StatisticTooltipUI_Frequency {
          break;
 
       case ELEVATION:
+         updateUI_Statistic_Elevation();
          break;
 
       }
@@ -631,52 +635,116 @@ public class StatisticTooltipUI_Frequency {
       _ttContainer.layout(true, true);
    }
 
-   private void updateUI_Statistic_DurationTime() {
+   private void updateUI_Statistic_Distance() {
 
-      _lblNumberOfTours.setText(Integer.toString(_statisticData_Frequency.statTimeCounter_High[_serieIndex][_valueIndex]));
+      final TourStatisticData_Frequency statData = _statisticData_Frequency;
+
+      final int[] units = statData.statDistance_Units;
+
+      _lblData.setText(Messages.Statistic_Tooltip_Label_Distance);
 
       if (_valueIndex == 0) {
 
-         // first bar
+         // first bar - duration <
 
-         // Duration <%s h
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_First,
-               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+         _lblDataValue.setText(String.format(NUMBER_FIRST_BAR, units[_valueIndex]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 
-         // Total %s h
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+      } else if (_valueIndex == units.length - 1) {
 
-      } else if (_valueIndex == _statisticData_Frequency.statTime_Units.length - 1) {
+         // last bar - duration >
 
-         // last bar
-
-         // Duration >%s
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Last,
-               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
-
-         // Total %s
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+         _lblDataValue.setText(String.format(NUMBER_LAST_BAR, units[_valueIndex - 1]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 
       } else {
 
-         // between first and last bar
+         // between first and last bar - duration ... - ...
 
-         // Duration %s-%s
-         _lblDataValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Between,
-               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-               Util.formatValue(_statisticData_Frequency.statTime_Units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue.setText(String.format(NUMBER_BETWEEN_FIRST_AND_LAST_BAR, units[_valueIndex - 1], units[_valueIndex]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+      }
+
+      // total
+      _lblTotalValue.setText(Integer.toString(statData.statDistance_Sum_High[_serieIndex][_valueIndex]));
+      _lblTotalValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+
+      _lblNumberOfTours.setText(Integer.toString(statData.statDistance_NumTours_High[_serieIndex][_valueIndex]));
+   }
+
+   private void updateUI_Statistic_DurationTime() {
+
+      final TourStatisticData_Frequency statData = _statisticData_Frequency;
+
+      final int[] units = statData.statDurationTime_Units;
+
+      _lblData.setText(Messages.Statistic_Tooltip_Label_DurationTime);
+
+      if (_valueIndex == 0) {
+
+         // first bar - duration <
+
+         _lblDataValue.setText(String.format("<%s", Util.formatValue(units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
          _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
 
-         // Total %s
-         _lblTotalValue.setText(String.format(Messages.Statistic_Tooltip_Label_DurationTime_Total,
-               Util.formatValue(_statisticData_Frequency.statTimeSum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
-         _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+      } else if (_valueIndex == units.length - 1) {
+
+         // last bar - duration >
+
+         _lblDataValue.setText(String.format(">%s", Util.formatValue(units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+      } else {
+
+         // between first and last bar - duration ...-...
+
+         _lblDataValue.setText(String.format("%s-%s",
+               Util.formatValue(units[_valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
+               Util.formatValue(units[_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)));
+         _lblDataValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
       }
+
+      // total
+      _lblTotalValue.setText(Util.formatValue(statData.statDurationTime_Sum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE));
+      _lblTotalValue_Unit.setText(Messages.Tour_Tooltip_Label_Hour);
+
+      _lblNumberOfTours.setText(Integer.toString(statData.statDurationTime_NumTours_High[_serieIndex][_valueIndex]));
+   }
+
+   private void updateUI_Statistic_Elevation() {
+
+      final TourStatisticData_Frequency statData = _statisticData_Frequency;
+
+      final int[] units = statData.statDistance_Units;
+
+      _lblData.setText(Messages.Statistic_Tooltip_Label_Elevation);
+
+      if (_valueIndex == 0) {
+
+         // first bar - duration <
+
+         _lblDataValue.setText(String.format(NUMBER_FIRST_BAR, units[_valueIndex]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+
+      } else if (_valueIndex == units.length - 1) {
+
+         // last bar - duration >
+
+         _lblDataValue.setText(String.format(NUMBER_LAST_BAR, units[_valueIndex - 1]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+
+      } else {
+
+         // between first and last bar - duration ... - ...
+
+         _lblDataValue.setText(String.format(NUMBER_BETWEEN_FIRST_AND_LAST_BAR, units[_valueIndex - 1], units[_valueIndex]));
+         _lblDataValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+      }
+
+      // total
+      _lblTotalValue.setText(Util.formatValue(statData.statElevation_Sum_High[_serieIndex][_valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE));
+      _lblTotalValue_Unit.setText(UI.UNIT_LABEL_DISTANCE);
+
+      _lblNumberOfTours.setText(Integer.toString(statData.statDistance_NumTours_High[_serieIndex][_valueIndex]));
    }
 }
