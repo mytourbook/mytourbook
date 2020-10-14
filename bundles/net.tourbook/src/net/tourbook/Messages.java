@@ -1390,6 +1390,7 @@ public class Messages extends NLS {
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Tour;
+   public static String        Log_Reimport_Tour_Skipped;
 
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;

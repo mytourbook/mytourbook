@@ -85,7 +85,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
             break;
 
          //The Garmin usage of START/STOP/STOP_ALL is described here:
-         //https://www.thisisant.com/forum/viewthread/4319
+         //https://www.thisisant.com/forum/viewthread/4319/#7452
 
          }
       }

@@ -64,8 +64,11 @@ Improvements
     These unchecked tags can be deleted with the DELETE key in the "Selected Tags" or by unchecking it in "Available Tags"
 
 * Dialog Adjust Elevation
-  - Adjustment Type: "Approach elevation with SRMT data"
+  - Adjustment Type: "Approach elevation with SRTM data"
     New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
+
+* Dropbox (Frederic)
+  - Dropbox file/folder dialog: Sorting alphabetically the Dropbox folders and files
 
 
 Changes  
@@ -93,6 +96,10 @@ Fixes
 
 * GPX/TCX Export
   - Fixed total distance issue https://sourceforge.net/p/mytourbook/discussion/622811/thread/fd281c265a/?limit=25#c72b 
+
+* FitLogEx Import (Frederic)
+  - Fixed a possible import failure for manual tours with a Time Offset
+  - Fixed an issue where importing large files (> 100MB) could possibly result in a OutOfMemory error when parsing Custom Data Field Definitions
 
  
    

@@ -120,6 +120,7 @@ public class RawDataManager {
    private static final String           LOG_REIMPORT_ONLY_TOURTIMERPAUSES     = Messages.Log_Reimport_Only_TourTimerPauses;
    private static final String           LOG_REIMPORT_ONLY_TRAINING            = Messages.Log_Reimport_Only_Training;
    private static final String           LOG_REIMPORT_TOUR                     = Messages.Log_Reimport_Tour;
+   private static final String           LOG_REIMPORT_TOUR_SKIPPED             = Messages.Log_Reimport_Tour_Skipped;
 
    private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
@@ -156,7 +157,6 @@ public class RawDataManager {
     */
    private static HashSet<IPath>           _allPreviousReimportFolders         = new HashSet<>();
    private static IPath                    _previousReimportFolder;
-
 
    /**
     * contains the device data imported from the device/file
@@ -565,6 +565,9 @@ public class RawDataManager {
                       * User canceled file dialog -> continue with next file, it is possible that a
                       * tour file could not be reselected because it is not available any more
                       */
+                     TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+                           NLS.bind(LOG_REIMPORT_TOUR_SKIPPED,
+                                 oldTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
                      continue;
                   }
 
@@ -854,13 +857,18 @@ public class RawDataManager {
 
                final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-               MessageDialog.openInformation(
+               final boolean okPressed = MessageDialog.openConfirm(
                      activeShell,
                      NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
                      NLS.bind(
                            Messages.Import_Data_Dialog_GetReimportedFilePath_Message, //
                            tourDateTimeShort,
                            tourDateTimeShort));
+
+               //The user doesn't want to look for a new file path for the current tour.
+               if (!okPressed) {
+                  return;
+               }
 
             } else {
 
@@ -892,12 +900,17 @@ public class RawDataManager {
 
                   if (reimportFilePathName[0] == null) {
 
-                     MessageDialog.openInformation(
+                     final boolean okPressed = MessageDialog.openConfirm(
                            activeShell,
                            Messages.import_data_dlg_reimport_title,
                            NLS.bind(
                                  Messages.Import_Data_Dialog_GetAlternativePath_Message,
                                  savedImportFilePathName));
+
+                     //The user doesn't want to look for a new file path for the current tour.
+                     if (!okPressed) {
+                        return;
+                     }
                   }
                }
             }
@@ -977,8 +990,13 @@ public class RawDataManager {
           */
 
          long previousTourTimerPauses = 0;
+         int oldAltitudeUp = 0;
+         int oldAltitudeDown = 0;
          if (reimportId == ReImport.OnlyTourTimerPauses) {
             previousTourTimerPauses = oldTourData.getTourDeviceTime_Paused();
+         } else if (reimportId == ReImport.OnlyAltitudeValues) {
+            oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+            oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
          }
 
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
@@ -990,24 +1008,6 @@ public class RawDataManager {
          } else {
 
             isTourReImported = true;
-
-            TourLogManager.addSubLog(TourLogState.IMPORT_OK,
-                  NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                        reimportFileNamePath));
-
-            //Print the old vs new data comparison
-            String differences = UI.EMPTY_STRING;
-            if (reimportId == ReImport.OnlyTourTimerPauses) {
-
-               differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
-                     UI.format_hhh_mm_ss(previousTourTimerPauses),
-                     UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused()));
-            }
-
-            if (!StringUtils.isNullOrEmpty(differences)) {
-               TourLogManager.addSubLog(TourLogState.INFO, differences);
-            }
 
             // set re-import file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
@@ -1027,6 +1027,47 @@ public class RawDataManager {
                final TourData savedTourData = TourManager.saveModifiedTour(newTourData, false);
 
                newTourData = savedTourData;
+            }
+
+            TourLogManager.addSubLog(TourLogState.IMPORT_OK,
+                  NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                        reimportFileNamePath));
+
+            //Print the old vs new data comparison
+            String previousData = UI.EMPTY_STRING;
+            String newData = UI.EMPTY_STRING;
+            switch (reimportId) {
+
+            case OnlyAltitudeValues:
+               final String heightLabel = UI.UNIT_IS_METRIC ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+               final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+
+               previousData = UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+                     + UI.DASH
+                     + oldAltitudeDown
+                     + heightLabel;
+               newData = UI.SYMBOL_PLUS + newAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
+                     + UI.DASH + newAltitudeDown
+                     + heightLabel;
+               break;
+            case OnlyTourTimerPauses:
+               previousData = UI.format_hhh_mm_ss(previousTourTimerPauses);
+               newData = UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused());
+               break;
+
+            default:
+               break;
+            }
+
+            if (!StringUtils.isNullOrEmpty(previousData) &&
+                  !StringUtils.isNullOrEmpty(newData)) {
+
+               TourLogManager.addSubLog(TourLogState.INFO,
+                     NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
+                           previousData,
+                           newData));
             }
 
             // check if tour is displayed in the import view
