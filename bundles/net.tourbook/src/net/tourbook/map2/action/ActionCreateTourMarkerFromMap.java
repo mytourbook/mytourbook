@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Frédéric Bard and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,9 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * @author Wolfgang Schramm created 11.07.2005
- */
 package net.tourbook.map2.action;
 
 import com.javadocmd.simplelatlng.LatLng;

@@ -122,7 +122,7 @@ public class CRPDataReader extends TourbookDevice {
 
          String line;
          StringTokenizer tokenLine;
-         final ArrayList<String> trackPoints = new ArrayList<String>();
+         final ArrayList<String> trackPoints = new ArrayList<>();
 
          tokenLine = new StringTokenizer(fileReader.readLine());
          @SuppressWarnings("unused")
@@ -157,9 +157,9 @@ public class CRPDataReader extends TourbookDevice {
                ? Integer.parseInt(tourStartTime.substring(3, 5))
                : Integer.parseInt(tourStartTime.substring(3));
 
-         // recording time
+         // elapsed time
          final String tourRecTimeSt = tokenLine.nextToken();
-         final int tourRecordingTime = Integer.parseInt(tourRecTimeSt.substring(0, 2))
+         final int tourDeviceTime_Elapsed = Integer.parseInt(tourRecTimeSt.substring(0, 2))
                * 3600
                + Integer.parseInt(tourRecTimeSt.substring(3, 5))
                      * 60
@@ -229,7 +229,7 @@ public class CRPDataReader extends TourbookDevice {
          /*
           * set time serie from the imported trackpoints
           */
-         final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+         final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
          int tpIndex = 0;
          int tourTime = 0;
@@ -294,7 +294,7 @@ public class CRPDataReader extends TourbookDevice {
                timeData.time = 0;
             } else if (tpIndex == trackPoints.size() - 1) {
                // last track point
-               timeData.time = tourRecordingTime - tourTime;
+               timeData.time = tourDeviceTime_Elapsed - tourTime;
             } else {
                timeData.time = interval;
             }
@@ -377,7 +377,8 @@ public class CRPDataReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.computeTourDrivingTime();
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+            tourData.computeTourMovingTime();
             tourData.computeComputedValues();
 
             tourData.setTourAltUp(tourAltUp);

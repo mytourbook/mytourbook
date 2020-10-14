@@ -17,12 +17,10 @@
  * @author JOSM - contributors - adapted for MyTourbook by Meinhard Ritscher
  *
  ********************************************************************************
-
+ *
  This class implements a default ProxySelector
  see http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html
-
  *******************************************************************************/
-
 package net.tourbook.proxy;
 
 import java.io.IOException;
@@ -37,11 +35,28 @@ import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DefaultProxySelector extends ProxySelector {
+
+   private static final String SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES = "java.net.useSystemProxies";
+
+   private static final String USE_SYSTEM_PROXIES                    = System.getProperty(SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES);
+
+   static {
+
+      if (USE_SYSTEM_PROXIES != null && USE_SYSTEM_PROXIES.equals(Boolean.TRUE.toString())) {
+
+         Util.logSystemProperty_Value(DefaultProxySelector.class,
+               SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES,
+               USE_SYSTEM_PROXIES,
+               "System proxy is used"); //$NON-NLS-1$
+      }
+   }
+
    /**
     * The {@see ProxySelector} provided by the JDK will retrieve proxy information
     * from the system settings, if the system property <tt>java.net.useSystemProxies</tt>
@@ -52,7 +67,7 @@ public class DefaultProxySelector extends ProxySelector {
    private static boolean JVM_WILL_USE_SYSTEM_PROXIES = false;
 
    {
-      final String v = System.getProperty("java.net.useSystemProxies"); //$NON-NLS-1$
+      final String v = USE_SYSTEM_PROXIES;
       if (v != null && v.equals(Boolean.TRUE.toString())) {
          JVM_WILL_USE_SYSTEM_PROXIES = true;
       }

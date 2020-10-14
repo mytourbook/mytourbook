@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -65,10 +65,14 @@ public class Messages extends NLS {
    public static String        tourtime_info_description_text;
    public static String        tourtime_info_distance;
    public static String        tourtime_info_distance_tour;
-   public static String        tourtime_info_driving_time;
-   public static String        tourtime_info_driving_time_tour;
-   public static String        tourtime_info_recording_time;
-   public static String        tourtime_info_recording_time_tour;
+   public static String        tourtime_info_moving_time;
+   public static String        tourtime_info_moving_time_tour;
+   public static String        tourtime_info_elapsed_time;
+   public static String        tourtime_info_elapsed_time_tour;
+   public static String        tourtime_info_recorded_time;
+   public static String        tourtime_info_recorded_time_tour;
+   public static String        tourtime_info_paused_time;
+   public static String        tourtime_info_paused_time_tour;
    public static String        tourtime_info_tags;
    public static String        tourtime_info_time;
    public static String        TourTime_Info_NumberOfTours;

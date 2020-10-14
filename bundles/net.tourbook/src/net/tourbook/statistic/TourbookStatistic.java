@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -246,6 +246,14 @@ public abstract class TourbookStatistic {
    protected abstract String getGridPrefPrefix();
 
    /**
+    * @param isShowSequenceNumbers
+    *           Show sequence numbers in the first column
+    * @return Returns the statistic values, these values are created on demand because they can use
+    *         some 100 ms, depending on the statistic.
+    */
+   public abstract String getRawStatisticValues(boolean isShowSequenceNumbers);
+
+   /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the
     *         selected tour or <code>null</code> otherwise.
     */
@@ -335,11 +343,19 @@ public abstract class TourbookStatistic {
 
       if (durationTime == DurationTime.BREAK) {
 
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Break);
+
+      } else if (durationTime == DurationTime.ELAPSED) {
+
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Elapsed);
+
+      } else if (durationTime == DurationTime.PAUSED) {
+
          yData_Duration.setYTitle(Messages.Graph_Label_Time_Paused);
 
-      } else if (durationTime == DurationTime.RECORDING) {
+      } else if (durationTime == DurationTime.RECORDED) {
 
-         yData_Duration.setYTitle(Messages.Graph_Label_Time_Recording);
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Recorded);
 
       } else {
 

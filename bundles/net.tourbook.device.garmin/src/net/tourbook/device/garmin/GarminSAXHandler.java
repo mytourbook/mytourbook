@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -82,6 +83,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           SENSOR_STATE_PRESENT        = "Present";                                                    //$NON-NLS-1$
    private static final String           ATTR_VALUE_SPORT            = "Sport";                                                      //$NON-NLS-1$
 
+   private static final String           DateTimePattern             = "yyyy-MM-dd'T'HH:mm:ss";
    private static final SimpleDateFormat TIME_FORMAT;
    private static final SimpleDateFormat TIME_FORMAT_SSSZ;
    private static final SimpleDateFormat TIME_FORMAT_RFC822;
@@ -99,9 +101,9 @@ public class GarminSAXHandler extends DefaultHandler {
             .toInstant()
             .toEpochMilli();
 
-      TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
-      TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); //$NON-NLS-1$
+      TIME_FORMAT = new SimpleDateFormat(DateTimePattern + "'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_SSSZ = new SimpleDateFormat(DateTimePattern + ".SSS'Z'"); //$NON-NLS-1$
+      TIME_FORMAT_RFC822 = new SimpleDateFormat(DateTimePattern + "Z"); //$NON-NLS-1$
 
       TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
       TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
@@ -144,17 +146,19 @@ public class GarminSAXHandler extends DefaultHandler {
    private String                  _importFilePath;
    private boolean                 _isImported;
 
-   private ArrayList<TimeData>     _allTimeData = new ArrayList<>();
+   private final List<Long>        _pausedTime_Start = new ArrayList<>();
+   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private ArrayList<TimeData>     _allTimeData      = new ArrayList<>();
 
    private TimeData                _timeData;
 
-   private int                     _dataVersion = -1;
+   private int                     _dataVersion      = -1;
    private int                     _lapCounter;
    private int                     _trackPointCounter;
 
    private boolean                 _isSetLapMarker;
    private boolean                 _isSetLapStartTime;
-   private ArrayList<Long>         _allLapStart = new ArrayList<>();
+   private ArrayList<Long>         _allLapStart      = new ArrayList<>();
 
    private long                    _currentTime;
    private String                  _activitySport;
@@ -163,7 +167,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                 _isDistanceFromSensor;
    private boolean                 _isFromStrideSensor;
 
-   private StringBuilder           _characters  = new StringBuilder();
+   private StringBuilder           _characters       = new StringBuilder();
 
    private Sport                   _sport;
    private String                  _tourNotes;
@@ -212,7 +216,7 @@ public class GarminSAXHandler extends DefaultHandler {
       final int weekYear = Util.getYearForWeek(jdkCalendar);
 
       sbJdk.append(jdkFormatter.format(dtDate));
-      sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
+      sbJdk.append(UI.SPACE1 + weekYear + " | "); //$NON-NLS-1$
    }
 
 // private static void weekCheck() {
@@ -294,8 +298,8 @@ public class GarminSAXHandler extends DefaultHandler {
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-            sbJoda.append("    "); //$NON-NLS-1$
-            sbJdk.append("    "); //$NON-NLS-1$
+            sbJoda.append(UI.SPACE4);
+            sbJdk.append(UI.SPACE4);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -319,7 +323,7 @@ public class GarminSAXHandler extends DefaultHandler {
    /**
     * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
     * partly corrupt. When tour starts with the date 2007-04-01, move forward in the list until
-    * another date occures and use this as the start date.
+    * another date occurs and use this as the start date.
     */
    private void adjustTourStart() {
 
@@ -466,6 +470,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
       _allLapStart.clear();
       _allTimeData.clear();
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    @Override
@@ -509,7 +515,7 @@ public class GarminSAXHandler extends DefaultHandler {
             if (_trackPointCounter > 0) {
                /*
                 * summarize calories when at least one trackpoint is available. This will fix a bug
-                * because an invalid tcx file can contain old laps with calories but without
+                * because an invalid TCX file can contain old laps with calories but without
                 * trackpoints
                 */
                _tourCalories += _lapCalories;
@@ -530,7 +536,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
             _isInName = false;
 
-            // "Name" tag occures multiple times
+            // "Name" tag occurs multiple times
             if (!_isInCreator) {
 
                _tourTitle = _characters.toString();
@@ -627,8 +633,11 @@ public class GarminSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
+         tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
+
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 
@@ -896,6 +905,18 @@ public class GarminSAXHandler extends DefaultHandler {
 
          _timeData.absoluteTime = _currentTime;
 
+         final int allTimeData = _allTimeData.size();
+
+         if (allTimeData > 1) {
+            final long previousTrackPointTime = _allTimeData.get(allTimeData - 1).absoluteTime;
+
+            //If the current time is greater than the previous time by more than 1 second,
+            //we consider that a pause.
+            if (_currentTime - previousTrackPointTime > 1000) {
+               _pausedTime_Start.add(previousTrackPointTime);
+               _pausedTime_End.add(_currentTime);
+            }
+         }
       }
    }
 
@@ -925,6 +946,9 @@ public class GarminSAXHandler extends DefaultHandler {
       _sport = new Sport();
       _tourNotes = null;
       _tourTitle = UI.EMPTY_STRING;
+
+      _pausedTime_Start.clear();
+      _pausedTime_End.clear();
    }
 
    /**
@@ -1031,6 +1055,11 @@ public class GarminSAXHandler extends DefaultHandler {
                      // create new time item
                      _timeData = new TimeData();
 
+                  } else if (name.equals(TAG_DISTANCE_METERS)) {
+
+                     _isInDistance = true;
+                     _characters.delete(0, _characters.length());
+
                   } else if (name.equals(TAG_CALORIES)) {
 
                      _isInCalories = true;
@@ -1106,7 +1135,7 @@ public class GarminSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_DATABASE)) {
 
          /*
-          * get version of the xml file
+          * get version of the XML file
           */
          for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 

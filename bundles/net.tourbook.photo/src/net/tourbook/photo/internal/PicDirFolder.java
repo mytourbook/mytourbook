@@ -415,7 +415,7 @@ public class PicDirFolder {
             // log command
             final StringBuilder sb = new StringBuilder();
             for (final String cmd : commands) {
-               sb.append(cmd + " "); //$NON-NLS-1$
+               sb.append(cmd + UI.SPACE1);
             }
             StatusUtil.logInfo(sb.toString());
 
@@ -885,7 +885,7 @@ public class PicDirFolder {
    private void onSelectFolder(final ITreeSelection treeSelection) {
 
       if (_isExpandingSelection) {
-         // prevent entless loops
+         // prevent endless loops
          return;
       }
 
@@ -919,13 +919,13 @@ public class PicDirFolder {
          }
       }
 
-      // reset navigation state, this is a bit of a complex behaviour
+      // reset navigation state, this is a bit of a complex behavior
       _isFromNavigationHistory = false;
    }
 
    /**
     * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
     * tree is clicked.
     *
     * @param treeSelection
@@ -954,7 +954,7 @@ public class PicDirFolder {
             @Override
             public void run() {
 
-               // check if a newer expand event occured
+               // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
                   return;
                }
@@ -1025,7 +1025,7 @@ public class PicDirFolder {
              * set top item to the previous top item, otherwise the expanded/collapse item is
              * positioned at the bottom and the UI is jumping all the time
              * <p>
-             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * win behavior: when an item is set to top which was collapsed before, it will be
              * expanded
              */
             if (topItem.isDisposed() == false) {
@@ -1173,7 +1173,7 @@ public void restoreState() {
    enableActions();
 
    /*
-    * delay folder retrieval so that the UI can be updated immediatedly
+    * delay folder retrieval so that the UI can be updated immediately
     */
    final Job folderJob = new UIJob(UI.EMPTY_STRING) {
 
@@ -1240,7 +1240,7 @@ public void saveState() {
     * @param isMoveUpHierarchyWhenFolderIsInvalid
     * @param isFromNavigationHistory
     *           Set <code>true</code> when the folder was selected from the navigations history
-    *           which prevents that the naviation history is updated.
+    *           which prevents that the navigation history is updated.
     * @param isRootItem
     * @return Return <code>false</code> when the folder which should be selected is not available
     */

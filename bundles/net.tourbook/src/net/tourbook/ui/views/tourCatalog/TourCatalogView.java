@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -280,7 +280,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                }
 
             } else {
-               // this is a child which can be the parent for other childs
+               // this is a child which can be the parent for other children
                getComparedTours(comparedTours, tourTreeItem, findCompIds);
             }
          }
@@ -477,7 +477,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setTourSpeed(compareTourProperty.speed);
-                     comparedTour.setTourRecordingTime(compareTourProperty.recordingTime);
+                     comparedTour.setTourDeviceTime_Elapsed(compareTourProperty.tourDeviceTime_Elapsed);
 
                      // update the viewer
                      _tourViewer.update(comparedTour, null);
@@ -694,7 +694,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       defineColumn_Title();
       defineColumn_Tags();
       defineColumn_Speed();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_ElapsedTime();
       defineColumn_AvgPulse();
    }
 
@@ -877,11 +877,11 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    }
 
    /**
-    * column: Recording time (hh:mm:ss)
+    * column: Elapsed time (hh:mm:ss)
     */
-   private void defineColumn_Time_RecordingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -890,7 +890,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             final Object element = cell.getElement();
             if (element instanceof TVICatalogComparedTour) {
 
-               final long value = ((TVICatalogComparedTour) element).tourRecordingTime;
+               final long value = ((TVICatalogComparedTour) element).tourDeviceTime_Elapsed;
 
                colDef.printLongValue(cell, value, true);
             }
@@ -1416,7 +1416,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     */
    private void updateTourViewer(final ArrayList<TVICompareResultComparedTour> persistedCompareResults) {
 
-      // ref id's which hast new children
+      // ref id's which has new children
       final HashMap<Long, Long> viewRefIds = new HashMap<>();
 
       // get all ref tours which needs to be updated

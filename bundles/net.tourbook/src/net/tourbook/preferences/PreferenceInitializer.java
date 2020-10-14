@@ -106,6 +106,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
@@ -114,6 +116,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
@@ -122,6 +126,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);
@@ -188,6 +194,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE, true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION, ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION);
+
+      //tour pauses
+      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, true);
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,  new RGB(0xff, 0x0, 0x80));
@@ -387,6 +396,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // heap is not displayed by default since version 11.7
       store.setDefault(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, false);
 
+      store.setDefault(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
       store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN, true);
       store.setDefault(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION, true);
       store.setDefault(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, 500);

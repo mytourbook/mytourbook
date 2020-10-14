@@ -38,9 +38,9 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
+import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -119,19 +119,19 @@ public class TourInfoUI {
    /*
     * Actions
     */
-   private ActionCloseTooltip                _actionCloseTooltip;
-   private ActionTourToolTip_EditTour        _actionEditTour;
-   private ActionTourToolTip_EditQuick       _actionEditQuick;
-   private ActionTourToolTip_EditPreferences _actionPrefDialog;
+   private ActionCloseTooltip             _actionCloseTooltip;
+   private ActionTourToolTip_EditTour     _actionEditTour;
+   private ActionTourToolTip_EditQuick    _actionEditQuick;
+   private Action_ToolTip_EditPreferences _actionPrefDialog;
 
-   private boolean                           _isActionsVisible = false;
+   private boolean                        _isActionsVisible = false;
 
    /**
     * Tour which is displayed in the tool tip
     */
-   private TourData                          _tourData;
+   private TourData                       _tourData;
 
-   private String                            _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
+   private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
 
    /*
     * fields which are optionally displayed when they are not null
@@ -160,7 +160,7 @@ public class TourInfoUI {
    private Text              _txtWeather;
 
    private CLabel            _lblClouds;
-   private CLabel            _lblTourType;
+   private CLabel            _lblTourType_Image;
 
    private Label             _lblAltitudeUp;
    private Label             _lblAltitudeUpUnit;
@@ -199,8 +199,12 @@ public class TourInfoUI {
    private Label             _lblMaxSpeedUnit;
    private Label             _lblMovingTime;
    private Label             _lblMovingTimeHour;
-   private Label             _lblRecordingTime;
-   private Label             _lblRecordingTimeHour;
+   private Label             _lblElapsedTime;
+   private Label             _lblElapsedTimeHour;
+   private Label             _lblPausedTime;
+   private Label             _lblPausedTimeHour;
+   private Label             _lblRecordedTime;
+   private Label             _lblRecordedTimeHour;
    private Label             _lblRestPulse;
    private Label             _lblTemperature;
    private Label             _lblTimeZone_Value;
@@ -307,7 +311,7 @@ public class TourInfoUI {
 
 // this do not help to remove flickering, first an empty tooltip window is displayed then also it's content
 //      _ttContainer.setRedraw(false);
- 
+
       updateUI();
       updateUI_Layout();
 
@@ -399,13 +403,13 @@ public class TourInfoUI {
           */
          if (_uiTourTypeName != null) {
 
-            _lblTourType = new CLabel(container, SWT.NONE);
+            _lblTourType_Image = new CLabel(container, SWT.NONE);
             GridDataFactory
                   .swtDefaults()//
                   .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_lblTourType);
-            _lblTourType.setForeground(_fgColor);
-            _lblTourType.setBackground(_bgColor);
+                  .applyTo(_lblTourType_Image);
+            _lblTourType_Image.setForeground(_fgColor);
+            _lblTourType_Image.setBackground(_bgColor);
          }
 
          /*
@@ -454,9 +458,13 @@ public class TourInfoUI {
 
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-         _actionPrefDialog = new ActionTourToolTip_EditPreferences(_tourToolTipProvider,
+
+         final Integer selectedTabFolder = new Integer(0);
+
+         _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
                Messages.Tour_Tooltip_Action_EditFormatPreferences,
-               PrefPageAppearanceDisplayFormat.ID);
+               PrefPageAppearanceDisplayFormat.ID,
+               selectedTabFolder);
 
          tbm.add(_actionEditTour);
          tbm.add(_actionEditQuick);
@@ -497,15 +505,35 @@ public class TourInfoUI {
 
       {
          /*
-          * recording time
+          * elapsed time
           */
-         createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
+         createUI_Label(container, Messages.Tour_Tooltip_Label_ElapsedTime);
 
-         _lblRecordingTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblRecordingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblElapsedTime = createUI_LabelValue(container, SWT.TRAIL);
+         _lblElapsedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
          // force this column to take the rest of the space
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRecordingTimeHour);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblElapsedTimeHour);
+      }
+
+      {
+         /*
+          * recorded time
+          */
+         createUI_Label(container, Messages.Tour_Tooltip_Label_RecordedTime);
+
+         _lblRecordedTime = createUI_LabelValue(container, SWT.TRAIL);
+         _lblRecordedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+      }
+
+      {
+         /*
+          * paused time
+          */
+         createUI_Label(container, Messages.Tour_Tooltip_Label_PausedTime);
+
+         _lblPausedTime = createUI_LabelValue(container, SWT.TRAIL);
+         _lblPausedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
       {
@@ -1258,9 +1286,9 @@ public class TourInfoUI {
 
    private boolean isSimpleTour() {
 
-      final long recordingTime = _tourData.getTourRecordingTime();
+      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
 
-      final boolean isShortTour = recordingTime < UI.DAY_IN_SECONDS;
+      final boolean isShortTour = elapsedTime < UI.DAY_IN_SECONDS;
       final boolean isSingleTour = !_tourData.isMultipleTours();
 
       return isShortTour || isSingleTour;
@@ -1289,9 +1317,9 @@ public class TourInfoUI {
       /*
        * upper/lower part
        */
-      if (_lblTourType != null && _lblTourType.isDisposed() == false) {
-         _lblTourType.setToolTipText(_uiTourTypeName);
-         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, false);
+      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+         _lblTourType_Image.setToolTipText(_uiTourTypeName);
+         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType_Image, false);
       }
 
       String tourTitle = _tourData.getTourTitle();
@@ -1321,12 +1349,14 @@ public class TourInfoUI {
       /*
        * column: left
        */
-      final long recordingTime = _tourData.getTourRecordingTime();
-      final long movingTime = _tourData.getTourDrivingTime();
-      final long breakTime = recordingTime - movingTime;
+      final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
+      final long recordedTime = _tourData.getTourDeviceTime_Recorded();
+      final long pausedTime = _tourData.getTourDeviceTime_Paused();
+      final long movingTime = _tourData.getTourComputedTime_Moving();
+      final long breakTime = elapsedTime - movingTime;
 
       final ZonedDateTime zdtTourStart = _tourData.getTourStartTime();
-      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+      final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
       if (isSimpleTour()) {
 
@@ -1342,12 +1372,16 @@ public class TourInfoUI {
 
                ));
 
-         _lblRecordingTimeHour.setVisible(true);
+         _lblElapsedTimeHour.setVisible(true);
+         _lblRecordedTimeHour.setVisible(true);
+         _lblPausedTimeHour.setVisible(true);
          _lblMovingTimeHour.setVisible(true);
          _lblBreakTimeHour.setVisible(true);
 
-         _lblRecordingTime.setText(FormatManager.formatRecordingTime(recordingTime));
-         _lblMovingTime.setText(FormatManager.formatDrivingTime(movingTime));
+         _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
+         _lblRecordedTime.setText(FormatManager.formatMovingTime(recordedTime));
+         _lblPausedTime.setText(FormatManager.formatPausedTime(pausedTime));
+         _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
          _lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
 
          /*
@@ -1380,20 +1414,27 @@ public class TourInfoUI {
                ));
 
          // hide labels, they are displayed with the period values
-         _lblRecordingTimeHour.setVisible(false);
+         _lblElapsedTimeHour.setVisible(false);
+         _lblRecordedTimeHour.setVisible(false);
+         _lblPausedTimeHour.setVisible(false);
          _lblMovingTimeHour.setVisible(false);
          _lblBreakTimeHour.setVisible(false);
 
-         final Period recordingPeriod = new Period(
+         final Period elapsedPeriod = new Period(
                _tourData.getTourStartTimeMS(),
                _tourData.getTourEndTimeMS(),
                _tourPeriodTemplate);
+         final Period recordedPeriod = new Period(0, recordedTime * 1000, _tourPeriodTemplate);
+         final Period pausedPeriod = new Period(0, pausedTime * 1000, _tourPeriodTemplate);
          final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
          final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
 
-         _lblRecordingTime.setText(recordingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
          _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+
       }
 
       int windSpeed = _tourData.getWeatherWindSpeed();

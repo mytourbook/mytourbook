@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,84 +28,83 @@ import net.tourbook.ui.TourTypeFilter;
  */
 public class StatisticContext {
 
-	/**
-	 * Person which is selected in the application.
-	 */
-	public TourPerson			appPerson;
+   /**
+    * Person which is selected in the application.
+    */
+   public TourPerson     appPerson;
 
-	/**
-	 * Tour type filter which is selected in the application.
-	 */
-	public TourTypeFilter	appTourTypeFilter;
+   /**
+    * Tour type filter which is selected in the application.
+    */
+   public TourTypeFilter appTourTypeFilter;
 
-	/**
-	 * First (youngest) year which is selected in the statistic container and where the statistics
-	 * start.
-	 */
-	public int					statFirstYear;
+   /**
+    * Year which is selected in the statistic container and where the statistics start.
+    */
+   public int            statSelectedYear;
 
-	/**
-	 * Number of years which should be displayed in the statistic
-	 */
-	public int					statNumberOfYears;
+   /**
+    * Number of years which should be displayed in the statistic
+    */
+   public int            statNumberOfYears;
 
-	public boolean				isRefreshData						= false;
+   public boolean        isRefreshData;
 
-	/**
-	 * Contains the state if bar reordering is supported by the statistic or not, default is
-	 * <code>false</code>.
-	 */
-	public boolean				outIsBarReorderingSupported	= false;
+   /**
+    * Contains the state if bar reordering is supported by the statistic or not, default is
+    * <code>false</code>.
+    */
+   public boolean        outIsBarReorderingSupported;
 
-	/**
-	 * Is <code>true</code> when bar names in the statistic UI must be updated with data from
-	 * {@link #outBarNames} and {@link #outVerticalBarIndex}.
-	 */
-	public boolean				outIsUpdateBarNames				= false;
+   /**
+    * Is <code>true</code> when bar names in the statistic UI must be updated with data from
+    * {@link #outBarNames} and {@link #outVerticalBarIndex}.
+    */
+   public boolean        outIsUpdateBarNames;
 
-	/**
-	 * When stacked charts are displayed, the stacked parts can be resorted vertically.
-	 * <p>
-	 * This contains the names of the bars or <code>null</code> when bars are not available.
-	 */
-	public String[]			outBarNames							= null;
+   /**
+    * When stacked charts are displayed, the stacked parts can be resorted vertically.
+    * <p>
+    * This contains the names of the bars or <code>null</code> when bars are not available.
+    */
+   public String[]       outBarNames;
 
-	/**
-	 * Index which bar should be selected in the combo box.
-	 */
-	public int					outVerticalBarIndex;
+   /**
+    * Index which bar should be selected in the combo box.
+    */
+   public int            outVerticalBarIndex;
 
-	public StatisticView		eventManager;
+   /**
+    * @param person
+    *           Active person or <code>null</code> when no person (all people) is selected
+    * @param activeTourTypeFilter
+    *           Tour type filter
+    * @param year
+    *           Year for the statistic, when multiple years are displayed, this is the youngest year
+    * @param numberOfYears
+    *           Number of years which should be displayed in the statistic
+    */
+   public StatisticContext(final TourPerson activePerson,
+                           final TourTypeFilter activeTourTypeFilter,
+                           final int selectedYear,
+                           final int numberOfYears) {
 
-	/**
-	 * @param person
-	 *           Active person or <code>null</code> when no person (all people) is selected
-	 * @param activeTourTypeFilter
-	 *           Tour type filter
-	 * @param year
-	 *           Year for the statistic, when multiple years are displayed, this is the youngest year
-	 * @param numberOfYears
-	 *           Number of years which should be displayed in the statistic
-	 */
-	public StatisticContext(final TourPerson activePerson,
-									final TourTypeFilter activeTourTypeFilter,
-									final int selectedYear,
-									final int numberOfYears) {
+      this.appPerson = activePerson;
+      this.appTourTypeFilter = activeTourTypeFilter;
 
-		this.appPerson = activePerson;
-		this.appTourTypeFilter = activeTourTypeFilter;
+      this.statSelectedYear = selectedYear;
+      this.statNumberOfYears = numberOfYears;
+   }
 
-		this.statFirstYear = selectedYear;
-		this.statNumberOfYears = numberOfYears;
-	};
+   /**
+    * @return Returns <code>true</code> when events can be fired otherwise they cannot be fired
+    *         because the view is already processing events.
+    */
+   public boolean canFireEvents() {
 
-	/**
-	 * @return Returns <code>true</code> when events can be fired otherwise they cannot be fired
-	 *         because the view is already processing events.
-	 */
-	public boolean canFireEvents() {
+      final StatisticView statView = StatisticManager.getStatisticView();
 
-		return eventManager == null || eventManager.canFireEvents();
-	}
+      return statView != null && statView.canFireEvents();
+   }
 
 }

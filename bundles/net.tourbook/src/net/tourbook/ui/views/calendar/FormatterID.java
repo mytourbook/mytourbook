@@ -37,8 +37,10 @@ public enum FormatterID {
    ENERGY_KCAL, //
    ENERGY_MJ, //
 
-   TIME_MOVING, //
-   TIME_RECORDING, //
+   TIME_ELAPSED, //
+   TIME_RECORDED, //
    TIME_PAUSED, //
+   TIME_MOVING, //
+   TIME_BREAK, //
 
 }

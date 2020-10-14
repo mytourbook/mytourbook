@@ -283,7 +283,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                         compareTourItem.dbEndIndex = compareTourProperty.endIndex;
 
                         compareTourItem.dbSpeed = compareTourProperty.speed;
-                        compareTourItem.dbRecordingTime = compareTourProperty.recordingTime;
+                        compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
 
                      } else {
 
@@ -640,7 +640,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       defineColumn_Motion_VerticalSpeed();
       defineColumn_Motion_Distance();
 
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Data_TimeInterval();
 
@@ -752,7 +752,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             final Object element = cell.getElement();
             if (element instanceof TVICompareResultComparedTour) {
 
-               cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+               cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeInterval));
                setCellColor(cell, element);
             }
          }
@@ -929,11 +929,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    }
 
    /**
-    * column: driving time (h)
+    * column: moving time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -944,7 +944,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             final Object element = cell.getElement();
             if (element instanceof TVICompareResultComparedTour) {
 
-               final long value = ((TVICompareResultComparedTour) element).compareDrivingTime;
+               final long value = ((TVICompareResultComparedTour) element).compareMovingTime;
 
                colDef.printLongValue(cell, value, true);
 
@@ -1240,7 +1240,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                   }
                }
             } else {
-               // this is a child which can be the parent for other childs
+               // this is a child which can be the parent for other children
                getComparedTours(comparedTours, treeItem, CompareIds);
             }
          }
@@ -1568,7 +1568,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          removedTourItem.dbStartIndex = -1;
          removedTourItem.dbEndIndex = -1;
          removedTourItem.dbSpeed = 0;
-         removedTourItem.dbRecordingTime = 0;
+         removedTourItem.dbElapsedTime = 0;
 
 //         removedTourItem.movedStartIndex = -1;
 //         removedTourItem.movedEndIndex = -1;

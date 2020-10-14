@@ -45,7 +45,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
-   private Section m_section = Section.SECTION_NONE;;
+   private Section m_section = Section.SECTION_NONE;
 
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
@@ -235,7 +235,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
    /*
     * (non-Javadoc) Parses records containing the tour data slices all in one row For examples of a
-    * row and the meaning of each of the tab seperated fields see the comment on the top of the
+    * row and the meaning of each of the tab separated fields see the comment on the top of the
     * method
     */
    private TimeData parseRecord(final String line, final int delta, final int lastAlti, final int lastDistance) {
@@ -300,7 +300,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          final StringBuffer tourDescription = new StringBuffer();
          final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
-         // time in seconds between time slices 20 seconds as the deafault
+         // time in seconds between time slices 20 seconds as the default
          int deltaTime = 20;
          int lastAlti = 0;
          int lastDistance = 0;
@@ -367,16 +367,17 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   tourData.setDeviceModeName(getDeviceModeName(Integer.parseInt(fields[1])));
                }
                if (fields[0].equals("TimeDriven")) {//"hh:mm:ss.00" //$NON-NLS-1$
-                  int tourDrivingTime = Short.parseShort(fields[1].substring(6, 8));
-                  tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(3, 5)) * 60;
-                  tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(0, 2)) * 3600;
-                  tourData.setTourDrivingTime(tourDrivingTime);
+                  int tourComputedTime_Moving = Short.parseShort(fields[1].substring(6, 8));
+                  tourComputedTime_Moving = tourComputedTime_Moving + Short.parseShort(fields[1].substring(3, 5)) * 60;
+                  tourComputedTime_Moving = tourComputedTime_Moving + Short.parseShort(fields[1].substring(0, 2)) * 3600;
+                  tourData.setTourComputedTime_Moving(tourComputedTime_Moving);
+                  tourData.setTourDeviceTime_Recorded(tourComputedTime_Moving);
                }
                if (fields[0].equals("RecTime")) {//"hh:mm:ss.00" //$NON-NLS-1$
-                  int tourRecordingTime = Short.parseShort(fields[1].substring(6, 8));
-                  tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(3, 5)) * 60;
-                  tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(0, 2)) * 3600;
-                  tourData.setTourRecordingTime(tourRecordingTime);
+                  int tourDeviceTime_Elapsed = Short.parseShort(fields[1].substring(6, 8));
+                  tourDeviceTime_Elapsed = tourDeviceTime_Elapsed + Short.parseShort(fields[1].substring(3, 5)) * 60;
+                  tourDeviceTime_Elapsed = tourDeviceTime_Elapsed + Short.parseShort(fields[1].substring(0, 2)) * 3600;
+                  tourData.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
                }
                if (fields[0].equals("Distance")) { //$NON-NLS-1$
                   tourData.setTourDistance(Integer.parseInt(fields[1]));
@@ -526,7 +527,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                // workaround for a bug within HAC4Linux writing
                // pulse information for that device even though
                // no pulse is recorded.
-               // the data written alsways form a sawtooth graph
+               // the data written always form a sawtooth graph
                // 0-256-0-256....
                if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
                   timeData.pulse = 0;
@@ -560,7 +561,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                timeRelative += Integer.parseInt(fields[2].substring(3, 5)) * 60;
                timeRelative += Integer.parseInt(fields[2].substring(0, 2)) * 3600;
 
-               // set time temporaritly the correct absolute time will be set later
+               // set time temporarily the correct absolute time will be set later
                tourMarker.setTime(timeRelative, Long.MIN_VALUE);
 
                allTourMarker.add(tourMarker);
@@ -615,7 +616,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             // create additional data
             tourData.computeComputedValues();
-            tourData.computeTourDrivingTime();
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+            tourData.computeTourMovingTime();
 
             tourData.completeTourMarkerWithRelativeTime();
          }

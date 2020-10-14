@@ -393,7 +393,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                      container,
                      GRAPH_LABEL_ALTITUDE,
                      UI.UNIT_LABEL_ALTITUDE,
-                     FormatManager.formatAltitude(value));
+                     FormatManager.formatElevation(value));
             }
          }
 
@@ -462,7 +462,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                      container,
                      GRAPH_LABEL_TIME,
                      UI.UNIT_LABEL_TIME,
-                     FormatManager.formatRecordingTime(timeValue));
+                     FormatManager.formatElapsedTime(timeValue));
             }
          }
       }

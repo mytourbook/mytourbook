@@ -22,193 +22,211 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.tourbook.Messages;
+import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
-   private static DataProvider_Tour_Month _instance;
+   private TourStatisticData_Month _tourMonthData;
 
-   private TourData_Month                 _tourMonthData;
-
-   private DataProvider_Tour_Month() {}
-
-   public static DataProvider_Tour_Month getInstance() {
-
-      if (_instance == null) {
-         _instance = new DataProvider_Tour_Month();
-      }
-
-      return _instance;
-   }
-
-   TourData_Month getMonthData(final TourPerson person,
-                               final TourTypeFilter tourTypeFilter,
-                               final int lastYear,
-                               final int numYears,
-                               final boolean refreshData,
-                               final DurationTime durationTime) {
+   TourStatisticData_Month getMonthData(final TourPerson person,
+                                        final TourTypeFilter tourTypeFilter,
+                                        final int lastYear,
+                                        final int numYears,
+                                        final boolean refreshData,
+                                        final DurationTime durationTime) {
 
       /*
        * check if the required data are already loaded
        */
-      if (_activePerson == person
-            && _activeTourTypeFilter == tourTypeFilter
-            && lastYear == _lastYear
-            && numYears == _numberOfYears
+      if (statistic_ActivePerson == person
+            && statistic_ActiveTourTypeFilter == tourTypeFilter
+            && lastYear == statistic_LastYear
+            && numYears == statistic_NumberOfYears
             && refreshData == false) {
 
          return _tourMonthData;
       }
 
-      _activePerson = person;
-      _activeTourTypeFilter = tourTypeFilter;
-      _lastYear = lastYear;
-      _numberOfYears = numYears;
+      // reset cached values
+      statistic_RawStatisticValues = null;
 
-      // get the tour types
-      final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
-      final TourType[] allTourTypes = allTourTypesList.toArray(new TourType[allTourTypesList.size()]);
-
-      _tourMonthData = new TourData_Month();
-
-      String fromTourData;
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
-
-         // with tag filter
-
-         fromTourData = NL
-
-               + "FROM (							" + NL //$NON-NLS-1$
-
-               + " SELECT							" + NL //$NON-NLS-1$
-
-               + "  StartYear,					" + NL //$NON-NLS-1$
-               + "  StartMonth,					" + NL //$NON-NLS-1$
-               + "  TourDistance,				" + NL //$NON-NLS-1$
-               + "  TourAltUp,					" + NL //$NON-NLS-1$
-               + "  TourRecordingTime,			" + NL //$NON-NLS-1$
-               + "  TourDrivingTime,			" + NL //$NON-NLS-1$
-
-               + "  TourType_TypeId 			" + NL //$NON-NLS-1$
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
-
-               // get tag id's
-               + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlFilter.getWhereClause() + NL
-
-               + ") td" //$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         fromTourData = NL
-
-               + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
-
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlFilter.getWhereClause()
-
-         ;
-      }
-
-      String sqlDurationTime = null;
-
-      switch (durationTime) {
-      case BREAK:
-
-         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
-         break;
-
-      case RECORDING:
-
-         sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
-         break;
-
-      case MOVING:
-      default:
-         // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
-         break;
-      }
-
-      final String sqlString = NL +
-
-            "SELECT" + NL //$NON-NLS-1$
-
-            + " StartYear,						" + NL //       1 //$NON-NLS-1$
-            + " StartMonth,					" + NL //       2 //$NON-NLS-1$
-            + " SUM(TourDistance),			" + NL //       3 //$NON-NLS-1$
-            + " SUM(TourAltUp),				" + NL //       4 //$NON-NLS-1$
-            + sqlDurationTime + "         " + NL //       5 //$NON-NLS-1$
-            + " SUM(TourRecordingTime),	" + NL //       6 //$NON-NLS-1$
-            + " SUM(TourDrivingTime),		" + NL //       7 //$NON-NLS-1$
-            + " SUM(1), 						" + NL //       8 //$NON-NLS-1$
-            + " TourType_TypeId 				" + NL //       9 //$NON-NLS-1$
-
-            + fromTourData
-
-            + (" GROUP BY StartYear, StartMonth, tourType_typeId ") + NL//$NON-NLS-1$
-            + (" ORDER BY StartYear, StartMonth") + NL //$NON-NLS-1$
-      ;
-
-      final boolean isShowNoTourTypes = tourTypeFilter.showUndefinedTourTypes();
-
-      int colorOffset = 0;
-      if (isShowNoTourTypes) {
-         colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      int numTourTypes = colorOffset + allTourTypes.length;
-      numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
-
-      final int numMonths = 12 * numYears;
+      String sql = null;
+      int numUsedTourTypes = 0;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final float[][] dbAltitude = new float[numTourTypes][numMonths];
+         statistic_ActivePerson = person;
+         statistic_ActiveTourTypeFilter = tourTypeFilter;
+         statistic_LastYear = lastYear;
+         statistic_NumberOfYears = numYears;
+
+         // get the tour types
+         final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
+         final TourType[] allTourTypes = allTourTypesList.toArray(new TourType[allTourTypesList.size()]);
+
+         _tourMonthData = new TourStatisticData_Month();
+
+         String fromTourData;
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder(true);
+
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+
+            // with tag filter
+
+            fromTourData = NL
+
+                  + "FROM (" + NL //                                                            //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                                         //$NON-NLS-1$
+
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
+                  + "      DISTINCT TourId," + NL //                                            //$NON-NLS-1$
+
+                  + "      StartYear," + NL //                                                  //$NON-NLS-1$
+                  + "      StartMonth," + NL //                                                 //$NON-NLS-1$
+
+                  + "      TourType_TypeId," + NL //                                            //$NON-NLS-1$
+
+                  + "      TourDeviceTime_Elapsed," + NL //                                     //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded," + NL //                                    //$NON-NLS-1$
+                  + "      TourDeviceTime_Paused," + NL //                                      //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
+
+                  + "      TourDistance," + NL //                                               //$NON-NLS-1$
+                  + "      TourAltUp" + NL //                                                   //$NON-NLS-1$
+
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+
+                  // get/filter tag id's
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //     //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
+
+                  + "   WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+                  + "      " + sqlAppFilter.getWhereClause() + NL
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                               //$NON-NLS-1$
+            ;
+
+         } else {
+
+            // without tag filter
+
+            fromTourData = NL
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                             //$NON-NLS-1$
+
+                  + " WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")" + NL //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + sqlAppFilter.getWhereClause()
+
+            ;
+         }
+
+         sql = NL +
+
+               "SELECT" + NL //                                               //$NON-NLS-1$
+
+               + "   StartYear," + NL //                                   1  //$NON-NLS-1$
+               + "   StartMonth," + NL //                                  2  //$NON-NLS-1$
+
+               + "   TourType_TypeId," + NL //                             3  //$NON-NLS-1$
+
+               + "   SUM(TourDeviceTime_Elapsed)," + NL //                 4  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Recorded)," + NL //                5  //$NON-NLS-1$
+               + "   SUM(TourDeviceTime_Paused)," + NL //                  6  //$NON-NLS-1$
+               + "   SUM(TourComputedTime_Moving)," + NL //                7  //$NON-NLS-1$
+               + "   " + createSQL_SumDurationTime(durationTime) + NL //   8  //$NON-NLS-1$
+
+               + "   SUM(TourDistance)," + NL //                           9  //$NON-NLS-1$
+               + "   SUM(TourAltUp)," + NL //                              10 //$NON-NLS-1$
+
+               + "   SUM(1)" + NL //                                       11 //$NON-NLS-1$
+
+               + fromTourData
+
+               + "GROUP BY StartYear, StartMonth, tourType_typeId" + NL //   //$NON-NLS-1$
+               + "ORDER BY StartYear, StartMonth" + NL //                    //$NON-NLS-1$
+         ;
+
+         final boolean isShowUndefinedTourTypes = tourTypeFilter.showUndefinedTourTypes();
+
+         int colorOffset = 0;
+         if (isShowUndefinedTourTypes) {
+            colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+         }
+
+         int numTourTypes = colorOffset + allTourTypes.length;
+         numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
+
+         final int numMonths = 12 * numYears;
+
+         final float[][] dbElevationUp = new float[numTourTypes][numMonths];
          final float[][] dbDistance = new float[numTourTypes][numMonths];
          final float[][] dbNumTours = new float[numTourTypes][numMonths];
 
          final int[][] dbDurationTime = new int[numTourTypes][numMonths];
-         final int[][] dbRecordingTime = new int[numTourTypes][numMonths];
-         final int[][] dbDrivingTime = new int[numTourTypes][numMonths];
+         final int[][] dbElapsedTime = new int[numTourTypes][numMonths];
+         final int[][] dbRecordedTime = new int[numTourTypes][numMonths];
+         final int[][] dbPausedTime = new int[numTourTypes][numMonths];
+         final int[][] dbMovingTime = new int[numTourTypes][numMonths];
          final int[][] dbBreakTime = new int[numTourTypes][numMonths];
 
          final long[][] dbTypeIds = new long[numTourTypes][numMonths];
          final long[] tourTypeSum = new long[numTourTypes];
          final long[] usedTourTypeIds = new long[numTourTypes];
+
+         /*
+          * Initialize tour types, when there are 0 tours for some years/months, a tour
+          * type 0 could be a valid tour type which is the default values for native arrays
+          * -> wrong tour type
+          */
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
+         for (final long[] allTypeIds : dbTypeIds) {
+            Arrays.fill(allTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
+         }
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         sqlFilter.setParameters(statement, 1);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         final ResultSet result = statement.executeQuery();
+         int paramIndex = 1;
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
+
+         final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final int dbValue_Year = result.getInt(1);
-            final int dbValue_Month = result.getInt(2);
-            final int dbValue_Distance = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Altitude = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-            final int dbValue_Duration = result.getInt(5);
-            final int dbValue_RecordingTime = result.getInt(6);
-            final int dbValue_DrivingTime = result.getInt(7);
-            final int dbValue_NumTours = result.getInt(8);
-            final Long dbValue_TourTypeIdObject = (Long) result.getObject(9);
+// SET_FORMATTING_OFF
+
+            final int dbValue_Year                 = result.getInt(1);
+            final int dbValue_Month                = result.getInt(2);
+
+            final Long dbValue_TourTypeIdObject    = (Long) result.getObject(3);
+
+            final int dbValue_ElapsedTime          = result.getInt(4);
+            final int dbValue_RecordedTime         = result.getInt(5);
+            final int dbValue_PausedTime           = result.getInt(6);
+            final int dbValue_MovingTime           = result.getInt(7);
+            final int dbValue_Duration             = result.getInt(8);
+
+            final long dbValue_Distance            = (long) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
+
+            final int dbValue_NumTours             = result.getInt(11);
+
+// SET_FORMATTING_ON
 
             final int yearIndex = numYears - (lastYear - dbValue_Year + 1);
             final int monthIndex = (dbValue_Month - 1) + yearIndex * 12;
@@ -229,27 +247,30 @@ public class DataProvider_Tour_Month extends DataProvider {
                }
             }
 
-            final long noTourTypeId = isShowNoTourTypes
+            final long noTourTypeId = isShowUndefinedTourTypes
                   ? TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
                   : TourType.TOUR_TYPE_IS_NOT_USED;
 
-            final long typeId = dbValue_TourTypeIdObject == null ? noTourTypeId : dbValue_TourTypeIdObject;
+            final long typeId = dbValue_TourTypeIdObject == null
+                  ? noTourTypeId
+                  : dbValue_TourTypeIdObject;
 
             dbTypeIds[colorIndex][monthIndex] = typeId;
+            usedTourTypeIds[colorIndex] = typeId;
 
-            dbAltitude[colorIndex][monthIndex] = dbValue_Altitude;
+            dbElevationUp[colorIndex][monthIndex] = dbValue_ElevationUp;
             dbDistance[colorIndex][monthIndex] = dbValue_Distance;
             dbDurationTime[colorIndex][monthIndex] = dbValue_Duration;
 
-            dbRecordingTime[colorIndex][monthIndex] = dbValue_RecordingTime;
-            dbDrivingTime[colorIndex][monthIndex] = dbValue_DrivingTime;
-            dbBreakTime[colorIndex][monthIndex] = dbValue_RecordingTime - dbValue_DrivingTime;
+            dbElapsedTime[colorIndex][monthIndex] = dbValue_ElapsedTime;
+            dbRecordedTime[colorIndex][monthIndex] = dbValue_RecordedTime;
+            dbPausedTime[colorIndex][monthIndex] = dbValue_PausedTime;
+            dbMovingTime[colorIndex][monthIndex] = dbValue_MovingTime;
+            dbBreakTime[colorIndex][monthIndex] = dbValue_ElapsedTime - dbValue_MovingTime;
 
             dbNumTours[colorIndex][monthIndex] = dbValue_NumTours;
 
-            usedTourTypeIds[colorIndex] = typeId;
-            tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_RecordingTime;
-
+            tourTypeSum[colorIndex] += dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime;
          }
 
          /*
@@ -257,14 +278,16 @@ public class DataProvider_Tour_Month extends DataProvider {
           */
          final ArrayList<Object> typeIdsWithData = new ArrayList<>();
 
-         final ArrayList<Object> altitudeWithData = new ArrayList<>();
-         final ArrayList<Object> distanceWithData = new ArrayList<>();
-         final ArrayList<Object> durationWithData = new ArrayList<>();
-         final ArrayList<Object> numToursWithData = new ArrayList<>();
+         final ArrayList<Object> elevationUp_WithData = new ArrayList<>();
+         final ArrayList<Object> distance_WithData = new ArrayList<>();
+         final ArrayList<Object> duration_WithData = new ArrayList<>();
+         final ArrayList<Object> numTours_WithData = new ArrayList<>();
 
-         final ArrayList<Object> recordingTimeWithData = new ArrayList<>();
-         final ArrayList<Object> drivingTimeWithData = new ArrayList<>();
-         final ArrayList<Object> breakTimeWithData = new ArrayList<>();
+         final ArrayList<Object> elapsedTime_WithData = new ArrayList<>();
+         final ArrayList<Object> recordedTime_WithData = new ArrayList<>();
+         final ArrayList<Object> pausedTime_WithData = new ArrayList<>();
+         final ArrayList<Object> movingTime_WithData = new ArrayList<>();
+         final ArrayList<Object> breakTime_WithData = new ArrayList<>();
 
          for (int tourTypeIndex = 0; tourTypeIndex < tourTypeSum.length; tourTypeIndex++) {
 
@@ -274,99 +297,294 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                typeIdsWithData.add(dbTypeIds[tourTypeIndex]);
 
-               altitudeWithData.add(dbAltitude[tourTypeIndex]);
-               distanceWithData.add(dbDistance[tourTypeIndex]);
-               durationWithData.add(dbDurationTime[tourTypeIndex]);
-               numToursWithData.add(dbNumTours[tourTypeIndex]);
+               elevationUp_WithData.add(dbElevationUp[tourTypeIndex]);
+               distance_WithData.add(dbDistance[tourTypeIndex]);
+               duration_WithData.add(dbDurationTime[tourTypeIndex]);
+               numTours_WithData.add(dbNumTours[tourTypeIndex]);
 
-               recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
-               drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
-               breakTimeWithData.add(dbBreakTime[tourTypeIndex]);
+               elapsedTime_WithData.add(dbElapsedTime[tourTypeIndex]);
+               recordedTime_WithData.add(dbRecordedTime[tourTypeIndex]);
+               pausedTime_WithData.add(dbPausedTime[tourTypeIndex]);
+               movingTime_WithData.add(dbMovingTime[tourTypeIndex]);
+               breakTime_WithData.add(dbBreakTime[tourTypeIndex]);
             }
          }
 
          /*
           * Create statistic data
           */
-         final int numUsedTourTypes = typeIdsWithData.size();
+         numUsedTourTypes = typeIdsWithData.size();
 
          if (numUsedTourTypes == 0) {
 
-            // there are NO data, create dummy data that the UI do not fail
+            // there are NO data -> create dummy data that the UI do not fail
 
             _tourMonthData.typeIds = new long[1][1];
             _tourMonthData.usedTourTypeIds = new long[] { TourType.TOUR_TYPE_IS_NOT_USED };
 
-            _tourMonthData.altitudeLow = new float[1][numMonths];
-            _tourMonthData.altitudeHigh = new float[1][numMonths];
+            _tourMonthData.elevationUp_Low = new float[1][numMonths];
+            _tourMonthData.elevationUp_High = new float[1][numMonths];
 
-            _tourMonthData.distanceLow = new float[1][numMonths];
-            _tourMonthData.distanceHigh = new float[1][numMonths];
+            _tourMonthData.distance_Low = new float[1][numMonths];
+            _tourMonthData.distance_High = new float[1][numMonths];
 
             _tourMonthData.setDurationTimeLow(new int[1][numMonths]);
             _tourMonthData.setDurationTimeHigh(new int[1][numMonths]);
 
-            _tourMonthData.recordingTime = new int[1][numMonths];
-            _tourMonthData.drivingTime = new int[1][numMonths];
+            _tourMonthData.elapsedTime = new int[1][numMonths];
+            _tourMonthData.recordedTime = new int[1][numMonths];
+            _tourMonthData.pausedTime = new int[1][numMonths];
+            _tourMonthData.movingTime = new int[1][numMonths];
             _tourMonthData.breakTime = new int[1][numMonths];
 
-            _tourMonthData.numToursLow = new float[1][numMonths];
-            _tourMonthData.numToursHigh = new float[1][numMonths];
+            _tourMonthData.numTours_Low = new float[1][numMonths];
+            _tourMonthData.numTours_High = new float[1][numMonths];
 
          } else {
 
             final long[][] usedTypeIds = new long[numUsedTourTypes][];
 
-            final float[][] usedAltitude = new float[numUsedTourTypes][];
+            final float[][] usedElevationUp = new float[numUsedTourTypes][];
             final float[][] usedDistance = new float[numUsedTourTypes][];
 
             final float[][] usedNumTours = new float[numUsedTourTypes][];
 
             final int[][] usedDuration = new int[numUsedTourTypes][];
-            final int[][] usedRecordingTime = new int[numUsedTourTypes][];
-            final int[][] usedDrivingTime = new int[numUsedTourTypes][];
+            final int[][] usedElapsedTime = new int[numUsedTourTypes][];
+            final int[][] usedRecordedTime = new int[numUsedTourTypes][];
+            final int[][] usedPausedTime = new int[numUsedTourTypes][];
+            final int[][] usedMovingTime = new int[numUsedTourTypes][];
             final int[][] usedBreakTime = new int[numUsedTourTypes][];
 
             for (int index = 0; index < numUsedTourTypes; index++) {
 
                usedTypeIds[index] = (long[]) typeIdsWithData.get(index);
 
-               usedAltitude[index] = (float[]) altitudeWithData.get(index);
-               usedDistance[index] = (float[]) distanceWithData.get(index);
+               usedElevationUp[index] = (float[]) elevationUp_WithData.get(index);
+               usedDistance[index] = (float[]) distance_WithData.get(index);
 
-               usedDuration[index] = (int[]) durationWithData.get(index);
-               usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
-               usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
-               usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
+               usedDuration[index] = (int[]) duration_WithData.get(index);
+               usedElapsedTime[index] = (int[]) elapsedTime_WithData.get(index);
+               usedRecordedTime[index] = (int[]) recordedTime_WithData.get(index);
+               usedPausedTime[index] = (int[]) pausedTime_WithData.get(index);
+               usedMovingTime[index] = (int[]) movingTime_WithData.get(index);
+               usedBreakTime[index] = (int[]) breakTime_WithData.get(index);
 
-               usedNumTours[index] = (float[]) numToursWithData.get(index);
+               usedNumTours[index] = (float[]) numTours_WithData.get(index);
             }
 
             _tourMonthData.typeIds = usedTypeIds;
             _tourMonthData.usedTourTypeIds = usedTourTypeIds;
 
-            _tourMonthData.altitudeLow = new float[numUsedTourTypes][numMonths];
-            _tourMonthData.altitudeHigh = usedAltitude;
+            _tourMonthData.elevationUp_Low = new float[numUsedTourTypes][numMonths];
+            _tourMonthData.elevationUp_High = usedElevationUp;
 
-            _tourMonthData.distanceLow = new float[numUsedTourTypes][numMonths];
-            _tourMonthData.distanceHigh = usedDistance;
+            _tourMonthData.distance_Low = new float[numUsedTourTypes][numMonths];
+            _tourMonthData.distance_High = usedDistance;
 
             _tourMonthData.setDurationTimeLow(new int[numUsedTourTypes][numMonths]);
             _tourMonthData.setDurationTimeHigh(usedDuration);
 
-            _tourMonthData.recordingTime = usedRecordingTime;
-            _tourMonthData.drivingTime = usedDrivingTime;
+            _tourMonthData.elapsedTime = usedElapsedTime;
+            _tourMonthData.recordedTime = usedRecordedTime;
+            _tourMonthData.pausedTime = usedPausedTime;
+            _tourMonthData.movingTime = usedMovingTime;
             _tourMonthData.breakTime = usedBreakTime;
 
-            _tourMonthData.numToursLow = new float[numUsedTourTypes][numMonths];
-            _tourMonthData.numToursHigh = usedNumTours;
+            _tourMonthData.numTours_Low = new float[numUsedTourTypes][numMonths];
+            _tourMonthData.numTours_High = usedNumTours;
          }
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         SQL.showException(e, sql);
       }
 
+      _tourMonthData.numUsedTourTypes = numUsedTourTypes;
+
       return _tourMonthData;
+   }
+
+   String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+
+      if (_tourMonthData == null) {
+         return null;
+      }
+
+      if (statistic_RawStatisticValues != null && isShowSequenceNumbers == statistic_isShowSequenceNumbers) {
+         return statistic_RawStatisticValues;
+      }
+
+      if (_tourMonthData.numUsedTourTypes == 0) {
+
+         // there are no real data -> show info
+
+         return Messages.Tour_StatisticValues_Label_NoData;
+      }
+
+      final String headerLine1 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD1_DATE_YEAR
+            + HEAD1_DATE_MONTH
+
+            + HEAD1_TOUR_TYPE
+
+            + HEAD1_DEVICE_TIME_ELAPSED
+            + HEAD1_DEVICE_TIME_RECORDED
+            + HEAD1_DEVICE_TIME_PAUSED
+
+            + HEAD1_COMPUTED_TIME_MOVING
+            + HEAD1_COMPUTED_TIME_BREAK
+
+            + HEAD1_ELEVATION
+            + HEAD1_DISTANCE
+
+            + HEAD1_NUMBER_OF_TOURS
+
+      ;
+
+      final String headerLine2 = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+
+            + HEAD2_DATE_YEAR
+            + HEAD2_DATE_MONTH
+
+            + HEAD2_TOUR_TYPE
+
+            + HEAD2_DEVICE_TIME_ELAPSED
+            + HEAD2_DEVICE_TIME_RECORDED
+            + HEAD2_DEVICE_TIME_PAUSED
+
+            + HEAD2_COMPUTED_TIME_MOVING
+            + HEAD2_COMPUTED_TIME_BREAK
+
+            + HEAD2_ELEVATION
+            + HEAD2_DISTANCE
+
+            + HEAD2_NUMBER_OF_TOURS
+
+      ;
+
+      final String valueFormatting = UI.EMPTY_STRING
+
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+
+            + VALUE_DATE_YEAR
+            + VALUE_DATE_MONTH
+
+            + VALUE_TOUR_TYPE
+
+            + VALUE_DEVICE_TIME_ELAPSED
+            + VALUE_DEVICE_TIME_RECORDED
+            + VALUE_DEVICE_TIME_PAUSED
+
+            + VALUE_COMPUTED_TIME_MOVING
+            + VALUE_COMPUTED_TIME_BREAK
+
+            + VALUE_ELEVATION
+            + VALUE_DISTANCE
+
+            + VALUE_NUMBER_OF_TOURS
+
+      ;
+
+      final StringBuilder sb = new StringBuilder();
+      sb.append(headerLine1 + NL);
+      sb.append(headerLine2 + NL);
+
+      final float[][] numTours = _tourMonthData.numTours_High;
+      final int numMonths = numTours[0].length;
+      final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
+
+      final long[][] allTourTypeIds = _tourMonthData.typeIds;
+      final long[] allUsedTourTypeIds = _tourMonthData.usedTourTypeIds;
+
+      int sequenceNumber = 0;
+
+      // loop: all months + years
+      for (int monthIndex = 0; monthIndex < numMonths; monthIndex++) {
+
+         final int yearIndex = monthIndex / 12;
+         final int year = firstYear + yearIndex;
+
+         final int month = (monthIndex % 12) + 1;
+
+         boolean isMonthData = false;
+
+         // loop: all tour types
+         for (int tourTypeIndex = 0; tourTypeIndex < numTours.length; tourTypeIndex++) {
+
+            final long tourTypeId = allTourTypeIds[tourTypeIndex][monthIndex];
+
+            /*
+             * Check if this type is used
+             */
+            String tourTypeName = UI.EMPTY_STRING;
+
+            boolean isDataForTourType = false;
+
+            for (final long usedTourTypeIdValue : allUsedTourTypeIds) {
+               if (usedTourTypeIdValue == tourTypeId) {
+
+                  isDataForTourType = usedTourTypeIdValue != TourType.TOUR_TYPE_IS_NOT_USED;
+
+                  tourTypeName = isDataForTourType
+                        ? TourDatabase.getTourTypeName(tourTypeId)
+                        : UI.EMPTY_STRING;
+
+                  break;
+               }
+            }
+
+            if (isDataForTourType) {
+
+               isMonthData = true;
+
+               Object sequenceNumberValue = UI.EMPTY_STRING;
+               if (isShowSequenceNumbers) {
+                  sequenceNumberValue = ++sequenceNumber;
+               }
+
+               sb.append(String.format(valueFormatting,
+
+                     sequenceNumberValue,
+
+                     year,
+                     month,
+
+                     tourTypeName,
+
+                     _tourMonthData.elapsedTime[tourTypeIndex][monthIndex],
+                     _tourMonthData.recordedTime[tourTypeIndex][monthIndex],
+                     _tourMonthData.pausedTime[tourTypeIndex][monthIndex],
+
+                     _tourMonthData.movingTime[tourTypeIndex][monthIndex],
+                     _tourMonthData.breakTime[tourTypeIndex][monthIndex],
+
+                     _tourMonthData.elevationUp_High[tourTypeIndex][monthIndex],
+                     _tourMonthData.distance_High[tourTypeIndex][monthIndex],
+
+                     _tourMonthData.numTours_High[tourTypeIndex][monthIndex]
+
+               ));
+
+               sb.append(NL);
+            }
+         }
+
+         // group values
+         if (isMonthData) {
+            sb.append(NL);
+         }
+      }
+
+      // cache values
+      statistic_RawStatisticValues = sb.toString();
+      statistic_isShowSequenceNumbers = isShowSequenceNumbers;
+
+      return statistic_RawStatisticValues;
    }
 
 }

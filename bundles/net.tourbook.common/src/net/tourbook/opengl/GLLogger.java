@@ -33,7 +33,7 @@ public class GLLogger {
 
    static {
       _logFormat.applyPattern("#.######"); //$NON-NLS-1$
-      _logFormat.setPositivePrefix(" "); //$NON-NLS-1$
+      _logFormat.setPositivePrefix(UI.SPACE1);
    }
 
    @SuppressWarnings("unused")

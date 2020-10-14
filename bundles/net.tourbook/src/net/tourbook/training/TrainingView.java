@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -826,7 +826,7 @@ public class TrainingView extends ViewPart {
       }
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      
+
       // an NPE occured when the part could not be created
       if (_partListener != null) {
          getViewSite().getPage().removePartListener(_partListener);
@@ -1399,7 +1399,7 @@ public class TrainingView extends ViewPart {
 
       final int personZoneSize = _personHrZones.size();
       final int[] tourHrZoneTimes = _tourData.getHrZones();
-      final long drivingTime = _tourData.getTourDrivingTime();
+      final long movingTime = _tourData.getTourComputedTime_Moving();
 
       _tourHrZonePercent = new double[personZoneSize];
 
@@ -1417,9 +1417,9 @@ public class TrainingView extends ViewPart {
          }
 
          final double zoneTime = tourHrZoneTimes[tourZoneIndex];
-         final double zoneTimePercent = drivingTime == 0 //
+         final double zoneTimePercent = movingTime == 0 //
                ? 0
-               : zoneTime * 100.0 / drivingTime;
+               : zoneTime * 100.0 / movingTime;
 
          if (zoneTime == -1) {
             // this zone and following zones are not available

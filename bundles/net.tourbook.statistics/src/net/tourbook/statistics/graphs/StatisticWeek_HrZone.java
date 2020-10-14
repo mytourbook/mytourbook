@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,6 +50,9 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private static final String      STATE_HR_ZONE_WEEK_BAR_ORDERING_START = "STATE_HR_ZONE_WEEK_BAR_ORDERING_START"; //$NON-NLS-1$
 
+   private TourStatisticData_WeekHrZones     _tourWeekData;
+   private DataProvider_HrZone_Week _tourWeek_DataProvider                = new DataProvider_HrZone_Week();
+
    private TourPerson               _appPerson;
    private TourTypeFilter           _appTourTypeFilter;
    private int                      _statYoungestYear;
@@ -61,8 +64,6 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private final MinMaxKeeper_YData _minMaxKeeper                         = new MinMaxKeeper_YData();
    private boolean                  _isSynchScaleEnabled;
-
-   private TourData_WeekHrZones     _tourWeekData;
 
    private int                      _barOrderStart;
 
@@ -220,6 +221,11 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
    @Override
    protected String getGridPrefPrefix() {
       return GRID_WEEK_HR_ZONE;
+   }
+
+   @Override
+   public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
+      return _tourWeek_DataProvider.getRawStatisticValues(isShowSequenceNumbers);
    }
 
    @Override
@@ -432,16 +438,15 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statYoungestYear = statContext.statFirstYear;
+      _statYoungestYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
-      _tourWeekData = DataProvider_HrZone_Week.getInstance()
-            .getWeekData(
-                  _appPerson,
-                  _appTourTypeFilter,
-                  _statYoungestYear,
-                  _statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData);
+      _tourWeekData = _tourWeek_DataProvider.getWeekData(
+            _appPerson,
+            _appTourTypeFilter,
+            _statYoungestYear,
+            _statNumberOfYears,
+            isDataDirtyWithReset() || statContext.isRefreshData);
 
       setupBars_10_HrZoneOrder(isNewPerson);
       setupBars_20_BarNames(statContext);

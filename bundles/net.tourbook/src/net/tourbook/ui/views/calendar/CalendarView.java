@@ -322,7 +322,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       }
 
       /*
-       * Today
+       * Go to today
        */
       {
          _actionGotoToday = new Action() {
@@ -332,7 +332,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
+         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Today));
       }
    }
 
@@ -350,7 +350,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       createUI(parent);
 
       createActions();
-      fillActions();
+      fillActionBars();
 
       addSelectionListener();
 
@@ -444,7 +444,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       super.dispose();
    }
 
-   private void fillActions() {
+   private void fillActionBars() {
 
       final IActionBars bars = getViewSite().getActionBars();
 
@@ -458,6 +458,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       toolbarMrg.add(yearMonthItem);
 
+      toolbarMrg.add(_actionGotoToday);
       toolbarMrg.add(_actionSetLinked);
       toolbarMrg.add(_actionTourInfo);
       toolbarMrg.add(_actionCalendarOptions);

@@ -34,10 +34,6 @@ _This document will not repeat already written text in the documentation._
 
 -DlogFitData
 
-**Log statistic values**
-
--DlogStatisticValues
-
 ### Other
 
 **Scramble content/values**

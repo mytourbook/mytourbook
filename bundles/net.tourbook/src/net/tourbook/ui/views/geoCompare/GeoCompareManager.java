@@ -15,14 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
@@ -235,10 +234,10 @@ public class GeoCompareManager {
 
          comparerItem.avgAltimeter = tourData.computeAvg_FromValues(tourData.getAltimeterSerie(), origStartIndex, origEndIndex);
 
-         final int recordingTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
-         final int drivingTime = Math.max(0, recordingTime - tourData.getBreakTime(origStartIndex, origEndIndex));
-         comparerItem.recordingTime = recordingTime;
-         comparerItem.movingTime = drivingTime;
+         final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
+         final int movingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));
+         comparerItem.elapsedTime = elapsedTime;
+         comparerItem.movingTime = movingTime;
          comparerItem.distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
       }
 
