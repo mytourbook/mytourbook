@@ -767,11 +767,11 @@ public class Chart extends ViewForm {
 
       final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
 
-		return new SelectionChartXSliderPosition(//
-				this,
-				chartGraph.getLeftSlider().getValuesIndex(),
+      return new SelectionChartXSliderPosition(//
+            this,
+            chartGraph.getLeftSlider().getValuesIndex(),
             chartGraph.getRightSlider().getValuesIndex());
-	}
+   }
 
    public long getXXDevViewPortLeftBorder() {
       return _chartComponents.getChartComponentGraph().getXXDevViewPortLeftBorder();
