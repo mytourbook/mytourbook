@@ -85,7 +85,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private long                        _selectedTourId                    = -1;
 
-   private int                         _statFirstYear;
+   private int                         _statSelectedYear;
    private int                         _statNumberOfYears;
 
    private Chart                       _chart;
@@ -153,7 +153,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int[] allYearDays = tourTimeData.allYearDays;
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
+      final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
       int yearDaysSum = 0;
 
       // create segments for each year
@@ -672,7 +672,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    @Override
    public void preferencesHasChanged() {
 
-      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _statFirstYear, _statNumberOfYears));
+      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _statSelectedYear, _statNumberOfYears));
    }
 
    void resetMinMaxKeeper() {
@@ -783,7 +783,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       _activePerson = statContext.appPerson;
       _activeTourTypeFilter = statContext.appTourTypeFilter;
-      _statFirstYear = statContext.statFirstYear;
+      _statSelectedYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       /*
@@ -813,7 +813,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       _statisticData_Day = _tourDay_DataProvider.getDayData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
-            statContext.statFirstYear,
+            statContext.statSelectedYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
             durationTime);
@@ -830,7 +830,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       /*
        * set graph minimum width, this is the number of days in the year
        */
-      final int yearDays = TimeTools.getNumberOfDaysWithYear(_statFirstYear);
+      final int yearDays = TimeTools.getNumberOfDaysWithYear(_statSelectedYear);
       chartModel.setChartMinWidth(yearDays);
 
       setChartProviders(_chart, chartModel);
