@@ -328,7 +328,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
          toolTip_SubTitle = String.format(SUB_TITLE_2_LINES, weekBeginDate, weekEndDate);
       }
 
-      new StatisticTooltipUI_Summary().createContentArea(
+      new StatisticTooltipUI_CategorizedData().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Week,
@@ -523,7 +523,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statFirstYear = statContext.statFirstYear;
+      _statFirstYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _statisticData_Week = _tourWeek_DataProvider.getWeekData(

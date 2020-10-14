@@ -69,7 +69,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
    private TourPerson               _appPerson;
    private TourTypeFilter           _appTourTypeFilter;
 
-   private int                      _statFirstYear;
+   private int                      _statSelectedYear;
    private int                      _statNumberOfYears;
 
    private Chart                    _chart;
@@ -98,7 +98,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
       final double segmentEnd[] = new double[_statNumberOfYears];
       final String[] segmentTitle = new String[_statNumberOfYears];
 
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
+      final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
 
       // get start/end and title for each segment
       for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -153,7 +153,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
+      final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
 
       final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
 
@@ -251,15 +251,15 @@ public abstract class StatisticMonth extends TourbookStatistic {
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int hoveredBar_SerieIndex,
-                                final int hoveredBar_ValueIndex) {
+                                final int serieIndex,
+                                final int valueIndex) {
 
       /*
        * Create tooltip title
        */
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
+      final int firstYear = _statSelectedYear - _statNumberOfYears + 1;
 
-      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(hoveredBar_ValueIndex);
+      final LocalDate monthDate = LocalDate.of(firstYear, 1, 1).plusMonths(valueIndex);
       final String monthText = Month
             .of(monthDate.getMonthValue())
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
@@ -270,12 +270,12 @@ public abstract class StatisticMonth extends TourbookStatistic {
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
 
-      new StatisticTooltipUI_Summary().createContentArea(
+      new StatisticTooltipUI_CategorizedData().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Month,
-            hoveredBar_SerieIndex,
-            hoveredBar_ValueIndex,
+            serieIndex,
+            valueIndex,
             toolTip_Title,
             null,
             totalColumnHeaderTitel,
@@ -483,7 +483,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private void updateStatistic() {
 
-      updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statFirstYear, _statNumberOfYears));
+      updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statSelectedYear, _statNumberOfYears));
    }
 
    @Override
@@ -502,13 +502,13 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statFirstYear = statContext.statFirstYear;
+      _statSelectedYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _statisticData_Month = _statisticMonth_DataProvider.getMonthData(
             _appPerson,
             _appTourTypeFilter,
-            _statFirstYear,
+            _statSelectedYear,
             _statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
             durationTime);
