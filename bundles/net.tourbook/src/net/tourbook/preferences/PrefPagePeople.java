@@ -1850,7 +1850,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private void initializeTrainingStressModels() {
 
       _trainingStressModels = new PrefPageTrainingStressModel[1];
-      //_prefPageBikeScore = new PrefPageBikeScore();
+      //TODO FB_prefPageBikeScore = new PrefPageBikeScore();
       _prefPageGovss = new PrefPageGovss();
       _prefPageGovss.setPersonModifiedListener(new IPersonModifiedListener() {
 

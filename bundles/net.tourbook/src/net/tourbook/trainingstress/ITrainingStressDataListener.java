@@ -17,9 +17,8 @@ package net.tourbook.trainingstress;
 
 public interface ITrainingStressDataListener {
 
-	/**
+   /**
     * Method is called when a training stress data is modified
-    *
     */
    abstract void trainingStressDataIsModified();
 
