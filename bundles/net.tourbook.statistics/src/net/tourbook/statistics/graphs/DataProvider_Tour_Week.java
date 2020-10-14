@@ -41,7 +41,7 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Week extends DataProvider {
 
-   private TourData_Week _tourWeekData;
+   private TourStatisticData_Week _tourWeekData;
 
    String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
@@ -53,7 +53,7 @@ public class DataProvider_Tour_Week extends DataProvider {
          return statistic_RawStatisticValues;
       }
 
-      if (_tourWeekData.numToursHigh.length == 0) {
+      if (_tourWeekData.numTours_High.length == 0) {
 
          // there are no real data -> show info
 
@@ -137,7 +137,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-      final float[][] allNumTours = _tourWeekData.numToursHigh;
+      final float[][] allNumTours = _tourWeekData.numTours_High;
       final int numAllWeeks = allNumTours[0].length;
       final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
       int prevYear = firstYear;
@@ -223,7 +223,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                }
             }
 
-            final float numTours = _tourWeekData.numToursHigh[tourTypeIndex][weekIndex];
+            final float numTours = _tourWeekData.numTours_High[tourTypeIndex][weekIndex];
 
             if (isDataForTourType && numTours > 0) {
 
@@ -261,7 +261,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                      _tourWeekData.breakTime[tourTypeIndex][weekIndex],
 
                      _tourWeekData.elevationUp_High[tourTypeIndex][weekIndex],
-                     _tourWeekData.distanceHigh[tourTypeIndex][weekIndex],
+                     _tourWeekData.distance_High[tourTypeIndex][weekIndex],
 
                      numTours
 
@@ -279,7 +279,7 @@ public class DataProvider_Tour_Week extends DataProvider {
       return statistic_RawStatisticValues;
    }
 
-   TourData_Week getWeekData(final TourPerson person,
+   TourStatisticData_Week getWeekData(final TourPerson person,
                              final TourTypeFilter tourTypeFilter,
                              final int lastYear,
                              final int numberOfYears,
@@ -311,7 +311,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
          setupYearNumbers();
 
-         _tourWeekData = new TourData_Week();
+         _tourWeekData = new TourStatisticData_Week();
 
          // get the tour types
          final ArrayList<TourType> allActiveTourTypesList = TourDatabase.getActiveTourTypes();
@@ -551,14 +551,14 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.setDurationTimeLow(new int[numTourTypes][numAllWeeks]);
          _tourWeekData.setDurationTimeHigh(allDbDurationTime);
 
-         _tourWeekData.distanceLow = new float[numTourTypes][numAllWeeks];
-         _tourWeekData.distanceHigh = allDbDistance;
+         _tourWeekData.distance_Low = new float[numTourTypes][numAllWeeks];
+         _tourWeekData.distance_High = allDbDistance;
 
          _tourWeekData.elevationUp_Low = new float[numTourTypes][numAllWeeks];
          _tourWeekData.elevationUp_High = allDbElevation;
 
-         _tourWeekData.numToursLow = new float[numTourTypes][numAllWeeks];
-         _tourWeekData.numToursHigh = allDbNumTours;
+         _tourWeekData.numTours_Low = new float[numTourTypes][numAllWeeks];
+         _tourWeekData.numTours_High = allDbNumTours;
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);

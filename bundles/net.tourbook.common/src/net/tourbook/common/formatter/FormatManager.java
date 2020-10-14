@@ -38,9 +38,9 @@ public class FormatManager {
    private static IValueFormatter        _valueFormatter_Time_HHMMSS = new ValueFormatter_Time_HHMMSS();
    private static IValueFormatter        _valueFormatter_Time_SSS    = new ValueFormatter_Time_SSS();
 
-   private static IValueFormatter        _altitudeFormatter;
    private static IValueFormatter        _cadenceFormatter;
    private static IValueFormatter        _distanceFormatter;
+   private static IValueFormatter        _elevationFormatter;
    private static IValueFormatter        _powerFormatter;
    private static IValueFormatter        _pulseFormatter;
    private static IValueFormatter        _speedFormatter;
@@ -51,28 +51,65 @@ public class FormatManager {
    private static IValueFormatter        _movingTimeFormatter;
    private static IValueFormatter        _breakTimeFormatter;
 
-   public static String formatAltitude(final float value) {
-      return _altitudeFormatter.printDouble(value);
-   }
+   private static IValueFormatter        _cadenceFormatter_Summary;
+   private static IValueFormatter        _distanceFormatter_Summary;
+   private static IValueFormatter        _elevationFormatter_Summary;
+   private static IValueFormatter        _powerFormatter_Summary;
+   private static IValueFormatter        _pulseFormatter_Summary;
+   private static IValueFormatter        _speedFormatter_Summary;
+
+   private static IValueFormatter        _elapsedTimeFormatter_Summary;
+   private static IValueFormatter        _recordedTimeFormatter_Summary;
+   private static IValueFormatter        _pausedTimeFormatter_Summary;
+   private static IValueFormatter        _movingTimeFormatter_Summary;
+   private static IValueFormatter        _breakTimeFormatter_Summary;
 
    public static String formatBreakTime(final long value) {
       return _breakTimeFormatter.printLong(value);
+   }
+
+   public static String formatBreakTime_Summary(final long value) {
+      return _breakTimeFormatter_Summary.printLong(value);
    }
 
    public static String formatCadence(final double value) {
       return _cadenceFormatter.printDouble(value);
    }
 
+   public static String formatCadence_Summary(final double value) {
+      return _cadenceFormatter_Summary.printDouble(value);
+   }
+
    public static String formatDistance(final double value) {
       return _distanceFormatter.printDouble(value);
+   }
+
+   public static String formatDistance_Summary(final double value) {
+      return _distanceFormatter_Summary.printDouble(value);
    }
 
    public static String formatElapsedTime(final long value) {
       return _elapsedTimeFormatter.printLong(value);
    }
 
+   public static String formatElapsedTime_Summary(final long value) {
+      return _elapsedTimeFormatter_Summary.printLong(value);
+   }
+
+   public static String formatElevation(final float value) {
+      return _elevationFormatter.printDouble(value);
+   }
+
+   public static String formatElevation_Summary(final float value) {
+      return _elevationFormatter_Summary.printDouble(value);
+   }
+
    public static String formatMovingTime(final long value) {
       return _movingTimeFormatter.printLong(value);
+   }
+
+   public static String formatMovingTime_Summary(final long value) {
+      return _movingTimeFormatter_Summary.printLong(value);
    }
 
    public static String formatNumber_0(final double value) {
@@ -92,20 +129,44 @@ public class FormatManager {
       return _pausedTimeFormatter.printLong(value);
    }
 
+   /**
+    * @param value
+    * @return Format a number with 0 digits but with thousender markers.
+    */
+   public static String formatPausedTime_Summary(final long value) {
+      return _pausedTimeFormatter_Summary.printLong(value);
+   }
+
    public static String formatPower(final double value) {
       return _powerFormatter.printDouble(value);
+   }
+
+   public static String formatPower_Summary(final double value) {
+      return _powerFormatter_Summary.printDouble(value);
    }
 
    public static String formatPulse(final double value) {
       return _pulseFormatter.printDouble(value);
    }
 
+   public static String formatPulse_Summary(final double value) {
+      return _pulseFormatter_Summary.printDouble(value);
+   }
+
    public static String formatRecordedTime(final long value) {
       return _recordedTimeFormatter.printLong(value);
    }
 
+   public static String formatRecordedTime_Summary(final long value) {
+      return _recordedTimeFormatter_Summary.printLong(value);
+   }
+
    public static String formatSpeed(final double value) {
       return _speedFormatter.printDouble(value);
+   }
+
+   public static String formatSpeed_Summary(final double value) {
+      return _speedFormatter_Summary.printDouble(value);
    }
 
    private static IValueFormatter getNumberFormatter(final String formatName) {
@@ -198,30 +259,60 @@ public class FormatManager {
 
    public static void updateDisplayFormats() {
 
-      final String altitude = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
-      final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
-      final String distance = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
-      final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
-      final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
-      final String speed = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
+// SET_FORMATTING_OFF
 
-      final String elapsedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
-      final String recordedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
-      final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
-      final String movingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
-      final String breakTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
+      final String cadence                = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
+      final String distance               = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
+      final String elevation              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
+      final String power                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
+      final String pulse                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+      final String speed                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
 
-      _altitudeFormatter = getNumberFormatter(altitude);
-      _cadenceFormatter = getNumberFormatter(cadence);
-      _distanceFormatter = getNumberFormatter(distance);
-      _powerFormatter = getNumberFormatter(power);
-      _pulseFormatter = getNumberFormatter(pulse);
-      _speedFormatter = getNumberFormatter(speed);
+      final String elapsedTime            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
+      final String recordedTime           = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
+      final String pausedTime             = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+      final String movingTime             = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME);
+      final String breakTime              = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME);
 
-      _elapsedTimeFormatter = getTimeFormatter(elapsedTime);
-      _recordedTimeFormatter = getTimeFormatter(recordedTime);
-      _pausedTimeFormatter = getTimeFormatter(pausedTime);
-      _movingTimeFormatter = getTimeFormatter(movingTime);
-      _breakTimeFormatter = getTimeFormatter(breakTime);
+      final String cadence_Summary        = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE_SUMMARY);
+      final String distance_Summary       = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE_SUMMARY);
+      final String elevation_Summary      = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY);
+      final String power_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
+      final String pulse_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
+      final String speed_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
+
+      final String elapsedTime_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY);
+      final String recordedTime_Summary   = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY);
+      final String pausedTime_Summary     = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME_SUMMARY);
+      final String movingTime_Summary     = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME_SUMMARY);
+      final String breakTime_Summary      = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME_SUMMARY);
+
+      _cadenceFormatter                   = getNumberFormatter(cadence);
+      _distanceFormatter                  = getNumberFormatter(distance);
+      _elevationFormatter                 = getNumberFormatter(elevation);
+      _powerFormatter                     = getNumberFormatter(power);
+      _pulseFormatter                     = getNumberFormatter(pulse);
+      _speedFormatter                     = getNumberFormatter(speed);
+
+      _elapsedTimeFormatter               = getTimeFormatter(elapsedTime);
+      _recordedTimeFormatter              = getTimeFormatter(recordedTime);
+      _pausedTimeFormatter                = getTimeFormatter(pausedTime);
+      _movingTimeFormatter                = getTimeFormatter(movingTime);
+      _breakTimeFormatter                 = getTimeFormatter(breakTime);
+
+      _cadenceFormatter_Summary           = getNumberFormatter(cadence_Summary);
+      _distanceFormatter_Summary          = getNumberFormatter(distance_Summary);
+      _elevationFormatter_Summary         = getNumberFormatter(elevation_Summary);
+      _powerFormatter_Summary             = getNumberFormatter(power_Summary);
+      _pulseFormatter_Summary             = getNumberFormatter(pulse_Summary);
+      _speedFormatter_Summary             = getNumberFormatter(speed_Summary);
+
+      _elapsedTimeFormatter_Summary       = getTimeFormatter(elapsedTime_Summary);
+      _recordedTimeFormatter_Summary      = getTimeFormatter(recordedTime_Summary);
+      _pausedTimeFormatter_Summary        = getTimeFormatter(pausedTime_Summary);
+      _movingTimeFormatter_Summary        = getTimeFormatter(movingTime_Summary);
+      _breakTimeFormatter_Summary         = getTimeFormatter(breakTime_Summary);
+
+// SET_FORMATTING_ON
    }
 }

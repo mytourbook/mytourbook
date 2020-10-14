@@ -1544,6 +1544,10 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Label_Power;
    public static String        Pref_DisplayFormat_Label_Pulse;
    public static String        Pref_DisplayFormat_Label_Speed;
+   public static String        Pref_DisplayFormat_Tab_MultipleTours;
+   public static String        Pref_DisplayFormat_Tab_MultipleTours_Tooltip;
+   public static String        Pref_DisplayFormat_Tab_OneTour;
+   public static String        Pref_DisplayFormat_Tab_OneTour_Tooltip;
 
    public static String        Pref_general_imperial_unit_fahrenheit;
    public static String        Pref_general_imperial_unit_feet;
@@ -1813,6 +1817,8 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Checkbox_Distance;
    public static String Pref_Statistic_Checkbox_Duration;
    public static String Pref_Statistic_Checkbox_NumberOfTours;
+   public static String Pref_Statistic_Checkbox_ShowPercentageValues;
+   public static String Pref_Statistic_Checkbox_ShowSummaryValues;
    public static String Pref_Statistic_Checkbox_TrainingEffect_Aerob;
    public static String Pref_Statistic_Checkbox_TrainingEffect_Anaerob;
    public static String Pref_Statistic_Checkbox_TrainingPerformance;
@@ -1823,6 +1829,7 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Group_ChartType;
    public static String Pref_Statistic_Group_DaySummary;
    public static String Pref_Statistic_Group_MonthSummary;
+   public static String Pref_Statistic_Group_StatisticTooltip;
    public static String Pref_Statistic_Group_TourFrequency;
    public static String Pref_Statistic_Group_Training;
    public static String Pref_Statistic_Group_WeekSummary;

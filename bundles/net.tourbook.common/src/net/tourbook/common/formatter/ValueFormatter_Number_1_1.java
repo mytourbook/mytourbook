@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,14 @@ public class ValueFormatter_Number_1_1 implements IValueFormatter {
 
 	@Override
 	public String printDouble(final double value) {
-		return _nf1.format(value);
+
+      final String formattedValue = _nf1.format(value);
+
+      if (value > 0 && ZERO_VALUE_TEXT_0_0.equals(formattedValue)) {
+         return BIGGER_THAN_ZERO;
+      }
+
+      return formattedValue;
 	}
 
 	@Override

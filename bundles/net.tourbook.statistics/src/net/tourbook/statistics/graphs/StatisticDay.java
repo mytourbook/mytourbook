@@ -54,6 +54,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
+import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.ITourProvider;
@@ -61,15 +62,14 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -77,7 +77,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
-   private TourData_Day                _tourDay_Data;
+   private TourStatisticData_Day       _statisticData_Day;
    private DataProvider_Tour_Day       _tourDay_DataProvider              = new DataProvider_Tour_Day();
 
    private TourTypeFilter              _activeTourTypeFilter;
@@ -85,8 +85,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private long                        _selectedTourId                    = -1;
 
-   private int                         _currentYear;
-   private int                         _numberOfYears;
+   private int                         _statFirstYear;
+   private int                         _statNumberOfYears;
 
    private Chart                       _chart;
    private StatisticContext            _statContext;
@@ -100,6 +100,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private StatisticTourToolTip        _tourToolTip;
    private TourInfoIconToolTipProvider _tourInfoToolTipProvider           = new TourInfoIconToolTipProvider();
+
+   private final TourInfoUI            _tourInfoUI                        = new TourInfoUI();
 
    private void addTourPropertyListener() {
 
@@ -119,7 +121,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
                      final long modifiedTourId = modifiedTourData.getTourId();
 
-                     final long[] tourIds = _tourDay_Data.allTourIds;
+                     final long[] tourIds = _statisticData_Day.allTourIds;
                      for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
 
                         final long tourId = tourIds[tourIdIndex];
@@ -127,7 +129,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                         if (tourId == modifiedTourId) {
 
                            // set new tour title
-                           _tourDay_Data.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
+                           _statisticData_Day.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
 
                            break;
                         }
@@ -144,14 +146,14 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    /**
     * create segments for the chart
     */
-   ChartStatisticSegments createChartSegments(final TourData_Day tourTimeData) {
+   ChartStatisticSegments createChartSegments(final TourStatisticData_Day tourTimeData) {
 
-      final double[] segmentStart = new double[_numberOfYears];
-      final double[] segmentEnd = new double[_numberOfYears];
-      final String[] segmentTitle = new String[_numberOfYears];
+      final double[] segmentStart = new double[_statNumberOfYears];
+      final double[] segmentEnd = new double[_statNumberOfYears];
+      final String[] segmentTitle = new String[_statNumberOfYears];
 
       final int[] allYearDays = tourTimeData.allYearDays;
-      final int oldestYear = _currentYear - _numberOfYears + 1;
+      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
       int yearDaysSum = 0;
 
       // create segments for each year
@@ -203,9 +205,9 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       _chart.addBarSelectionListener(new IBarSelectionListener() {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
-            if (_tourDay_Data.allTypeIds.length > 0) {
+            if (_statisticData_Day.allTypeIds.length > 0) {
 
-               _selectedTourId = _tourDay_Data.allTourIds[valueIndex];
+               _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
                _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                if (StatisticView.isInUpdateUI()) {
@@ -240,7 +242,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-            _selectedTourId = _tourDay_Data.allTourIds[valueIndex];
+            _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
             _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
             ActionEditQuick.doAction(StatisticDay.this);
@@ -261,7 +263,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
                   if (barChartSelection.serieIndex != -1) {
 
-                     _selectedTourId = _tourDay_Data.allTourIds[barChartSelection.valueIndex];
+                     _selectedTourId = _statisticData_Day.allTourIds[barChartSelection.valueIndex];
                      _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
                      ActionEditQuick.doAction(StatisticDay.this);
@@ -276,7 +278,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private ChartToolTipInfo createToolTipData(int valueIndex) {
 
-      final int[] tourDOYValues = _tourDay_Data.getDoyValues();
+      final int[] tourDOYValues = _statisticData_Day.getDoyValues();
 
       if (valueIndex >= tourDOYValues.length) {
          valueIndex -= tourDOYValues.length;
@@ -286,28 +288,28 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          return null;
       }
 
-      final long tooltipTourId = _tourDay_Data.allTourIds[valueIndex];
+      final long tooltipTourId = _statisticData_Day.allTourIds[valueIndex];
 
-      final String tourTypeName = TourDatabase.getTourTypeName(_tourDay_Data.allTypeIds[valueIndex]);
-      final String tourTags = TourDatabase.getTagNames(_tourDay_Data.tagIds.get(tooltipTourId));
-      final String tourDescription = _tourDay_Data.allTourDescriptions.get(valueIndex)
+      final String tourTypeName = TourDatabase.getTourTypeName(_statisticData_Day.allTypeIds[valueIndex]);
+      final String tourTags = TourDatabase.getTagNames(_statisticData_Day.tagIds.get(tooltipTourId));
+      final String tourDescription = _statisticData_Day.allTourDescriptions.get(valueIndex)
             .replace(
                   net.tourbook.ui.UI.SYSTEM_NEW_LINE,
                   UI.NEW_LINE1);
 
-      final int[] startValue = _tourDay_Data.allStartTime;
-      final int[] endValue = _tourDay_Data.allEndTime;
+      final int[] startValue = _statisticData_Day.allStartTime;
+      final int[] endValue = _statisticData_Day.allEndTime;
 
-      final int elapsedTime = _tourDay_Data.allDeviceTime_Elapsed[valueIndex];
-      final int movingTime = _tourDay_Data.allComputedTime_Moving[valueIndex];
+      final int elapsedTime = _statisticData_Day.allDeviceTime_Elapsed[valueIndex];
+      final int movingTime = _statisticData_Day.allComputedTime_Moving[valueIndex];
       final int breakTime = elapsedTime - movingTime;
-      final int recordedTime = _tourDay_Data.allDeviceTime_Recorded[valueIndex];
-      final int pausedTime = _tourDay_Data.allDeviceTime_Paused[valueIndex];
+      final int recordedTime = _statisticData_Day.allDeviceTime_Recorded[valueIndex];
+      final int pausedTime = _statisticData_Day.allDeviceTime_Paused[valueIndex];
 
-      final ZonedDateTime zdtTourStart = _tourDay_Data.allStartDateTimes.get(valueIndex);
+      final ZonedDateTime zdtTourStart = _statisticData_Day.allStartDateTimes.get(valueIndex);
       final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
 
-      final float distance = _tourDay_Data.allDistance[valueIndex];
+      final float distance = _statisticData_Day.allDistance[valueIndex];
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final int time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
@@ -372,7 +374,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             UI.UNIT_LABEL_DISTANCE,
             //
             // altitude
-            (int) _tourDay_Data.allElevation[valueIndex],
+            (int) _statisticData_Day.allElevation[valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
             //
             // start time
@@ -423,7 +425,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       );
 
       // set title
-      String tourTitle = _tourDay_Data.allTourTitles.get(valueIndex);
+      String tourTitle = _statisticData_Day.allTourTitles.get(valueIndex);
       if (tourTitle == null || tourTitle.trim().length() == 0) {
          tourTitle = tourTypeName;
       }
@@ -435,22 +437,59 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       return tt1;
    }
 
+   /**
+    * @param toolTipProvider
+    * @param parent
+    * @param hoveredBar_VerticalIndex
+    *           serieIndex
+    * @param hoveredBar_HorizontalIndex
+    *           valueIndex
+    */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int _hoveredBar_VerticalIndex,
-                                final int _hoveredBar_HorizontalIndex) {
+                                final int serieIndex,
+                                int valueIndex) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText("Bar Tooltip\n\n"
-               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
-               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+      final int[] tourDOYValues = _statisticData_Day.getDoyValues();
 
+      if (valueIndex >= tourDOYValues.length) {
+         valueIndex -= tourDOYValues.length;
       }
+
+      if (tourDOYValues == null || valueIndex >= tourDOYValues.length) {
+         return;
+      }
+
+      final long tourId = _statisticData_Day.allTourIds[valueIndex];
+
+      TourData _tourData = null;
+      if (tourId != -1) {
+
+         // first get data from the tour id when it is set
+         _tourData = TourManager.getInstance().getTourData(tourId);
+      }
+
+      if (_tourData == null) {
+
+         // there are no data available
+
+         _tourInfoUI.createUI_NoData(parent);
+
+      } else {
+
+         // tour data is available
+
+         _tourInfoUI.createContentArea(parent, _tourData, toolTipProvider, this);
+
+         _tourInfoUI.setActionsEnabled(true);
+      }
+
+      parent.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _tourInfoUI.dispose();
+         }
+      });
    }
 
    /**
@@ -458,10 +497,10 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
     */
    void createXDataDay(final ChartDataModel chartModel) {
 
-      final ChartDataXSerie xData = new ChartDataXSerie(_tourDay_Data.getDoyValuesDouble());
+      final ChartDataXSerie xData = new ChartDataXSerie(_statisticData_Day.getDoyValuesDouble());
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 //      xData.setVisibleMaxValue(fCurrentYear);
-      xData.setChartSegments(createChartSegments(_tourDay_Data));
+      xData.setChartSegments(createChartSegments(_statisticData_Day));
 
       chartModel.setXData(xData);
    }
@@ -473,8 +512,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDay_Data.allElevation_Low,
-            _tourDay_Data.allElevation_High);
+            _statisticData_Day.allElevation_Low,
+            _statisticData_Day.allElevation_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
       yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
@@ -482,7 +521,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDay_Data.allTypeColorIndices });
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
@@ -494,8 +533,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDay_Data.allAvgPace_Low,
-            _tourDay_Data.allAvgPace_High);
+            _statisticData_Day.allAvgPace_Low,
+            _statisticData_Day.allAvgPace_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_PACE);
       yData.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -503,7 +542,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDay_Data.allTypeColorIndices });
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
@@ -515,8 +554,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDay_Data.allAvgSpeed_Low,
-            _tourDay_Data.allAvgSpeed_High);
+            _statisticData_Day.allAvgSpeed_Low,
+            _statisticData_Day.allAvgSpeed_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_SPEED);
       yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
@@ -524,7 +563,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDay_Data.allTypeColorIndices });
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
@@ -539,8 +578,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDay_Data.allDistance_Low,
-            _tourDay_Data.allDistance_High);
+            _statisticData_Day.allDistance_Low,
+            _statisticData_Day.allDistance_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
@@ -549,7 +588,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
       yData.setValueDivisor(1000);
-      yData.setColorIndex(new int[][] { _tourDay_Data.allTypeColorIndices });
+      yData.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
@@ -564,8 +603,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       _yData_Duration = new ChartDataYSerie(
             ChartType.BAR,
-            _tourDay_Data.getDurationLowFloat(),
-            _tourDay_Data.getDurationHighFloat());
+            _statisticData_Day.getDurationLowFloat(),
+            _statisticData_Day.getDurationHighFloat());
 
       _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
       _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
@@ -573,7 +612,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       _yData_Duration.setAllValueColors(0);
       _yData_Duration.setShowYSlider(true);
       _yData_Duration.setVisibleMinValue(0);
-      _yData_Duration.setColorIndex(new int[][] { _tourDay_Data.allTypeColorIndices });
+      _yData_Duration.setColorIndex(new int[][] { _statisticData_Day.allTypeColorIndices });
 
       StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
@@ -633,7 +672,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    @Override
    public void preferencesHasChanged() {
 
-      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
+      updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _statFirstYear, _statNumberOfYears));
    }
 
    void resetMinMaxKeeper() {
@@ -663,13 +702,13 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       }
 
       final ISelection selection = _chart.getSelection();
-      if (_tourDay_Data != null && selection instanceof SelectionBarChart) {
+      if (_statisticData_Day != null && selection instanceof SelectionBarChart) {
 
          final int valueIndex = ((SelectionBarChart) selection).valueIndex;
 
          // check array bounds
-         if (valueIndex < _tourDay_Data.allTourIds.length) {
-            viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDay_Data.allTourIds[valueIndex]));
+         if (valueIndex < _statisticData_Day.allTourIds.length) {
+            viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(_statisticData_Day.allTourIds[valueIndex]));
          }
       }
    }
@@ -677,7 +716,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    @Override
    public boolean selectTour(final Long tourId) {
 
-      final long[] tourIds = _tourDay_Data.allTourIds;
+      final long[] tourIds = _statisticData_Day.allTourIds;
       final boolean selectedItems[] = new boolean[tourIds.length];
       boolean isSelected = false;
 
@@ -744,8 +783,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       _activePerson = statContext.appPerson;
       _activeTourTypeFilter = statContext.appTourTypeFilter;
-      _currentYear = statContext.statFirstYear;
-      _numberOfYears = statContext.statNumberOfYears;
+      _statFirstYear = statContext.statFirstYear;
+      _statNumberOfYears = statContext.statNumberOfYears;
 
       /*
        * get currently selected tour id
@@ -758,7 +797,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          if (barChartSelection.serieIndex != -1) {
 
             int selectedValueIndex = barChartSelection.valueIndex;
-            final long[] tourIds = _tourDay_Data.allTourIds;
+            final long[] tourIds = _statisticData_Day.allTourIds;
 
             if (tourIds.length > 0) {
 
@@ -771,7 +810,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          }
       }
 
-      _tourDay_Data = _tourDay_DataProvider.getDayData(
+      _statisticData_Day = _tourDay_DataProvider.getDayData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
             statContext.statFirstYear,
@@ -791,7 +830,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       /*
        * set graph minimum width, this is the number of days in the year
        */
-      final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
+      final int yearDays = TimeTools.getNumberOfDaysWithYear(_statFirstYear);
       chartModel.setChartMinWidth(yearDays);
 
       setChartProviders(_chart, chartModel);

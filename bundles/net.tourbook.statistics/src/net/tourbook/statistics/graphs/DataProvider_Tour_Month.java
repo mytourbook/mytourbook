@@ -37,14 +37,14 @@ import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
-   private TourData_Month _tourMonthData;
+   private TourStatisticData_Month _tourMonthData;
 
-   TourData_Month getMonthData(final TourPerson person,
-                               final TourTypeFilter tourTypeFilter,
-                               final int lastYear,
-                               final int numYears,
-                               final boolean refreshData,
-                               final DurationTime durationTime) {
+   TourStatisticData_Month getMonthData(final TourPerson person,
+                                        final TourTypeFilter tourTypeFilter,
+                                        final int lastYear,
+                                        final int numYears,
+                                        final boolean refreshData,
+                                        final DurationTime durationTime) {
 
       /*
        * check if the required data are already loaded
@@ -75,7 +75,7 @@ public class DataProvider_Tour_Month extends DataProvider {
          final ArrayList<TourType> allTourTypesList = TourDatabase.getActiveTourTypes();
          final TourType[] allTourTypes = allTourTypesList.toArray(new TourType[allTourTypesList.size()]);
 
-         _tourMonthData = new TourData_Month();
+         _tourMonthData = new TourStatisticData_Month();
 
          String fromTourData;
 
@@ -221,8 +221,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_MovingTime           = result.getInt(7);
             final int dbValue_Duration             = result.getInt(8);
 
-            final int dbValue_Distance             = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_ElevationUp          = (int) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
+            final long dbValue_Distance            = (long) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(11);
 
@@ -325,8 +325,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             _tourMonthData.elevationUp_Low = new float[1][numMonths];
             _tourMonthData.elevationUp_High = new float[1][numMonths];
 
-            _tourMonthData.distanceLow = new float[1][numMonths];
-            _tourMonthData.distanceHigh = new float[1][numMonths];
+            _tourMonthData.distance_Low = new float[1][numMonths];
+            _tourMonthData.distance_High = new float[1][numMonths];
 
             _tourMonthData.setDurationTimeLow(new int[1][numMonths]);
             _tourMonthData.setDurationTimeHigh(new int[1][numMonths]);
@@ -337,8 +337,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             _tourMonthData.movingTime = new int[1][numMonths];
             _tourMonthData.breakTime = new int[1][numMonths];
 
-            _tourMonthData.numToursLow = new float[1][numMonths];
-            _tourMonthData.numToursHigh = new float[1][numMonths];
+            _tourMonthData.numTours_Low = new float[1][numMonths];
+            _tourMonthData.numTours_High = new float[1][numMonths];
 
          } else {
 
@@ -379,8 +379,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             _tourMonthData.elevationUp_Low = new float[numUsedTourTypes][numMonths];
             _tourMonthData.elevationUp_High = usedElevationUp;
 
-            _tourMonthData.distanceLow = new float[numUsedTourTypes][numMonths];
-            _tourMonthData.distanceHigh = usedDistance;
+            _tourMonthData.distance_Low = new float[numUsedTourTypes][numMonths];
+            _tourMonthData.distance_High = usedDistance;
 
             _tourMonthData.setDurationTimeLow(new int[numUsedTourTypes][numMonths]);
             _tourMonthData.setDurationTimeHigh(usedDuration);
@@ -391,8 +391,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             _tourMonthData.movingTime = usedMovingTime;
             _tourMonthData.breakTime = usedBreakTime;
 
-            _tourMonthData.numToursLow = new float[numUsedTourTypes][numMonths];
-            _tourMonthData.numToursHigh = usedNumTours;
+            _tourMonthData.numTours_Low = new float[numUsedTourTypes][numMonths];
+            _tourMonthData.numTours_High = usedNumTours;
          }
 
       } catch (final SQLException e) {
@@ -494,7 +494,7 @@ public class DataProvider_Tour_Month extends DataProvider {
       sb.append(headerLine1 + NL);
       sb.append(headerLine2 + NL);
 
-      final float[][] numTours = _tourMonthData.numToursHigh;
+      final float[][] numTours = _tourMonthData.numTours_High;
       final int numMonths = numTours[0].length;
       final int firstYear = statistic_LastYear - statistic_NumberOfYears + 1;
 
@@ -564,9 +564,9 @@ public class DataProvider_Tour_Month extends DataProvider {
                      _tourMonthData.breakTime[tourTypeIndex][monthIndex],
 
                      _tourMonthData.elevationUp_High[tourTypeIndex][monthIndex],
-                     _tourMonthData.distanceHigh[tourTypeIndex][monthIndex],
+                     _tourMonthData.distance_High[tourTypeIndex][monthIndex],
 
-                     _tourMonthData.numToursHigh[tourTypeIndex][monthIndex]
+                     _tourMonthData.numTours_High[tourTypeIndex][monthIndex]
 
                ));
 

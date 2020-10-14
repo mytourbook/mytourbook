@@ -47,6 +47,8 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private Button _chkShowDistance;
    private Button _chkShowDuration;
    private Button _chkShowNumberOfTours;
+   private Button _chkTooltip_ShowPercentageValues;
+   private Button _chkTooltip_ShowSummaryValues;
    private Button _chkShowYearSeparator;
 
    private Button _rdoChartType_BarAdjacent;
@@ -63,13 +65,13 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       initUI(parent);
 
       createUI_100_Graphs(parent);
-      createUI_200_ChartType(parent);
+      createUI_200_StatisticTooltip(parent);
+      createUI_300_ChartType(parent);
    }
 
    private void createUI_100_Graphs(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-//      group.setText(Messages.Pref_Graphs_Group_Grid);
       group.setText(Messages.Pref_Statistic_Group_MonthSummary);
       GridDataFactory
             .fillDefaults()//
@@ -194,10 +196,36 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       }
    }
 
-   private void createUI_200_ChartType(final Composite parent) {
+   private void createUI_200_StatisticTooltip(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-//      group.setText(Messages.Pref_Graphs_Group_Grid);
+      group.setText(Messages.Pref_Statistic_Group_StatisticTooltip);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      {
+         {
+            /*
+             * Show total values
+             */
+            _chkTooltip_ShowSummaryValues = new Button(group, SWT.CHECK);
+            _chkTooltip_ShowSummaryValues.setText(Messages.Pref_Statistic_Checkbox_ShowSummaryValues);
+            _chkTooltip_ShowSummaryValues.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show % values
+             */
+            _chkTooltip_ShowPercentageValues = new Button(group, SWT.CHECK);
+            _chkTooltip_ShowPercentageValues.setText(Messages.Pref_Statistic_Checkbox_ShowPercentageValues);
+//          tooltip: Percentage of the bar value to the total value
+            _chkTooltip_ShowPercentageValues.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+   }
+
+   private void createUI_300_ChartType(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Statistic_Group_ChartType);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
@@ -267,6 +295,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
       _chkShowYearSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR));
 
+      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
+
       final String chartType = _prefStore.getDefaultString(ITourbookPreferences.STAT_MONTH_CHART_TYPE);
       _rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
       _rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
@@ -290,6 +321,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE));
       _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
       _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
+
+      _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
+      _chkTooltip_ShowSummaryValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES));
 
       _chkShowYearSeparator.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR));
 
@@ -317,6 +351,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, _chkShowDuration.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
 
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, _chkTooltip_ShowSummaryValues.getSelection());
+
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, _chkShowYearSeparator.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_CHART_TYPE,
@@ -326,7 +363,6 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                   : ChartDataSerie.CHART_TYPE_BAR_STACKED);
 
       String selectedDurationType = UI.EMPTY_STRING;
-
       if (_rdoDuration_BreakTime.getSelection()) {
          selectedDurationType = DurationTime.BREAK.name();
       } else if (_rdoDuration_MovingTime.getSelection()) {
@@ -338,7 +374,6 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
       } else if (_rdoDuration_ElapsedTime.getSelection()) {
          selectedDurationType = DurationTime.ELAPSED.name();
       }
-
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_DURATION_TIME, selectedDurationType);
    }
 }

@@ -44,7 +44,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
    private Long          _selectedTourId;
 
-   private TourData_Time _tourDataTime;
+   private TourStatisticData_Time _tourDataTime;
 
    public String getRawStatisticValues(final boolean isShowSequenceNumbers) {
 
@@ -199,7 +199,7 @@ public class DataProvider_Tour_Time extends DataProvider {
     * @param isForceUpdate
     * @return
     */
-   TourData_Time getTourTimeData(final TourPerson person,
+   TourStatisticData_Time getTourTimeData(final TourPerson person,
                                  final TourTypeFilter tourTypeFilter,
                                  final int lastYear,
                                  final int numberOfYears,
@@ -442,7 +442,7 @@ public class DataProvider_Tour_Time extends DataProvider {
          /*
           * create data
           */
-         _tourDataTime = new TourData_Time();
+         _tourDataTime = new TourStatisticData_Time();
 
          _tourDataTime.allTourIds = allTourIds.toArray();
 

@@ -13,30 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.statistics.graphs;
 
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.util.IToolTipProvider;
+public class TourStatisticData_Month extends TourStatisticData_Common {
 
-public class Action_ToolTip_EditPreferences extends ActionOpenPrefDialog {
-
-   private final IToolTipProvider _ttProvider;
-
-   public Action_ToolTip_EditPreferences(final IToolTipProvider tourToolTipProvider,
-                                         final String text,
-                                         final String prefPageId,
-                                         final Object data) {
-
-      super(text, prefPageId, data);
-
-      _ttProvider = tourToolTipProvider;
-   }
-
-   @Override
-   public void run() {
-
-      _ttProvider.hideToolTip();
-
-      super.run();
-   }
 }

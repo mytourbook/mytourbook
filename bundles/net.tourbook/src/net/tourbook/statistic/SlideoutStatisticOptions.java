@@ -69,8 +69,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
       _actionPrefDialog = new ActionOpenPrefDialog(

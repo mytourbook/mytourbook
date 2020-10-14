@@ -471,6 +471,8 @@ public class Messages extends NLS {
    public static String        Segmenter_Tooltip_Label_DeviceTime_Elapsed;
    public static String        Segmenter_Tooltip_Label_Title;
 
+   public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage;
+   public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip;
    public static String        Statistic_Tooltip_Label_NumberOfTours;
 
    public static String        Tooltip_WayPoint_Label_Altitude;

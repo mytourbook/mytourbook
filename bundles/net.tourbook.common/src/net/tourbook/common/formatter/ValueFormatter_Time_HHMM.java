@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,25 +20,31 @@ import net.tourbook.common.UI;
 
 public class ValueFormatter_Time_HHMM implements IValueFormatter {
 
-	@Override
-	public String printDouble(final double value) {
-		return Messages.App_Error_NotSupportedValueFormatter;
-	}
+   @Override
+   public String printDouble(final double value) {
+      return Messages.App_Error_NotSupportedValueFormatter;
+   }
 
-	@Override
-	public String printLong(final long value) {
+   @Override
+   public String printLong(final long value) {
 
-		if (value == 0) {
-			return UI.EMPTY_STRING;
-		}
+      if (value == 0) {
+         return UI.EMPTY_STRING;
+      }
 
-		return UI.format_hh_mm(value + 30);
-	}
+      final String formattedValue = UI.format_hh_mm(value + 30);
 
-	@Override
-	public String toString() {
-		return "ValueFormatter_Time_HHMM [" // //$NON-NLS-1$
-				+ "printLong()" //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
-	}
+      if (value > 0 && ZERO_VALUE_TEXT_HH_MM.equals(formattedValue)) {
+         return BIGGER_THAN_ZERO;
+      }
+
+      return formattedValue;
+   }
+
+   @Override
+   public String toString() {
+      return "ValueFormatter_Time_HHMM [" // //$NON-NLS-1$
+            + "printLong()" //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 }

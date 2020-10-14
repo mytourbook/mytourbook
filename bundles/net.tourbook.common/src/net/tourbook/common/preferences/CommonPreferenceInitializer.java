@@ -58,23 +58,39 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
                colorDefinition.getLineColor_Default());
       }
 
+// SET_FORMATTING_OFF
+
       /*
        * Display formats
        */
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE,   true);
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SELECTED_TAB,     0);
 
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE, ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE, ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER, ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE, ValueFormat.NUMBER_1_0.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED, ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE,              ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE,               ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE,              ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED,                 ValueFormat.NUMBER_1_0.name());
 
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME, ValueFormat.TIME_HH_MM.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME, ValueFormat.TIME_HH_MM.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME, ValueFormat.TIME_HH_MM.name());
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME, ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME,          ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME,         ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME,           ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME,           ValueFormat.TIME_HH_MM.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME,            ValueFormat.TIME_HH_MM.name());
+
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE_SUMMARY,      ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE_SUMMARY,       ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE_SUMMARY,      ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY,         ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY,         ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY,         ValueFormat.NUMBER_1_0.name());
+
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY,  ValueFormat.TIME_HH.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY, ValueFormat.TIME_HH.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME_SUMMARY,   ValueFormat.TIME_HH.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_MOVING_TIME_SUMMARY,   ValueFormat.TIME_HH.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_BREAK_TIME_SUMMARY,    ValueFormat.TIME_HH.name());
 
       /*
        * Time zone
@@ -82,18 +98,20 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       final ZoneId defaultZoneId = ZoneId.systemDefault();
       final String defaultId = defaultZoneId.getId();
 
-      store.setDefault(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, 1);
-      store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
-      store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, true);
-      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
-      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
-      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);
-      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE,       1);
+      store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,             true);
+      store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE,    true);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID,                   defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1,                 defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2,                 defaultId);
+      store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3,                 defaultId);
 
       /*
        * calendar week
        */
-      store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
-      store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, 4);
+      store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK,       DayOfWeek.MONDAY.getValue());
+      store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK,  4);
+
+// SET_FORMATTING_ON
    }
 }
