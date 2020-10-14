@@ -632,6 +632,23 @@ public class UI {
       spinner.setSelection(oldValue + valueAdjustment);
    }
 
+   public static float convertBodyHeightFromMetric(final float height) {
+      if (UNIT_IS_METRIC) {
+         return height;
+      }
+
+      return height * UNIT_METER_TO_INCHES;
+   }
+
+   public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
+
+      if (UNIT_IS_METRIC) {
+         return primaryHeight;
+      }
+
+      return 100 * (primaryHeight * 12 + subHeight) / UNIT_METER_TO_INCHES;
+   }
+
    /**
     * @param bodyWeight
     * @return Returns the weight in the current measurement system.
