@@ -1265,8 +1265,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          return;
       }
 
-      final TourPerson ewnfkjw = TourbookPlugin.getActivePerson();
-      ewnfkjw.computePerformanceModelingData();
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+      activePerson.computePerformanceModelingData();
       saveState();
 
       final int[] elevation = new int[] { 0, 0 };
