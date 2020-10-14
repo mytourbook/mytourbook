@@ -2437,7 +2437,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final int index = _comboTrainingStressModel.getSelectionIndex();
          if (index >= 0 && index < _trainingStressModels.length) {
             _trainingStressModels[index].restoreState();
-            //TODO problem here : When the users restores the data, how can we detect again when the model page has changed?
+            //TODO FB problem here : When the users restores the data, how can we detect again when the model page has changed?
             //We need to be sent an event somehow. To be continued
          }
       }

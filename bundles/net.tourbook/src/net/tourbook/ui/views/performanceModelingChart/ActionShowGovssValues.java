@@ -29,7 +29,7 @@ public class ActionShowGovssValues extends Action {
 
       super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-      //TODO
+      //TODO FB
       setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PerformanceGraph_govss));
 
