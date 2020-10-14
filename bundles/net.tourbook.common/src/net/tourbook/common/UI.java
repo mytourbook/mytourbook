@@ -38,6 +38,7 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -530,6 +531,8 @@ public class UI {
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
     * screenshots.
+    * <p>
+    * Commandline parameter: <code>-DscrambleData</code>
     */
    public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
 
@@ -1399,7 +1402,78 @@ public class UI {
    }
 
    /**
-    * Opens the control context menu, the menu is aligned below the control to the right side
+    * Copied from {@link org.eclipse.ui.internal.handlers.ContextMenuHandler} and adjusted.
+    *
+    * @param control
+    */
+   @SuppressWarnings("restriction")
+   public static void openContextMenu(final Control control) {
+
+      if (control == null || control.isDisposed()) {
+         return;
+      }
+
+      final Shell shell = control.getShell();
+      final Display display = shell == null ? Display.getCurrent() : shell.getDisplay();
+
+      final Point cursorLocation = display.getCursorLocation();
+
+      final Event event = new Event();
+      event.x = cursorLocation.x;
+      event.y = cursorLocation.y;
+      event.detail = SWT.MENU_MOUSE;
+
+      control.notifyListeners(SWT.MenuDetect, event);
+
+      if (!event.doit) {
+         return;
+      }
+
+      final Menu menu = control.getMenu();
+
+      if (menu != null && !menu.isDisposed()) {
+
+         if (event.x != cursorLocation.x || event.y != cursorLocation.y) {
+            menu.setLocation(event.x, event.y);
+         }
+         menu.setVisible(true);
+
+      } else {
+
+         final Point size = control.getSize();
+         final Point location = control.toDisplay(0, 0);
+
+         final Event mouseEvent = new Event();
+         mouseEvent.widget = control;
+
+         if (event.x < location.x
+               || location.x + size.x <= event.x
+               || event.y < location.y
+               || location.y + size.y <= event.y) {
+
+            final Point center = control.toDisplay(Geometry.divide(size, 2));
+            mouseEvent.x = center.x;
+            mouseEvent.y = center.y;
+            mouseEvent.type = SWT.MouseMove;
+            display.post(mouseEvent);
+
+         } else {
+
+            mouseEvent.x = event.x;
+            mouseEvent.y = event.y;
+         }
+
+         mouseEvent.button = 2;
+         mouseEvent.type = SWT.MouseDown;
+         display.post(mouseEvent);
+
+         mouseEvent.type = SWT.MouseUp;
+         display.post(mouseEvent);
+      }
+   }
+
+   /**
+    * Opens the control context menu, the menue is aligned below the control to the right side
     *
     * @param control
     *           Controls which menu is opened
