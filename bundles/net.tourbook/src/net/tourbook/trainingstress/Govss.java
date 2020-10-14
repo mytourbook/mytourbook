@@ -106,7 +106,7 @@ public class Govss {
       final float intensityWeighingFactor = lactateNormalizedPower / athleteThresholdPower;
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
-      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
+      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourDeviceTime_Elapsed());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
       float trainingStressValue = normalizedWork * intensityWeighingFactor;

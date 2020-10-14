@@ -459,7 +459,7 @@ public class PerformanceModelingChartView extends ViewPart {
              * combo: year
              */
             _comboYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setToolTipText(Messages.Calendar_View_Combo_Year_Tooltip);
             _comboYear.setVisibleItemCount(50);
 
             GridDataFactory
