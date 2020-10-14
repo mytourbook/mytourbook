@@ -20,9 +20,9 @@ package net.tourbook.statistics.graphs;
  */
 public class TourStatisticData_Frequency {
 
-   int[]   statDistance_Units;
-   int[]   statDurationTime_Units;
-   int[]   statElevation_Units;
+   int[]   statGroupedValues_Distance;
+   int[]   statGroupedValues_DurationTime;
+   int[]   statGroupedValues_Elevation;
 
    int[][] statDistance_NumTours_Low;
    int[][] statDistance_NumTours_High;

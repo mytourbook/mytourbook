@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class StatisticTooltipUI_ForCategorizedData {
+public class StatisticTooltipUI_CategorizedData {
 
    private static final String          APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    private static final String          IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
