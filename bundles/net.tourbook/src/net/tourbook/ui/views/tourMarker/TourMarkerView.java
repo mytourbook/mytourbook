@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
@@ -911,6 +910,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       });
    }
 
+   /**
+    * Column: Normalized pace (min/km or min/mi)
+    */
    private void defineColumn_Motion_Pace_Normalized() {
       final ColumnDefinition colDef = TableColumnFactory.MOTION_NORMALIZED_PACE.createColumn(_columnManager, _pc);
 
@@ -931,14 +933,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final double normalizedPace = _tourData.computeNormalizedPace(previousMarkerIndex, currentMarkerIndex);
 
-            if (normalizedPace == 0.0) {
-               cell.setText(UI.EMPTY_STRING);
-            } else {
-               cell.setText(UI.format_mm_ss((long) normalizedPace));
-            }
+            final String cellText = normalizedPace == 0.0
+                  ? UI.EMPTY_STRING
+                  : UI.format_mm_ss((long) normalizedPace);
+
+            cell.setText(cellText);
          }
       });
-
    }
 
    /**
@@ -1183,8 +1184,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       final ArrayList<TourMarker> selectedTourMarker = new ArrayList<>();
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-         selectedTourMarker.add((TourMarker) iterator.next());
+      for (final Object name : selection) {
+         selectedTourMarker.add((TourMarker) name);
       }
 
       TourManager.fireEventWithCustomData(//
