@@ -793,11 +793,11 @@ public class StatisticTooltipUI_CategorizedData {
       _lblComputedTime_Break              .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
       _lblComputedTime_Break_Unit         .setText(computedTime_Break_UnitText);
 
-      _lblDistance                        .setText(distance          == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
-      _lblDistance_Unit                   .setText(distance          == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+      _lblDistance                        .setText(distance                      == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
+      _lblDistance_Unit                   .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-      _lblElevationUp                     .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
+      _lblElevationUp                     .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
+      _lblElevationUp_Unit                .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
 
       _lblNumberOfTours                   .setText(Integer.toString((int) (numTours + 0.5)));
 
