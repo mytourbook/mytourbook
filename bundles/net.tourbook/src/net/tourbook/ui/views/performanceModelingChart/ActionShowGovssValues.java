@@ -31,6 +31,7 @@ public class ActionShowGovssValues extends Action {
 
       //TODO FB
       setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+      //TODO FB
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PerformanceGraph_govss));
 
       _performanceModelingChartView = performanceModelingChartView;

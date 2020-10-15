@@ -652,9 +652,6 @@ public class Messages extends NLS {
    public static String        Compute_GovssValues_Dialog_ComputeForUserTours_Message;
 
    public static String        Compute_PerformanceModelingChart_Group;
-   public static String        Compute_PerformanceModelingChart_ComputeForAllTours_Job_Result;
-   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Message;
-   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Title;
 
    public static String        Compute_HrZone_Group;
    public static String        Compute_HrZone_Link;
@@ -1349,7 +1346,6 @@ public class Messages extends NLS {
    public static String        Log_ComputeGovss_002_End;
    public static String        Log_ComputeGovss_010_Success;
    public static String        Log_ComputeGovss_011_NoSuccess;
-   public static String        Log_ComputeGovss_012_Information;
 
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
