@@ -49,8 +49,9 @@ public class StatisticTooltipUI_CategorizedData {
    private static final String          APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    private static final String          IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
 
-   private static final int             VERTICAL_LINE_SPACE      = 8;
+   private static final String          NUMBERS_UNIT             = net.tourbook.statistics.Messages.NUMBERS_UNIT;
 
+   private static final int             VERTICAL_LINE_SPACE      = 8;
    private static final int             SHELL_MARGIN             = 5;
 
    private static final IValueFormatter VALUE_FORMATTER_1_0      = new ValueFormatter_Number_1_0();
@@ -584,7 +585,7 @@ public class StatisticTooltipUI_CategorizedData {
          createUI_Label(container, Messages.Statistic_Tooltip_Label_NumberOfTours);
 
          _lblNumberOfTours = createUI_LabelValue(container, SWT.TRAIL);
-         createUI_LabelValue(container, SWT.LEAD);
+         createUI_Label(container, NUMBERS_UNIT, SWT.LEAD);
 
          if (_isShowPercentage) {
             _lblNumberOfTours_Percentage = createUI_LabelValue(container, SWT.TRAIL);
@@ -592,7 +593,7 @@ public class StatisticTooltipUI_CategorizedData {
 
          if (_isShowSummary) {
             _lblNumberOfTours_Summary = createUI_LabelValue(container, SWT.TRAIL);
-            createUI_LabelValue(container, SWT.LEAD);
+            createUI_Label(container, NUMBERS_UNIT, SWT.LEAD);
          }
       }
    }
@@ -744,11 +745,11 @@ public class StatisticTooltipUI_CategorizedData {
 
       final float distance                               = _tourData_Common.distance_High_Resorted    [_serieIndex][_valueIndex];
       final float elevationUp                            = _tourData_Common.elevationUp_High_Resorted [_serieIndex][_valueIndex];
-      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_serieIndex][_valueIndex] + 0.5f;
+      final float numTours                               = _tourData_Common.numTours_High_Resorted    [_serieIndex][_valueIndex] ;
 
       final float distance_Summary                       = computeSummary(_tourData_Common.distance_High_Resorted,      _valueIndex);
       final float elevationUp_Summary                    = computeSummary(_tourData_Common.elevationUp_High_Resorted,   _valueIndex);
-      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex) + 0.5f;
+      final float numTours_Summary                       = computeSummary(_tourData_Common.numTours_High_Resorted,      _valueIndex) ;
 
       final float distance_Percentage                    = distance_Summary    == 0 ? 0 : distance    / distance_Summary      * 100;
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
@@ -778,28 +779,28 @@ public class StatisticTooltipUI_CategorizedData {
       final String computedTime_Moving_Summary_UnitText  = computedTime_Moving_Summary    == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
       final String computedTime_Break_Summary_UnitText   = computedTime_Break_Summary     == 0 ? UI.EMPTY_STRING : Messages.Tour_Tooltip_Label_Hour;
 
-      _lblDeviceTime_Elapsed              .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed));
-      _lblDeviceTime_Elapsed_Unit         .setText(deviceTime_Elapsed_UnitText);
+      _lblDeviceTime_Elapsed                 .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed));
+      _lblDeviceTime_Elapsed_Unit            .setText(deviceTime_Elapsed_UnitText);
 
-      _lblDeviceTime_Recorded             .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded));
-      _lblDeviceTime_Recorded_Unit        .setText(deviceTime_Recorded_UnitText);
+      _lblDeviceTime_Recorded                .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded));
+      _lblDeviceTime_Recorded_Unit           .setText(deviceTime_Recorded_UnitText);
 
-      _lblDeviceTime_Paused               .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused));
-      _lblDeviceTime_Paused_Unit          .setText(deviceTime_Paused_UnitText);
+      _lblDeviceTime_Paused                  .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused));
+      _lblDeviceTime_Paused_Unit             .setText(deviceTime_Paused_UnitText);
 
-      _lblComputedTime_Moving             .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving));
-      _lblComputedTime_Moving_Unit        .setText(computedTime_Moving_UnitText);
+      _lblComputedTime_Moving                .setText(FormatManager.formatMovingTime_Summary    (computedTime_Moving));
+      _lblComputedTime_Moving_Unit           .setText(computedTime_Moving_UnitText);
 
-      _lblComputedTime_Break              .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
-      _lblComputedTime_Break_Unit         .setText(computedTime_Break_UnitText);
+      _lblComputedTime_Break                 .setText(FormatManager.formatBreakTime_Summary     (computedTime_Break));
+      _lblComputedTime_Break_Unit            .setText(computedTime_Break_UnitText);
 
-      _lblDistance                        .setText(distance          == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
-      _lblDistance_Unit                   .setText(distance          == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
+      _lblDistance                           .setText(distance                      == 0 ? UI.EMPTY_STRING : FormatManager.formatDistance_Summary      (distance / 1000.0));
+      _lblDistance_Unit                      .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
-      _lblElevationUp                     .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                .setText(elevationUp_WithMeasurement         == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
+      _lblElevationUp                        .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
+      _lblElevationUp_Unit                   .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
 
-      _lblNumberOfTours                   .setText(Integer.toString((int) (numTours + 0.5)));
+      _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
       if (_isShowSummary) {
 

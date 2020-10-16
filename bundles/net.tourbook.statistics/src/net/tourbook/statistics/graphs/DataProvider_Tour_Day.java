@@ -45,8 +45,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
    private TourStatisticData_Day _tourDayData;
 
-   private boolean      _isAdjustSamePosition;
-   private boolean      _isShowTrainingPerformance_AvgValue;
+   private boolean               _isAdjustSamePosition;
+   private boolean               _isShowTrainingPerformance_AvgValue;
 
    private void adjustValues(final TFloatArrayList dbAllValues,
                              final float[] lowValues,
@@ -176,11 +176,11 @@ public class DataProvider_Tour_Day extends DataProvider {
    }
 
    TourStatisticData_Day getDayData(final TourPerson person,
-                           final TourTypeFilter tourTypeFilter,
-                           final int lastYear,
-                           final int numberOfYears,
-                           final boolean refreshData,
-                           final DurationTime durationTime) {
+                                    final TourTypeFilter tourTypeFilter,
+                                    final int lastYear,
+                                    final int numberOfYears,
+                                    final boolean refreshData,
+                                    final DurationTime durationTime) {
 
       // don't reload data which are already available
       if (person == statistic_ActivePerson
@@ -303,7 +303,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
          final TIntArrayList dbAllTourComputedTime_Moving = new TIntArrayList();
-         final TIntArrayList dbAllTourDuration = new TIntArrayList();
+         final TIntArrayList dbAllTourDurationTimes = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
          final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
@@ -421,7 +421,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourDeviceTime_Paused.add(dbPausedTime);
                dbAllTourComputedTime_Moving.add(dbMovingTime);
 
-               dbAllTourDuration.add(durationTimeValue);
+               dbAllTourDurationTimes.add(durationTimeValue);
 
                // round distance
                final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
@@ -475,7 +475,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          final int[] allYearsDOY = dbAllYearsDOY.toArray();
 
-         final int[] duration_High = dbAllTourDuration.toArray();
+         final int[] durationTime_High = dbAllTourDurationTimes.toArray();
 
          final float[] distance_High = dbAllDistance.toArray();
          final float[] elevation_High = dbAllElevation.toArray();
@@ -487,9 +487,9 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] trainEffect_Anaerob_High = dbAllTrain_Effect_Anaerob.toArray();
          final float[] trainPerformance_High = dbAllTrain_Performance.toArray();
 
-         final int serieLength = duration_High.length;
+         final int serieLength = durationTime_High.length;
 
-         final int[] duration_Low = new int[serieLength];
+         final int[] durationTime_Low = new int[serieLength];
          final float[] elevation_Low = new float[serieLength];
          final float[] avgPace_Low = new float[serieLength];
          final float[] avgSpeed_Low = new float[serieLength];
@@ -526,7 +526,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 // SET_FORMATTING_OFF
 
-               duration_High[tourIndex]               += duration_Low[tourIndex]             = duration_High[tourIndex - 1];
+               durationTime_High[tourIndex]           += durationTime_Low[tourIndex]         = durationTime_High[tourIndex - 1];
 
                elevation_High[tourIndex]              += elevation_Low[tourIndex]            = elevation_High[tourIndex - 1];
                avgPace_High[tourIndex]                += avgPace_Low[tourIndex]              = avgPace_High[tourIndex - 1];
@@ -547,7 +547,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 // SET_FORMATTING_OFF
 
-               adjustValues(dbAllTourDuration,           duration_Low,  duration_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+               adjustValues(dbAllTourDurationTimes,           durationTime_Low,  durationTime_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
 
                adjustValues(dbAllDistance,               distance_Low,  distance_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
                adjustValues(dbAllElevation,              elevation_Low, elevation_High,   sameDOY_FirstIndex,  sameDOY_LastIndex);
@@ -557,7 +557,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                adjustValues(dbAllTrain_Effect_Aerob,     trainEffect_Aerob_Low,     trainEffect_Aerob_High,    sameDOY_FirstIndex,     sameDOY_LastIndex);
                adjustValues(dbAllTrain_Effect_Anaerob,   trainEffect_Anaerob_Low,   trainEffect_Anaerob_High,  sameDOY_FirstIndex,     sameDOY_LastIndex);
 
-               adjustValues_Avg(dbAllTourDuration,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
+               adjustValues_Avg(dbAllTourDurationTimes,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
 
 // SET_FORMATTING_ON
 
@@ -570,7 +570,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 // SET_FORMATTING_OFF
 
-         adjustValues(dbAllTourDuration,           duration_Low,     duration_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
+         adjustValues(dbAllTourDurationTimes,           durationTime_Low,     durationTime_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
 
          adjustValues(dbAllDistance,               distance_Low,     distance_High,    sameDOY_FirstIndex,  sameDOY_LastIndex);
          adjustValues(dbAllElevation,              elevation_Low,    elevation_High,   sameDOY_FirstIndex,  sameDOY_LastIndex);
@@ -580,7 +580,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          adjustValues(dbAllTrain_Effect_Aerob,     trainEffect_Aerob_Low,     trainEffect_Aerob_High,    sameDOY_FirstIndex,     sameDOY_LastIndex);
          adjustValues(dbAllTrain_Effect_Anaerob,   trainEffect_Anaerob_Low,   trainEffect_Anaerob_High,  sameDOY_FirstIndex,     sameDOY_LastIndex);
 
-         adjustValues_Avg(dbAllTourDuration,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
+         adjustValues_Avg(dbAllTourDurationTimes,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
 
 //SET_FORMATTING_ON
 
@@ -618,8 +618,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.tagIds = allTagIds;
 
-         _tourDayData.setDurationLow(duration_Low);
-         _tourDayData.setDurationHigh(duration_High);
+         _tourDayData.setDurationLow(durationTime_Low);
+         _tourDayData.setDurationHigh(durationTime_High);
 
          _tourDayData.allDistance = dbAllDistance.toArray();
          _tourDayData.allDistance_Low = distance_Low;
