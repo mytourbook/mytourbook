@@ -1828,6 +1828,7 @@ public class Messages extends NLS {
 
    public static String Pref_Statistic_Group_ChartType;
    public static String Pref_Statistic_Group_DaySummary;
+   public static String Pref_Statistic_Group_DurationTime;
    public static String Pref_Statistic_Group_MonthSummary;
    public static String Pref_Statistic_Group_StatisticTooltip;
    public static String Pref_Statistic_Group_TourFrequency;

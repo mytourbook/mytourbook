@@ -47,9 +47,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    private Button _chkShowDistance;
    private Button _chkShowDuration;
    private Button _chkShowNumberOfTours;
+   private Button _chkShowYearSeparator;
    private Button _chkTooltip_ShowPercentageValues;
    private Button _chkTooltip_ShowSummaryValues;
-   private Button _chkShowYearSeparator;
 
    private Button _rdoChartType_BarAdjacent;
    private Button _rdoChartType_BarStacked;
@@ -117,7 +117,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
-             * Moving, elapsed + break time
+             * Elapsed, recorded, paused, moving and break time
              */
             final Composite timeContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()
