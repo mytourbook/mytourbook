@@ -18,6 +18,7 @@ package net.tourbook.statistic;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -528,6 +529,15 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
       _spinnerDuration_Minimum.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.STAT_DURATION_LOW_VALUE));
       _spinnerDuration_NumOfBars.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.STAT_DURATION_NUMBERS));
 
+      final Enum<DurationTime> durationTime = Util.getEnumValue(
+            _prefStore.getDefaultString(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME),
+            DurationTime.MOVING);
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+
       onChangeUI();
    }
 
@@ -548,6 +558,15 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
       _spinnerDuration_Interval.setSelection(_prefStore.getInt(ITourbookPreferences.STAT_DURATION_INTERVAL));
       _spinnerDuration_Minimum.setSelection(_prefStore.getInt(ITourbookPreferences.STAT_DURATION_LOW_VALUE));
       _spinnerDuration_NumOfBars.setSelection(_prefStore.getInt(ITourbookPreferences.STAT_DURATION_NUMBERS));
+
+      final Enum<DurationTime> durationTime = Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME),
+            DurationTime.MOVING);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
    }
 
    @Override
@@ -567,5 +586,19 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
       _prefStore.setValue(ITourbookPreferences.STAT_DURATION_INTERVAL, _spinnerDuration_Interval.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_DURATION_LOW_VALUE, _spinnerDuration_Minimum.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_DURATION_NUMBERS, _spinnerDuration_NumOfBars.getSelection());
+
+      String selectedDurationTime = UI.EMPTY_STRING;
+      if (_rdoDuration_BreakTime.getSelection()) {
+         selectedDurationTime = DurationTime.BREAK.name();
+      } else if (_rdoDuration_MovingTime.getSelection()) {
+         selectedDurationTime = DurationTime.MOVING.name();
+      } else if (_rdoDuration_RecordedTime.getSelection()) {
+         selectedDurationTime = DurationTime.RECORDED.name();
+      } else if (_rdoDuration_PausedTime.getSelection()) {
+         selectedDurationTime = DurationTime.PAUSED.name();
+      } else if (_rdoDuration_ElapsedTime.getSelection()) {
+         selectedDurationTime = DurationTime.ELAPSED.name();
+      }
+      _prefStore.setValue(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME, selectedDurationTime);
    }
 }

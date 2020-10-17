@@ -62,10 +62,11 @@ public class StatisticTooltipUI_TourFrequency {
    private static final String          TITLE_FORMAT                      = "%s %s";                        //$NON-NLS-1$
 
    private static final int             VERTICAL_LINE_SPACE               = 8;
-
    private static final int             SHELL_MARGIN                      = 5;
 
    private static final IValueFormatter VALUE_FORMATTER_1_0               = new ValueFormatter_Number_1_0();
+
+   private final int                    _columnSpacing                    = 10;
 
    /*
     * Tooltip context
@@ -138,17 +139,6 @@ public class StatisticTooltipUI_TourFrequency {
       public void run() {
          _toolTipProvider.hideToolTip();
       }
-   }
-
-   private float computeSummary(final float[][] allDataSeries, final int valueIndex) {
-
-      float summary = 0;
-
-      for (final float[] dataSerie : allDataSeries) {
-         summary += dataSerie[valueIndex];
-      }
-
-      return summary;
    }
 
    private int computeSummary(final int[][] allDataSeries, final int valueIndex) {
@@ -277,15 +267,15 @@ public class StatisticTooltipUI_TourFrequency {
                   // remove vertical spacing
                   .spacing(defaultSpacing.x, 0)
                   .applyTo(container);
-//            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
             {
 
                createUI_18_ColumnHeader(container);
 
-               createUI_Spacer_Columns(container, numColumns);
+               createUI_Spacer_Row(container, numColumns);
                createUI_30_BarData(container);
 
-               createUI_Spacer_Columns(container, numColumns);
+//               createUI_Spacer_Row(container, numColumns);
                createUI_32_NumTours(container);
             }
          }
@@ -374,8 +364,6 @@ public class StatisticTooltipUI_TourFrequency {
 
    private void createUI_18_ColumnHeader(final Composite parent) {
 
-      final int columnSpacing = 20;
-
       {
          // column 1+2
          _lblColumnHeader_TourType = createUI_Label(parent, UI.EMPTY_STRING);
@@ -396,27 +384,20 @@ public class StatisticTooltipUI_TourFrequency {
             final Label lblPercentage = createUI_Label(parent, Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage, SWT.TRAIL);
             lblPercentage.setToolTipText(Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip);
             lblPercentage.setFont(FONT_BOLD);
-            GridDataFactory.fillDefaults().indent(columnSpacing, 0).applyTo(lblPercentage);
+            GridDataFactory.fillDefaults().indent(_columnSpacing, 0).applyTo(lblPercentage);
          }
       }
 
       if (_isShowSummary) {
 
          {
-            // column 5: Total
+            // column 5+6: Total
             _lblColumnHeader_Summary = createUI_Label(parent, UI.EMPTY_STRING, SWT.TRAIL);
             _lblColumnHeader_Summary.setFont(FONT_BOLD);
             GridDataFactory.fillDefaults()
-                  .indent(columnSpacing, 0)
+                  .indent(_columnSpacing, 0)
+                  .span(2, 1)
                   .applyTo(_lblColumnHeader_Summary);
-         }
-         {
-            // column 6: Summary unit
-            final Label lblSummaryUnit = createUI_Label(parent, UI.EMPTY_STRING);
-
-            if (_isShowSummary == false) {
-               lblSummaryUnit.setVisible(false);
-            }
          }
       }
    }
@@ -438,6 +419,11 @@ public class StatisticTooltipUI_TourFrequency {
 
          if (_isShowSummary) {
             _lblDataValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .grab(true, false)
+                  .applyTo(_lblDataValue_Summary);
+
             _lblDataValue_Summary_Unit = createUI_LabelValue(container, SWT.TRAIL);
          }
       }
@@ -460,6 +446,11 @@ public class StatisticTooltipUI_TourFrequency {
 
          if (_isShowSummary) {
             _lblNumberOfTours_Summary = createUI_LabelValue(container, SWT.TRAIL);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.END, SWT.FILL)
+                  .grab(true, false)
+                  .applyTo(_lblNumberOfTours_Summary);
+
             createUI_Label(container, NUMBERS_UNIT, SWT.LEAD);
          }
       }
@@ -548,7 +539,7 @@ public class StatisticTooltipUI_TourFrequency {
     * @param container
     * @param numColumns
     */
-   private void createUI_Spacer_Columns(final Composite container, final int numColumns) {
+   private void createUI_Spacer_Row(final Composite container, final int numColumns) {
 
       // spacer
       final Label label = createUI_Label(container, null);

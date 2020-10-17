@@ -48,6 +48,8 @@ public class DataProvider_Tour_Day extends DataProvider {
    private boolean               _isAdjustSamePosition;
    private boolean               _isShowTrainingPerformance_AvgValue;
 
+   private DurationTime          _durationTime;
+
    private void adjustValues(final TFloatArrayList dbAllValues,
                              final float[] lowValues,
                              final float[] highValues,
@@ -187,7 +189,10 @@ public class DataProvider_Tour_Day extends DataProvider {
             && tourTypeFilter == statistic_ActiveTourTypeFilter
             && lastYear == statistic_LastYear
             && numberOfYears == statistic_NumberOfYears
-            && refreshData == false) {
+            && _durationTime == durationTime
+            && refreshData == false
+
+      ) {
 
          return _tourDayData;
       }
@@ -204,6 +209,8 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          statistic_LastYear = lastYear;
          statistic_NumberOfYears = numberOfYears;
+
+         _durationTime = durationTime;
 
          setupYearNumbers();
 

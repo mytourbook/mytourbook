@@ -132,7 +132,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          public void propertyChange(final PropertyChangeEvent event) {
             final String property = event.getProperty();
 
-            // test if the color or statistic data have changed
+            // test if statistic options are modified
             if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                   || property.equals(ITourbookPreferences.STAT_ALTITUDE_NUMBERS)
                   || property.equals(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE)
@@ -142,7 +142,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   || property.equals(ITourbookPreferences.STAT_DISTANCE_INTERVAL)
                   || property.equals(ITourbookPreferences.STAT_DURATION_NUMBERS)
                   || property.equals(ITourbookPreferences.STAT_DURATION_LOW_VALUE)
-                  || property.equals(ITourbookPreferences.STAT_DURATION_INTERVAL)) {
+                  || property.equals(ITourbookPreferences.STAT_DURATION_INTERVAL)
+                  || property.equals(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME)) {
 
                // get the changed preferences
                createGroupValues();
@@ -282,39 +283,42 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       // loop: all tours
       for (int tourIndex = 0; tourIndex < statData_Day.allDistance_High.length; tourIndex++) {
 
-         int unitIndex;
+         int groupIndex;
          final int typeColorIndex = statData_Day.allTypeColorIndices[tourIndex];
 
          final int diffDistance = (int) ((statData_Day.allDistance_High[tourIndex] - statData_Day.allDistance_Low[tourIndex] + 500) / 1000);
          final int diffElevation = (int) (statData_Day.allElevation_High[tourIndex] - statData_Day.allElevation_Low[tourIndex]);
          final int diffDurationTime = (int) (statData_Day.getDurationHighFloat()[tourIndex] - statData_Day.getDurationLowFloat()[tourIndex]);
 
-         unitIndex = createTourStatData(
+         // distance
+         groupIndex = createTourStatData(
                diffDistance,
                _statDistance_GroupValues,
                _statDistance_NumTours_High[typeColorIndex],
                _statDistance_Sum_High[typeColorIndex]);
 
-         _statDistance_NumTours_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
-         _statDistance_Sum_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+         _statDistance_NumTours_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
+         _statDistance_Sum_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
 
-         unitIndex = createTourStatData(
+         // elevation
+         groupIndex = createTourStatData(
                diffElevation,
                _statElevation_GroupValues,
                _statElevation_NumTours_High[typeColorIndex],
                _statElevation_Sum_High[typeColorIndex]);
 
-         _statElevation_NumTours_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
-         _statElevation_Sum_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+         _statElevation_NumTours_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
+         _statElevation_Sum_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
 
-         unitIndex = createTourStatData(
+         // duration time
+         groupIndex = createTourStatData(
                diffDurationTime,
                _statDutationTime_GroupValues,
                _statDurationTime_NumTours_High[typeColorIndex],
                _statDurationTime_Sum_High[typeColorIndex]);
 
-         _statDurationTime_NumTours_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
-         _statDurationTime_Sum_ColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
+         _statDurationTime_NumTours_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
+         _statDurationTime_Sum_ColorIndex[typeColorIndex][groupIndex] = typeColorIndex;
       }
    }
 
@@ -631,7 +635,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    }
 
    /**
-    * calculate the statistic for one tour
+    * Calculate the statistic for one tour
     *
     * @param tourValue
     * @param allGroupedValues
@@ -644,7 +648,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       int lastGroup = -1;
       boolean isGroupFound = false;
 
-      // loop: all units
+      // loop: all groups
       for (int groupIndex = 0; groupIndex < allGroupedValues.length; groupIndex++) {
 
          final int groupValue = allGroupedValues[groupIndex];
@@ -893,6 +897,10 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _stat_SelectedYear = statContext.statSelectedYear;
       _stat_NumberOfYears = statContext.statNumberOfYears;
 
+      final Enum<DurationTime> durationTime = net.tourbook.common.util.Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME),
+            DurationTime.MOVING);
+
       // load statistic data from db
       _tourDay_Data = _tourDay_DataProvider.getDayData(
 
@@ -903,8 +911,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
             isDataDirtyWithReset() || statContext.isRefreshData,
 
-            // this may need to be customized as in the other statistics
-            DurationTime.MOVING);
+            (DurationTime) durationTime);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
