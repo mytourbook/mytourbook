@@ -847,8 +847,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                                 final int[][] highValues,
                                 final int[][] colorIndex,
                                 final int yUnit,
-                                final String unit,
-                                final String title) {
+                                final DurationTime durationTime,
+                                final String unit) {
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
@@ -867,15 +867,18 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       yData.setAxisUnit(yUnit);
       yData.setUnitLabel(unit);
       yData.setAllValueColors(0);
-      yData.setYTitle(title);
       yData.setVisibleMinValue(0);
       yData.setShowYSlider(true);
+
+      // set y title to the selected time duration
+      setGraphLabel_Duration(yData, durationTime);
 
       chartDataModel.addYData(yData);
 
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _stat_ActiveTourTypeFilter);
       yData.setColorIndex(colorIndex);
+
 
       createToolTipProvider_TimeDuration(chartDataModel);
 
@@ -897,7 +900,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _stat_SelectedYear = statContext.statSelectedYear;
       _stat_NumberOfYears = statContext.statNumberOfYears;
 
-      final Enum<DurationTime> durationTime = net.tourbook.common.util.Util.getEnumValue(
+      final DurationTime durationTime = (DurationTime) net.tourbook.common.util.Util.getEnumValue(
             _prefStore.getString(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME),
             DurationTime.MOVING);
 
@@ -911,7 +914,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
             isDataDirtyWithReset() || statContext.isRefreshData,
 
-            (DurationTime) durationTime);
+            durationTime);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
@@ -963,8 +966,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statDurationTime_NumTours_High,
             _statDurationTime_NumTours_ColorIndex,
             ChartDataXSerie.AXIS_UNIT_NUMBER,
-            Messages.NUMBERS_UNIT,
-            Messages.LABEL_GRAPH_TIME);
+            durationTime,
+            Messages.NUMBERS_UNIT);
 
       updateChartTime(
             _chartDuration_Values,
@@ -973,8 +976,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statDurationTime_Sum_High,
             _statDurationTime_Sum_ColorIndex,
             ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE,
-            Messages.LABEL_GRAPH_TIME_UNIT,
-            Messages.LABEL_GRAPH_TIME);
+            durationTime,
+            Messages.LABEL_GRAPH_TIME_UNIT);
    }
 
    @Override

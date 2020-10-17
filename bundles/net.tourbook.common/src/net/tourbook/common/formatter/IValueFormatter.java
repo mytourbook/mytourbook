@@ -27,8 +27,24 @@ public interface IValueFormatter {
    static final String ZERO_VALUE_TEXT_HH_MM    = "0:00";    //$NON-NLS-1$
    static final String ZERO_VALUE_TEXT_HH_MM_SS = "0:00:00"; //$NON-NLS-1$
 
+   /**
+    * @param value
+    * @return
+    */
    String printDouble(double value);
 
+   /**
+    * @param value
+    * @return
+    */
    String printLong(long value);
+
+   /**
+    * @param value
+    * @param isHide0Value
+    * @param isShowBiggerThan0
+    * @return
+    */
+   String printLong(long value, boolean isHide0Value, boolean isShowBiggerThan0);
 
 }

@@ -27,14 +27,19 @@ public class ValueFormatter_Time_HHMMSS implements IValueFormatter {
 
    @Override
    public String printLong(final long value) {
+      return printLong(value, true, true);
+   }
 
-      if (value == 0) {
+   @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+
+      if (value == 0 && isHide0Value) {
          return UI.EMPTY_STRING;
       }
 
       final String formattedValue = UI.format_hhh_mm_ss(value);
 
-      if (value > 0 && ZERO_VALUE_TEXT_HH_MM_SS.equals(formattedValue)) {
+      if (isShowBiggerThan0 && value > 0 && ZERO_VALUE_TEXT_HH_MM_SS.equals(formattedValue)) {
          return BIGGER_THAN_ZERO;
       }
 
