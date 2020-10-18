@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,33 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.statistics.graphs;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.tourChart.TourChart;
+public enum FrequencyStatistic {
 
-import org.eclipse.jface.action.Action;
+   DISTANCE, //
 
+   DURATION_TIME, //
 
-public class ActionTourChartPauses extends Action {
+   ELEVATION, //
 
-   private TourChart _tourChart;
-
-   public ActionTourChartPauses(final TourChart tourChart) {
-
-      super(null, AS_CHECK_BOX);
-
-      setToolTipText(Messages.Tour_Action_ShowTourPauses_Tooltip);
-
-      _tourChart = tourChart;
-
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
-   }
-
-   @Override
-   public void run() {
-      _tourChart.actionShowTourPauses(isChecked());
-   }
 }

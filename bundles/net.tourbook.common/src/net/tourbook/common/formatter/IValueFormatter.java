@@ -27,8 +27,30 @@ public interface IValueFormatter {
    static final String ZERO_VALUE_TEXT_HH_MM    = "0:00";    //$NON-NLS-1$
    static final String ZERO_VALUE_TEXT_HH_MM_SS = "0:00:00"; //$NON-NLS-1$
 
+   /**
+    * @param value
+    * @return
+    */
    String printDouble(double value);
 
+   /**
+    * Formats the long values to a string. The formatted value is an empty string when it is 0 and
+    * ">0" is displayed when the formatted text is "0" but the value is larger than 0.
+    *
+    * @param value
+    * @return
+    */
    String printLong(long value);
+
+   /**
+    * @param value
+    * @param isHide0Value
+    *           When <code>false</code> then a "0" value is displayed
+    * @param isShowBiggerThan0
+    *           When <code>false</code> then ">0" is displayed when the formatted text is "0" but
+    *           the values larger than 0.
+    * @return
+    */
+   String printLong(long value, boolean isHide0Value, boolean isShowBiggerThan0);
 
 }

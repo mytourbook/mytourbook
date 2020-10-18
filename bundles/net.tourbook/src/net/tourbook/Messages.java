@@ -874,13 +874,9 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_StartComparing;
 
    public static String        Graph_Label_Time_Moving;
-
    public static String        Graph_Label_Time_Paused;
-
    public static String        Graph_Label_Time_Elapsed;
-
    public static String        Graph_Label_Time_Break;
-
    public static String        Graph_Label_Time_Recorded;
 
    public static String        HR_Zone_01_060_Moderate;
@@ -1609,7 +1605,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Checkbox_ShowVerticalGrid;
    public static String        Pref_Graphs_Dialog_GridLine_Warning_Message;
    public static String        Pref_Graphs_Error_one_graph_must_be_selected;
-   public static String        Pref_Graphs_grid_distance;
    public static String        Pref_Graphs_grid_horizontal_distance;
    public static String        Pref_Graphs_grid_vertical_distance;
    public static String        Pref_Graphs_Group_Grid;
@@ -1620,6 +1615,8 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Label_GraphTransparency_Tooltip;
    public static String        Pref_Graphs_Label_GraphTransparencyLine;
    public static String        Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
+   public static String        Pref_Graphs_Label_GridDistance;
+   public static String        Pref_Graphs_Label_GridDistance_Tooltip;
    public static String        Pref_Graphs_Label_MaxValue;
    public static String        Pref_Graphs_Label_MinValue;
    public static String        Pref_Graphs_Label_select_graph;
@@ -1828,6 +1825,7 @@ public class Messages extends NLS {
 
    public static String Pref_Statistic_Group_ChartType;
    public static String Pref_Statistic_Group_DaySummary;
+   public static String Pref_Statistic_Group_DurationTime;
    public static String Pref_Statistic_Group_MonthSummary;
    public static String Pref_Statistic_Group_StatisticTooltip;
    public static String Pref_Statistic_Group_TourFrequency;
@@ -2427,8 +2425,6 @@ public class Messages extends NLS {
    public static String Tour_Action_EditChartPreferences;
    public static String Tour_Action_EditSmoothingPreferences;
    public static String Tour_Action_EditStatisticPreferences;
-   public static String Tour_Action_Show_Tour_Pauses;
-
    public static String Tour_Action_graph_altimeter_tooltip;
    public static String Tour_Action_graph_altitude_tooltip;
    public static String Tour_Action_graph_analyzer_tooltip;
@@ -2477,6 +2473,8 @@ public class Messages extends NLS {
    public static String Tour_Action_SetTimeZone;
    public static String Tour_Action_SetWeatherConditions;
    public static String Tour_Action_ShowBreaktimeValues;
+   public static String Tour_Action_ShowTourPauses;
+   public static String Tour_Action_ShowTourPauses_Tooltip;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;
@@ -3035,7 +3033,6 @@ public class Messages extends NLS {
    public static String Year_Statistic_Combo_LastYears_Tooltip;
    public static String Year_Statistic_Combo_NumberOfYears_Tooltip;
    public static String Year_Statistic_Label_NumberOfYears;
-   public static String Year_Statistic_Tooltip_Pulse;
 
    static {
       // initialize resource bundle

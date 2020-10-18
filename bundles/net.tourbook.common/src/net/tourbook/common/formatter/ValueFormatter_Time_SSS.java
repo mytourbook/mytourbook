@@ -27,8 +27,13 @@ public class ValueFormatter_Time_SSS implements IValueFormatter {
 
    @Override
    public String printLong(final long value) {
+      return printLong(value, true, true);
+   }
 
-      if (value == 0) {
+   @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+
+      if (value == 0 && isHide0Value) {
          return UI.EMPTY_STRING;
       }
 

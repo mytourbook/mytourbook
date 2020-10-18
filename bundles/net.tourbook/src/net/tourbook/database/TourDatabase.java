@@ -583,9 +583,9 @@ public class TourDatabase {
        * @throws SQLException
        */
       private static void RenameCol(final Statement stmt,
-                                        final String table,
-                                        final String columnName,
-                                        final String newColumnName) throws SQLException {
+                                    final String table,
+                                    final String columnName,
+                                    final String newColumnName) throws SQLException {
 
          final String sql = UI.EMPTY_STRING//
                + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -2008,8 +2008,8 @@ public class TourDatabase {
 
    /**
     * @param tourTypeId
-    * @return Returns the name for the {@link TourType} or an empty string when the tour type id was
-    *         not found
+    * @return Returns the name for the {@link TourType} or "- No Tour Type -" when the tour type id
+    *         was not found
     */
    public static String getTourTypeName(final long tourTypeId) {
 

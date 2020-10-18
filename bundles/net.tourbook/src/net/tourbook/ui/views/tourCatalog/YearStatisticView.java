@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -27,7 +26,6 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
@@ -429,42 +427,6 @@ public class YearStatisticView extends ViewPart {
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
    }
 
-   private ChartToolTipInfo createToolTipInfo(int valueIndex) {
-
-      if (valueIndex >= _DOYValues.size()) {
-         valueIndex -= _DOYValues.size();
-      }
-
-      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
-         return null;
-      }
-
-      /*
-       * set calendar day/month/year
-       */
-      final int firstYear = getFirstYear();
-      final int tourDOY = _DOYValues.get(valueIndex);
-
-      final ZonedDateTime tourDate = ZonedDateTime
-            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
-            .plusDays(tourDOY);
-
-      final StringBuilder toolTipFormat = new StringBuilder();
-      toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
-      toolTipFormat.append(UI.NEW_LINE);
-
-      final String ttText = UI.EMPTY_STRING
-            + String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
-            + UI.NEW_LINE
-            + String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-
-      toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
-      toolTipInfo.setLabel(ttText);
-
-      return toolTipInfo;
-   }
 
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
@@ -1061,11 +1023,6 @@ public class YearStatisticView extends ViewPart {
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
             YearStatisticView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(valueIndex);
          }
       });
 

@@ -39,10 +39,9 @@ public class StatisticContext {
    public TourTypeFilter appTourTypeFilter;
 
    /**
-    * First (youngest) year which is selected in the statistic container and where the statistics
-    * start.
+    * Year which is selected in the statistic container and where the statistics start.
     */
-   public int            statFirstYear;
+   public int            statSelectedYear;
 
    /**
     * Number of years which should be displayed in the statistic
@@ -93,7 +92,7 @@ public class StatisticContext {
       this.appPerson = activePerson;
       this.appTourTypeFilter = activeTourTypeFilter;
 
-      this.statFirstYear = selectedYear;
+      this.statSelectedYear = selectedYear;
       this.statNumberOfYears = numberOfYears;
    }
 

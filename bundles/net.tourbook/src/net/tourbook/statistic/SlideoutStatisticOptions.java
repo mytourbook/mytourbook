@@ -101,8 +101,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
 //         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));

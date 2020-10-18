@@ -26,7 +26,6 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartTitleSegmentConfig;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
@@ -53,10 +52,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticYear extends TourbookStatistic {
-
-//   private static final String      STATISTIC_TOOLTIP_LABEL_COLUMN_HEADER_YEAR = net.tourbook.ui.Messages.Statistic_Tooltip_Label_ColumnHeader_Year;
-
-   private static final String      STRING_SEPARATOR       = " - ";                        //$NON-NLS-1$
 
    private final IPreferenceStore   _prefStore             = TourbookPlugin.getPrefStore();
 
@@ -121,100 +116,6 @@ public abstract class StatisticYear extends TourbookStatistic {
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
    }
 
-   private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
-
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
-
-      final int elapsedTime = _statisticData_Year.elapsedTime[serieIndex][valueIndex];
-      final int recordedTime = _statisticData_Year.recordedTime[serieIndex][valueIndex];
-      final int pausedTime = _statisticData_Year.pausedTime[serieIndex][valueIndex];
-      final int movingTime = _statisticData_Year.movingTime[serieIndex][valueIndex];
-      final int breakTime = elapsedTime - movingTime;
-
-      /*
-       * tool tip: title
-       */
-      final StringBuilder titleString = new StringBuilder();
-
-      final String tourTypeName = StatisticServices.getTourTypeName(//
-            serieIndex,
-            valueIndex,
-            _statisticData_Year.typeIds_Resorted,
-            _appTourTypeFilter);
-
-      if (tourTypeName != null && tourTypeName.length() > 0) {
-         titleString.append(tourTypeName);
-         titleString.append(STRING_SEPARATOR);
-      }
-
-      titleString.append(Messages.tourtime_info_date_year);
-      titleString.append(UI.NEW_LINE);
-
-      final int statYear = oldestYear + valueIndex;
-      final String toolTipTitle = String.format(titleString.toString(), statYear).toString();
-
-      /*
-       * tool tip: label
-       */
-      final StringBuilder toolTipFormat = new StringBuilder();
-      toolTipFormat.append(Messages.tourtime_info_distance);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_altitude);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_elapsed_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recorded_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_paused_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_moving_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_break_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
-
-      final String toolTipLabel = String.format(
-            toolTipFormat.toString(), //
-            //
-            //
-            (int) _statisticData_Year.distance_High_Resorted[serieIndex][valueIndex],
-            UI.UNIT_LABEL_DISTANCE,
-            //
-            (int) _statisticData_Year.elevationUp_High_Resorted[serieIndex][valueIndex],
-            UI.UNIT_LABEL_ALTITUDE,
-            //
-            elapsedTime / 3600,
-            (elapsedTime % 3600) / 60,
-            //
-            recordedTime / 3600,
-            (recordedTime % 3600) / 60,
-            //
-            pausedTime / 3600,
-            (pausedTime % 3600) / 60,
-            //
-            movingTime / 3600,
-            (movingTime % 3600) / 60,
-            //
-            breakTime / 3600,
-            (breakTime % 3600) / 60,
-            //
-            (int) _statisticData_Year.numTours_High_Resorted[serieIndex][valueIndex]
-      //
-      ).toString();
-
-      /*
-       * create tool tip info
-       */
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-      toolTipInfo.setTitle(toolTipTitle);
-      toolTipInfo.setLabel(toolTipLabel);
-
-      return toolTipInfo;
-   }
-
    /**
     * @param toolTipProvider
     * @param parent
@@ -240,7 +141,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
 
-      new StatisticTooltipUI_Summary().createContentArea(
+      new StatisticTooltipUI_CategorizedData().createContentArea(
             parent,
             toolTipProvider,
             _statisticData_Year,
@@ -445,11 +346,6 @@ public abstract class StatisticYear extends TourbookStatistic {
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
             StatisticYear.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(serieIndex, valueIndex);
-         }
       });
    }
 
@@ -486,13 +382,13 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statFirstYear = statContext.statFirstYear;
+      _statFirstYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _statisticData_Year = _tourYear_DataProvider.getYearData(
             statContext.appPerson,
             statContext.appTourTypeFilter,
-            statContext.statFirstYear,
+            statContext.statSelectedYear,
             statContext.statNumberOfYears,
             isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
             durationTime);

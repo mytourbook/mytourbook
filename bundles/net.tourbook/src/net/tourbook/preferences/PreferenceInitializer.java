@@ -129,6 +129,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME, DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);

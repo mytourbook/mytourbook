@@ -26,6 +26,4 @@ import org.eclipse.swt.widgets.Composite;
 public interface IChartInfoProvider {
 
    void createToolTipUI(IToolTipProvider toolTipProvider, Composite parent, int serieIndex, int valueIndex);
-
-   ChartToolTipInfo getToolTipInfo(int serieIndex, int valueIndex);
 }

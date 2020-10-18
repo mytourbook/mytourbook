@@ -42,11 +42,13 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageImport extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String    ID          = "net.tourbook.preferences.PrefPageImport"; //$NON-NLS-1$
+   public static final String    ID               = "net.tourbook.preferences.PrefPageImport"; //$NON-NLS-1$
 
-   private final IDialogSettings _state      = TourbookPlugin.getState(RawDataView.ID);
+   private static final int      VERTICAL_SPACING = 10;
 
-   private RawDataManager        _rawDataMgr = RawDataManager.getInstance();
+   private final IDialogSettings _state           = TourbookPlugin.getState(RawDataView.ID);
+
+   private RawDataManager        _rawDataMgr      = RawDataManager.getInstance();
 
    private PixelConverter        _pc;
    private SelectionAdapter      _defaultSelectionListener;
@@ -99,7 +101,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       {
          {
             /*
-             * Label: common info
+             * Label: Common info
              */
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.PrefPage_Import_Label_Info);
@@ -113,57 +115,60 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             _chkAutoOpenImportLog = new Button(container, SWT.CHECK);
             _chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenTourLogView);
             _chkAutoOpenImportLog.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()//
-                  .indent(0, _pc.convertVerticalDLUsToPixels(4))
+            GridDataFactory.fillDefaults()
+                  .indent(0, VERTICAL_SPACING)
                   .applyTo(_chkAutoOpenImportLog);
          }
 
          {
-            /*
-             * Checkbox: create tour id with time
-             */
-            _chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
-            _chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
-            _chkCreateTourIdWithTime.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()//
-//						.indent(0, _pc.convertVerticalDLUsToPixels(4))
-                  .applyTo(_chkCreateTourIdWithTime);
-         }
-
-         {
-            /*
-             * Label: id info
-             */
-            _lblIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-            _lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, false)
-                  .indent(_checkboxIndent, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(_lblIdInfo);
-         }
-         {
-            /*
-             * Checkbox: Ignore invalid files
-             */
-            _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
-            _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
-            _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .indent(0, 10)
-                  .applyTo(_chkIgnoreInvalidFile);
+            {
+               /*
+                * Checkbox: Create tour id with time
+                */
+               _chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
+               _chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
+               _chkCreateTourIdWithTime.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .indent(0, VERTICAL_SPACING)
+                     .applyTo(_chkCreateTourIdWithTime);
+            }
+            {
+               /*
+                * Label: id info
+                */
+               _lblIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+               _lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(_checkboxIndent, 0)
+                     .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                     .applyTo(_lblIdInfo);
+            }
          }
          {
-            /*
-             * Label:
-             */
-            _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-            _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, false)
-                  .indent(_checkboxIndent, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(_lblInvalidFilesInfo);
+            {
+               /*
+                * Checkbox: Ignore invalid files
+                */
+               _chkIgnoreInvalidFile = new Button(container, SWT.CHECK);
+               _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
+               _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .indent(0, VERTICAL_SPACING)
+                     .applyTo(_chkIgnoreInvalidFile);
+            }
+            {
+               /*
+                * Label: Info
+                */
+               _lblInvalidFilesInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+               _lblInvalidFilesInfo.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(_checkboxIndent, 0)
+                     .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                     .applyTo(_lblInvalidFilesInfo);
+            }
          }
          {
             /*
@@ -175,7 +180,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             _chkSetBodyWeight.setText(Messages.PrefPage_Import_Checkbox_SetBodyWeight);
             _chkSetBodyWeight.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
-                  .indent(0, 10)
+                  .indent(0, VERTICAL_SPACING)
                   .applyTo(_chkSetBodyWeight);
 
             // link
@@ -200,23 +205,26 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
              */
             final Composite cadenceContainer = new Composite(parent, SWT.NONE);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cadenceContainer);
+            GridDataFactory.fillDefaults()
+                  .indent(0, VERTICAL_SPACING)
+                  .applyTo(cadenceContainer);
+            {
+               final Label lblDefaultCadence = new Label(cadenceContainer, SWT.FILL | SWT.LEFT);
+               lblDefaultCadence.setText(Messages.PrefPage_Import_Default_Cadence);
 
-            final Label lblDefaultCadence = new Label(cadenceContainer, SWT.FILL | SWT.LEFT);
+               _comboDefaultCadence = new ComboViewerCadence(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-            lblDefaultCadence.setText(Messages.PrefPage_Import_Default_Cadence);
-
-            _comboDefaultCadence = new ComboViewerCadence(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-            /*
-             * Label:
-             */
-            final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
-            lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_Cadence_Tooltip);
-            GridDataFactory.fillDefaults()//
-                  .grab(true, false)
-                  .indent(_checkboxIndent, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(lblDefaultCadenceInfo);
+               /*
+                * Label: Info
+                */
+               final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
+               lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_Cadence_Tooltip);
+               GridDataFactory.fillDefaults()//
+                     .grab(true, false)
+                     .indent(_checkboxIndent, 0)
+                     .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                     .applyTo(lblDefaultCadenceInfo);
+            }
          }
       }
    }

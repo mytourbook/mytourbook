@@ -35,7 +35,6 @@ public class ValueFormatter_Number_1_2 implements IValueFormatter {
 
       _nf2.setGroupingUsed(isGroupingUsed);
    }
-
    @Override
    public String printDouble(final double value) {
 
@@ -51,6 +50,11 @@ public class ValueFormatter_Number_1_2 implements IValueFormatter {
    @Override
    public String printLong(final long value) {
       return Messages.App_Error_NotSupportedValueFormatter;
+   }
+
+   @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return printLong(value);
    }
 
    @Override

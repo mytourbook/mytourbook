@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -99,8 +99,9 @@ public class ChartOptions_Grid {
              * label: grid distance
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Graphs_grid_distance);
-            GridDataFactory.fillDefaults()//
+            label.setText(Messages.Pref_Graphs_Label_GridDistance);
+            label.setToolTipText(Messages.Pref_Graphs_Label_GridDistance_Tooltip);
+            GridDataFactory.fillDefaults()
                   .span(3, 1)
                   .applyTo(label);
          }
@@ -111,7 +112,7 @@ public class ChartOptions_Grid {
              */
             _lblGridHorizontal = new Label(group, SWT.NONE);
             _lblGridHorizontal.setText(Messages.Pref_Graphs_grid_horizontal_distance);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
 //                  .indent(16, 0)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblGridHorizontal);
