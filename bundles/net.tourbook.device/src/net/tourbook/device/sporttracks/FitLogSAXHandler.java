@@ -232,28 +232,28 @@ public class FitLogSAXHandler extends DefaultHandler {
          final StringBuilder notes = new StringBuilder(ATTRIB_EQUIPMENT_ID + "(SportTracks): " + Id); //$NON-NLS-1$
 
          if (!StringUtils.isNullOrEmpty(DatePurchased)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1
          }
          if (!StringUtils.isNullOrEmpty(ExpectedLifeKilometers)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + ": " + ExpectedLifeKilometers); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + ": " + ExpectedLifeKilometers); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(InUse)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_IN_USE + ": " + InUse); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_IN_USE + ": " + InUse); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(PurchaseLocation)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_PURCHASE_LOCATION + ": " + PurchaseLocation); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_LOCATION + ": " + PurchaseLocation); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(PurchasePrice)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_PURCHASE_PRICE + ": " + PurchasePrice); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_PRICE + ": " + PurchasePrice); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(Type)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_TYPE + ": " + Type); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_TYPE + ": " + Type); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(WeightKilograms) && !WeightKilograms.equals("0.000")) { //$NON-NLS-1$
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS + ": " + WeightKilograms); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_WEIGHT_KILOGRAMS + ": " + WeightKilograms); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(Notes)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.ATTRIB_EQUIPMENT_NOTES + ": " + Notes); //$NON-NLS-1$
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_NOTES + ": " + Notes); //$NON-NLS-1$
          }
 
          return notes.toString();
