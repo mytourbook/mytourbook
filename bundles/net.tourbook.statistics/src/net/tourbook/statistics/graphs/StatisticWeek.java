@@ -25,7 +25,6 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
@@ -53,7 +52,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
    private static final String      SUB_TITLE_1_LINE       = "%s … %s";                   //$NON-NLS-1$
    private static final String      SUB_TITLE_2_LINES      = "%s …\n%s";                  //$NON-NLS-1$
 
-   private static final char        NL                     = UI.NEW_LINE;
 
    private TourStatisticData_Week   _statisticData_Week;
    private DataProvider_Tour_Week   _tourWeek_DataProvider = new DataProvider_Tour_Week();
@@ -131,137 +129,9 @@ public abstract class StatisticWeek extends TourbookStatistic {
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
             StatisticWeek.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(serieIndex, valueIndex);
-         }
       };
    }
 
-   private ChartToolTipInfo createToolTipInfo(final int colorIndex, final int weekIndex) {
-
-      final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
-
-      final WeekFields calendarWeek = TimeTools.calendarWeek;
-      final TemporalField weekOfWeekBasedYear = calendarWeek.weekOfWeekBasedYear();
-      final TemporalField weekBasedYear = calendarWeek.weekBasedYear();
-      final TemporalField dayOfWeek = calendarWeek.dayOfWeek();
-
-      // first day in the statistic calendar
-      final LocalDate jan_1_1 = LocalDate.of(oldestYear, 1, 1);
-
-      final int jan_1_1_DayOfWeek = jan_1_1.get(dayOfWeek) - 1;
-
-      final int jan_1_1_WeekOfYear = jan_1_1.get(weekOfWeekBasedYear);
-      LocalDate firstStatisticDay;
-
-      if (jan_1_1_WeekOfYear > 33) {
-
-         // the week from 1.1.January is from the last year -> this is not displayed
-         firstStatisticDay = jan_1_1.plusDays(7 - jan_1_1_DayOfWeek);
-
-      } else {
-
-         firstStatisticDay = jan_1_1.minusDays(jan_1_1_DayOfWeek);
-      }
-
-      final LocalDate valueStatisticDay = firstStatisticDay.plusWeeks(weekIndex);
-
-      final int weekOfYear = valueStatisticDay.get(weekOfWeekBasedYear);
-      final int weekYear = valueStatisticDay.get(weekBasedYear);
-
-      final String beginDate = TimeTools.Formatter_Date_F.format(valueStatisticDay);
-      final String endDate = TimeTools.Formatter_Date_F.format(valueStatisticDay.plusDays(6));
-
-      final Integer elapsedTime = _statisticData_Week.elapsedTime[colorIndex][weekIndex];
-      final Integer recordedTime = _statisticData_Week.recordedTime[colorIndex][weekIndex];
-      final Integer pausedTime = _statisticData_Week.pausedTime[colorIndex][weekIndex];
-      final Integer movingTime = _statisticData_Week.movingTime[colorIndex][weekIndex];
-      final int breakTime = elapsedTime - movingTime;
-
-      final String tourTypeName = StatisticServices.getTourTypeName(colorIndex, _appTourTypeFilter);
-
-      /*
-       * Tool tip: title
-       */
-      final StringBuilder sbTitleFormat = new StringBuilder();
-      sbTitleFormat.append(Messages.tourtime_info_week);
-      sbTitleFormat.append(NL);
-
-      final String toolTipTitle = String.format(sbTitleFormat.toString(),
-            tourTypeName,
-            weekOfYear,
-            weekYear
-
-      ).toString();
-
-      /*
-       * Tool tip: label
-       */
-      final StringBuilder sbToolTipFormat = new StringBuilder();
-      sbToolTipFormat.append(Messages.tourtime_info_date_week);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_distance_tour);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_altitude);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_elapsed_time);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_recorded_time);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_paused_time);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_moving_time);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.tourtime_info_break_time);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(NL);
-      sbToolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
-
-      final String toolTipLabel = String.format(
-            sbToolTipFormat.toString(), //
-            //
-            beginDate,
-            endDate,
-            //
-            _statisticData_Week.distance_High[colorIndex][weekIndex] / 1000,
-            UI.UNIT_LABEL_DISTANCE,
-            //
-            (int) _statisticData_Week.elevationUp_High[colorIndex][weekIndex],
-            UI.UNIT_LABEL_ALTITUDE,
-            //
-            elapsedTime / 3600,
-            (elapsedTime % 3600) / 60,
-            //
-            recordedTime / 3600,
-            (recordedTime % 3600) / 60,
-            //
-            pausedTime / 3600,
-            (pausedTime % 3600) / 60,
-            //
-            movingTime / 3600,
-            (movingTime % 3600) / 60,
-            //
-            breakTime / 3600,
-            (breakTime % 3600) / 60,
-            //
-            (int) _statisticData_Week.numTours_High[colorIndex][weekIndex]
-      //
-      ).toString();
-
-      /*
-       * create tool tip info
-       */
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-      toolTipInfo.setTitle(toolTipTitle);
-      toolTipInfo.setLabel(toolTipLabel);
-
-      return toolTipInfo;
-   }
 
    /**
     * @param toolTipProvider

@@ -23,11 +23,9 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
-import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.IToolTipProvider;
@@ -57,8 +55,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticTour_Frequency extends TourbookStatistic {
-
-   private static final char           NL                                  = UI.NEW_LINE;
 
    private final IPreferenceStore      _prefStore                          = TourbookPlugin.getPrefStore();
 
@@ -359,20 +355,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       createGroupValues();
    }
 
-   /**
-    * create tool tip info
-    */
-   private ChartToolTipInfo createToolTipProvider(final int serieIndex, final String toolTipLabel) {
-
-      final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _stat_ActiveTourTypeFilter);
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-      toolTipInfo.setTitle(tourTypeName);
-      toolTipInfo.setLabel(toolTipLabel);
-
-      return toolTipInfo;
-   }
-
    private void createToolTipProvider_Distance(final ChartDataModel chartModel) {
 
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
@@ -387,63 +369,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   valueIndex,
                   FrequencyStatistic.DISTANCE);
          }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-
-            String toolTipLabel;
-            final StringBuilder sb = new StringBuilder();
-
-            final int distance = _statDistance_Sum_High[serieIndex][valueIndex];
-            final int counter = _statDistance_NumTours_High[serieIndex][valueIndex];
-
-            if (valueIndex == 0) {
-
-               sb.append(Messages.numbers_info_distance_down);
-               sb.append(NL);
-               sb.append(Messages.numbers_info_distance_total);
-
-               toolTipLabel = String.format(
-                     sb.toString(),
-                     _statDistance_GroupValues[valueIndex],
-                     UI.UNIT_LABEL_DISTANCE,
-                     counter,
-                     distance,
-                     UI.UNIT_LABEL_DISTANCE).toString();
-
-            } else if (valueIndex == _statDistance_GroupValues.length - 1) {
-
-               sb.append(Messages.numbers_info_distance_up);
-               sb.append(NL);
-               sb.append(Messages.numbers_info_distance_total);
-
-               toolTipLabel = String.format(
-                     sb.toString(),
-                     _statDistance_GroupValues[valueIndex - 1],
-                     UI.UNIT_LABEL_DISTANCE,
-                     counter,
-                     distance,
-                     UI.UNIT_LABEL_DISTANCE).toString();
-            } else {
-
-               sb.append(Messages.numbers_info_distance_between);
-               sb.append(NL);
-               sb.append(Messages.numbers_info_distance_total);
-
-               toolTipLabel = String.format(
-                     sb.toString(),
-                     _statDistance_GroupValues[valueIndex - 1],
-                     _statDistance_GroupValues[valueIndex],
-                     UI.UNIT_LABEL_DISTANCE,
-                     counter,
-                     distance,
-                     UI.UNIT_LABEL_DISTANCE).toString();
-            }
-
-            return createToolTipProvider(serieIndex, toolTipLabel);
-
-         }
-
       });
    }
 
@@ -459,65 +384,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   serieIndex,
                   valueIndex,
                   FrequencyStatistic.ELEVATION);
-         }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-
-            String toolTipLabel;
-            final StringBuilder infoText = new StringBuilder();
-
-            final int summary = _statElevation_Sum_High[serieIndex][valueIndex];
-            final int numTours = _statElevation_NumTours_High[serieIndex][valueIndex];
-            final String unit = UI.UNIT_LABEL_ALTITUDE;
-
-            if (valueIndex == 0) {
-
-               infoText.append(Messages.numbers_info_altitude_down);
-               infoText.append(NL);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statElevation_GroupValues[valueIndex],
-                     unit,
-                     numTours,
-                     //
-                     summary,
-                     unit).toString();
-
-            } else if (valueIndex == _statElevation_GroupValues.length - 1) {
-
-               infoText.append(Messages.numbers_info_altitude_up);
-               infoText.append(NL);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statElevation_GroupValues[valueIndex - 1],
-                     unit,
-                     numTours,
-                     //
-                     summary,
-                     unit).toString();
-            } else {
-
-               infoText.append(Messages.numbers_info_altitude_between);
-               infoText.append(NL);
-               infoText.append(Messages.numbers_info_altitude_total);
-
-               toolTipLabel = String.format(
-                     infoText.toString(),
-                     _statElevation_GroupValues[valueIndex - 1],
-                     _statElevation_GroupValues[valueIndex],
-                     unit,
-                     numTours,
-                     //
-                     summary,
-                     unit).toString();
-            }
-
-            return createToolTipProvider(serieIndex, toolTipLabel);
          }
       });
    }
@@ -535,59 +401,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   serieIndex,
                   valueIndex,
                   FrequencyStatistic.DURATION_TIME);
-         }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-
-            String toolTipLabel;
-            final StringBuilder toolTipFormat = new StringBuilder();
-
-            if (valueIndex == 0) {
-
-               // first bar
-
-               toolTipFormat.append(Messages.numbers_info_time_down);
-               toolTipFormat.append(NL);
-               toolTipFormat.append(Messages.numbers_info_time_total);
-
-               toolTipLabel = String.format(toolTipFormat.toString(),
-
-                     Util.formatValue(_statDutationTime_GroupValues[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-
-                     _statDurationTime_NumTours_High[serieIndex][valueIndex],
-                     Util.formatValue(_statDurationTime_Sum_High[serieIndex][valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
-
-            } else if (valueIndex == _statDutationTime_GroupValues.length - 1) {
-
-               // last bar
-
-               toolTipFormat.append(Messages.numbers_info_time_up);
-               toolTipFormat.append(NL);
-               toolTipFormat.append(Messages.numbers_info_time_total);
-
-               toolTipLabel = String.format(toolTipFormat.toString(),
-
-                     Util.formatValue(_statDutationTime_GroupValues[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-                     _statDurationTime_NumTours_High[serieIndex][valueIndex],
-                     Util.formatValue(_statDurationTime_Sum_High[serieIndex][valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
-            } else {
-
-               // between bar
-
-               toolTipFormat.append(Messages.numbers_info_time_between);
-               toolTipFormat.append(NL);
-               toolTipFormat.append(Messages.numbers_info_time_total);
-
-               toolTipLabel = String.format(toolTipFormat.toString(),
-
-                     Util.formatValue(_statDutationTime_GroupValues[valueIndex - 1], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-                     Util.formatValue(_statDutationTime_GroupValues[valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE),
-                     _statDurationTime_NumTours_High[serieIndex][valueIndex],
-                     Util.formatValue(_statDurationTime_Sum_High[serieIndex][valueIndex], ChartDataSerie.AXIS_UNIT_HOUR_MINUTE)).toString();
-            }
-
-            return createToolTipProvider(serieIndex, toolTipLabel);
          }
       });
    }
@@ -878,7 +691,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _stat_ActiveTourTypeFilter);
       yData.setColorIndex(colorIndex);
-
 
       createToolTipProvider_TimeDuration(chartDataModel);
 

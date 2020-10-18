@@ -33,56 +33,12 @@ public class Messages extends NLS {
    public static String        LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC;
    public static String        LABEL_GRAPH_TRAINING_PERFORMANCE;
 
-   public static String        numbers_info_altitude_between;
-   public static String        numbers_info_altitude_down;
-   public static String        numbers_info_altitude_total;
-   public static String        numbers_info_altitude_up;
-   public static String        numbers_info_distance_between;
-   public static String        numbers_info_distance_down;
-   public static String        numbers_info_distance_total;
-   public static String        numbers_info_distance_up;
-   public static String        numbers_info_time_between;
-   public static String        numbers_info_time_down;
-   public static String        numbers_info_time_total;
-   public static String        numbers_info_time_up;
-
    public static String        NUMBERS_UNIT;
 
    public static String        Statistic_HrZone_Error_NoHrZoneInPerson;
    public static String        Statistic_HrZone_ErrorNoPerson;
 
    public static String        Statistic_Label_Invers;
-
-   public static String        tourtime_info_altitude;
-   public static String        tourtime_info_avg_pace;
-   public static String        tourtime_info_avg_speed;
-   public static String        tourtime_info_break_time;
-   public static String        tourtime_info_break_time_tour;
-   public static String        tourtime_info_date_month;
-   public static String        tourtime_info_date_week;
-   public static String        tourtime_info_date_year;
-   public static String        tourtime_info_description;
-   public static String        tourtime_info_description_text;
-   public static String        tourtime_info_distance;
-   public static String        tourtime_info_distance_tour;
-   public static String        tourtime_info_moving_time;
-   public static String        tourtime_info_moving_time_tour;
-   public static String        tourtime_info_elapsed_time;
-   public static String        tourtime_info_elapsed_time_tour;
-   public static String        tourtime_info_recorded_time;
-   public static String        tourtime_info_recorded_time_tour;
-   public static String        tourtime_info_paused_time;
-   public static String        tourtime_info_paused_time_tour;
-   public static String        tourtime_info_tags;
-   public static String        tourtime_info_time;
-   public static String        TourTime_Info_NumberOfTours;
-   public static String        Tourtime_Info_TimeZone;
-   public static String        Tourtime_Info_TimeZoneDifference;
-   public static String        Tourtime_Info_Training_Effect_Aerob;
-   public static String        Tourtime_Info_Training_Effect_Anaerob;
-   public static String        Tourtime_Info_Training_Performance;
-   public static String        tourtime_info_tour_type;
-   public static String        tourtime_info_week;
 
    static {
       // initialize resource bundle

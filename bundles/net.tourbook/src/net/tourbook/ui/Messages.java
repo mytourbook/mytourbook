@@ -474,14 +474,8 @@ public class Messages extends NLS {
    public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage;
    public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip;
    public static String        Statistic_Tooltip_Label_Distance;
-   public static String        Statistic_Tooltip_Label_DurationTime;
-   public static String        Statistic_Tooltip_Label_DurationTime_Between;
-   public static String        Statistic_Tooltip_Label_DurationTime_First;
-   public static String        Statistic_Tooltip_Label_DurationTime_Last;
-   public static String        Statistic_Tooltip_Label_DurationTime_Total;
    public static String        Statistic_Tooltip_Label_Elevation;
    public static String        Statistic_Tooltip_Label_NumberOfTours;
-   public static String        Statistic_Tooltip_Label_Total;
 
    public static String        Tooltip_WayPoint_Label_Altitude;
    public static String        Tooltip_WayPoint_Label_Category;

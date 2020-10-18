@@ -3037,7 +3037,6 @@ public class Messages extends NLS {
    public static String Year_Statistic_Combo_LastYears_Tooltip;
    public static String Year_Statistic_Combo_NumberOfYears_Tooltip;
    public static String Year_Statistic_Label_NumberOfYears;
-   public static String Year_Statistic_Tooltip_Pulse;
 
    static {
       // initialize resource bundle
