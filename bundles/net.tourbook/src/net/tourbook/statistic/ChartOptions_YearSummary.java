@@ -31,8 +31,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 
 public class ChartOptions_YearSummary implements IStatisticOptions {
 
@@ -83,7 +85,6 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          createUI_110_Left(group);
-         createUI_120_Right(group);
       }
    }
 
@@ -125,8 +126,9 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
                   .grab(true, false)
                   .indent(16, 0)
                   .applyTo(timeContainer);
-            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(timeContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
             {
+               // row 1
                {
                   /*
                    * Elapsed time
@@ -135,6 +137,12 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
                   _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
                   _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
                }
+               {
+                  // spacer
+                  new Label(timeContainer, SWT.NONE);
+               }
+
+               // row 2
                {
                   /*
                    * Recorded time
@@ -145,19 +153,21 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
                }
                {
                   /*
-                   * Paused time
-                   */
-                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
-                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
                    * Moving time
                    */
                   _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
                   _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
                   _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
+               }
+
+               // row 3
+               {
+                  /*
+                   * Paused time
+                   */
+                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
                   /*
@@ -168,6 +178,17 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
+            // set tab order that device and computed times are grouped together
+            final Control[] tabList = {
+
+                  _rdoDuration_ElapsedTime,
+                  _rdoDuration_RecordedTime,
+                  _rdoDuration_PausedTime,
+
+                  _rdoDuration_MovingTime,
+                  _rdoDuration_BreakTime,
+            };
+            timeContainer.setTabList(tabList);
          }
          {
             /*
@@ -177,15 +198,6 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
             _chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
             _chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
          }
-      }
-   }
-
-   private void createUI_120_Right(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
          {
             /*
              * Show year separator

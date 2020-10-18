@@ -48,7 +48,7 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
 
-   private TourData_MonthHrZones     _tourMonth_Data;
+   private TourStatisticData_MonthHrZones     _tourMonth_Data;
    private DataProvider_HrZone_Month _tourMonth_DataProvider = new DataProvider_HrZone_Month();
 
    private TourPerson                _appPerson;
@@ -73,7 +73,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       super();
    }
 
-   private ChartStatisticSegments createChartSegments(final TourData_MonthHrZones monthData) {
+   private ChartStatisticSegments createChartSegments(final TourStatisticData_MonthHrZones monthData) {
 
       /*
        * create segments for each year
@@ -111,7 +111,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
       return monthSegments;
    }
 
-   private double[] createMonthData(final TourData_MonthHrZones monthData) {
+   private double[] createMonthData(final TourStatisticData_MonthHrZones monthData) {
 
       /*
        * create segments for each year
@@ -442,7 +442,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statYoungestYear = statContext.statFirstYear;
+      _statYoungestYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _tourMonth_Data = _tourMonth_DataProvider.getMonthData(

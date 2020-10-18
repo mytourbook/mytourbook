@@ -72,6 +72,10 @@ public class FormatManager {
       return _breakTimeFormatter_Summary.printLong(value);
    }
 
+   public static String formatBreakTime_Summary(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _breakTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
+   }
+
    public static String formatCadence(final double value) {
       return _cadenceFormatter.printDouble(value);
    }
@@ -96,6 +100,10 @@ public class FormatManager {
       return _elapsedTimeFormatter_Summary.printLong(value);
    }
 
+   public static String formatElapsedTime_Summary(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _elapsedTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
+   }
+
    public static String formatElevation(final float value) {
       return _elevationFormatter.printDouble(value);
    }
@@ -110,6 +118,10 @@ public class FormatManager {
 
    public static String formatMovingTime_Summary(final long value) {
       return _movingTimeFormatter_Summary.printLong(value);
+   }
+
+   public static String formatMovingTime_Summary(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _movingTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
    }
 
    public static String formatNumber_0(final double value) {
@@ -137,6 +149,10 @@ public class FormatManager {
       return _pausedTimeFormatter_Summary.printLong(value);
    }
 
+   public static String formatPausedTime_Summary(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _pausedTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
+   }
+
    public static String formatPower(final double value) {
       return _powerFormatter.printDouble(value);
    }
@@ -159,6 +175,10 @@ public class FormatManager {
 
    public static String formatRecordedTime_Summary(final long value) {
       return _recordedTimeFormatter_Summary.printLong(value);
+   }
+
+   public static String formatRecordedTime_Summary(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return _recordedTimeFormatter_Summary.printLong(value, isHide0Value, isShowBiggerThan0);
    }
 
    public static String formatSpeed(final double value) {

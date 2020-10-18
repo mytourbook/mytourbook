@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
@@ -31,11 +31,10 @@ public class ActionShowTourPauses extends Action {
 
       _mapView = mapView;
 
-      setText(Messages.map_action_show_tour_pauses);
+      setText(Messages.Tour_Action_ShowTourPauses);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin
-            .getImageDescriptor(net.tourbook.Messages.Image__TourPauses_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
    }
 
    @Override
