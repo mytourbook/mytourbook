@@ -2429,8 +2429,6 @@ public class Messages extends NLS {
    public static String Tour_Action_EditChartPreferences;
    public static String Tour_Action_EditSmoothingPreferences;
    public static String Tour_Action_EditStatisticPreferences;
-   public static String Tour_Action_Show_Tour_Pauses;
-
    public static String Tour_Action_graph_altimeter_tooltip;
    public static String Tour_Action_graph_altitude_tooltip;
    public static String Tour_Action_graph_analyzer_tooltip;
@@ -2479,6 +2477,8 @@ public class Messages extends NLS {
    public static String Tour_Action_SetTimeZone;
    public static String Tour_Action_SetWeatherConditions;
    public static String Tour_Action_ShowBreaktimeValues;
+   public static String Tour_Action_ShowTourPauses;
+   public static String Tour_Action_ShowTourPauses_Tooltip;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;
