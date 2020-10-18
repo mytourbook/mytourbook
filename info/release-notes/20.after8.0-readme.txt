@@ -7,6 +7,14 @@ TODO's
 * !!! Translators need new babel editor plugin when using Eclipse 2020-09 !!!
   http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
+* Translators should check if the new time words are correct because they where automatically transformed from the existing time words
+
+Issues
+======
+
+* Reimport of paused times do not show the confirm dialog
+
+
 New
 ===
 

@@ -874,13 +874,9 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_StartComparing;
 
    public static String        Graph_Label_Time_Moving;
-
    public static String        Graph_Label_Time_Paused;
-
    public static String        Graph_Label_Time_Elapsed;
-
    public static String        Graph_Label_Time_Break;
-
    public static String        Graph_Label_Time_Recorded;
 
    public static String        HR_Zone_01_060_Moderate;
