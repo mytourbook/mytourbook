@@ -22,6 +22,8 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -71,6 +73,9 @@ public class StatisticTooltipUI_TourFrequency {
    private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
 
    private static final IValueFormatter  VALUE_FORMATTER_1_0               = new ValueFormatter_Number_1_0();
+
+   private static IValueFormatter        _valueFormatter_Time_HH           = new ValueFormatter_Time_HH();
+   private static IValueFormatter        _valueFormatter_Time_HHMM         = new ValueFormatter_Time_HHMM();
 
    private final int                     _columnSpacing                    = 10;
 
@@ -227,6 +232,83 @@ public class StatisticTooltipUI_TourFrequency {
       updateUI_Layout();
 
       enableControls();
+   }
+
+   private String createText_DurationTime(final long durationTimeValue, final DurationTime durationTimeType) {
+
+      switch (durationTimeType) {
+      case RECORDED:
+         return FormatManager.formatRecordedTime_Summary(durationTimeValue);
+      case ELAPSED:
+         return FormatManager.formatElapsedTime_Summary(durationTimeValue);
+      case PAUSED:
+         return FormatManager.formatPausedTime_Summary(durationTimeValue);
+
+      case MOVING:
+         return FormatManager.formatMovingTime_Summary(durationTimeValue);
+      case BREAK:
+         return FormatManager.formatBreakTime_Summary(durationTimeValue);
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
+   private String createText_DurationTimeLabel(final DurationTime durationTimeType) {
+
+      switch (durationTimeType) {
+
+      case ELAPSED:
+         return Messages.Tour_Tooltip_Label_ElapsedTime;
+      case RECORDED:
+         return Messages.Tour_Tooltip_Label_RecordedTime;
+      case PAUSED:
+         return Messages.Tour_Tooltip_Label_PausedTime;
+
+      case MOVING:
+         return Messages.Tour_Tooltip_Label_MovingTime;
+      case BREAK:
+         return Messages.Tour_Tooltip_Label_BreakTime;
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
+   private String createText_Title(final TourStatisticData_Frequency statData) {
+
+      final int durationTimeInterval = _prefStore.getInt(ITourbookPreferences.STAT_DURATION_INTERVAL);
+
+      final int[] allGroupValues = statData.statDurationTime_GroupValues;
+      String titleText;
+      if (_valueIndex == 0) {
+
+         // first bar - duration <
+         titleText = String.format(TEXT_FIRST_BAR, createText_TitleTime(allGroupValues[_valueIndex], durationTimeInterval));
+
+      } else if (_valueIndex == allGroupValues.length - 1) {
+
+         // last bar - duration >
+
+         titleText = String.format(TEXT_LAST_BAR, createText_TitleTime(allGroupValues[_valueIndex - 1], durationTimeInterval));
+
+      } else {
+
+         // between first and last bar - duration ...-...
+
+         titleText = String.format(TEXT_BETWEEN_FIRST_AND_LAST_BAR,
+               createText_TitleTime(allGroupValues[_valueIndex - 1], durationTimeInterval),
+               createText_TitleTime(allGroupValues[_valueIndex], durationTimeInterval));
+      }
+      return titleText;
+   }
+
+   private String createText_TitleTime(final int durationTime_Value, final int durationTime_Interval) {
+
+      if (durationTime_Interval % 60 == 0) {
+         return _valueFormatter_Time_HH.printLong(durationTime_Value, false, false);
+      } else {
+         // show minutes when interval is not 1 hour
+         return _valueFormatter_Time_HHMM.printLong(durationTime_Value, false, false);
+      }
    }
 
    private void createUI(final Composite parent) {
@@ -563,64 +645,6 @@ public class StatisticTooltipUI_TourFrequency {
 
    }
 
-   private String formatDurationTime(final int durationTimeValue, final DurationTime durationTimeType) {
-
-      switch (durationTimeType) {
-      case RECORDED:
-         return FormatManager.formatRecordedTime_Summary(durationTimeValue, false, false);
-      case ELAPSED:
-         return FormatManager.formatElapsedTime_Summary(durationTimeValue, false, false);
-      case PAUSED:
-         return FormatManager.formatPausedTime_Summary(durationTimeValue, false, false);
-
-      case MOVING:
-         return FormatManager.formatMovingTime_Summary(durationTimeValue, false, false);
-      case BREAK:
-         return FormatManager.formatBreakTime_Summary(durationTimeValue, false, false);
-      }
-
-      return UI.EMPTY_STRING;
-   }
-
-   private String formatDurationTime_WithDefault(final long durationTimeValue, final DurationTime durationTimeType) {
-
-      switch (durationTimeType) {
-      case RECORDED:
-         return FormatManager.formatRecordedTime_Summary(durationTimeValue);
-      case ELAPSED:
-         return FormatManager.formatElapsedTime_Summary(durationTimeValue);
-      case PAUSED:
-         return FormatManager.formatPausedTime_Summary(durationTimeValue);
-
-      case MOVING:
-         return FormatManager.formatMovingTime_Summary(durationTimeValue);
-      case BREAK:
-         return FormatManager.formatBreakTime_Summary(durationTimeValue);
-      }
-
-      return UI.EMPTY_STRING;
-   }
-
-   private String getDurationTimeLabel(final DurationTime durationTimeType) {
-
-      switch (durationTimeType) {
-
-      case ELAPSED:
-         return Messages.Tour_Tooltip_Label_ElapsedTime;
-      case RECORDED:
-         return Messages.Tour_Tooltip_Label_RecordedTime;
-      case PAUSED:
-         return Messages.Tour_Tooltip_Label_PausedTime;
-
-      case MOVING:
-         return Messages.Tour_Tooltip_Label_MovingTime;
-      case BREAK:
-         return Messages.Tour_Tooltip_Label_BreakTime;
-      }
-
-      return UI.EMPTY_STRING;
-   }
-
    private void initUI(final Composite parent) {
 
    }
@@ -758,48 +782,25 @@ public class StatisticTooltipUI_TourFrequency {
             _prefStore.getString(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME),
             DurationTime.MOVING);
 
-      final int[] allGroupValues = statData.statDurationTime_GroupValues;
-      String titleText;
-
-      if (_valueIndex == 0) {
-
-         // first bar - duration <
-         titleText = String.format(TEXT_FIRST_BAR, formatDurationTime(allGroupValues[_valueIndex], durationTimeType));
-
-      } else if (_valueIndex == allGroupValues.length - 1) {
-
-         // last bar - duration >
-
-         titleText = String.format(TEXT_LAST_BAR, formatDurationTime(allGroupValues[_valueIndex - 1], durationTimeType));
-
-      } else {
-
-         // between first and last bar - duration ...-...
-
-         titleText = String.format(TEXT_BETWEEN_FIRST_AND_LAST_BAR,
-               formatDurationTime(allGroupValues[_valueIndex - 1], durationTimeType),
-               formatDurationTime(allGroupValues[_valueIndex], durationTimeType));
-      }
-
       final String unit = Messages.Tour_Tooltip_Label_Hour;
-      final String titleFormatted = String.format(TITLE_FORMAT, titleText, unit);
+      final String title = String.format(TITLE_FORMAT, createText_Title(statData), unit);
 
-      _lblTitle.setText(titleFormatted);
+      _lblTitle.setText(title);
 
-      _lblDataLabel.setText(getDurationTimeLabel(durationTimeType));
+      _lblDataLabel.setText(createText_DurationTimeLabel(durationTimeType));
 
-      _lblDataValue.setText(formatDurationTime_WithDefault(durationTime, durationTimeType));
+      _lblDataValue.setText(createText_DurationTime(durationTime, durationTimeType));
       _lblDataValue_Unit.setText(unit);
 
       _lblNumberOfTours.setText(Integer.toString(statData.statDurationTime_NumTours_High[_serieIndex][_valueIndex]));
 
       if (_isShowSummary) {
 
-         _lblColumnHeader_Summary.setText(titleFormatted);
+         _lblColumnHeader_Summary.setText(title);
 
          _lblDataValue_Summary.setText(durationTime_Summary == 0
                ? UI.EMPTY_STRING
-               : formatDurationTime_WithDefault((long) durationTime_Summary, durationTimeType));
+               : createText_DurationTime((long) durationTime_Summary, durationTimeType));
 
          _lblDataValue_Summary_Unit.setText(unit);
 
@@ -877,7 +878,7 @@ public class StatisticTooltipUI_TourFrequency {
 
          _lblDataValue_Summary.setText(elevationUp_Summary_WithMeasurement == 0
                ? UI.EMPTY_STRING
-               : FormatManager.formatDistance_Summary(elevationUp_Summary_WithMeasurement));
+               : FormatManager.formatElevation_Summary(elevationUp_Summary_WithMeasurement));
          _lblDataValue_Summary_Unit.setText(unit);
 
          _lblNumberOfTours_Summary.setText(Integer.toString((int) (numTours_Summary + 0.5)));

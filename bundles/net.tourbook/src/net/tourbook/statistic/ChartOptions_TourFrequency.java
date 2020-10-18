@@ -74,7 +74,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
       initUI(parent);
 
       createUI_10_DataGroups(parent);
-      createUI_20_Time(parent);
+      createUI_20_DurationTime(parent);
       createUI_30_StatisticTooltip(parent);
    }
 
@@ -378,7 +378,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
    /**
     * Elapsed, recorded, paused, moving and break time
     */
-   private void createUI_20_Time(final Composite parent) {
+   private void createUI_20_DurationTime(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Statistic_Group_DurationTime);
@@ -439,7 +439,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
          }
       }
 
-      // set tab order that device and computed times are grouped together, it's the first time to use this feature :-)
+      // set tab order that device and computed times are grouped together
       final Control[] tabList = {
 
             _rdoDuration_ElapsedTime,
