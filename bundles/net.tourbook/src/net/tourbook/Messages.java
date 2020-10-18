@@ -1609,7 +1609,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Checkbox_ShowVerticalGrid;
    public static String        Pref_Graphs_Dialog_GridLine_Warning_Message;
    public static String        Pref_Graphs_Error_one_graph_must_be_selected;
-   public static String        Pref_Graphs_grid_distance;
    public static String        Pref_Graphs_grid_horizontal_distance;
    public static String        Pref_Graphs_grid_vertical_distance;
    public static String        Pref_Graphs_Group_Grid;
@@ -1620,6 +1619,8 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Label_GraphTransparency_Tooltip;
    public static String        Pref_Graphs_Label_GraphTransparencyLine;
    public static String        Pref_Graphs_Label_GraphTransparencyLine_Tooltip;
+   public static String        Pref_Graphs_Label_GridDistance;
+   public static String        Pref_Graphs_Label_GridDistance_Tooltip;
    public static String        Pref_Graphs_Label_MaxValue;
    public static String        Pref_Graphs_Label_MinValue;
    public static String        Pref_Graphs_Label_select_graph;
