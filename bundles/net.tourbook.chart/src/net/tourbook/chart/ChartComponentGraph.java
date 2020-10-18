@@ -5912,7 +5912,6 @@ public class ChartComponentGraph extends Canvas {
                   _hoveredBarValueIndex = valueIndex;
 
                   _hoveredBar_ToolTip.open(barFocusRectangle, serieIndex, valueIndex);
-//                  _hoveredBarToolTip_OLD.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
 
                   isBarHit = true;
                   break;
