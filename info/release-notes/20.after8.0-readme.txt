@@ -81,6 +81,7 @@ Improvements
 * Tour re-import(Frederic)
   - Added a contextual menu "Reimport Tours..." to give the ability to select several data to re-import for selected tours or all tours in the database
   - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
+  - Added the ability for the user to skip a file if the filepath is unknown or not found
 
 
 Changes  
