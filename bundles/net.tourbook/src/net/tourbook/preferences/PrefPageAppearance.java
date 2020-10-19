@@ -373,6 +373,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_COMBINED_VALUES, false);
+
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);

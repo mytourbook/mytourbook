@@ -540,6 +540,8 @@ public interface ITourbookPreferences {
    public static final String TOGGLE_STATE_REIMPORT_TOUR_MARKER               = "TOGGLE_STATE_REIMPORT_TOUR_MARKER";              //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES          = "TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES";         //$NON-NLS-1$
 
+   public static final String TOGGLE_STATE_REIMPORT_COMBINED_VALUES           = "TOGGLE_STATE_REIMPORT_COMBINED_VALUES";          //$NON-NLS-1$
+
    public static final String TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES           = "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";          //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_CADENCE_VALUES            = "TOGGLE_STATE_REIMPORT_CADENCE_VALUES";           //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_GEAR_VALUES               = "TOGGLE_STATE_REIMPORT_GEAR_VALUES";              //$NON-NLS-1$

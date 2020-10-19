@@ -78,6 +78,10 @@ Improvements
 * Dropbox (Frederic)
   - Dropbox file/folder dialog: Sorting alphabetically the Dropbox folders and files
 
+* Tour re-import(Frederic)
+  - Added a contextual menu "Reimport Tours..." to give the ability to select several data to re-import for selected tours or all tours in the database
+  - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
+
 
 Changes  
 =======
