@@ -1523,7 +1523,9 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_NumberOfRecent_TourTypes;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
    public static String        Pref_Appearance_Radio_UseRecordedTime;
+   public static String        Pref_Appearance_Radio_UseRecordedTime_Tooltip;
    public static String        Pref_Appearance_Radio_UseMovingTime;
+   public static String        Pref_Appearance_Radio_UseMovingTime_Tooltip;
    public static String        Pref_Appearance_ShowTourTypeContextMenu;
    public static String        Pref_Appearance_ShowTourTypeContextMenu_Tooltip;
 
