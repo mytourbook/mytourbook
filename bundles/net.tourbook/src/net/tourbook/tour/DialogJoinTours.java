@@ -1334,9 +1334,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
 
          final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
-         joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
+         if (pausedTime_Start != null) {
+            joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
+         }
          final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
-         joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+         if (pausedTime_End != null) {
+            joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+         }
 
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
          joinedMovingTime += tourData.getTourComputedTime_Moving();
