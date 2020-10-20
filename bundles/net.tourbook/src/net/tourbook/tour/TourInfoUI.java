@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -35,6 +36,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
@@ -89,6 +91,8 @@ public class TourInfoUI {
          .withMillisRemoved()
 //
    ;
+
+   protected final IPreferenceStore      _prefStore               = TourbookPlugin.getPrefStore();
 
    private final NumberFormat            _nf0                     = NumberFormat.getNumberInstance();
    private final NumberFormat            _nf1                     = NumberFormat.getInstance();
@@ -1485,11 +1489,13 @@ public class TourInfoUI {
       _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-      final float avgSpeed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
+      final float avgSpeed = time == 0 ? 0 : 3.6f * distance / time;
       _lblAvgSpeed.setText(FormatManager.formatSpeed(avgSpeed));
       _lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
-      final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
+      final int pace = (int) (distance == 0 ? 0 : (time * 1000 / distance));
       _lblAvgPace.setText(
             String.format(//
                   Messages.Tour_Tooltip_Format_Pace,

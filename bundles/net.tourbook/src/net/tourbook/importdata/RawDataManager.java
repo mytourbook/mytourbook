@@ -255,7 +255,7 @@ public class RawDataManager {
       String previousData = UI.EMPTY_STRING;
       String newData = UI.EMPTY_STRING;
       switch (reimportId) {
-      //TODO FB
+
       case AltitudeValues:
 
          final String heightLabel = UI.UNIT_IS_METRIC ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
@@ -285,6 +285,16 @@ public class RawDataManager {
                : net.tourbook.ui.Messages.Value_Unit_Cadence);
          break;
 
+      case GearValues:
+         previousData = Math.round(oldTourData.getFrontShiftCount()) + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label
+               + UI.COMMA_SPACE +
+               Math.round(oldTourData.getRearShiftCount()) + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
+         newData = Math.round(newTourData.getFrontShiftCount()) + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label
+               + UI.COMMA_SPACE +
+               Math.round(newTourData.getRearShiftCount()) + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
+
+         break;
+
       case PowerAndPulseValues:
          previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
                + Math.round(oldTourData.getAvgPulse()) + net.tourbook.ui.Messages.Value_Unit_Pulse + UI.COMMA_SPACE
@@ -295,28 +305,36 @@ public class RawDataManager {
          break;
 
       case PowerAndSpeedValues:
-         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + oldTourData.getCalories();
-         newData = newTourData.getPower_Avg() + UI.UNIT_POWER_SHORT;
+         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
+               + oldTourData.getCalories() / 1000f + net.tourbook.ui.Messages.Value_Unit_KCalories;
+         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
+               + newTourData.getCalories() / 1000f + net.tourbook.ui.Messages.Value_Unit_KCalories;
          break;
 
       case TemperatureValues:
-         previousData = oldTourData.getAvgTemperature() + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
+         float avgTemperature = oldTourData.getAvgTemperature();
+         if (!UI.UNIT_IS_METRIC) {
+            avgTemperature = avgTemperature
+                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+         }
+         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
-         newData = newTourData.getAvgTemperature() + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
+
+         avgTemperature = newTourData.getAvgTemperature();
+         if (!UI.UNIT_IS_METRIC) {
+            avgTemperature = avgTemperature
+                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+         }
+         newData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
          break;
 
       case TourMarkers:
-         previousData = oldTourData.getTourMarkersSorted().size() + "";
-         newData = newTourData.getTourMarkersSorted().size() + "";
+         previousData = oldTourData.getTourMarkers().size() + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
+         newData = newTourData.getTourMarkers().size() + UI.SPACE1 + net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
          break;
-
-//      case TrainingValues:
-//         dataToReimportDetails.add(Messages.Import_Data_TrainingValues);
-//         break;
-//      case Tour:
-//         dataToReimportDetails.add(Messages.Import_Data_EntireTour);
-//         break;
 
       default:
          break;
@@ -1384,7 +1402,6 @@ public class RawDataManager {
                                                  final TourData oldTourData,
                                                  final TourData reimportedTourData) {
 
-      //TODO FB here are the data to show in the message old vs new
       // ALTITUDE
       if (reimportIds.contains(ReImport.TimeSlices) || reimportIds.contains(ReImport.AltitudeValues)) {
 
