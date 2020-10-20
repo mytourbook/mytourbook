@@ -1302,6 +1302,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             joinedRestPulse = tourData.getRestPulse();
 
          } else {
+            //TODO FB
+            // As it's not the first tour, we add the time difference between this tour's start time
+            // and the previous tour end time as a pause.
 
             if (isJoinedDistanceFromSensor && tourData.isDistanceSensorPresent()) {
                // keep TRUE state
