@@ -427,23 +427,45 @@ public class YearStatisticView extends ViewPart {
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
    }
 
-
+   /**
+    * @param toolTipProvider
+    * @param parent
+    * @param serieIndex
+    * @param valueIndex
+    * @param frequencyStatistic
+    */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int _hoveredBar_VerticalIndex,
-                                final int _hoveredBar_HorizontalIndex) {
+                                final int serieIndex,
+                                final int valueIndex) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText("Bar Tooltip\n\n"
-               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
-               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+      final long tourTypeId = StatisticServices.getTourTypeId(serieIndex, _stat_ActiveTourTypeFilter);
 
+      // create sub title
+      final int firstYear = _stat_SelectedYear - _stat_NumberOfYears + 1;
+      String toolTip_SubTitle = null;
+      if (_stat_NumberOfYears > 1) {
+         toolTip_SubTitle = String.format("%d … %d", firstYear, _stat_SelectedYear); //$NON-NLS-1$
       }
+
+      final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
+      final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
+
+      new YearStatistic_TooltipUI().createContentArea(parent,
+
+            toolTipProvider,
+            _statisticData_Frequency,
+            frequencyStatistic,
+
+            serieIndex,
+            valueIndex,
+
+            tourTypeId,
+
+            toolTip_SubTitle,
+
+            isShowSummaryValues,
+            isShowPercentageValues);
    }
 
    private void createUI(final Composite parent) {
@@ -875,6 +897,7 @@ public class YearStatisticView extends ViewPart {
          yearIndex++;
       }
    }
+
    /**
     * show statistic for several years
     *
