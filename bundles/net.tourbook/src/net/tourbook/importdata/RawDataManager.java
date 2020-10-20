@@ -1168,12 +1168,6 @@ public class RawDataManager {
                   previousTourData.setCalories(oldTourData.getCalories());
                   break;
 
-               case TrainingValues:
-                  previousTourData.setTraining_TrainingEffect_Aerob(oldTourData.getTraining_TrainingEffect_Aerob());
-                  previousTourData.setTraining_TrainingEffect_Anaerob(oldTourData.getTraining_TrainingEffect_Anaerob());
-                  previousTourData.setTraining_TrainingPerformance(oldTourData.getTraining_TrainingPerformance());
-                  break;
-
                case GearValues:
                   previousTourData.setFrontShiftCount(oldTourData.getFrontShiftCount());
                   previousTourData.setRearShiftCount(oldTourData.getRearShiftCount());

@@ -84,6 +84,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private static final String       STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";          //$NON-NLS-1$
    private static final String       STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";      //$NON-NLS-1$
    private static final String       STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";            //$NON-NLS-1$
+   private static final String       STATE_IS_INSERT_PAUSES                 = "isInsertPauses";                //$NON-NLS-1$
 
    private static final String       STATE_JOIN_METHOD                      = "JoinMethod";                    //$NON-NLS-1$
    private static final String       STATE_JOIN_METHOD_ORIGINAL             = "original";                      //$NON-NLS-1$
@@ -198,6 +199,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private Button                           _chkIncludeDescription;
    private Button                           _chkIncludeMarkerWaypoints;
    private Button                           _chkCreateTourMarker;
+   private Button                           _chkInsertPauses;
    private Label                            _lblMarkerText;
    private Combo                            _cboTourMarker;
 
@@ -397,6 +399,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          createUI30TypeTags(_dlgInnerContainer);
          createUI40Person(_dlgInnerContainer);
          createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionAdapter);
+         createUI60InsertPauses(_dlgInnerContainer);
       }
    }
 
@@ -715,6 +718,17 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       }
    }
 
+   /**
+    * Checkbox to specify if pauses should be inserted between joined tours
+    */
+   private void createUI60InsertPauses(final Composite parent) {
+
+      // combo: person
+      _chkInsertPauses = new Button(parent, SWT.CHECK);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_chkInsertPauses);
+      _chkInsertPauses.setText(Messages.Dialog_JoinTours_Checkbox_InsertPauses);
+   }
+
 //   /**
 //    * info
 //    */
@@ -963,6 +977,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       long absFirstTourStartTimeSec = 0;
       long absJoinedTourStartTimeSec = 0;
       ZonedDateTime joinedTourStart = null;
+
+      TourData previousTourData = null;
 
       boolean isFirstTour = true;
 
@@ -1302,10 +1318,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             joinedRestPulse = tourData.getRestPulse();
 
          } else {
-            //TODO FB
-            // As it's not the first tour, we add the time difference between this tour's start time
-            // and the previous tour end time as a pause.
-
             if (isJoinedDistanceFromSensor && tourData.isDistanceSensorPresent()) {
                // keep TRUE state
             } else {
@@ -1327,14 +1339,22 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             } else {
                joinedDeviceTimeInterval = -1;
             }
-         }
 
-         /*
-          * summarize other fields
-          */
-         tourData.computeTourMovingTime();
-         joinedElapsedTime += tourData.getTourDeviceTime_Elapsed();
-         joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
+            if (_chkInsertPauses.getSelection()) {
+               // As it's not the first tour, we add the time difference between this tour's start time
+               // and the previous tour end time as a pause.
+
+               final long previousTourEndTime = previousTourData.getTourEndTimeMS();
+               final long currentTourStartTime = tourData.getTourStartTimeMS();
+
+               if (previousTourEndTime < currentTourStartTime) {
+                  joinedPausedTime_Start.add(previousTourEndTime);
+                  joinedPausedTime_End.add(currentTourStartTime);
+
+                  joinedPausedTime += (currentTourStartTime - previousTourEndTime) / 1000;
+               }
+            }
+         }
 
          final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
          if (pausedTime_Start != null) {
@@ -1344,8 +1364,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          if (pausedTime_End != null) {
             joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
          }
-
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
+
+         /*
+          * summarize other fields
+          */
+         tourData.computeTourMovingTime();
+         joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
+         joinedElapsedTime += tourData.getTourDeviceTime_Elapsed() + joinedPausedTime;
+
          joinedMovingTime += tourData.getTourComputedTime_Moving();
 
          joinedDistance += tourData.getTourDistance();
@@ -1357,6 +1384,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          isFirstTour = false;
          joinedTourStartIndex = joinedSerieIndex;
          joinedTourStartDistance += relTourDistance;
+
+         previousTourData = tourData;
       }
 
       /*
@@ -1543,7 +1572,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // description/marker/waypoints
       _chkIncludeDescription.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_DESCRIPTION, true));
       _chkIncludeMarkerWaypoints.setSelection(Util.getStateBoolean(_state, STATE_IS_INCLUDE_MARKER_WAYPOINTS, true));
-      _chkCreateTourMarker.setSelection(Util.getStateBoolean(_state, STATE_IS_CREATE_TOUR_MARKER, true));
+      _chkCreateTourMarker.setSelection(Util.getStateBoolean(_state, STATE_IS_CREATE_TOUR_MARKER, false));
+
+      _chkInsertPauses.setSelection(Util.getStateBoolean(_state, STATE_IS_INSERT_PAUSES, true));
 
       /*
        * update UI from selected tours
@@ -1616,6 +1647,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       // person
       _state.put(STATE_PERSON_ID, getSelectedPerson().getPersonId());
+
+      //Insert pauses between tours
+      _state.put(STATE_IS_INSERT_PAUSES, _chkInsertPauses.getSelection());
    }
 
    @Override
