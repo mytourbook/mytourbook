@@ -526,7 +526,7 @@ public class UI {
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
-   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData"; //$NON-NLS-1$
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous

@@ -112,7 +112,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_WEEK
@@ -365,7 +365,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
 
                   // get/filter tag id's
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //              //$NON-NLS-1$
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //              //$NON-NLS-1$ //$NON-NLS-2$
                   + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
 
                   + "   WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
@@ -383,7 +383,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                   + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                       //$NON-NLS-1$
 
                   + "WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   " + sqlAppFilter.getWhereClause()
+                  + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
             ;
          }

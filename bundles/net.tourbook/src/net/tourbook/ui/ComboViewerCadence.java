@@ -26,7 +26,7 @@ public class ComboViewerCadence extends ComboViewer {
 
    @Override
    public void add(final Object element) {
-      throw new NotImplementedException("This method cannot be called");
+      throw new NotImplementedException("This method cannot be called"); //$NON-NLS-1$
    }
 
    public CadenceMultiplier getSelectedCadence() {
@@ -40,7 +40,7 @@ public class ComboViewerCadence extends ComboViewer {
          @Override
          public String getText(final Object element) {
             if (!(element instanceof CadenceMultiplier)) {
-               throw new IllegalStateException("Invalid object type found in ComboViewerCadence: " + element.getClass());
+               throw new IllegalStateException("Invalid object type found in ComboViewerCadence: " + element.getClass()); //$NON-NLS-1$
             }
             return ((CadenceMultiplier) element).getNlsLabel();
          }

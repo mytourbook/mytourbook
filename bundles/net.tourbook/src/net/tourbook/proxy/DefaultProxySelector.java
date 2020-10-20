@@ -42,7 +42,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DefaultProxySelector extends ProxySelector {
 
-   private static final String SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES = "java.net.useSystemProxies";
+   private static final String SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES = "java.net.useSystemProxies"; //$NON-NLS-1$
 
    private static final String USE_SYSTEM_PROXIES                    = System.getProperty(SYS_PROP__JAVA_NET_USE_SYSTEM_PROXIES);
 

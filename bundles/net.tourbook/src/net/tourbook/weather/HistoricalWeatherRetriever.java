@@ -49,7 +49,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData"; //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
    static {

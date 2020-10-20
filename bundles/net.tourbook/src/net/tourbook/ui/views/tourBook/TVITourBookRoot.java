@@ -85,14 +85,14 @@ public class TVITourBookRoot extends TVITourBookItem {
                   + "      DISTINCT TourId," + NL //                                         //$NON-NLS-1$
 
                   + "      StartYear," + NL //                                               //$NON-NLS-1$
-                  + "      " + SQL_SUM_FIELDS
+                  + "      " + SQL_SUM_FIELDS //$NON-NLS-1$
 
                   + "   FROM TOURDATA" + NL //                                               //$NON-NLS-1$
 
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //  //$NON-NLS-1$
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() + " jTdataTtag" //  //$NON-NLS-1$ //$NON-NLS-2$
                   + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //             //$NON-NLS-1$
 
-                  + "   " + sqlWhereClause
+                  + "   " + sqlWhereClause //$NON-NLS-1$
 
                   + ") NecessaryNameOtherwiseItDoNotWork" + NL //                            //$NON-NLS-1$
             ;
@@ -121,7 +121,7 @@ public class TVITourBookRoot extends TVITourBookItem {
                "SELECT" + NL //                                //$NON-NLS-1$
 
                + "   StartYear," + NL //                       //$NON-NLS-1$
-               + "   " + SQL_SUM_COLUMNS
+               + "   " + SQL_SUM_COLUMNS //$NON-NLS-1$
 
                + sqlFromTourData
                + sqlGroupBy
