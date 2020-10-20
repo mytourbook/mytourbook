@@ -247,7 +247,6 @@ public class DialogReimportTours extends TitleAreaDialog {
           * checkbox: Re-import all tours in the database
           */
          _chkReimport_Tours_All = new Button(groupTours, SWT.RADIO);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkReimport_Tours_All);
          _chkReimport_Tours_All.setText(Messages.dialog_reimport_tours_checkbox_alltours);
          _chkReimport_Tours_All.addSelectionListener(buttonListener);
 
@@ -255,7 +254,6 @@ public class DialogReimportTours extends TitleAreaDialog {
           * checkbox: Re-import the selected tours
           */
          _chkReimport_Tours_Selected = new Button(groupTours, SWT.RADIO);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_chkReimport_Tours_Selected);
          _chkReimport_Tours_Selected.setText(Messages.dialog_reimport_tours_checkbox_selectedtours);
          _chkReimport_Tours_Selected.addSelectionListener(buttonListener);
       }
