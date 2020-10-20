@@ -875,7 +875,7 @@ public class RawDataManager {
          case TourMarkers:
 
             if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER,
+                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKERS,
                   Messages.Import_Data_Dialog_ConfirmReimportTourMarker_Message)) {
 
                TourLogManager.addLog(

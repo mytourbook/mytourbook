@@ -12,8 +12,6 @@ TODO's
 Issues
 ======
 
-* Reimport of paused times do not show the confirm dialog
-
 
 New
 ===
