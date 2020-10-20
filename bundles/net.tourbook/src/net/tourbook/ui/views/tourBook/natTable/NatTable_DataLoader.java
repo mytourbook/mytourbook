@@ -336,9 +336,9 @@ public class NatTable_DataLoader {
                   + " ( SELECT" + NL //                                                                  //$NON-NLS-1$
                   + "      TourId," + NL //                                                              //$NON-NLS-1$
                   + "      jTdataTtag.TourTag_tagId" + NL //                                             //$NON-NLS-1$
-                  + "      " + sqlSortingFields_2
+                  + "      " + sqlSortingFields_2 //$NON-NLS-1$
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
-                  + "   " + sqlCombineTagsWithAnd.getSqlString()
+                  + "   " + sqlCombineTagsWithAnd.getSqlString() //$NON-NLS-1$
                   + "   AS jTdataTtag" + NL //                                                           //$NON-NLS-1$
                   + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                         //$NON-NLS-1$
 
@@ -522,7 +522,7 @@ public class NatTable_DataLoader {
 
                + "       FROM TOURDATA" + NL //                                                          //$NON-NLS-1$
 
-               + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
+               + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //$NON-NLS-1$
 
                + "       AS jTdataTtag" //      //$NON-NLS-1$
                + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                        //$NON-NLS-1$

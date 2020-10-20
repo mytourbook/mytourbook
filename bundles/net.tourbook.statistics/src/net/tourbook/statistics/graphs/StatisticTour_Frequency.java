@@ -424,7 +424,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       final int firstYear = _stat_SelectedYear - _stat_NumberOfYears + 1;
       String toolTip_SubTitle = null;
       if (_stat_NumberOfYears > 1) {
-         toolTip_SubTitle = String.format("%d … %d", firstYear, _stat_SelectedYear);
+         toolTip_SubTitle = String.format("%d … %d", firstYear, _stat_SelectedYear); //$NON-NLS-1$
       }
 
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
