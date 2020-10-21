@@ -1800,7 +1800,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
          <view
             category    ="net.tourbook.category.compareTours"
-            class       ="net.tourbook.ui.views.tourCatalog.YearStatisticView"
+            class       ="net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View"
             icon        ="icons/tour-map-statistic.png"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
             name        ="%view_name_tourCatalog_statistics"/>
