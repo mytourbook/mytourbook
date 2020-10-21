@@ -104,7 +104,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
@@ -276,7 +276,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                + " ON TourId = jTdataTtag.TourData_tourId" + NL //                  //$NON-NLS-1$
 
                + " WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE //$NON-NLS-1$ //$NON-NLS-2$
-               + "   " + sqlAppFilter.getWhereClause()
+               + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 

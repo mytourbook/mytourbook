@@ -179,7 +179,7 @@ public class TourTagFilterSqlJoinBuilder {
 
          // combine tags with OR
 
-         _sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
+         _sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG; //$NON-NLS-1$
 
       } else {
 

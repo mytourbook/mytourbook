@@ -60,7 +60,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FitDataReader extends TourbookDevice {
 
-   private static final String SYS_PROP__LOG_FIT_DATA = "logFitData";
+   private static final String SYS_PROP__LOG_FIT_DATA = "logFitData"; //$NON-NLS-1$
    private static boolean      _isLogging_FitData     = System.getProperty(SYS_PROP__LOG_FIT_DATA) != null;
 
    static {

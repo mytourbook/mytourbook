@@ -736,7 +736,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s")
+            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
 
             + VALUE_DATE_YEAR
             + VALUE_DATE_MONTH
