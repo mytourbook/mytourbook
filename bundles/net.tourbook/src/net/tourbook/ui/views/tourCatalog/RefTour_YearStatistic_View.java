@@ -73,12 +73,13 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class YearStatisticView extends ViewPart {
-
-   public static final String  ID                         = "net.tourbook.views.tourCatalog.yearStatisticView";     //$NON-NLS-1$
+public class RefTour_YearStatistic_View extends ViewPart {
 
    private static final String GRAPH_LABEL_HEARTBEAT      = net.tourbook.common.Messages.Graph_Label_Heartbeat;
    private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+
+
+   public static final String  ID                         = "net.tourbook.views.tourCatalog.yearStatisticView";     //$NON-NLS-1$
 
    static final String         STATE_NUMBER_OF_YEARS      = "numberOfYearsToDisplay";                               //$NON-NLS-1$
 
@@ -195,7 +196,7 @@ public class YearStatisticView extends ViewPart {
       }
    }
 
-   public YearStatisticView() {}
+   public RefTour_YearStatistic_View() {}
 
    void actionSynchScale(final boolean isSynchMaxValue) {
       _isSynchMaxValue = isSynchMaxValue;
@@ -428,44 +429,44 @@ public class YearStatisticView extends ViewPart {
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
    }
 
-   private ChartToolTipInfo createToolTipInfo(int valueIndex) {
-
-      if (valueIndex >= _DOYValues.size()) {
-         valueIndex -= _DOYValues.size();
-      }
-
-      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
-         return null;
-      }
-
-      /*
-       * set calendar day/month/year
-       */
-      final int firstYear = getFirstYear();
-      final int tourDOY = _DOYValues.get(valueIndex);
-
-      final ZonedDateTime tourDate = ZonedDateTime
-            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
-            .plusDays(tourDOY);
-
-      final StringBuilder toolTipFormat = new StringBuilder();
-      toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
-      toolTipFormat.append(UI.NEW_LINE);
-
-      final String ttText = UI.EMPTY_STRING
-            + String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
-            + UI.NEW_LINE
-            + String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
-
-see final Messages vom 4.10.2020
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-
-      toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
-      toolTipInfo.setLabel(ttText);
-
-      return toolTipInfo;
-   }
+//   private ChartToolTipInfo createToolTipInfo(int valueIndex) {
+//
+//      if (valueIndex >= _DOYValues.size()) {
+//         valueIndex -= _DOYValues.size();
+//      }
+//
+//      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
+//         return null;
+//      }
+//
+//      /*
+//       * set calendar day/month/year
+//       */
+//      final int firstYear = getFirstYear();
+//      final int tourDOY = _DOYValues.get(valueIndex);
+//
+//      final ZonedDateTime tourDate = ZonedDateTime
+//            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
+//            .plusDays(tourDOY);
+//
+//      final StringBuilder toolTipFormat = new StringBuilder();
+//      toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
+//      toolTipFormat.append(UI.NEW_LINE);
+//
+//      final String ttText = UI.EMPTY_STRING
+//            + String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
+//            + UI.NEW_LINE
+//            + String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
+//
+////      Pulse:   %1.1f
+//
+//      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+//
+//      toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
+//      toolTipInfo.setLabel(ttText);
+//
+//      return toolTipInfo;
+//   }
 
    /**
     * @param toolTipProvider
@@ -477,35 +478,40 @@ see final Messages vom 4.10.2020
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
                                 final int serieIndex,
-                                final int valueIndex) {
+                                int valueIndex) {
 
-      final long tourTypeId = StatisticServices.getTourTypeId(serieIndex, _stat_ActiveTourTypeFilter);
-
-      // create sub title
-      final int firstYear = _stat_SelectedYear - _stat_NumberOfYears + 1;
-      String toolTip_SubTitle = null;
-      if (_stat_NumberOfYears > 1) {
-         toolTip_SubTitle = String.format("%d … %d", firstYear, _stat_SelectedYear); //$NON-NLS-1$
+      if (valueIndex >= _DOYValues.size()) {
+         valueIndex -= _DOYValues.size();
       }
 
-      final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
-      final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
+      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
+         return;
+      }
 
-      new YearStatistic_TooltipUI().createContentArea(parent,
+      /*
+       * Get day/month/year
+       */
+      final int firstYear = getFirstYear();
+      final int tourDOY = _DOYValues.get(valueIndex);
 
+      final ZonedDateTime tourDate = ZonedDateTime
+            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
+            .plusDays(tourDOY);
+      final String title = tourDate.format(TimeTools.Formatter_Date_F);
+
+
+      new RefTour_YearStatistic_TooltipUI().createContentArea(
+
+            parent,
             toolTipProvider,
-            _statisticData_Frequency,
-            frequencyStatistic,
 
-            serieIndex,
-            valueIndex,
+            title,
 
-            tourTypeId,
+            _avgPulse.get(valueIndex),
+            _tourSpeed.get(valueIndex)
 
-            toolTip_SubTitle,
+      );
 
-            isShowSummaryValues,
-            isShowPercentageValues);
    }
 
    private void createUI(final Composite parent) {
@@ -865,7 +871,7 @@ see final Messages vom 4.10.2020
    private void restoreState() {
 
       // select previous value
-      final int selectedYear = Util.getStateInt(_state, YearStatisticView.STATE_NUMBER_OF_YEARS, 3);
+      final int selectedYear = Util.getStateInt(_state, RefTour_YearStatistic_View.STATE_NUMBER_OF_YEARS, 3);
       _cboNumberOfYears.select(Math.min(selectedYear - 1, _cboNumberOfYears.getItemCount() - 1));
 
       _numberOfYears = getSelectedYears();
@@ -1085,7 +1091,7 @@ see final Messages vom 4.10.2020
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            YearStatisticView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
       });
 

@@ -15,18 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
-import net.tourbook.common.formatter.IValueFormatter;
-import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
-import net.tourbook.common.formatter.ValueFormatter_Time_HH;
-import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
-import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
@@ -35,53 +29,26 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class YearStatistic_TooltipUI {
+public class RefTour_YearStatistic_TooltipUI {
 
    private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    private static final String IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
 
-
-
-   private static final int              VERTICAL_LINE_SPACE               = 8;
-   private static final int              SHELL_MARGIN                      = 5;
-
-   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
-
-   private static final IValueFormatter  VALUE_FORMATTER_1_0               = new ValueFormatter_Number_1_0();
-
-   private static IValueFormatter        _valueFormatter_Time_HH           = new ValueFormatter_Time_HH();
-   private static IValueFormatter        _valueFormatter_Time_HHMM         = new ValueFormatter_Time_HHMM();
-
-   private final int                     _columnSpacing                    = 10;
+   private static final int    VERTICAL_LINE_SPACE      = 8;
+   private static final int    SHELL_MARGIN             = 5;
 
    /*
     * Tooltip context
     */
-   private IToolTipProvider            _toolTipProvider;
-   private TourStatisticData_Frequency _statisticData_Frequency;
-
-   private String                      _toolTip_SubTitle;
-   private int                         _serieIndex;
-   private int                         _valueIndex;
-
-   private boolean                     _isTourTypeImageAvailable;
-   private long                        _tourTypeId;
-   private String                      _tourTypeName;
-
-   private boolean                     _isShowPercentage;
-   private boolean                     _isShowSummary;
+   private IToolTipProvider _toolTipProvider;
 
    /*
     * Actions
@@ -92,35 +59,23 @@ public class YearStatistic_TooltipUI {
    /*
     * UI resources
     */
-   private Color              _bgColor;
-   private Color              _fgColor;
+   private Color  _bgColor;
+   private Color  _fgColor;
 
-   private Font               FONT_BOLD = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
+   private Float  _avgPulse;
+   private Float  _avgSpeed;
+   private String _title;
 
    /*
     * UI controls
     */
    private Composite _ttContainer;
 
-   private Label     _lblSubTitle;
+   private Label     _lblAvgPulse;
+   private Label     _lblAvgPulseUnit;
+   private Label     _lblAvgSpeed;
+   private Label     _lblAvgSpeedUnit;
    private Label     _lblTitle;
-   private CLabel    _lblTourType_Image;
-
-   private Label     _lblColumnHeader_Summary;
-   private Label     _lblColumnHeader_TourType;
-
-   private Label     _lblDataLabel;
-
-   private Label     _lblDataValue;
-   private Label     _lblDataValue_Unit;
-   private Label     _lblDataValue_Summary;
-   private Label     _lblDataValue_Summary_Unit;
-   private Label     _lblDataValue_Percentage;
-
-   private Label     _lblNumberOfTours;
-   private Label     _lblNumberOfTours_Percentage;
-   private Label     _lblNumberOfTours_Summary;
 
    private class ActionCloseTooltip extends Action {
 
@@ -138,17 +93,6 @@ public class YearStatistic_TooltipUI {
       }
    }
 
-   private int computeSummary(final int[][] allDataSeries, final int valueIndex) {
-
-      int summary = 0;
-
-      for (final int[] dataSerie : allDataSeries) {
-         summary += dataSerie[valueIndex];
-      }
-
-      return summary;
-   }
-
    private void createActions() {
 
       _actionCloseTooltip = new ActionCloseTooltip();
@@ -159,7 +103,8 @@ public class YearStatistic_TooltipUI {
 
             // set index for the tab folder which should be selected when dialog is opened and applied
             // in net.tourbook.preferences.PrefPageAppearanceDisplayFormat.applyData(Object)
-            new Integer(1));
+            // -> select single tour formatting
+            new Integer(0));
    }
 
    /**
@@ -169,6 +114,9 @@ public class YearStatistic_TooltipUI {
     * @param frequencyStatistic
     * @param serieIndex
     * @param valueIndex
+    * @param uiText_Title
+    * @param avgSpeed
+    * @param avgPulse
     * @param tourTypeId
     * @param toolTip_Title
     * @param toolTip_SubTitle
@@ -178,33 +126,20 @@ public class YearStatistic_TooltipUI {
     */
    void createContentArea(final Composite parent,
                           final IToolTipProvider toolTipProvider,
-                          final int serieIndex,
-                          final int valueIndex,
-                          final long tourTypeId,
-                          final String toolTip_SubTitle,
-                          final boolean isShowSummary,
-                          final boolean isShowPercentage) {
+                          final String uiText_Title,
+                          final Float avgPulse,
+                          final Float avgSpeed) {
 
       _toolTipProvider = toolTipProvider;
-      _statisticData_Frequency = statisticData_Frequency;
 
-      _serieIndex = serieIndex;
-      _valueIndex = valueIndex;
-
-      _toolTip_SubTitle = toolTip_SubTitle;
-
-      _isShowPercentage = isShowPercentage;
-      _isShowSummary = isShowSummary;
+      _title = uiText_Title;
+      _avgPulse = avgPulse;
+      _avgSpeed = avgSpeed;
 
       final Display display = parent.getDisplay();
 
       _bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
       _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-
-      // setup tour type
-      _tourTypeId = tourTypeId;
-      _tourTypeName = TourDatabase.getTourTypeName(_tourTypeId);
-      _isTourTypeImageAvailable = _tourTypeId >= 0;
 
       initUI(parent);
 
@@ -217,21 +152,11 @@ public class YearStatistic_TooltipUI {
       enableControls();
    }
 
-
-
-
    private void createUI(final Composite parent) {
 
       final Point defaultSpacing = LayoutConstants.getSpacing();
 
-      int numColumns = 3;
-
-      if (_isShowPercentage) {
-         numColumns++;
-      }
-      if (_isShowSummary) {
-         numColumns += 2;
-      }
+      final int numColumns = 3;
 
       /*
        * shell container is necessary because the margins of the inner container will hide the
@@ -266,9 +191,6 @@ public class YearStatistic_TooltipUI {
                   .applyTo(container);
 //            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
             {
-
-               createUI_18_ColumnHeader(container);
-
                createUI_Spacer_Row(container, numColumns);
                createUI_30_BarData(container);
             }
@@ -278,7 +200,7 @@ public class YearStatistic_TooltipUI {
 
    private void createUI_10_Header(final Composite parent) {
 
-      final int numColumns = _isTourTypeImageAvailable ? 3 : 2;
+      final int numColumns = 2;
 
       final Composite container = new Composite(parent, SWT.NONE);
       container.setForeground(_fgColor);
@@ -289,19 +211,6 @@ public class YearStatistic_TooltipUI {
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-         /*
-          * Tour type image
-          */
-         if (_isTourTypeImageAvailable) {
-
-            _lblTourType_Image = new CLabel(container, SWT.NONE);
-            GridDataFactory.swtDefaults()
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_lblTourType_Image);
-            _lblTourType_Image.setForeground(_fgColor);
-            _lblTourType_Image.setBackground(_bgColor);
-         }
-
          /*
           * Title
           */
@@ -318,13 +227,6 @@ public class YearStatistic_TooltipUI {
           * Action toolbar in the top right corner
           */
          createUI_12_Header_Toolbar(container);
-      }
-
-      if (_toolTip_SubTitle != null) {
-
-         _lblSubTitle = new Label(parent, SWT.LEAD | SWT.WRAP);
-         _lblSubTitle.setForeground(_fgColor);
-         _lblSubTitle.setBackground(_bgColor);
       }
    }
 
@@ -356,73 +258,27 @@ public class YearStatistic_TooltipUI {
       tbm.update(true);
    }
 
-   private void createUI_18_ColumnHeader(final Composite parent) {
-
-      {
-         // column 1+2
-         _lblColumnHeader_TourType = createUI_Label(parent, UI.EMPTY_STRING);
-         _lblColumnHeader_TourType.setFont(FONT_BOLD);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-//               .align(SWT.END, SWT.FILL)
-               .applyTo(_lblColumnHeader_TourType);
-      }
-      {
-         // column 3: unit
-         createUI_Label(parent, UI.EMPTY_STRING);
-      }
-      if (_isShowPercentage) {
-
-         {
-            // column 4: %
-            final Label lblPercentage = createUI_Label(parent, Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage, SWT.TRAIL);
-            lblPercentage.setToolTipText(Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip);
-            lblPercentage.setFont(FONT_BOLD);
-            GridDataFactory.fillDefaults().indent(_columnSpacing, 0).applyTo(lblPercentage);
-         }
-      }
-
-      if (_isShowSummary) {
-
-         {
-            // column 5+6: Total
-            _lblColumnHeader_Summary = createUI_Label(parent, UI.EMPTY_STRING, SWT.TRAIL);
-            _lblColumnHeader_Summary.setFont(FONT_BOLD);
-            GridDataFactory.fillDefaults()
-                  .indent(_columnSpacing, 0)
-                  .span(2, 1)
-                  .applyTo(_lblColumnHeader_Summary);
-         }
-      }
-   }
-
-   private void createUI_30_BarData(final Composite container) {
+   private void createUI_30_BarData(final Composite parent) {
 
       {
          /*
-          * Data
+          * Avg Pulse
           */
-         _lblDataLabel = createUI_Label(container, UI.EMPTY_STRING);
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPulse);
 
-         _lblDataValue = createUI_LabelValue(container, SWT.TRAIL);
-         _lblDataValue_Unit = createUI_LabelValue(container, SWT.TRAIL);
+         _lblAvgPulse = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgPulseUnit = createUI_LabelValue(parent, SWT.LEAD);
+      }
+      {
+         /*
+          * Avg Speed
+          */
+         createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgSpeed);
 
-         if (_isShowPercentage) {
-            _lblDataValue_Percentage = createUI_LabelValue(container, SWT.TRAIL);
-         }
-
-         if (_isShowSummary) {
-            _lblDataValue_Summary = createUI_LabelValue(container, SWT.TRAIL);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.END, SWT.FILL)
-                  .grab(true, false)
-                  .applyTo(_lblDataValue_Summary);
-
-            _lblDataValue_Summary_Unit = createUI_LabelValue(container, SWT.TRAIL);
-         }
+         _lblAvgSpeed = createUI_LabelValue(parent, SWT.TRAIL);
+         _lblAvgSpeedUnit = createUI_LabelValue(parent, SWT.LEAD);
       }
    }
-
 
    private Label createUI_Label(final Composite parent, final String labelText) {
 
@@ -430,22 +286,6 @@ public class YearStatistic_TooltipUI {
 
       label.setForeground(_fgColor);
       label.setBackground(_bgColor);
-
-      if (labelText != null) {
-         label.setText(labelText);
-      }
-
-      return label;
-   }
-
-   private Label createUI_Label(final Composite parent, final String labelText, final int style) {
-
-      final Label label = new Label(parent, style);
-
-      label.setForeground(_fgColor);
-      label.setBackground(_bgColor);
-
-      GridDataFactory.fillDefaults().applyTo(label);
 
       if (labelText != null) {
          label.setText(labelText);
@@ -531,22 +371,14 @@ public class YearStatistic_TooltipUI {
 
    private void updateUI() {
 
-      // tour type image
-      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+      _lblTitle.setText(_title);
 
-         if (_tourTypeId < 0) {
-            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
-         } else {
-            _lblTourType_Image.setImage(TourTypeImage.getTourTypeImage(_tourTypeId));
-         }
-         _lblTourType_Image.setToolTipText(_tourTypeName);
-      }
+      // avg pulse
+      _lblAvgPulse.setText(FormatManager.formatPulse(_avgPulse));
+      _lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-      _lblColumnHeader_TourType.setText(_tourTypeName);
-
-      if (_toolTip_SubTitle != null) {
-         _lblSubTitle.setText(_toolTip_SubTitle);
-      }
+      _lblAvgSpeed.setText(FormatManager.formatSpeed(_avgSpeed));
+      _lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
    }
 
@@ -556,6 +388,5 @@ public class YearStatistic_TooltipUI {
 
       _ttContainer.layout(true, true);
    }
-
 
 }
