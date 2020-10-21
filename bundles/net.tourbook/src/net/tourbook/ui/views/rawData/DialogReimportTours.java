@@ -284,7 +284,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .span(2, 1)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkEntireTour);
-         _chkEntireTour.setText(Messages.Import_Data_EntireTour);
+         _chkEntireTour.setText(Messages.Import_Data_Checkbox_EntireTour);
          _chkEntireTour.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -301,7 +301,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkAltitude);
-         _chkAltitude.setText(Messages.Import_Data_AltitudeValues);
+         _chkAltitude.setText(Messages.Import_Data_Checkbox_AltitudeValues);
 
          /*
           * checkbox: cadence
@@ -311,7 +311,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkCadence);
-         _chkCadence.setText(Messages.Import_Data_CadenceValues);
+         _chkCadence.setText(Messages.Import_Data_Checkbox_CadenceValues);
 
          /*
           * checkbox: Gear
@@ -321,7 +321,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkGear);
-         _chkGear.setText(Messages.Import_Data_GearValues);
+         _chkGear.setText(Messages.Import_Data_Checkbox_GearValues);
 
          /*
           * checkbox: Power And Pulse
@@ -331,7 +331,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkPowerAndPulse);
-         _chkPowerAndPulse.setText(Messages.Import_Data_PowerAndPulseValues);
+         _chkPowerAndPulse.setText(Messages.Import_Data_Checkbox_PowerAndPulseValues);
 
          /*
           * checkbox: Power And Speed
@@ -341,7 +341,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkPowerAndSpeed);
-         _chkPowerAndSpeed.setText(Messages.Import_Data_PowerAndSpeedValues);
+         _chkPowerAndSpeed.setText(Messages.Import_Data_Checkbox_PowerAndSpeedValues);
 
          /*
           * checkbox: Running Dynamics
@@ -351,7 +351,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkRunningDynamics);
-         _chkRunningDynamics.setText(Messages.Import_Data_RunningDynamicsValues);
+         _chkRunningDynamics.setText(Messages.Import_Data_Checkbox_RunningDynamicsValues);
 
          /*
           * checkbox: Swimming
@@ -361,7 +361,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkSwimming);
-         _chkSwimming.setText(Messages.Import_Data_SwimmingValues);
+         _chkSwimming.setText(Messages.Import_Data_Checkbox_SwimmingValues);
 
          /*
           * checkbox: Temperature
@@ -371,7 +371,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTemperature);
-         _chkTemperature.setText(Messages.Import_Data_TemperatureValues);
+         _chkTemperature.setText(Messages.Import_Data_Checkbox_TemperatureValues);
 
          /*
           * checkbox: Training
@@ -381,7 +381,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTraining);
-         _chkTraining.setText(Messages.Import_Data_TrainingValues);
+         _chkTraining.setText(Messages.Import_Data_Checkbox_TrainingValues);
 
          /*
           * checkbox: Time slices
@@ -391,7 +391,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTimeSlices);
-         _chkTimeSlices.setText(Messages.Import_Data_TimeSlices);
+         _chkTimeSlices.setText(Messages.Import_Data_Checkbox_TimeSlices);
 
          /*
           * checkbox: Tour markers
@@ -401,7 +401,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTourMarkers);
-         _chkTourMarkers.setText(Messages.Import_Data_TourMarkers);
+         _chkTourMarkers.setText(Messages.Import_Data_Checkbox_TourMarkers);
 
          /*
           * checkbox: Timer Pauses
@@ -411,7 +411,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTourTimerPauses);
-         _chkTourTimerPauses.setText(Messages.Import_Data_TourTimerPauses);
+         _chkTourTimerPauses.setText(Messages.Import_Data_Checkbox_TourTimerPauses);
       }
 
    }
