@@ -246,6 +246,14 @@ public abstract class TourbookStatistic {
    protected abstract String getGridPrefPrefix();
 
    /**
+    * @param isShowSequenceNumbers
+    *           Show sequence numbers in the first column
+    * @return Returns the statistic values, these values are created on demand because they can use
+    *         some 100 ms, depending on the statistic.
+    */
+   public abstract String getRawStatisticValues(boolean isShowSequenceNumbers);
+
+   /**
     * @return When a tour can be selected in the statistic, this will return the tour Id of the
     *         selected tour or <code>null</code> otherwise.
     */

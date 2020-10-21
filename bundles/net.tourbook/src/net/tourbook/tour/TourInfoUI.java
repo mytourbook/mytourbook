@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -35,12 +36,13 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
+import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -90,6 +92,8 @@ public class TourInfoUI {
 //
    ;
 
+   protected final IPreferenceStore      _prefStore               = TourbookPlugin.getPrefStore();
+
    private final NumberFormat            _nf0                     = NumberFormat.getNumberInstance();
    private final NumberFormat            _nf1                     = NumberFormat.getInstance();
    private final NumberFormat            _nf2                     = NumberFormat.getInstance();
@@ -119,19 +123,19 @@ public class TourInfoUI {
    /*
     * Actions
     */
-   private ActionCloseTooltip                _actionCloseTooltip;
-   private ActionTourToolTip_EditTour        _actionEditTour;
-   private ActionTourToolTip_EditQuick       _actionEditQuick;
-   private ActionTourToolTip_EditPreferences _actionPrefDialog;
+   private ActionCloseTooltip             _actionCloseTooltip;
+   private ActionTourToolTip_EditTour     _actionEditTour;
+   private ActionTourToolTip_EditQuick    _actionEditQuick;
+   private Action_ToolTip_EditPreferences _actionPrefDialog;
 
-   private boolean                           _isActionsVisible = false;
+   private boolean                        _isActionsVisible = false;
 
    /**
     * Tour which is displayed in the tool tip
     */
-   private TourData                          _tourData;
+   private TourData                       _tourData;
 
-   private String                            _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
+   private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
 
    /*
     * fields which are optionally displayed when they are not null
@@ -160,7 +164,7 @@ public class TourInfoUI {
    private Text              _txtWeather;
 
    private CLabel            _lblClouds;
-   private CLabel            _lblTourType;
+   private CLabel            _lblTourType_Image;
 
    private Label             _lblAltitudeUp;
    private Label             _lblAltitudeUpUnit;
@@ -403,13 +407,13 @@ public class TourInfoUI {
           */
          if (_uiTourTypeName != null) {
 
-            _lblTourType = new CLabel(container, SWT.NONE);
+            _lblTourType_Image = new CLabel(container, SWT.NONE);
             GridDataFactory
                   .swtDefaults()//
                   .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_lblTourType);
-            _lblTourType.setForeground(_fgColor);
-            _lblTourType.setBackground(_bgColor);
+                  .applyTo(_lblTourType_Image);
+            _lblTourType_Image.setForeground(_fgColor);
+            _lblTourType_Image.setBackground(_bgColor);
          }
 
          /*
@@ -458,9 +462,13 @@ public class TourInfoUI {
 
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-         _actionPrefDialog = new ActionTourToolTip_EditPreferences(_tourToolTipProvider,
+
+         final Integer selectedTabFolder = new Integer(0);
+
+         _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
                Messages.Tour_Tooltip_Action_EditFormatPreferences,
-               PrefPageAppearanceDisplayFormat.ID);
+               PrefPageAppearanceDisplayFormat.ID,
+               selectedTabFolder);
 
          tbm.add(_actionEditTour);
          tbm.add(_actionEditQuick);
@@ -1313,9 +1321,9 @@ public class TourInfoUI {
       /*
        * upper/lower part
        */
-      if (_lblTourType != null && _lblTourType.isDisposed() == false) {
-         _lblTourType.setToolTipText(_uiTourTypeName);
-         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, false);
+      if (_lblTourType_Image != null && _lblTourType_Image.isDisposed() == false) {
+         _lblTourType_Image.setToolTipText(_uiTourTypeName);
+         net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType_Image, false);
       }
 
       String tourTitle = _tourData.getTourTitle();
@@ -1481,11 +1489,13 @@ public class TourInfoUI {
       _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-      final float avgSpeed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+      final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
+      final float avgSpeed = time == 0 ? 0 : 3.6f * distance / time;
       _lblAvgSpeed.setText(FormatManager.formatSpeed(avgSpeed));
       _lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
-      final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
+      final int pace = (int) (distance == 0 ? 0 : (time * 1000 / distance));
       _lblAvgPace.setText(
             String.format(//
                   Messages.Tour_Tooltip_Format_Pace,

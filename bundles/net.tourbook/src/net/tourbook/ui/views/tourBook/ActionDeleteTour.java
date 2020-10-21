@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourBook;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 
 import net.tourbook.Messages;
@@ -157,7 +156,7 @@ public class ActionDeleteTour extends Action {
       }
 
       // loop: selected tours
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+      for (Object treeItem : selection) {
 
          if (monitor != null) {
 
@@ -171,7 +170,6 @@ public class ActionDeleteTour extends Action {
             }
          }
 
-         final Object treeItem = iterator.next();
          if (treeItem instanceof TVITourBookTour) {
 
             final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
@@ -278,7 +276,7 @@ public class ActionDeleteTour extends Action {
 
                .thenAccept((allRowPositions) -> {
 
-                  // keep row positon for the first deleted tour
+                  // keep row position for the first deleted tour
                   final int firstRowPosition = allRowPositions[0];
 
                   firstDeletePosition[0] = firstRowPosition;

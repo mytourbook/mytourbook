@@ -20,22 +20,36 @@ public interface ICommonPreferences {
    /*
     * Colors
     */
-   public static final String GRAPH_COLORS                  = "graph.colors.";                 //$NON-NLS-1$
+   public static final String GRAPH_COLORS                         = "graph.colors.";                        //$NON-NLS-1$
 
-   public static final String DISPLAY_FORMAT_ALTITUDE       = "DISPLAY_FORMAT_ALTITUDE";       //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_CADENCE        = "DISPLAY_FORMAT_CADENCE";        //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_DISTANCE       = "DISPLAY_FORMAT_DISTANCE";       //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_POWER          = "DISPLAY_FORMAT_POWER";          //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_PULSE          = "DISPLAY_FORMAT_PULSE";          //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_SPEED          = "DISPLAY_FORMAT_SPEED";          //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_ALTITUDE              = "DISPLAY_FORMAT_ALTITUDE";              //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_CADENCE               = "DISPLAY_FORMAT_CADENCE";               //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_DISTANCE              = "DISPLAY_FORMAT_DISTANCE";              //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_POWER                 = "DISPLAY_FORMAT_POWER";                 //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_PULSE                 = "DISPLAY_FORMAT_PULSE";                 //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_SPEED                 = "DISPLAY_FORMAT_SPEED";                 //$NON-NLS-1$
 
-   public static final String DISPLAY_FORMAT_ELAPSED_TIME   = "DISPLAY_FORMAT_ELAPSED_TIME";   //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_RECORDED_TIME  = "DISPLAY_FORMAT_RECORDED_TIME";  //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_PAUSED_TIME    = "DISPLAY_FORMAT_PAUSED_TIME";    //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_MOVING_TIME    = "DISPLAY_FORMAT_MOVING_TIME";    //$NON-NLS-1$
-   public static final String DISPLAY_FORMAT_BREAK_TIME     = "DISPLAY_FORMAT_BREAK_TIME";     //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_ELAPSED_TIME          = "DISPLAY_FORMAT_ELAPSED_TIME";          //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_RECORDED_TIME         = "DISPLAY_FORMAT_RECORDED_TIME";         //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_PAUSED_TIME           = "DISPLAY_FORMAT_PAUSED_TIME";           //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_MOVING_TIME           = "DISPLAY_FORMAT_MOVING_TIME";           //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_BREAK_TIME            = "DISPLAY_FORMAT_BREAK_TIME";            //$NON-NLS-1$
 
-   public static final String DISPLAY_FORMAT_IS_LIVE_UPDATE = "DISPLAY_FORMAT_IS_LIVE_UPDATE"; //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_ALTITUDE_SUMMARY      = "DISPLAY_FORMAT_ALTITUDE_SUMMARY";      //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_CADENCE_SUMMARY       = "DISPLAY_FORMAT_CADENCE_SUMMARY";       //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_DISTANCE_SUMMARY      = "DISPLAY_FORMAT_DISTANCE_SUMMARY";      //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_POWER_SUMMARY         = "DISPLAY_FORMAT_POWER_SUMMARY";         //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_PULSE_SUMMARY         = "DISPLAY_FORMAT_PULSE_SUMMARY";         //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_SPEED_SUMMARY         = "DISPLAY_FORMAT_SPEED_SUMMARY";         //$NON-NLS-1$
+
+   public static final String DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY  = "DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY";  //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_RECORDED_TIME_SUMMARY = "DISPLAY_FORMAT_RECORDED_TIME_SUMMARY"; //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_PAUSED_TIME_SUMMARY   = "DISPLAY_FORMAT_PAUSED_TIME_SUMMARY";   //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_MOVING_TIME_SUMMARY   = "DISPLAY_FORMAT_MOVING_TIME_SUMMARY";   //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_BREAK_TIME_SUMMARY    = "DISPLAY_FORMAT_BREAK_TIME_SUMMARY";    //$NON-NLS-1$
+
+   public static final String DISPLAY_FORMAT_IS_LIVE_UPDATE        = "DISPLAY_FORMAT_IS_LIVE_UPDATE";        //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_SELECTED_TAB          = "DISPLAY_FORMAT_SELECTED_TAB";          //$NON-NLS-1$
 
    /*
     * Timezone

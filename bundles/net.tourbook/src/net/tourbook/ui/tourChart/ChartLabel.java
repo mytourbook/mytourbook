@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,116 +18,118 @@
  */
 package net.tourbook.ui.tourChart;
 
-import org.eclipse.swt.graphics.Rectangle;
-
 import net.tourbook.common.UI;
 import net.tourbook.photo.Photo;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 public class ChartLabel {
 
-	/**
-	 * marker was created in the device
-	 */
-	public final static int	MARKER_TYPE_DEVICE		= 1;
+   /**
+    * marker was created in the device
+    */
+   public final static int MARKER_TYPE_DEVICE     = 1;
 
-	/**
-	 * marker was created in the tourbook application
-	 */
-	public final static int	MARKER_TYPE_CUSTOM		= 2;
+   /**
+    * marker was created in the tourbook application
+    */
+   public final static int MARKER_TYPE_CUSTOM     = 2;
 
-	public static final int	VISIBLE_TYPE_DEFAULT	= 0;
-	public static final int	VISIBLE_TYPE_TYPE_NEW	= 10;
-	public static final int	VISIBLE_TYPE_TYPE_EDIT	= 20;
+   public static final int VISIBLE_TYPE_DEFAULT   = 0;
+   public static final int VISIBLE_TYPE_TYPE_NEW  = 10;
+   public static final int VISIBLE_TYPE_TYPE_EDIT = 20;
 
-	public boolean			isVisible;
-	public boolean			isDescription;
+   public boolean          isVisible;
+   public boolean          isDescription;
 
-	/**
-	 * x-position in graph units
-	 */
-	public double			graphX;
+   /**
+    * x-position in graph units
+    */
+   public double           graphX;
 
-	/**
-	 * index in the data serie
-	 */
-	public int				serieIndex;
+   /**
+    * index in the data serie
+    */
+   public int              serieIndex;
 
-	public String			markerLabel				= UI.EMPTY_STRING;
+   public String           markerLabel            = UI.EMPTY_STRING;
 
-	/**
-	 * visual position in the chart
-	 */
-	public int				visualPosition;
+   public String           pauseDuration          = UI.EMPTY_STRING;
 
-	/**
-	 * marker type, this can be <code>TourMarker.MARKER_TYPE_DEVICE</code> or
-	 * <code>TourMarker.MARKER_TYPE_CUSTOM</code>
-	 */
-	public int				type;
+   /**
+    * visual position in the chart
+    */
+   public int              visualPosition;
 
-	public int				labelXOffset;
+   /**
+    * marker type, this can be <code>TourMarker.MARKER_TYPE_DEVICE</code> or
+    * <code>TourMarker.MARKER_TYPE_CUSTOM</code>
+    */
+   public int              type;
 
-	public int				labelYOffset;
-	public int				visualType;
+   public int              labelXOffset;
 
-	public Photo			markerSignPhoto;
+   public int              labelYOffset;
+   public int              visualType;
 
-	/*
-	 * Painted label positions
-	 */
-	public int				devXMarker;
-	public int				devYMarker;
+   public Photo            markerSignPhoto;
 
-	/**
-	 * Painted position.
-	 */
-	public Rectangle		paintedLabel;
+   /*
+    * Painted label positions
+    */
+   public int       devXMarker;
+   public int       devYMarker;
 
-	public int				devHoverSize;
+   /**
+    * Painted position.
+    */
+   public Rectangle paintedLabel;
 
-	public int				devMarkerPointSize;
-	/**
-	 * Bounds where the marker sign image is painted.
-	 */
-	public Rectangle		devMarkerSignImageBounds;
+   public int       devHoverSize;
 
-	/**
-	 * Is <code>true</code> when the label is drawn vertically.
-	 */
-	public boolean			devIsVertical;
+   public int       devMarkerPointSize;
+   /**
+    * Bounds where the marker sign image is painted.
+    */
+   public Rectangle devMarkerSignImageBounds;
 
-	/**
-	 * Contains custom data, can be used to keep references to the model.
-	 */
-	public Object			data;
+   /**
+    * Is <code>true</code> when the label is drawn vertically.
+    */
+   public boolean   devIsVertical;
 
-	/*
-	 * Graph margins
-	 */
-	public int				devYBottom;
+   /**
+    * Contains custom data, can be used to keep references to the model.
+    */
+   public Object    data;
 
-	public int				devYTop;
-	public int				devGraphWidth;
+   /*
+    * Graph margins
+    */
+   public int devYBottom;
 
-	ChartLabel() {}
+   public int devYTop;
+   public int devGraphWidth;
 
-	/**
-	 * @return Returns <code>true</code> when the marker is created with the device.
-	 */
-	public boolean isDeviceMarker() {
+   ChartLabel() {}
 
-		return type == ChartLabel.MARKER_TYPE_DEVICE;
-	}
+   /**
+    * @return Returns <code>true</code> when the marker is created with the device.
+    */
+   public boolean isDeviceMarker() {
 
-	@Override
-	public String toString() {
-		return "ChartLabel [" // //$NON-NLS-1$
+      return type == ChartLabel.MARKER_TYPE_DEVICE;
+   }
+
+   @Override
+   public String toString() {
+      return "ChartLabel [" // //$NON-NLS-1$
 //				+ ("serieIndex=" + serieIndex + ", ")
 //				+ ("graphX=" + graphX + ", ")
 //				+ ("devXMarker=" + devXMarker + ", ")
 //				+ ("devYMarker=" + devYMarker + ", ")
-				+ ("markerLabel=" + markerLabel) //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
-	}
+            + ("markerLabel=" + markerLabel) //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 
 }

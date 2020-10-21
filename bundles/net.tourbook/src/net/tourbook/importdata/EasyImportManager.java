@@ -1274,11 +1274,11 @@ public class EasyImportManager {
          // tour type is not set
       }
 
-      TourLogManager.addSubLog(//
+      TourLogManager.addSubLog(
             TourLogState.DEFAULT,
-            String.format(//
+            String.format(
                   LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
                   tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  tourTypeName + " (" + tourTypeCadence.getNlsLabel() + ")"));
+                  String.format("%s (%s)", tourTypeName, tourTypeCadence.getNlsLabel())));//$NON-NLS-1$
    }
 }

@@ -464,12 +464,20 @@ public class Messages extends NLS {
 
    public static String        Segmenter_Tooltip_Label_Altimeter;
    public static String        Segmenter_Tooltip_Label_AltitudeDifference;
-   public static String        Segmenter_Tooltip_Label_BreakTime;
+   public static String        Segmenter_Tooltip_Label_ComputedTime_Break;
    public static String        Segmenter_Tooltip_Label_Distance;
    public static String        Segmenter_Tooltip_Label_Gradient;
-   public static String        Segmenter_Tooltip_Label_MovingTime;
+   public static String        Segmenter_Tooltip_Label_ComputedTime_Moving;
    public static String        Segmenter_Tooltip_Label_DeviceTime_Elapsed;
+   public static String        Segmenter_Tooltip_Label_DeviceTime_Recorded;
+   public static String        Segmenter_Tooltip_Label_DeviceTime_Paused;
    public static String        Segmenter_Tooltip_Label_Title;
+
+   public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage;
+   public static String        Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip;
+   public static String        Statistic_Tooltip_Label_Distance;
+   public static String        Statistic_Tooltip_Label_Elevation;
+   public static String        Statistic_Tooltip_Label_NumberOfTours;
 
    public static String        Tooltip_WayPoint_Label_Altitude;
    public static String        Tooltip_WayPoint_Label_Category;

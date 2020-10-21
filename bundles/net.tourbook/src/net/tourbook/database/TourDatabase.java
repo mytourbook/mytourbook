@@ -103,6 +103,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 42;
 
+//   private static final int TOURBOOK_DB_VERSION = 42; // 20.?
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -582,12 +583,12 @@ public class TourDatabase {
        * @throws SQLException
        */
       private static void RenameCol(final Statement stmt,
-                                        final String table,
-                                        final String columnName,
-                                        final String newColumnName) throws SQLException {
+                                    final String table,
+                                    final String columnName,
+                                    final String newColumnName) throws SQLException {
 
          final String sql = UI.EMPTY_STRING//
-               + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$
+               + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
          exec(stmt, sql);
       }
@@ -2007,8 +2008,8 @@ public class TourDatabase {
 
    /**
     * @param tourTypeId
-    * @return Returns the name for the {@link TourType} or an empty string when the tour type id was
-    *         not found
+    * @return Returns the name for the {@link TourType} or "- No Tour Type -" when the tour type id
+    *         was not found
     */
    public static String getTourTypeName(final long tourTypeId) {
 
@@ -7513,10 +7514,10 @@ public class TourDatabase {
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded", DEFAULT_0);                            //$NON-NLS-1$
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Paused",   DEFAULT_0);                            //$NON-NLS-1$
 
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed");
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving");
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            SQL.RenameCol(stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", "TourDeviceTime_Elapsed");
+            SQL.RenameCol(stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", "TourDeviceTime_Elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_ON
          }

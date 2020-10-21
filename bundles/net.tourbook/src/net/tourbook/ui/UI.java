@@ -1109,7 +1109,17 @@ public class UI {
 
                if (_fontForLogging != null) {
 
-                  _fontForLogging.dispose();
+                  /**
+                   * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
+                   * using the old font in setFont(...) before the new font is initialized
+                   * -> realy bad behavior !!!
+                   */
+                  final Font oldFont = _fontForLogging;
+
+                  display.timerExec(10_000, () -> {
+                     oldFont.dispose();
+                  });
+
                   _fontForLogging = null;
                }
 

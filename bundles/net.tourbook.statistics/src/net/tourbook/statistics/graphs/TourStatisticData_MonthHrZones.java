@@ -15,16 +15,10 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-class TourData_WeekHrZones {
+class TourStatisticData_MonthHrZones {
 
    /**
     * HR zones values in seconds.
     */
-   int[][] hrZoneValues;
-
-   int[]   years;
-   int[]   yearWeeks;
-   int[]   yearDays;
-
-   String  statisticValuesRaw;
+   public int[][] hrZoneValues;
 }

@@ -786,14 +786,14 @@ public class CalendarTourDataProvider {
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
-                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
+                  + "   " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //$NON-NLS-1$
 
                   + "   AS jTdataTtag" //                                              //$NON-NLS-1$
                   + "   ON tourId = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
 
                   + "   WHERE  startWeekYear=?" + NL //                                //$NON-NLS-1$
                   + "      AND startWeek=?" + NL //                                    //$NON-NLS-1$
-                  + "      " + sqlAppFilter.getWhereClause() + NL
+                  + "      " + sqlAppFilter.getWhereClause() + NL //$NON-NLS-1$
 
                   + ") NecessaryNameOtherwiseItDoNotWork" //                           //$NON-NLS-1$
 
@@ -807,7 +807,7 @@ public class CalendarTourDataProvider {
 
                   + "   WHERE  startWeekYear=?" + NL //                                //$NON-NLS-1$
                   + "      AND startWeek=?" + NL //                                    //$NON-NLS-1$
-                  + "      " + sqlAppFilter.getWhereClause();
+                  + "      " + sqlAppFilter.getWhereClause(); //$NON-NLS-1$
          }
 
          sql = "SELECT" + NL //                                                     //$NON-NLS-1$

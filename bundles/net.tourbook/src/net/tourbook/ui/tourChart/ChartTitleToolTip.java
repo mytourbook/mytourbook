@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,268 +42,265 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider, IOpeningDialog {
 
-	private String				_dialogId	= getClass().getCanonicalName();
+   private String            _dialogId = getClass().getCanonicalName();
 
-	private TourChart			_tourChart;
-	private ChartTitleSegment	_hoveredTitleSegment;
+   private TourChart         _tourChart;
+   private ChartTitleSegment _hoveredTitleSegment;
 
-	/*
-	 * UI resources
-	 */
-	private final TourInfoUI	_tourInfoUI	= new TourInfoUI();
+   /*
+    * UI resources
+    */
+   private final TourInfoUI _tourInfoUI = new TourInfoUI();
 
-	private Long				_hoveredTourId;
+   private Long             _hoveredTourId;
 
-	public ChartTitleToolTip(final TourChart tourChart) {
+   public ChartTitleToolTip(final TourChart tourChart) {
 
-		super(tourChart);
+      super(tourChart);
 
-		_tourChart = tourChart;
+      _tourChart = tourChart;
 
-		setFadeInSteps(10);
+      setFadeInSteps(10);
 
-		setFadeOutSteps(20);
-		setFadeOutDelaySteps(30);
+      setFadeOutSteps(20);
+      setFadeOutDelaySteps(30);
 
-		setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-	}
+      setBehaviourOnMouseOver(MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
+   }
 
-	void actionQuickEditTour() {
+   void actionQuickEditTour() {
 
-		_tourInfoUI.actionQuickEditTour();
-	}
+      _tourInfoUI.actionQuickEditTour();
+   }
 
-	@Override
-	protected void beforeHideToolTip() {
+   @Override
+   protected void beforeHideToolTip() {
 
-		/*
-		 * This is the tricky part that the hovered marker is reset before the tooltip is closed and
-		 * not when nothing is hovered. This ensures that the tooltip has a valid state.
-		 */
-		_hoveredTitleSegment = null;
+      /*
+       * This is the tricky part that the hovered marker is reset before the tooltip is closed and
+       * not when nothing is hovered. This ensures that the tooltip has a valid state.
+       */
+      _hoveredTitleSegment = null;
 
-	}
+   }
 
-	@Override
-	protected boolean canShowToolTip() {
+   @Override
+   protected boolean canShowToolTip() {
 
-		return _hoveredTitleSegment != null;
-	}
+      return _hoveredTitleSegment != null;
+   }
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite shell) {
+   @Override
+   protected void createToolTipContentArea(final Composite shell) {
 
-		if (_hoveredTitleSegment == null) {
-			return null;
-		}
+      if (_hoveredTitleSegment == null) {
+         return;
+      }
 
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
+      shell.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
-		return createUI(shell);
-	}
+      createUI(shell);
+   }
 
-	private Composite createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		Composite ui;
+      final TourData tourData = TourManager.getInstance().getTourData(_hoveredTitleSegment.getTourId());
 
-		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTitleSegment.getTourId());
+      if (tourData == null) {
 
-		if (tourData == null) {
+         // there are no data available
 
-			// there are no data available
+         _tourInfoUI.createUI_NoData(parent);
 
-			ui = _tourInfoUI.createUI_NoData(parent);
+      } else {
 
-		} else {
+         // tour data is available
 
-			// tour data is available
+         _tourInfoUI.setActionsEnabled(true);
 
-			_tourInfoUI.setActionsEnabled(true);
+         _tourInfoUI.createContentArea(parent, tourData, this, this);
+      }
+   }
 
-			ui = _tourInfoUI.createContentArea(parent, tourData, this, this);
-		}
-		return ui;
-	}
+   @Override
+   public String getDialogId() {
+      return _dialogId;
+   }
 
-	@Override
-	public String getDialogId() {
-		return _dialogId;
-	}
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+      final TourData tourData = TourManager.getInstance().getTourData(_hoveredTourId);
 
-		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTourId);
+      final ArrayList<TourData> tours = new ArrayList<>();
+      tours.add(tourData);
 
-		final ArrayList<TourData> tours = new ArrayList<TourData>();
-		tours.add(tourData);
+      return tours;
+   }
 
-		return tours;
-	}
+   /**
+    * By default the tooltip is located to the left side of the tour marker point, when not visible
+    * it is displayed to the right side of the tour marker point.
+    */
+   @Override
+   public Point getToolTipLocation(final Point tipSize) {
 
-	/**
-	 * By default the tooltip is located to the left side of the tour marker point, when not visible
-	 * it is displayed to the right side of the tour marker point.
-	 */
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
+      final int devHoveredX = _hoveredTitleSegment.devXTitle;
+      int devHoveredY = _hoveredTitleSegment.devYTitle;
+      final int devHoveredWidth = _hoveredTitleSegment.titleWidth;
 
-		final int devHoveredX = _hoveredTitleSegment.devXTitle;
-		int devHoveredY = _hoveredTitleSegment.devYTitle;
-		final int devHoveredWidth = _hoveredTitleSegment.titleWidth;
+      final int devYTop = _hoveredTitleSegment.devYGraphTop;
 
-		final int devYTop = _hoveredTitleSegment.devYGraphTop;
+      final int tipWidth = tipSize.x;
+      final int tipHeight = tipSize.y;
 
-		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
+      int ttPosX;
+      int ttPosY;
 
-		int ttPosX;
-		int ttPosY;
+      if (devHoveredY < devYTop) {
+         // remove hovered size
+         devHoveredY = devYTop;
+      }
 
-		if (devHoveredY < devYTop) {
-			// remove hovered size
-			devHoveredY = devYTop;
-		}
+      // position tooltip above the chart
+      ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
+      ttPosY = -tipHeight + 1;
 
-		// position tooltip above the chart
-		ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;
-		ttPosY = -tipHeight + 1;
+      // ckeck if tooltip is left to the chart border
+      if (ttPosX + tipWidth < 0) {
 
-		// ckeck if tooltip is left to the chart border
-		if (ttPosX + tipWidth < 0) {
+         // set tooltip to the graph left border
+         ttPosX = -tipWidth - 1;
 
-			// set tooltip to the graph left border
-			ttPosX = -tipWidth - 1;
+      } else if (ttPosX > _hoveredTitleSegment.devGraphWidth) {
 
-		} else if (ttPosX > _hoveredTitleSegment.devGraphWidth) {
+         // set tooltip to the graph right border
+         ttPosX = _hoveredTitleSegment.devGraphWidth;
+      }
 
-			// set tooltip to the graph right border
-			ttPosX = _hoveredTitleSegment.devGraphWidth;
-		}
+      final ChartComponentGraph graphControl = _tourChart.getChartComponents().getChartComponentGraph();
+      final IToolBarManager iTbm = _tourChart.getToolBarManager();
 
-		final ChartComponentGraph graphControl = _tourChart.getChartComponents().getChartComponentGraph();
-		final IToolBarManager iTbm = _tourChart.getToolBarManager();
+      final ToolBarManager tbm = (ToolBarManager) iTbm;
+      final ToolBar toolbarControl = tbm.getControl();
 
-		final ToolBarManager tbm = (ToolBarManager) iTbm;
-		final ToolBar toolbarControl = tbm.getControl();
+      /*
+       * Center horizontally in the middle of the tour segment and vertically above the toolbar
+       * that the tool buttons are not hidden from the tooltip.
+       */
+      final Point ttLocationX = graphControl.toDisplay(ttPosX, ttPosY);
+      final Point ttLocationY = toolbarControl.toDisplay(ttPosX, ttPosY);
 
-		/*
-		 * Center horizontally in the middle of the tour segment and vertically above the toolbar
-		 * that the tool buttons are not hidden from the tooltip.
-		 */
-		final Point ttLocationX = graphControl.toDisplay(ttPosX, ttPosY);
-		final Point ttLocationY = toolbarControl.toDisplay(ttPosX, ttPosY);
+      final Point ttLocation = new Point(ttLocationX.x, ttLocationY.y - 1);
 
-		final Point ttLocation = new Point(ttLocationX.x, ttLocationY.y - 1);
+      /*
+       * Fixup display bounds
+       */
+      final Rectangle displayBounds = UI.getDisplayBounds(toolbarControl, ttLocation);
+      final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
 
-		/*
-		 * Fixup display bounds
-		 */
-		final Rectangle displayBounds = UI.getDisplayBounds(toolbarControl, ttLocation);
-		final Point rightBottomBounds = new Point(tipSize.x + ttLocation.x, tipSize.y + ttLocation.y);
+      final boolean isLocationInDisplay = displayBounds.contains(ttLocation);
+      final boolean isBottomInDisplay = displayBounds.contains(rightBottomBounds);
 
-		final boolean isLocationInDisplay = displayBounds.contains(ttLocation);
-		final boolean isBottomInDisplay = displayBounds.contains(rightBottomBounds);
+      if (!(isLocationInDisplay && isBottomInDisplay)) {
 
-		if (!(isLocationInDisplay && isBottomInDisplay)) {
+         final int displayX = displayBounds.x;
+         final int displayY = displayBounds.y;
+         final int displayWidth = displayBounds.width;
 
-			final int displayX = displayBounds.x;
-			final int displayY = displayBounds.y;
-			final int displayWidth = displayBounds.width;
+         if (ttLocation.x < displayX) {
+            ttLocation.x = displayX;
+         }
 
-			if (ttLocation.x < displayX) {
-				ttLocation.x = displayX;
-			}
+         if (rightBottomBounds.x > displayX + displayWidth) {
+            ttLocation.x = displayWidth - tipWidth;
+         }
 
-			if (rightBottomBounds.x > displayX + displayWidth) {
-				ttLocation.x = displayWidth - tipWidth;
-			}
+         if (ttLocation.y < displayY) {
+            // position evaluated with try and error until it fits
+            ttLocation.y = ttLocationX.y - ttPosY + graphControl.getSize().y;
+         }
+      }
 
-			if (ttLocation.y < displayY) {
-				// position evaluated with try and error until it fits
-				ttLocation.y = ttLocationX.y - ttPosY + graphControl.getSize().y;
-			}
-		}
+      return ttLocation;
+   }
 
-		return ttLocation;
-	}
+   @Override
+   public void hideDialog() {
+      hide();
+   }
 
-	@Override
-	public void hideDialog() {
-		hide();
-	}
+   @Override
+   public void hideToolTip() {
 
-	@Override
-	public void hideToolTip() {
+      /*
+       * MUST be hidden this way otherwise hide() would close another dialog which is opening..
+       */
 
-		/*
-		 * MUST be hidden this way otherwise hide() would close another dialog which is opening..
-		 */
+      hideNow();
+   }
 
-		hideNow();
-	}
+   @Override
+   protected boolean isInNoHideArea(final Point displayCursorLocation) {
 
-	@Override
-	protected boolean isInNoHideArea(final Point displayCursorLocation) {
+      if (_hoveredTitleSegment == null) {
+         return false;
+      } else {
+         return _hoveredTitleSegment.isInNoHideArea(
+               _tourChart.getChartComponents().getChartComponentGraph(),
+               displayCursorLocation);
+      }
+   }
 
-		if (_hoveredTitleSegment == null) {
-			return false;
-		} else {
-			return _hoveredTitleSegment.isInNoHideArea(
-					_tourChart.getChartComponents().getChartComponentGraph(),
-					displayCursorLocation);
-		}
-	}
+   private void onDispose() {
+      _tourInfoUI.dispose();
+   }
 
-	private void onDispose() {
-		_tourInfoUI.dispose();
-	}
+   void open(final ChartTitleSegment titleSegment) {
 
-	void open(final ChartTitleSegment titleSegment) {
+      boolean isKeepOpened = false;
 
-		boolean isKeepOpened = false;
+      if (titleSegment != null && isTooltipClosing()) {
 
-		if (titleSegment != null && isTooltipClosing()) {
+         /**
+          * This case occures when the tooltip is opened but is currently closing and the mouse
+          * is moved from the tooltip back to the hovered label.
+          * <p>
+          * This prevents that when the mouse is over the hovered label but not moved, that the
+          * tooltip keeps opened.
+          */
+         isKeepOpened = true;
+      }
 
-			/**
-			 * This case occures when the tooltip is opened but is currently closing and the mouse
-			 * is moved from the tooltip back to the hovered label.
-			 * <p>
-			 * This prevents that when the mouse is over the hovered label but not moved, that the
-			 * tooltip keeps opened.
-			 */
-			isKeepOpened = true;
-		}
+      if (titleSegment == _hoveredTitleSegment && isKeepOpened == false) {
+         // nothing has changed
 
-		if (titleSegment == _hoveredTitleSegment && isKeepOpened == false) {
-			// nothing has changed
+         return;
+      }
 
-			return;
-		}
+      if (titleSegment == null || titleSegment.getTourId() == null) {
 
-		if (titleSegment == null || titleSegment.getTourId() == null) {
+         // a marker is not hovered or is hidden, hide tooltip
 
-			// a marker is not hovered or is hidden, hide tooltip
+         _hoveredTitleSegment = null;
+         _hoveredTourId = null;
 
-			_hoveredTitleSegment = null;
-			_hoveredTourId = null;
+         hide();
 
-			hide();
+      } else {
 
-		} else {
+         // another marker is hovered, show tooltip
 
-			// another marker is hovered, show tooltip
+         _hoveredTitleSegment = titleSegment;
+         _hoveredTourId = titleSegment.getTourId();
 
-			_hoveredTitleSegment = titleSegment;
-			_hoveredTourId = titleSegment.getTourId();
-
-			showToolTip();
-		}
-	}
+         showToolTip();
+      }
+   }
 
 }

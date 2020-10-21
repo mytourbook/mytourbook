@@ -13,37 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.statistics.graphs;
 
-import org.eclipse.jface.viewers.ISelection;
+public enum FrequencyStatistic {
 
-/**
- * Contains tours which has been deleted in the database or removed from a view (tours in the import
- * view which are not saved but removed)
- */
-public class Selection_StatisticValues implements ISelection {
+   DISTANCE, //
 
-   String statisticValuesRaw;
+   DURATION_TIME, //
 
-   public Selection_StatisticValues(final String statisticValuesRaw) {
-
-      super();
-
-      this.statisticValuesRaw = statisticValuesRaw;
-   }
-
-   @Override
-   public boolean isEmpty() {
-      return false;
-   }
-
-   @Override
-   public String toString() {
-
-      return "Selection_StatisticValues\n" //$NON-NLS-1$
-            + "[\n" //$NON-NLS-1$
-            + "statisticValues=" + statisticValuesRaw + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "]"; //$NON-NLS-1$
-   }
+   ELEVATION, //
 
 }

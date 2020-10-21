@@ -373,7 +373,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private I2ndAltiLayer             _layer2ndAlti;
    private ChartLayerMarker          _layerMarker;
    private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
-   private ChartLayerMarker          _layerPause;
+   private ChartLayerPause           _layerPause;
    private ChartLayerPhoto           _layerPhoto;
    private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
    private ChartLayerSegmentValue    _layerTourSegmenterOther;
@@ -2239,19 +2239,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
       chartLabel.serieIndex = xAxisSerieIndex;
 
-      chartLabel.markerLabel = pauseDuration;
-      chartLabel.isDescription = true;
-      chartLabel.visualPosition = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
-      chartLabel.type = ChartLabel.MARKER_TYPE_DEVICE;
-      chartLabel.visualType = ChartLabel.VISIBLE_TYPE_DEFAULT;
-
-      chartLabel.isVisible = true;
+      chartLabel.pauseDuration = pauseDuration;
 
       return chartLabel;
    }
 
    /**
-    * create the layer which displays the tour pauses
+    * Creates the layer which displays the tour pauses
     *
     * @param isForcedPauses
     *           When <code>true</code> the pauses must be drawn, otherwise
@@ -2269,42 +2263,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // pauses layer is visible
 
-      final ChartMarkerConfig cmc = new ChartMarkerConfig();
-
-      cmc.isDrawMarkerWithDefaultColor = _tcc.isDrawMarkerWithDefaultColor;
-      cmc.isShowAbsoluteValues = _tcc.isShowAbsoluteValues;
-      cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
-      cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
-      cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
-      cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
-      cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
-      cmc.isShowSignImage = _tcc.isShowSignImage;
-      cmc.isShowLabelTempPos = _tcc.isShowLabelTempPos;
-
-      cmc.markerLabelTempPos = _tcc.markerLabelTempPos;
-      cmc.markerTooltipPosition = _tcc.markerTooltipPosition;
-
-      cmc.markerHoverSize = _tcc.markerHoverSize;
-      cmc.markerLabelOffset = _tcc.markerLabelOffset;
-      cmc.markerPointSize = _tcc.markerPointSize;
-      cmc.markerSignImageSize = _tcc.markerSignImageSize;
-
-      cmc.markerColorDefault = _tcc.markerColorDefault;
-      cmc.markerColorDevice = _tcc.markerColorDevice;
-      cmc.markerColorHidden = _tcc.markerColorHidden;
+      final ChartPauseConfig cpc = new ChartPauseConfig();
 
       if (_layerPause == null) {
 
-         // setup marker layer, a layer is created only once
+         // setup pause layer, a layer is created only once
 
-         _layerPause = new ChartLayerMarker(this);
+         _layerPause = new ChartLayerPause(this);
 
          // set overlay painter
          addChartOverlay(_layerPause);
-
       }
 
-      _layerPause.setChartMarkerConfig(cmc);
+      _layerPause.setChartPauseConfig(cpc);
 
       // set data serie for the x-axis
       final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
@@ -2339,17 +2310,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
 
-               final long pauseDuration = Math.round((float) (pausedTime_End - pausedTime_Start) / 1000);
+               final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
                pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
-                  previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+                  previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
                for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
 
-                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
 
                   if (currentTime >= pausedTime_Start) {
                      break;
@@ -2363,7 +2334,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                         tourSerieIndex,
                         0);
 
-                  cmc.chartLabels.add(chartLabel);
+                  cpc.chartLabels.add(chartLabel);
                }
 
                ++relativeTourPauseIndex;
@@ -2384,18 +2355,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          String pauseDurationText;
          int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
+         final long tourStartTime = _tourData.getTourStartTimeMS();
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-            final long pauseDuration = Math.round((float) (pausedTime_End[index] - pausedTime_Start[index]) / 1000);
+            final long pauseDuration = Math.round((pausedTime_End[index] - pausedTime_Start[index]) / 1000f);
             pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
-            for (; serieIndex < timeSerie.length; ++serieIndex) {
+            for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
 
-               final long currentTime = timeSerie[serieIndex] * 1000 + _tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
 
-               if (currentTime == pausedTime_Start[index] || currentTime > pausedTime_Start[index]) {
+               if (currentTime >= pausedTime_Start[index]) {
                   break;
                }
+            }
+
+            if (serieIndex >= xAxisSerie.length) {
+               continue;
             }
 
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
@@ -2404,7 +2380,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   serieIndex,
                   0);
 
-            cmc.chartLabels.add(chartLabel);
+            cpc.chartLabels.add(chartLabel);
          }
       }
    }

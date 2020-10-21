@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,36 +21,48 @@ import net.tourbook.common.Messages;
 
 public class ValueFormatter_Number_1_3 implements IValueFormatter {
 
-	private final NumberFormat _nf3 = NumberFormat.getNumberInstance();
+   private final NumberFormat _nf3 = NumberFormat.getNumberInstance();
 
-	public ValueFormatter_Number_1_3() {
+   public ValueFormatter_Number_1_3() {
 
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
-	}
+      _nf3.setMinimumFractionDigits(3);
+      _nf3.setMaximumFractionDigits(3);
+   }
 
-	public ValueFormatter_Number_1_3(final boolean isGroupingUsed) {
+   public ValueFormatter_Number_1_3(final boolean isGroupingUsed) {
 
-		this();
+      this();
 
-		_nf3.setGroupingUsed(isGroupingUsed);
-	}
+      _nf3.setGroupingUsed(isGroupingUsed);
+   }
 
-	@Override
-	public String printDouble(final double value) {
-		return _nf3.format(value);
-	}
+   @Override
+   public String printDouble(final double value) {
 
-	@Override
-	public String printLong(final long value) {
-		return Messages.App_Error_NotSupportedValueFormatter;
-	}
+      final String formattedValue = _nf3.format(value);
 
-	@Override
-	public String toString() {
-		return "ValueFormatter_Number_1_3 [" // //$NON-NLS-1$
-				+ "printDouble()" //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
-	}
+      if (value > 0 && ZERO_VALUE_TEXT_0_000.equals(formattedValue)) {
+         return BIGGER_THAN_ZERO;
+      }
+
+      return formattedValue;
+   }
+
+   @Override
+   public String printLong(final long value) {
+      return Messages.App_Error_NotSupportedValueFormatter;
+   }
+
+   @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return printLong(value);
+   }
+
+   @Override
+   public String toString() {
+      return "ValueFormatter_Number_1_3 [" // //$NON-NLS-1$
+            + "printDouble()" //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 
 }

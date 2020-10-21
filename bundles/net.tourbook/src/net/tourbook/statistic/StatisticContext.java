@@ -39,46 +39,40 @@ public class StatisticContext {
    public TourTypeFilter appTourTypeFilter;
 
    /**
-    * First (youngest) year which is selected in the statistic container and where the statistics
-    * start.
+    * Year which is selected in the statistic container and where the statistics start.
     */
-   public int            statFirstYear;
+   public int            statSelectedYear;
 
    /**
     * Number of years which should be displayed in the statistic
     */
    public int            statNumberOfYears;
 
-   public boolean        isRefreshData               = false;
+   public boolean        isRefreshData;
 
    /**
     * Contains the state if bar reordering is supported by the statistic or not, default is
     * <code>false</code>.
     */
-   public boolean        outIsBarReorderingSupported = false;
+   public boolean        outIsBarReorderingSupported;
 
    /**
     * Is <code>true</code> when bar names in the statistic UI must be updated with data from
     * {@link #outBarNames} and {@link #outVerticalBarIndex}.
     */
-   public boolean        outIsUpdateBarNames         = false;
+   public boolean        outIsUpdateBarNames;
 
    /**
     * When stacked charts are displayed, the stacked parts can be resorted vertically.
     * <p>
     * This contains the names of the bars or <code>null</code> when bars are not available.
     */
-   public String[]       outBarNames                 = null;
+   public String[]       outBarNames;
 
    /**
     * Index which bar should be selected in the combo box.
     */
    public int            outVerticalBarIndex;
-
-   /**
-    * Contains the statistic values on which the statistic graph is based.
-    */
-   public String         outStatisticValuesRaw;
 
    /**
     * @param person
@@ -98,7 +92,7 @@ public class StatisticContext {
       this.appPerson = activePerson;
       this.appTourTypeFilter = activeTourTypeFilter;
 
-      this.statFirstYear = selectedYear;
+      this.statSelectedYear = selectedYear;
       this.statNumberOfYears = numberOfYears;
    }
 

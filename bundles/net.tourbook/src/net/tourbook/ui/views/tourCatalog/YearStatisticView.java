@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.ui.views.tourCatalog;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -27,7 +26,6 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
@@ -38,6 +36,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -428,41 +427,23 @@ public class YearStatisticView extends ViewPart {
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
    }
 
-   private ChartToolTipInfo createToolTipInfo(int valueIndex) {
 
-      if (valueIndex >= _DOYValues.size()) {
-         valueIndex -= _DOYValues.size();
+   private void createToolTipUI(final IToolTipProvider toolTipProvider,
+                                final Composite parent,
+                                final int _hoveredBar_VerticalIndex,
+                                final int _hoveredBar_HorizontalIndex) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+         label.setText("Bar Tooltip\n\n"
+               + "serieIndex:" + _hoveredBar_VerticalIndex + "\n"
+               + "valueIndex:" + _hoveredBar_HorizontalIndex + "\n");
+
       }
-
-      if (_DOYValues == null || valueIndex >= _DOYValues.size()) {
-         return null;
-      }
-
-      /*
-       * set calendar day/month/year
-       */
-      final int firstYear = getFirstYear();
-      final int tourDOY = _DOYValues.get(valueIndex);
-
-      final ZonedDateTime tourDate = ZonedDateTime
-            .of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
-            .plusDays(tourDOY);
-
-      final StringBuilder toolTipFormat = new StringBuilder();
-      toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
-      toolTipFormat.append(UI.NEW_LINE);
-
-      final String ttText = UI.EMPTY_STRING
-            + String.format(Messages.tourCatalog_view_tooltip_speed, _nf1.format(_tourSpeed.get(valueIndex)))
-            + UI.NEW_LINE
-            + String.format(Messages.Year_Statistic_Tooltip_Pulse, _avgPulse.get(valueIndex));
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-
-      toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
-      toolTipInfo.setLabel(ttText);
-
-      return toolTipInfo;
    }
 
    private void createUI(final Composite parent) {
@@ -894,7 +875,6 @@ public class YearStatisticView extends ViewPart {
          yearIndex++;
       }
    }
-
    /**
     * show statistic for several years
     *
@@ -1039,9 +1019,10 @@ public class YearStatisticView extends ViewPart {
        */
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
          @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(valueIndex);
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            YearStatisticView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
          }
       });
 

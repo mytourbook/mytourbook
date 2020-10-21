@@ -472,7 +472,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
              * label: grid distance
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Graphs_grid_distance);
+            label.setText(Messages.Pref_Graphs_Label_GridDistance);
+            label.setToolTipText(Messages.Pref_Graphs_Label_GridDistance_Tooltip);
             GridDataFactory.fillDefaults()//
                   .span(3, 1)
                   .applyTo(label);
