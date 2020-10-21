@@ -985,6 +985,11 @@ public class RawDataManager {
 
             if (savedImportFilePathName == null) {
 
+               //The user doesn't want to look for a new file path for the current tour.
+               if (skipToursWithFileNotFound) {
+                  return;
+               }
+
                // in older versions the file path name is not saved
 
                final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
