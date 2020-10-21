@@ -1877,7 +1877,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             // show this text only when the name is different
             if (!tileName.equals(ttName)) {
-               ttText.append(ttName + " (" + ttCadence.getNlsLabel() + ")");
+               ttText.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
             }
          }
       }

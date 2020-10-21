@@ -2315,12 +2315,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
-                  previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+                  previousTourElapsedTime = _tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
                for (; tourSerieIndex < _tourData.timeSerie.length; ++tourSerieIndex) {
 
-                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+                  final long currentTime = _tourData.timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
 
                   if (currentTime >= pausedTime_Start) {
                      break;
@@ -2355,18 +2355,23 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          String pauseDurationText;
          int serieIndex = 0;
          final int[] timeSerie = _tourData.timeSerie;
+         final long tourStartTime = _tourData.getTourStartTimeMS();
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
             final long pauseDuration = Math.round((pausedTime_End[index] - pausedTime_Start[index]) / 1000f);
             pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
 
-            for (; serieIndex < timeSerie.length; ++serieIndex) {
+            for (; serieIndex < timeSerie.length && serieIndex < xAxisSerie.length; ++serieIndex) {
 
-               final long currentTime = timeSerie[serieIndex] * 1000 + _tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTime;
 
                if (currentTime >= pausedTime_Start[index]) {
                   break;
                }
+            }
+
+            if (serieIndex >= xAxisSerie.length) {
+               continue;
             }
 
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(

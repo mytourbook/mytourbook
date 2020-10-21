@@ -54,6 +54,11 @@ public class ValueFormatter_Number_1_0 implements IValueFormatter {
    }
 
    @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return printLong(value);
+   }
+
+   @Override
    public String toString() {
       return "ValueFormatter_Number_1_0 [" // //$NON-NLS-1$
             + "printDouble()" //$NON-NLS-1$

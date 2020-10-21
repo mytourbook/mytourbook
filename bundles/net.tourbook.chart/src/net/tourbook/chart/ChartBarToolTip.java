@@ -106,7 +106,7 @@ public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipPr
 
       final int barHeightOffset = Math.min(20, barHeight / 3);
 
-      final int ttPosX = _barRectangle.x + barWidth - barWidth / 3;
+      final int ttPosX = _barRectangle.x + barWidth - barWidth / 5;
       final int ttPosY = _barRectangle.y + barHeight - barHeightOffset;
 
       final Point displayTTLocation = graphControl.toDisplay(ttPosX, ttPosY);

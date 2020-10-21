@@ -7,6 +7,12 @@ TODO's
 * !!! Translators need new babel editor plugin when using Eclipse 2020-09 !!!
   http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
+* Translators should check if the new time words are correct because they where automatically transformed from the existing time words
+
+Issues
+======
+
+
 New
 ===
 
@@ -54,8 +60,8 @@ Improvements
 
 * Statistics View
   - New toolbar action: Copy statistic values to the clipboard
-  - Show totals in the tooltip for all tour types in one time unit - https://sourceforge.net/p/mytourbook/feature-requests/180/
-  - Values in the statistic tooltip can be formatted differently than tour tooltips values
+  - Show total/percentage values in the tooltip - https://sourceforge.net/p/mytourbook/feature-requests/180/
+  - Statistic tooltip values (a summary of tours) can be formatted differently compared with tour tooltip values
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
@@ -69,6 +75,11 @@ Improvements
 
 * Dropbox (Frederic)
   - Dropbox file/folder dialog: Sorting alphabetically the Dropbox folders and files
+
+* Tour re-import(Frederic)
+  - Added a contextual menu "Reimport Tours..." to give the ability to select several data to re-import for selected tours or all tours in the database
+  - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
+  - Added the ability for the user to skip a file if the filepath is unknown or not found
 
 
 Changes  

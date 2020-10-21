@@ -29,7 +29,6 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartTitleSegmentConfig;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
@@ -56,8 +55,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
-
-   private static final char        NL                           = UI.NEW_LINE;
 
    private static final String      TOOLTIP_TITLE_FORMAT         = "%s %d";                      //$NON-NLS-1$
 
@@ -149,96 +146,6 @@ public abstract class StatisticMonth extends TourbookStatistic {
       _chart = new Chart(parent, SWT.FLAT);
       _chart.setShowZoomActions(true);
       _chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-   }
-
-   private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
-
-      final int oldestYear = _statSelectedYear - _statNumberOfYears + 1;
-
-      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
-
-      final String monthText = Month
-            .of(monthDate.getMonthValue())
-            .getDisplayName(TextStyle.FULL, Locale.getDefault());
-
-      final Integer elapsedTime = _statisticData_Month.elapsedTime[serieIndex][valueIndex];
-      final Integer recordedTime = _statisticData_Month.recordedTime[serieIndex][valueIndex];
-      final Integer pausedTime = _statisticData_Month.pausedTime[serieIndex][valueIndex];
-      final Integer movingTime = _statisticData_Month.movingTime[serieIndex][valueIndex];
-      final int breakTime = elapsedTime - movingTime;
-
-      /*
-       * Tool tip: title
-       */
-      final StringBuilder sbTitle = new StringBuilder();
-
-      final String tourTypeName = StatisticServices.getTourTypeName(
-            serieIndex,
-            valueIndex,
-            _statisticData_Month.typeIds_Resorted,
-            _appTourTypeFilter);
-
-      if (tourTypeName != null && tourTypeName.length() > 0) {
-         sbTitle.append(tourTypeName);
-      }
-
-      final String toolTipTitle = String.format(Messages.tourtime_info_date_month,
-            sbTitle.toString(),
-            monthText,
-            monthDate.getYear());
-
-      /*
-       * Tool tip: label
-       */
-      final String toolTipFormat = UI.EMPTY_STRING
-
-            + Messages.tourtime_info_distance_tour + NL
-            + Messages.tourtime_info_altitude + NL
-            + NL
-            + Messages.tourtime_info_elapsed_time + NL
-            + Messages.tourtime_info_recorded_time + NL
-            + Messages.tourtime_info_paused_time + NL
-            + Messages.tourtime_info_moving_time + NL
-            + Messages.tourtime_info_break_time + NL
-            + NL
-            + Messages.TourTime_Info_NumberOfTours;
-
-      final String toolTipLabel = String.format(toolTipFormat,
-
-            _statisticData_Month.distance_High_Resorted[serieIndex][valueIndex] / 1000,
-            UI.UNIT_LABEL_DISTANCE,
-
-            (int) _statisticData_Month.elevationUp_High_Resorted[serieIndex][valueIndex],
-            UI.UNIT_LABEL_ALTITUDE,
-
-            elapsedTime / 3600,
-            (elapsedTime % 3600) / 60,
-
-            recordedTime / 3600,
-            (recordedTime % 3600) / 60,
-
-            pausedTime / 3600,
-            (pausedTime % 3600) / 60,
-
-            movingTime / 3600,
-            (movingTime % 3600) / 60,
-
-            breakTime / 3600,
-            (breakTime % 3600) / 60,
-
-            (int) _statisticData_Month.numTours_High_Resorted[serieIndex][valueIndex]
-
-      ).toString();
-
-      /*
-       * create tool tip info
-       */
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-      toolTipInfo.setTitle(toolTipTitle);
-      toolTipInfo.setLabel(toolTipLabel);
-
-      return toolTipInfo;
    }
 
    /**
@@ -459,11 +366,6 @@ public abstract class StatisticMonth extends TourbookStatistic {
                                      final int hoveredBar_Value_HorizontalIndex) {
 
             StatisticMonth.this.createToolTipUI(toolTipProvider, parent, hoveredBar_Serie_VerticalIndex, hoveredBar_Value_HorizontalIndex);
-         }
-
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(serieIndex, valueIndex);
          }
       });
    }

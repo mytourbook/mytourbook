@@ -84,7 +84,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           SENSOR_STATE_PRESENT        = "Present";                                                    //$NON-NLS-1$
    private static final String           ATTR_VALUE_SPORT            = "Sport";                                                      //$NON-NLS-1$
 
-   private static final String           DateTimePattern             = "yyyy-MM-dd'T'HH:mm:ss";
+   private static final String           DateTimePattern             = "yyyy-MM-dd'T'HH:mm:ss"; //$NON-NLS-1$
    private static final SimpleDateFormat TIME_FORMAT;
    private static final SimpleDateFormat TIME_FORMAT_SSSZ;
    private static final SimpleDateFormat TIME_FORMAT_RFC822;

@@ -21,23 +21,23 @@ import net.tourbook.common.Messages;
 
 public class ValueFormatter_Number_1_1 implements IValueFormatter {
 
-	private final static NumberFormat _nf1 = NumberFormat.getNumberInstance();
+   private final static NumberFormat _nf1 = NumberFormat.getNumberInstance();
 
-	public ValueFormatter_Number_1_1() {
+   public ValueFormatter_Number_1_1() {
 
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-	public ValueFormatter_Number_1_1(final boolean isGroupingUsed) {
+   public ValueFormatter_Number_1_1(final boolean isGroupingUsed) {
 
-		this();
+      this();
 
-		_nf1.setGroupingUsed(isGroupingUsed);
-	}
+      _nf1.setGroupingUsed(isGroupingUsed);
+   }
 
-	@Override
-	public String printDouble(final double value) {
+   @Override
+   public String printDouble(final double value) {
 
       final String formattedValue = _nf1.format(value);
 
@@ -46,18 +46,23 @@ public class ValueFormatter_Number_1_1 implements IValueFormatter {
       }
 
       return formattedValue;
-	}
+   }
 
-	@Override
-	public String printLong(final long value) {
-		return Messages.App_Error_NotSupportedValueFormatter;
-	}
+   @Override
+   public String printLong(final long value) {
+      return Messages.App_Error_NotSupportedValueFormatter;
+   }
 
-	@Override
-	public String toString() {
-		return "ValueFormatter_Number_1_1 [" // //$NON-NLS-1$
-				+ "printDouble()" //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
-	}
+   @Override
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return printLong(value);
+   }
+
+   @Override
+   public String toString() {
+      return "ValueFormatter_Number_1_1 [" // //$NON-NLS-1$
+            + "printDouble()" //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 
 }

@@ -31,8 +31,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 
 public class ChartOptions_MonthSummary implements IStatisticOptions {
 
@@ -43,13 +45,13 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    /*
     * UI controls
     */
-   private Button _chkShowAltitude;
+   private Button _chkShowElevationUp;
    private Button _chkShowDistance;
-   private Button _chkShowDuration;
+   private Button _chkShowDurationTime;
    private Button _chkShowNumberOfTours;
+   private Button _chkShowYearSeparator;
    private Button _chkTooltip_ShowPercentageValues;
    private Button _chkTooltip_ShowSummaryValues;
-   private Button _chkShowYearSeparator;
 
    private Button _rdoChartType_BarAdjacent;
    private Button _rdoChartType_BarStacked;
@@ -73,126 +75,125 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Statistic_Group_MonthSummary);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         createUI_110_Left(group);
-         createUI_120_Right(group);
+         /*
+          * Show distance
+          */
+         _chkShowDistance = new Button(group, SWT.CHECK);
+         _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
+         _chkShowDistance.addSelectionListener(_defaultSelectionListener);
       }
-   }
-
-   private void createUI_110_Left(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         {
-            /*
-             * Show distance
-             */
-            _chkShowDistance = new Button(container, SWT.CHECK);
-            _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
-            _chkShowDistance.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            /*
-             * Show altitude
-             */
-            _chkShowAltitude = new Button(container, SWT.CHECK);
-            _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
-            _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            /*
-             * Show time
-             */
-            _chkShowDuration = new Button(container, SWT.CHECK);
-            _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
-            _chkShowDuration.addSelectionListener(_defaultSelectionListener);
+         /*
+          * Show altitude
+          */
+         _chkShowElevationUp = new Button(group, SWT.CHECK);
+         _chkShowElevationUp.setText(Messages.Pref_Statistic_Checkbox_Altitude);
+         _chkShowElevationUp.addSelectionListener(_defaultSelectionListener);
+      }
+      {
+         /*
+          * Show time
+          */
+         _chkShowDurationTime = new Button(group, SWT.CHECK);
+         _chkShowDurationTime.setText(Messages.Pref_Statistic_Checkbox_Duration);
+         _chkShowDurationTime.addSelectionListener(_defaultSelectionListener);
 
-            /*
-             * Moving, elapsed + break time
-             */
-            final Composite timeContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .indent(16, 0)
-                  .applyTo(timeContainer);
-            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(timeContainer);
+         /*
+          * Elapsed, recorded, paused, moving and break time
+          */
+         final Composite timeContainer = new Composite(group, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .indent(16, 0)
+               .applyTo(timeContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
+         {
+            // row: 1
             {
-               {
-                  /*
-                   * Elapsed time
-                   */
-                  _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
-                  _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
-                   * Recorded time
-                   */
-                  _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
-                  _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
-                   * Paused time
-                   */
-                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
-                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
-                   * Moving time
-                   */
-                  _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
-                  _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
-               }
-               {
-                  /*
-                   * Break time
-                   */
-                  _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
-                  _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
-               }
+               /*
+                * Elapsed time
+                */
+               _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
+               _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+               _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               // spacer
+               new Label(timeContainer, SWT.NONE);
+            }
+
+            // row: 2
+            {
+               /*
+                * Recorded time
+                */
+               _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
+               _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+               _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
+            }
+
+            {
+               /*
+                * Moving time
+                */
+               _rdoDuration_MovingTime = new Button(timeContainer, SWT.RADIO);
+               _rdoDuration_MovingTime.setText(Messages.Pref_Statistic_Radio_Duration_MovingTime);
+               _rdoDuration_MovingTime.addSelectionListener(_defaultSelectionListener);
+            }
+
+            // row: 3
+            {
+               /*
+                * Paused time
+                */
+               _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+               _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+               _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               /*
+                * Break time
+                */
+               _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
+               _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
+               _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
             }
          }
-         {
-            /*
-             * Show number of tours
-             */
-            _chkShowNumberOfTours = new Button(container, SWT.CHECK);
-            _chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
-            _chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
-         }
+         // set tab order that device and computed times are grouped together, it's the first time to use this feature :-)
+         final Control[] tabList = {
+
+               _rdoDuration_ElapsedTime,
+               _rdoDuration_RecordedTime,
+               _rdoDuration_PausedTime,
+
+               _rdoDuration_MovingTime,
+               _rdoDuration_BreakTime,
+         };
+         timeContainer.setTabList(tabList);
+
       }
-   }
-
-   private void createUI_120_Right(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         {
-            /*
-             * Show year separator
-             */
-            _chkShowYearSeparator = new Button(container, SWT.CHECK);
-            _chkShowYearSeparator.setText(Messages.Pref_Statistic_Checkbox_YearSeparator);
-            _chkShowYearSeparator.addSelectionListener(_defaultSelectionListener);
-         }
+         /*
+          * Show number of tours
+          */
+         _chkShowNumberOfTours = new Button(group, SWT.CHECK);
+         _chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
+         _chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
+      }
+      {
+         /*
+          * Show year separator
+          */
+         _chkShowYearSeparator = new Button(group, SWT.CHECK);
+         _chkShowYearSeparator.setText(Messages.Pref_Statistic_Checkbox_YearSeparator);
+         _chkShowYearSeparator.addSelectionListener(_defaultSelectionListener);
       }
    }
 
@@ -252,7 +253,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
 
    private void enableControls() {
 
-      final boolean isShowDuration = _chkShowDuration.getSelection();
+      final boolean isShowDuration = _chkShowDurationTime.getSelection();
 
       _rdoDuration_MovingTime.setEnabled(isShowDuration);
       _rdoDuration_BreakTime.setEnabled(isShowDuration);
@@ -289,9 +290,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void resetToDefaults() {
 
-      _chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
+      _chkShowElevationUp.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
+      _chkShowDurationTime.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
       _chkShowNumberOfTours.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
       _chkShowYearSeparator.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR));
 
@@ -317,9 +318,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void restoreState() {
 
-      _chkShowAltitude.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
+      _chkShowElevationUp.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE));
       _chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE));
-      _chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
+      _chkShowDurationTime.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION));
       _chkShowNumberOfTours.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS));
 
       _chkTooltip_ShowPercentageValues.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES));
@@ -346,9 +347,9 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, _chkShowAltitude.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, _chkShowElevationUp.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
-      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, _chkShowDuration.getSelection());
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, _chkShowDurationTime.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, _chkShowNumberOfTours.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, _chkTooltip_ShowPercentageValues.getSelection());
@@ -362,18 +363,18 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
                   ? ChartDataSerie.CHART_TYPE_BAR_ADJACENT
                   : ChartDataSerie.CHART_TYPE_BAR_STACKED);
 
-      String selectedDurationType = UI.EMPTY_STRING;
+      String selectedDurationTime = UI.EMPTY_STRING;
       if (_rdoDuration_BreakTime.getSelection()) {
-         selectedDurationType = DurationTime.BREAK.name();
+         selectedDurationTime = DurationTime.BREAK.name();
       } else if (_rdoDuration_MovingTime.getSelection()) {
-         selectedDurationType = DurationTime.MOVING.name();
+         selectedDurationTime = DurationTime.MOVING.name();
       } else if (_rdoDuration_RecordedTime.getSelection()) {
-         selectedDurationType = DurationTime.RECORDED.name();
+         selectedDurationTime = DurationTime.RECORDED.name();
       } else if (_rdoDuration_PausedTime.getSelection()) {
-         selectedDurationType = DurationTime.PAUSED.name();
+         selectedDurationTime = DurationTime.PAUSED.name();
       } else if (_rdoDuration_ElapsedTime.getSelection()) {
-         selectedDurationType = DurationTime.ELAPSED.name();
+         selectedDurationTime = DurationTime.ELAPSED.name();
       }
-      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_DURATION_TIME, selectedDurationType);
+      _prefStore.setValue(ITourbookPreferences.STAT_MONTH_DURATION_TIME, selectedDurationTime);
    }
 }

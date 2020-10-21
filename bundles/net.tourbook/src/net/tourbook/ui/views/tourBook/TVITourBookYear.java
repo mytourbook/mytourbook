@@ -99,20 +99,20 @@ public class TVITourBookYear extends TVITourBookItem {
                   // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
                   + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
 
-                  + "      " + sqlSumYearField + "," + NL //                           //$NON-NLS-1$
-                  + "      " + sqlSumYearFieldSub + "," + NL //                        //$NON-NLS-1$
-                  + "      " + SQL_SUM_FIELDS + NL
+                  + "      " + sqlSumYearField + "," + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
+                  + "      " + sqlSumYearFieldSub + "," + NL //                        //$NON-NLS-1$ //$NON-NLS-2$
+                  + "      " + SQL_SUM_FIELDS + NL //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
-                  + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
+                  + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable() //$NON-NLS-1$
 
                   + "   AS jTdataTtag" + NL //$NON-NLS-1$
                   + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
 
                   + "   WHERE " + sqlSumYearField + "=?" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
-                  + "      " + sqlAppFilter.getWhereClause()
+                  + "      " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
                   + ") NecessaryNameOtherwiseItDoNotWork" + NL //                      //$NON-NLS-1$
             ;
@@ -126,7 +126,7 @@ public class TVITourBookYear extends TVITourBookItem {
                   + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
                   + "WHERE " + sqlSumYearField + "=?" + NL //                          //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   " + sqlAppFilter.getWhereClause() + NL;
+                  + "   " + sqlAppFilter.getWhereClause() + NL; //$NON-NLS-1$
          }
 
          sql = NL +

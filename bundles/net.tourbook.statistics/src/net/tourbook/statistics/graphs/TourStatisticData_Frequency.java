@@ -20,28 +20,27 @@ package net.tourbook.statistics.graphs;
  */
 public class TourStatisticData_Frequency {
 
-   int[]   statGroupedValues_Distance;
-   int[]   statGroupedValues_DurationTime;
-   int[]   statGroupedValues_Elevation;
-
+   int[]   statDistance_GroupValues;
    int[][] statDistance_NumTours_Low;
    int[][] statDistance_NumTours_High;
    int[][] statDistance_NumTours_ColorIndex;
-   int[][] statDistance_Sum_Low;
-   int[][] statDistance_Sum_High;
-   int[][] statDistance_Sum_ColorIndex;
+   int[][] statDistance_SumValues_Low;
+   int[][] statDistance_SumValues_High;
+   int[][] statDistance_SumValues_ColorIndex;
 
+   int[]   statDurationTime_GroupValues;
    int[][] statDurationTime_NumTours_Low;
    int[][] statDurationTime_NumTours_High;
    int[][] statDurationTime_NumTours_ColorIndex;
-   int[][] statDurationTime_Sum_Low;
-   int[][] statDurationTime_Sum_High;
-   int[][] statDurationTime_Sum_ColorIndex;
+   int[][] statDurationTime_SumValues_Low;
+   int[][] statDurationTime_SumValues_High;
+   int[][] statDurationTime_SumValues_ColorIndex;
 
+   int[]   statElevation_GroupValues;
    int[][] statElevation_NumTours_Low;
    int[][] statElevation_NumTours_High;
    int[][] statElevation_NumTours_ColorIndex;
-   int[][] statElevation_Sum_Low;
-   int[][] statElevation_Sum_High;
-   int[][] statElevation_Sum_ColorIndex;
+   int[][] statElevation_SumValues_Low;
+   int[][] statElevation_SumValues_High;
+   int[][] statElevation_SumValues_ColorIndex;
 }

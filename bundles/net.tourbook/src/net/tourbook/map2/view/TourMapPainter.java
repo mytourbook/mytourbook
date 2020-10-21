@@ -1379,7 +1379,7 @@ public class TourMapPainter extends MapPainter {
 
                for (; tourSerieIndex < timeSerie.length; ++tourSerieIndex) {
 
-                  final long currentTime = timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+                  final long currentTime = timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
 
                   if (currentTime >= pausedTime_Start) {
                      break;
@@ -1430,7 +1430,7 @@ public class TourMapPainter extends MapPainter {
 
             for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
 
-               final long currentTime = timeSerie[timeSerieIndex] * 1000 + tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourData.getTourStartTimeMS();
 
                if (currentTime >= startTime) {
                   serieIndex = timeSerieIndex;

@@ -1668,7 +1668,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
           * count number of selected items
           */
 
-         for (Object treeItem : selection) {
+         for (final Object treeItem : selection) {
 
             if (treeItem instanceof TVITourBookTour) {
                if (numTourItems == 0) {
@@ -1984,7 +1984,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectedTours = _tourViewer_Tree.getStructuredSelection();
       }
 
-      for (Object viewItem : selectedTours) {
+      for (final Object viewItem : selectedTours) {
 
          if (viewItem instanceof TVITourBookYear) {
 
@@ -2477,7 +2477,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 
       // loop: all selected items
-      for (Object treeItem : selectedTours) {
+      for (final Object treeItem : selectedTours) {
 
          if (isSelectAllChildren) {
 

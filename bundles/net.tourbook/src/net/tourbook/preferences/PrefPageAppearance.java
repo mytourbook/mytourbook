@@ -147,17 +147,30 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          /*
           * Time to use for pace and speed computation
           */
-         final Label label = new Label(group, NONE);
-         label.setText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption);
-         label.setToolTipText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip);
+         {
+            final Label label = new Label(group, NONE);
+            label.setText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption);
+            label.setToolTipText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+         }
 
-         // Moving time
-         _rdoComputedTime_Moving = new Button(group, SWT.RADIO);
-         _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
-
-         // Recorded time
-         _rdoDeviceTime_Recorded = new Button(group, SWT.RADIO);
-         _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
+         final Composite container = new Composite(group, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+         {
+            {
+               // Recorded time
+               _rdoDeviceTime_Recorded = new Button(container, SWT.RADIO);
+               _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
+               _rdoDeviceTime_Recorded.setToolTipText(Messages.Pref_Appearance_Radio_UseRecordedTime_Tooltip);
+            }
+            {
+               // Moving time
+               _rdoComputedTime_Moving = new Button(container, SWT.RADIO);
+               _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
+               _rdoComputedTime_Moving.setToolTipText(Messages.Pref_Appearance_Radio_UseMovingTime_Tooltip);
+            }
+         }
       }
    }
 
@@ -360,6 +373,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_COMBINED_VALUES, false);
+
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);
@@ -370,8 +385,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKERS, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES, false);
 
       MessageDialog.openInformation(getShell(),
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
