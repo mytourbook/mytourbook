@@ -23,12 +23,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -40,7 +37,6 @@ import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
-import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -392,40 +388,41 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
-
-      final int oldestYear = 2011;//_statFirstYear - _statNumberOfYears + 1;
-
-      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
-
-      final String monthText = Month
-            .of(monthDate.getMonthValue())
-            .getDisplayName(TextStyle.FULL, Locale.getDefault());
-
-      /*
-       * tool tip: title
-       */
-      final StringBuilder sbTitle = new StringBuilder();
-      sbTitle.append("Score of the day");
-
-      /*
-       * tool tip: label
-       */
-      final StringBuilder toolTipLabel = new StringBuilder();
-      toolTipLabel.append("Score");
-      toolTipLabel.append(UI.NEW_LINE);
-      toolTipLabel.append("234");
-
-      /*
-       * create tool tip info
-       */
-
-      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
-      toolTipInfo.setTitle(sbTitle.toString());
-      toolTipInfo.setLabel(toolTipLabel.toString());
-
-      return toolTipInfo;
-   }
+   //TODO FB
+//   private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
+//
+//      final int oldestYear = 2011;//_statFirstYear - _statNumberOfYears + 1;
+//
+//      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
+//
+//      final String monthText = Month
+//            .of(monthDate.getMonthValue())
+//            .getDisplayName(TextStyle.FULL, Locale.getDefault());
+//
+//      /*
+//       * tool tip: title
+//       */
+//      final StringBuilder sbTitle = new StringBuilder();
+//      sbTitle.append("Score of the day");
+//
+//      /*
+//       * tool tip: label
+//       */
+//      final StringBuilder toolTipLabel = new StringBuilder();
+//      toolTipLabel.append("Score");
+//      toolTipLabel.append(UI.NEW_LINE);
+//      toolTipLabel.append("234");
+//
+//      /*
+//       * create tool tip info
+//       */
+//
+//      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+//      toolTipInfo.setTitle(sbTitle.toString());
+//      toolTipInfo.setLabel(toolTipLabel.toString());
+//
+//      return toolTipInfo;
+//   }
 
    private void createUI(final Composite parent) {
 
