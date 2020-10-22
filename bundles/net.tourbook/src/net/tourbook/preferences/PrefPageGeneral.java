@@ -42,6 +42,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -102,7 +104,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    // measurement system
    private Button _chkShowMeasurementInAppToolbar;
-   private Combo  _comboSystem;
+   private Combo  _comboSystem_OLD;
 
    private Label  _lblSystemAltitude;
    private Label  _lblSystemDistance;
@@ -121,7 +123,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private Combo _comboMinDaysInFirstWeek;
 
    // notes
-   private Text _txtNotes;
+   private Text  _txtNotes;
+
+   private Combo _comboSystem;
 
    /**
     * check if the user has changed calendar week and if the tour data are inconsistent
@@ -160,37 +164,85 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
 
          _tabFolder = new TabFolder(parent, SWT.TOP);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolder);
          {
 
             final TabItem tabMeasurementSystem = new TabItem(_tabFolder, SWT.NONE);
-            tabMeasurementSystem.setControl(createUI_10_MeasurementSystem(_tabFolder));
+            tabMeasurementSystem.setControl(createUI_100_MeasurementSystem(_tabFolder));
             tabMeasurementSystem.setText(Messages.Pref_general_system_measurement);
 
             final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
-            tabBreakTime.setControl(createUI_20_TimeZone(_tabFolder));
+            tabBreakTime.setControl(createUI_200_TimeZone(_tabFolder));
             tabBreakTime.setText(Messages.Pref_General_Group_TimeZone);
 
             final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
-            tabElevation.setControl(createUI_30_WeekNumber(_tabFolder));
+            tabElevation.setControl(createUI_300_WeekNumber(_tabFolder));
             tabElevation.setText(Messages.Pref_General_CalendarWeek);
 
             final TabItem tabNotes = new TabItem(_tabFolder, SWT.NONE);
-            tabNotes.setControl(createUI_40_Notes(_tabFolder));
+            tabNotes.setControl(createUI_400_Notes(_tabFolder));
             tabNotes.setText(Messages.Pref_General_Notes);
          }
       }
    }
 
-   private Composite createUI_10_MeasurementSystem(final Composite parent) {
+   private Composite createUI_100_MeasurementSystem(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .swtDefaults()
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+
+         createUI_110_MeasurementSystem(container);
+         createUI_199_MeasurementSystem_OLD(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_110_MeasurementSystem(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         {
+            /*
+             * Measurement system
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+            label.setText(Messages.Pref_General_Label_MeasurementSystem);
+
+            // combo
+            _comboSystem = new Combo(container, SWT.DROP_DOWN);
+            _comboSystem.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSystem_Select();
+               }
+            });
+            _comboSystem.addModifyListener(new ModifyListener() {
+               @Override
+               public void modifyText(final ModifyEvent e) {
+                  onSystem_Modify(e);
+               }
+            });
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem);
+         }
+      }
+
+   }
+
+   private void createUI_199_MeasurementSystem_OLD(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults()
             .numColumns(3)
             .extendedMargins(5, 5, 10, 5)
             .spacing(20, 5)
@@ -205,18 +257,18 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          label.setText(Messages.Pref_General_Label_MeasurementSystem);
 
          // combo
-         _comboSystem = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem);
-         _comboSystem.addSelectionListener(new SelectionAdapter() {
+         _comboSystem_OLD = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+         GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem_OLD);
+         _comboSystem_OLD.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               onSelectSystem();
+               onSelectSystem_OLD();
             }
          });
 
          // fill combo box
-         _comboSystem.add(Messages.App_measurement_metric); // metric system
-         _comboSystem.add(Messages.App_measurement_imperial); // imperial system
+         _comboSystem_OLD.add(Messages.App_measurement_metric); // metric system
+         _comboSystem_OLD.add(Messages.App_measurement_imperial); // imperial system
 
          /*
           * radio: altitude
@@ -277,13 +329,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                .indent(0, _pc.convertVerticalDLUsToPixels(8))
                .applyTo(_chkShowMeasurementInAppToolbar);
       }
-
-      container.layout(true, true);
-
-      return container;
    }
 
-   private Composite createUI_20_TimeZone(final Composite parent) {
+   private Composite createUI_200_TimeZone(final Composite parent) {
 
       final String defaultTimeZoneId = ZoneId.systemDefault().getId();
 
@@ -473,7 +521,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       return container;
    }
 
-   private Composite createUI_30_WeekNumber(final Composite parent) {
+   private Composite createUI_300_WeekNumber(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -566,7 +614,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       return container;
    }
 
-   private Composite createUI_40_Notes(final Composite parent) {
+   private Composite createUI_400_Notes(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -724,12 +772,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       _currentMinimalDaysInFirstWeek = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
    }
 
-   private void onSelectSystem() {
+   private void onSelectSystem_OLD() {
 
-      int selectedSystem = _comboSystem.getSelectionIndex();
+      int selectedSystem = _comboSystem_OLD.getSelectionIndex();
 
       if (selectedSystem == -1) {
-         _comboSystem.select(0);
+         _comboSystem_OLD.select(0);
          selectedSystem = 0;
       }
 
@@ -759,6 +807,21 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _rdoTemperatureCelcius.setSelection(false);
          _rdoTemperatureFahrenheit.setSelection(true);
       }
+   }
+
+   private void onSystem_Modify(final ModifyEvent e) {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void onSystem_Select() {
+
+      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystem_Select()"
+            + "\t: " + _comboSystem.getSelectionIndex()
+//            + "\t: " +
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    @Override
@@ -848,26 +911,15 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
-      {
-         // measurement system
-
-         _chkShowMeasurementInAppToolbar.setSelection(
-               _prefStore
-                     .getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
-         MeasurementSystemContributionItem.selectSystemFromPrefStore(_comboSystem);
-         onSelectSystem();
-      }
+      restoreState_MeasurementSystem();
 
       {
          // time zone
 
          final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-         _chkTimeZoneLiveUpdate.setSelection(
-               _prefStoreCommon
-                     .getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-         _chkUseAnotherTimeZone.setSelection(//
-               _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+         _chkTimeZoneLiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+         _chkUseAnotherTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
          _timeZoneId_1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
          _timeZoneId_2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
@@ -883,13 +935,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // calendar week
 
-         _backupFirstDayOfWeek = //
-               _currentFirstDayOfWeek = _prefStoreCommon.getInt(
-                     ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+         _backupFirstDayOfWeek = _currentFirstDayOfWeek =
+               _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
-         _backupMinimalDaysInFirstWeek = //
-               _currentMinimalDaysInFirstWeek = _prefStoreCommon
-                     .getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+         _backupMinimalDaysInFirstWeek = _currentMinimalDaysInFirstWeek =
+               _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
          updateUI_CalendarWeek();
       }
@@ -907,20 +957,27 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       }
    }
 
+   private void restoreState_MeasurementSystem() {
+
+      // measurement system
+
+      _chkShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
+      MeasurementSystemContributionItem.selectSystemFromPrefStore(_comboSystem_OLD);
+      onSelectSystem_OLD();
+   }
+
    private void saveState() {
 
       {
          // measurement system
 
-         int selectedIndex = _comboSystem.getSelectionIndex();
+         int selectedIndex = _comboSystem_OLD.getSelectionIndex();
          if (selectedIndex == -1) {
             selectedIndex = 0;
          }
          MeasurementSystemContributionItem.selectSystemInPrefStore(selectedIndex);
 
-         _prefStore.setValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
-               _chkShowMeasurementInAppToolbar.getSelection());
+         _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkShowMeasurementInAppToolbar.getSelection());
       }
 
       {
@@ -934,9 +991,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          TimeTools.setDefaultTimeZone(selectedTimeZoneId);
 
          // time zone
-         _prefStoreCommon.setValue(
-               ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, //
-               _chkTimeZoneLiveUpdate.getSelection());
+         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkTimeZoneLiveUpdate.getSelection());
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
