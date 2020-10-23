@@ -42,7 +42,7 @@ class DialogSelectMeasurementSystem extends Dialog {
 
 		final int systemIndex = _rdoMetric.getSelection() ? 0 : 1;
 
-		MeasurementSystemContributionItem.selectSystemInPrefStore(systemIndex);
+		MeasurementSystemContributionItem.saveMeasurementSystem_OLD(systemIndex);
 
 		return super.close();
 	}

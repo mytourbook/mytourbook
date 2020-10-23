@@ -83,7 +83,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private int              _currentFirstDayOfWeek;
    private int              _currentMinimalDaysInFirstWeek;
 
-   private boolean          _showMeasurementSystemInUI;
+   private boolean          _isShowMeasurementSystemInUI;
 
    private PixelConverter   _pc;
 
@@ -93,8 +93,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private TabFolder _tabFolder;
 
    // timezone
-   private Button _chkTimeZoneLiveUpdate;
-   private Button _chkUseAnotherTimeZone;
+   private Button _chkTimeZone_LiveUpdate;
+   private Button _chkTimeZone_UseAnotherTimeZone;
    private Button _rdoTimeZone_1;
    private Button _rdoTimeZone_2;
    private Button _rdoTimeZone_3;
@@ -103,24 +103,28 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private Combo  _comboTimeZone_3;
 
    // measurement system
-   private Button _chkShowMeasurementInAppToolbar;
+   private Button _chkSystem_ShowMeasurementInAppToolbar;
    private Combo  _comboSystem_OLD;
 
-   private Label  _lblSystemAltitude;
-   private Label  _lblSystemDistance;
-   private Label  _lblSystemTemperature;
-   private Label  _lblTimeZoneInfo;
+   private Label  _lblSystem_BodyWeight;
+   private Label  _lblSystem_Elevation;
+   private Label  _lblSystem_Distance;
+   private Label  _lblSystem_Temperature;
+   private Label  _lblTimeZone_Info;
 
-   private Button _rdoAltitudeMeter;
-   private Button _rdoAltitudeFoot;
-   private Button _rdoDistanceKm;
-   private Button _rdoDistanceMi;
-   private Button _rdoTemperatureCelcius;
-   private Button _rdoTemperatureFahrenheit;
+   private Button _rdoSystem_BodyWeight_Kg;
+   private Button _rdoSystem_BodyWeight_Pound;
+   private Button _rdoSystem_Distance_Km;
+   private Button _rdoSystem_Distance_Mile;
+   private Button _rdoSystem_Distance_NauticMile;
+   private Button _rdoSystem_Elevation_Meter;
+   private Button _rdoSystem_Elevation_Foot;
+   private Button _rdoSystem_Temperature_Celcius;
+   private Button _rdoSystem_Temperature_Fahrenheit;
 
    // calendar week
-   private Combo _comboFirstDay;
-   private Combo _comboMinDaysInFirstWeek;
+   private Combo _comboWeek_FirstDay;
+   private Combo _comboWeek_MinDaysInFirstWeek;
 
    // notes
    private Text  _txtNotes;
@@ -192,7 +196,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
       {
 
          createUI_110_MeasurementSystem(container);
@@ -205,8 +209,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private void createUI_110_MeasurementSystem(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .indent(0, 5)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .applyTo(container);
       {
          {
             /*
@@ -232,7 +241,111 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                   onSystem_Modify(e);
                }
             });
-            GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem);
+            GridDataFactory.fillDefaults()
+//                  .span(2, 1)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboSystem);
+         }
+         {
+            /*
+             * Distance
+             */
+
+            // label
+            _lblSystem_Distance = new Label(container, SWT.NONE);
+            _lblSystem_Distance.setText(Messages.Pref_System_Label_Distance);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystem_Distance);
+
+            final Composite containerUnit = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerUnit);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerUnit);
+            {
+               // radio
+               _rdoSystem_Distance_Km = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Distance_Km.setText(Messages.Pref_System_Radio_Distance_Kilometer);
+
+               _rdoSystem_Distance_Mile = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Distance_Mile.setText(Messages.Pref_System_Radio_Distance_Nautic);
+
+               _rdoSystem_Distance_NauticMile = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Distance_NauticMile.setText(Messages.Pref_System_Radio_Distance_NauticMile);
+            }
+         }
+         {
+            /*
+             * Elevation
+             */
+
+            // label
+            _lblSystem_Elevation = new Label(container, SWT.NONE);
+            _lblSystem_Elevation.setText(Messages.Pref_System_Label_Elevation);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystem_Elevation);
+
+            final Composite containerUnit = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerUnit);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerUnit);
+            {
+               _rdoSystem_Elevation_Meter = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Elevation_Meter.setText(Messages.Pref_System_Radio_Elevation_Meter);
+
+               _rdoSystem_Elevation_Foot = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Elevation_Foot.setText(Messages.Pref_System_Radio_Elevation_Foot);
+            }
+         }
+         {
+            /*
+             * Temperature
+             */
+
+            // label
+            _lblSystem_Temperature = new Label(container, SWT.NONE);
+            _lblSystem_Temperature.setText(Messages.Pref_System_Label_Temperature);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystem_Temperature);
+
+            final Composite containerUnit = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerUnit);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerUnit);
+            {
+               _rdoSystem_Temperature_Celcius = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Temperature_Celcius.setText(Messages.Pref_System_Radio_Temperature_Celcius);
+
+               _rdoSystem_Temperature_Fahrenheit = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_Temperature_Fahrenheit.setText(Messages.Pref_System_Radio_Temperature_Fahrenheit);
+            }
+         }
+
+         {
+            /*
+             * Body weight
+             */
+
+            // label
+            _lblSystem_BodyWeight = new Label(container, SWT.NONE);
+            _lblSystem_BodyWeight.setText(Messages.Pref_System_Label_BodyWeight);
+            GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystem_BodyWeight);
+
+            final Composite containerUnit = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerUnit);
+            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(containerUnit);
+            {
+               _rdoSystem_BodyWeight_Kg = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_BodyWeight_Kg.setText(Messages.Pref_System_Radio_BodyWeight_Kilogram);
+
+               _rdoSystem_BodyWeight_Pound = new Button(containerUnit, SWT.RADIO);
+               _rdoSystem_BodyWeight_Pound.setText(Messages.Pref_System_Radio_BodyWeight_Pound);
+            }
+         }
+
+         {
+            /*
+             * Checkbox: Show in app toolbar
+             */
+            _chkSystem_ShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
+            _chkSystem_ShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(0, _pc.convertVerticalDLUsToPixels(8))
+                  .applyTo(_chkSystem_ShowMeasurementInAppToolbar);
          }
       }
 
@@ -242,92 +355,35 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults()
-            .numColumns(3)
-            .extendedMargins(5, 5, 10, 5)
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+//            .extendedMargins(5, 5, 10, 5)
             .spacing(20, 5)
             .applyTo(container);
       {
-         /*
-          * measurement system
-          */
-         // label
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText(Messages.Pref_General_Label_MeasurementSystem);
+         {
+            /*
+             * Measurement system
+             */
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+            label.setText(Messages.Pref_General_Label_MeasurementSystem);
 
-         // combo
-         _comboSystem_OLD = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem_OLD);
-         _comboSystem_OLD.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectSystem_OLD();
-            }
-         });
+            // combo
+            _comboSystem_OLD = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            GridDataFactory.fillDefaults().span(3, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem_OLD);
+            _comboSystem_OLD.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectSystem_OLD();
+               }
+            });
 
-         // fill combo box
-         _comboSystem_OLD.add(Messages.App_measurement_metric); // metric system
-         _comboSystem_OLD.add(Messages.App_measurement_imperial); // imperial system
-
-         /*
-          * radio: altitude
-          */
-
-         // label
-         _lblSystemAltitude = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystemAltitude);
-         _lblSystemAltitude.setText(Messages.Pref_general_system_altitude);
-
-         // radio
-         _rdoAltitudeMeter = new Button(container, SWT.RADIO);
-         _rdoAltitudeMeter.setText(Messages.Pref_general_metric_unit_m);
-
-         _rdoAltitudeFoot = new Button(container, SWT.RADIO);
-         _rdoAltitudeFoot.setText(Messages.Pref_general_imperial_unit_feet);
-
-         /*
-          * radio: distance
-          */
-
-         // label
-         _lblSystemDistance = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystemDistance);
-         _lblSystemDistance.setText(Messages.Pref_general_system_distance);
-
-         // radio
-         _rdoDistanceKm = new Button(container, SWT.RADIO);
-         _rdoDistanceKm.setText(Messages.Pref_general_metric_unit_km);
-
-         _rdoDistanceMi = new Button(container, SWT.RADIO);
-         _rdoDistanceMi.setText(Messages.Pref_general_imperial_unit_mi);
-
-         /*
-          * radio: temperature
-          */
-
-         // label
-         _lblSystemTemperature = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystemTemperature);
-         _lblSystemTemperature.setText(Messages.Pref_general_system_temperature);
-
-         // radio
-         _rdoTemperatureCelcius = new Button(container, SWT.RADIO);
-         _rdoTemperatureCelcius.setText(Messages.Pref_general_metric_unit_celcius);
-
-         _rdoTemperatureFahrenheit = new Button(container, SWT.RADIO);
-         _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
-
-         /*
-          * Checkbox: Show in app toolbar
-          */
-         _chkShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
-         _chkShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
-         GridDataFactory
-               .fillDefaults()//
-               .span(3, 1)
-               .indent(0, _pc.convertVerticalDLUsToPixels(8))
-               .applyTo(_chkShowMeasurementInAppToolbar);
+            // fill combo box
+            _comboSystem_OLD.add(Messages.App_measurement_metric); // metric system
+            _comboSystem_OLD.add(Messages.App_measurement_imperial); // imperial system
+         }
       }
    }
 
@@ -382,22 +438,22 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             /*
              * Checkbox: Set time zone
              */
-            _chkUseAnotherTimeZone = new Button(container, SWT.CHECK);
-            _chkUseAnotherTimeZone.setText(NLS.bind(Messages.Pref_General_Checkbox_SetTimeZone, defaultTimeZoneId));
-            _chkUseAnotherTimeZone.addSelectionListener(timeZoneListener);
+            _chkTimeZone_UseAnotherTimeZone = new Button(container, SWT.CHECK);
+            _chkTimeZone_UseAnotherTimeZone.setText(NLS.bind(Messages.Pref_General_Checkbox_SetTimeZone, defaultTimeZoneId));
+            _chkTimeZone_UseAnotherTimeZone.addSelectionListener(timeZoneListener);
             GridDataFactory
                   .fillDefaults()//
                   .span(2, 1)
                   .indent(0, 2 * verticalSpacing)
-                  .applyTo(_chkUseAnotherTimeZone);
+                  .applyTo(_chkTimeZone_UseAnotherTimeZone);
          }
 
          {
             /*
              * Label: Info
              */
-            _lblTimeZoneInfo = new Label(container, SWT.WRAP);
-            _lblTimeZoneInfo.setText(Messages.Pref_General_Label_SetAnotherTimeZone);
+            _lblTimeZone_Info = new Label(container, SWT.WRAP);
+            _lblTimeZone_Info.setText(Messages.Pref_General_Label_SetAnotherTimeZone);
 
             GridDataFactory
                   .fillDefaults()//
@@ -405,7 +461,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                   .span(2, 1)
                   .indent(columnIndent, verticalSpacing)
                   .hint(defaultTextWidth, SWT.DEFAULT)
-                  .applyTo(_lblTimeZoneInfo);
+                  .applyTo(_lblTimeZone_Info);
          }
 
          {
@@ -499,10 +555,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             /*
              * Checkbox: live update
              */
-            _chkTimeZoneLiveUpdate = new Button(container, SWT.CHECK);
-            _chkTimeZoneLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
-            _chkTimeZoneLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-            _chkTimeZoneLiveUpdate.addSelectionListener(new SelectionAdapter() {
+            _chkTimeZone_LiveUpdate = new Button(container, SWT.CHECK);
+            _chkTimeZone_LiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
+            _chkTimeZone_LiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
+            _chkTimeZone_LiveUpdate.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   doTimeZoneLiveUpdate();
@@ -514,7 +570,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                   .align(SWT.FILL, SWT.END)
                   .span(2, 1)
                   .indent(0, 2 * verticalSpacing)
-                  .applyTo(_chkTimeZoneLiveUpdate);
+                  .applyTo(_chkTimeZone_LiveUpdate);
          }
       }
 
@@ -539,9 +595,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          label.setText(Messages.Pref_General_Label_FirstDayOfWeek);
          label.setToolTipText(Messages.Pref_General_Label_FirstDayOfWeek_Tooltip);
 
-         _comboFirstDay = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboFirstDay.setVisibleItemCount(10);
-         _comboFirstDay.addSelectionListener(new SelectionAdapter() {
+         _comboWeek_FirstDay = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboWeek_FirstDay.setVisibleItemCount(10);
+         _comboWeek_FirstDay.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onSelectCalendarWeek();
@@ -561,7 +617,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                weekDay = weekDay + UI.DASH_WITH_SPACE + Messages.App_Label_ISO8601;
             }
 
-            _comboFirstDay.add(weekDay);
+            _comboWeek_FirstDay.add(weekDay);
          }
 
          /*
@@ -571,9 +627,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          label.setText(Messages.Pref_General_Label_MinimalDaysInFirstWeek);
          label.setToolTipText(Messages.Pref_General_Label_MinimalDaysInFirstWeek_Tooltip);
 
-         _comboMinDaysInFirstWeek = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboMinDaysInFirstWeek.setVisibleItemCount(10);
-         _comboMinDaysInFirstWeek.addSelectionListener(new SelectionAdapter() {
+         _comboWeek_MinDaysInFirstWeek = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboWeek_MinDaysInFirstWeek.setVisibleItemCount(10);
+         _comboWeek_MinDaysInFirstWeek.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onSelectCalendarWeek();
@@ -589,7 +645,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             } else {
                dayText = Integer.toString(dayIndex);
             }
-            _comboMinDaysInFirstWeek.add(dayText);
+            _comboWeek_MinDaysInFirstWeek.add(dayText);
          }
 
          /*
@@ -642,39 +698,22 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void doTimeZoneLiveUpdate() {
 
-      if (_chkTimeZoneLiveUpdate.getSelection()) {
+      if (_chkTimeZone_LiveUpdate.getSelection()) {
          performApply();
       }
    }
 
    private void enableControls() {
 
-      final boolean isUseTimeZone = _chkUseAnotherTimeZone.getSelection();
+      final boolean isUseTimeZone = _chkTimeZone_UseAnotherTimeZone.getSelection();
 
-      _lblTimeZoneInfo.setEnabled(isUseTimeZone);
+      _lblTimeZone_Info.setEnabled(isUseTimeZone);
       _rdoTimeZone_1.setEnabled(isUseTimeZone);
       _rdoTimeZone_2.setEnabled(isUseTimeZone);
       _rdoTimeZone_3.setEnabled(isUseTimeZone);
       _comboTimeZone_1.setEnabled(isUseTimeZone);
       _comboTimeZone_2.setEnabled(isUseTimeZone);
       _comboTimeZone_3.setEnabled(isUseTimeZone);
-
-      /*
-       * disable all individual measurement controls because this is currently not working when
-       * individual systems are changed
-       */
-      _lblSystemAltitude.setEnabled(false);
-      _lblSystemDistance.setEnabled(false);
-      _lblSystemTemperature.setEnabled(false);
-
-      _rdoAltitudeMeter.setEnabled(false);
-      _rdoAltitudeFoot.setEnabled(false);
-
-      _rdoDistanceKm.setEnabled(false);
-      _rdoDistanceMi.setEnabled(false);
-
-      _rdoTemperatureCelcius.setEnabled(false);
-      _rdoTemperatureFahrenheit.setEnabled(false);
    }
 
    private int getSelectedCustomZoneNumber() {
@@ -711,7 +750,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       setPreferenceStore(_prefStore);
 
-      _showMeasurementSystemInUI = _prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+      _isShowMeasurementSystemInUI = _prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
    }
 
    private void initUI(final Composite parent) {
@@ -768,8 +807,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void onSelectCalendarWeek() {
 
-      _currentFirstDayOfWeek = _comboFirstDay.getSelectionIndex() + 1;
-      _currentMinimalDaysInFirstWeek = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
+      _currentFirstDayOfWeek = _comboWeek_FirstDay.getSelectionIndex() + 1;
+      _currentMinimalDaysInFirstWeek = _comboWeek_MinDaysInFirstWeek.getSelectionIndex() + 1;
    }
 
    private void onSelectSystem_OLD() {
@@ -785,27 +824,27 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          // metric
 
-         _rdoAltitudeMeter.setSelection(true);
-         _rdoAltitudeFoot.setSelection(false);
+         _rdoSystem_Elevation_Meter.setSelection(true);
+         _rdoSystem_Elevation_Foot.setSelection(false);
 
-         _rdoDistanceKm.setSelection(true);
-         _rdoDistanceMi.setSelection(false);
+         _rdoSystem_Distance_Km.setSelection(true);
+         _rdoSystem_Distance_Mile.setSelection(false);
 
-         _rdoTemperatureCelcius.setSelection(true);
-         _rdoTemperatureFahrenheit.setSelection(false);
+         _rdoSystem_Temperature_Celcius.setSelection(true);
+         _rdoSystem_Temperature_Fahrenheit.setSelection(false);
 
       } else {
 
          // imperial
 
-         _rdoAltitudeMeter.setSelection(false);
-         _rdoAltitudeFoot.setSelection(true);
+         _rdoSystem_Elevation_Meter.setSelection(false);
+         _rdoSystem_Elevation_Foot.setSelection(true);
 
-         _rdoDistanceKm.setSelection(false);
-         _rdoDistanceMi.setSelection(true);
+         _rdoSystem_Distance_Km.setSelection(false);
+         _rdoSystem_Distance_Mile.setSelection(true);
 
-         _rdoTemperatureCelcius.setSelection(false);
-         _rdoTemperatureFahrenheit.setSelection(true);
+         _rdoSystem_Temperature_Celcius.setSelection(false);
+         _rdoSystem_Temperature_Fahrenheit.setSelection(true);
       }
    }
 
@@ -816,8 +855,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void onSystem_Select() {
 
-      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystem_Select()"
-            + "\t: " + _comboSystem.getSelectionIndex()
+      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystem_Select()" //$NON-NLS-1$ //$NON-NLS-2$
+            + "\t: " + _comboSystem.getSelectionIndex() //$NON-NLS-1$
 //            + "\t: " +
       );
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -842,10 +881,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          // time zone
          final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-         _chkTimeZoneLiveUpdate.setSelection(//
+         _chkTimeZone_LiveUpdate.setSelection(//
                _prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
 
-         _chkUseAnotherTimeZone.setSelection(//
+         _chkTimeZone_UseAnotherTimeZone.setSelection(//
                _prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
          _timeZoneId_1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
@@ -886,7 +925,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          saveState();
 
-         if (_chkShowMeasurementInAppToolbar.getSelection() != _showMeasurementSystemInUI) {
+         if (_chkSystem_ShowMeasurementInAppToolbar.getSelection() != _isShowMeasurementSystemInUI) {
 
             // field is modified, ask for restart
 
@@ -918,8 +957,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-         _chkTimeZoneLiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-         _chkUseAnotherTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+         _chkTimeZone_LiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+         _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
          _timeZoneId_1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
          _timeZoneId_2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
@@ -961,8 +1000,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       // measurement system
 
-      _chkShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
-      MeasurementSystemContributionItem.selectSystemFromPrefStore(_comboSystem_OLD);
+      _chkSystem_ShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
+      MeasurementSystemContributionItem.selectMeasurementSystem_OLD(_comboSystem_OLD);
       onSelectSystem_OLD();
    }
 
@@ -975,15 +1014,15 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          if (selectedIndex == -1) {
             selectedIndex = 0;
          }
-         MeasurementSystemContributionItem.selectSystemInPrefStore(selectedIndex);
+         MeasurementSystemContributionItem.saveMeasurementSystem_OLD(selectedIndex);
 
-         _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkShowMeasurementInAppToolbar.getSelection());
+         _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkSystem_ShowMeasurementInAppToolbar.getSelection());
       }
 
       {
          // time zone
 
-         final boolean isUseSystemTimeZone = !_chkUseAnotherTimeZone.getSelection();
+         final boolean isUseSystemTimeZone = !_chkTimeZone_UseAnotherTimeZone.getSelection();
          final int selectedZone = getSelectedCustomZoneNumber();
          final String selectedTimeZoneId = getSelectedTimeZoneId(isUseSystemTimeZone, selectedZone);
 
@@ -991,7 +1030,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          TimeTools.setDefaultTimeZone(selectedTimeZoneId);
 
          // time zone
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkTimeZoneLiveUpdate.getSelection());
+         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkTimeZone_LiveUpdate.getSelection());
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
          _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
@@ -1003,8 +1042,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // calendar week
 
-         final int firstDayOfWeek = _comboFirstDay.getSelectionIndex() + 1;
-         final int minDays = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
+         final int firstDayOfWeek = _comboWeek_FirstDay.getSelectionIndex() + 1;
+         final int minDays = _comboWeek_MinDaysInFirstWeek.getSelectionIndex() + 1;
 
          _prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
          _prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
@@ -1041,8 +1080,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    protected void updateUI_CalendarWeek() {
 
-      _comboFirstDay.select(_backupFirstDayOfWeek - 1);
-      _comboMinDaysInFirstWeek.select(_backupMinimalDaysInFirstWeek - 1);
+      _comboWeek_FirstDay.select(_backupFirstDayOfWeek - 1);
+      _comboWeek_MinDaysInFirstWeek.select(_backupMinimalDaysInFirstWeek - 1);
    }
 
    /**

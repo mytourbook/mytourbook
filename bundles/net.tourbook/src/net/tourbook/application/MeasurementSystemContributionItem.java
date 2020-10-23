@@ -57,29 +57,14 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       super(id);
    }
 
-   public static void selectSystemFromPrefStore(final Combo combo) {
-
-      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
-
-      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
-         combo.select(0);
-      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-         combo.select(1);
-      } else {
-         combo.select(0);
-      }
-
-      _oldSystemIndex = combo.getSelectionIndex();
-   }
-
    /**
-    * Sets measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}... var's
-    * and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
+    * Saves the measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}...
+    * var's and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
     *
     * @param systemIndex
     *           0...metric, 1...imperial
     */
-   public static void selectSystemInPrefStore(final int systemIndex) {
+   public static void saveMeasurementSystem_OLD(final int systemIndex) {
 
       if (systemIndex == _oldSystemIndex) {
          // nothing has changed
@@ -135,6 +120,21 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
    }
 
+   public static void selectMeasurementSystem_OLD(final Combo combo) {
+
+      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
+
+      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
+         combo.select(0);
+      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+         combo.select(1);
+      } else {
+         combo.select(0);
+      }
+
+      _oldSystemIndex = combo.getSelectionIndex();
+   }
+
    /**
     * listen for changes in the person list
     */
@@ -150,7 +150,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
                _isFireSelectionEvent = false;
                {
-                  selectSystemFromPrefStore(_combo);
+                  selectMeasurementSystem_OLD(_combo);
                }
                _isFireSelectionEvent = true;
             }
@@ -236,7 +236,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       _combo.add(Messages.App_measurement_imperial); // imperial system
 
       // select previous value
-      selectSystemFromPrefStore(_combo);
+      selectMeasurementSystem_OLD(_combo);
 
       return _combo;
    }
@@ -249,6 +249,6 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          return;
       }
 
-      selectSystemInPrefStore(selectedIndex);
+      saveMeasurementSystem_OLD(selectedIndex);
    }
 }
