@@ -212,7 +212,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
                   /*
                    * Do not fire an event when this is running already in an update event. This
-                   * occures when a tour is modified (marker) in the toubook view and the stat view
+                   * occurs when a tour is modified (marker) in the tourbook view and the stat view
                    * is opened !!!
                    */
 
@@ -718,7 +718,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       // set state if average values should be displayed or not, set it BEFORE retrieving data
       if (this instanceof StatisticTraining_Bar) {
 
-         // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
+         // ensure the data are computed with the correct graph context, otherwise it do not work depending what was previously selected
          _isForceReloadData = true;
 
          durationTime = (DurationTime) Util.getEnumValue(
@@ -731,7 +731,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       } else if (this instanceof StatisticTraining_Line) {
 
-         // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
+         // ensure the data are computed with the correct graph context, otherwise it do not work depending what was previously selected
          _isForceReloadData = true;
 
          durationTime = (DurationTime) Util.getEnumValue(
