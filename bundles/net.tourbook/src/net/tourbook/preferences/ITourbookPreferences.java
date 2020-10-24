@@ -368,7 +368,7 @@ public interface ITourbookPreferences {
    /*
     * measurement system
     */
-   public static final String MEASUREMENT_SYSTEM                = "system.of.measurement";             //$NON-NLS-1$
+   public static final String MEASUREMENT_SYSTEM                = "MEASUREMENT_SYSTEM";                //$NON-NLS-1$
    public static final String MEASUREMENT_SYSTEM_SHOW_IN_UI     = "system.of.measurement.show.in.ui";  //$NON-NLS-1$
 
    public static final String MEASUREMENT_SYSTEM_DISTANCE       = "system.of.measurement.distance";    //$NON-NLS-1$

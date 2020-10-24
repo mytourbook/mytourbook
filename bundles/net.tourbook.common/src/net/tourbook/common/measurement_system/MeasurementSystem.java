@@ -15,13 +15,119 @@
  *******************************************************************************/
 package net.tourbook.common.measurement_system;
 
-public class MeasurementSystem {
+import net.tourbook.common.util.StatusUtil;
 
-   String      name;
+public class MeasurementSystem implements Cloneable {
 
-   Distance    distance;
-   Elevation   elevation;
-   Temperature temperature;
-   Weight      weight;
+   private String      name;
 
+   private Distance    distance;
+   private Elevation   elevation;
+   private Temperature temperature;
+   private Weight      weight;
+
+   public MeasurementSystem(final String name,
+                            final Distance distance,
+                            final Elevation elevation,
+                            final Temperature temperature,
+                            final Weight weight) {
+
+      this.name = name;
+
+      this.distance = distance;
+      this.elevation = elevation;
+      this.temperature = temperature;
+      this.weight = weight;
+   }
+
+   @Override
+   public MeasurementSystem clone() {
+
+      MeasurementSystem clonedProfile = null;
+
+      try {
+
+         clonedProfile = (MeasurementSystem) super.clone();
+
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
+
+      return clonedProfile;
+   }
+
+   /**
+    * @return the distance
+    */
+   public Distance getDistance() {
+      return distance;
+   }
+
+   /**
+    * @return the elevation
+    */
+   public Elevation getElevation() {
+      return elevation;
+   }
+
+   /**
+    * @return the name
+    */
+   public String getName() {
+      return name;
+   }
+
+   /**
+    * @return the temperature
+    */
+   public Temperature getTemperature() {
+      return temperature;
+   }
+
+   /**
+    * @return the weight
+    */
+   public Weight getWeight() {
+      return weight;
+   }
+
+   /**
+    * @param distance
+    *           the distance to set
+    */
+   public void setDistance(final Distance distance) {
+      this.distance = distance;
+   }
+
+   /**
+    * @param elevation
+    *           the elevation to set
+    */
+   public void setElevation(final Elevation elevation) {
+      this.elevation = elevation;
+   }
+
+   /**
+    * @param name
+    *           the name to set
+    */
+   public void setName(final String name) {
+      this.name = name;
+   }
+
+   /**
+    * @param temperature
+    *           the temperature to set
+    */
+   public void setTemperature(final Temperature temperature) {
+      this.temperature = temperature;
+   }
+
+   /**
+    * @param weight
+    *           the weight to set
+    */
+   public void setWeight(final Weight weight) {
+      this.weight = weight;
+   }
 }

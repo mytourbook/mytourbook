@@ -1879,19 +1879,22 @@ public class Messages extends NLS {
 
    public static String Pref_Swimming_Label_Info;
 
-   public static String Pref_System_Label_BodyWeight;
+   public static String Pref_System_Group_MeasurementSystem;
    public static String Pref_System_Label_Distance;
    public static String Pref_System_Label_Elevation;
+   public static String Pref_System_Label_System;
    public static String Pref_System_Label_Temperature;
-   public static String Pref_System_Radio_BodyWeight_Kilogram;
-   public static String Pref_System_Radio_BodyWeight_Pound;
-   public static String Pref_System_Radio_Distance_Kilometer;
-   public static String Pref_System_Radio_Distance_Nautic;
-   public static String Pref_System_Radio_Distance_NauticMile;
-   public static String Pref_System_Radio_Elevation_Foot;
-   public static String Pref_System_Radio_Elevation_Meter;
-   public static String Pref_System_Radio_Temperature_Celcius;
-   public static String Pref_System_Radio_Temperature_Fahrenheit;
+
+   public static String Pref_System_Label_Weight;
+   public static String Pref_System_Option_BodyWeight_Kilogram;
+   public static String Pref_System_Option_BodyWeight_Pound;
+   public static String Pref_System_Option_Distance_Kilometer;
+   public static String Pref_System_Option_Distance_Mile;
+   public static String Pref_System_Option_Distance_NauticMile;
+   public static String Pref_System_Option_Elevation_Foot;
+   public static String Pref_System_Option_Elevation_Meter;
+   public static String Pref_System_Option_Temperature_Celcius;
+   public static String Pref_System_Option_Temperature_Fahrenheit;
 
    public static String Pref_Tour_Button_FailedUpdate;
    public static String Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
