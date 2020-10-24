@@ -32,6 +32,8 @@ public class Messages extends NLS {
    public static String        LABEL_GRAPH_TRAINING_EFFECT;
    public static String        LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC;
    public static String        LABEL_GRAPH_TRAINING_PERFORMANCE;
+   public static String        LABEL_GRAPH_BODYWEIGHT;
+   public static String        LABEL_GRAPH_BODYFAT;
 
    public static String        NUMBERS_UNIT;
 

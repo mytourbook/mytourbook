@@ -114,6 +114,8 @@ public class Messages extends NLS {
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;
+   public static String        Graph_Label_Athlete_Body_Fat;
+   public static String        Graph_Label_Athlete_Body_Weight;
    public static String        Graph_Label_Cadence;
    public static String        Graph_Label_Cadence_Unit;
    public static String        Graph_Label_Cadence_Unit_Spm;
@@ -139,6 +141,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Tour_Compare;
    public static String        Graph_Label_Tour_Compare_Unit;
    public static String        Graph_Label_Geo_Compare_Unit;
+   public static String        Graph_Label_Prefix_AthleteData;
    public static String        Graph_Label_Prefix_RunningDynamics;
    public static String        Graph_Label_Prefix_Swimming;
    public static String        Graph_Label_Prefix_Training;

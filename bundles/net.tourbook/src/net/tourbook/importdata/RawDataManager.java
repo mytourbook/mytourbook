@@ -681,43 +681,43 @@ public class RawDataManager {
             switch (reimportId) {
 
             case TimeSlices:
-               dataToReimportDetails.add(Messages.Import_Data_TimeSlices);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TimeSlices);
                break;
             case AltitudeValues:
-               dataToReimportDetails.add(Messages.Import_Data_AltitudeValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_AltitudeValues);
                break;
             case CadenceValues:
-               dataToReimportDetails.add(Messages.Import_Data_CadenceValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_CadenceValues);
                break;
             case GearValues:
-               dataToReimportDetails.add(Messages.Import_Data_GearValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_GearValues);
                break;
             case PowerAndPulseValues:
-               dataToReimportDetails.add(Messages.Import_Data_PowerAndPulseValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_PowerAndPulseValues);
                break;
             case PowerAndSpeedValues:
-               dataToReimportDetails.add(Messages.Import_Data_PowerAndSpeedValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_PowerAndSpeedValues);
                break;
             case RunningDynamics:
-               dataToReimportDetails.add(Messages.Import_Data_RunningDynamicsValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_RunningDynamicsValues);
                break;
             case Swimming:
-               dataToReimportDetails.add(Messages.Import_Data_SwimmingValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_SwimmingValues);
                break;
             case TemperatureValues:
-               dataToReimportDetails.add(Messages.Import_Data_TemperatureValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TemperatureValues);
                break;
             case TourMarkers:
-               dataToReimportDetails.add(Messages.Import_Data_TourMarkers);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TourMarkers);
                break;
             case TourTimerPauses:
-               dataToReimportDetails.add(Messages.Import_Data_TourTimerPauses);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TourTimerPauses);
                break;
             case TrainingValues:
-               dataToReimportDetails.add(Messages.Import_Data_TrainingValues);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TrainingValues);
                break;
             case Tour:
-               dataToReimportDetails.add(Messages.Import_Data_EntireTour);
+               dataToReimportDetails.add(Messages.Import_Data_Checkbox_EntireTour);
                break;
             }
          }
@@ -984,6 +984,11 @@ public class RawDataManager {
             final String savedImportFilePathName = tourData.getImportFilePathName();
 
             if (savedImportFilePathName == null) {
+
+               //The user doesn't want to look for a new file path for the current tour.
+               if (skipToursWithFileNotFound) {
+                  return;
+               }
 
                // in older versions the file path name is not saved
 

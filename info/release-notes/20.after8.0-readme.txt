@@ -37,6 +37,10 @@ New
 * Statistic Values View
   - Displays the values of the statistic graphs
   - Statistic values can be copied in csv format to the clipboard
+  - Displays athlete's data (body weight and fat) for any given day/week/month/year
+
+* Tour Editor (Frederic)
+  - Added a body fat percentage field in the Personal Details section
 
 Improvements
 ============

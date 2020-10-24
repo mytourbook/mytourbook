@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -588,75 +587,77 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * tab: tour
     */
-   private Combo             _comboTitle;
+   private Combo              _comboTitle;
    //
    private ComboViewerCadence _comboCadence;
    //
-   private CLabel            _lblCloudIcon;
-   private CLabel            _lblTourType;
+   private CLabel             _lblCloudIcon;
+   private CLabel             _lblTourType;
    //
-   private ControlDecoration _decoTimeZone;
+   private ControlDecoration  _decoTimeZone;
    //
-   private Combo             _comboLocation_Start;
-   private Combo             _comboLocation_End;
-   private Combo             _comboTimeZone;
-   private Combo             _comboWeather_Clouds;
-   private Combo             _comboWeather_WindDirectionText;
-   private Combo             _comboWeather_WindSpeedText;
+   private Combo              _comboLocation_Start;
+   private Combo              _comboLocation_End;
+   private Combo              _comboTimeZone;
+   private Combo              _comboWeather_Clouds;
+   private Combo              _comboWeather_WindDirectionText;
+   private Combo              _comboWeather_WindSpeedText;
    //
-   private DateTime          _dtStartTime;
-   private DateTime          _dtTourDate;
+   private DateTime           _dtStartTime;
+   private DateTime           _dtTourDate;
    //
-   private Label             _lblAltitudeUpUnit;
-   private Label             _lblAltitudeDownUnit;
-   private Label             _lblDistanceUnit;
-   private Label             _lblPerson_BodyWeightUnit;
-   private Label             _lblSpeedUnit;
-   private Label             _lblStartTime;
-   private Label             _lblTags;
-   private Label             _lblTimeZone;
-   private Label             _lblWeather_PrecipitationUnit;
-   private Label             _lblWeather_PressureUnit;
-   private Label             _lblWeather_TemperatureUnit_Avg;
-   private Label             _lblWeather_TemperatureUnit_Max;
-   private Label             _lblWeather_TemperatureUnit_Min;
-   private Label             _lblWeather_TemperatureUnit_WindChill;
+   private Label              _lblAltitudeUpUnit;
+   private Label              _lblAltitudeDownUnit;
+   private Label              _lblDistanceUnit;
+   private Label              _lblPerson_BodyWeightUnit;
+   private Label              _lblPerson_BodyFatUnit;
+   private Label              _lblSpeedUnit;
+   private Label              _lblStartTime;
+   private Label              _lblTags;
+   private Label              _lblTimeZone;
+   private Label              _lblWeather_PrecipitationUnit;
+   private Label              _lblWeather_PressureUnit;
+   private Label              _lblWeather_TemperatureUnit_Avg;
+   private Label              _lblWeather_TemperatureUnit_Max;
+   private Label              _lblWeather_TemperatureUnit_Min;
+   private Label              _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link              _linkDefaultTimeZone;
-   private Link              _linkGeoTimeZone;
-   private Link              _linkRemoveTimeZone;
-   private Link              _linkTag;
-   private Link              _linkTourType;
-   private Link              _linkWeather;
+   private Link               _linkDefaultTimeZone;
+   private Link               _linkGeoTimeZone;
+   private Link               _linkRemoveTimeZone;
+   private Link               _linkTag;
+   private Link               _linkTourType;
+   private Link               _linkWeather;
    //
-   private Spinner           _spinPerson_BodyWeight;
-   private Spinner           _spinPerson_Calories;
-   private Spinner           _spinPerson_FTP;
-   private Spinner           _spinPerson_RestPuls;
-   private Spinner           _spinWeather_Humidity;
-   private Spinner           _spinWeather_PrecipitationValue;
-   private Spinner           _spinWeather_PressureValue;
-   private Spinner           _spinWeather_Temperature_Average;
-   private Spinner           _spinWeather_Temperature_Min;
-   private Spinner           _spinWeather_Temperature_Max;
-   private Spinner           _spinWeather_Temperature_WindChill;
-   private Spinner           _spinWeather_Wind_DirectionValue;
-   private Spinner           _spinWeather_Wind_SpeedValue;
+   private Spinner            _spinPerson_BodyFat;
+   private Spinner            _spinPerson_BodyWeight;
+   private Spinner            _spinPerson_Calories;
+   private Spinner            _spinPerson_FTP;
+   private Spinner            _spinPerson_RestPuls;
+   private Spinner            _spinWeather_Humidity;
+   private Spinner            _spinWeather_PrecipitationValue;
+   private Spinner            _spinWeather_PressureValue;
+   private Spinner            _spinWeather_Temperature_Average;
+   private Spinner            _spinWeather_Temperature_Min;
+   private Spinner            _spinWeather_Temperature_Max;
+   private Spinner            _spinWeather_Temperature_WindChill;
+   private Spinner            _spinWeather_Wind_DirectionValue;
+   private Spinner            _spinWeather_Wind_SpeedValue;
    //
-   private Text              _txtAltitudeDown;
-   private Text              _txtAltitudeUp;
-   private Text              _txtDescription;
-   private Text              _txtDistance;
-   private Text              _txtWeather;
+   private Text               _txtAltitudeDown;
+   private Text               _txtAltitudeUp;
+   private Text               _txtDescription;
+   private Text               _txtDistance;
+   private Text               _txtWeather;
    //
-   private TimeDuration      _deviceTime_Elapsed;                  // Total time of the activity
-   private TimeDuration      _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
-   private TimeDuration      _deviceTime_Paused;                   // Time where the user deliberately paused the device
-   private TimeDuration      _computedTime_Moving;                 // Computed time moving
-   private TimeDuration      _computedTime_Break;                  // Computed time stopped
+   private TimeDuration       _deviceTime_Elapsed;                  // Total time of the activity
+   private TimeDuration       _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
+   private TimeDuration       _deviceTime_Paused;                   // Time where the user deliberately paused the device
+   private TimeDuration       _computedTime_Moving;                 // Computed time moving
+   private TimeDuration       _computedTime_Break;                  // Computed time stopped
 
-   private Menu              _swimViewer_ContextMenu;
-   private Menu              _timeViewer_ContextMenu;
+   private Menu               _swimViewer_ContextMenu;
+   private Menu               _timeViewer_ContextMenu;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -3862,6 +3863,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // label: bpm
             _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
          }
+         {
+            /*
+             * FTP - Functional Threshold Power
+             */
+
+            // label: FTP
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_FTP);
+            label.setToolTipText(Messages.Tour_Editor_Label_FTP_Tooltip);
+            _firstColumnControls.add(label);
+
+            // spinner: FTP
+            _spinPerson_FTP = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinPerson_FTP);
+            _spinPerson_FTP.setMinimum(0);
+            _spinPerson_FTP.setMaximum(10000);
+
+            _spinPerson_FTP.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_FTP.addSelectionListener(_selectionListener);
+
+            // spacer
+            _tk.createLabel(container, UI.EMPTY_STRING);
+         }
       }
    }
 
@@ -3902,28 +3928,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
          {
             /*
-             * FTP - Functional Threshold Power
+             * Body fat
              */
 
-            // label: FTP
-            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_FTP);
-            label.setToolTipText(Messages.Tour_Editor_Label_FTP_Tooltip);
+            // label: fat
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyFat);
+            label.setToolTipText(Messages.Tour_Editor_Label_BodyFat_Tooltip);
             _secondColumnControls.add(label);
 
-            // spinner: FTP
-            _spinPerson_FTP = new Spinner(container, SWT.BORDER);
+            // spinner: fat
+            _spinPerson_BodyFat = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinPerson_FTP);
-            _spinPerson_FTP.setMinimum(0);
-            _spinPerson_FTP.setMaximum(10000);
+                  .applyTo(_spinPerson_BodyFat);
+            _spinPerson_BodyFat.setDigits(1);
+            _spinPerson_BodyFat.setMinimum(0);
+            _spinPerson_BodyFat.setMaximum(1000); // 100%
 
-            _spinPerson_FTP.addMouseWheelListener(_mouseWheelListener);
-            _spinPerson_FTP.addSelectionListener(_selectionListener);
+            _spinPerson_BodyFat.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_BodyFat.addSelectionListener(_selectionListener);
 
-            // spacer
-            _tk.createLabel(container, UI.EMPTY_STRING);
+            // label: unit
+            _lblPerson_BodyFatUnit = _tk.createLabel(container, UI.UNIT_PERCENT);
          }
       }
    }
@@ -6219,8 +6246,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       // get selected Marker
       TourMarker selectedMarker = null;
-      for (final Iterator<?> iterator = sliceSelection.iterator(); iterator.hasNext();) {
-         final TimeSlice timeSlice = (TimeSlice) iterator.next();
+      for (final Object name : sliceSelection) {
+         final TimeSlice timeSlice = (TimeSlice) name;
          if (_markerMap.containsKey(timeSlice.serieIndex)) {
             selectedMarker = _markerMap.get(timeSlice.serieIndex);
             break;
@@ -6371,6 +6398,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // Personal
       _spinPerson_BodyWeight.setEnabled(canEdit);
+      _spinPerson_BodyFat.setEnabled(canEdit);
       _spinPerson_FTP.setEnabled(canEdit);
       _spinPerson_RestPuls.setEnabled(canEdit);
       _spinPerson_Calories.setEnabled(canEdit);
@@ -8320,6 +8348,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          final float bodyWeight = UI.convertBodyWeightToMetric(_spinPerson_BodyWeight.getSelection());
          _tourData.setBodyWeight(bodyWeight / 10.0f);
+         _tourData.setBodyFat(_spinPerson_BodyFat.getSelection() / 10.0f);
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
          _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
@@ -8777,6 +8806,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
       _spinPerson_BodyWeight.setSelection(Math.round(bodyWeight * 10));
+      _spinPerson_BodyFat.setSelection(Math.round(_tourData.getBodyFat() * 10));
 
       _spinPerson_FTP.setSelection(_tourData.getPower_FTP());
       _spinPerson_RestPuls.setSelection(_tourData.getRestPulse());
@@ -8957,6 +8987,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblPerson_BodyWeightUnit.setText(UI.UNIT_LABEL_WEIGHT);
+      _lblPerson_BodyFatUnit.setText(UI.UNIT_PERCENT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
@@ -8966,7 +8997,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
-      final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int)_tourData.getCadenceMultiplier());
+      final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
 
       /*

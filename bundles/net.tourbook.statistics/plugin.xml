@@ -197,6 +197,40 @@
          category-data  ="Altitude"
          category-time  ="Year"
       />
+      
+      <!-- ATHLETE -->
+
+      <statistic
+         name           ="%Pref_Day_Summary_AthleteData"
+         class          ="net.tourbook.statistics.graphs.StatisticDay_AthleteData"
+         id             ="net.tourbook.statistics.StatisticSummaryDayAthleteData"
+         category-data  ="AthleteData"
+         category-time  ="Day"
+      />
+         
+      <statistic
+         name           ="%Pref_Week_Summary_AthleteData"
+         class          ="net.tourbook.statistics.graphs.StatisticWeek_AthleteData"
+         id             ="net.tourbook.statistics.StatisticSummaryWeekAthleteData"
+         category-data  ="AthleteData"
+         category-time  ="Week"
+      />
+         
+      <statistic
+         name           ="%Pref_Month_Summary_AthleteData"
+         class          ="net.tourbook.statistics.graphs.StatisticMonth_AthleteData"
+         id             ="net.tourbook.statistics.StatisticSummaryMonthAthleteData"
+         category-data  ="AthleteData"
+         category-time  ="Month"
+      />
+         
+      <statistic
+         name           ="%Pref_Year_Summary_AthleteData"
+         class          ="net.tourbook.statistics.graphs.StatisticYear_AthleteData"
+         id             ="net.tourbook.statistics.StatisticSummaryYearAthleteData"
+         category-data  ="AthleteData"
+         category-time  ="Year"
+      />
             
    </extension>
 

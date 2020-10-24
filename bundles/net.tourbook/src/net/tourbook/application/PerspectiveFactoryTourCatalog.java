@@ -28,7 +28,7 @@ import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour;
 import net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour;
-import net.tourbook.ui.views.tourCatalog.YearStatisticView;
+import net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -75,7 +75,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 				
 				IPageLayout.BOTTOM, 0.7f, FOLDER_ID_TOUR_DIRECTORIES);
 		
-		folderYearStat.addView(YearStatisticView.ID);
+		folderYearStat.addView(RefTour_YearStatistic_View.ID);
 
 		//--------------------------------------------------------------------------------
 
