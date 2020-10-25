@@ -107,6 +107,10 @@ public class MeasurementSystem_Manager {
 
    private MeasurementSystem_Manager() {}
 
+   public static MeasurementSystem getActiveMeasurementSystem() {
+      return _allSystemProfiles.get(_activeSystemProfileIndex);
+   }
+
    /**
     * @return the _activeSystemProfileIndex
     */
@@ -114,16 +118,23 @@ public class MeasurementSystem_Manager {
       return _activeSystemProfileIndex;
    }
 
-   public static ArrayList<MeasurementSystem> getAllProfiles() {
+   public static ArrayList<MeasurementSystem> getCurrentProfiles() {
       return _allSystemProfiles;
+   }
+
+   /**
+    * @return the aLL_DEFAULT_PROFILES
+    */
+   public static ArrayList<MeasurementSystem> getDefaultProfiles() {
+      return ALL_DEFAULT_PROFILES;
    }
 
    private static void readProfiles() {
 
       // get loaded system profiles
-      final ArrayList<MeasurementSystem> allProfiles = readProfiles_10_FromXml();
+      final ArrayList<MeasurementSystem> allLoadedProfiles = readProfiles_10_FromXmlFile();
 
-      if (allProfiles == null || allProfiles.size() == 0) {
+      if (allLoadedProfiles == null || allLoadedProfiles.size() == 0) {
 
          // profiles are not yet available -> create defaults
 
@@ -135,6 +146,20 @@ public class MeasurementSystem_Manager {
 
          return;
       }
+
+      _allSystemProfiles.addAll(allLoadedProfiles);
+
+      /*
+       * Get active profile
+       */
+      _activeSystemProfileIndex = 0;
+      for (int profileIndex = 0; profileIndex < allLoadedProfiles.size(); profileIndex++) {
+         final MeasurementSystem measurementSystem = allLoadedProfiles.get(profileIndex);
+         if (measurementSystem.getSaveState_IsProfileActive()) {
+            _activeSystemProfileIndex = profileIndex;
+            break;
+         }
+      }
    }
 
    /**
@@ -142,7 +167,7 @@ public class MeasurementSystem_Manager {
     *
     * @return
     */
-   private static ArrayList<MeasurementSystem> readProfiles_10_FromXml() {
+   private static ArrayList<MeasurementSystem> readProfiles_10_FromXmlFile() {
 
       final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
       final File file = stateLocation.append(STATE_FILE).toFile();
@@ -159,7 +184,7 @@ public class MeasurementSystem_Manager {
 
          final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
-         allLoadedProfiles = readProfiles_20_Profile(xmlRoot);
+         allLoadedProfiles = readProfiles_20_ProfileData(xmlRoot);
 
       } catch (final IOException | WorkbenchException e) {
          StatusUtil.log(e);
@@ -168,27 +193,32 @@ public class MeasurementSystem_Manager {
       return allLoadedProfiles;
    }
 
-   private static ArrayList<MeasurementSystem> readProfiles_20_Profile(final XMLMemento xmlRoot) {
+   private static ArrayList<MeasurementSystem> readProfiles_20_ProfileData(final XMLMemento xmlRoot) {
 
       final ArrayList<MeasurementSystem> allLoadedProfiles = new ArrayList<>();
 
-//      final IMemento[] xmlAllProfiles = xmlRoot.getChildren(TAG_PROFILE);
-//
-//      for (final IMemento xmlProfile : xmlAllProfiles) {
-//
-//         final MeasurementSystem colorDef = new MeasurementSystem();
-//         allLoadedProfiles.add(colorDef);
-//
-//         final IMemento[] xmlProfiles = xmlProfile.getChildren(TAG_COLOR_PROFILE);
-//
-//         for (final IMemento xmlProfile : xmlProfiles) {
-//
-//            final Map3ColorProfile colorProfile = new Map3ColorProfile();
-//            colorDef.addProfile(colorProfile);
-//
-//         }
-//         colorProfile.setProfileName(Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING));
-//      }
+      final IMemento[] xmlAllProfiles = xmlRoot.getChildren(TAG_PROFILE);
+
+      for (final IMemento xmlProfile : xmlAllProfiles) {
+
+         final boolean isProfileActive = Util.getXmlBoolean(xmlProfile, ATTR_IS_ACTIVE, false);
+
+// SET_FORMATTING_OFF
+
+         final String      profileName = Util.getXmlString(xmlProfile, ATTR_NAME, "Invalid profilename");//$NON-NLS-1$
+
+         final Distance    distance    = (Distance)      Util.getXmlEnum(xmlProfile, ATTR_DISTANCE,      Distance.KILOMETER);
+         final Elevation   elevation   = (Elevation)     Util.getXmlEnum(xmlProfile, ATTR_ELEVATION,     Elevation.METER);
+         final Temperature temperature = (Temperature)   Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,   Temperature.CELCIUS);
+         final Weight      weight      = (Weight)        Util.getXmlEnum(xmlProfile, ATTR_WEIGHT,        Weight.KILOGRAM);
+
+// SET_FORMATTING_ON
+
+         final MeasurementSystem systemProfile = new MeasurementSystem(profileName, distance, elevation, temperature, weight);
+         allLoadedProfiles.add(systemProfile);
+
+         systemProfile.setSavedState_IsProfileActive(isProfileActive);
+      }
 
       return allLoadedProfiles;
    }
@@ -199,6 +229,12 @@ public class MeasurementSystem_Manager {
     * @param allClonedSystemProfiles
     */
    public static void saveState(final ArrayList<MeasurementSystem> allClonedSystemProfiles) {
+
+      // apply new system profiles
+      _allSystemProfiles.clear();
+      for (final MeasurementSystem measurementSystem : allClonedSystemProfiles) {
+         _allSystemProfiles.add(measurementSystem.clone());
+      }
 
       BufferedWriter writer = null;
 
@@ -270,11 +306,11 @@ public class MeasurementSystem_Manager {
    }
 
    /**
-    * @param _activeSystemProfileIndex
+    * @param activeSystemProfileIndex
     *           the _activeSystemProfileIndex to set
     */
-   public static void setActiveSystemProfileIndex(final int _activeSystemProfileIndex) {
-      MeasurementSystem_Manager._activeSystemProfileIndex = _activeSystemProfileIndex;
+   public static void setActiveSystemProfileIndex(final int activeSystemProfileIndex) {
+      _activeSystemProfileIndex = activeSystemProfileIndex;
    }
 
 }

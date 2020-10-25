@@ -19,12 +19,14 @@ import net.tourbook.common.util.StatusUtil;
 
 public class MeasurementSystem implements Cloneable {
 
-   private String      name;
+   private String      _name;
 
-   private Distance    distance;
-   private Elevation   elevation;
-   private Temperature temperature;
-   private Weight      weight;
+   private Distance    _distance;
+   private Elevation   _elevation;
+   private Temperature _temperature;
+   private Weight      _weight;
+
+   private boolean     _savedState_IsProfileActive;
 
    public MeasurementSystem(final String name,
                             final Distance distance,
@@ -32,12 +34,12 @@ public class MeasurementSystem implements Cloneable {
                             final Temperature temperature,
                             final Weight weight) {
 
-      this.name = name;
+      _name = name;
 
-      this.distance = distance;
-      this.elevation = elevation;
-      this.temperature = temperature;
-      this.weight = weight;
+      _distance = distance;
+      _elevation = elevation;
+      _temperature = temperature;
+      _weight = weight;
    }
 
    @Override
@@ -60,35 +62,42 @@ public class MeasurementSystem implements Cloneable {
     * @return the distance
     */
    public Distance getDistance() {
-      return distance;
+      return _distance;
    }
 
    /**
     * @return the elevation
     */
    public Elevation getElevation() {
-      return elevation;
+      return _elevation;
    }
 
    /**
     * @return the name
     */
    public String getName() {
-      return name;
+      return _name;
+   }
+
+   /**
+    * @return the _state_IsProfileActive
+    */
+   public boolean getSaveState_IsProfileActive() {
+      return _savedState_IsProfileActive;
    }
 
    /**
     * @return the temperature
     */
    public Temperature getTemperature() {
-      return temperature;
+      return _temperature;
    }
 
    /**
     * @return the weight
     */
    public Weight getWeight() {
-      return weight;
+      return _weight;
    }
 
    /**
@@ -96,7 +105,7 @@ public class MeasurementSystem implements Cloneable {
     *           the distance to set
     */
    public void setDistance(final Distance distance) {
-      this.distance = distance;
+      this._distance = distance;
    }
 
    /**
@@ -104,7 +113,7 @@ public class MeasurementSystem implements Cloneable {
     *           the elevation to set
     */
    public void setElevation(final Elevation elevation) {
-      this.elevation = elevation;
+      this._elevation = elevation;
    }
 
    /**
@@ -112,7 +121,11 @@ public class MeasurementSystem implements Cloneable {
     *           the name to set
     */
    public void setName(final String name) {
-      this.name = name;
+      this._name = name;
+   }
+
+   public void setSavedState_IsProfileActive(final boolean isProfileActive) {
+      _savedState_IsProfileActive = isProfileActive;
    }
 
    /**
@@ -120,7 +133,7 @@ public class MeasurementSystem implements Cloneable {
     *           the temperature to set
     */
    public void setTemperature(final Temperature temperature) {
-      this.temperature = temperature;
+      this._temperature = temperature;
    }
 
    /**
@@ -128,6 +141,23 @@ public class MeasurementSystem implements Cloneable {
     *           the weight to set
     */
    public void setWeight(final Weight weight) {
-      this.weight = weight;
+      this._weight = weight;
+   }
+
+   @Override
+   public String toString() {
+
+      return "MeasurementSystem\n" //$NON-NLS-1$
+
+            + "[\n" //$NON-NLS-1$
+
+            + "_name=" + _name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_distance=" + _distance + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_elevation=" + _elevation + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_temperature=" + _temperature + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_weight=" + _weight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_savedState_IsProfileActive=" + _savedState_IsProfileActive + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]"; //$NON-NLS-1$
    }
 }

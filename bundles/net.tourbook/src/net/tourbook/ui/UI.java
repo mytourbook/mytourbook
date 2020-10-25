@@ -32,6 +32,12 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.measurement_system.Distance;
+import net.tourbook.common.measurement_system.Elevation;
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.measurement_system.Temperature;
+import net.tourbook.common.measurement_system.Weight;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -1330,15 +1336,17 @@ public class UI {
       // pref store var cannot be set from a static field because it can be null !!!
       final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
+      final MeasurementSystem activeMeasurementSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
       /*
        * Distance
        */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+      final Distance distance = activeMeasurementSystem.getDistance();
+      if (distance == Distance.MILE) {
 
          // set imperial measure system
 
-         net.tourbook.common.UI.UNIT_IS_METRIC = false;
+         net.tourbook.common.UI.UNIT_DISTANCE_IS_METRIC = true;
 
          UNIT_VALUE_DISTANCE = UNIT_MILE;
          UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
@@ -1353,11 +1361,15 @@ public class UI {
          net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
          net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
+      } else if (distance == Distance.NAUTIC_MILE) {
+
+         TODO
+
       } else {
 
          // default is the metric measure system
 
-         net.tourbook.common.UI.UNIT_IS_METRIC = true;
+         net.tourbook.common.UI.UNIT_DISTANCE_IS_METRIC = false;
 
          UNIT_VALUE_DISTANCE = 1;
          UNIT_VALUE_DISTANCE_SMALL = 1;
@@ -1376,8 +1388,7 @@ public class UI {
       /*
        * Elevation
        */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT)) {
+      if (activeMeasurementSystem.getElevation() == Elevation.FOOT) {
 
          // set imperial measure system
 
@@ -1399,8 +1410,7 @@ public class UI {
       /*
        * Temperature
        */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F)) {
+      if (activeMeasurementSystem.getTemperature() == Temperature.FAHRENHEIT) {
 
          // set imperial measure system
 
@@ -1422,8 +1432,7 @@ public class UI {
       /*
        * Weight
        */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS)) {
+      if (activeMeasurementSystem.getWeight() == Weight.POUND) {
 
          // set imperial measure system
 

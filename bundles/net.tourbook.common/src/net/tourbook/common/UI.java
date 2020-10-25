@@ -241,9 +241,28 @@ public class UI {
    public static final int     DEFAULT_FIELD_WIDTH       = 40;
 
    /**
-    * Is <code>true</code> when the measurement system is metric, otherwise it is imperial.
+    * Is <code>true</code> when the measurement system for a distance is metric, which is kilometer,
+    * otherwise it is not metric which can be e.g. mile or nautic mile.
     */
-   public static boolean       UNIT_IS_METRIC;
+   public static boolean       UNIT_DISTANCE_IS_METRIC;
+
+   /**
+    * Is <code>true</code> when the measurement system for the elevation is metric, which is meter,
+    * otherwise it is not metric.
+    */
+   public static boolean       UNIT_ELEVATION_IS_METRIC;
+
+   /**
+    * Is <code>true</code> when the measurement system for a temperature is metric, which is
+    * celcius, otherwise it is not metric.
+    */
+   public static boolean       UNIT_TEMPERATURE_IS_METRIC;
+
+   /**
+    * Is <code>true</code> when the measurement system for a weight is metric, which is kilogram,
+    * otherwise it is not metric.
+    */
+   public static boolean       UNIT_WEIGHT_IS_METRIC;
 
    /*
     * Contains the unit label in the current measurement system for the distance values
@@ -526,7 +545,7 @@ public class UI {
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
-   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData"; //$NON-NLS-1$
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous

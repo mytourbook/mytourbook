@@ -88,9 +88,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private int                          _currentFirstDayOfWeek;
    private int                          _currentMinimalDaysInFirstWeek;
 
+   private boolean                      _isInUpdateUI;
    private boolean                      _isShowMeasurementSystemInUI;
-
-   private int                          _selectedSystemProfileIndex;
 
    /**
     * Contains cloned profiles of the measurement systems.
@@ -291,8 +290,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void createUI_110_MeasurementSystem(final Composite parent) {
 
-      final GridDataFactory gridData_Label = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
       final GridDataFactory gridData_Combo = GridDataFactory.fillDefaults().grab(true, false);
+      final GridDataFactory gridData_Label = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
 
       final SelectionAdapter itemListener = new SelectionAdapter() {
          @Override
@@ -334,8 +333,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
                label.setText(Messages.Pref_System_Label_System);
+               gridData_Label.applyTo(label);
 
                // combo
                _comboSystem_Profile = new Combo(container, SWT.DROP_DOWN);
@@ -738,25 +737,36 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void fillSystemControls() {
 
-      for (final MeasurementSystem measurementSystem : _allSystemProfiles) {
-         _comboSystem_Profile.add(measurementSystem.getName());
-      }
+      final boolean isInUpdateUIBackup = _isInUpdateUI;
 
-      for (final SystemDistance systemDistance : _allSystemDistances) {
-         _comboSystem_Distance.add(systemDistance.label);
-      }
+      _isInUpdateUI = true;
+      {
+         _comboSystem_Profile.removeAll();
+         for (final MeasurementSystem measurementSystem : _allSystemProfiles) {
+            _comboSystem_Profile.add(measurementSystem.getName());
+         }
 
-      for (final SystemElevation systemElevation : _allSystemElevations) {
-         _comboSystem_Elevation.add(systemElevation.label);
-      }
+         _comboSystem_Distance.removeAll();
+         for (final SystemDistance systemDistance : _allSystemDistances) {
+            _comboSystem_Distance.add(systemDistance.label);
+         }
 
-      for (final SystemTemperature systemTemperature : _allSystemTemperatures) {
-         _comboSystem_Temperature.add(systemTemperature.label);
-      }
+         _comboSystem_Elevation.removeAll();
+         for (final SystemElevation systemElevation : _allSystemElevations) {
+            _comboSystem_Elevation.add(systemElevation.label);
+         }
 
-      for (final SystemWeight systemWeight : _allSystemWeights) {
-         _comboSystem_Weight.add(systemWeight.label);
+         _comboSystem_Temperature.removeAll();
+         for (final SystemTemperature systemTemperature : _allSystemTemperatures) {
+            _comboSystem_Temperature.add(systemTemperature.label);
+         }
+
+         _comboSystem_Weight.removeAll();
+         for (final SystemWeight systemWeight : _allSystemWeights) {
+            _comboSystem_Weight.add(systemWeight.label);
+         }
       }
+      _isInUpdateUI = isInUpdateUIBackup;
    }
 
    private int getSelectedCustomZoneNumber() {
@@ -916,37 +926,30 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void onSystemItem_Select() {
 
-//    MeasurementSystemContributionItem.selectMeasurementSystem_OLD(_comboSystem_OLD);
+      final int activeSystemProfileIndex = MeasurementSystem_Manager.getActiveSystemProfileIndex();
 
-      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystemItem_Select()" //$NON-NLS-1$ //$NON-NLS-2$
-            + "\t: " + _comboSystem_Profile.getSelectionIndex() //$NON-NLS-1$
-//            + "\t: " +
-            );
-// TODO remove SYSTEM.OUT.PRINTLN
+      // update model
+      final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(activeSystemProfileIndex);
 
-      _selectedSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
+      final Distance distance = _allSystemDistances[_comboSystem_Distance.getSelectionIndex()].distance;
+      final Elevation elevation = _allSystemElevations[_comboSystem_Elevation.getSelectionIndex()].elevation;
+      final Temperature temperature = _allSystemTemperatures[_comboSystem_Temperature.getSelectionIndex()].temperature;
+      final Weight weight = _allSystemWeights[_comboSystem_Weight.getSelectionIndex()].weight;
 
-      final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_selectedSystemProfileIndex);
-
-//      _comboSystem_Distance.select(getSystemIndex_Distance(selectedSystemProfile));
-//      _comboSystem_Elevation.select(getSystemIndex_Elevation(selectedSystemProfile));
-//      _comboSystem_Temperature.select(getSystemIndex_Temperature(selectedSystemProfile));
-//      _comboSystem_Weight.select(getSystemIndex_Weight(selectedSystemProfile));
+      selectedSystemProfile.setDistance(distance);
+      selectedSystemProfile.setElevation(elevation);
+      selectedSystemProfile.setTemperature(temperature);
+      selectedSystemProfile.setWeight(weight);
    }
 
    private void onSystemProfile_Modify(final ModifyEvent event) {
 
+      if (_isInUpdateUI) {
+         return;
+      }
+
       final int selectedSystemIndex = _comboSystem_Profile.getSelectionIndex();
       final String newProfileText = _comboSystem_Profile.getText();
-
-
-      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystem_Modify()" //$NON-NLS-1$ //$NON-NLS-2$
-            + "\tindex: " + selectedSystemIndex //$NON-NLS-1$
-            + "\ttext: " + newProfileText //$NON-NLS-1$
-//            + "\t: " //$NON-NLS-1$
-//            + "\t: " +
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
 
       if (selectedSystemIndex != -1) {
 
@@ -957,40 +960,34 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       // selectedSystemIndex == -1 -> the previous selected item is modified -> update previous item
 
-      final MeasurementSystem previousSelectedProfile = _allSystemProfiles.get(_selectedSystemProfileIndex);
+      final int activeSystemProfileIndex = MeasurementSystem_Manager.getActiveSystemProfileIndex();
 
+      // update model
+      final MeasurementSystem previousSelectedProfile = _allSystemProfiles.get(activeSystemProfileIndex);
       previousSelectedProfile.setName(newProfileText);
 
       _comboSystem_Profile.getDisplay().asyncExec(() -> {
 
          // because the index is -1 -> reselect it
 
-         // update model
-         _comboSystem_Profile.setItem(_selectedSystemProfileIndex, newProfileText);
-
          // update UI
-         _comboSystem_Profile.select(_selectedSystemProfileIndex);
+         _comboSystem_Profile.setItem(activeSystemProfileIndex, newProfileText);
+         _comboSystem_Profile.select(activeSystemProfileIndex);
 
-         // by default the text is selected
+         // by default the text is selected -> remove anoying selection
          _comboSystem_Profile.clearSelection();
       });
    }
 
    private void onSystemProfile_Select() {
 
-//    MeasurementSystemContributionItem.selectMeasurementSystem_OLD(_comboSystem_OLD);
+      final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
 
-      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSystem_Select()" //$NON-NLS-1$ //$NON-NLS-2$
-            + "\t: " + _comboSystem_Profile.getSelectionIndex() //$NON-NLS-1$
-//            + "\t: " +
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
+      // update model
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(activeSystemProfileIndex);
 
-      _selectedSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
-
-      final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_selectedSystemProfileIndex);
-
-      // updaate UI
+      // update UI
+      final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(activeSystemProfileIndex);
       _comboSystem_Distance.select(getSystemIndex_Distance(selectedSystemProfile));
       _comboSystem_Elevation.select(getSystemIndex_Elevation(selectedSystemProfile));
       _comboSystem_Temperature.select(getSystemIndex_Temperature(selectedSystemProfile));
@@ -1010,16 +1007,31 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       if (selectedTab == TAB_FOLDER_MEASUREMENT_SYSTEM) {
 
+         _allSystemProfiles.clear();
+
+         // clone default profiles
+         final ArrayList<MeasurementSystem> allSystemProfiles = MeasurementSystem_Manager.getDefaultProfiles();
+         for (final MeasurementSystem measurementSystem : allSystemProfiles) {
+            _allSystemProfiles.add(measurementSystem.clone());
+         }
+
+         // update profile names
+         fillSystemControls();
+
+         // select metric system
+         _comboSystem_Profile.select(0);
+
+         onSystemProfile_Select();
+
       } else if (selectedTab == TAB_FOLDER_TIME_ZONE) {
 
          // time zone
          final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-         _chkTimeZone_LiveUpdate.setSelection(//
-               _prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+         _chkTimeZone_LiveUpdate.setSelection(_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
 
-         _chkTimeZone_UseAnotherTimeZone.setSelection(//
-               _prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+         _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStoreCommon.getDefaultBoolean(
+               ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
          _timeZoneId_1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
          _timeZoneId_2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
@@ -1035,13 +1047,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       } else if (selectedTab == TAB_FOLDER_CALENDAR_WEEK) {
 
          // calendar week
-         _backupFirstDayOfWeek = //
-               _currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(
-                     ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+         _backupFirstDayOfWeek =
+               _currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
-         _backupMinimalDaysInFirstWeek = //
-               _currentMinimalDaysInFirstWeek = _prefStoreCommon
-                     .getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+         _backupMinimalDaysInFirstWeek =
+               _currentMinimalDaysInFirstWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
          updateUI_CalendarWeek();
       }
@@ -1084,8 +1094,28 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
-      restoreState_MeasurementSystem();
+      _isInUpdateUI = true;
+      {
+         // measurement system
 
+         _chkSystem_ShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
+
+         _allSystemProfiles = new ArrayList<>();
+
+         // clone profiles
+         final ArrayList<MeasurementSystem> allSystemProfiles = MeasurementSystem_Manager.getCurrentProfiles();
+         for (final MeasurementSystem measurementSystem : allSystemProfiles) {
+            _allSystemProfiles.add(measurementSystem.clone());
+         }
+
+         fillSystemControls();
+
+         // select active system
+         final int activeSystemIndex = MeasurementSystem_Manager.getActiveSystemProfileIndex();
+         _comboSystem_Profile.select(activeSystemIndex);
+
+         onSystemProfile_Select();
+      }
       {
          // time zone
 
@@ -1108,11 +1138,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // calendar week
 
-         _backupFirstDayOfWeek = _currentFirstDayOfWeek =
-               _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+         _backupFirstDayOfWeek =
+               _currentFirstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
-         _backupMinimalDaysInFirstWeek = _currentMinimalDaysInFirstWeek =
-               _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+         _backupMinimalDaysInFirstWeek =
+               _currentMinimalDaysInFirstWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
          updateUI_CalendarWeek();
       }
@@ -1128,27 +1158,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          _tabFolder.setSelection(_prefStore.getInt(STATE_GENERAL_SELECTED_TAB));
       }
-   }
-
-   private void restoreState_MeasurementSystem() {
-
-      _chkSystem_ShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
-
-      _allSystemProfiles = new ArrayList<>();
-
-      // clone profiles
-      final ArrayList<MeasurementSystem> allSystemProfiles = MeasurementSystem_Manager.getAllProfiles();
-      for (final MeasurementSystem measurementSystem : allSystemProfiles) {
-         _allSystemProfiles.add(measurementSystem.clone());
-      }
-
-      fillSystemControls();
-
-      // select active system
-      final int activeSystemIndex = MeasurementSystem_Manager.getActiveSystemProfileIndex();
-      _comboSystem_Profile.select(activeSystemIndex);
-
-      onSystemProfile_Select();
+      _isInUpdateUI = false;
    }
 
    private void saveState() {
@@ -1156,7 +1166,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // measurement system
 
-//         MeasurementSystemContributionItem.saveMeasurementSystem_OLD(selectedIndex);
          MeasurementSystem_Manager.saveState(_allSystemProfiles);
 
          _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkSystem_ShowMeasurementInAppToolbar.getSelection());

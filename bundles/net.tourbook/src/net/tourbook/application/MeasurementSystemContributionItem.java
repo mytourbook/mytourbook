@@ -77,41 +77,41 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
          // set metric system
 
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_KG);
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_KG);
 
       } else {
 
          // set imperial system
 
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS);
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
+//
+//         _prefStore.putValue(
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
+//               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS);
       }
 
       UI.updateUnits();
@@ -122,15 +122,15 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
    public static void selectMeasurementSystem_OLD(final Combo combo) {
 
-      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
-
-      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
-         combo.select(0);
-      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-         combo.select(1);
-      } else {
-         combo.select(0);
-      }
+//      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
+//
+//      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
+//         combo.select(0);
+//      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+//         combo.select(1);
+//      } else {
+//         combo.select(0);
+//      }
 
       _oldSystemIndex = combo.getSelectionIndex();
    }
