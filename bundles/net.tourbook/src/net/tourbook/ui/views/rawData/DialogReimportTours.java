@@ -156,7 +156,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.setText(Messages.dialog_reimport_tours_shell_text);
+      shell.setText(Messages.dialog_reimport_tours_dialog_title);
 
       shell.addListener(SWT.Resize, new Listener() {
          @Override
@@ -570,42 +570,44 @@ public class DialogReimportTours extends TitleAreaDialog {
                   reimportIds.add(ReImport.Tour);
                } else {
 
-                  if (_chkAltitude.getSelection()) {
-                     reimportIds.add(ReImport.AltitudeValues);
-                  }
-                  if (_chkCadence.getSelection()) {
-                     reimportIds.add(ReImport.CadenceValues);
-                  }
-                  if (_chkGear.getSelection()) {
-                     reimportIds.add(ReImport.GearValues);
-                  }
-                  if (_chkPowerAndPulse.getSelection()) {
-                     reimportIds.add(ReImport.PowerAndPulseValues);
-                  }
-                  if (_chkPowerAndSpeed.getSelection()) {
-                     reimportIds.add(ReImport.PowerAndSpeedValues);
-                  }
-                  if (_chkRunningDynamics.getSelection()) {
-                     reimportIds.add(ReImport.RunningDynamics);
-                  }
-                  if (_chkSwimming.getSelection()) {
-                     reimportIds.add(ReImport.Swimming);
-                  }
-                  if (_chkTemperature.getSelection()) {
-                     reimportIds.add(ReImport.TemperatureValues);
-                  }
-                  if (_chkTraining.getSelection()) {
-                     reimportIds.add(ReImport.TrainingValues);
-                  }
                   if (_chkTimeSlices.getSelection()) {
                      reimportIds.add(ReImport.TimeSlices);
+                  } else {
+                     if (_chkAltitude.getSelection()) {
+                        reimportIds.add(ReImport.AltitudeValues);
+                     }
+                     if (_chkCadence.getSelection()) {
+                        reimportIds.add(ReImport.CadenceValues);
+                     }
+                     if (_chkGear.getSelection()) {
+                        reimportIds.add(ReImport.GearValues);
+                     }
+                     if (_chkPowerAndPulse.getSelection()) {
+                        reimportIds.add(ReImport.PowerAndPulseValues);
+                     }
+                     if (_chkPowerAndSpeed.getSelection()) {
+                        reimportIds.add(ReImport.PowerAndSpeedValues);
+                     }
+                     if (_chkRunningDynamics.getSelection()) {
+                        reimportIds.add(ReImport.RunningDynamics);
+                     }
+                     if (_chkSwimming.getSelection()) {
+                        reimportIds.add(ReImport.Swimming);
+                     }
+                     if (_chkTemperature.getSelection()) {
+                        reimportIds.add(ReImport.TemperatureValues);
+                     }
+                     if (_chkTourTimerPauses.getSelection()) {
+                        reimportIds.add(ReImport.TourTimerPauses);
+                     }
+                     if (_chkTraining.getSelection()) {
+                        reimportIds.add(ReImport.TrainingValues);
+                     }
                   }
                   if (_chkTourMarkers.getSelection()) {
                      reimportIds.add(ReImport.TourMarkers);
                   }
-                  if (_chkTourTimerPauses.getSelection()) {
-                     reimportIds.add(ReImport.TourTimerPauses);
-                  }
+
                }
 
                doReimport(reimportIds);

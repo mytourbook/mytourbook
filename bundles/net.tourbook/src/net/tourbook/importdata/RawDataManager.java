@@ -107,20 +107,7 @@ public class RawDataManager {
    public static final String            LOG_REIMPORT_END                      = Messages.Log_Reimport_PreviousFiles_End;
 
    public static final String            LOG_REIMPORT_COMBINED_VALUES          = Messages.Log_Reimport_Combined_Values;
-   private static final String           LOG_REIMPORT_ALL_TIME_SLICES          = Messages.Log_Reimport_AllTimeSlices;
    private static final String           LOG_REIMPORT_MANUAL_TOUR              = Messages.Log_Reimport_ManualTour;
-   private static final String           LOG_REIMPORT_ONLY_ALTITUDE            = Messages.Log_Reimport_Only_Altitude;
-   private static final String           LOG_REIMPORT_ONLY_CADENCE             = Messages.Log_Reimport_Only_Cadence;
-   private static final String           LOG_REIMPORT_ONLY_GEAR                = Messages.Log_Reimport_Only_Gear;
-   private static final String           LOG_REIMPORT_ONLY_MARKER              = Messages.Log_Reimport_Only_TourMarker;
-   private static final String           LOG_REIMPORT_ONLY_POWER_SPEED         = Messages.Log_Reimport_Only_PowerSpeed;
-   private static final String           LOG_REIMPORT_ONLY_POWER_PULSE         = Messages.Log_Reimport_Only_PowerPulse;
-   private static final String           LOG_REIMPORT_ONLY_RUNNING_DYNAMICS    = Messages.Log_Reimport_Only_RunningDynamics;
-   private static final String           LOG_REIMPORT_ONLY_SWIMMING            = Messages.Log_Reimport_Only_Swimming;
-   private static final String           LOG_REIMPORT_ONLY_TEMPERATURE         = Messages.Log_Reimport_Only_Temperature;
-   private static final String           LOG_REIMPORT_ONLY_TOURTIMERPAUSES     = Messages.Log_Reimport_Only_TourTimerPauses;
-   private static final String           LOG_REIMPORT_ONLY_TRAINING            = Messages.Log_Reimport_Only_Training;
-   private static final String           LOG_REIMPORT_TOUR                     = Messages.Log_Reimport_Tour;
    private static final String           LOG_REIMPORT_TOUR_SKIPPED             = Messages.Log_Reimport_Tour_Skipped;
 
    private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
@@ -671,270 +658,118 @@ public class RawDataManager {
       }
    }
 
+   /**
+    * Asks the user if the re-import of all the chosen data is desired.
+    *
+    * @param reimportIds
+    *           A list of data IDs to be re-imported
+    * @return
+    */
    public boolean actionReimportTour_10_Confirm(final List<ReImport> reimportIds) {
 
-      if (reimportIds.size() > 1) {
-         final ArrayList<String> dataToReimportDetails = new ArrayList<>();
+      final ArrayList<String> dataToReimportDetails = new ArrayList<>();
 
-         for (final ReImport reimportId : reimportIds) {
+      for (final ReImport reimportId : reimportIds) {
 
-            switch (reimportId) {
+         // ALTITUDE
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.AltitudeValues) {
 
-            case TimeSlices:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TimeSlices);
-               break;
-            case AltitudeValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_AltitudeValues);
-               break;
-            case CadenceValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_CadenceValues);
-               break;
-            case GearValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_GearValues);
-               break;
-            case PowerAndPulseValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_PowerAndPulseValues);
-               break;
-            case PowerAndSpeedValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_PowerAndSpeedValues);
-               break;
-            case RunningDynamics:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_RunningDynamicsValues);
-               break;
-            case Swimming:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_SwimmingValues);
-               break;
-            case TemperatureValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TemperatureValues);
-               break;
-            case TourMarkers:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TourMarkers);
-               break;
-            case TourTimerPauses:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TourTimerPauses);
-               break;
-            case TrainingValues:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_TrainingValues);
-               break;
-            case Tour:
-               dataToReimportDetails.add(Messages.Import_Data_Checkbox_EntireTour);
-               break;
-            }
+            dataToReimportDetails.add(Messages.Import_Data_Text_AltitudeValues);
          }
 
-         final String formattedDataToReimportDetails = String.join(UI.COMMA_SPACE, dataToReimportDetails);
+         // CADENCE
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.CadenceValues) {
 
-         if (actionReimportTour_12_ConfirmDialog(
-               ITourbookPreferences.TOGGLE_STATE_REIMPORT_COMBINED_VALUES,
-               NLS.bind(Messages.Import_Data_Dialog_ConfirmReimportValues_Message, formattedDataToReimportDetails))) {
-
-            TourLogManager.addLog(
-                  TourLogState.DEFAULT, //
-                  NLS.bind(LOG_REIMPORT_COMBINED_VALUES, formattedDataToReimportDetails),
-                  TourLogView.CSS_LOG_TITLE);
-            return true;
+            dataToReimportDetails.add(Messages.Import_Data_Text_CadenceValues);
          }
 
-         return false;
-      } else {
-         switch (reimportIds.get(0)) {
+         // GEAR
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.GearValues) {
 
-         case TimeSlices:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES,
-                  Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ALL_TIME_SLICES,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case AltitudeValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportAltitudeValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_ALTITUDE,
-                     TourLogView.CSS_LOG_TITLE);
-               return true;
-            }
-            break;
-
-         case CadenceValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportCadenceValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_CADENCE,
-                     TourLogView.CSS_LOG_TITLE);
-               return true;
-            }
-            break;
-
-         case GearValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportGearValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_GEAR,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case PowerAndPulseValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportPowerAndPulseValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_POWER_PULSE,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case PowerAndSpeedValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_POWER_SPEED,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case RunningDynamics:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimport_RunningDynamicsValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_RUNNING_DYNAMICS,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case Swimming:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimport_SwimmingValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_SWIMMING,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case TemperatureValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportTemperatureValues_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_TEMPERATURE,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case TourMarkers:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKERS,
-                  Messages.Import_Data_Dialog_ConfirmReimportTourMarker_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_MARKER,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case TourTimerPauses:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES,
-                  Messages.Import_Data_Dialog_ConfirmReimportTourTimerPauses_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_TOURTIMERPAUSES,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case TrainingValues:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES,
-                  Messages.Import_Data_Dialog_ConfirmReimportTraining_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_ONLY_TRAINING,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
-
-         case Tour:
-
-            if (actionReimportTour_12_ConfirmDialog(
-                  ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR,
-                  Messages.Import_Data_Dialog_ConfirmReimport_Message)) {
-
-               TourLogManager.addLog(
-                     TourLogState.DEFAULT, //
-                     LOG_REIMPORT_TOUR,
-                     TourLogView.CSS_LOG_TITLE);
-
-               return true;
-            }
-            break;
+            dataToReimportDetails.add(Messages.Import_Data_Text_GearValues);
          }
 
-         return false;
+         // POWER
+         if (reimportId == ReImport.TimeSlices
+               || reimportId == ReImport.PowerAndPulseValues
+               || reimportId == ReImport.PowerAndSpeedValues) {
+            dataToReimportDetails.add(Messages.Import_Data_Text_PowerValues);
+         }
+
+         // PULSE
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.PowerAndPulseValues) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_PulseValues);
+         }
+
+         // SPEED
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.PowerAndSpeedValues) {
+            dataToReimportDetails.add(Messages.Import_Data_Text_SpeedValues);
+         }
+
+         // RUNNING DYNAMICS
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.RunningDynamics) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_RunningDynamicsValues);
+         }
+
+         // SWIMMING
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.Swimming) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_SwimmingValues);
+         }
+
+         // TEMPERATURE
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.TemperatureValues) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_TemperatureValues);
+         }
+
+         // TRAINING
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.TrainingValues) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_TrainingValues);
+         }
+
+         // PAUSES
+         if (reimportId == ReImport.TimeSlices || reimportId == ReImport.TourTimerPauses) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_TourTimerPauses);
+         }
+
+         // TOUR MARKERS
+         if (reimportId == ReImport.TourMarkers) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_TourMarkers);
+         }
+
+         // ALL
+         if (reimportId == ReImport.TimeSlices) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_TimeSlices);
+         }
+
+         // ALL
+         if (reimportId == ReImport.Tour) {
+
+            dataToReimportDetails.add(Messages.Import_Data_Text_EntireTour);
+         }
       }
+
+      final String formattedDataToReimportDetails = String.join(UI.COMMA_SPACE, dataToReimportDetails);
+
+      if (actionReimportTour_12_ConfirmDialog(
+            ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES,
+            NLS.bind(Messages.Import_Data_Dialog_ConfirmReimportValues_Message, formattedDataToReimportDetails))) {
+
+         TourLogManager.addLog(
+               TourLogState.DEFAULT, //
+               NLS.bind(LOG_REIMPORT_COMBINED_VALUES, formattedDataToReimportDetails),
+               TourLogView.CSS_LOG_TITLE);
+         return true;
+      }
+
+      return false;
    }
 
    private boolean actionReimportTour_12_ConfirmDialog(final String toggleState, final String confirmMessage) {
