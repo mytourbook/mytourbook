@@ -90,27 +90,34 @@ public class DialogReimportTours extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button    _chkAltitude;
-   private Button    _chkCadence;
-   private Button    _chkGear;
-   private Button    _chkPowerAndPulse;
-   private Button    _chkPowerAndSpeed;
-   private Button    _chkRunningDynamics;
-   private Button    _chkSwimming;
-   private Button    _chkTemperature;
-   private Button    _chkTraining;
-   private Button    _chkTimeSlices;
-   private Button    _chkTourMarkers;
-   private Button    _chkTourTimerPauses;
-   private Button    _chkEntireTour;
+   private Button         _chkAltitude;
+   private Button         _chkCadence;
+   private Button         _chkGear;
+   private Button         _chkPowerAndPulse;
+   private Button         _chkPowerAndSpeed;
+   private Button         _chkRunningDynamics;
+   private Button         _chkSwimming;
+   private Button         _chkTemperature;
+   private Button         _chkTraining;
+   private Button         _chkTimeSlices;
+   private Button         _chkTourMarkers;
+   private Button         _chkTourTimerPauses;
+   private Button         _chkEntireTour;
 
-   private Button    _chkSkip_Tours_With_ImportFile_NotFound;
+   private Button         _chkSkip_Tours_With_ImportFile_NotFound;
 
-   private Button    _chkReimport_Tours_All;
-   private Button    _chkReimport_Tours_Selected;
+   private Button         _chkReimport_Tours_All;
+   private Button         _chkReimport_Tours_Selected;
 
-   private Composite _dlgContainer;
-   private Composite _inputContainer;
+   private Composite      _dlgContainer;
+   private Composite      _inputContainer;
+
+   final SelectionAdapter _buttonListener = new SelectionAdapter() {
+                                             @Override
+                                             public void widgetSelected(final SelectionEvent e) {
+                                                enableReimportButton();
+                                             }
+                                          };
 
    /**
     * @param parentShell
@@ -229,14 +236,6 @@ public class DialogReimportTours extends TitleAreaDialog {
     */
    private void createUI_10_Tours(final Composite parent) {
 
-      final SelectionAdapter buttonListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            final Button btn = (Button) e.getSource();
-            enableReimportButton(btn.getSelection());
-         }
-      };
-
       final Group groupTours = new Group(parent, SWT.NONE);
       groupTours.setText(Messages.Dialog_Reimport_Tours_Group_Tours);
       groupTours.setToolTipText(Messages.Dialog_Reimport_Tours_Group_Tours_Tooltip);
@@ -248,14 +247,14 @@ public class DialogReimportTours extends TitleAreaDialog {
           */
          _chkReimport_Tours_All = new Button(groupTours, SWT.RADIO);
          _chkReimport_Tours_All.setText(Messages.dialog_reimport_tours_checkbox_alltours);
-         _chkReimport_Tours_All.addSelectionListener(buttonListener);
+         _chkReimport_Tours_All.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Re-import the selected tours
           */
          _chkReimport_Tours_Selected = new Button(groupTours, SWT.RADIO);
          _chkReimport_Tours_Selected.setText(Messages.dialog_reimport_tours_checkbox_selectedtours);
-         _chkReimport_Tours_Selected.addSelectionListener(buttonListener);
+         _chkReimport_Tours_Selected.addSelectionListener(_buttonListener);
       }
    }
 
@@ -290,6 +289,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             public void widgetSelected(final SelectionEvent e) {
                final Button btn = (Button) e.getSource();
                enableDataButtons(!btn.getSelection());
+               enableReimportButton();
             }
          });
 
@@ -302,6 +302,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkAltitude);
          _chkAltitude.setText(Messages.Import_Data_Checkbox_AltitudeValues);
+         _chkAltitude.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: cadence
@@ -312,6 +313,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkCadence);
          _chkCadence.setText(Messages.Import_Data_Checkbox_CadenceValues);
+         _chkCadence.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Gear
@@ -322,6 +324,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkGear);
          _chkGear.setText(Messages.Import_Data_Checkbox_GearValues);
+         _chkGear.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Power And Pulse
@@ -332,6 +335,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkPowerAndPulse);
          _chkPowerAndPulse.setText(Messages.Import_Data_Checkbox_PowerAndPulseValues);
+         _chkPowerAndPulse.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Power And Speed
@@ -342,6 +346,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkPowerAndSpeed);
          _chkPowerAndSpeed.setText(Messages.Import_Data_Checkbox_PowerAndSpeedValues);
+         _chkPowerAndSpeed.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Running Dynamics
@@ -352,6 +357,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkRunningDynamics);
          _chkRunningDynamics.setText(Messages.Import_Data_Checkbox_RunningDynamicsValues);
+         _chkRunningDynamics.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Swimming
@@ -362,6 +368,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkSwimming);
          _chkSwimming.setText(Messages.Import_Data_Checkbox_SwimmingValues);
+         _chkSwimming.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Temperature
@@ -372,6 +379,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTemperature);
          _chkTemperature.setText(Messages.Import_Data_Checkbox_TemperatureValues);
+         _chkTemperature.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Training
@@ -382,6 +390,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTraining);
          _chkTraining.setText(Messages.Import_Data_Checkbox_TrainingValues);
+         _chkTraining.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Time slices
@@ -392,6 +401,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTimeSlices);
          _chkTimeSlices.setText(Messages.Import_Data_Checkbox_TimeSlices);
+         _chkTimeSlices.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Tour markers
@@ -402,6 +412,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTourMarkers);
          _chkTourMarkers.setText(Messages.Import_Data_Checkbox_TourMarkers);
+         _chkTourMarkers.addSelectionListener(_buttonListener);
 
          /*
           * checkbox: Timer Pauses
@@ -412,6 +423,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTourTimerPauses);
          _chkTourTimerPauses.setText(Messages.Import_Data_Checkbox_TourTimerPauses);
+         _chkTourTimerPauses.addSelectionListener(_buttonListener);
       }
 
    }
@@ -491,7 +503,23 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkTourTimerPauses.setEnabled(isNotReimportEntireTour);
    }
 
-   private void enableReimportButton(final boolean isEnabled) {
+   private void enableReimportButton() {
+
+      final boolean isEnabled = ((_chkReimport_Tours_All.getSelection() || _chkReimport_Tours_Selected.getSelection()) &&
+            (_chkEntireTour.getSelection() ||
+                  _chkAltitude.getSelection() ||
+                  _chkCadence.getSelection() ||
+                  _chkGear.getSelection() ||
+                  _chkPowerAndPulse.getSelection() ||
+                  _chkPowerAndSpeed.getSelection() ||
+                  _chkRunningDynamics.getSelection() ||
+                  _chkSwimming.getSelection() ||
+                  _chkTemperature.getSelection() ||
+                  _chkTraining.getSelection() ||
+                  _chkTimeSlices.getSelection() ||
+                  _chkTourMarkers.getSelection() ||
+                  _chkTourTimerPauses.getSelection()));
+
       final Button okButton = getButton(IDialogConstants.OK_ID);
       if (okButton != null) {
          okButton.setEnabled(isEnabled);
@@ -611,7 +639,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkSkip_Tours_With_ImportFile_NotFound.setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
 
       enableDataButtons(!isReimportEntireTour);
-      enableReimportButton(isReimportAllTours || isReimportSelectedTours);
+      enableReimportButton();
    }
 
    private void saveState() {
