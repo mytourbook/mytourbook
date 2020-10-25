@@ -348,7 +348,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
    private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private Action_Reimport_SubMenu        _actionReimportSubMenu;
+   private ActionReimportTours            _actionReimport_Tours;
    private ActionRemoveTour               _actionRemoveTour;
    private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
    private ActionSaveTourInDatabase       _actionSaveTour;
@@ -1028,7 +1028,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionOpenTourLogView = new ActionOpenTourLogView();
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
-      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
       _actionRemoveTour = new ActionRemoveTour(this);
       _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
       _actionSaveTour = new ActionSaveTourInDatabase(this, false);
@@ -3654,7 +3654,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionMergeIntoTour.setEnabled(isOneSelectedNotDeleteTour);
 
       _actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
-      _actionReimportSubMenu.setEnabled(selectedTours > 0);
+      _actionReimport_Tours.setEnabled(selectedTours > 0);
       _actionRemoveTour.setEnabled(selectedTours > 0);
       _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
       _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
@@ -3730,7 +3730,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimportSubMenu);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionEditImportPreferences);
       menuMgr.add(_actionRemoveTour);
       menuMgr.add(_actionDeleteTourFile);
