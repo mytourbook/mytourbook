@@ -287,8 +287,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          _chkEntireTour.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               final Button btn = (Button) e.getSource();
-               enableDataButtons(!btn.getSelection());
+               enableDataButtons();
                enableReimportButton();
             }
          });
@@ -401,7 +400,13 @@ public class DialogReimportTours extends TitleAreaDialog {
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkTimeSlices);
          _chkTimeSlices.setText(Messages.Import_Data_Checkbox_TimeSlices);
-         _chkTimeSlices.addSelectionListener(_buttonListener);
+         _chkTimeSlices.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               enableDataButtons();
+               enableReimportButton();
+            }
+         });
 
          /*
           * checkbox: Tour markers
@@ -487,20 +492,23 @@ public class DialogReimportTours extends TitleAreaDialog {
       }
    }
 
-   private void enableDataButtons(final boolean isNotReimportEntireTour) {
+   private void enableDataButtons() {
 
-      _chkAltitude.setEnabled(isNotReimportEntireTour);
-      _chkCadence.setEnabled(isNotReimportEntireTour);
-      _chkGear.setEnabled(isNotReimportEntireTour);
-      _chkPowerAndPulse.setEnabled(isNotReimportEntireTour);
-      _chkPowerAndSpeed.setEnabled(isNotReimportEntireTour);
-      _chkRunningDynamics.setEnabled(isNotReimportEntireTour);
-      _chkSwimming.setEnabled(isNotReimportEntireTour);
-      _chkTemperature.setEnabled(isNotReimportEntireTour);
-      _chkTraining.setEnabled(isNotReimportEntireTour);
-      _chkTimeSlices.setEnabled(isNotReimportEntireTour);
-      _chkTourMarkers.setEnabled(isNotReimportEntireTour);
-      _chkTourTimerPauses.setEnabled(isNotReimportEntireTour);
+      final boolean isReimportEntireTour = _chkEntireTour.getSelection();
+      final boolean isReimportTimeSlices = _chkTimeSlices.getSelection();
+
+      _chkAltitude.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkCadence.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkGear.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkPowerAndPulse.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkPowerAndSpeed.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkRunningDynamics.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkSwimming.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkTemperature.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkTraining.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
+      _chkTimeSlices.setEnabled(!isReimportEntireTour);
+      _chkTourMarkers.setEnabled(!isReimportEntireTour);
+      _chkTourTimerPauses.setEnabled(!isReimportEntireTour && !isReimportTimeSlices);
    }
 
    private void enableReimportButton() {
@@ -638,7 +646,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       // Skip tours for which the import file is not found
       _chkSkip_Tours_With_ImportFile_NotFound.setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
 
-      enableDataButtons(!isReimportEntireTour);
+      enableDataButtons();
       enableReimportButton();
    }
 
