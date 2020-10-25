@@ -411,8 +411,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + "   SUM(1)," + NL //                                          11 //$NON-NLS-1$
 
-               + "   AVG(BodyWeight),         " + NL //      12 //$NON-NLS-1$
-               + "   AVG(BodyFat)          " + NL //      13 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
