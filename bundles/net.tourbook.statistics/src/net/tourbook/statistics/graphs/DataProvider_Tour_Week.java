@@ -510,7 +510,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             final int dbValue_NumTours          = result.getInt(11);
 
-            final float dbValue_BodyWeight = result.getFloat(12);
+            final float dbValue_BodyWeight = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
             final float dbValue_BodyFat = result.getFloat(13);
 
 // SET_FORMATTING_ON

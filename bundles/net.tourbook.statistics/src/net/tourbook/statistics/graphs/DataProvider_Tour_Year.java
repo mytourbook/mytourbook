@@ -412,8 +412,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             final long dbValue_ElevationUp          = (long) (result.getInt(9) / UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(10);
-            final float dbValue_BodyWeight = result.getFloat(11);
-            final float dbValue_BodyFat = result.getFloat(12);
+            final float dbValue_BodyWeight = result.getFloat(11) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat = result.getFloat(12) ;
 
 // SET_FORMATTING_ON
 
