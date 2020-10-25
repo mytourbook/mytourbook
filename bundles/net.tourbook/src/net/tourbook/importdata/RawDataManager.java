@@ -1145,8 +1145,6 @@ public class RawDataManager {
 
                case TourTimerPauses:
                   previousTourData.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
-                  previousTourData.setPausedTime_Start(oldTourData.getPausedTime_Start());
-                  previousTourData.setPausedTime_End(oldTourData.getPausedTime_End());
                   break;
 
                case CadenceValues:
@@ -1159,7 +1157,7 @@ public class RawDataManager {
                   break;
 
                case TourMarkers:
-                  previousTourData.setTourMarkers(oldTourData.getTourMarkers());
+                  previousTourData.setTourMarkers(new HashSet<>(oldTourData.getTourMarkers()));
                   break;
 
                case PowerAndSpeedValues:
@@ -1337,29 +1335,28 @@ public class RawDataManager {
             // keep body weight from old tour
             newTourData.setBodyWeight(oldTourData.getBodyWeight());
 
-         } else if (reimportIds.contains(ReImport.TimeSlices)
-               || reimportIds.contains(ReImport.AltitudeValues)
-               || reimportIds.contains(ReImport.CadenceValues)
-               || reimportIds.contains(ReImport.GearValues)
-               || reimportIds.contains(ReImport.PowerAndPulseValues)
-               || reimportIds.contains(ReImport.PowerAndSpeedValues)
-               || reimportIds.contains(ReImport.RunningDynamics)
-               || reimportIds.contains(ReImport.Swimming)
-               || reimportIds.contains(ReImport.TemperatureValues)
-               || reimportIds.contains(ReImport.TourTimerPauses)
-               || reimportIds.contains(ReImport.TrainingValues)) {
+         } else {
+            if (reimportIds.contains(ReImport.TimeSlices)
+                  || reimportIds.contains(ReImport.AltitudeValues)
+                  || reimportIds.contains(ReImport.CadenceValues)
+                  || reimportIds.contains(ReImport.GearValues)
+                  || reimportIds.contains(ReImport.PowerAndPulseValues)
+                  || reimportIds.contains(ReImport.PowerAndSpeedValues)
+                  || reimportIds.contains(ReImport.RunningDynamics)
+                  || reimportIds.contains(ReImport.Swimming)
+                  || reimportIds.contains(ReImport.TemperatureValues)
+                  || reimportIds.contains(ReImport.TourTimerPauses)
+                  || reimportIds.contains(ReImport.TrainingValues)) {
 
-            // replace part of the tour
+               // replace part of the tour
 
-            actionReimportTour_40_TimeSlices(reimportIds, oldTourData, reimportedTourData);
+               actionReimportTour_40_TimeSlices(reimportIds, oldTourData, reimportedTourData);
+            }
 
-            newTourData = oldTourData;
+            if (reimportIds.contains(ReImport.TourMarkers)) {
 
-         } else if (reimportIds.contains(ReImport.TourMarkers)) {
-
-            // re-import only tour markers
-
-            oldTourData.setTourMarkers(reimportedTourData.getTourMarkers());
+               oldTourData.setTourMarkers(reimportedTourData.getTourMarkers());
+            }
 
             newTourData = oldTourData;
          }
