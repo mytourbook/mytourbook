@@ -1237,6 +1237,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private int[]              segmentSerie_Time_Elapsed;
    @Transient
+   private int[]              segmentSerie_Time_Recorded;
+   @Transient
+   private int[]              segmentSerie_Time_Paused;
+   @Transient
    public int[]               segmentSerie_Time_Moving;
 
    @Transient
@@ -5250,6 +5254,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             : tourComputedTime_Moving * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
       segmentSerie_Time_Elapsed = new int[segmentSerieLength];
+      segmentSerie_Time_Recorded = new int[segmentSerieLength];
+      segmentSerie_Time_Paused = new int[segmentSerieLength];
       segmentSerie_Time_Moving = new int[segmentSerieLength];
       segmentSerie_Time_Break = new int[segmentSerieLength];
       segmentSerie_Time_Total = new int[segmentSerieLength];
@@ -5271,6 +5277,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       int segmentIndex2nd = 0;
 
       int totalTime_Elapsed = 0;
+      int totalTime_Recorded = 0;
+      int totalTime_Paused = 0;
       int totalTime_Moving = 0;
       int totalTime_Break = 0;
       float totalDistance = 0;
@@ -5300,16 +5308,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
           */
          final int segmentEndTime = timeSerie[segmentEndIndex];
          final int segmentElapsedTime = segmentEndTime - segmentStartTime;
+         final int segmentPausedTime = getPausedTime(segmentStartIndex, segmentEndIndex);
+         final int segmentRecordedTime = segmentElapsedTime - segmentPausedTime;
          final int segmentBreakTime = getBreakTime(segmentStartIndex, segmentEndIndex, btConfig);
 
          final float segmentMovingTime = segmentElapsedTime - segmentBreakTime;
 
          segmentSerie_Time_Elapsed[segmentIndex] = segment.deviceTime_Elapsed = segmentElapsedTime;
+         segmentSerie_Time_Recorded[segmentIndex] = segment.deviceTime_Recorded = segmentRecordedTime;
+         segmentSerie_Time_Paused[segmentIndex] = segment.deviceTime_Paused = segmentPausedTime;
          segmentSerie_Time_Moving[segmentIndex] = segment.computedTime_Moving = (int) segmentMovingTime;
          segmentSerie_Time_Break[segmentIndex] = segment.computedTime_Break = segmentBreakTime;
          segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentElapsedTime;
 
          totalTime_Elapsed += segmentElapsedTime;
+         totalTime_Recorded += segmentRecordedTime;
+         totalTime_Paused += segmentPausedTime;
          totalTime_Moving += segmentMovingTime;
          totalTime_Break += segmentBreakTime;
 
@@ -5488,6 +5502,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       totalSegment.isTotal = true;
 
       totalSegment.deviceTime_Elapsed = totalTime_Elapsed;
+      totalSegment.deviceTime_Recorded = totalTime_Recorded;
+      totalSegment.deviceTime_Paused = totalTime_Paused;
       totalSegment.computedTime_Moving = totalTime_Moving;
       totalSegment.computedTime_Break = totalTime_Break;
 
@@ -7556,6 +7572,36 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   /**
+    * Calculates the total amount of paused time between start and end index
+    *
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the paused time in seconds
+    */
+   private int getPausedTime(final int startIndex, final int endIndex) {
+
+      int totalPausedTime = 0;
+
+      // check required data
+      if (timeSerie == null || pausedTime_Start == null) {
+         return totalPausedTime;
+      }
+
+      for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+         final long currentPausedTime_Start = pausedTime_Start[index] / 1000;
+         final long currentRelativePausedTime_Start = (pausedTime_Start[index] - tourStartTime) / 1000;
+
+         if (currentRelativePausedTime_Start >= timeSerie[startIndex] &&
+               currentRelativePausedTime_Start <= timeSerie[endIndex]) {
+            totalPausedTime += (pausedTime_End[index] / 1000) - currentPausedTime_Start;
+         }
+      }
+
+      return totalPausedTime;
+   }
+
    public long[] getPausedTime_End() {
       return pausedTime_End;
    }
@@ -8345,7 +8391,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          totalTourTimerPauses += pausedTime_End[index] - pausedTime_Start[index];
       }
 
-      return totalTourTimerPauses / 1000;
+      return Math.round(totalTourTimerPauses / 1000f);
    }
 
    /**

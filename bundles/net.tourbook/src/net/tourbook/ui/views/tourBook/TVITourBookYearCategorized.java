@@ -89,7 +89,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
             + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
             + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + sqlAppFilter.getWhereClause()
+            + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
 
             + "ORDER BY TourStartTime" + NL; //                                     //$NON-NLS-1$
 

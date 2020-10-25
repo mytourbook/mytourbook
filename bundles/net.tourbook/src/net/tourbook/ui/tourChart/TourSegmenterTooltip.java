@@ -95,12 +95,12 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
    private Font      _boldFont;
 
-   private Label     _lblAltitude_Diff;
-   private Label     _lblAltitude_Diff_Unit;
-   private Label     _lblAltitude_DownHour;
-   private Label     _lblAltitude_DownHour_Unit;
-   private Label     _lblAltitude_UpHour;
-   private Label     _lblAltitude_UpHour_Unit;
+   private Label     _lblElevation_Diff;
+   private Label     _lblElevation_Diff_Unit;
+   private Label     _lblElevation_DownHour;
+   private Label     _lblElevation_DownHour_Unit;
+   private Label     _lblElevation_UpHour;
+   private Label     _lblElevation_UpHour_Unit;
    private Label     _lblAvg_Cadence;
    private Label     _lblAvg_CadenceUnit;
    private Label     _lblAvg_Pace;
@@ -277,10 +277,42 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       }
 
       /*
+       * recorded time
+       */
+      {
+         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_DeviceTime_Recorded);
+         _firstColumnControls.add(label);
+
+         _lblTime_Recorded = createUI_LabelValue(container, SWT.TRAIL);
+         _secondColumnControls.add(_lblTime_Recorded);
+
+         final Label labelHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+
+         // force this column to take the rest of the space
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(labelHour);
+      }
+
+      /*
+       * paused time
+       */
+      {
+         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_DeviceTime_Paused);
+         _firstColumnControls.add(label);
+
+         _lblTime_Paused = createUI_LabelValue(container, SWT.TRAIL);
+         _secondColumnControls.add(_lblTime_Paused);
+
+         final Label labelHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+
+         // force this column to take the rest of the space
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(labelHour);
+      }
+
+      /*
        * moving time
        */
       {
-         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_MovingTime);
+         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_ComputedTime_Moving);
          _firstColumnControls.add(label);
 
          _lblTime_Moving = createUI_LabelValue(container, SWT.TRAIL);
@@ -293,7 +325,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
        * break time
        */
       {
-         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_BreakTime);
+         final Label label = createUI_Label(container, Messages.Segmenter_Tooltip_Label_ComputedTime_Break);
          _firstColumnControls.add(label);
 
          _lblTime_Break = createUI_LabelValue(container, SWT.TRAIL);
@@ -322,13 +354,13 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       createUI_Spacer(container);
 
       /*
-       * Altitude up/down
+       * Elevation gain up/down
        */
       {
          _firstColumnControls.add(createUI_Label(container, Messages.Segmenter_Tooltip_Label_AltitudeDifference));
-         _secondColumnControls.add(_lblAltitude_Diff = createUI_LabelValue(container, SWT.TRAIL));
+         _secondColumnControls.add(_lblElevation_Diff = createUI_LabelValue(container, SWT.TRAIL));
 
-         _lblAltitude_Diff_Unit = createUI_LabelValue(container, SWT.LEAD);
+         _lblElevation_Diff_Unit = createUI_LabelValue(container, SWT.LEAD);
       }
 
       /*
@@ -434,9 +466,9 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
                Messages.Segmenter_Tooltip_Label_Altimeter
                      + UI.SPACE
                      + UI.SYMBOL_ARROW_UP));
-         _secondColumnControls.add(_lblAltitude_UpHour = createUI_LabelValue(container, SWT.TRAIL));
+         _secondColumnControls.add(_lblElevation_UpHour = createUI_LabelValue(container, SWT.TRAIL));
 
-         _lblAltitude_UpHour_Unit = createUI_LabelValue(container, SWT.LEAD);
+         _lblElevation_UpHour_Unit = createUI_LabelValue(container, SWT.LEAD);
       }
 
       /*
@@ -447,9 +479,9 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
                Messages.Segmenter_Tooltip_Label_Altimeter
                      + UI.SPACE
                      + UI.SYMBOL_ARROW_DOWN));
-         _secondColumnControls.add(_lblAltitude_DownHour = createUI_LabelValue(container, SWT.TRAIL));
+         _secondColumnControls.add(_lblElevation_DownHour = createUI_LabelValue(container, SWT.TRAIL));
 
-         _lblAltitude_DownHour_Unit = createUI_LabelValue(container, SWT.LEAD);
+         _lblElevation_DownHour_Unit = createUI_LabelValue(container, SWT.LEAD);
       }
    }
 
@@ -707,22 +739,22 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 //				dtTourStart.getWeekOfWeekyear()));
 
       /*
-       * Altitude
+       * Elevation Gain
        */
-      _lblAltitude_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff));
-      _lblAltitude_Diff_Unit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblElevation_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff));
+      _lblElevation_Diff_Unit.setText(UI.UNIT_LABEL_ALTITUDE);
 
       final float altiDown = (tourSegment.altitude_Segment_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
             / tourSegment.deviceTime_Elapsed
             * 3600;
-      _lblAltitude_DownHour.setText(_nf_1_0.format(altiDown));
-      _lblAltitude_DownHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
+      _lblElevation_DownHour.setText(_nf_1_0.format(altiDown));
+      _lblElevation_DownHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
 
       final float altiUp = (tourSegment.altitude_Segment_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
             / tourSegment.deviceTime_Elapsed
             * 3600;
-      _lblAltitude_UpHour.setText(_nf_1_0.format(altiUp));
-      _lblAltitude_UpHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
+      _lblElevation_UpHour.setText(_nf_1_0.format(altiUp));
+      _lblElevation_UpHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
 
       _lblGradient.setText(_nf_1_1.format(tourSegment.gradient));
 
@@ -765,7 +797,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       _lblTime_Elapsed.setText(FormatManager.formatElapsedTime(tourSegment.deviceTime_Elapsed));
       _lblTime_Recorded.setText(FormatManager.formatRecordedTime(tourSegment.deviceTime_Recorded));
       _lblTime_Paused.setText(FormatManager.formatPausedTime(tourSegment.deviceTime_Paused));
-      _lblTime_Moving.setText(FormatManager.formatPausedTime(tourSegment.computedTime_Moving));
+      _lblTime_Moving.setText(FormatManager.formatMovingTime(tourSegment.computedTime_Moving));
       _lblTime_Break.setText(FormatManager.formatPausedTime(tourSegment.computedTime_Break));
    }
 }

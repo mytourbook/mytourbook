@@ -56,6 +56,9 @@ public class StatisticTooltipUI_CategorizedData {
 
    private static final IValueFormatter VALUE_FORMATTER_1_0      = new ValueFormatter_Number_1_0();
 
+   private static final int             _columnSpacing           = 20;
+   private static final GridDataFactory _columnGridData          = GridDataFactory.fillDefaults().grab(true, false).indent(_columnSpacing, 0);
+
    /*
     * Tooltip context
     */
@@ -294,7 +297,7 @@ public class StatisticTooltipUI_CategorizedData {
                   // remove vertical spacing
                   .spacing(defaultSpacing.x, 0)
                   .applyTo(container);
-//            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//            container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             {
 
                createUI_18_ColumnHeader(container);
@@ -394,15 +397,12 @@ public class StatisticTooltipUI_CategorizedData {
 
    private void createUI_18_ColumnHeader(final Composite parent) {
 
-      final int columnSpacing = 20;
-
       {
          // column 1+2
          _lblColumnHeader_TourType = createUI_Label(parent, UI.EMPTY_STRING);
          _lblColumnHeader_TourType.setFont(FONT_BOLD);
          GridDataFactory.fillDefaults()
                .span(2, 1)
-//               .align(SWT.END, SWT.FILL)
                .applyTo(_lblColumnHeader_TourType);
       }
       {
@@ -416,18 +416,19 @@ public class StatisticTooltipUI_CategorizedData {
             final Label lblPercentage = createUI_Label(parent, Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage, SWT.TRAIL);
             lblPercentage.setToolTipText(Messages.Statistic_Tooltip_Label_ColumnHeader_Percentage_Tooltip);
             lblPercentage.setFont(FONT_BOLD);
-            GridDataFactory.fillDefaults().indent(columnSpacing, 0).applyTo(lblPercentage);
+            GridDataFactory.fillDefaults().indent(_columnSpacing, 0).applyTo(lblPercentage);
          }
       }
 
       if (_isShowSummary) {
 
          {
-            // column 5: Total
-            final Label lblTotal = createUI_Label(parent, _summaryColumn_HeaderTitle, SWT.TRAIL);
+            // column 5: Summary
+            final Label lblTotal = createUI_Label(parent, _summaryColumn_HeaderTitle, SWT.LEAD);
             lblTotal.setFont(FONT_BOLD);
             GridDataFactory.fillDefaults()
-                  .indent(columnSpacing, 0)
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .indent(_columnSpacing, 0)
                   .applyTo(lblTotal);
          }
          {
@@ -459,7 +460,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblDeviceTime_Elapsed_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblDeviceTime_Elapsed_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblDeviceTime_Elapsed_Summary);
+            _columnGridData.applyTo(_lblDeviceTime_Elapsed_Summary);
          }
       }
       {
@@ -478,6 +479,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblDeviceTime_Recorded_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblDeviceTime_Recorded_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
+            _columnGridData.applyTo(_lblDeviceTime_Recorded_Summary);
          }
       }
       {
@@ -496,6 +498,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblDeviceTime_Paused_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblDeviceTime_Paused_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
+            _columnGridData.applyTo(_lblDeviceTime_Paused_Summary);
          }
       }
       {
@@ -514,6 +517,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblComputedTime_Moving_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblComputedTime_Moving_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
+            _columnGridData.applyTo(_lblComputedTime_Moving_Summary);
          }
       }
       {
@@ -532,6 +536,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblComputedTime_Break_Summary = createUI_LabelValue(parent, SWT.TRAIL);
             _lblComputedTime_Break_Summary_Unit = createUI_LabelValue(parent, SWT.LEAD);
+            _columnGridData.applyTo(_lblComputedTime_Break_Summary);
          }
       }
    }
@@ -554,6 +559,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblDistance_Summary = createUI_LabelValue(container, SWT.TRAIL);
             _lblDistance_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
+            _columnGridData.applyTo(_lblDistance_Summary);
          }
       }
       {
@@ -572,6 +578,7 @@ public class StatisticTooltipUI_CategorizedData {
          if (_isShowSummary) {
             _lblElevationUp_Summary = createUI_LabelValue(container, SWT.TRAIL);
             _lblElevationUp_Summary_Unit = createUI_LabelValue(container, SWT.LEAD);
+            _columnGridData.applyTo(_lblElevationUp_Summary);
          }
       }
    }
@@ -782,7 +789,7 @@ public class StatisticTooltipUI_CategorizedData {
       _lblDeviceTime_Elapsed                 .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed));
       _lblDeviceTime_Elapsed_Unit            .setText(deviceTime_Elapsed_UnitText);
 
-      _lblDeviceTime_Recorded                .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded));
+      _lblDeviceTime_Recorded                .setText(FormatManager.formatRecordedTime_Summary  (deviceTime_Recorded));
       _lblDeviceTime_Recorded_Unit           .setText(deviceTime_Recorded_UnitText);
 
       _lblDeviceTime_Paused                  .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused));
@@ -806,7 +813,7 @@ public class StatisticTooltipUI_CategorizedData {
 
          _lblDeviceTime_Elapsed_Summary      .setText(FormatManager.formatElapsedTime_Summary   (deviceTime_Elapsed_Summary));
          _lblDeviceTime_Elapsed_Summary_Unit .setText(deviceTime_Elapsed_Summary_UnitText);
-         _lblDeviceTime_Recorded_Summary     .setText(FormatManager.formatMovingTime_Summary    (deviceTime_Recorded_Summary));
+         _lblDeviceTime_Recorded_Summary     .setText(FormatManager.formatRecordedTime_Summary  (deviceTime_Recorded_Summary));
          _lblDeviceTime_Recorded_Summary_Unit.setText(deviceTime_Recorded_Summary_UnitText);
          _lblDeviceTime_Paused_Summary       .setText(FormatManager.formatPausedTime_Summary    (deviceTime_Paused_Summary));
          _lblDeviceTime_Paused_Summary_Unit  .setText(deviceTime_Paused_Summary_UnitText);

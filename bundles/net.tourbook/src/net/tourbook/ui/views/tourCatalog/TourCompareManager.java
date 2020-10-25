@@ -558,9 +558,9 @@ public class TourCompareManager {
       final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
       final IWorkbenchPage activePage = window.getActivePage();
 
-      final IViewPart yearStatView = activePage.findView(YearStatisticView.ID);
-      if (yearStatView instanceof YearStatisticView) {
-         navigatedTour = ((YearStatisticView) yearStatView).navigateTour(isNextTour);
+      final IViewPart yearStatView = activePage.findView(RefTour_YearStatistic_View.ID);
+      if (yearStatView instanceof RefTour_YearStatistic_View) {
+         navigatedTour = ((RefTour_YearStatistic_View) yearStatView).navigateTour(isNextTour);
       }
 
       final IViewPart comparedTours = activePage.findView(TourCompareResultView.ID);

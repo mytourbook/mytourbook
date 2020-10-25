@@ -40,6 +40,9 @@ public class Messages extends NLS {
 
    public static String        Statistic_Label_Invers;
 
+   public static String        Statistic_Week_Tooltip_ColumnHeaderTitle;
+   public static String        Statistic_Week_Tooltip_Title;
+
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

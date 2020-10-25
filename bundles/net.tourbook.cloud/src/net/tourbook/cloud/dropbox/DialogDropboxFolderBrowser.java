@@ -22,6 +22,7 @@ import com.dropbox.core.v2.files.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
@@ -265,7 +266,9 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
          @Override
          public Object[] getElements(final Object inputElement) {
-            return _folderList.toArray();
+            final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).collect(Collectors
+                  .toList()).toArray();
+            return sortedElements;
          }
 
          @Override
@@ -330,7 +333,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       }
 
       // Double clicking on an item should always return only 1 element.
-      final Metadata item = ((Metadata) selection.toArray()[0]);
+      final Metadata item = ((Metadata) selectionArray[0]);
       final String itemPath = item.getPathDisplay();
 
       if (item instanceof FolderMetadata) {

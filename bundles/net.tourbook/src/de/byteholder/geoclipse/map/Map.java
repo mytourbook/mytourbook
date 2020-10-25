@@ -147,6 +147,7 @@ public class Map extends Canvas {
 
    private static final String          TOUR_TOOLTIP_LABEL_DISTANCE           = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME        = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
+   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME      = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final IDialogSettings _geoFilterState                       = TourGeoFilter_Manager.getState();
    /**
@@ -820,7 +821,7 @@ public class Map extends Canvas {
       addTraverseListener(new TraverseListener() {
          @Override
          public void keyTraversed(final TraverseEvent e) {
-            // enable travers keys
+            // enable traverse keys
             e.doit = true;
          }
       });
@@ -3944,13 +3945,18 @@ public class Map extends Canvas {
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
+      final long recordedTime = tourData.getTourDeviceTime_Recorded();
+      final String textRecordedTime = String.format(VALUE_FORMAT_2,
+            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            FormatManager.formatRecordedTime(recordedTime));
+
       final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
-      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime;
+      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime + UI.DASH_WITH_DOUBLE_SPACE + textRecordedTime;
 
       final Point dateTimeSize = gc.textExtent(tourDateTime);
       final Point valueSize = gc.textExtent(valueText);

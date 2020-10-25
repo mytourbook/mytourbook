@@ -23,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -1669,9 +1668,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
           * count number of selected items
           */
 
-         for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+         for (final Object treeItem : selection) {
 
-            final Object treeItem = iter.next();
             if (treeItem instanceof TVITourBookTour) {
                if (numTourItems == 0) {
                   firstTourItem = (TVITourBookTour) treeItem;
@@ -1986,9 +1984,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectedTours = _tourViewer_Tree.getStructuredSelection();
       }
 
-      for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-
-         final Object viewItem = tourIterator.next();
+      for (final Object viewItem : selectedTours) {
 
          if (viewItem instanceof TVITourBookYear) {
 
@@ -2481,9 +2477,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 
       // loop: all selected items
-      for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
-
-         final Object treeItem = itemIterator.next();
+      for (final Object treeItem : selectedTours) {
 
          if (isSelectAllChildren) {
 
@@ -3075,7 +3069,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-
+                     
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3093,13 +3087,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                     
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                     
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-
+                     
                       * </code>
                       */
 
