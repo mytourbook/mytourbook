@@ -129,6 +129,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    static final int                      DEFAULT_DISTANCE_INTERVAL     = 100;
    static final int                      DEFAULT_GEO_ACCURACY          = 10_000;
    //
+   private static final String           COLUMN_AVG_PACE               = "avgPace";                                         //$NON-NLS-1$
    private static final String           COLUMN_AVG_PULSE              = "avgPulse";                                        //$NON-NLS-1$
    private static final String           COLUMN_AVG_SPEED              = "avgSpeed";                                        //$NON-NLS-1$
    private static final String           COLUMN_GEO_DIFF               = "geoDiff";                                         //$NON-NLS-1$
@@ -339,6 +340,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.avgPulse - item2.avgPulse;
             break;
 
+         case COLUMN_AVG_PACE:
+            rc = item1.avgPace - item2.avgPace;
+            break;
+
          case COLUMN_AVG_SPEED:
             rc = item1.avgSpeed - item2.avgSpeed;
             break;
@@ -357,6 +362,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:
             rc = item1.movingTime - item2.movingTime;
+            break;
+
+         case TableColumnFactory.TIME__DEVICE_RECORDED_TIME_ID:
+            rc = item1.recordedTime - item2.recordedTime;
             break;
 
          case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:
@@ -1295,14 +1304,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_GeoDiff();
       defineColumn_GeoDiff_Relative();
       defineColumn_Time_TourStartDate();
+      defineColumn_Motion_AvgPace();
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_Altimeter();
       defineColumn_Motion_Distance();
 
       defineColumn_Body_AvgPulse();
 
-      defineColumn_Time_MovingTime();
       defineColumn_Time_ElapsedTime();
+      defineColumn_Time_RecordedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Tour_Type();
       defineColumn_Tour_Title();
@@ -1454,7 +1465,37 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: Tour start date
+    * Column: Motion - Avg pace min/km - min/mi
+    */
+   private void defineColumn_Motion_AvgPace() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_AVG_PACE);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final float avgpace = item.avgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            if (avgpace == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.format_mm_ss((long) avgpace));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Motion - Avg speed km/h - mph
     */
    private void defineColumn_Motion_AvgSpeed() {
 
@@ -1543,6 +1584,29 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
             final long value = item.movingTime;
+
+            colDef.printLongValue(cell, value, true);
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Recorded time (h)
+    */
+   private void defineColumn_Time_RecordedTime() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final long value = item.recordedTime;
 
             colDef.printLongValue(cell, value, true);
          }

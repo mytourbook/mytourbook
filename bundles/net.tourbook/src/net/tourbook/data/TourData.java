@@ -7588,7 +7588,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param endIndex
     * @return Returns the paused time in seconds
     */
-   private int getPausedTime(final int startIndex, final int endIndex) {
+   public int getPausedTime(final int startIndex, final int endIndex) {
 
       int totalPausedTime = 0;
 
