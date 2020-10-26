@@ -201,13 +201,6 @@ public class Messages extends NLS {
    public static String        Map3_PropertyTooltip_Action_Close_Tooltip;
    public static String        Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
-   public static String        Measurement_System_Profile_Imperial;
-   public static String        Measurement_System_Profile_Metric;
-   public static String        Measurement_System_Profile_Nautic;
-   public static String        Measurement_System_Profile_Other1;
-   public static String        Measurement_System_Profile_Other2;
-   public static String        Measurement_System_Profile_Other3;
-
    public static String        Period_Format_Space;
    public static String        Period_Format_Comma;
    public static String        Period_Format_CommaAndAnd;

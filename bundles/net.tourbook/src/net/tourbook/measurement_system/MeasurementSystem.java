@@ -13,22 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.measurement_system;
+package net.tourbook.measurement_system;
 
 import net.tourbook.common.util.StatusUtil;
 
+/**
+ * Contains all system measurement data for one profile.
+ */
 public class MeasurementSystem implements Cloneable {
 
-   private String      _name;
+   private String              _name;
 
-   private Distance    _distance;
-   private Elevation   _elevation;
-   private Temperature _temperature;
-   private Weight      _weight;
+   private AtmosphericPressure _atmosphericPressure;
+   private Distance            _distance;
+   private Elevation           _elevation;
+   private Temperature         _temperature;
+   private Weight              _weight;
 
-   private boolean     _savedState_IsProfileActive;
+   private boolean             _savedState_IsProfileActive;
 
    public MeasurementSystem(final String name,
+                            final AtmosphericPressure pressure,
                             final Distance distance,
                             final Elevation elevation,
                             final Temperature temperature,
@@ -36,6 +41,7 @@ public class MeasurementSystem implements Cloneable {
 
       _name = name;
 
+      _atmosphericPressure = pressure;
       _distance = distance;
       _elevation = elevation;
       _temperature = temperature;
@@ -56,6 +62,13 @@ public class MeasurementSystem implements Cloneable {
       }
 
       return clonedProfile;
+   }
+
+   /**
+    * @return the _atmosphericPressure
+    */
+   public AtmosphericPressure getAtmosphericPressure() {
+      return _atmosphericPressure;
    }
 
    /**
@@ -101,11 +114,19 @@ public class MeasurementSystem implements Cloneable {
    }
 
    /**
+    * @param _atmosphericPressure
+    *           the _atmosphericPressure to set
+    */
+   public void setAtmosphericPressure(final AtmosphericPressure _atmosphericPressure) {
+      this._atmosphericPressure = _atmosphericPressure;
+   }
+
+   /**
     * @param distance
     *           the distance to set
     */
    public void setDistance(final Distance distance) {
-      this._distance = distance;
+      _distance = distance;
    }
 
    /**
@@ -113,7 +134,7 @@ public class MeasurementSystem implements Cloneable {
     *           the elevation to set
     */
    public void setElevation(final Elevation elevation) {
-      this._elevation = elevation;
+      _elevation = elevation;
    }
 
    /**
@@ -121,7 +142,7 @@ public class MeasurementSystem implements Cloneable {
     *           the name to set
     */
    public void setName(final String name) {
-      this._name = name;
+      _name = name;
    }
 
    public void setSavedState_IsProfileActive(final boolean isProfileActive) {
@@ -133,7 +154,7 @@ public class MeasurementSystem implements Cloneable {
     *           the temperature to set
     */
    public void setTemperature(final Temperature temperature) {
-      this._temperature = temperature;
+      _temperature = temperature;
    }
 
    /**
@@ -141,7 +162,7 @@ public class MeasurementSystem implements Cloneable {
     *           the weight to set
     */
    public void setWeight(final Weight weight) {
-      this._weight = weight;
+      _weight = weight;
    }
 
    @Override

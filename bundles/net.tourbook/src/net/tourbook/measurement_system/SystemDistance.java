@@ -13,17 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.measurement_system;
+package net.tourbook.measurement_system;
 
-public enum Weight {
+public class SystemDistance {
 
-   /**
-    * Metric measurement system: kg
-    */
-   KILOGRAM,
+   private String   label;
+   private Distance distance;
 
-   /**
-    * Imperial measurement system: lb
-    */
-   POUND
+   public SystemDistance(final Distance distance, final String label) {
+
+      this.distance = distance;
+      this.label = label;
+   }
+
+   public String getLabel() {
+      return label;
+   }
+
+   public Distance getDistance() {
+      return distance;
+   }
 }

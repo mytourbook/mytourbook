@@ -32,18 +32,18 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.measurement_system.Distance;
-import net.tourbook.common.measurement_system.Elevation;
-import net.tourbook.common.measurement_system.MeasurementSystem;
-import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.common.measurement_system.Temperature;
-import net.tourbook.common.measurement_system.Weight;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.measurement_system.Distance;
+import net.tourbook.measurement_system.Elevation;
+import net.tourbook.measurement_system.MeasurementSystem;
+import net.tourbook.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.measurement_system.Temperature;
+import net.tourbook.measurement_system.Weight;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
@@ -1333,9 +1333,6 @@ public class UI {
     */
    public static void updateUnits() {
 
-      // pref store var cannot be set from a static field because it can be null !!!
-      final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
       final MeasurementSystem activeMeasurementSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
 
       /*
@@ -1363,7 +1360,7 @@ public class UI {
 
       } else if (distance == Distance.NAUTIC_MILE) {
 
-         TODO
+//         TODO
 
       } else {
 

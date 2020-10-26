@@ -13,22 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.measurement_system;
+package net.tourbook.measurement_system;
 
-public enum Distance {
-
-   /**
-    * Metric measurement system - km
-    */
-   KILOMETER,
+public enum Temperature {
 
    /**
-    * Imperial measurement system - mi
+    * Metric measurement system: °C
     */
-   MILE,
+   CELCIUS,
 
    /**
-    * Nautical mile - nmi
+    * Imperial measurement system: °F
     */
-   NAUTIC_MILE
+   FAHRENHEIT
 }

@@ -1472,6 +1472,14 @@ public class Messages extends NLS {
    public static String        Map25_Provider_OpenScienceMap_Description;
    public static String        Map25_Provider_OpenScienceMap_Name;
 
+   public static String        Measurement_System_Profile_Imperial;
+   public static String        Measurement_System_Profile_Metric;
+   public static String        Measurement_System_Profile_Nautic;
+   public static String        Measurement_System_Profile_Other1;
+   public static String        Measurement_System_Profile_Other2;
+   public static String        Measurement_System_Profile_Other3;
+   public static String        Measurement_System_Tooltip;
+
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;
    public static String        merge_tour_dlg_invalid_tour_message;
@@ -1880,12 +1888,14 @@ public class Messages extends NLS {
    public static String Pref_Swimming_Label_Info;
 
    public static String Pref_System_Group_MeasurementSystem;
+   public static String Pref_System_Label_AtmosphericPressure;
    public static String Pref_System_Label_Distance;
    public static String Pref_System_Label_Elevation;
    public static String Pref_System_Label_System;
    public static String Pref_System_Label_Temperature;
-
    public static String Pref_System_Label_Weight;
+   public static String Pref_System_Option_AtmosphericPressure_InchOfMercury;
+   public static String Pref_System_Option_AtmosphericPressure_Millibar;
    public static String Pref_System_Option_BodyWeight_Kilogram;
    public static String Pref_System_Option_BodyWeight_Pound;
    public static String Pref_System_Option_Distance_Kilometer;

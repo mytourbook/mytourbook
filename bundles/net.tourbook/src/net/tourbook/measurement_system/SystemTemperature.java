@@ -13,17 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.measurement_system;
+package net.tourbook.measurement_system;
 
-public enum Elevation {
+public class SystemTemperature {
 
-   /**
-    * Metric measurement system: meter
-    */
-   METER,
+   private String      label;
+   private Temperature temperature;
 
-   /**
-    * Imperial measurement system: foot
-    */
-   FOOT
+   public SystemTemperature(final Temperature temperature, final String label) {
+
+      this.temperature = temperature;
+      this.label = label;
+   }
+
+   public String getLabel() {
+      return label;
+   }
+
+   public Temperature getTemperature() {
+      return temperature;
+   }
 }
