@@ -620,8 +620,6 @@ public class RawDataManager {
             int imported = 0;
             final int importSize = selectedTourIds.length;
 
-            //TourManager.getTour(requestedTourId)
-
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, importSize);
 
             // loop: all selected tours in the viewer
