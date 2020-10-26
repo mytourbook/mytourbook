@@ -90,6 +90,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    /*
     * UI controls
     */
+   private Composite      _parent;
    private Button         _chkAltitude;
    private Button         _chkCadence;
    private Button         _chkGear;
@@ -201,7 +202,9 @@ public class DialogReimportTours extends TitleAreaDialog {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      initUI(parent);
+      _parent = parent;
+
+      initUI();
 
       _dlgContainer = (Composite) super.createDialogArea(parent);
 
@@ -549,15 +552,16 @@ public class DialogReimportTours extends TitleAreaDialog {
       return _state;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _pc = new PixelConverter(parent);
+      _pc = new PixelConverter(_parent);
    }
 
    @Override
    protected void okPressed() {
 
-      net.tourbook.ui.UI.disableAllControls(_inputContainer);
+      //We close the window so the user can see that import progress bar and log view
+      _parent.getShell().setVisible(false);
 
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
