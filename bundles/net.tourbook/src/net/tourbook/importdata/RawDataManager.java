@@ -59,8 +59,9 @@ import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.ui.views.tourBook.TVITourBookTour;
+import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.IPath;
@@ -73,7 +74,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
@@ -563,7 +563,9 @@ public class RawDataManager {
     * @param skipToursWithFileNotFound
     *           Indicates whether to re-import or not a tour for which the file is not found
     */
-   public void actionReimportTour(final List<ReImport> reimportIds, final ITourViewer3 tourViewer, final boolean skipToursWithFileNotFound) {
+   public void actionReimportTour(final List<ReImport> reimportIds,
+                                  final ITourViewer3 tourViewer,
+                                  final boolean skipToursWithFileNotFound) {
 
       final long start = System.currentTimeMillis();
 
@@ -583,8 +585,27 @@ public class RawDataManager {
 
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 
-      // get selected tours
-      final IStructuredSelection selectedTours = tourViewer.getViewer().getStructuredSelection();
+      // get selected tour IDs
+
+      Object[] selectedItems = null;
+      if (tourViewer instanceof TourBookView) {
+         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+      } else if (tourViewer instanceof CollatedToursView) {
+         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+      } else if (tourViewer instanceof RawDataView) {
+         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
+      }
+
+      if (selectedItems == null) {
+         return;
+      }
+      /*
+       * convert selection to array
+       */
+      final Long[] selectedTourIds = new Long[selectedItems.length];
+      for (int i = 0; i < selectedItems.length; i++) {
+         selectedTourIds[i] = (Long) selectedItems[i];
+      }
 
       setImportId();
       setImportCanceled(false);
@@ -597,12 +618,14 @@ public class RawDataManager {
             boolean isReImported = false;
             final File[] reimportedFile = new File[1];
             int imported = 0;
-            final int importSize = selectedTours.size();
+            final int importSize = selectedTourIds.length;
+
+            //TourManager.getTour(requestedTourId)
 
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, importSize);
 
             // loop: all selected tours in the viewer
-            for (final Object selectedTourItem : selectedTours.toArray()) {
+            for (final Long tourId : selectedTourIds) {
 
                if (monitor.isCanceled()) {
                   // stop re-importing but process re-imported tours
@@ -615,13 +638,7 @@ public class RawDataManager {
                            Messages.Import_Data_Dialog_Reimport_SubTask, //
                            new Object[] { ++imported, importSize }));
 
-               TourData oldTourData = null;
-
-               if (selectedTourItem instanceof TVITourBookTour) {
-                  oldTourData = TourManager.getInstance().getTourData(((TVITourBookTour) selectedTourItem).getTourId());
-               } else if (selectedTourItem instanceof TourData) {
-                  oldTourData = (TourData) selectedTourItem;
-               }
+               final TourData oldTourData = TourManager.getTour(tourId);
 
                if (oldTourData == null) {
                   continue;
@@ -638,7 +655,6 @@ public class RawDataManager {
                Display.getDefault().asyncExec(() -> {
 
                   tourViewer.reloadViewer();
-                  tourViewer.getViewer().setSelection(selectedTours, true);
                });
             }
          }

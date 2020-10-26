@@ -1031,7 +1031,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: timeinterval
+    * column: time interval
     */
 
    private void defineColumn_Data_TimeInterval() {

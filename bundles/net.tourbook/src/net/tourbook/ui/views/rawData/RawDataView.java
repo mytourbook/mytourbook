@@ -106,6 +106,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProviderAll;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -193,7 +194,7 @@ import org.joda.time.PeriodType;
 /**
  *
  */
-public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
+public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3, ITourProviderByID {
 
 // SET_FORMATTING_OFF
 
@@ -3999,6 +4000,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    @Override
+   public Set<Long> getSelectedTourIDs() {
+      final Set<Long> tourIds = new HashSet<>();
+
+      final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+      for (final Object viewItem : selectedTours) {
+
+         if (viewItem instanceof TourData) {
+            tourIds.add(((TourData) viewItem).getTourId());
+         }
+      }
+
+      return tourIds;
+   }
+
+   @Override
    public ArrayList<TourData> getSelectedTours() {
 
       final TourManager tourManager = TourManager.getInstance();
@@ -4396,7 +4412,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      // Log reimport
+      // Log re-import
       TourLogManager.addLog(
             TourLogState.DEFAULT,
             RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
@@ -4436,7 +4452,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * reimport previous imported tours
+    * re-import previous imported tours
     *
     * @param monitor
     * @param importedFiles
@@ -5402,7 +5418,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Runnable thread_WatchFolders_Runnable() {
 
       return new Runnable() {
-         @SuppressWarnings("resource")
          @Override
          public void run() {
 
