@@ -2266,7 +2266,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2305,7 +2305,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2344,7 +2344,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2383,7 +2383,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2422,7 +2422,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2461,7 +2461,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER == false) {
 
                // imperial has 1 more digit
 

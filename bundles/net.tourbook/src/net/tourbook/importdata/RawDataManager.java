@@ -258,7 +258,7 @@ public class RawDataManager {
 
       case AltitudeValues:
 
-         final String heightLabel = UI.UNIT_IS_METRIC ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+         final String heightLabel = UI.UNIT_IS_ELEVATION_METER ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
          final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
          final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
          final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
@@ -313,21 +313,23 @@ public class RawDataManager {
 
       case TemperatureValues:
          float avgTemperature = oldTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_METRIC) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
                   * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
                   + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
          }
-         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
+         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
+               ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
 
          avgTemperature = newTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_METRIC) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
                   * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
                   + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
          }
-         newData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC ? UI.SYMBOL_TEMPERATURE_CELCIUS
+         newData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
+               ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
          break;
 

@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -6219,8 +6218,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       // get selected Marker
       TourMarker selectedMarker = null;
-      for (final Iterator<?> iterator = sliceSelection.iterator(); iterator.hasNext();) {
-         final TimeSlice timeSlice = (TimeSlice) iterator.next();
+      for (final Object name : sliceSelection) {
+         final TimeSlice timeSlice = (TimeSlice) name;
          if (_markerMap.containsKey(timeSlice.serieIndex)) {
             selectedMarker = _markerMap.get(timeSlice.serieIndex);
             break;
@@ -8854,7 +8853,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_METRIC) {
+      if (UI.UNIT_IS_) {
          _spinWeather_PrecipitationValue.setDigits(0);
          _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
       } else {

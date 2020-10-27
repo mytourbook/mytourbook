@@ -241,28 +241,43 @@ public class UI {
    public static final int     DEFAULT_FIELD_WIDTH       = 40;
 
    /**
-    * Is <code>true</code> when the measurement system for a distance is metric, which is kilometer,
-    * otherwise it is not metric which can be e.g. mile or nautic mile.
+    * Hash code including all system measurement data. This can be used to easily find out if the
+    * system has changed.
     */
-   public static boolean       UNIT_DISTANCE_IS_METRIC;
+   public static int           UNIT_HASH_CODE;
 
    /**
-    * Is <code>true</code> when the measurement system for the elevation is metric, which is meter,
-    * otherwise it is not metric.
+    * Is <code>true</code> when the measurement system for the body height is meter, which is
+    * metric.
     */
-   public static boolean       UNIT_ELEVATION_IS_METRIC;
+   public static boolean       UNIT_IS_BODY_HEIGHT_METER;
 
    /**
-    * Is <code>true</code> when the measurement system for a temperature is metric, which is
-    * celcius, otherwise it is not metric.
+    * Is <code>true</code> when the measurement system for a distance is kilometer, which is metric.
     */
-   public static boolean       UNIT_TEMPERATURE_IS_METRIC;
+   public static boolean       UNIT_IS_DISTANCE_XL_KILOMETER;
+   public static boolean       UNIT_IS_DISTANCE_XL_MILE;
+   public static boolean       UNIT_IS_DISTANCE_XL_NAUTICAL_MILE;
+
+   public static boolean       UNIT_IS_DISTANCE_M_METER;
+   public static boolean       UNIT_IS_DISTANCE_M_YARD;
+
+   public static boolean       UNIT_IS_DISTANCE_S_MILLIMETER;
+   public static boolean       UNIT_IS_DISTANCE_S_INCH;
 
    /**
-    * Is <code>true</code> when the measurement system for a weight is metric, which is kilogram,
-    * otherwise it is not metric.
+    * Is <code>true</code> when the measurement system for the elevation is meter, which is metric.
     */
-   public static boolean       UNIT_WEIGHT_IS_METRIC;
+   public static boolean       UNIT_IS_ELEVATION_METER;
+
+   /**
+    */
+   public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
+
+   /**
+    * Is <code>true</code> when the measurement system for a weight is kilogramm, which is metric.
+    */
+   public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
 
    /*
     * Contains the unit label in the current measurement system for the distance values
@@ -655,7 +670,7 @@ public class UI {
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_BODY_HEIGHT_METER) {
          return height;
       }
 
@@ -664,7 +679,7 @@ public class UI {
 
    public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
 
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_BODY_HEIGHT_METER) {
          return primaryHeight;
       }
 

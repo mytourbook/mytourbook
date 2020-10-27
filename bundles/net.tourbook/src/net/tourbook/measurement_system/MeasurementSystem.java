@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
+import java.util.Objects;
+
 import net.tourbook.common.util.StatusUtil;
 
 /**
@@ -97,6 +99,14 @@ public class MeasurementSystem implements Cloneable {
     */
    public boolean getSaveState_IsProfileActive() {
       return _savedState_IsProfileActive;
+   }
+
+   /**
+    * @return Returns the hash code including all measurement system data fields but not the profile
+    *         name.
+    */
+   public int getSystemDataHash() {
+      return Objects.hash(_atmosphericPressure, _distance, _elevation, _temperature, _weight);
    }
 
    /**

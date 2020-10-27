@@ -1333,59 +1333,89 @@ public class UI {
     */
    public static void updateUnits() {
 
-      final MeasurementSystem activeMeasurementSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      net.tourbook.common.UI.UNIT_HASH_CODE = activeSystem.getSystemDataHash();
+
+// SET_FORMATTING_OFF
 
       /*
        * Distance
        */
-      final Distance distance = activeMeasurementSystem.getDistance();
+      final Distance distance = activeSystem.getDistance();
       if (distance == Distance.MILE) {
 
          // set imperial measure system
 
-         net.tourbook.common.UI.UNIT_DISTANCE_IS_METRIC = true;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_KILOMETER     = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_MILE          = true;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_NAUTICAL_MILE = false;
 
-         UNIT_VALUE_DISTANCE = UNIT_MILE;
-         UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH = UNIT_INCH;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_M_METER          = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_M_YARD           = true;
 
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_S_MILLIMETER     = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_S_INCH           = true;
 
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
+         net.tourbook.common.UI.UNIT_IS_BODY_HEIGHT_METER         = false;
 
-         net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
-         net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_MI;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
+
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG    = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
+
+         net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_MPH;
+         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
+
+         UNIT_VALUE_DISTANCE              = UNIT_MILE;
+         UNIT_VALUE_DISTANCE_SMALL        = UNIT_YARD;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = UNIT_INCH;
 
       } else if (distance == Distance.NAUTIC_MILE) {
 
-//         TODO
+// TODO
+
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_KILOMETER     = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_MILE          = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_NAUTICAL_MILE = true;
+
+         net.tourbook.common.UI.UNIT_IS_BODY_HEIGHT_METER         = false;
 
       } else {
 
          // default is the metric measure system
 
-         net.tourbook.common.UI.UNIT_DISTANCE_IS_METRIC = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_KILOMETER     = true;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_MILE          = false;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_XL_NAUTICAL_MILE = false;
 
-         UNIT_VALUE_DISTANCE = 1;
-         UNIT_VALUE_DISTANCE_SMALL = 1;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_M_METER          = true;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_M_YARD           = false;
 
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_METER;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_MM;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_S_MILLIMETER     = true;
+         net.tourbook.common.UI.UNIT_IS_DISTANCE_S_INCH           = false;
 
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_MB;
+         net.tourbook.common.UI.UNIT_IS_BODY_HEIGHT_METER         = true;
 
-         net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
-         net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_KM;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_METER;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_MM;
+
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG    = net.tourbook.common.UI.UNIT_PRESSURE_MB;
+
+         net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KM_H;
+         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
+
+         UNIT_VALUE_DISTANCE              = 1;
+         UNIT_VALUE_DISTANCE_SMALL        = 1;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = 1;
       }
 
       /*
        * Elevation
        */
-      if (activeMeasurementSystem.getElevation() == Elevation.FOOT) {
+      if (activeSystem.getElevation() == Elevation.FOOT) {
 
          // set imperial measure system
 
@@ -1407,7 +1437,7 @@ public class UI {
       /*
        * Temperature
        */
-      if (activeMeasurementSystem.getTemperature() == Temperature.FAHRENHEIT) {
+      if (activeSystem.getTemperature() == Temperature.FAHRENHEIT) {
 
          // set imperial measure system
 
@@ -1429,7 +1459,7 @@ public class UI {
       /*
        * Weight
        */
-      if (activeMeasurementSystem.getWeight() == Weight.POUND) {
+      if (activeSystem.getWeight() == Weight.POUND) {
 
          // set imperial measure system
 
@@ -1447,6 +1477,8 @@ public class UI {
          net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
          net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_KG;
       }
+
+// SET_FORMATTING_ON
 
       TourFilterManager.updateUnits();
    }

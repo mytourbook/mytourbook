@@ -3756,9 +3756,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             final TourSegment segment = (TourSegment) cell.getElement();
             final double value = segment.strideLength * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH * 1000;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef.printValue_0(cell, value);
             } else {
+               // imperial needs more digits
                colDef.printDetailValue(cell, value);
             }
          }

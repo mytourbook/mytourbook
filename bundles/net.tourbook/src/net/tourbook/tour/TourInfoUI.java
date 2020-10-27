@@ -1601,7 +1601,7 @@ public class TourInfoUI {
          _lblRunDyn_StanceTimeBalance_Avg.setText(_nf1.format(_tourData.getRunDyn_StanceTimeBalance_Avg()));
          _lblRunDyn_StanceTimeBalance_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
 
-         if (UI.UNIT_IS_METRIC) {
+         if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
 
             _lblRunDyn_StepLength_Min.setText(_nf0.format(_tourData.getRunDyn_StepLength_Min() * mmOrInch));
             _lblRunDyn_StepLength_Max.setText(_nf0.format(_tourData.getRunDyn_StepLength_Max() * mmOrInch));

@@ -538,6 +538,8 @@ public class Messages extends NLS {
    public static String        App_Dialog_FirstStartup_Message;
    public static String        App_Dialog_FirstStartup_Title;
    public static String        App_Dialog_FirstStartupSystem_Label_Info;
+
+   public static String App_Dialog_FirstStartupSystem_Label_Info2;
    public static String        App_Dialog_FirstStartupSystem_Label_System;
    public static String        App_Dialog_FirstStartupSystem_Radio_Imperial;
    public static String        App_Dialog_FirstStartupSystem_Radio_Metric;
@@ -1089,6 +1091,10 @@ public class Messages extends NLS {
    public static String        Image__show_distance_on_x_axis_disabled;
    public static String        Image__show_distance_on_x_axis_imperial;
    public static String        Image__show_distance_on_x_axis_imperial_disabled;
+
+   public static String Image__show_distance_on_x_axis_NauticMile;
+
+   public static String Image__show_distance_on_x_axis_NauticMile_disabled;
    public static String        Image__show_time_on_x_axis;
    public static String        Image__spline_point;
    public static String        Image__synch_graph_byScale;

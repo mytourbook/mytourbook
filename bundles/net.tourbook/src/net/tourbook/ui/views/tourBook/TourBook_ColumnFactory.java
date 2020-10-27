@@ -1816,7 +1816,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -1833,7 +1833,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1858,7 +1858,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -1875,7 +1875,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1900,7 +1900,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -1917,7 +1917,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1942,7 +1942,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -1959,7 +1959,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1984,7 +1984,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -2001,7 +2001,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -2026,7 +2026,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
             } else {
                return colDef_NatTable.printDoubleValue(value);
@@ -2043,7 +2043,7 @@ public class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_DISTANCE_XL_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
             } else {
                colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
