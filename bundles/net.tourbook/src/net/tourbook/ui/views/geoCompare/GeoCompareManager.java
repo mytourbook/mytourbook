@@ -187,7 +187,7 @@ public class GeoCompareManager {
 
             /*
              * Make sure the compare index is not larger than the tour index, this happens when the
-             * part slices has exeeded the tour slices
+             * part slices has exceeded the tour slices
              */
             if (compareIndex == numNormTourSlices) {
                latLonDiff = -1;
@@ -213,7 +213,7 @@ public class GeoCompareManager {
 
             minDiffValue = latLonDiff;
 
-            // keep tour index where the min diff occured
+            // keep tour index where the min diff occurred
             normMinDiffIndex = normTourIndex;
          }
 

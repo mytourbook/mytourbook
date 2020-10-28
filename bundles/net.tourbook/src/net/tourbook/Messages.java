@@ -2094,6 +2094,7 @@ public class Messages extends NLS {
    public static String Slideout_GeoCompareOptions_Label_ComparedTourPart;
    public static String Slideout_GeoCompareOptions_Label_DistanceInterval;
    public static String Slideout_GeoCompareOptions_Label_GeoAccuracy;
+   public static String Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter;
    public static String Slideout_GeoCompareOptions_Label_LineWidth;
    public static String Slideout_GeoCompareOptions_Label_NormalizedDistance;
    public static String Slideout_GeoCompareOptions_Label_ReferenceTour;
