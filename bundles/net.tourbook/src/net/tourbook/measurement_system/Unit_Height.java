@@ -15,22 +15,15 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public class SystemWeight {
+public enum Unit_Height {
 
-   String label;
-   Weight weight;
+   /**
+    * Metric measurement system: meter
+    */
+   METER,
 
-   public SystemWeight(final Weight weight, final String label) {
-
-      this.weight = weight;
-      this.label = label;
-   }
-
-   public String getLabel() {
-      return label;
-   }
-
-   public Weight getWeight() {
-      return weight;
-   }
+   /**
+    * Imperial measurement system: inch
+    */
+   INCH
 }

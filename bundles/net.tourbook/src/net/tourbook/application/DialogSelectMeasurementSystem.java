@@ -18,11 +18,11 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.SystemAtmosphericPressure;
-import net.tourbook.measurement_system.SystemDistance;
-import net.tourbook.measurement_system.SystemElevation;
-import net.tourbook.measurement_system.SystemTemperature;
-import net.tourbook.measurement_system.SystemWeight;
+import net.tourbook.measurement_system.System_Pressure_Atmosphere;
+import net.tourbook.measurement_system.System_Distance;
+import net.tourbook.measurement_system.System_Elevation;
+import net.tourbook.measurement_system.System_Temperature;
+import net.tourbook.measurement_system.System_Weight;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -231,23 +231,23 @@ class DialogSelectMeasurementSystem extends Dialog {
          _comboSystem_Profile.add(systemProfile.getName());
       }
 
-      for (final SystemAtmosphericPressure system : MeasurementSystem_Manager.getAllSystem_AtmosphericPressures()) {
+      for (final System_Pressure_Atmosphere system : MeasurementSystem_Manager.getAllSystem_AtmosphericPressures()) {
          _comboSystem_AtmosphericPressure.add(system.getLabel());
       }
 
-      for (final SystemDistance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
+      for (final System_Distance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
          _comboSystem_Distance.add(systemDistance.getLabel());
       }
 
-      for (final SystemElevation systemElevation : MeasurementSystem_Manager.getAllSystem_Elevations()) {
+      for (final System_Elevation systemElevation : MeasurementSystem_Manager.getAllSystem_Elevations()) {
          _comboSystem_Elevation.add(systemElevation.getLabel());
       }
 
-      for (final SystemTemperature systemTemperature : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
+      for (final System_Temperature systemTemperature : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
          _comboSystem_Temperature.add(systemTemperature.getLabel());
       }
 
-      for (final SystemWeight systemWeight : MeasurementSystem_Manager.getAllSystem_Weights()) {
+      for (final System_Weight systemWeight : MeasurementSystem_Manager.getAllSystem_Weights()) {
          _comboSystem_Weight.add(systemWeight.getLabel());
       }
    }
@@ -257,7 +257,7 @@ class DialogSelectMeasurementSystem extends Dialog {
       final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
       final MeasurementSystem selectedSystemProfile = MeasurementSystem_Manager.getCurrentProfiles().get(activeSystemProfileIndex);
 
-      _comboSystem_AtmosphericPressure.select(MeasurementSystem_Manager.getSystemIndex_AtmosphericPressure(selectedSystemProfile));
+      _comboSystem_AtmosphericPressure.select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
       _comboSystem_Distance.select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
       _comboSystem_Elevation.select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
       _comboSystem_Temperature.select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));

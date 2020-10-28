@@ -15,15 +15,15 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Weight {
+public enum Unit_Elevation {
 
    /**
-    * Metric measurement system: kg
+    * Metric measurement system: meter
     */
-   KILOGRAM,
+   METER,
 
    /**
-    * Imperial measurement system: lb
+    * Imperial measurement system: foot
     */
-   POUND
+   FOOT
 }

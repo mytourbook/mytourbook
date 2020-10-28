@@ -15,15 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum AtmosphericPressure {
+public class System_Temperature {
 
-   /**
-    * Metric measurement system - mbar
-    */
-   MILLIBAR,
+   private String           _label;
+   private Unit_Temperature _temperature;
 
-   /**
-    * Imperial measurement system - inHg
-    */
-   INCH_OF_MERCURY,
+   public System_Temperature(final Unit_Temperature temperature, final String label) {
+
+      _temperature = temperature;
+      _label = label;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
+
+   public Unit_Temperature getTemperature() {
+      return _temperature;
+   }
 }

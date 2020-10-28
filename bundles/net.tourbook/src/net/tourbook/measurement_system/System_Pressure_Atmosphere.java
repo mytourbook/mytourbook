@@ -15,20 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Distance {
+public class System_Pressure_Atmosphere {
 
-   /**
-    * Metric measurement system - km
-    */
-   KILOMETER,
+   private String                   _label;
+   private Unit_Pressure_Atmosphere _pressure;
 
-   /**
-    * Imperial measurement system - mi
-    */
-   MILE,
+   public System_Pressure_Atmosphere(final Unit_Pressure_Atmosphere pressure, final String label) {
 
-   /**
-    * Nautical mile - nmi
-    */
-   NAUTIC_MILE
+      _pressure = pressure;
+      _label = label;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
+
+   public Unit_Pressure_Atmosphere getPressure() {
+      return _pressure;
+   }
 }

@@ -15,22 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public class SystemElevation {
+public class System_Distance {
 
-   private String    label;
-   private Elevation elevation;
+   private String        _label;
+   private Unit_Distance _distance;
 
-   public SystemElevation(final Elevation elevation, final String label) {
+   public System_Distance(final Unit_Distance distance, final String label) {
 
-      this.elevation = elevation;
-      this.label = label;
+      _distance = distance;
+      _label = label;
+   }
+
+   public Unit_Distance getDistance() {
+      return _distance;
    }
 
    public String getLabel() {
-      return label;
-   }
-
-   public Elevation getElevation() {
-      return elevation;
+      return _label;
    }
 }

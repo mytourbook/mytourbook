@@ -15,25 +15,20 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public class SystemAtmosphericPressure {
-
-   private String              label;
-   private AtmosphericPressure pressure;
-
-   public SystemAtmosphericPressure(final AtmosphericPressure pressure, final String label) {
-
-      this.pressure = pressure;
-      this.label = label;
-   }
+public enum Unit_Distance {
 
    /**
-    * @return the label
+    * Metric measurement system - km
     */
-   public String getLabel() {
-      return label;
-   }
+   KILOMETER,
 
-   public AtmosphericPressure getPressure() {
-      return pressure;
-   }
+   /**
+    * Imperial measurement system - mi
+    */
+   MILE,
+
+   /**
+    * Nautical mile - nmi
+    */
+   NAUTIC_MILE
 }

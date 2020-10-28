@@ -15,15 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Temperature {
+public class System_Height {
 
-   /**
-    * Metric measurement system: °C
-    */
-   CELCIUS,
+   private String      _label;
+   private Unit_Height _height;
 
-   /**
-    * Imperial measurement system: °F
-    */
-   FAHRENHEIT
+   public System_Height(final Unit_Height height, final String label) {
+
+      _height = height;
+      _label = label;
+   }
+
+   public Unit_Height getHeight() {
+      return _height;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
 }

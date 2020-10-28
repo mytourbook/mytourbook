@@ -15,15 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Elevation {
+public class System_Length {
 
-   /**
-    * Metric measurement system: meter
-    */
-   METER,
+   private String      _label;
+   private Unit_Length _length;
 
-   /**
-    * Imperial measurement system: foot
-    */
-   FOOT
+   public System_Length(final Unit_Length length, final String label) {
+
+      _length = length;
+      _label = label;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
+
+   public Unit_Length getLength() {
+      return _length;
+   }
 }

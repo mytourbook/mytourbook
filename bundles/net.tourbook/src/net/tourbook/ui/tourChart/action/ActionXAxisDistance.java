@@ -49,12 +49,12 @@ public class ActionXAxisDistance extends Action {
       String imagePath;
       String disabledImagePath;
 
-      if (UI.UNIT_IS_DISTANCE_XL_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
          imagePath = Messages.Image__show_distance_on_x_axis_imperial;
          disabledImagePath = Messages.Image__show_distance_on_x_axis_imperial_disabled;
 
-      } else if (UI.UNIT_IS_DISTANCE_XL_NAUTICAL_MILE) {
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          imagePath = Messages.Image__show_distance_on_x_axis_NauticMile;
          disabledImagePath = Messages.Image__show_distance_on_x_axis_NauticMile_disabled;

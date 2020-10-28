@@ -64,9 +64,13 @@ public class MeasurementSystem_Manager {
    private static final String                 ATTR_NAME                 = "name";                       //$NON-NLS-1$
    private static final String                 ATTR_IS_ACTIVE            = "isActive";                   //$NON-NLS-1$
 
-   private static final String                 ATTR_ATMOSPHERIC_PRESSURE = "atmosphericPressure";        //$NON-NLS-1$
+   private static final String                 ATTR_PRESSURE_ATMOSPHERE  = "pressureAtmosphere";         //$NON-NLS-1$
+   private static final String                 ATTR_DAY_TIME             = "dayTime";                    //$NON-NLS-1$
    private static final String                 ATTR_DISTANCE             = "distance";                   //$NON-NLS-1$
    private static final String                 ATTR_ELEVATION            = "elevation";                  //$NON-NLS-1$
+   private static final String                 ATTR_HEIGHT               = "height";                     //$NON-NLS-1$
+   private static final String                 ATTR_LENGTH               = "length";                     //$NON-NLS-1$
+   private static final String                 ATTR_SMALL_LENGTH         = "smallLength";                //$NON-NLS-1$
    private static final String                 ATTR_TEMPERATURE          = "temperature";                //$NON-NLS-1$
    private static final String                 ATTR_WEIGHT               = "weight";                     //$NON-NLS-1$
 
@@ -82,66 +86,137 @@ public class MeasurementSystem_Manager {
    static {
 
 // SET_FORMATTING_OFF
+// SET_FORMATTING_ON
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Metric,
 
-            AtmosphericPressure.MILLIBAR,          Distance.KILOMETER,        Elevation.METER,     Temperature.CELCIUS,          Weight.KILOGRAM));
+            Unit_DayTime._24_HOURS,
+            Unit_Distance.KILOMETER,
+            Unit_Elevation.METER,
+            Unit_Height.METER,
+            Unit_Length.METER,
+            Unit_Pressure_Atmosphere.MILLIBAR,
+            Unit_SmallLength.MILLIMETER,
+            Unit_Temperature.CELCIUS,
+            Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Imperial,
 
-            AtmosphericPressure.INCH_OF_MERCURY,   Distance.MILE,             Elevation.FOOT,      Temperature.FAHRENHEIT,       Weight.POUND));
+            Unit_DayTime.AM_PM,
+            Unit_Distance.MILE,
+            Unit_Elevation.FOOT,
+            Unit_Height.INCH,
+            Unit_Length.YARD,
+            Unit_Pressure_Atmosphere.INCH_OF_MERCURY,
+            Unit_SmallLength.INCH,
+            Unit_Temperature.FAHRENHEIT,
+            Unit_Weight.POUND));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Nautic,
 
-            AtmosphericPressure.MILLIBAR,          Distance.NAUTIC_MILE,      Elevation.METER,     Temperature.CELCIUS,          Weight.KILOGRAM));
+            Unit_DayTime._24_HOURS,
+            Unit_Distance.NAUTIC_MILE,
+            Unit_Elevation.METER,
+            Unit_Height.METER,
+            Unit_Length.METER,
+            Unit_Pressure_Atmosphere.MILLIBAR,
+            Unit_SmallLength.MILLIMETER,
+            Unit_Temperature.CELCIUS,
+            Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other1,
 
-            AtmosphericPressure.MILLIBAR,          Distance.KILOMETER,        Elevation.METER,     Temperature.CELCIUS,          Weight.KILOGRAM));
+            Unit_DayTime._24_HOURS,
+            Unit_Distance.KILOMETER,
+            Unit_Elevation.METER,
+            Unit_Height.METER,
+            Unit_Length.METER,
+            Unit_Pressure_Atmosphere.MILLIBAR,
+            Unit_SmallLength.MILLIMETER,
+            Unit_Temperature.CELCIUS,
+            Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other2,
 
-            AtmosphericPressure.MILLIBAR,          Distance.KILOMETER,        Elevation.METER,     Temperature.CELCIUS,          Weight.KILOGRAM));
+            Unit_DayTime._24_HOURS,
+            Unit_Distance.KILOMETER,
+            Unit_Elevation.METER,
+            Unit_Height.METER,
+            Unit_Length.METER,
+            Unit_Pressure_Atmosphere.MILLIBAR,
+            Unit_SmallLength.MILLIMETER,
+            Unit_Temperature.CELCIUS,
+            Unit_Weight.KILOGRAM));
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other3,
 
-            AtmosphericPressure.MILLIBAR,          Distance.KILOMETER,        Elevation.METER,     Temperature.CELCIUS,          Weight.KILOGRAM));
-
-// SET_FORMATTING_ON
+            Unit_DayTime._24_HOURS,
+            Unit_Distance.KILOMETER,
+            Unit_Elevation.METER,
+            Unit_Height.METER,
+            Unit_Length.METER,
+            Unit_Pressure_Atmosphere.MILLIBAR,
+            Unit_SmallLength.MILLIMETER,
+            Unit_Temperature.CELCIUS,
+            Unit_Weight.KILOGRAM));
 
       // overwrite default values with saved values
       readProfiles();
    }
 
-   private static final SystemAtmosphericPressure _allSystemAtmosphericPressure[] = {
+   private static final System_Pressure_Atmosphere    _allSystem_Pressure_Atmosphere[] = {
 
-         new SystemAtmosphericPressure(AtmosphericPressure.MILLIBAR, Messages.Pref_System_Option_AtmosphericPressure_Millibar),
-         new SystemAtmosphericPressure(AtmosphericPressure.INCH_OF_MERCURY, Messages.Pref_System_Option_AtmosphericPressure_InchOfMercury),
+         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.MILLIBAR, Messages.Pref_System_Option_Pressure_Atmosphere_Millibar),
+         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.INCH_OF_MERCURY, Messages.Pref_System_Option_Pressure_Atmosphere_InchOfMercury),
    };
 
-   private static final SystemDistance            _allSystemDistances[]           = {
+   private static final System_DayTime     _allSystem_DayTime[]             = {
 
-         new SystemDistance(Distance.KILOMETER, Messages.Pref_System_Option_Distance_Kilometer),
-         new SystemDistance(Distance.MILE, Messages.Pref_System_Option_Distance_Mile),
-         new SystemDistance(Distance.NAUTIC_MILE, Messages.Pref_System_Option_Distance_NauticMile),
+         new System_DayTime(Unit_DayTime._24_HOURS, Messages.Pref_System_Option_DayTime_24_Hours),
+         new System_DayTime(Unit_DayTime.AM_PM, Messages.Pref_System_Option_DayTime_AM_PM),
    };
 
-   private static final SystemElevation           _allSystemElevations[]          = {
+   private static final System_Distance    _allSystem_Distances[]           = {
 
-         new SystemElevation(Elevation.METER, Messages.Pref_System_Option_Elevation_Meter),
-         new SystemElevation(Elevation.FOOT, Messages.Pref_System_Option_Elevation_Foot),
+         new System_Distance(Unit_Distance.KILOMETER, Messages.Pref_System_Option_Distance_Kilometer),
+         new System_Distance(Unit_Distance.MILE, Messages.Pref_System_Option_Distance_Mile),
+         new System_Distance(Unit_Distance.NAUTIC_MILE, Messages.Pref_System_Option_Distance_NauticMile),
    };
 
-   private static final SystemTemperature         _allSystemTemperatures[]        = {
+   private static final System_Elevation   _allSystem_Elevations[]          = {
 
-         new SystemTemperature(Temperature.CELCIUS, Messages.Pref_System_Option_Temperature_Celcius),
-         new SystemTemperature(Temperature.FAHRENHEIT, Messages.Pref_System_Option_Temperature_Fahrenheit),
+         new System_Elevation(Unit_Elevation.METER, Messages.Pref_System_Option_Elevation_Meter),
+         new System_Elevation(Unit_Elevation.FOOT, Messages.Pref_System_Option_Elevation_Foot),
    };
 
-   private static final SystemWeight              _allSystemWeights[]             = {
+   private static final System_Height      _allSystem_Heights[]             = {
 
-         new SystemWeight(Weight.KILOGRAM, Messages.Pref_System_Option_BodyWeight_Kilogram),
-         new SystemWeight(Weight.POUND, Messages.Pref_System_Option_BodyWeight_Pound),
+         new System_Height(Unit_Height.METER, Messages.Pref_System_Option_Height_Meter),
+         new System_Height(Unit_Height.INCH, Messages.Pref_System_Option_Height_Inch),
+   };
+
+   private static final System_Length      _allSystem_Lengths[]             = {
+
+         new System_Length(Unit_Length.METER, Messages.Pref_System_Option_Length_Meter),
+         new System_Length(Unit_Length.YARD, Messages.Pref_System_Option_Length_Yard),
+   };
+
+   private static final System_SmallLength _allSystem_SmallLength[]         = {
+
+         new System_SmallLength(Unit_SmallLength.MILLIMETER, Messages.Pref_System_Option_SmallLength_Millimeter),
+         new System_SmallLength(Unit_SmallLength.INCH, Messages.Pref_System_Option_SmallLength_Inch),
+   };
+
+   private static final System_Temperature _allSystem_Temperatures[]        = {
+
+         new System_Temperature(Unit_Temperature.CELCIUS, Messages.Pref_System_Option_Temperature_Celcius),
+         new System_Temperature(Unit_Temperature.FAHRENHEIT, Messages.Pref_System_Option_Temperature_Fahrenheit),
+   };
+
+   private static final System_Weight      _allSystem_Weights[]             = {
+
+         new System_Weight(Unit_Weight.KILOGRAM, Messages.Pref_System_Option_BodyWeight_Kilogram),
+         new System_Weight(Unit_Weight.POUND, Messages.Pref_System_Option_BodyWeight_Pound),
    };
 
    private MeasurementSystem_Manager() {}
@@ -153,19 +228,19 @@ public class MeasurementSystem_Manager {
       return _allSystemProfiles.get(_activeSystemProfileIndex);
    }
 
-   public static SystemAtmosphericPressure getActiveSystem_AtmosphericPressure() {
+   public static System_Pressure_Atmosphere getActiveSystem_AtmosphericPressure() {
 
-      return _allSystemAtmosphericPressure[getSystemIndex_AtmosphericPressure(getActiveMeasurementSystem())];
+      return _allSystem_Pressure_Atmosphere[getSystemIndex_Pressure_Atmosphere(getActiveMeasurementSystem())];
    }
 
-   public static SystemDistance getActiveSystem_Distance() {
+   public static System_Distance getActiveSystem_Distance() {
 
-      return _allSystemDistances[getSystemIndex_Distance(getActiveMeasurementSystem())];
+      return _allSystem_Distances[getSystemIndex_Distance(getActiveMeasurementSystem())];
    }
 
-   public static SystemElevation getActiveSystem_Elevation() {
+   public static System_Elevation getActiveSystem_Elevation() {
 
-      return _allSystemElevations[getSystemIndex_Elevation(getActiveMeasurementSystem())];
+      return _allSystem_Elevations[getSystemIndex_Elevation(getActiveMeasurementSystem())];
    }
 
    /**
@@ -175,34 +250,50 @@ public class MeasurementSystem_Manager {
       return _activeSystemProfileIndex;
    }
 
-   public static SystemTemperature getActiveSystem_Temperature() {
+   public static System_Temperature getActiveSystem_Temperature() {
 
-      return _allSystemTemperatures[getSystemIndex_Temperature(getActiveMeasurementSystem())];
+      return _allSystem_Temperatures[getSystemIndex_Temperature(getActiveMeasurementSystem())];
    }
 
-   public static SystemWeight getActiveSystem_Weight() {
+   public static System_Weight getActiveSystem_Weight() {
 
-      return _allSystemWeights[getSystemIndex_Weight(getActiveMeasurementSystem())];
+      return _allSystem_Weights[getSystemIndex_Weight(getActiveMeasurementSystem())];
    }
 
-   public static SystemAtmosphericPressure[] getAllSystem_AtmosphericPressures() {
-      return _allSystemAtmosphericPressure;
+   public static System_Pressure_Atmosphere[] getAllSystem_AtmosphericPressures() {
+      return _allSystem_Pressure_Atmosphere;
    }
 
-   public static SystemDistance[] getAllSystem_Distances() {
-      return _allSystemDistances;
+   public static System_DayTime[] getAllSystem_DayTime() {
+      return _allSystem_DayTime;
    }
 
-   public static SystemElevation[] getAllSystem_Elevations() {
-      return _allSystemElevations;
+   public static System_Distance[] getAllSystem_Distances() {
+      return _allSystem_Distances;
    }
 
-   public static SystemTemperature[] getAllSystem_Temperatures() {
-      return _allSystemTemperatures;
+   public static System_Elevation[] getAllSystem_Elevations() {
+      return _allSystem_Elevations;
    }
 
-   public static SystemWeight[] getAllSystem_Weights() {
-      return _allSystemWeights;
+   public static System_Height[] getAllSystem_Heights() {
+      return _allSystem_Heights;
+   }
+
+   public static System_Length[] getAllSystem_Length() {
+      return _allSystem_Lengths;
+   }
+
+   public static System_SmallLength[] getAllSystem_SmallLength() {
+      return _allSystem_SmallLength;
+   }
+
+   public static System_Temperature[] getAllSystem_Temperatures() {
+      return _allSystem_Temperatures;
+   }
+
+   public static System_Weight[] getAllSystem_Weights() {
+      return _allSystem_Weights;
    }
 
    public static ArrayList<MeasurementSystem> getCurrentProfiles() {
@@ -216,13 +307,13 @@ public class MeasurementSystem_Manager {
       return ALL_DEFAULT_PROFILES;
    }
 
-   public static int getSystemIndex_AtmosphericPressure(final MeasurementSystem selectedSystemProfile) {
+   public static int getSystemIndex_DayTime(final MeasurementSystem selectedSystemProfile) {
 
-      final AtmosphericPressure profilePressure = selectedSystemProfile.getAtmosphericPressure();
+      final Unit_DayTime profileUnit = selectedSystemProfile.getDayTime();
 
-      for (int systemIndex = 0; systemIndex < _allSystemAtmosphericPressure.length; systemIndex++) {
+      for (int systemIndex = 0; systemIndex < _allSystem_DayTime.length; systemIndex++) {
 
-         if (profilePressure.equals(_allSystemAtmosphericPressure[systemIndex].getPressure())) {
+         if (profileUnit.equals(_allSystem_DayTime[systemIndex].getDayTime())) {
             return systemIndex;
          }
       }
@@ -233,11 +324,11 @@ public class MeasurementSystem_Manager {
 
    public static int getSystemIndex_Distance(final MeasurementSystem selectedSystemProfile) {
 
-      final Distance profileDistance = selectedSystemProfile.getDistance();
+      final Unit_Distance profileUnit = selectedSystemProfile.getDistance();
 
-      for (int systemIndex = 0; systemIndex < _allSystemDistances.length; systemIndex++) {
+      for (int systemIndex = 0; systemIndex < _allSystem_Distances.length; systemIndex++) {
 
-         if (profileDistance.equals(_allSystemDistances[systemIndex].getDistance())) {
+         if (profileUnit.equals(_allSystem_Distances[systemIndex].getDistance())) {
             return systemIndex;
          }
       }
@@ -248,11 +339,71 @@ public class MeasurementSystem_Manager {
 
    public static int getSystemIndex_Elevation(final MeasurementSystem selectedSystemProfile) {
 
-      final Elevation profileElevation = selectedSystemProfile.getElevation();
+      final Unit_Elevation profileUnit = selectedSystemProfile.getElevation();
 
-      for (int systemIndex = 0; systemIndex < _allSystemElevations.length; systemIndex++) {
+      for (int systemIndex = 0; systemIndex < _allSystem_Elevations.length; systemIndex++) {
 
-         if (profileElevation.equals(_allSystemElevations[systemIndex].getElevation())) {
+         if (profileUnit.equals(_allSystem_Elevations[systemIndex].getElevation())) {
+            return systemIndex;
+         }
+      }
+
+      // return default
+      return 0;
+   }
+
+   public static int getSystemIndex_Height(final MeasurementSystem selectedSystemProfile) {
+
+      final Unit_Height profileUnit = selectedSystemProfile.getHeight();
+
+      for (int systemIndex = 0; systemIndex < _allSystem_Heights.length; systemIndex++) {
+
+         if (profileUnit.equals(_allSystem_Heights[systemIndex].getHeight())) {
+            return systemIndex;
+         }
+      }
+
+      // return default
+      return 0;
+   }
+
+   public static int getSystemIndex_Length(final MeasurementSystem selectedSystemProfile) {
+
+      final Unit_Length profileUnit = selectedSystemProfile.getLength();
+
+      for (int systemIndex = 0; systemIndex < _allSystem_Lengths.length; systemIndex++) {
+
+         if (profileUnit.equals(_allSystem_Lengths[systemIndex].getLength())) {
+            return systemIndex;
+         }
+      }
+
+      // return default
+      return 0;
+   }
+
+   public static int getSystemIndex_Pressure_Atmosphere(final MeasurementSystem selectedSystemProfile) {
+
+      final Unit_Pressure_Atmosphere profileUnit = selectedSystemProfile.getPressure_Atmosphere();
+
+      for (int systemIndex = 0; systemIndex < _allSystem_Pressure_Atmosphere.length; systemIndex++) {
+
+         if (profileUnit.equals(_allSystem_Pressure_Atmosphere[systemIndex].getPressure())) {
+            return systemIndex;
+         }
+      }
+
+      // return default
+      return 0;
+   }
+
+   public static int getSystemIndex_SmallLength(final MeasurementSystem selectedSystemProfile) {
+
+      final Unit_SmallLength profileUnit = selectedSystemProfile.getSmallLength();
+
+      for (int systemIndex = 0; systemIndex < _allSystem_SmallLength.length; systemIndex++) {
+
+         if (profileUnit.equals(_allSystem_SmallLength[systemIndex].getSmallLength())) {
             return systemIndex;
          }
       }
@@ -263,11 +414,11 @@ public class MeasurementSystem_Manager {
 
    public static int getSystemIndex_Temperature(final MeasurementSystem selectedSystemProfile) {
 
-      final Temperature profileTemperature = selectedSystemProfile.getTemperature();
+      final Unit_Temperature profileUnit = selectedSystemProfile.getTemperature();
 
-      for (int systemIndex = 0; systemIndex < _allSystemTemperatures.length; systemIndex++) {
+      for (int systemIndex = 0; systemIndex < _allSystem_Temperatures.length; systemIndex++) {
 
-         if (profileTemperature.equals(_allSystemTemperatures[systemIndex].getTemperature())) {
+         if (profileUnit.equals(_allSystem_Temperatures[systemIndex].getTemperature())) {
             return systemIndex;
          }
       }
@@ -278,11 +429,11 @@ public class MeasurementSystem_Manager {
 
    public static int getSystemIndex_Weight(final MeasurementSystem selectedSystemProfile) {
 
-      final Weight profileWeight = selectedSystemProfile.getWeight();
+      final Unit_Weight profileUnit = selectedSystemProfile.getWeight();
 
-      for (int systemIndex = 0; systemIndex < _allSystemWeights.length; systemIndex++) {
+      for (int systemIndex = 0; systemIndex < _allSystem_Weights.length; systemIndex++) {
 
-         if (profileWeight.equals(_allSystemWeights[systemIndex].getWeight())) {
+         if (profileUnit.equals(_allSystem_Weights[systemIndex].getWeight())) {
             return systemIndex;
          }
       }
@@ -364,20 +515,33 @@ public class MeasurementSystem_Manager {
       for (final IMemento xmlProfile : xmlAllProfiles) {
 
          final boolean isProfileActive = Util.getXmlBoolean(xmlProfile, ATTR_IS_ACTIVE, false);
+         final String profileName = Util.getXmlString(xmlProfile, ATTR_NAME, "Invalid profilename");//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
-         final String      profileName = Util.getXmlString(xmlProfile, ATTR_NAME, "Invalid profilename");//$NON-NLS-1$
-
-         final AtmosphericPressure    atmosphericPressure  = (AtmosphericPressure)  Util.getXmlEnum(xmlProfile, ATTR_ATMOSPHERIC_PRESSURE, AtmosphericPressure.MILLIBAR);
-         final Distance               distance             = (Distance)             Util.getXmlEnum(xmlProfile, ATTR_DISTANCE,             Distance.KILOMETER);
-         final Elevation              elevation            = (Elevation)            Util.getXmlEnum(xmlProfile, ATTR_ELEVATION,            Elevation.METER);
-         final Temperature            temperature          = (Temperature)          Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,          Temperature.CELCIUS);
-         final Weight                 weight               = (Weight)               Util.getXmlEnum(xmlProfile, ATTR_WEIGHT,               Weight.KILOGRAM);
+         final Unit_Pressure_Atmosphere   atmosphericPressure  = (Unit_Pressure_Atmosphere)  Util.getXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE,   Unit_Pressure_Atmosphere.MILLIBAR);
+         final Unit_DayTime               dayTime              = (Unit_DayTime)              Util.getXmlEnum(xmlProfile, ATTR_DAY_TIME,               Unit_DayTime._24_HOURS);
+         final Unit_Distance              distance             = (Unit_Distance)             Util.getXmlEnum(xmlProfile, ATTR_DISTANCE,               Unit_Distance.KILOMETER);
+         final Unit_Elevation             elevation            = (Unit_Elevation)            Util.getXmlEnum(xmlProfile, ATTR_ELEVATION,              Unit_Elevation.METER);
+         final Unit_Height                height               = (Unit_Height)               Util.getXmlEnum(xmlProfile, ATTR_HEIGHT,                 Unit_Height.METER);
+         final Unit_Length                length               = (Unit_Length)               Util.getXmlEnum(xmlProfile, ATTR_LENGTH,                 Unit_Length.METER);
+         final Unit_SmallLength           smallLength          = (Unit_SmallLength)          Util.getXmlEnum(xmlProfile, ATTR_SMALL_LENGTH,           Unit_SmallLength.MILLIMETER);
+         final Unit_Temperature           temperature          = (Unit_Temperature)          Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,            Unit_Temperature.CELCIUS);
+         final Unit_Weight                weight               = (Unit_Weight)               Util.getXmlEnum(xmlProfile, ATTR_WEIGHT,                 Unit_Weight.KILOGRAM);
 
 // SET_FORMATTING_ON
 
-         final MeasurementSystem systemProfile = new MeasurementSystem(profileName, atmosphericPressure, distance, elevation, temperature, weight);
+         final MeasurementSystem systemProfile = new MeasurementSystem(profileName,
+               dayTime,
+               distance,
+               elevation,
+               height,
+               length,
+               atmosphericPressure,
+               smallLength,
+               temperature,
+               weight);
+
          allLoadedProfiles.add(systemProfile);
 
          systemProfile.setSavedState_IsProfileActive(isProfileActive);
@@ -466,9 +630,13 @@ public class MeasurementSystem_Manager {
             xmlProfile.putBoolean(ATTR_IS_ACTIVE, true);
          }
 
-         Util.setXmlEnum(xmlProfile, ATTR_ATMOSPHERIC_PRESSURE, system.getAtmosphericPressure());
+         Util.setXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE, system.getPressure_Atmosphere());
+         Util.setXmlEnum(xmlProfile, ATTR_DAY_TIME, system.getDayTime());
          Util.setXmlEnum(xmlProfile, ATTR_DISTANCE, system.getDistance());
          Util.setXmlEnum(xmlProfile, ATTR_ELEVATION, system.getElevation());
+         Util.setXmlEnum(xmlProfile, ATTR_HEIGHT, system.getHeight());
+         Util.setXmlEnum(xmlProfile, ATTR_LENGTH, system.getLength());
+         Util.setXmlEnum(xmlProfile, ATTR_SMALL_LENGTH, system.getSmallLength());
          Util.setXmlEnum(xmlProfile, ATTR_TEMPERATURE, system.getTemperature());
          Util.setXmlEnum(xmlProfile, ATTR_WEIGHT, system.getWeight());
       }

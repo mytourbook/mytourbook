@@ -5151,7 +5151,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final int timeOfDay = _tourStartDayTime + _swimSerie_Time[serieIndex];
                final int secondOfDay24 = timeOfDay % 86_400;
 
-               if (UI.UNIT_IS_METRIC) {
+               if (UI.UNIT_IS_DAY_TIME_24_HOURS) {
                   cell.setText(UI.format_hhh_mm_ss(secondOfDay24));
                } else {
                   cell.setText(LocalTime.ofSecondOfDay(secondOfDay24).format(TimeTools.Formatter_DayTimeSecondsAmPm));
@@ -5724,7 +5724,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final int timeOfDay = _tourStartDayTime + _serieTime[serieIndex];
                final int secondOfDay24 = timeOfDay % 86_400;
 
-               if (UI.UNIT_IS_METRIC) {
+               if (UI.UNIT_IS_DAY_TIME_24_HOURS) {
                   cell.setText(UI.format_hhh_mm_ss(secondOfDay24));
                } else {
                   cell.setText(LocalTime.ofSecondOfDay(secondOfDay24).format(TimeTools.Formatter_DayTimeSecondsAmPm));
@@ -8334,7 +8334,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          float pressure = _spinWeather_PressureValue.getSelection();
 
-         if (UI.UNIT_IS_METRIC) {
+         if (UI.UNIT_IS_PRESSURE_MILLIBAR) {
             pressure /= 10.0f;
          } else {
             pressure /= 100.0f;
@@ -8853,7 +8853,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_) {
+      if (UI.UNIT_IS_SMALL_LENGTH_MILLIMETER) {
          _spinWeather_PrecipitationValue.setDigits(0);
          _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
       } else {
@@ -8867,7 +8867,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float pressure = UI.convertPressure_FromMetric(_tourData.getWeather_Pressure());
 
-      if (UI.UNIT_IS_METRIC) {
+      if (UI.UNIT_IS_PRESSURE_MILLIBAR) {
          _spinWeather_PressureValue.setDigits(1);
          _spinWeather_PressureValue.setSelection(Math.round(pressure * 10));
       } else {

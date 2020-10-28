@@ -247,23 +247,29 @@ public class UI {
    public static int           UNIT_HASH_CODE;
 
    /**
-    * Is <code>true</code> when the measurement system for the body height is meter, which is
-    * metric.
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is millibar
+    * (mb), otherwise it is inch of mercury (inHg)
     */
-   public static boolean       UNIT_IS_BODY_HEIGHT_METER;
+   public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
+
+   /**
+    * Is <code>true</code> when the measurement system for daytime is 24-hours, otherwise it is
+    * 12-hour (am/pm)
+    */
+   public static boolean       UNIT_IS_DAY_TIME_24_HOURS;
 
    /**
     * Is <code>true</code> when the measurement system for a distance is kilometer, which is metric.
     */
-   public static boolean       UNIT_IS_DISTANCE_XL_KILOMETER;
-   public static boolean       UNIT_IS_DISTANCE_XL_MILE;
-   public static boolean       UNIT_IS_DISTANCE_XL_NAUTICAL_MILE;
+   public static boolean       UNIT_IS_DISTANCE_KILOMETER;
+   public static boolean       UNIT_IS_DISTANCE_MILE;
+   public static boolean       UNIT_IS_DISTANCE_NAUTICAL_MILE;
 
-   public static boolean       UNIT_IS_DISTANCE_M_METER;
-   public static boolean       UNIT_IS_DISTANCE_M_YARD;
+   public static boolean       UNIT_IS_LENGTH_METER;
+   public static boolean       UNIT_IS_LENGTH_YARD;
 
-   public static boolean       UNIT_IS_DISTANCE_S_MILLIMETER;
-   public static boolean       UNIT_IS_DISTANCE_S_INCH;
+   public static boolean       UNIT_IS_SMALL_LENGTH_MILLIMETER;
+   public static boolean       UNIT_IS_SMALL_LENGTH_INCH;
 
    /**
     * Is <code>true</code> when the measurement system for the elevation is meter, which is metric.
@@ -670,7 +676,7 @@ public class UI {
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
-      if (UNIT_IS_BODY_HEIGHT_METER) {
+      if (UNIT_IS_ELEVATION_METER) {
          return height;
       }
 
@@ -679,7 +685,7 @@ public class UI {
 
    public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
 
-      if (UNIT_IS_BODY_HEIGHT_METER) {
+      if (UNIT_IS_ELEVATION_METER) {
          return primaryHeight;
       }
 
@@ -781,7 +787,7 @@ public class UI {
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_SMALL_LENGTH_MILLIMETER) {
          return precipitation;
       }
 
@@ -947,6 +953,20 @@ public class UI {
       gc.dispose();
 
       return image;
+   }
+
+   public static void createtSpacer_Horizontal(final Composite parent, final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
+   public static void createtSpacer_Vertical(final Composite parent, final int height) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).applyTo(label);
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {

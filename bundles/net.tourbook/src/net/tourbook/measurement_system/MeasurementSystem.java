@@ -24,28 +24,40 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class MeasurementSystem implements Cloneable {
 
-   private String              _name;
+   private String                   _name;
 
-   private AtmosphericPressure _atmosphericPressure;
-   private Distance            _distance;
-   private Elevation           _elevation;
-   private Temperature         _temperature;
-   private Weight              _weight;
+   private Unit_DayTime             _dayTime;
+   private Unit_Distance            _distance;
+   private Unit_Elevation           _elevation;
+   private Unit_Height              _height;
+   private Unit_Length              _length;
+   private Unit_Pressure_Atmosphere _pressure_Atmosphere;
+   private Unit_SmallLength         _smallLength;
+   private Unit_Temperature         _temperature;
+   private Unit_Weight              _weight;
 
-   private boolean             _savedState_IsProfileActive;
+   private boolean                  _savedState_IsProfileActive;
 
    public MeasurementSystem(final String name,
-                            final AtmosphericPressure pressure,
-                            final Distance distance,
-                            final Elevation elevation,
-                            final Temperature temperature,
-                            final Weight weight) {
+                            final Unit_DayTime dayTime,
+                            final Unit_Distance distance,
+                            final Unit_Elevation elevation,
+                            final Unit_Height height,
+                            final Unit_Length length,
+                            final Unit_Pressure_Atmosphere pressure,
+                            final Unit_SmallLength smallLength,
+                            final Unit_Temperature temperature,
+                            final Unit_Weight weight) {
 
       _name = name;
 
-      _atmosphericPressure = pressure;
+      _pressure_Atmosphere = pressure;
+      _dayTime = dayTime;
       _distance = distance;
       _elevation = elevation;
+      _height = height;
+      _length = length;
+      _smallLength = smallLength;
       _temperature = temperature;
       _weight = weight;
    }
@@ -66,25 +78,30 @@ public class MeasurementSystem implements Cloneable {
       return clonedProfile;
    }
 
-   /**
-    * @return the _atmosphericPressure
-    */
-   public AtmosphericPressure getAtmosphericPressure() {
-      return _atmosphericPressure;
+   public Unit_DayTime getDayTime() {
+      return _dayTime;
    }
 
    /**
     * @return the distance
     */
-   public Distance getDistance() {
+   public Unit_Distance getDistance() {
       return _distance;
    }
 
    /**
     * @return the elevation
     */
-   public Elevation getElevation() {
+   public Unit_Elevation getElevation() {
       return _elevation;
+   }
+
+   public Unit_Height getHeight() {
+      return _height;
+   }
+
+   public Unit_Length getLength() {
+      return _length;
    }
 
    /**
@@ -95,10 +112,21 @@ public class MeasurementSystem implements Cloneable {
    }
 
    /**
+    * @return the _atmosphericPressure
+    */
+   public Unit_Pressure_Atmosphere getPressure_Atmosphere() {
+      return _pressure_Atmosphere;
+   }
+
+   /**
     * @return the _state_IsProfileActive
     */
    public boolean getSaveState_IsProfileActive() {
       return _savedState_IsProfileActive;
+   }
+
+   public Unit_SmallLength getSmallLength() {
+      return _smallLength;
    }
 
    /**
@@ -106,20 +134,30 @@ public class MeasurementSystem implements Cloneable {
     *         name.
     */
    public int getSystemDataHash() {
-      return Objects.hash(_atmosphericPressure, _distance, _elevation, _temperature, _weight);
+
+      return Objects.hash(
+            _dayTime,
+            _distance,
+            _elevation,
+            _height,
+            _length,
+            _pressure_Atmosphere,
+            _smallLength,
+            _temperature,
+            _weight);
    }
 
    /**
     * @return the temperature
     */
-   public Temperature getTemperature() {
+   public Unit_Temperature getTemperature() {
       return _temperature;
    }
 
    /**
     * @return the weight
     */
-   public Weight getWeight() {
+   public Unit_Weight getWeight() {
       return _weight;
    }
 
@@ -127,15 +165,19 @@ public class MeasurementSystem implements Cloneable {
     * @param _atmosphericPressure
     *           the _atmosphericPressure to set
     */
-   public void setAtmosphericPressure(final AtmosphericPressure _atmosphericPressure) {
-      this._atmosphericPressure = _atmosphericPressure;
+   public void setAtmosphericPressure(final Unit_Pressure_Atmosphere _atmosphericPressure) {
+      this._pressure_Atmosphere = _atmosphericPressure;
+   }
+
+   public void setDayTime(final Unit_DayTime _dayTime) {
+      this._dayTime = _dayTime;
    }
 
    /**
     * @param distance
     *           the distance to set
     */
-   public void setDistance(final Distance distance) {
+   public void setDistance(final Unit_Distance distance) {
       _distance = distance;
    }
 
@@ -143,8 +185,16 @@ public class MeasurementSystem implements Cloneable {
     * @param elevation
     *           the elevation to set
     */
-   public void setElevation(final Elevation elevation) {
+   public void setElevation(final Unit_Elevation elevation) {
       _elevation = elevation;
+   }
+
+   public void setHeight(final Unit_Height _height) {
+      this._height = _height;
+   }
+
+   public void setLength(final Unit_Length _length) {
+      this._length = _length;
    }
 
    /**
@@ -159,11 +209,15 @@ public class MeasurementSystem implements Cloneable {
       _savedState_IsProfileActive = isProfileActive;
    }
 
+   public void setSmallLength(final Unit_SmallLength _smallLength) {
+      this._smallLength = _smallLength;
+   }
+
    /**
     * @param temperature
     *           the temperature to set
     */
-   public void setTemperature(final Temperature temperature) {
+   public void setTemperature(final Unit_Temperature temperature) {
       _temperature = temperature;
    }
 
@@ -171,7 +225,7 @@ public class MeasurementSystem implements Cloneable {
     * @param weight
     *           the weight to set
     */
-   public void setWeight(final Weight weight) {
+   public void setWeight(final Unit_Weight weight) {
       _weight = weight;
    }
 
