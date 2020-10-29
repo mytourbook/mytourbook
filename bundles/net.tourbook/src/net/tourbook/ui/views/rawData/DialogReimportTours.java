@@ -270,7 +270,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private void createUI_20_Data(final Composite parent) {
 
       final int verticalDistance = _pc.convertVerticalDLUsToPixels(4);
-      final int verticalDistance_MoreVSpace = _pc.convertVerticalDLUsToPixels(8);
+      final int verticalDistance_MoreVSpace = _pc.convertVerticalDLUsToPixels(12);
 
       final GridDataFactory gridDataTour = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
