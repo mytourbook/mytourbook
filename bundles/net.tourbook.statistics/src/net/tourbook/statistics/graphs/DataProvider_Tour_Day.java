@@ -23,10 +23,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.OptionalDouble;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -107,6 +111,53 @@ public class DataProvider_Tour_Day extends DataProvider {
             duration_Low[avgIndex] = 0;
             duration_High[avgIndex] = maxValue;
          }
+      }
+   }
+
+   /**
+    * For a given list of tour start times, this procedure computes the average values
+    * for each unique tour start day.
+    *
+    * @param dbAllTourStartDateTime
+    *           A list of tour start times.
+    * @param values
+    *           The values to average for each unique tour start date.
+    */
+   private void adjustValues_Avg(final ArrayList<ZonedDateTime> dbAllTourStartDateTime,
+                                 final float[] values) {
+
+      final Map<LocalDate, ArrayList<Float>> uniqueDates = new HashMap<>();
+
+      ArrayList<Float> valuesList;
+      for (int index = 0; index < dbAllTourStartDateTime.size(); ++index) {
+
+         final LocalDate tourLocalDate = dbAllTourStartDateTime.get(index).toLocalDate();
+
+         if (!uniqueDates.containsKey(tourLocalDate)) {
+            valuesList = new ArrayList<>();
+            valuesList.add(values[index]);
+            uniqueDates.put(tourLocalDate, valuesList);
+         } else {
+            valuesList = uniqueDates.get(tourLocalDate);
+            valuesList.add(values[index]);
+            uniqueDates.replace(tourLocalDate, valuesList);
+         }
+      }
+
+      final float[] adjustedValues = new float[uniqueDates.size()];
+
+      //We compute and store the average of those values
+      int index = 0;
+      for (final Entry<LocalDate, ArrayList<Float>> uniqueDate : uniqueDates.entrySet()) {
+
+         final ArrayList<Float> dayValues = uniqueDate.getValue();
+
+         final OptionalDouble averageDouble = dayValues.stream().mapToDouble(d -> d).average();
+
+         if (averageDouble.isPresent()) {
+            adjustedValues[index] = (float) averageDouble.getAsDouble();
+         }
+         ++index;
       }
    }
 
@@ -281,7 +332,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                + "   training_TrainingPerformance," + NL //          16 //$NON-NLS-1$
 
                + "   TourType_typeId," + NL //                       17 //$NON-NLS-1$
-               + "   jTdataTtag.TourTag_tagId" + NL //               18 //$NON-NLS-1$
+               + "   jTdataTtag.TourTag_tagId," + NL //               18 //$NON-NLS-1$
+
+               + "   BodyWeight,         " + NL //      19 //$NON-NLS-1$
+               + "   BodyFat          " + NL //      20 //$NON-NLS-1$
 
                + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
@@ -320,6 +374,9 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TFloatArrayList dbAllTrain_Effect_Aerob = new TFloatArrayList();
          final TFloatArrayList dbAllTrain_Effect_Anaerob = new TFloatArrayList();
          final TFloatArrayList dbAllTrain_Performance = new TFloatArrayList();
+
+         final TFloatArrayList dbAllBodyWeight = new TFloatArrayList();
+         final TFloatArrayList dbAllBodyFat = new TFloatArrayList();
 
          final ArrayList<String> dbAllTourTitle = new ArrayList<>();
          final ArrayList<String> dbAllTourDescription = new ArrayList<>();
@@ -383,6 +440,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                final Long dbValue_TourTypeIdObject    = (Long) result.getObject(17);
 
+               final float bodyWeight    =  result.getFloat(19) * UI.UNIT_VALUE_WEIGHT;
+               final float bodyFat    =  result.getFloat(20);
+
 // SET_FORMATTING_ON
 
                final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
@@ -429,6 +489,9 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourComputedTime_Moving.add(dbMovingTime);
 
                dbAllTourDurationTimes.add(durationTimeValue);
+
+               dbAllBodyWeight.add(bodyWeight);
+               dbAllBodyFat.add(bodyFat);
 
                // round distance
                final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
@@ -493,6 +556,9 @@ public class DataProvider_Tour_Day extends DataProvider {
          final float[] trainEffect_Aerob_High = dbAllTrain_Effect_Aerob.toArray();
          final float[] trainEffect_Anaerob_High = dbAllTrain_Effect_Anaerob.toArray();
          final float[] trainPerformance_High = dbAllTrain_Performance.toArray();
+
+         final float[] bodyWeight_High = dbAllBodyWeight.toArray();
+         final float[] bodyFat_High = dbAllBodyFat.toArray();
 
          final int serieLength = durationTime_High.length;
 
@@ -589,6 +655,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          adjustValues_Avg(dbAllTourDurationTimes,       dbAllTrain_Performance,    trainPerformance_Low,      trainPerformance_High,  sameDOY_FirstIndex,  sameDOY_LastIndex);
 
+         adjustValues_Avg(dbAllTourStartDateTime,       bodyWeight_High);
+         adjustValues_Avg(dbAllTourStartDateTime,       bodyFat_High);
+
 //SET_FORMATTING_ON
 
          // get number of days for all years
@@ -651,6 +720,12 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allTraining_Performance = dbAllTrain_Performance.toArray();
          _tourDayData.allTraining_Performance_Low = trainPerformance_Low;
          _tourDayData.allTraining_Performance_High = trainPerformance_High;
+
+         _tourDayData.allAthleteBodyWeight_Low = new float[yearDays];
+         _tourDayData.allAthleteBodyWeight_High = bodyWeight_High;
+
+         _tourDayData.allAthleteBodyFat_Low = new float[yearDays];
+         _tourDayData.allAthleteBodyFat_High = bodyFat_High;
 
          _tourDayData.allTourTitles = dbAllTourTitle;
          _tourDayData.allTourDescriptions = dbAllTourDescription;

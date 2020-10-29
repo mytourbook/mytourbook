@@ -373,21 +373,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING, false);
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_COMBINED_VALUES, false);
-
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_SWIMMING_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKERS, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES, false);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES, false);
 
       MessageDialog.openInformation(getShell(),
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,

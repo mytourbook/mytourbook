@@ -47,14 +47,16 @@ public class GeoPartComparerItem {
    long           minDiffValue = -2;
 
    float          avgPulse;
+   float          avgPace;
    float          avgSpeed;
    double         avgAltimeter;
 
    ZonedDateTime  tourStartTime;
    long           tourStartTimeMS;
 
-   long           movingTime;
    int            elapsedTime;
+   long           recordedTime;
+   long           movingTime;
    float          distance;
 
    /**

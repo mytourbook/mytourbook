@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.OptionalDouble;
 
 import net.tourbook.Messages;
 import net.tourbook.common.util.SQL;
@@ -217,11 +218,11 @@ public class DataProvider_Tour_Year extends DataProvider {
    }
 
    TourStatisticData_Year getYearData(final TourPerson person,
-                             final TourTypeFilter tourTypeFilter,
-                             final int lastYear,
-                             final int numYears,
-                             final boolean refreshData,
-                             final DurationTime durationTime) {
+                                      final TourTypeFilter tourTypeFilter,
+                                      final int lastYear,
+                                      final int numYears,
+                                      final boolean refreshData,
+                                      final DurationTime durationTime) {
 
       /*
        * check if the required data are already loaded
@@ -240,7 +241,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
       String sql = null;
 
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+      try (final Connection conn = TourDatabase.getInstance().getConnection()) {
 
          statistic_ActivePerson = person;
          statistic_ActiveTourTypeFilter = tourTypeFilter;
@@ -282,7 +283,10 @@ public class DataProvider_Tour_Year extends DataProvider {
                   + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
 
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
-                  + "      TourAltUp" + NL //                                                   //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                                   //$NON-NLS-1$
+
+                  + "      BodyWeight,         " + NL //       //$NON-NLS-1$
+                  + "      BodyFat          " + NL //       //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
 
@@ -327,7 +331,10 @@ public class DataProvider_Tour_Year extends DataProvider {
                + "   SUM(TourDistance)," + NL //                           8  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                              9  //$NON-NLS-1$
 
-               + "   SUM(1)" + NL //                                       10 //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                       10 //$NON-NLS-1$
+
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      11 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      12 //$NON-NLS-1$
 
                + fromTourData
 
@@ -348,6 +355,15 @@ public class DataProvider_Tour_Year extends DataProvider {
          final float[][] dbDistance = new float[numTourTypes][numYears];
          final float[][] dbElevation = new float[numTourTypes][numYears];
          final float[][] dbNumTours = new float[numTourTypes][numYears];
+         @SuppressWarnings("unchecked")
+         final ArrayList<Float>[] dbBodyWeight = new ArrayList[numYears];
+         @SuppressWarnings("unchecked")
+         final ArrayList<Float>[] dbBodyFat = new ArrayList[numYears];
+         // initializing
+         for (int index = 0; index < numYears; index++) {
+            dbBodyWeight[index] = new ArrayList<>();
+            dbBodyFat[index] = new ArrayList<>();
+         }
 
          final int[][] dbDurationTime = new int[numTourTypes][numYears];
          final int[][] dbElapsedTime = new int[numTourTypes][numYears];
@@ -396,6 +412,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             final long dbValue_ElevationUp          = (long) (result.getInt(9) / UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(10);
+            final float dbValue_BodyWeight = result.getFloat(11) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat = result.getFloat(12);
 
 // SET_FORMATTING_ON
 
@@ -433,6 +451,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             dbDistance[colorIndex][yearIndex] = dbValue_Distance;
             dbElevation[colorIndex][yearIndex] = dbValue_ElevationUp;
             dbNumTours[colorIndex][yearIndex] = dbValue_NumTours;
+            dbBodyWeight[yearIndex].add(dbValue_BodyWeight);
+            dbBodyFat[yearIndex].add(dbValue_BodyFat);
 
             dbDurationTime[colorIndex][yearIndex] = dbValue_Duration;
 
@@ -520,6 +540,11 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourYearData.numTours_Low = new float[1][numYears];
             _tourYearData.numTours_High = new float[1][numYears];
 
+            _tourYearData.athleteBodyWeight_Low = new float[numYears];
+            _tourYearData.athleteBodyWeight_High = new float[numYears];
+            _tourYearData.athleteBodyFat_Low = new float[numYears];
+            _tourYearData.athleteBodyFat_High = new float[numYears];
+
          } else {
 
             final long[][] usedTypeIds = new long[numTourTypes_WithData][];
@@ -571,6 +596,28 @@ public class DataProvider_Tour_Year extends DataProvider {
 
             _tourYearData.numTours_Low = new float[numTourTypes_WithData][numYears];
             _tourYearData.numTours_High = usedNumTours;
+
+            _tourYearData.athleteBodyWeight_Low = new float[numYears];
+
+            final float[] weight = new float[numYears];
+            for (int index = 0; index < numYears; ++index) {
+               final OptionalDouble averageDouble = dbBodyWeight[index].stream().mapToDouble(d -> d).average();
+
+               if (averageDouble.isPresent()) {
+                  weight[index] = (float) averageDouble.getAsDouble();
+               }
+            }
+            _tourYearData.athleteBodyWeight_High = weight;
+            final float[] fat = new float[numYears];
+            for (int index = 0; index < numYears; ++index) {
+               final OptionalDouble averageDouble = dbBodyFat[index].stream().mapToDouble(d -> d).average();
+
+               if (averageDouble.isPresent()) {
+                  fat[index] = (float) averageDouble.getAsDouble();
+               }
+            }
+            _tourYearData.athleteBodyFat_Low = new float[numYears];
+            _tourYearData.athleteBodyFat_High = fat;
          }
 
          _tourYearData.numUsedTourTypes = numTourTypes_WithData;
