@@ -333,8 +333,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 
                + "   SUM(1)," + NL //                                       10 //$NON-NLS-1$
 
-               + "   AVG(BodyWeight),         " + NL //      11 //$NON-NLS-1$
-               + "   AVG(BodyFat)          " + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      11 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      12 //$NON-NLS-1$
 
                + fromTourData
 
@@ -412,7 +412,7 @@ public class DataProvider_Tour_Year extends DataProvider {
             final long dbValue_ElevationUp          = (long) (result.getInt(9) / UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(10);
-            final float dbValue_BodyWeight = result.getFloat(11);
+            final float dbValue_BodyWeight = result.getFloat(11) * UI.UNIT_VALUE_WEIGHT;
             final float dbValue_BodyFat = result.getFloat(12);
 
 // SET_FORMATTING_ON

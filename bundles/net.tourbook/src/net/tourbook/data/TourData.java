@@ -6720,14 +6720,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   /**
+    * Sets the paused time start and end arrays based on given arrays.
+    * Note: This procedure ensures that the finalized arrays are of the same size.
+    *
+    * @param pausedTime_Start
+    *           A given array of paused time start times
+    * @param pausedTime_End
+    *           A given array of paused time end times
+    */
    public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
                                         final List<Long> pausedTime_End) {
 
-      if (pausedTime_Start == null || pausedTime_Start.size() == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.size() == 0 ||
+            pausedTime_End == null || pausedTime_End.size() == 0) {
          return;
       }
 
-      pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+      if (pausedTime_Start.size() > pausedTime_End.size()) {
+         pausedTime_Start = pausedTime_Start.subList(0, pausedTime_End.size());
+      }
 
       setPausedTime_Start(pausedTime_Start.stream().mapToLong(l -> l).toArray());
       setPausedTime_End(pausedTime_End.stream().mapToLong(l -> l).toArray());
@@ -7588,7 +7600,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param endIndex
     * @return Returns the paused time in seconds
     */
-   private int getPausedTime(final int startIndex, final int endIndex) {
+   public int getPausedTime(final int startIndex, final int endIndex) {
 
       int totalPausedTime = 0;
 

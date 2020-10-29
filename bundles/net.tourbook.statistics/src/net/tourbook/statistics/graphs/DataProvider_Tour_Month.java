@@ -158,8 +158,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 
                + "   SUM(1)," + NL //                                       11 //$NON-NLS-1$
 
-               + "   AVG(BodyWeight),         " + NL //      12 //$NON-NLS-1$
-               + "   AVG(BodyFat)          " + NL //      13 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
@@ -235,7 +235,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             final int dbValue_NumTours             = result.getInt(11);
 
-            final float dbValue_BodyWeight = result.getFloat(12);
+            final float dbValue_BodyWeight = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
             final float dbValue_BodyFat = result.getFloat(13);
 
 // SET_FORMATTING_ON

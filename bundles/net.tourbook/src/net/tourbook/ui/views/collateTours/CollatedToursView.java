@@ -19,7 +19,6 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -79,7 +78,7 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
+import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -207,7 +206,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private ActionModifyColumns                        _actionModifyColumns;
    private ActionPrint                                _actionPrintTour;
    private ActionRefreshView                          _actionRefreshView;
-   private Action_Reimport_SubMenu                    _actionReimportSubMenu;
+   private ActionReimportTours                        _actionReimport_Tours;
    private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetPerson                            _actionSetOtherPerson;
@@ -478,7 +477,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
       _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -1032,7 +1031,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: timeinterval
+    * column: time interval
     */
 
    private void defineColumn_Data_TimeInterval() {
@@ -1790,9 +1789,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       TVICollatedTour firstTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+      for (final Object treeItem : selection) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICollatedTour) {
 
             boolean isDummyTour = false;
@@ -1848,7 +1846,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
-      _actionReimportSubMenu.setEnabled(isTourSelected);
+      _actionReimport_Tours.setEnabled(isTourSelected);
       _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -1923,7 +1921,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimportSubMenu);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
@@ -1979,9 +1977,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
-      for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-
-         final Object viewItem = tourIterator.next();
+      for (final Object viewItem : selectedTours) {
 
          if (viewItem instanceof TVICollatedTour) {
             tourIds.add(((TVICollatedTour) viewItem).getTourId());
@@ -2059,9 +2055,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
       // loop: all selected items
-      for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
-
-         final Object treeItem = itemIterator.next();
+      for (final Object treeItem : selectedTours) {
 
          final TVICollatedTour tourItem = (TVICollatedTour) treeItem;
 

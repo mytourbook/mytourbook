@@ -440,7 +440,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                final Long dbValue_TourTypeIdObject    = (Long) result.getObject(17);
 
-               final float bodyWeight    =  result.getFloat(19);
+               final float bodyWeight    =  result.getFloat(19) * UI.UNIT_VALUE_WEIGHT;
                final float bodyFat    =  result.getFloat(20);
 
 // SET_FORMATTING_ON

@@ -42,6 +42,9 @@ New
 * Tour Editor (Frederic)
   - Added a body fat percentage field in the Personal Details section
 
+* Geo Compare View (Frederic)
+  - Added a relative geo differences filter to only display the compared tours for which the relative geo difference is under that threshold (see feature request https://sourceforge.net/p/mytourbook/feature-requests/183/)
+
 Improvements
 ============
 
@@ -66,6 +69,10 @@ Improvements
   - New toolbar action: Copy statistic values to the clipboard
   - Show total/percentage values in the tooltip - https://sourceforge.net/p/mytourbook/feature-requests/180/
   - Statistic tooltip values (a summary of tours) can be formatted differently compared with tour tooltip values
+
+* Geo Compare View (Frederic)
+  - Added the recorded time column
+  - Added the Average Pace column
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
