@@ -490,6 +490,7 @@ public class Messages extends NLS {
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteTourMarker;
+   public static String        App_Action_DeselectAll;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
    public static String        App_Action_Dialog_ActionIsInProgress_Title;
    public static String        App_Action_Duplicate;
