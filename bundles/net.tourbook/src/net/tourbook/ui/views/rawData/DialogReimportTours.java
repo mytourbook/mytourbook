@@ -684,6 +684,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkTourTimerPauses.setSelection(false);
       _chkTraining.setSelection(false);
 
+      enableReimportButton();
    }
 
    private void restoreState() {
