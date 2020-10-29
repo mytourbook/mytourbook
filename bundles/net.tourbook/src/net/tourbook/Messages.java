@@ -1235,6 +1235,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Checkbox_TourTimerPauses;
    public static String        Import_Data_Checkbox_TrainingValues;
    public static String        Import_Data_Checkbox_EntireTour;
+   public static String        Import_Data_Checkbox_ImportFileLocation;
    public static String        Import_Data_Text_AltitudeValues;
    public static String        Import_Data_Text_CadenceValues;
    public static String        Import_Data_Text_GearValues;
@@ -1249,6 +1250,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Text_TourTimerPauses;
    public static String        Import_Data_Text_TrainingValues;
    public static String        Import_Data_Text_EntireTour;
+   public static String        Import_Data_Text_ImportFileLocation;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
@@ -1305,6 +1307,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_WatchingOff;
    public static String        Import_Data_HTML_WatchingOn;
    public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
+   public static String        Import_Data_Dialog_IsCancelReImport_Message;
+   public static String        Import_Data_Dialog_IsCancelReImport_Title;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
    public static String        Import_Data_Monitor_Backup;
