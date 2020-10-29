@@ -62,6 +62,11 @@ public abstract class TourStatisticData_Common {
    float[][] durationTime_Low_Resorted;
    float[][] durationTime_High_Resorted;
 
+   float[]   athleteBodyWeight_Low;
+   float[]   athleteBodyWeight_High;
+   float[]   athleteBodyFat_Low;
+   float[]   athleteBodyFat_High;
+
    /**
     * Contains the used {@link TourType} ID or -1 when not available. This data has the same length
     * as the other common data.

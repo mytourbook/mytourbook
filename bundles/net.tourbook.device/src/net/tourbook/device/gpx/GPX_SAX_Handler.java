@@ -191,7 +191,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_TOUR_CALORIES            = "mt:calories";             //$NON-NLS-1$
    private static final String TAG_MT_TOUR_REST_PULSE          = "mt:restPulse";            //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_BIKER_WEIGHT        = "mt:bikerWeight";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_WEIGHT        = "mt:BodyWeight";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_FAT        = "mt:BodyFat";          //$NON-NLS-1$
    private static final String TAG_MT_TOUR_CONCONI_DEFLECTION  = "mt:conconiDeflection";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_DP_TOLERANCE        = "mt:dpTolerance";          //$NON-NLS-1$
 
@@ -655,9 +656,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setRestPulse(getIntValue(charData));
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_BIKER_WEIGHT)) {
+      } else if (name.equals(TAG_MT_TOUR_BODY_WEIGHT)) {
 
          _tourData.setBodyWeight(getFloatValue(charData));
+         _isInMT_Tour = false;
+
+      } else if (name.equals(TAG_MT_TOUR_BODY_FAT)) {
+
+         _tourData.setBodyFat(getFloatValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)) {
@@ -1636,7 +1642,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
             || name.equals(TAG_MT_TOUR_CALORIES)
             || name.equals(TAG_MT_TOUR_REST_PULSE)
 
-            || name.equals(TAG_MT_TOUR_BIKER_WEIGHT)
+            || name.equals(TAG_MT_TOUR_BODY_WEIGHT)
+            || name.equals(TAG_MT_TOUR_BODY_FAT)
             || name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)
             || name.equals(TAG_MT_TOUR_DP_TOLERANCE)
 

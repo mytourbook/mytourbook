@@ -2,12 +2,15 @@
 
 
 TODO's
-
-======  
+======
+  
 * !!! Translators need new babel editor plugin when using Eclipse 2020-09 !!!
   http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
 * Translators should check if the new time words are correct because they where automatically transformed from the existing time words
+
+* Need a better solution in RawDataManager - actionReimportTour_40 when timeDiff > 20000 -> could not reimport 2007-04-01-00-00-39.tcx which had a time diff of 44_000 
+
 
 Issues
 ======
@@ -37,6 +40,13 @@ New
 * Statistic Values View
   - Displays the values of the statistic graphs
   - Statistic values can be copied in csv format to the clipboard
+  - Displays athlete's data (body weight and fat) for any given day/week/month/year
+
+* Tour Editor (Frederic)
+  - Added a body fat percentage field in the Personal Details section
+
+* Geo Compare View (Frederic)
+  - Added a relative geo differences filter to only display the compared tours for which the relative geo difference is under that threshold (see feature request https://sourceforge.net/p/mytourbook/feature-requests/183/)
 
 * Import Magellan/Mio Cyclo 105 *.act Files (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/219
 
@@ -65,6 +75,10 @@ Improvements
   - New toolbar action: Copy statistic values to the clipboard
   - Show total/percentage values in the tooltip - https://sourceforge.net/p/mytourbook/feature-requests/180/
   - Statistic tooltip values (a summary of tours) can be formatted differently compared with tour tooltip values
+
+* Geo Compare View (Frederic)
+  - Added the recorded time column
+  - Added the Average Pace column
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 

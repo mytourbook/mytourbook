@@ -21,14 +21,17 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IWorkbenchPart;
 
 public class GeoCompareManager {
@@ -44,7 +47,6 @@ public class GeoCompareManager {
    private static final ListenerList<IGeoCompareListener>        _geoCompareListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    private static boolean                                        _isGeoComparingOn;
-
    static {
 
       /*
@@ -74,6 +76,8 @@ public class GeoCompareManager {
 
       _comparerExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(COMPARATOR_THREADS, threadFactory);
    }
+
+   protected final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public static void addGeoCompareEventListener(final IGeoCompareListener listener) {
 
@@ -183,7 +187,7 @@ public class GeoCompareManager {
 
             /*
              * Make sure the compare index is not larger than the tour index, this happens when the
-             * part slices has exeeded the tour slices
+             * part slices has exceeded the tour slices
              */
             if (compareIndex == numNormTourSlices) {
                latLonDiff = -1;
@@ -209,7 +213,7 @@ public class GeoCompareManager {
 
             minDiffValue = latLonDiff;
 
-            // keep tour index where the min diff occured
+            // keep tour index where the min diff occurred
             normMinDiffIndex = normTourIndex;
          }
 
@@ -238,7 +242,15 @@ public class GeoCompareManager {
          final int movingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));
          comparerItem.elapsedTime = elapsedTime;
          comparerItem.movingTime = movingTime;
-         comparerItem.distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
+         final int recordedTime = Math.max(0, elapsedTime - tourData.getPausedTime(origStartIndex, origEndIndex));
+         comparerItem.recordedTime = recordedTime;
+
+         final float distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];
+         comparerItem.distance = distance;
+
+         final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+         final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
+         comparerItem.avgPace = distance == 0 ? 0 : time * 1000 / distance;
       }
 
       final ZonedDateTime tourStartTime = tourData.getTourStartTime();
