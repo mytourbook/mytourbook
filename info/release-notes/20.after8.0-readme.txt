@@ -9,8 +9,6 @@ TODO's
 
 * Translators should check if the new time words are correct because they where automatically transformed from the existing time words
 
-* Need a better solution in RawDataManager - actionReimportTour_40 when timeDiff > 20000 -> could not reimport 2007-04-01-00-00-39.tcx which had a time diff of 44_000 
-
 
 Issues
 ======
