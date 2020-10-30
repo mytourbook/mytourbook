@@ -2262,17 +2262,6 @@ public class TourDatabase {
       }
 
       /*
-       * Check invalid data
-       */
-      if (Float.isNaN(tourData.getMaxPace())) {
-
-         // this occurred and caused an exception:
-         // Caused by: java.sql.SQLDataException: The resulting value is outside the range for the data type DOUBLE.
-
-         tourData.resetMaxPace();
-      }
-
-      /*
        * Removed cached data
        */
       TourManager.clearMultipleTourData();

@@ -1540,15 +1540,7 @@ public class TourInfoUI {
       _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
       _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-      float maxPace = _tourData.getMaxPace();
-      //If maxPace is equal to the maximum float value,
-      //it means that the Tour may not have a pace serie data.
-      //In this case, we set it to 0, otherwise it will display
-      //a gigantic value.
-      if (maxPace == Float.MAX_VALUE) {
-         maxPace = 0;
-      }
-      _lblMaxPace.setText(UI.format_mm_ss((long) (maxPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+      _lblMaxPace.setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
       _lblMaxPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
       _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
