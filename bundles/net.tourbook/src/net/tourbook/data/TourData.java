@@ -9221,6 +9221,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return true;
    }
 
+   public void resetMaxPace() {
+      maxPace = 0;
+   }
+
    /**
     * Reset sorted markers that they are sorted again.
     */
