@@ -1034,7 +1034,8 @@ public class RawDataManager {
 
             clonedTourData = (TourData) oldTourData.clone();
 
-            // loop: all re-import id's
+            // loop: For each re-import id, we save the associated data for future display
+            //to compare with the new data
             for (final ReImportParts reImportId : reImportPartIds) {
 
                switch (reImportId) {
@@ -1481,7 +1482,7 @@ public class RawDataManager {
          long totalTourTimerPauses = 0;
          final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
          if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-            final List<Long> listPausedTime_Start = Arrays.stream(reimportedTourData.getPausedTime_Start()).boxed().collect(Collectors.toList());
+            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
             final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().collect(Collectors.toList());
             oldTourData.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End);
          }

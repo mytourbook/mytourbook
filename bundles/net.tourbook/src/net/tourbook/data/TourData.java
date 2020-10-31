@@ -4629,7 +4629,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       speedSerieImperial = new float[serieLength];
 
-      maxSpeed = 0;
+      maxSpeed = maxPace = 0;
 
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -4643,6 +4643,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          maxSpeed = Math.max(maxSpeed, speedMetric);
       }
 
+      //Convert the max speed to max pace
       maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
    }
 
