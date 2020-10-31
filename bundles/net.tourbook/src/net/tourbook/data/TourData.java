@@ -3877,7 +3877,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      maxSpeed = 0.0f;
+      maxSpeed = maxPace = 0.0f;
 
       for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
