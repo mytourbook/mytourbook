@@ -1373,10 +1373,11 @@ public class TourDatabase {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
 
-      try (Connection conn = getInstance().getConnection(); //
+      try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final ResultSet result = stmt.executeQuery("SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+         final ResultSet result = stmt.executeQuery(
+               "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY TourStartTime"); //$NON-NLS-1$ //$NON-NLS-2$
 
          while (result.next()) {
             tourIds.add(result.getLong(1));
@@ -2232,7 +2233,7 @@ public class TourDatabase {
    public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       /*
-       * Prevent saving a tour which was deleted before
+       * prevent saving a tour which was deleted before
        */
       if (tourData.isTourDeleted) {
          return null;
@@ -2246,7 +2247,7 @@ public class TourDatabase {
       }
 
       /*
-       * Prevent saving a tour when a person is not set, this check is for internal use that all
+       * prevent saving a tour when a person is not set, this check is for internal use that all
        * data are valid
        */
       if (tourData.getTourPerson() == null) {
@@ -2255,7 +2256,7 @@ public class TourDatabase {
       }
 
       /*
-       * Check size of varcar fields
+       * check size of varcar fields
        */
       if (tourData.isValidForSave() == false) {
          return null;
