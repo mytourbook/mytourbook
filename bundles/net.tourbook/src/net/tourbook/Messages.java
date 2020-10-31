@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                   //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_None;
@@ -1292,6 +1292,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_IsCancelReImport_Title;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference;
+   public static String        Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference_Subsequent;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
    public static String        Import_Data_Monitor_Backup;
    public static String        Import_Data_Monitor_Backup_SubTask;
@@ -1420,8 +1421,8 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing2;                                          //2, because of refactoring
-   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                  //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2;                                            //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                    //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
@@ -1432,10 +1433,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt2;                                             //2, because of refactoring
-   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                     //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2;                                        //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2;                                               //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                       //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                          //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                  //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;

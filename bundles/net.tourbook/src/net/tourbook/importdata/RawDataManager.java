@@ -1165,6 +1165,8 @@ public class RawDataManager {
 
       TourLogManager.showLogView();
 
+      int numLoggedErrors = 0;
+
       final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
       String message = null;
 
@@ -1188,15 +1190,29 @@ public class RawDataManager {
                // disabled for .fit files because they can have different tour start times (of some seconds)
                && reImportedFile.getName().toLowerCase().endsWith(FILE_EXTENSION_FIT) == false) {
 
-            TourLogManager.subLog_Error(NLS.bind(
-                  Messages.Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference,
-                  new Object[] {
-                        oldTourDateTimeShort,
-                        reImportedFile.toString(),
-                        TimeTools.Formatter_DateTime_SM.format(oldTourData.getTourStartTime()),
-                        TimeTools.Formatter_DateTime_SM.format(reimportedTourData.getTourStartTime()),
-                        timeDiff / 1000
-                  }));
+            if (numLoggedErrors == 0) {
+
+               numLoggedErrors++;
+
+               TourLogManager.subLog_Error(NLS.bind(
+                     Messages.Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference,
+                     new Object[] {
+                           oldTourDateTimeShort,
+                           reImportedFile.toString(),
+                           TimeTools.Formatter_DateTime_SM.format(oldTourData.getTourStartTime()),
+                           TimeTools.Formatter_DateTime_SM.format(reimportedTourData.getTourStartTime()),
+                           timeDiff / 1000
+                     }));
+
+            } else if (numLoggedErrors == 1) {
+
+               numLoggedErrors++;
+
+               TourLogManager.subLog_Error(NLS.bind(
+                     Messages.Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference_Subsequent,
+                     new Object[] {
+                           oldTourDateTimeShort }));
+            }
 
             continue;
          }
