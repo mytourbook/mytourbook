@@ -1373,10 +1373,11 @@ public class TourDatabase {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
 
-      try (Connection conn = getInstance().getConnection(); //
+      try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final ResultSet result = stmt.executeQuery("SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+         final ResultSet result = stmt.executeQuery(
+               "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY TourStartTime"); //$NON-NLS-1$ //$NON-NLS-2$
 
          while (result.next()) {
             tourIds.add(result.getLong(1));
