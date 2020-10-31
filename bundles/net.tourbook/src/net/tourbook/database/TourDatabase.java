@@ -2232,7 +2232,7 @@ public class TourDatabase {
    public static TourData saveTour(final TourData tourData, final boolean isUpdateModifiedDate) {
 
       /*
-       * Prevent saving a tour which was deleted before
+       * prevent saving a tour which was deleted before
        */
       if (tourData.isTourDeleted) {
          return null;
@@ -2246,7 +2246,7 @@ public class TourDatabase {
       }
 
       /*
-       * Prevent saving a tour when a person is not set, this check is for internal use that all
+       * prevent saving a tour when a person is not set, this check is for internal use that all
        * data are valid
        */
       if (tourData.getTourPerson() == null) {
@@ -2255,21 +2255,10 @@ public class TourDatabase {
       }
 
       /*
-       * Check size of varcar fields
+       * check size of varcar fields
        */
       if (tourData.isValidForSave() == false) {
          return null;
-      }
-
-      /*
-       * Check invalid data
-       */
-      if (Float.isNaN(tourData.getMaxPace())) {
-
-         // this occurred and caused an exception:
-         // Caused by: java.sql.SQLDataException: The resulting value is outside the range for the data type DOUBLE.
-
-         tourData.resetMaxPace();
       }
 
       /*
