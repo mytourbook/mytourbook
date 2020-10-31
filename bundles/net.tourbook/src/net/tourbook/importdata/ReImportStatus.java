@@ -23,7 +23,11 @@ public class ReImportStatus {
    boolean isReImported;
 
    /**
-    * Is <code>true</code> when an empty or invalid import file location is canceled by the user.
+    * Is <code>true</code> when the invalid import file location is canceled by the user.
     */
-   boolean isCanceledTheFileLocationDialog;
+   boolean isCanceled_ByUser_TheFileLocationDialog;
+
+   boolean isCanceled_Auto_ImportFilePathIsEmpty;
+
+   boolean isCanceled_Auto_TheFileLocationDialog;
 }

@@ -660,7 +660,8 @@ public class RawDataManager {
 
                reimportTour(reimportPartIds, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
 
-               if (reImportStatus.isCanceledTheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false && skipToursWithFileNotFound == false) {
+               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false
+                     && skipToursWithFileNotFound == false) {
 
                   // user has canceled the re-import -> ask if the whole re-import should be canceled
 
@@ -871,6 +872,9 @@ public class RawDataManager {
 
             // The user doesn't want to look for a new file path for the current tour
             if (skipToursWithFileNotFound) {
+
+               reImportStatus.isCanceled_Auto_ImportFilePathIsEmpty = true;
+
                return;
             }
 
@@ -888,7 +892,7 @@ public class RawDataManager {
             // The user doesn't want to look for a new file path for the current tour
             if (!okPressed) {
 
-               reImportStatus.isCanceledTheFileLocationDialog = true;
+               reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
 
                return;
             }
@@ -927,6 +931,9 @@ public class RawDataManager {
 
                   //The user doesn't want to look for a new file path for the current tour.
                   if (skipToursWithFileNotFound) {
+
+                     reImportStatus.isCanceled_Auto_TheFileLocationDialog = true;
+
                      return;
                   }
 
@@ -940,7 +947,7 @@ public class RawDataManager {
                   // The user doesn't want to look for a new file path for the current tour
                   if (!okPressed) {
 
-                     reImportStatus.isCanceledTheFileLocationDialog = true;
+                     reImportStatus.isCanceled_ByUser_TheFileLocationDialog = true;
 
                      return;
                   }
@@ -2016,9 +2023,24 @@ public class RawDataManager {
              * User canceled file dialog -> continue with next file, it is possible that a
              * tour file could not be reselected because it is not available any more
              */
+            String reason;
+            if (reImportStatus.isCanceled_Auto_ImportFilePathIsEmpty) {
+               reason = Messages.Log_Reimport_Tour_Skipped_FilePathIsEmpty;
+
+            } else if (reImportStatus.isCanceled_Auto_TheFileLocationDialog) {
+               reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
+
+            } else if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog) {
+               reason = Messages.Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
+
+            } else {
+               reason = Messages.Log_Reimport_Tour_Skipped_OtherReasons;
+            }
+
             TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
                   NLS.bind(LOG_REIMPORT_TOUR_SKIPPED,
-                        tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)));
+                        tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                        reason));
 
             reImportStatus.isReImported = isReImported;
 
