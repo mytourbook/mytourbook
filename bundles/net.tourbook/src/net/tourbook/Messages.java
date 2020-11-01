@@ -117,16 +117,6 @@ public class Messages extends NLS {
    public static String        Calendar_View_Combo_Year_Tooltip;
 
    public static String        dialog_export_btn_export;
-   public static String        dialog_reimport_tours_btn_reimport;
-   public static String        dialog_reimport_tours_btn_skip_tours_with_importFile_notfound;
-   public static String        dialog_reimport_tours_checkbox_alltours;
-   public static String        dialog_reimport_tours_checkbox_selectedtours;
-   public static String        dialog_reimport_tours_dialog_title;
-   public static String        Dialog_Reimport_Tours_Group_Tours;
-   public static String        Dialog_Reimport_Tours_Group_Tours_Tooltip;
-   public static String        Dialog_Reimport_Tours_Group_Data;
-   public static String        Dialog_Reimport_Tours_Group_Data_Tooltip;
-   public static String        dialog_reimport_tours_shell_text;
    public static String        dialog_export_chk_camouflageSpeed;
    public static String        dialog_export_chk_camouflageSpeed_tooltip;
    public static String        dialog_export_chk_camouflageSpeedInput_tooltip;
@@ -365,6 +355,34 @@ public class Messages extends NLS {
 
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
+
+   public static String        Dialog_ReimportTours_Action_OpenDialog;
+   public static String        Dialog_ReimportTours_Button_ReImport;
+   public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
+   public static String        Dialog_ReimportTours_Checkbox_AllTours;
+   public static String        Dialog_ReimportTours_Checkbox_AltitudeValues;
+   public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
+   public static String        Dialog_ReimportTours_Checkbox_EntireTour;
+   public static String        Dialog_ReimportTours_Checkbox_GearValues;
+   public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
+   public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
+   public static String        Dialog_ReimportTours_Checkbox_PowerAndPulseValues;
+   public static String        Dialog_ReimportTours_Checkbox_PowerAndSpeedValues;
+   public static String        Dialog_ReimportTours_Checkbox_RunningDynamicsValues;
+   public static String        Dialog_ReimportTours_Checkbox_SelectedTours;
+   public static String        Dialog_ReimportTours_Checkbox_SwimmingValues;
+   public static String        Dialog_ReimportTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
+   public static String        Dialog_ReimportTours_Checkbox_TourMarkers;
+   public static String        Dialog_ReimportTours_Checkbox_TourTimerPauses;
+   public static String        Dialog_ReimportTours_Checkbox_TrainingValues;
+   public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
+   public static String        Dialog_ReimportTours_Dialog_Message;
+   public static String        Dialog_ReimportTours_Dialog_Title;
+   public static String        Dialog_ReimportTours_Group_Tours;
+   public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
+   public static String        Dialog_ReimportTours_Group_Data;
+   public static String        Dialog_ReimportTours_Group_Data_Tooltip;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
@@ -1200,22 +1218,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-   public static String        Import_Data_Dialog_ConfirmReimportValues_Message;
-   public static String        Import_Data_Checkbox_AltitudeValues;
-   public static String        Import_Data_Checkbox_CadenceValues;
-   public static String        Import_Data_Checkbox_GearValues;
-   public static String        Import_Data_Checkbox_PowerAndPulseValues;
-   public static String        Import_Data_Checkbox_PowerAndSpeedValues;
-   public static String        Import_Data_Checkbox_RunningDynamicsValues;
-   public static String        Import_Data_Checkbox_SwimmingValues;
-   public static String        Import_Data_Checkbox_TemperatureValues;
-   public static String        Import_Data_Checkbox_TimeSlices;
-   public static String        Import_Data_Checkbox_TourMarkers;
-   public static String        Import_Data_Checkbox_TourTimerPauses;
-   public static String        Import_Data_Checkbox_TrainingValues;
-   public static String        Import_Data_Checkbox_EntireTour;
-   public static String        Import_Data_Checkbox_ImportFileLocation;
-   public static String        Import_Data_Checkbox_ImportFileLocation_Tooltip;
    public static String        Import_Data_Text_AltitudeValues;
    public static String        Import_Data_Text_CadenceValues;
    public static String        Import_Data_Text_GearValues;

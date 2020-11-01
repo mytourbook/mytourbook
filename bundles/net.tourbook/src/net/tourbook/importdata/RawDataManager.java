@@ -807,7 +807,7 @@ public class RawDataManager {
 
       if (actionReimportTour_12_Confirm_Dialog(
             ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES,
-            NLS.bind(Messages.Import_Data_Dialog_ConfirmReimportValues_Message, String.join(UI.NEW_LINE1, dataToReimportDetails)))) {
+            NLS.bind(Messages.Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message, String.join(UI.NEW_LINE1, dataToReimportDetails)))) {
 
          TourLogManager.addLog(
                TourLogState.DEFAULT,
