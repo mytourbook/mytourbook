@@ -361,6 +361,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
    public static String        Dialog_ReimportTours_Checkbox_AllTours;
    public static String        Dialog_ReimportTours_Checkbox_AltitudeValues;
+   public static String        Dialog_ReimportTours_Checkbox_BetweenDates;
    public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
    public static String        Dialog_ReimportTours_Checkbox_GearValues;
@@ -379,6 +380,8 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
    public static String        Dialog_ReimportTours_Dialog_Message;
    public static String        Dialog_ReimportTours_Dialog_Title;
+   public static String        Dialog_ReimportTours_Dialog_ToursAreNotAvailable;
+   public static String        Dialog_ReimportTours_Error_2ndDateMustBeLarger;
    public static String        Dialog_ReimportTours_Group_Tours;
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
