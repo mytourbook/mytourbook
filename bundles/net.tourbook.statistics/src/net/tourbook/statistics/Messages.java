@@ -22,6 +22,8 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.statistics.messages"; //$NON-NLS-1$
 
    public static String        LABEL_GRAPH_ALTITUDE;
+   public static String        LABEL_GRAPH_BODY_FAT;
+   public static String        LABEL_GRAPH_BODY_WEIGHT;
    public static String        LABEL_GRAPH_DAYTIME;
    public static String        LABEL_GRAPH_DISTANCE;
    public static String        LABEL_GRAPH_NUMBER_OF_TOURS;
@@ -32,8 +34,6 @@ public class Messages extends NLS {
    public static String        LABEL_GRAPH_TRAINING_EFFECT;
    public static String        LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC;
    public static String        LABEL_GRAPH_TRAINING_PERFORMANCE;
-   public static String        LABEL_GRAPH_BODYWEIGHT;
-   public static String        LABEL_GRAPH_BODYFAT;
 
    public static String        NUMBERS_UNIT;
 

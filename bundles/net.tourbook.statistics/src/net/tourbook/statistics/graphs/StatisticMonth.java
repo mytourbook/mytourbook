@@ -212,7 +212,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             _statisticData_Month.athleteBodyFat_Low,
             _statisticData_Month.athleteBodyFat_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODYFAT);
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
       yData.setUnitLabel(UI.UNIT_PERCENT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
@@ -236,7 +236,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             _statisticData_Month.athleteBodyWeight_Low,
             _statisticData_Month.athleteBodyWeight_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODYWEIGHT);
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
       yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
