@@ -227,7 +227,7 @@ public class TourLogView extends ViewPart {
             _browser.execute(js);
 
             // log log text to the console
-            System.out.println(noBrowserText);
+            System.out.println("[TourLog] " + noBrowserText);//$NON-NLS-1$
 
 //            System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
 //                  + (((float) (System.nanoTime() - start) / 1000000) + " ms"));

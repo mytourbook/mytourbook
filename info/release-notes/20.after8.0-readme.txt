@@ -93,6 +93,7 @@ Improvements
   - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
   - Added the ability for the user to skip a file if the filepath is unknown or not found
   - Correct the import filepath location (Wolfgang)
+  - Re-import tours between two dates (Wolfgang)
 
 
 Changes  
