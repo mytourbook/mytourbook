@@ -351,7 +351,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             _statisticData_Day.allAthleteBodyFat_Low,
             _statisticData_Day.allAthleteBodyFat_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODYFAT);
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
       yData.setUnitLabel(UI.UNIT_PERCENT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
@@ -374,7 +374,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             _statisticData_Day.allAthleteBodyWeight_Low,
             _statisticData_Day.allAthleteBodyWeight_High);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_BODYWEIGHT);
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
       yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setShowYSlider(true);
