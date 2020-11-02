@@ -91,32 +91,29 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
     */
    private Composite             _parent;
 
+   private Button                _chkGeo_RelativeDifferences_Filter;
    private Button                _chkMapOption_TrackOpacity;
 
    private ColorSelectorExtended _colorMapOption_RefTour;
    private ColorSelectorExtended _colorMapOption_ComparedTourPart;
 
+   private Label                 _lblGeo_Accuracy;
+   private Label                 _lblGeo_Accuracy_Value;
    private Label                 _lblGeo_DistanceInterval;
    private Label                 _lblGeo_DistanceInterval_Unit;
-   private Label                 _lblGeo_GeoAccuracy;
-   private Label                 _lblGeo_GeoAccuracy_Value;
-   private Label                 _lblGeo_RelativeDifferences_Filter;
-   private Label                 _lblGeo_RelativeDifferences_Filter_Value;
    private Label                 _lblGeo_NormalizedDistance;
-   private Label                 _lblGeo_NormalizedDistance_Value;
    private Label                 _lblGeo_NormalizedDistance_Unit;
+   private Label                 _lblGeo_NormalizedDistance_Value;
+   private Label                 _lblGeo_RelativeDifferences_Filter_Value;
    private Label                 _lblMapOption_ComparedTourPart;
    private Label                 _lblMapOption_LineWidth;
    private Label                 _lblMapOption_RefTour;
-//	private Label						_lblNumGeoGrids;
-//	private Label						_lblNumSlices;
-//	private Label						_lblNumTours;
 
-   private Spinner _spinnerGeo_GeoAccuracy;
-   private Spinner _spinnerGeo_GeoRelativeDifferences_Filter;
-   private Spinner _spinnerGeo_DistanceInterval;
-   private Spinner _spinnerMapOption_LineWidth;
-   private Spinner _spinnerMapOption_TrackOpacity;
+   private Spinner               _spinnerGeo_Accuracy;
+   private Spinner               _spinnerGeo_DistanceInterval;
+   private Spinner               _spinnerGeo_RelativeDifferences_Filter;
+   private Spinner               _spinnerMapOption_LineWidth;
+   private Spinner               _spinnerMapOption_TrackOpacity;
 
    /**
     * @param ownerControl
@@ -190,13 +187,13 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             createUI_20_CompareOptions(container);
          }
 
-//			// compute width for all controls and equalize column width for the different sections
-//			container.layout(true, true);
-//			UI.setEqualizeColumWidths(_firstColumnControls, 5);
-//			UI.setEqualizeColumWidths(_secondColumnControls);
+//         // compute width for all controls and equalize column width for the different sections
+//         container.layout(true, true);
+//         UI.setEqualizeColumWidths(_firstColumnControls, 5);
+//         UI.setEqualizeColumWidths(_secondColumnControls);
 //
-//			container.layout(true, true);
-//			UI.setEqualizeColumWidths(_firstColumnContainerControls);
+//         container.layout(true, true);
+//         UI.setEqualizeColumWidths(_firstColumnContainerControls);
       }
 
       return shellContainer;
@@ -207,7 +204,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             /*
@@ -216,8 +213,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Slideout_GeoCompareOptions_Label_Title);
             MTFont.setBannerFont(label);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(label);
          }
@@ -226,7 +222,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
              * Actionbar
              */
             final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.BEGINNING)
                   .applyTo(toolbar);
@@ -243,8 +239,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
    private void createUI_20_CompareOptions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
@@ -256,11 +251,17 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
    private void createUI_40_Options(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
+      final GridDataFactory gridData_Grab_FillCenter = GridDataFactory
             .fillDefaults()
-            //				.grab(true, false)
-            .applyTo(container);
+            .grab(true, false)
+            .align(SWT.FILL, SWT.CENTER);
+
+      final GridDataFactory gridData_EndFill = GridDataFactory
+            .fillDefaults()
+            .align(SWT.END, SWT.FILL);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
       _firstColumnContainerControls.add(container);
@@ -279,10 +280,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             {
                _lblGeo_NormalizedDistance_Value = new Label(container, SWT.TRAIL);
                _lblGeo_NormalizedDistance_Value.setText(UI.EMPTY_STRING);
-               GridDataFactory
-                     .fillDefaults()
-                     .align(SWT.END, SWT.FILL)
-                     .applyTo(_lblGeo_NormalizedDistance_Value);
+               gridData_EndFill.applyTo(_lblGeo_NormalizedDistance_Value);
 
                _secondColumnControls.add(_lblGeo_NormalizedDistance_Value);
             }
@@ -315,10 +313,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
                _spinnerGeo_DistanceInterval.setPageIncrement(10);
                _spinnerGeo_DistanceInterval.addSelectionListener(_compareSelectionListener);
                _spinnerGeo_DistanceInterval.addMouseWheelListener(_compareMouseWheelListener);
-               GridDataFactory
-                     .fillDefaults()
-                     .align(SWT.END, SWT.FILL)
-                     .applyTo(_spinnerGeo_DistanceInterval);
+               gridData_EndFill.applyTo(_spinnerGeo_DistanceInterval);
 
                _secondColumnControls.add(_spinnerGeo_DistanceInterval);
             }
@@ -326,11 +321,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
                // Label: Distance unit
                _lblGeo_DistanceInterval_Unit = new Label(container, SWT.NONE);
                _lblGeo_DistanceInterval_Unit.setText(UI.UNIT_LABEL_DISTANCE_M_OR_YD);
-               GridDataFactory
-                     .fillDefaults()
-                     .grab(true, false)
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_lblGeo_DistanceInterval_Unit);
+               gridData_Grab_FillCenter.applyTo(_lblGeo_DistanceInterval_Unit);
             }
          }
          {
@@ -339,34 +330,26 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
              */
             {
                // Label
-               _lblGeo_GeoAccuracy = new Label(container, SWT.NONE);
-               _lblGeo_GeoAccuracy.setText(Messages.Slideout_GeoCompareOptions_Label_GeoAccuracy);
+               _lblGeo_Accuracy = new Label(container, SWT.NONE);
+               _lblGeo_Accuracy.setText(Messages.Slideout_GeoCompareOptions_Label_GeoAccuracy);
 
-               _firstColumnControls.add(_lblGeo_GeoAccuracy);
+               _firstColumnControls.add(_lblGeo_Accuracy);
             }
             {
                // Spinner
-               _spinnerGeo_GeoAccuracy = new Spinner(container, SWT.BORDER);
-               _spinnerGeo_GeoAccuracy.setMinimum(100);
-               _spinnerGeo_GeoAccuracy.setMaximum(100_000);
-               _spinnerGeo_GeoAccuracy.setPageIncrement(100);
-               _spinnerGeo_GeoAccuracy.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_GeoAccuracy.addMouseWheelListener(_compareMouseWheelListener);
-//					GridDataFactory
-//							.fillDefaults()
-//							.align(SWT.END, SWT.FILL)
-//							.applyTo(_spinnerGeoAccuracy);
+               _spinnerGeo_Accuracy = new Spinner(container, SWT.BORDER);
+               _spinnerGeo_Accuracy.setMinimum(100);
+               _spinnerGeo_Accuracy.setMaximum(100_000);
+               _spinnerGeo_Accuracy.setPageIncrement(100);
+               _spinnerGeo_Accuracy.addSelectionListener(_compareSelectionListener);
+               _spinnerGeo_Accuracy.addMouseWheelListener(_compareMouseWheelListener);
 
-               _secondColumnControls.add(_spinnerGeo_GeoAccuracy);
+               _secondColumnControls.add(_spinnerGeo_Accuracy);
             }
             {
                // geo distance
-               _lblGeo_GeoAccuracy_Value = new Label(container, SWT.NONE);
-               GridDataFactory
-                     .fillDefaults()
-                     .grab(true, false)
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_lblGeo_GeoAccuracy_Value);
+               _lblGeo_Accuracy_Value = new Label(container, SWT.NONE);
+               gridData_Grab_FillCenter.applyTo(_lblGeo_Accuracy_Value);
             }
          }
          {
@@ -374,32 +357,31 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
              * Relative geographic differences filter
              */
             {
-               // Label
-               _lblGeo_RelativeDifferences_Filter = new Label(container, SWT.NONE);
-               _lblGeo_RelativeDifferences_Filter.setText(Messages.Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter);
+               // Checkbox
+               _chkGeo_RelativeDifferences_Filter = new Button(container, SWT.CHECK);
+               _chkGeo_RelativeDifferences_Filter.setText(Messages.Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter);
+               _chkGeo_RelativeDifferences_Filter.setToolTipText(Messages.Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter_Tooltip);
+               _chkGeo_RelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
 
-               _firstColumnControls.add(_lblGeo_RelativeDifferences_Filter);
+               _firstColumnControls.add(_chkGeo_RelativeDifferences_Filter);
             }
             {
                // Spinner
-               _spinnerGeo_GeoRelativeDifferences_Filter = new Spinner(container, SWT.BORDER);
-               _spinnerGeo_GeoRelativeDifferences_Filter.setMinimum(1);
-               _spinnerGeo_GeoRelativeDifferences_Filter.setMaximum(100);
-               _spinnerGeo_GeoRelativeDifferences_Filter.setPageIncrement(10);
-               _spinnerGeo_GeoRelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
-               _spinnerGeo_GeoRelativeDifferences_Filter.addMouseWheelListener(_compareMouseWheelListener);
+               _spinnerGeo_RelativeDifferences_Filter = new Spinner(container, SWT.BORDER);
+               _spinnerGeo_RelativeDifferences_Filter.setMinimum(1);
+               _spinnerGeo_RelativeDifferences_Filter.setMaximum(100);
+               _spinnerGeo_RelativeDifferences_Filter.setPageIncrement(10);
+               _spinnerGeo_RelativeDifferences_Filter.addSelectionListener(_compareSelectionListener);
+               _spinnerGeo_RelativeDifferences_Filter.addMouseWheelListener(_compareMouseWheelListener);
+               gridData_EndFill.applyTo(_spinnerGeo_RelativeDifferences_Filter);
 
-               _secondColumnControls.add(_spinnerGeo_GeoRelativeDifferences_Filter);
+               _secondColumnControls.add(_spinnerGeo_RelativeDifferences_Filter);
             }
             {
                // geo differences percentage value
                _lblGeo_RelativeDifferences_Filter_Value = new Label(container, SWT.NONE);
                _lblGeo_RelativeDifferences_Filter_Value.setText(UI.UNIT_PERCENT);
-               GridDataFactory
-                     .fillDefaults()
-                     .grab(true, false)
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_lblGeo_RelativeDifferences_Filter_Value);
+               gridData_Grab_FillCenter.applyTo(_lblGeo_RelativeDifferences_Filter_Value);
             }
          }
       }
@@ -506,21 +488,24 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       final boolean isGeoCompareActive = GeoCompareManager.isGeoComparing();
 
       final boolean isTrackOpacity = _chkMapOption_TrackOpacity.getSelection();
+      final boolean isGeoFilter = _chkGeo_RelativeDifferences_Filter.getSelection();
+
       _spinnerMapOption_TrackOpacity.setEnabled(isTrackOpacity);
+
+      _chkGeo_RelativeDifferences_Filter.setEnabled(isGeoCompareActive);
 
       _lblGeo_DistanceInterval.setEnabled(isGeoCompareActive);
       _lblGeo_DistanceInterval_Unit.setEnabled(isGeoCompareActive);
-      _lblGeo_GeoAccuracy.setEnabled(isGeoCompareActive);
-      _lblGeo_GeoAccuracy_Value.setEnabled(isGeoCompareActive);
-      _lblGeo_RelativeDifferences_Filter.setEnabled(isGeoCompareActive);
+      _lblGeo_Accuracy.setEnabled(isGeoCompareActive);
+      _lblGeo_Accuracy_Value.setEnabled(isGeoCompareActive);
       _lblGeo_RelativeDifferences_Filter_Value.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance_Value.setEnabled(isGeoCompareActive);
       _lblGeo_NormalizedDistance_Unit.setEnabled(isGeoCompareActive);
 
       _spinnerGeo_DistanceInterval.setEnabled(isGeoCompareActive);
-      _spinnerGeo_GeoAccuracy.setEnabled(isGeoCompareActive);
-      _spinnerGeo_GeoRelativeDifferences_Filter.setEnabled(isGeoCompareActive);
+      _spinnerGeo_Accuracy.setEnabled(isGeoCompareActive);
+      _spinnerGeo_RelativeDifferences_Filter.setEnabled(isGeoCompareActive && isGeoFilter);
    }
 
    private void initUI(final Composite parent) {
@@ -577,11 +562,13 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
    private void onChange_CompareParameter() {
 
-      saveStateSlideout();
+      saveState_Slideout();
 
       updateUI_GeoAccuracy();
 
       _geoCompareView.onChange_CompareParameter();
+
+      enableControls();
    }
 
    private void onChange_MapOptions() {
@@ -596,7 +583,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
    private void onDisposeSlideout() {
 
-      saveStateSlideout();
+      saveState_Slideout();
 
       _firstColumnControls.clear();
       _secondColumnControls.clear();
@@ -606,19 +593,21 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
 // SET_FORMATTING_OFF
 
-		_spinnerGeo_DistanceInterval.setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
-		_spinnerGeo_GeoAccuracy.setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
-		_spinnerGeo_GeoRelativeDifferences_Filter.setSelection(GeoCompareView.DEFAULT_GEO_RELATIVEDIFFERENCES_FILTER);
+      _spinnerGeo_DistanceInterval                 .setSelection(GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
+      _spinnerGeo_Accuracy                      .setSelection(GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-		/*
-		 * Map options
-		 */
-		_chkMapOption_TrackOpacity.setSelection(			_prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
-		_spinnerMapOption_TrackOpacity.setSelection(		_prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
-		_spinnerMapOption_LineWidth.setSelection(			_prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+      _chkGeo_RelativeDifferences_Filter           .setSelection(GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
+      _spinnerGeo_RelativeDifferences_Filter    .setSelection(GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
 
-		_colorMapOption_RefTour.setColorValue(				PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
-		_colorMapOption_ComparedTourPart.setColorValue(		PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+      /*
+       * Map options
+       */
+      _chkMapOption_TrackOpacity.setSelection(        _prefStore.getDefaultBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+      _spinnerMapOption_TrackOpacity.setSelection(    _prefStore.getDefaultInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+      _spinnerMapOption_LineWidth.setSelection(       _prefStore.getDefaultInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+
+      _colorMapOption_RefTour.setColorValue(          PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+      _colorMapOption_ComparedTourPart.setColorValue( PreferenceConverter.getDefaultColor(_prefStore,ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
 
 // SET_FORMATTING_ON
 
@@ -635,23 +624,24 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
 // SET_FORMATTING_OFF
 
-		_geoAccuracy = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY, GeoCompareView.DEFAULT_GEO_ACCURACY);
+      _geoAccuracy = Util.getStateInt(_state, GeoCompareView.STATE_GEO_ACCURACY, GeoCompareView.DEFAULT_GEO_ACCURACY);
 
-		_spinnerGeo_GeoAccuracy.setSelection(			_geoAccuracy);
-		_spinnerGeo_DistanceInterval.setSelection(		Util.getStateInt(_state, GeoCompareView.STATE_DISTANCE_INTERVAL, GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
+      _spinnerGeo_Accuracy                   .setSelection(_geoAccuracy);
+      _spinnerGeo_DistanceInterval           .setSelection(Util.getStateInt(_state,       GeoCompareView.STATE_DISTANCE_INTERVAL,                  GeoCompareView.DEFAULT_DISTANCE_INTERVAL));
 
-      _spinnerGeo_GeoRelativeDifferences_Filter.setSelection(Util.getStateInt(_state, GeoCompareView.STATE_GEO_RELATIVEDIFFERENCES_FILTER, GeoCompareView.DEFAULT_GEO_RELATIVEDIFFERENCES_FILTER));
+      _chkGeo_RelativeDifferences_Filter     .setSelection(Util.getStateBoolean(_state,   GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER, GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER));
+      _spinnerGeo_RelativeDifferences_Filter .setSelection(Util.getStateInt(_state,       GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,    GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER));
 
-		/*
-		 * Map options
-		 */
-		_spinnerMapOption_LineWidth.setSelection(		_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
+      /*
+       * Map options
+       */
+      _spinnerMapOption_LineWidth         .setSelection(_prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH));
 
-		_colorMapOption_ComparedTourPart.setColorValue(	PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
-		_colorMapOption_RefTour.setColorValue(			PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
+      _colorMapOption_ComparedTourPart    .setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB));
+      _colorMapOption_RefTour             .setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB));
 
-		_chkMapOption_TrackOpacity.setSelection(		_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
-		_spinnerMapOption_TrackOpacity.setSelection(	_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
+      _chkMapOption_TrackOpacity          .setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY));
+      _spinnerMapOption_TrackOpacity      .setSelection(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY));
 
 // SET_FORMATTING_ON
    }
@@ -660,24 +650,29 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
 // SET_FORMATTING_OFF
 
-		_prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,		_spinnerMapOption_LineWidth.getSelection());
-		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,		_chkMapOption_TrackOpacity.getSelection());
-		_prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,		_spinnerMapOption_TrackOpacity.getSelection());
+      _prefStore.setValue(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,     _spinnerMapOption_LineWidth.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   _chkMapOption_TrackOpacity.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      _spinnerMapOption_TrackOpacity.getSelection());
 
-		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,	_colorMapOption_ComparedTourPart.getColorValue());
-		PreferenceConverter.setValue(_prefStore,	ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,				_colorMapOption_RefTour.getColorValue());
+      PreferenceConverter.setValue(_prefStore,   ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,   _colorMapOption_ComparedTourPart.getColorValue());
+      PreferenceConverter.setValue(_prefStore,   ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,             _colorMapOption_RefTour.getColorValue());
 
 // SET_FORMATTING_ON
    }
 
-   private void saveStateSlideout() {
+   private void saveState_Slideout() {
 
-      _geoAccuracy = _spinnerGeo_GeoAccuracy.getSelection();
+      _geoAccuracy = _spinnerGeo_Accuracy.getSelection();
 
-      _state.put(GeoCompareView.STATE_GEO_ACCURACY, _geoAccuracy);
-      _state.put(GeoCompareView.STATE_DISTANCE_INTERVAL, _spinnerGeo_DistanceInterval.getSelection());
-      _state.put(GeoCompareView.STATE_GEO_RELATIVEDIFFERENCES_FILTER, _spinnerGeo_GeoRelativeDifferences_Filter.getSelection());
+// SET_FORMATTING_OFF
 
+      _state.put(GeoCompareView.STATE_GEO_ACCURACY,                        _geoAccuracy);
+      _state.put(GeoCompareView.STATE_DISTANCE_INTERVAL,                   _spinnerGeo_DistanceInterval.getSelection());
+
+      _state.put(GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER,  _chkGeo_RelativeDifferences_Filter.getSelection());
+      _state.put(GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,     _spinnerGeo_RelativeDifferences_Filter.getSelection());
+
+// SET_FORMATTING_ON
    }
 
    private void updateUI_GeoAccuracy() {
@@ -700,7 +695,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
       final String geoDistance = String.format(valueFormatting, distValue, UI.UNIT_LABEL_DISTANCE_M_OR_YD);
 
-      _lblGeo_GeoAccuracy_Value.setText(geoDistance);
+      _lblGeo_Accuracy_Value.setText(geoDistance);
    }
 
    void updateUI_StateValues(final GeoCompareState slideoutState) {
