@@ -237,7 +237,7 @@ public class DialogReimportTours extends TitleAreaDialog {
              * Re-import ALL tours in the database
              */
             _rdoReimport_Tours_All = new Button(group, SWT.RADIO);
-            _rdoReimport_Tours_All.setText(Messages.Dialog_ReimportTours_Checkbox_AllTours);
+            _rdoReimport_Tours_All.setText(Messages.Dialog_ReimportTours_Radio_AllTours);
             _rdoReimport_Tours_All.addSelectionListener(_defaultListener);
             GridDataFactory.fillDefaults().span(2, 1).indent(0, 3).applyTo(_rdoReimport_Tours_All);
          }
@@ -246,7 +246,7 @@ public class DialogReimportTours extends TitleAreaDialog {
              * Re-import the SELECTED tours
              */
             _rdoReimport_Tours_Selected = new Button(group, SWT.RADIO);
-            _rdoReimport_Tours_Selected.setText(Messages.Dialog_ReimportTours_Checkbox_SelectedTours);
+            _rdoReimport_Tours_Selected.setText(Messages.Dialog_ReimportTours_Radio_SelectedTours);
             _rdoReimport_Tours_Selected.addSelectionListener(_defaultListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoReimport_Tours_Selected);
          }
@@ -255,7 +255,7 @@ public class DialogReimportTours extends TitleAreaDialog {
              * Re-import between dates
              */
             _rdoReimport_Tours_BetweenDates = new Button(group, SWT.RADIO);
-            _rdoReimport_Tours_BetweenDates.setText(Messages.Dialog_ReimportTours_Checkbox_BetweenDates);
+            _rdoReimport_Tours_BetweenDates.setText(Messages.Dialog_ReimportTours_Radio_BetweenDates);
             _rdoReimport_Tours_BetweenDates.addSelectionListener(_defaultListener);
 
             final Composite container = new Composite(group, SWT.NONE);
@@ -306,7 +306,7 @@ public class DialogReimportTours extends TitleAreaDialog {
        */
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Dialog_ReimportTours_Group_Data);
-      group.setText(Messages.Dialog_ReimportTours_Group_Data_Tooltip);
+      group.setToolTipText(Messages.Dialog_ReimportTours_Group_Data_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).indent(0, VERTICAL_SECTION_MARGIN).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
@@ -355,7 +355,7 @@ public class DialogReimportTours extends TitleAreaDialog {
              * Checkbox: Elevation
              */
             _chkData_Elevation = new Button(group, SWT.CHECK);
-            _chkData_Elevation.setText(Messages.Dialog_ReimportTours_Checkbox_AltitudeValues);
+            _chkData_Elevation.setText(Messages.Dialog_ReimportTours_Checkbox_ElevationValues);
             _chkData_Elevation.addSelectionListener(_defaultListener);
             gridDataItem_FirstColumn.applyTo(_chkData_Elevation);
          }

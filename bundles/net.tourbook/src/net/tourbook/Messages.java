@@ -358,11 +358,8 @@ public class Messages extends NLS {
 
    public static String        Dialog_ReimportTours_Action_OpenDialog;
    public static String        Dialog_ReimportTours_Button_ReImport;
-   public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
-   public static String        Dialog_ReimportTours_Checkbox_AllTours;
-   public static String        Dialog_ReimportTours_Checkbox_AltitudeValues;
-   public static String        Dialog_ReimportTours_Checkbox_BetweenDates;
    public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
+   public static String        Dialog_ReimportTours_Checkbox_ElevationValues;
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
    public static String        Dialog_ReimportTours_Checkbox_GearValues;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
@@ -370,7 +367,7 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Checkbox_PowerAndPulseValues;
    public static String        Dialog_ReimportTours_Checkbox_PowerAndSpeedValues;
    public static String        Dialog_ReimportTours_Checkbox_RunningDynamicsValues;
-   public static String        Dialog_ReimportTours_Checkbox_SelectedTours;
+   public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
    public static String        Dialog_ReimportTours_Checkbox_SwimmingValues;
    public static String        Dialog_ReimportTours_Checkbox_TemperatureValues;
    public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
@@ -386,6 +383,9 @@ public class Messages extends NLS {
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
    public static String        Dialog_ReimportTours_Group_Data_Tooltip;
+   public static String        Dialog_ReimportTours_Radio_AllTours;
+   public static String        Dialog_ReimportTours_Radio_BetweenDates;
+   public static String        Dialog_ReimportTours_Radio_SelectedTours;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
