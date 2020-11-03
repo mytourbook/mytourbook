@@ -3611,33 +3611,49 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       maxSpeed = 0.0f;
-      maxPace = Float.MAX_VALUE;
 
       for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
          final float timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
          final float distanceDiff = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
 
-         final double speedMetric = distanceDiff / timeDiff * 3.6;
-         final double speedImperial = speedMetric / UI.UNIT_MILE;
+         if (timeDiff == 0) {
 
-         if (speedMetric > maxSpeed) {
-            maxSpeed = (float) speedMetric;
+            // this case occurred -> copy data from previous time slice
+
+            final int prevSerieIndex = serieIndex - 1;
+
+            speedSerie[serieIndex] = speedSerie[prevSerieIndex];
+            speedSerieImperial[serieIndex] = speedSerieImperial[prevSerieIndex];
+
+            paceSerieSeconds[serieIndex] = paceSerieSeconds[prevSerieIndex];
+            paceSerieSecondsImperial[serieIndex] = paceSerieSecondsImperial[prevSerieIndex];
+
+            paceSerieMinute[serieIndex] = paceSerieMinute[prevSerieIndex];
+            paceSerieMinuteImperial[serieIndex] = paceSerieMinuteImperial[prevSerieIndex];
+
+         } else {
+
+            final double speedMetric = distanceDiff / timeDiff * 3.6;
+            final double speedImperial = speedMetric / UI.UNIT_MILE;
+
+            speedSerie[serieIndex] = (float) speedMetric;
+            speedSerieImperial[serieIndex] = (float) speedImperial;
+
+            final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+            final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+
+            if (speedMetric > maxSpeed) {
+               maxSpeed = (float) speedMetric;
+               maxPace = paceMetricSeconds;
+            }
+
+            paceSerieSeconds[serieIndex] = paceMetricSeconds;
+            paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+            paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+            paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
          }
-
-         speedSerie[serieIndex] = (float) speedMetric;
-         speedSerieImperial[serieIndex] = (float) speedImperial;
-
-         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
-
-         paceSerieSeconds[serieIndex] = paceMetricSeconds;
-         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
-
-         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
-
-         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
-         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
       }
    }
 
@@ -3861,17 +3877,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      maxSpeed = 0.0f;
-      maxPace = Float.MAX_VALUE;
+      maxSpeed = maxPace = 0.0f;
 
       for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
          final double speedMetric = Vh[serieIndex] * 3.6;
          final double speedImperial = speedMetric / UI.UNIT_MILE;
-
-         if (speedMetric > maxSpeed) {
-            maxSpeed = (float) speedMetric;
-         }
 
          speedSerie[serieIndex] = (float) speedMetric;
          speedSerieImperial[serieIndex] = (float) speedImperial;
@@ -3879,10 +3890,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
          final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
+         if (speedMetric > maxSpeed) {
+            maxSpeed = (float) speedMetric;
+            maxPace = paceMetricSeconds;
+         }
+
          paceSerieSeconds[serieIndex] = paceMetricSeconds;
          paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
-
-         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
 
          paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
          paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
@@ -4615,7 +4629,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       speedSerieImperial = new float[serieLength];
 
-      maxSpeed = 0;
+      maxSpeed = maxPace = 0;
 
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -4628,6 +4642,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          speedSerieImperial[serieIndex] = speedMetric / UI.UNIT_MILE;
          maxSpeed = Math.max(maxSpeed, speedMetric);
       }
+
+      //Convert the max speed to max pace
+      maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
    }
 
    /**
@@ -4673,8 +4690,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final int serieLengthLast = serieLength - 1;
 
-      maxSpeed = 0;
-      maxPace = Float.MAX_VALUE;
+      maxSpeed = maxPace = 0;
 
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -4739,14 +4755,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
          final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
-         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
-
          paceSerieSeconds[serieIndex] = paceMetricSeconds;
          paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
          paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
          paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
       }
+
+      //Convert the max speed to max pace
+      maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
    }
 
    /**
@@ -4764,8 +4781,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int serieLength = timeSerie.length;
       final int lastSerieIndex = serieLength - 1;
 
-      maxSpeed = 0;
-      maxPace = Float.MAX_VALUE;
+      maxSpeed = maxPace = 0;
 
       speedSerie = new float[serieLength];
       speedSerieImperial = new float[serieLength];
@@ -9695,7 +9711,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
       final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
-      maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
+      //Convert the max speed to max pace
+      maxPace = maxSpeed < 1.0 ? 0 : (float) (3600.0 / maxSpeed);
 
       paceSerieSeconds[serieIndex] = paceMetricSeconds;
       paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;

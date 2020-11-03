@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,27 +13,21 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.rawData;
+package net.tourbook.importdata;
 
-import net.tourbook.Messages;
-import net.tourbook.common.util.ITourViewer3;
+/**
+ * Keeps the different states which can occur when a re-import is performed.
+ */
+public class ReImportStatus {
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
+   boolean isReImported;
 
-public class ActionReimportTours extends Action {
+   /**
+    * Is <code>true</code> when the invalid import file location is canceled by the user.
+    */
+   boolean isCanceled_ByUser_TheFileLocationDialog;
 
-   private final ITourViewer3 _tourViewer;
+   boolean isCanceled_Auto_ImportFilePathIsEmpty;
 
-   public ActionReimportTours(final ITourViewer3 tourViewer) {
-
-      _tourViewer = tourViewer;
-
-      setText(Messages.Dialog_ReimportTours_Action_OpenDialog);
-   }
-
-   @Override
-   public void run() {
-      new DialogReimportTours(Display.getCurrent().getActiveShell(), _tourViewer).open();
-   }
+   boolean isCanceled_Auto_TheFileLocationDialog;
 }

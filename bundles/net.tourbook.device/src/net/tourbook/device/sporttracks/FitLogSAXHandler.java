@@ -232,7 +232,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          final StringBuilder notes = new StringBuilder(ATTRIB_EQUIPMENT_ID + "(SportTracks): " + Id); //$NON-NLS-1$
 
          if (!StringUtils.isNullOrEmpty(DatePurchased)) {
-            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1
+            notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1$
          }
          if (!StringUtils.isNullOrEmpty(ExpectedLifeKilometers)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + ": " + ExpectedLifeKilometers); //$NON-NLS-1$
