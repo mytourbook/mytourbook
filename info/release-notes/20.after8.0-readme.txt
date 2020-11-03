@@ -44,6 +44,9 @@ New
 * Geo Compare View (Frederic)
   - Added a relative geo differences filter to only display the compared tours for which the relative geo difference is under that threshold (see feature request https://sourceforge.net/p/mytourbook/feature-requests/183/)
 
+* Import Magellan/Mio Cyclo 105 *.act Files (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/219
+
+
 Improvements
 ============
 
@@ -124,8 +127,6 @@ Fixes
   - Fixed a possible import failure for manual tours with a Time Offset
   - Fixed an issue where importing large files (> 100MB) could possibly result in a OutOfMemory error when parsing Custom Data Field Definitions
 
- 
-   
 Translation    
 ===========
 
