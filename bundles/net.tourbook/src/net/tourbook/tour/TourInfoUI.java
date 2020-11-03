@@ -182,7 +182,7 @@ public class TourInfoUI {
    private Label             _lblAvg_PowerUnit;
    private Label             _lblBodyWeight;
    private Label             _lblBreakTime;
-   private Label             _lblBreakTimeHour;
+   private Label             _lblBreakTime_Unit;
    private Label             _lblCalories;
    private Label             _lblCloudsUnit;
    private Label             _lblDate;
@@ -202,13 +202,13 @@ public class TourInfoUI {
    private Label             _lblMaxSpeed;
    private Label             _lblMaxSpeedUnit;
    private Label             _lblMovingTime;
-   private Label             _lblMovingTimeHour;
+   private Label             _lblMovingTime_Unit;
    private Label             _lblElapsedTime;
-   private Label             _lblElapsedTimeHour;
+   private Label             _lblElapsedTime_Unit;
    private Label             _lblPausedTime;
-   private Label             _lblPausedTimeHour;
+   private Label             _lblPausedTime_Unit;
    private Label             _lblRecordedTime;
-   private Label             _lblRecordedTimeHour;
+   private Label             _lblRecordedTime_Unit;
    private Label             _lblRestPulse;
    private Label             _lblTemperature;
    private Label             _lblTimeZone_Value;
@@ -514,10 +514,10 @@ public class TourInfoUI {
          createUI_Label(container, Messages.Tour_Tooltip_Label_ElapsedTime);
 
          _lblElapsedTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblElapsedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblElapsedTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
          // force this column to take the rest of the space
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblElapsedTimeHour);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblElapsedTime_Unit);
       }
 
       {
@@ -527,7 +527,7 @@ public class TourInfoUI {
          createUI_Label(container, Messages.Tour_Tooltip_Label_RecordedTime);
 
          _lblRecordedTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblRecordedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblRecordedTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
       {
@@ -537,7 +537,7 @@ public class TourInfoUI {
          createUI_Label(container, Messages.Tour_Tooltip_Label_PausedTime);
 
          _lblPausedTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblPausedTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblPausedTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
       {
@@ -547,7 +547,7 @@ public class TourInfoUI {
          createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
 
          _lblMovingTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblMovingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblMovingTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
       {
@@ -557,7 +557,7 @@ public class TourInfoUI {
          createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
 
          _lblBreakTime = createUI_LabelValue(container, SWT.TRAIL);
-         _lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+         _lblBreakTime_Unit = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
       }
 
       if (isSimpleTour()) {
@@ -1376,11 +1376,12 @@ public class TourInfoUI {
 
                ));
 
-         _lblElapsedTimeHour.setVisible(true);
-         _lblRecordedTimeHour.setVisible(true);
-         _lblPausedTimeHour.setVisible(true);
-         _lblMovingTimeHour.setVisible(true);
-         _lblBreakTimeHour.setVisible(true);
+         // show units only when data are available
+         _lblElapsedTime_Unit.setVisible(elapsedTime > 0);
+         _lblRecordedTime_Unit.setVisible(recordedTime > 0);
+         _lblPausedTime_Unit.setVisible(pausedTime > 0);
+         _lblMovingTime_Unit.setVisible(movingTime > 0);
+         _lblBreakTime_Unit.setVisible(breakTime > 0);
 
          _lblElapsedTime.setText(FormatManager.formatElapsedTime(elapsedTime));
          _lblRecordedTime.setText(FormatManager.formatMovingTime(recordedTime));
@@ -1418,11 +1419,11 @@ public class TourInfoUI {
                ));
 
          // hide labels, they are displayed with the period values
-         _lblElapsedTimeHour.setVisible(false);
-         _lblRecordedTimeHour.setVisible(false);
-         _lblPausedTimeHour.setVisible(false);
-         _lblMovingTimeHour.setVisible(false);
-         _lblBreakTimeHour.setVisible(false);
+         _lblElapsedTime_Unit.setVisible(false);
+         _lblRecordedTime_Unit.setVisible(false);
+         _lblPausedTime_Unit.setVisible(false);
+         _lblMovingTime_Unit.setVisible(false);
+         _lblBreakTime_Unit.setVisible(false);
 
          final Period elapsedPeriod = new Period(
                _tourData.getTourStartTimeMS(),
@@ -1540,15 +1541,7 @@ public class TourInfoUI {
       _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
       _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-      float maxPace = _tourData.getMaxPace();
-      //If maxPace is equal to the maximum float value,
-      //it means that the Tour may not have a pace serie data.
-      //In this case, we set it to 0, otherwise it will display
-      //a gigantic value.
-      if (maxPace == Float.MAX_VALUE) {
-         maxPace = 0;
-      }
-      _lblMaxPace.setText(UI.format_mm_ss((long) (maxPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+      _lblMaxPace.setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
       _lblMaxPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
       _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));

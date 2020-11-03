@@ -1379,10 +1379,11 @@ public class TourDatabase {
 
       final ArrayList<Long> tourIds = new ArrayList<>();
 
-      try (Connection conn = getInstance().getConnection(); //
+      try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         final ResultSet result = stmt.executeQuery("SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+         final ResultSet result = stmt.executeQuery(
+               "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA + " ORDER BY TourStartTime"); //$NON-NLS-1$ //$NON-NLS-2$
 
          while (result.next()) {
             tourIds.add(result.getLong(1));
@@ -1390,6 +1391,48 @@ public class TourDatabase {
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
+      }
+
+      return tourIds;
+   }
+
+   public static ArrayList<Long> getAllTourIds_BetweenTwoDates(final LocalDate dateFrom, final LocalDate dateUntil) {
+
+      final ArrayList<Long> tourIds = new ArrayList<>();
+
+      PreparedStatement stmt = null;
+
+      try (Connection conn = getInstance().getConnection()) {
+
+         final ZoneId defaultTimeZone = TimeTools.getDefaultTimeZone();
+
+         final ZonedDateTime dateStart = dateFrom.atStartOfDay(defaultTimeZone);
+         final ZonedDateTime dateEnd = dateUntil.atStartOfDay(defaultTimeZone).plusDays(1);
+
+         final long dateFromMS = dateStart.toInstant().toEpochMilli();
+         final long dateUntilMS = dateEnd.toInstant().toEpochMilli();
+
+         final String sql = UI.EMPTY_STRING +
+
+               "SELECT tourId" //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
+               + " WHERE TourStartTime >= ? AND TourStartTime < ?" //$NON-NLS-1$
+               + " ORDER BY TourStartTime"; //$NON-NLS-1$
+
+         stmt = conn.prepareStatement(sql);
+         stmt.setLong(1, dateFromMS);
+         stmt.setLong(2, dateUntilMS);
+
+         final ResultSet result = stmt.executeQuery();
+
+         while (result.next()) {
+            tourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      } finally {
+         Util.closeSql(stmt);
       }
 
       return tourIds;
@@ -1457,10 +1500,10 @@ public class TourDatabase {
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
 
-            final Query emQuery = em.createQuery(
-                  UI.EMPTY_STRING
-                        + "SELECT tourTagCategory" //$NON-NLS-1$
-                        + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT tourTagCategory" //$NON-NLS-1$
+                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory"); //$NON-NLS-1$ //$NON-NLS-2$
 
             _allTourTagCategories = new HashMap<>();
 

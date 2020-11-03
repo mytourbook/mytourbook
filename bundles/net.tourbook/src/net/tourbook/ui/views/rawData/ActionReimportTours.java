@@ -29,7 +29,7 @@ public class ActionReimportTours extends Action {
 
       _tourViewer = tourViewer;
 
-      setText(Messages.dialog_reimport_tours_shell_text);
+      setText(Messages.Dialog_ReimportTours_Action_OpenDialog);
    }
 
    @Override

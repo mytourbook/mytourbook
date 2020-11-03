@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                   //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_None;
@@ -121,16 +121,6 @@ public class Messages extends NLS {
    public static String        Compute_GovssValues_ComputeForAllTours_Job_Result;
 
    public static String        dialog_export_btn_export;
-   public static String        dialog_reimport_tours_btn_reimport;
-   public static String        dialog_reimport_tours_btn_skip_tours_with_importFile_notfound;
-   public static String        dialog_reimport_tours_checkbox_alltours;
-   public static String        dialog_reimport_tours_checkbox_selectedtours;
-   public static String        dialog_reimport_tours_dialog_title;
-   public static String        Dialog_Reimport_Tours_Group_Tours;
-   public static String        Dialog_Reimport_Tours_Group_Tours_Tooltip;
-   public static String        Dialog_Reimport_Tours_Group_Data;
-   public static String        Dialog_Reimport_Tours_Group_Data_Tooltip;
-   public static String        dialog_reimport_tours_shell_text;
    public static String        dialog_export_chk_camouflageSpeed;
    public static String        dialog_export_chk_camouflageSpeed_tooltip;
    public static String        dialog_export_chk_camouflageSpeedInput_tooltip;
@@ -372,6 +362,37 @@ public class Messages extends NLS {
 
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
+
+   public static String        Dialog_ReimportTours_Action_OpenDialog;
+   public static String        Dialog_ReimportTours_Button_ReImport;
+   public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
+   public static String        Dialog_ReimportTours_Checkbox_ElevationValues;
+   public static String        Dialog_ReimportTours_Checkbox_EntireTour;
+   public static String        Dialog_ReimportTours_Checkbox_GearValues;
+   public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
+   public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
+   public static String        Dialog_ReimportTours_Checkbox_PowerAndPulseValues;
+   public static String        Dialog_ReimportTours_Checkbox_PowerAndSpeedValues;
+   public static String        Dialog_ReimportTours_Checkbox_RunningDynamicsValues;
+   public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
+   public static String        Dialog_ReimportTours_Checkbox_SwimmingValues;
+   public static String        Dialog_ReimportTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
+   public static String        Dialog_ReimportTours_Checkbox_TourMarkers;
+   public static String        Dialog_ReimportTours_Checkbox_TourTimerPauses;
+   public static String        Dialog_ReimportTours_Checkbox_TrainingValues;
+   public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
+   public static String        Dialog_ReimportTours_Dialog_Message;
+   public static String        Dialog_ReimportTours_Dialog_Title;
+   public static String        Dialog_ReimportTours_Dialog_ToursAreNotAvailable;
+   public static String        Dialog_ReimportTours_Error_2ndDateMustBeLarger;
+   public static String        Dialog_ReimportTours_Group_Tours;
+   public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
+   public static String        Dialog_ReimportTours_Group_Data;
+   public static String        Dialog_ReimportTours_Group_Data_Tooltip;
+   public static String        Dialog_ReimportTours_Radio_AllTours;
+   public static String        Dialog_ReimportTours_Radio_BetweenDates;
+   public static String        Dialog_ReimportTours_Radio_SelectedTours;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
@@ -1221,21 +1242,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-   public static String        Import_Data_Dialog_ConfirmReimportValues_Message;
-   public static String        Import_Data_Checkbox_AltitudeValues;
-   public static String        Import_Data_Checkbox_CadenceValues;
-   public static String        Import_Data_Checkbox_GearValues;
-   public static String        Import_Data_Checkbox_PowerAndPulseValues;
-   public static String        Import_Data_Checkbox_PowerAndSpeedValues;
-   public static String        Import_Data_Checkbox_RunningDynamicsValues;
-   public static String        Import_Data_Checkbox_SwimmingValues;
-   public static String        Import_Data_Checkbox_TemperatureValues;
-   public static String        Import_Data_Checkbox_TimeSlices;
-   public static String        Import_Data_Checkbox_TourMarkers;
-   public static String        Import_Data_Checkbox_TourTimerPauses;
-   public static String        Import_Data_Checkbox_TrainingValues;
-   public static String        Import_Data_Checkbox_EntireTour;
-   public static String        Import_Data_Checkbox_ImportFileLocation;
    public static String        Import_Data_Text_AltitudeValues;
    public static String        Import_Data_Text_CadenceValues;
    public static String        Import_Data_Text_GearValues;
@@ -1259,6 +1265,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_Reimport_SubTask;
    public static String        Import_Data_Dialog_Reimport_Task;
    public static String        Import_Data_Dialog_Reimport_Title;
+   public static String        Import_Data_Dialog_ReimportFile_Title;
    public static String        Import_Data_Error_CreatingFileName_Message;
    public static String        Import_Data_Error_CreatingFileName_Title;
    public static String        Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
@@ -1310,6 +1317,8 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_IsCancelReImport_Message;
    public static String        Import_Data_Dialog_IsCancelReImport_Title;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
+   public static String        Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference;
+   public static String        Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference_Subsequent;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
    public static String        Import_Data_Monitor_Backup;
    public static String        Import_Data_Monitor_Backup_SubTask;
@@ -1389,6 +1398,10 @@ public class Messages extends NLS {
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Tour;
    public static String        Log_Reimport_Tour_Skipped;
+   public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
+   public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
+   public static String        Log_Reimport_Tour_Skipped_FilePathIsEmpty;
+   public static String        Log_Reimport_Tour_Skipped_OtherReasons;
 
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
@@ -1439,8 +1452,8 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing2;                                          //2, because of refactoring
-   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                  //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2;                                            //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                    //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
@@ -1451,10 +1464,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt2;                                             //2, because of refactoring
-   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                     //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2;                                        //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2;                                               //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                       //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                          //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                  //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -2142,6 +2155,7 @@ public class Messages extends NLS {
    public static String Slideout_GeoCompareOptions_Label_DistanceInterval;
    public static String Slideout_GeoCompareOptions_Label_GeoAccuracy;
    public static String Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter;
+   public static String Slideout_GeoCompareOptions_Label_GeoRelativeDifferences_Filter_Tooltip;
    public static String Slideout_GeoCompareOptions_Label_LineWidth;
    public static String Slideout_GeoCompareOptions_Label_NormalizedDistance;
    public static String Slideout_GeoCompareOptions_Label_ReferenceTour;
