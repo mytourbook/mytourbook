@@ -1,0 +1,48 @@
+20.?.0                                                 ?. Month 2020
+
+
+TODO's
+======
+  
+* 
+
+Issues
+======
+
+
+New
+===
+
+* 
+
+Improvements
+============
+
+* 
+
+Changes  
+=======
+
+* 
+
+Fixes   
+=====
+
+* 
+
+
+Translation    
+===========
+
+ - Czech 20.8 (Lukas)
+ - Dutch 20.8 (Maarten)
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+
+* FIT SDK 21.40
+* Eclipse 2020-09

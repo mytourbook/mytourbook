@@ -1,4 +1,4 @@
-20.?.0                                                 ?. Month 2020
+20.11.0                                                 ?. November 2020
 
 
 TODO's
@@ -8,10 +8,6 @@ TODO's
   http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
 
 * Translators should check if the new time words are correct because they where automatically transformed from the existing time words
-
-
-Issues
-======
 
 
 New
@@ -127,6 +123,7 @@ Fixes
   - Fixed a possible import failure for manual tours with a Time Offset
   - Fixed an issue where importing large files (> 100MB) could possibly result in a OutOfMemory error when parsing Custom Data Field Definitions
 
+
 Translation    
 ===========
 
@@ -141,4 +138,3 @@ System
 ======
 
 * FIT SDK 21.40
-* Eclipse 2020-09
