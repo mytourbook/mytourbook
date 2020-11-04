@@ -18,9 +18,13 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.System_Pressure_Atmosphere;
+import net.tourbook.measurement_system.System_DayTime;
 import net.tourbook.measurement_system.System_Distance;
 import net.tourbook.measurement_system.System_Elevation;
+import net.tourbook.measurement_system.System_Height;
+import net.tourbook.measurement_system.System_Length;
+import net.tourbook.measurement_system.System_Pressure_Atmosphere;
+import net.tourbook.measurement_system.System_LengthSmall;
 import net.tourbook.measurement_system.System_Temperature;
 import net.tourbook.measurement_system.System_Weight;
 
@@ -39,12 +43,16 @@ import org.eclipse.swt.widgets.Shell;
 
 class DialogSelectMeasurementSystem extends Dialog {
 
-   private Combo _comboSystem_AtmosphericPressure;
-   private Combo _comboSystem_Distance;
-   private Combo _comboSystem_Elevation;
    private Combo _comboSystem_Profile;
-   private Combo _comboSystem_Temperature;
-   private Combo _comboSystem_Weight;
+   private Combo _comboSystemOptiop_DayTime;
+   private Combo _comboSystemOptiop_Distance;
+   private Combo _comboSystemOptiop_Elevation;
+   private Combo _comboSystemOptiop_Height_Body;
+   private Combo _comboSystemOptiop_Length;
+   private Combo _comboSystemOptiop_Length_Small;
+   private Combo _comboSystemOptiop_Pressure_Atmosphere;
+   private Combo _comboSystemOptiop_Temperature;
+   private Combo _comboSystemOptiop_Weight;
 
    protected DialogSelectMeasurementSystem(final Shell parentShell) {
       super(parentShell);
@@ -53,7 +61,9 @@ class DialogSelectMeasurementSystem extends Dialog {
    @Override
    public boolean close() {
 
-//		MeasurementSystemContributionItem.saveMeasurementSystem_OLD(systemIndex);
+      final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
+
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(activeSystemProfileIndex, false);
 
       return super.close();
    }
@@ -75,9 +85,9 @@ class DialogSelectMeasurementSystem extends Dialog {
       final Composite ui = createUI(parent);
 
       enableControls();
-      fillControls();
+      fillSystemControls();
 
-      // select metric system which is the first profile in the first startup
+      // select default system which is the metric (first) profile in the first startup
       _comboSystem_Profile.select(0);
       onSystemProfile_Select();
 
@@ -126,7 +136,7 @@ class DialogSelectMeasurementSystem extends Dialog {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
@@ -142,6 +152,9 @@ class DialogSelectMeasurementSystem extends Dialog {
             _comboSystem_Profile = new Combo(container, SWT.READ_ONLY);
             _comboSystem_Profile.addSelectionListener(profileListener);
             gridData_Combo.applyTo(_comboSystem_Profile);
+
+            // spacer
+            new Label(container, SWT.NONE);
          }
          {
             /*
@@ -154,8 +167,51 @@ class DialogSelectMeasurementSystem extends Dialog {
             gridData_Label.applyTo(label);
 
             // combo
-            _comboSystem_Distance = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystem_Distance);
+            _comboSystemOptiop_Distance = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Distance);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Distance_Info);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Length
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_Length);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_Length = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Length);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Length_Info);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Small length
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_Length_Small);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_Length_Small = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Length_Small);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Length_Small_Info);
+            gridData_Label.applyTo(labelInfo);
          }
          {
             /*
@@ -168,8 +224,32 @@ class DialogSelectMeasurementSystem extends Dialog {
             gridData_Label.applyTo(label);
 
             // combo
-            _comboSystem_Elevation = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystem_Elevation);
+            _comboSystemOptiop_Elevation = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Elevation);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Elevation_Info);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Height
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_Height);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_Height_Body = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Height_Body);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Height_Info);
+            gridData_Label.applyTo(labelInfo);
          }
          {
             /*
@@ -182,12 +262,30 @@ class DialogSelectMeasurementSystem extends Dialog {
             gridData_Label.applyTo(label);
 
             // combo
-            _comboSystem_Temperature = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystem_Temperature);
+            _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
+
+            new Label(container, SWT.NONE);
          }
          {
             /*
-             * Body weight
+             * Daytime
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_DayTime);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
+
+            new Label(container, SWT.NONE);
+         }
+         {
+            /*
+             * Weight
              */
 
             // label
@@ -196,8 +294,13 @@ class DialogSelectMeasurementSystem extends Dialog {
             gridData_Label.applyTo(label);
 
             // combo
-            _comboSystem_Weight = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystem_Weight);
+            _comboSystemOptiop_Weight = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Weight);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Weight_Info);
+            gridData_Label.applyTo(labelInfo);
          }
          {
             /*
@@ -206,50 +309,76 @@ class DialogSelectMeasurementSystem extends Dialog {
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_System_Label_AtmosphericPressure);
+            label.setText(Messages.Pref_System_Label_Pressure_Atmosphere);
             gridData_Label.applyTo(label);
 
             // combo
-            _comboSystem_AtmosphericPressure = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystem_AtmosphericPressure);
+            _comboSystemOptiop_Pressure_Atmosphere = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Pressure_Atmosphere);
+
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_Pressure_Atmosphere_Info);
+            gridData_Label.applyTo(labelInfo);
          }
       }
    }
 
    private void enableControls() {
 
-      _comboSystem_AtmosphericPressure.setEnabled(false);
-      _comboSystem_Distance.setEnabled(false);
-      _comboSystem_Elevation.setEnabled(false);
-      _comboSystem_Temperature.setEnabled(false);
-      _comboSystem_Weight.setEnabled(false);
+      _comboSystemOptiop_DayTime.setEnabled(false);
+      _comboSystemOptiop_Distance.setEnabled(false);
+      _comboSystemOptiop_Elevation.setEnabled(false);
+      _comboSystemOptiop_Height_Body.setEnabled(false);
+      _comboSystemOptiop_Length.setEnabled(false);
+      _comboSystemOptiop_Length_Small.setEnabled(false);
+      _comboSystemOptiop_Pressure_Atmosphere.setEnabled(false);
+      _comboSystemOptiop_Temperature.setEnabled(false);
+      _comboSystemOptiop_Weight.setEnabled(false);
    }
 
-   private void fillControls() {
+   private void fillSystemControls() {
 
       for (final MeasurementSystem systemProfile : MeasurementSystem_Manager.getCurrentProfiles()) {
          _comboSystem_Profile.add(systemProfile.getName());
       }
 
       for (final System_Pressure_Atmosphere system : MeasurementSystem_Manager.getAllSystem_AtmosphericPressures()) {
-         _comboSystem_AtmosphericPressure.add(system.getLabel());
+         _comboSystemOptiop_Pressure_Atmosphere.add(system.getLabel());
+      }
+
+      for (final System_DayTime system : MeasurementSystem_Manager.getAllSystem_DayTime()) {
+         _comboSystemOptiop_DayTime.add(system.getLabel());
       }
 
       for (final System_Distance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
-         _comboSystem_Distance.add(systemDistance.getLabel());
+         _comboSystemOptiop_Distance.add(systemDistance.getLabel());
       }
 
       for (final System_Elevation systemElevation : MeasurementSystem_Manager.getAllSystem_Elevations()) {
-         _comboSystem_Elevation.add(systemElevation.getLabel());
+         _comboSystemOptiop_Elevation.add(systemElevation.getLabel());
+      }
+
+      for (final System_Height systemHeight : MeasurementSystem_Manager.getAllSystem_Heights()) {
+         _comboSystemOptiop_Height_Body.add(systemHeight.getLabel());
+      }
+
+      for (final System_Length systemElevation : MeasurementSystem_Manager.getAllSystem_Length()) {
+         _comboSystemOptiop_Length.add(systemElevation.getLabel());
+      }
+
+      for (final System_LengthSmall systemElevation : MeasurementSystem_Manager.getAllSystem_SmallLength()) {
+         _comboSystemOptiop_Length_Small.add(systemElevation.getLabel());
       }
 
       for (final System_Temperature systemTemperature : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
-         _comboSystem_Temperature.add(systemTemperature.getLabel());
+         _comboSystemOptiop_Temperature.add(systemTemperature.getLabel());
       }
 
       for (final System_Weight systemWeight : MeasurementSystem_Manager.getAllSystem_Weights()) {
-         _comboSystem_Weight.add(systemWeight.getLabel());
+         _comboSystemOptiop_Weight.add(systemWeight.getLabel());
       }
+
    }
 
    private void onSystemProfile_Select() {
@@ -257,10 +386,16 @@ class DialogSelectMeasurementSystem extends Dialog {
       final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
       final MeasurementSystem selectedSystemProfile = MeasurementSystem_Manager.getCurrentProfiles().get(activeSystemProfileIndex);
 
-      _comboSystem_AtmosphericPressure.select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
-      _comboSystem_Distance.select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
-      _comboSystem_Elevation.select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
-      _comboSystem_Temperature.select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
-      _comboSystem_Weight.select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
+// SET_FORMATTING_OFF
+      _comboSystemOptiop_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
+      _comboSystemOptiop_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
+      _comboSystemOptiop_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
+      _comboSystemOptiop_Height_Body         .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));
+      _comboSystemOptiop_Length              .select(MeasurementSystem_Manager.getSystemIndex_Length(selectedSystemProfile));
+      _comboSystemOptiop_Length_Small        .select(MeasurementSystem_Manager.getSystemIndex_Length_Small(selectedSystemProfile));
+      _comboSystemOptiop_Pressure_Atmosphere .select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
+      _comboSystemOptiop_Temperature         .select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
+      _comboSystemOptiop_Weight              .select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
+// SET_FORMATTING_ON
    }
 }

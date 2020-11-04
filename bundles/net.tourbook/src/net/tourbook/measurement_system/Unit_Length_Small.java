@@ -15,22 +15,15 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public class System_SmallLength {
+public enum Unit_Length_Small {
 
-   private String           _label;
-   private Unit_SmallLength _smallLength;
+   /**
+    * Millimeter (mm)
+    */
+   MILLIMETER,
 
-   public System_SmallLength(final Unit_SmallLength smallLength, final String label) {
-
-      _smallLength = smallLength;
-      _label = label;
-   }
-
-   public String getLabel() {
-      return _label;
-   }
-
-   public Unit_SmallLength getSmallLength() {
-      return _smallLength;
-   }
+   /**
+    * Inch (inch)
+    */
+   INCH
 }

@@ -169,27 +169,34 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          return;
       }
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(selectedIndex);
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(selectedIndex, true);
    }
 
    private void selectActiveSystem() {
 
-      final String systemData = UI.EMPTY_STRING
+      final String DASH = UI.DASH_WITH_SPACE;
 
-            + Messages.Pref_System_Label_Distance + UI.DASH_WITH_SPACE + MeasurementSystem_Manager.getActiveSystem_Distance().getLabel() + NL
-            + Messages.Pref_System_Label_Elevation + UI.DASH_WITH_SPACE + MeasurementSystem_Manager.getActiveSystem_Elevation().getLabel() + NL
-            + Messages.Pref_System_Label_Temperature + UI.DASH_WITH_SPACE + MeasurementSystem_Manager.getActiveSystem_Temperature().getLabel() + NL
-            + Messages.Pref_System_Label_Weight + UI.DASH_WITH_SPACE + MeasurementSystem_Manager.getActiveSystem_Weight().getLabel() + NL
+// SET_FORMATTING_OFF
 
-            + Messages.Pref_System_Label_AtmosphericPressure + UI.DASH_WITH_SPACE
-            + MeasurementSystem_Manager.getActiveSystem_AtmosphericPressure().getLabel()
+      final String tooltipData = UI.EMPTY_STRING
+
+         + Messages.Pref_System_Label_Distance              + DASH + MeasurementSystem_Manager.getActiveSystemOption_Distance().getLabel()      + NL
+         + Messages.Pref_System_Label_Length                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length().getLabel()        + NL
+         + Messages.Pref_System_Label_Length_Small           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
+         + Messages.Pref_System_Label_Elevation             + DASH + MeasurementSystem_Manager.getActiveSystemOption_Elevation().getLabel()     + NL
+         + Messages.Pref_System_Label_Height                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Height().getLabel()        + NL
+         + Messages.Pref_System_Label_Temperature           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Temperature().getLabel()   + NL
+         + Messages.Pref_System_Label_DayTime               + DASH + MeasurementSystem_Manager.getActiveSystemOption_DayTime().getLabel()       + NL
+         + Messages.Pref_System_Label_Weight                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Weight().getLabel()        + NL
+         + Messages.Pref_System_Label_Pressure_Atmosphere   + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pressure_Atmospheric().getLabel()
 
       ;
+// SET_FORMATTING_ON
 
       final int activeSystemProfileIndex = MeasurementSystem_Manager.getActiveSystem_ProfileIndex();
       _combo.select(activeSystemProfileIndex);
 
-      _combo.setToolTipText(String.format(Messages.Measurement_System_Tooltip, systemData));
+      _combo.setToolTipText(String.format(Messages.Measurement_System_Tooltip, tooltipData));
    }
 
    private void updateUI_MeasurementSystem() {

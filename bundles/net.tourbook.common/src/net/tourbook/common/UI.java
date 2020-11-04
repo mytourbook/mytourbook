@@ -962,11 +962,14 @@ public class UI {
       GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
    }
 
-   public static void createtSpacer_Vertical(final Composite parent, final int height) {
+   public static void createtSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
 
       final Label label = new Label(parent, SWT.NONE);
 
-      GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).applyTo(label);
+      GridDataFactory.fillDefaults()
+            .hint(SWT.DEFAULT, height)
+            .span(spanHorizontal, 1)
+            .applyTo(label);
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {

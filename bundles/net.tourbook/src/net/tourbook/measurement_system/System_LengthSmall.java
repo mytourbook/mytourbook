@@ -15,15 +15,22 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Unit_Height {
+public class System_LengthSmall {
 
-   /**
-    * Metric measurement system: meter
-    */
-   METER,
+   private String            _label;
+   private Unit_Length_Small _smallLength;
 
-   /**
-    * Imperial measurement system: inch
-    */
-   INCH
+   public System_LengthSmall(final Unit_Length_Small smallLength, final String label) {
+
+      _smallLength = smallLength;
+      _label = label;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
+
+   public Unit_Length_Small getSmallLength() {
+      return _smallLength;
+   }
 }

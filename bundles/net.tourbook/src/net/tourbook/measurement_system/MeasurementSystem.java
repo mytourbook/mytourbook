@@ -29,23 +29,23 @@ public class MeasurementSystem implements Cloneable {
    private Unit_DayTime             _dayTime;
    private Unit_Distance            _distance;
    private Unit_Elevation           _elevation;
-   private Unit_Height              _height;
+   private Unit_Height_Body         _height;
    private Unit_Length              _length;
+   private Unit_Length_Small        _length_Small;
    private Unit_Pressure_Atmosphere _pressure_Atmosphere;
-   private Unit_SmallLength         _smallLength;
    private Unit_Temperature         _temperature;
-   private Unit_Weight              _weight;
+   private Unit_Weight              _weight_Body;
 
    private boolean                  _savedState_IsProfileActive;
 
    public MeasurementSystem(final String name,
                             final Unit_DayTime dayTime,
                             final Unit_Distance distance,
-                            final Unit_Elevation elevation,
-                            final Unit_Height height,
                             final Unit_Length length,
+                            final Unit_Length_Small smallLength,
+                            final Unit_Elevation elevation,
+                            final Unit_Height_Body height,
                             final Unit_Pressure_Atmosphere pressure,
-                            final Unit_SmallLength smallLength,
                             final Unit_Temperature temperature,
                             final Unit_Weight weight) {
 
@@ -54,12 +54,12 @@ public class MeasurementSystem implements Cloneable {
       _pressure_Atmosphere = pressure;
       _dayTime = dayTime;
       _distance = distance;
+      _length = length;
+      _length_Small = smallLength;
       _elevation = elevation;
       _height = height;
-      _length = length;
-      _smallLength = smallLength;
       _temperature = temperature;
-      _weight = weight;
+      _weight_Body = weight;
    }
 
    @Override
@@ -96,12 +96,16 @@ public class MeasurementSystem implements Cloneable {
       return _elevation;
    }
 
-   public Unit_Height getHeight() {
+   public Unit_Height_Body getHeight() {
       return _height;
    }
 
    public Unit_Length getLength() {
       return _length;
+   }
+
+   public Unit_Length_Small getLengthSmall() {
+      return _length_Small;
    }
 
    /**
@@ -125,10 +129,6 @@ public class MeasurementSystem implements Cloneable {
       return _savedState_IsProfileActive;
    }
 
-   public Unit_SmallLength getSmallLength() {
-      return _smallLength;
-   }
-
    /**
     * @return Returns the hash code including all measurement system data fields but not the profile
     *         name.
@@ -142,9 +142,9 @@ public class MeasurementSystem implements Cloneable {
             _height,
             _length,
             _pressure_Atmosphere,
-            _smallLength,
+            _length_Small,
             _temperature,
-            _weight);
+            _weight_Body);
    }
 
    /**
@@ -158,7 +158,7 @@ public class MeasurementSystem implements Cloneable {
     * @return the weight
     */
    public Unit_Weight getWeight() {
-      return _weight;
+      return _weight_Body;
    }
 
    /**
@@ -189,7 +189,7 @@ public class MeasurementSystem implements Cloneable {
       _elevation = elevation;
    }
 
-   public void setHeight(final Unit_Height _height) {
+   public void setHeight(final Unit_Height_Body _height) {
       this._height = _height;
    }
 
@@ -209,8 +209,8 @@ public class MeasurementSystem implements Cloneable {
       _savedState_IsProfileActive = isProfileActive;
    }
 
-   public void setSmallLength(final Unit_SmallLength _smallLength) {
-      this._smallLength = _smallLength;
+   public void setSmallLength(final Unit_Length_Small _smallLength) {
+      this._length_Small = _smallLength;
    }
 
    /**
@@ -226,7 +226,7 @@ public class MeasurementSystem implements Cloneable {
     *           the weight to set
     */
    public void setWeight(final Unit_Weight weight) {
-      _weight = weight;
+      _weight_Body = weight;
    }
 
    @Override
@@ -240,7 +240,7 @@ public class MeasurementSystem implements Cloneable {
             + "_distance=" + _distance + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_elevation=" + _elevation + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_temperature=" + _temperature + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_weight=" + _weight + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_weight=" + _weight_Body + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_savedState_IsProfileActive=" + _savedState_IsProfileActive + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
             + "]"; //$NON-NLS-1$

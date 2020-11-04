@@ -32,22 +32,22 @@ import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.System_Pressure_Atmosphere;
 import net.tourbook.measurement_system.System_DayTime;
 import net.tourbook.measurement_system.System_Distance;
 import net.tourbook.measurement_system.System_Elevation;
 import net.tourbook.measurement_system.System_Height;
 import net.tourbook.measurement_system.System_Length;
-import net.tourbook.measurement_system.System_SmallLength;
+import net.tourbook.measurement_system.System_Pressure_Atmosphere;
+import net.tourbook.measurement_system.System_LengthSmall;
 import net.tourbook.measurement_system.System_Temperature;
 import net.tourbook.measurement_system.System_Weight;
-import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_DayTime;
 import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
-import net.tourbook.measurement_system.Unit_Height;
+import net.tourbook.measurement_system.Unit_Height_Body;
 import net.tourbook.measurement_system.Unit_Length;
-import net.tourbook.measurement_system.Unit_SmallLength;
+import net.tourbook.measurement_system.Unit_Length_Small;
+import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_Temperature;
 import net.tourbook.measurement_system.Unit_Weight;
 
@@ -138,16 +138,16 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    // measurement system
    private Button _chkSystem_ShowMeasurementInAppToolbar;
 
-   private Combo  _comboSystem_Pressure;
-   private Combo  _comboSystem_DayTime;
-   private Combo  _comboSystem_Distance;
-   private Combo  _comboSystem_Elevation;
-   private Combo  _comboSystem_Height;
-   private Combo  _comboSystem_Length;
    private Combo  _comboSystem_Profile;
-   private Combo  _comboSystem_SmallLength;
-   private Combo  _comboSystem_Temperature;
-   private Combo  _comboSystem_Weight;
+   private Combo  _comboSystemOptiop_DayTime;
+   private Combo  _comboSystemOptiop_Distance;
+   private Combo  _comboSystemOptiop_Elevation;
+   private Combo  _comboSystemOptiop_Height_Body;
+   private Combo  _comboSystemOptiop_Length;
+   private Combo  _comboSystemOptiop_Length_Small;
+   private Combo  _comboSystemOptiop_Pressure_Atmosphere;
+   private Combo  _comboSystemOptiop_Temperature;
+   private Combo  _comboSystemOptiop_Weight;
 
    // calendar week
    private Combo _comboWeek_FirstDay;
@@ -232,6 +232,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
              */
             _chkSystem_ShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
             _chkSystem_ShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
+            _chkSystem_ShowMeasurementInAppToolbar.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSystemItem_Select();
+               }
+            });
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(0, _pc.convertVerticalDLUsToPixels(8))
@@ -280,12 +286,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
          {
-            {
-               // vertical spacer
-               UI.createtSpacer_Vertical(container, 2);
-               UI.createtSpacer_Vertical(container, 2);
-               UI.createtSpacer_Vertical(container, 2);
-            }
+            // vertical spacer
+            UI.createtSpacer_Vertical(container, 2, 3);
+
             {
                /*
                 * Measurement system
@@ -304,12 +307,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                new Label(container, SWT.NONE);
             }
-            {
-               // vertical spacer
-               UI.createtSpacer_Vertical(container, 5);
-               UI.createtSpacer_Vertical(container, 5);
-               UI.createtSpacer_Vertical(container, 5);
-            }
+
+            // vertical spacer
+            UI.createtSpacer_Vertical(container, 5, 3);
+
             {
                /*
                 * Distance
@@ -321,9 +322,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Distance = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Distance.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Distance);
+               _comboSystemOptiop_Distance = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Distance.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Distance);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
@@ -341,13 +342,33 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Length = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Length.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Length);
+               _comboSystemOptiop_Length = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Length.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Length);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
                labelInfo.setText(Messages.Pref_System_Label_Length_Info);
+               gridData_Label.applyTo(labelInfo);
+            }
+            {
+               /*
+                * Small length
+                */
+
+               // label
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Pref_System_Label_Length_Small);
+               gridData_Label.applyTo(label);
+
+               // combo
+               _comboSystemOptiop_Length_Small = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Length_Small.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Length_Small);
+
+               // label: info
+               final Label labelInfo = new Label(container, SWT.NONE);
+               labelInfo.setText(Messages.Pref_System_Label_Length_Small_Info);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -361,9 +382,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Elevation = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Elevation.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Elevation);
+               _comboSystemOptiop_Elevation = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Elevation.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Elevation);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
@@ -381,33 +402,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Height = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Height.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Height);
+               _comboSystemOptiop_Height_Body = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Height_Body.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Height_Body);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
                labelInfo.setText(Messages.Pref_System_Label_Height_Info);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Small length
-                */
-
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_SmallLength);
-               gridData_Label.applyTo(label);
-
-               // combo
-               _comboSystem_SmallLength = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_SmallLength.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_SmallLength);
-
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_SmallLength_Info);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -421,9 +422,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Temperature = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Temperature.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Temperature);
+               _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Temperature.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
 
                new Label(container, SWT.NONE);
             }
@@ -438,9 +439,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_DayTime = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_DayTime.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_DayTime);
+               _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_DayTime.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
 
                new Label(container, SWT.NONE);
             }
@@ -455,9 +456,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Weight = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Weight.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Weight);
+               _comboSystemOptiop_Weight = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Weight.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Weight);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
@@ -471,17 +472,17 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_AtmosphericPressure);
+               label.setText(Messages.Pref_System_Label_Pressure_Atmosphere);
                gridData_Label.applyTo(label);
 
                // combo
-               _comboSystem_Pressure = new Combo(container, SWT.READ_ONLY);
-               _comboSystem_Pressure.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystem_Pressure);
+               _comboSystemOptiop_Pressure_Atmosphere = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Pressure_Atmosphere.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Pressure_Atmosphere);
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Pressure_Info);
+               labelInfo.setText(Messages.Pref_System_Label_Pressure_Atmosphere_Info);
                gridData_Label.applyTo(labelInfo);
             }
          }
@@ -828,49 +829,49 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _comboSystem_Profile.add(systemProfile.getName());
          }
 
-         _comboSystem_Pressure.removeAll();
+         _comboSystemOptiop_Pressure_Atmosphere.removeAll();
          for (final System_Pressure_Atmosphere system : MeasurementSystem_Manager.getAllSystem_AtmosphericPressures()) {
-            _comboSystem_Pressure.add(system.getLabel());
+            _comboSystemOptiop_Pressure_Atmosphere.add(system.getLabel());
          }
 
-         _comboSystem_DayTime.removeAll();
+         _comboSystemOptiop_DayTime.removeAll();
          for (final System_DayTime system : MeasurementSystem_Manager.getAllSystem_DayTime()) {
-            _comboSystem_DayTime.add(system.getLabel());
+            _comboSystemOptiop_DayTime.add(system.getLabel());
          }
 
-         _comboSystem_Distance.removeAll();
+         _comboSystemOptiop_Distance.removeAll();
          for (final System_Distance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
-            _comboSystem_Distance.add(systemDistance.getLabel());
+            _comboSystemOptiop_Distance.add(systemDistance.getLabel());
          }
 
-         _comboSystem_Elevation.removeAll();
+         _comboSystemOptiop_Elevation.removeAll();
          for (final System_Elevation systemElevation : MeasurementSystem_Manager.getAllSystem_Elevations()) {
-            _comboSystem_Elevation.add(systemElevation.getLabel());
+            _comboSystemOptiop_Elevation.add(systemElevation.getLabel());
          }
 
-         _comboSystem_Height.removeAll();
+         _comboSystemOptiop_Height_Body.removeAll();
          for (final System_Height systemHeight : MeasurementSystem_Manager.getAllSystem_Heights()) {
-            _comboSystem_Height.add(systemHeight.getLabel());
+            _comboSystemOptiop_Height_Body.add(systemHeight.getLabel());
          }
 
-         _comboSystem_Length.removeAll();
+         _comboSystemOptiop_Length.removeAll();
          for (final System_Length systemElevation : MeasurementSystem_Manager.getAllSystem_Length()) {
-            _comboSystem_Length.add(systemElevation.getLabel());
+            _comboSystemOptiop_Length.add(systemElevation.getLabel());
          }
 
-         _comboSystem_SmallLength.removeAll();
-         for (final System_SmallLength systemElevation : MeasurementSystem_Manager.getAllSystem_SmallLength()) {
-            _comboSystem_SmallLength.add(systemElevation.getLabel());
+         _comboSystemOptiop_Length_Small.removeAll();
+         for (final System_LengthSmall systemElevation : MeasurementSystem_Manager.getAllSystem_SmallLength()) {
+            _comboSystemOptiop_Length_Small.add(systemElevation.getLabel());
          }
 
-         _comboSystem_Temperature.removeAll();
+         _comboSystemOptiop_Temperature.removeAll();
          for (final System_Temperature systemTemperature : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
-            _comboSystem_Temperature.add(systemTemperature.getLabel());
+            _comboSystemOptiop_Temperature.add(systemTemperature.getLabel());
          }
 
-         _comboSystem_Weight.removeAll();
+         _comboSystemOptiop_Weight.removeAll();
          for (final System_Weight systemWeight : MeasurementSystem_Manager.getAllSystem_Weights()) {
-            _comboSystem_Weight.add(systemWeight.getLabel());
+            _comboSystemOptiop_Weight.add(systemWeight.getLabel());
          }
       }
       _isInUpdateUI = isInUpdateUIBackup;
@@ -987,19 +988,19 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final System_Elevation[]            allElevations           = MeasurementSystem_Manager.getAllSystem_Elevations();
       final System_Height[]               allHeights              = MeasurementSystem_Manager.getAllSystem_Heights();
       final System_Length[]               allLengths              = MeasurementSystem_Manager.getAllSystem_Length();
-      final System_SmallLength[]          allSmallLengths         = MeasurementSystem_Manager.getAllSystem_SmallLength();
+      final System_LengthSmall[]          allSmallLengths         = MeasurementSystem_Manager.getAllSystem_SmallLength();
       final System_Temperature[]          allTemperatures         = MeasurementSystem_Manager.getAllSystem_Temperatures();
       final System_Weight[]               allWeights              = MeasurementSystem_Manager.getAllSystem_Weights();
 
-      final Unit_Pressure_Atmosphere      pressure    = allAtmosphericPressures  [_comboSystem_Pressure.getSelectionIndex()].getPressure();
-      final Unit_DayTime                  dayTime     = allDayTime               [_comboSystem_DayTime.getSelectionIndex()].getDayTime();
-      final Unit_Distance                 distance    = allDistances             [_comboSystem_Distance.getSelectionIndex()].getDistance();
-      final Unit_Elevation                elevation   = allElevations            [_comboSystem_Elevation.getSelectionIndex()].getElevation();
-      final Unit_Height                   height      = allHeights               [_comboSystem_Height.getSelectionIndex()].getHeight();
-      final Unit_Length                   length      = allLengths               [_comboSystem_Length.getSelectionIndex()].getLength();
-      final Unit_SmallLength              smallLength = allSmallLengths          [_comboSystem_SmallLength.getSelectionIndex()].getSmallLength();
-      final Unit_Temperature              temperature = allTemperatures          [_comboSystem_Temperature.getSelectionIndex()].getTemperature();
-      final Unit_Weight                   weight      = allWeights               [_comboSystem_Weight.getSelectionIndex()].getWeight();
+      final Unit_Pressure_Atmosphere      pressure    = allAtmosphericPressures  [_comboSystemOptiop_Pressure_Atmosphere.getSelectionIndex()].getPressure();
+      final Unit_DayTime                  dayTime     = allDayTime               [_comboSystemOptiop_DayTime.getSelectionIndex()].getDayTime();
+      final Unit_Distance                 distance    = allDistances             [_comboSystemOptiop_Distance.getSelectionIndex()].getDistance();
+      final Unit_Elevation                elevation   = allElevations            [_comboSystemOptiop_Elevation.getSelectionIndex()].getElevation();
+      final Unit_Height_Body                   height      = allHeights               [_comboSystemOptiop_Height_Body.getSelectionIndex()].getHeight();
+      final Unit_Length                   length      = allLengths               [_comboSystemOptiop_Length.getSelectionIndex()].getLength();
+      final Unit_Length_Small              smallLength = allSmallLengths          [_comboSystemOptiop_Length_Small.getSelectionIndex()].getSmallLength();
+      final Unit_Temperature              temperature = allTemperatures          [_comboSystemOptiop_Temperature.getSelectionIndex()].getTemperature();
+      final Unit_Weight                   weight      = allWeights               [_comboSystemOptiop_Weight.getSelectionIndex()].getWeight();
 // SET_FORMATTING_ON
 
       selectedSystemProfile.setAtmosphericPressure(pressure);
@@ -1061,15 +1062,15 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_activeSystemProfileIndex);
 
 // SET_FORMATTING_OFF
-      _comboSystem_Pressure .select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
-      _comboSystem_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
-      _comboSystem_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
-      _comboSystem_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
-      _comboSystem_Height              .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));
-      _comboSystem_Length              .select(MeasurementSystem_Manager.getSystemIndex_Length(selectedSystemProfile));
-      _comboSystem_SmallLength         .select(MeasurementSystem_Manager.getSystemIndex_SmallLength(selectedSystemProfile));
-      _comboSystem_Temperature         .select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
-      _comboSystem_Weight              .select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
+      _comboSystemOptiop_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
+      _comboSystemOptiop_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
+      _comboSystemOptiop_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
+      _comboSystemOptiop_Height_Body         .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));
+      _comboSystemOptiop_Length              .select(MeasurementSystem_Manager.getSystemIndex_Length(selectedSystemProfile));
+      _comboSystemOptiop_Length_Small        .select(MeasurementSystem_Manager.getSystemIndex_Length_Small(selectedSystemProfile));
+      _comboSystemOptiop_Pressure_Atmosphere .select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
+      _comboSystemOptiop_Temperature         .select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
+      _comboSystemOptiop_Weight              .select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
 // SET_FORMATTING_ON
 
       if (isModified) {
@@ -1265,7 +1266,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkSystem_ShowMeasurementInAppToolbar.getSelection());
 
             // fire modify event
-            MeasurementSystem_Manager.setActiveSystemProfileIndex(_activeSystemProfileIndex);
+            MeasurementSystem_Manager.setActiveSystemProfileIndex(_activeSystemProfileIndex, true);
          }
       }
 

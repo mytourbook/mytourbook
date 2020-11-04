@@ -36,6 +36,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -218,7 +219,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       new DialogSelectMeasurementSystem(activeShell).open();
 
       // tell the pref page to create a new default person
-      final Boolean isCreatePerson = new Boolean(true);
+      final Boolean isCreatePerson = Boolean.TRUE;
 
       // this dialog fires an event that the person list is modified
       PreferencesUtil
@@ -511,6 +512,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public boolean preWindowShellClose() {
 
+      MeasurementSystem_Manager.saveState();
+      _applicationActionBarAdvisor._personContribItem.saveState();
+
       TagMenuManager.saveTagState();
       TourTagFilterManager.saveState();
 
@@ -526,8 +530,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       FTSearchManager.closeIndexReaderSuggester();
       WebContentServer.stop();
-
-      _applicationActionBarAdvisor._personContribItem.saveState();
 
       /**
        * Save map3 state only when map is initialized (displayed). When this state is not checked

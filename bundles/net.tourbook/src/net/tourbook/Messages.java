@@ -561,7 +561,7 @@ public class Messages extends NLS {
    public static String        App_Dialog_FirstStartup_Title;
    public static String        App_Dialog_FirstStartupSystem_Label_Info;
 
-   public static String App_Dialog_FirstStartupSystem_Label_Info2;
+   public static String        App_Dialog_FirstStartupSystem_Label_Info2;
    public static String        App_Dialog_FirstStartupSystem_Label_System;
    public static String        App_Dialog_FirstStartupSystem_Radio_Imperial;
    public static String        App_Dialog_FirstStartupSystem_Radio_Metric;
@@ -1114,9 +1114,9 @@ public class Messages extends NLS {
    public static String        Image__show_distance_on_x_axis_imperial;
    public static String        Image__show_distance_on_x_axis_imperial_disabled;
 
-   public static String Image__show_distance_on_x_axis_NauticMile;
+   public static String        Image__show_distance_on_x_axis_NauticMile;
 
-   public static String Image__show_distance_on_x_axis_NauticMile_disabled;
+   public static String        Image__show_distance_on_x_axis_NauticMile_disabled;
    public static String        Image__show_time_on_x_axis;
    public static String        Image__spline_point;
    public static String        Image__synch_graph_byScale;
@@ -1887,61 +1887,40 @@ public class Messages extends NLS {
    public static String Pref_Swimming_Label_Info;
 
    public static String Pref_System_Group_MeasurementSystem;
-   public static String Pref_System_Label_AtmosphericPressure;
    public static String Pref_System_Label_DayTime;
-
    public static String Pref_System_Label_Distance;
-
    public static String Pref_System_Label_Distance_Info;
    public static String Pref_System_Label_Elevation;
-
    public static String Pref_System_Label_Elevation_Info;
-
    public static String Pref_System_Label_Height;
-
    public static String Pref_System_Label_Height_Info;
-
    public static String Pref_System_Label_Length;
-
    public static String Pref_System_Label_Length_Info;
-
-   public static String Pref_System_Label_Pressure_Info;
-   public static String Pref_System_Label_SmallLength;
-
-   public static String Pref_System_Label_SmallLength_Info;
-
+   public static String Pref_System_Label_Length_Small;
+   public static String Pref_System_Label_Length_Small_Info;
+   public static String Pref_System_Label_Pressure_Atmosphere;
+   public static String Pref_System_Label_Pressure_Atmosphere_Info;
    public static String Pref_System_Label_System;
    public static String Pref_System_Label_Temperature;
    public static String Pref_System_Label_Weight;
-
    public static String Pref_System_Label_Weight_Info;
    public static String Pref_System_Option_BodyWeight_Kilogram;
    public static String Pref_System_Option_BodyWeight_Pound;
    public static String Pref_System_Option_DayTime_24_Hours;
-
    public static String Pref_System_Option_DayTime_AM_PM;
-
    public static String Pref_System_Option_Distance_Kilometer;
    public static String Pref_System_Option_Distance_Mile;
    public static String Pref_System_Option_Distance_NauticMile;
    public static String Pref_System_Option_Elevation_Foot;
    public static String Pref_System_Option_Elevation_Meter;
-
    public static String Pref_System_Option_Height_Inch;
-
    public static String Pref_System_Option_Height_Meter;
-
    public static String Pref_System_Option_Length_Meter;
-
    public static String Pref_System_Option_Length_Yard;
    public static String Pref_System_Option_Pressure_Atmosphere_InchOfMercury;
-
    public static String Pref_System_Option_Pressure_Atmosphere_Millibar;
-
    public static String Pref_System_Option_SmallLength_Inch;
-
    public static String Pref_System_Option_SmallLength_Millimeter;
-
    public static String Pref_System_Option_Temperature_Celcius;
    public static String Pref_System_Option_Temperature_Fahrenheit;
 

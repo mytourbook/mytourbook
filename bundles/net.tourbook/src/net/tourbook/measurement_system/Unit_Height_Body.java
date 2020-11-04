@@ -15,15 +15,15 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public enum Unit_SmallLength {
+public enum Unit_Height_Body {
 
    /**
-    * Millimeter (mm)
+    * Metric measurement system: meter
     */
-   MILLIMETER,
+   METER,
 
    /**
-    * Inch (inch)
+    * Imperial measurement system: inch
     */
    INCH
 }

@@ -40,10 +40,10 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_DayTime;
 import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
+import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_Temperature;
 import net.tourbook.measurement_system.Unit_Weight;
 import net.tourbook.photo.IPhotoPreferences;
@@ -229,7 +229,8 @@ public class UI {
    /**
     * Contains the system of measurement value for distances relative to the metric system.
     * <p>
-    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE}
+    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE} or
+    * {@link #UNIT_NAUTICAL_MILE}
     */
    public static float         UNIT_VALUE_DISTANCE            = 1;
 
@@ -1343,14 +1344,14 @@ public class UI {
          // set imperial measure system
 
          net.tourbook.common.UI.UNIT_IS_PRESSURE_MILLIBAR         = false;
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG                = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG    = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
 
       } else {
 
          // default is the metric measure system
 
          net.tourbook.common.UI.UNIT_IS_PRESSURE_MILLIBAR         = true;
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG                = net.tourbook.common.UI.UNIT_PRESSURE_MB;
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG    = net.tourbook.common.UI.UNIT_PRESSURE_MB;
       }
 
       /*

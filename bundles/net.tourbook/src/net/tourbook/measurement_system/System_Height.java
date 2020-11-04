@@ -17,16 +17,16 @@ package net.tourbook.measurement_system;
 
 public class System_Height {
 
-   private String      _label;
-   private Unit_Height _height;
+   private String           _label;
+   private Unit_Height_Body _height;
 
-   public System_Height(final Unit_Height height, final String label) {
+   public System_Height(final Unit_Height_Body height, final String label) {
 
       _height = height;
       _label = label;
    }
 
-   public Unit_Height getHeight() {
+   public Unit_Height_Body getHeight() {
       return _height;
    }
 
