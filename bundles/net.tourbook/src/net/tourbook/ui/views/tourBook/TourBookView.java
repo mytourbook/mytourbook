@@ -87,7 +87,7 @@ import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
+import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
@@ -316,7 +316,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IContextMenuProvider            _viewerContextMenuProvider_Tree                 = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues        _subMenu_AdjustTourValues;
-   private Action_Reimport_SubMenu         _subMenu_Reimport;
    //
    private ActionCollapseAll               _actionCollapseAll;
    private ActionCollapseOthers            _actionCollapseOthers;
@@ -336,6 +335,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
    private ActionPrint                     _actionPrintTour;
    private ActionRefreshView               _actionRefreshView;
+   private ActionReimportTours             _actionReimport_Tours;
    private ActionSelectAllTours            _actionSelectAllTours;
    private ActionSetTourTypeMenu           _actionSetTourType;
    private ActionSetPerson                 _actionSetOtherPerson;
@@ -1097,7 +1097,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void createActions() {
 
       _subMenu_AdjustTourValues = new SubMenu_AdjustTourValues(this, this);
-      _subMenu_Reimport = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
 
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
@@ -1740,7 +1740,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
       _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
 
-      _subMenu_Reimport.setEnabled(isTourSelected);
+      _actionReimport_Tours.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionEditQuick.setEnabled(isOneTour);
@@ -1843,7 +1843,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       menuMgr.add(new Separator());
       menuMgr.add(_subMenu_AdjustTourValues);
-      menuMgr.add(_subMenu_Reimport);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTour);
 
@@ -3069,7 +3069,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3087,13 +3087,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 

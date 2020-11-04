@@ -200,6 +200,54 @@ public abstract class StatisticMonth extends TourbookStatistic {
       chartDataModel.setXData(xData);
    }
 
+   /**
+    * Athlete's body fat
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyFat(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Month.athleteBodyFat_Low,
+            _statisticData_Month.athleteBodyFat_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
+      yData.setUnitLabel(UI.UNIT_PERCENT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
+   /**
+    * Athlete's body weight
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyWeight(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Month.athleteBodyWeight_Low,
+            _statisticData_Month.athleteBodyWeight_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
+      yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Month.typeIds_Resorted, _appTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
    void createYData_Distance(final ChartDataModel chartDataModel) {
 
       // distance

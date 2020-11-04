@@ -3165,7 +3165,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));

@@ -1,67 +1,55 @@
-20.?.0                                                 ?. Month 2020
-
-
-TODO's
-
-======  
-* !!! Translators need new babel editor plugin when using Eclipse 2020-09 !!!
-  http://mytourbook.sourceforge.net/mytourbook/index.php/development/translation/install-resource-editor
-
-* Translators should check if the new time words are correct because they where automatically transformed from the existing time words
-
-Issues
-======
+20.11.0                                                 ?. November 2020
 
 
 New
 ===
 
 * Elapsed Time - Recorded Time - Paused Time (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/222
+ 
+  Device time - when the user pressed start/stop/pause:
+  - Elapsed time (formerly Recording Time)
+  - Recorded Time (new)
+  - Paused Time = Elapsed Time - Recorded Time (new)
 
-    New time data:
-
-    Elapsed time (formerly Recording Time)
-    Recorded Time
-    Paused Time (= Elapsed Time - Recorded Time)
-
-    Existing time data:
-
-    Moving Time
-    Break Time ( = Elapsed Time - Moving Time)
-
- - The recorded/paused time are imported from the following formats Garmin FIT, Suunto (Ambit 2 xml, Ambit 2 sml, Suunto Spartan/9 .json.gz), SportTracks Fitlog, Garmin TCX
- - Added the ability to re-import, for existing tours, only the timer pauses (and hence also the recorded time).
- - The new tour times (Recorded & Paused Times) are available for display in the TourDataEditorView, TourBookView, Calendar view & Statistics View
- - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
+  Computed time - is dependend on the break time algorithm:
+  - Moving Time
+  - Break Time = Elapsed Time - Moving Time
+    
+  - The recorded/paused time are imported from the following formats Garmin FIT, Suunto (Ambit 2 xml, Ambit 2 sml, Suunto Spartan/9 .json.gz), SportTracks Fitlog, Garmin TCX
+  - Added the ability to re-import, for existing tours, only the timer pauses (and hence also the recorded time)
+  - The new tour times (Recorded & Paused Times) are available for display in the TourDataEditor, TourBook view, Calendar view & Statistics view
+  - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
 
 * Statistic Values View
   - Displays the values of the statistic graphs
   - Statistic values can be copied in csv format to the clipboard
 
+* Import Magellan/Mio Cyclo 105 *.act Files (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/219
+
+
 Improvements
 ============
 
-* Improved Cadence Support (rtdog)
-  - Added new cadence type "none" for tours with no cadence
-  - Added default cadence assignment during Easy Import Launcher when setting tour type
-  - Created import preference for default cadence to use during import launcher configuration
-  - Added language support for cadence type names (none/rpm/spm)
-
-* Flat Tour Book View
-  - Sort also by
-    - Computed break time
+* Tour Book View (flat)
+  - Sort also by computed break time
   - Show markers and tags columns with the saved content (no dummy text)
   
-* Tour Book View
-  - Reimport keeps manually selected paths during a session and tries to reuse it for subsequent files when necessary.
-
 * Calendar View
   - New toolbar action: Go to today
 
 * Statistics View
+  - Displays athlete's data (body weight and fat) for any given day/week/month/year (Frederic)
   - New toolbar action: Copy statistic values to the clipboard
   - Show total/percentage values in the tooltip - https://sourceforge.net/p/mytourbook/feature-requests/180/
   - Statistic tooltip values (a summary of tours) can be formatted differently compared with tour tooltip values
+
+* Tour Editor (Frederic)
+  - Added a body fat percentage field in the Personal Details section
+
+* Geo Compare View (Frederic)
+  - Added a relative geo differences filter to only display the compared tours for which the relative geo difference is under that threshold (see feature request https://sourceforge.net/p/mytourbook/feature-requests/183/)
+  - Added the recorded time column
+  - Added the Average Pace column
   
 * Tour Tag Filter
   - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
@@ -80,6 +68,15 @@ Improvements
   - Added a contextual menu "Reimport Tours..." to give the ability to select several data to re-import for selected tours or all tours in the database
   - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
   - Added the ability for the user to skip a file if the filepath is unknown or not found
+  - Correct the import filepath location (Wolfgang)
+  - Re-import tours between two dates (Wolfgang)
+  - Re-import keeps manually selected paths during a session and tries to reuse it for subsequent files when necessary (Wolfgang)
+
+* Improved Cadence Support (rtdog)
+  - Added new cadence type "none" for tours with no cadence
+  - Added default cadence assignment during Easy Import Launcher when setting tour type
+  - Created import preference for default cadence to use during import launcher configuration
+  - Added language support for cadence type names (none/rpm/spm)
 
 
 Changes  
@@ -90,9 +87,6 @@ Changes
 
 Fixes   
 =====
-
-* Tour Log (rtdog)
-  - Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration
 
 * Tour Book View
   - Tour tag filter caused SQL exception in flat layout view https://github.com/wolfgang-ch/mytourbook/issues/220
@@ -112,8 +106,10 @@ Fixes
   - Fixed a possible import failure for manual tours with a Time Offset
   - Fixed an issue where importing large files (> 100MB) could possibly result in a OutOfMemory error when parsing Custom Data Field Definitions
 
- 
-   
+* Tour Log (rtdog)
+  - Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration
+
+
 Translation    
 ===========
 
@@ -128,4 +124,3 @@ System
 ======
 
 * FIT SDK 21.40
-* Eclipse 2020-09

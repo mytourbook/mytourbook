@@ -35,6 +35,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
@@ -82,6 +84,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_MIO_105             = "10500"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_NMEA                = "32481"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_HRM           = "63193"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_PDD           = "76913"; //$NON-NLS-1$
@@ -996,6 +999,27 @@ public class Util {
       }
 
       return comboIndex;
+   }
+
+   public static LocalDate getStateDate(final IDialogSettings state, final String stateKey, final LocalDate defaultValue, final DateTime dateTimeControl) {
+
+      final String value = state.get(stateKey);
+      LocalDate parsedValue;
+
+      try {
+
+         parsedValue = LocalDate.parse(value);
+
+      } catch (final Exception e) {
+
+         parsedValue = defaultValue;
+      }
+
+      dateTimeControl.setYear(parsedValue.getYear());
+      dateTimeControl.setMonth(parsedValue.getMonthValue() - 1);
+      dateTimeControl.setDay(parsedValue.getDayOfMonth());
+
+      return parsedValue;
    }
 
    /**
@@ -2415,6 +2439,16 @@ public class Util {
       stateValues[2] = Integer.toString(rgb.blue);
 
       state.put(stateKey, stateValues);
+   }
+
+   public static void setStateDate(final IDialogSettings state, final String stateKey, final DateTime dateTime) {
+
+      final LocalDate localDate = LocalDate.of(
+            dateTime.getYear(),
+            dateTime.getMonth() + 1,
+            dateTime.getDay());
+
+      state.put(stateKey, localDate.toString());
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,

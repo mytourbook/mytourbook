@@ -52,7 +52,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
    private static final String      SUB_TITLE_1_LINE       = "%s … %s";                   //$NON-NLS-1$
    private static final String      SUB_TITLE_2_LINES      = "%s …\n%s";                  //$NON-NLS-1$
 
-
    private TourStatisticData_Week   _statisticData_Week;
    private DataProvider_Tour_Week   _tourWeek_DataProvider = new DataProvider_Tour_Week();
 
@@ -131,7 +130,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
          }
       };
    }
-
 
    /**
     * @param toolTipProvider
@@ -252,6 +250,54 @@ public abstract class StatisticWeek extends TourbookStatistic {
       StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
       StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds, _appTourTypeFilter);
       StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+      chartDataModel.addYData(yData);
+   }
+
+   /**
+    * Athlete's body fat
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyFat(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Week.athleteBodyFat_Low,
+            _statisticData_Week.athleteBodyFat_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
+      yData.setUnitLabel(UI.UNIT_PERCENT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds_Resorted, _appTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
+   /**
+    * Athlete's body weight
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyWeight(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Week.athleteBodyWeight_Low,
+            _statisticData_Week.athleteBodyWeight_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
+      yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(yData, _statisticData_Week.typeIds_Resorted, _appTourTypeFilter);
 
       chartDataModel.addYData(yData);
    }

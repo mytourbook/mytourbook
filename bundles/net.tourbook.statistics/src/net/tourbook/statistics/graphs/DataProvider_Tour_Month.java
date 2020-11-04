@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -33,7 +34,6 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
@@ -107,7 +107,10 @@ public class DataProvider_Tour_Month extends DataProvider {
                   + "      TourComputedTime_Moving," + NL //                                    //$NON-NLS-1$
 
                   + "      TourDistance," + NL //                                               //$NON-NLS-1$
-                  + "      TourAltUp" + NL //                                                   //$NON-NLS-1$
+                  + "      TourAltUp," + NL //                                                   //$NON-NLS-1$
+
+                  + "      BodyWeight,         " + NL //       //$NON-NLS-1$
+                  + "      BodyFat          " + NL //       //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
 
@@ -153,7 +156,10 @@ public class DataProvider_Tour_Month extends DataProvider {
                + "   SUM(TourDistance)," + NL //                           9  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                              10 //$NON-NLS-1$
 
-               + "   SUM(1)" + NL //                                       11 //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                       11 //$NON-NLS-1$
+
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
@@ -188,6 +194,9 @@ public class DataProvider_Tour_Month extends DataProvider {
          final long[] tourTypeSum = new long[numTourTypes];
          final long[] usedTourTypeIds = new long[numTourTypes];
 
+         final float[] allDbBodyWeight = new float[numMonths];
+         final float[] allDbBodyFat = new float[numMonths];
+
          /*
           * Initialize tour types, when there are 0 tours for some years/months, a tour
           * type 0 could be a valid tour type which is the default values for native arrays
@@ -221,10 +230,13 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_MovingTime           = result.getInt(7);
             final int dbValue_Duration             = result.getInt(8);
 
-            final long dbValue_Distance            = (long) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
+            final long dbValue_Distance            = (long) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(11);
+
+            final float dbValue_BodyWeight = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat = result.getFloat(13);
 
 // SET_FORMATTING_ON
 
@@ -270,7 +282,32 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             dbNumTours[colorIndex][monthIndex] = dbValue_NumTours;
 
+            allDbBodyWeight[monthIndex] = dbValue_BodyWeight;
+            allDbBodyFat[monthIndex] = dbValue_BodyFat;
+
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime;
+
+            if (UI.IS_SCRAMBLE_DATA) {
+
+// SET_FORMATTING_OFF
+               dbElevationUp[colorIndex][monthIndex]  = UI.scrambleNumbers(dbElevationUp[colorIndex][monthIndex]);
+               dbDistance[colorIndex][monthIndex]     = UI.scrambleNumbers(dbDistance[colorIndex][monthIndex]);
+               dbDurationTime[colorIndex][monthIndex] = UI.scrambleNumbers(dbDurationTime[colorIndex][monthIndex]);
+
+               dbElapsedTime[colorIndex][monthIndex]  = UI.scrambleNumbers(dbElapsedTime[colorIndex][monthIndex]);
+               dbRecordedTime[colorIndex][monthIndex] = UI.scrambleNumbers(dbRecordedTime[colorIndex][monthIndex]);
+               dbPausedTime[colorIndex][monthIndex]   = UI.scrambleNumbers(dbPausedTime[colorIndex][monthIndex]);
+               dbMovingTime[colorIndex][monthIndex]   = UI.scrambleNumbers(dbMovingTime[colorIndex][monthIndex]);
+               dbBreakTime[colorIndex][monthIndex]    = UI.scrambleNumbers(dbBreakTime[colorIndex][monthIndex]);
+
+               dbNumTours[colorIndex][monthIndex]     = UI.scrambleNumbers(dbNumTours[colorIndex][monthIndex]);
+
+               allDbBodyWeight[monthIndex]            = UI.scrambleNumbers(allDbBodyWeight[monthIndex]);
+               allDbBodyFat[monthIndex]               = UI.scrambleNumbers(allDbBodyFat[monthIndex]);
+
+               tourTypeSum[colorIndex]               += UI.scrambleNumbers(dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime);
+// SET_FORMATTING_ON
+            }
          }
 
          /*
@@ -340,6 +377,11 @@ public class DataProvider_Tour_Month extends DataProvider {
             _tourMonthData.numTours_Low = new float[1][numMonths];
             _tourMonthData.numTours_High = new float[1][numMonths];
 
+            _tourMonthData.athleteBodyWeight_Low = new float[numMonths];
+            _tourMonthData.athleteBodyWeight_High = new float[numMonths];
+            _tourMonthData.athleteBodyFat_Low = new float[numMonths];
+            _tourMonthData.athleteBodyFat_High = new float[numMonths];
+
          } else {
 
             final long[][] usedTypeIds = new long[numUsedTourTypes][];
@@ -393,6 +435,11 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             _tourMonthData.numTours_Low = new float[numUsedTourTypes][numMonths];
             _tourMonthData.numTours_High = usedNumTours;
+
+            _tourMonthData.athleteBodyWeight_Low = new float[numMonths];
+            _tourMonthData.athleteBodyWeight_High = allDbBodyWeight;
+            _tourMonthData.athleteBodyFat_Low = new float[numMonths];
+            _tourMonthData.athleteBodyFat_High = allDbBodyFat;
          }
 
       } catch (final SQLException e) {

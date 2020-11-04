@@ -340,6 +340,52 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    }
 
    /**
+    * Athlete's body fat
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyFat(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Day.allAthleteBodyFat_Low,
+            _statisticData_Day.allAthleteBodyFat_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_FAT);
+      yData.setUnitLabel(UI.UNIT_PERCENT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYFAT, _activeTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
+   /**
+    * Athlete's body weight
+    *
+    * @param chartDataModel
+    */
+   void createYData_AthleteBodyWeight(final ChartDataModel chartDataModel) {
+
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            _statisticData_Day.allAthleteBodyWeight_Low,
+            _statisticData_Day.allAthleteBodyWeight_High);
+
+      yData.setYTitle(Messages.LABEL_GRAPH_BODY_WEIGHT);
+      yData.setUnitLabel(UI.UNIT_LABEL_WEIGHT);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setShowYSlider(true);
+
+      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT);
+      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_BODYWEIGHT, _activeTourTypeFilter);
+
+      chartDataModel.addYData(yData);
+   }
+
+   /**
     * Altitude
     */
    void createYDataAltitude(final ChartDataModel chartModel) {

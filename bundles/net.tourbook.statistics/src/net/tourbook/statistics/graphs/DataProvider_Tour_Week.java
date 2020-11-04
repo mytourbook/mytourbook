@@ -280,11 +280,11 @@ public class DataProvider_Tour_Week extends DataProvider {
    }
 
    TourStatisticData_Week getWeekData(final TourPerson person,
-                             final TourTypeFilter tourTypeFilter,
-                             final int lastYear,
-                             final int numberOfYears,
-                             final boolean refreshData,
-                             final DurationTime durationTime) {
+                                      final TourTypeFilter tourTypeFilter,
+                                      final int lastYear,
+                                      final int numberOfYears,
+                                      final boolean refreshData,
+                                      final DurationTime durationTime) {
 
       // when the data for the year are already loaded, all is done
       if (statistic_ActivePerson == person
@@ -360,7 +360,10 @@ public class DataProvider_Tour_Week extends DataProvider {
                   + "      TourDistance," + NL //                                                        //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                                           //$NON-NLS-1$
 
-                  + "      TourType_TypeId" + NL //                                                      //$NON-NLS-1$
+                  + "      TourType_TypeId," + NL //                                                      //$NON-NLS-1$
+
+                  + "      BodyWeight,         " + NL //       //$NON-NLS-1$
+                  + "      BodyFat          " + NL //       //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
 
@@ -406,7 +409,10 @@ public class DataProvider_Tour_Week extends DataProvider {
                + "   SUM(TourDistance)," + NL //                              9  //$NON-NLS-1$
                + "   SUM(TourAltUp)," + NL //                                 10 //$NON-NLS-1$
 
-               + "   SUM(1)" + NL //                                          11 //$NON-NLS-1$
+               + "   SUM(1)," + NL //                                          11 //$NON-NLS-1$
+
+               + "   AVG( CASE WHEN BodyWeight = 0         THEN NULL ELSE BodyWeight END)," + NL //      12 //$NON-NLS-1$
+               + "   AVG( CASE WHEN BodyFat = 0         THEN NULL ELSE BodyFat END)" + NL //      13 //$NON-NLS-1$
 
                + fromTourData
 
@@ -435,6 +441,9 @@ public class DataProvider_Tour_Week extends DataProvider {
          final float[][] allDbElevation = new float[numTourTypes][numAllWeeks];
 
          final float[][] allDbNumTours = new float[numTourTypes][numAllWeeks];
+
+         final float[] allDbBodyWeight = new float[numAllWeeks];
+         final float[] allDbBodyFat = new float[numAllWeeks];
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
@@ -501,6 +510,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             final int dbValue_NumTours          = result.getInt(11);
 
+            final float dbValue_BodyWeight = result.getFloat(12) * UI.UNIT_VALUE_WEIGHT;
+            final float dbValue_BodyFat = result.getFloat(13);
+
 // SET_FORMATTING_ON
 
             /*
@@ -533,6 +545,9 @@ public class DataProvider_Tour_Week extends DataProvider {
             allDbElevation[colorIndex][weekIndex] = dbValue_Elevation;
 
             allDbNumTours[colorIndex][weekIndex] = dbValue_NumTours;
+
+            allDbBodyWeight[weekIndex] = dbValue_BodyWeight;
+            allDbBodyFat[weekIndex] = dbValue_BodyFat;
          }
 
          _tourWeekData.years = allYear_Numbers;
@@ -559,6 +574,11 @@ public class DataProvider_Tour_Week extends DataProvider {
 
          _tourWeekData.numTours_Low = new float[numTourTypes][numAllWeeks];
          _tourWeekData.numTours_High = allDbNumTours;
+
+         _tourWeekData.athleteBodyWeight_Low = new float[numAllWeeks];
+         _tourWeekData.athleteBodyWeight_High = allDbBodyWeight;
+         _tourWeekData.athleteBodyFat_Low = new float[numAllWeeks];
+         _tourWeekData.athleteBodyFat_High = allDbBodyFat;
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
