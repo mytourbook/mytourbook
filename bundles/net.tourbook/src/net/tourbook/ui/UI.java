@@ -43,6 +43,8 @@ import net.tourbook.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.measurement_system.Unit_DayTime;
 import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
+import net.tourbook.measurement_system.Unit_Length;
+import net.tourbook.measurement_system.Unit_Length_Small;
 import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_Temperature;
 import net.tourbook.measurement_system.Unit_Weight;
@@ -1384,8 +1386,8 @@ public class UI {
       net.tourbook.common.UI.UNIT_IS_LENGTH_METER              = false;
       net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = false;
 
-      net.tourbook.common.UI.UNIT_IS_SMALL_LENGTH_MILLIMETER   = false;
-      net.tourbook.common.UI.UNIT_IS_SMALL_LENGTH_INCH         = false;
+      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_MILLIMETER   = false;
+      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH         = false;
 
       final Unit_Distance distance = activeSystem.getDistance();
       if (distance == Unit_Distance.MILE) {
@@ -1393,44 +1395,77 @@ public class UI {
          // set imperial measure system
 
          net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE             = true;
-         net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = true;
-         net.tourbook.common.UI.UNIT_IS_SMALL_LENGTH_INCH         = true;
 
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_MI;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
 
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_MPH;
          net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
-         UNIT_VALUE_DISTANCE              = UNIT_MILE;
-         UNIT_VALUE_DISTANCE_SMALL        = UNIT_YARD;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH   = UNIT_INCH;
+         UNIT_VALUE_DISTANCE                                      = UNIT_MILE;
 
       } else if (distance == Unit_Distance.NAUTIC_MILE) {
 
-// TODO
-
          net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE = true;
+
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_NMI;
+
+         net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KNOT;
+         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
+
+         UNIT_VALUE_DISTANCE                                      = UNIT_NAUTICAL_MILE;
 
       } else {
 
          // default is the metric measure system
 
          net.tourbook.common.UI.UNIT_IS_DISTANCE_KILOMETER        = true;
-         net.tourbook.common.UI.UNIT_IS_LENGTH_METER              = true;
-         net.tourbook.common.UI.UNIT_IS_SMALL_LENGTH_MILLIMETER   = true;
 
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_KM;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_METER;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_MM;
 
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KM_H;
          net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
 
-         UNIT_VALUE_DISTANCE              = 1;
-         UNIT_VALUE_DISTANCE_SMALL        = 1;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH   = 1;
+         UNIT_VALUE_DISTANCE                                      = 1;
+      }
+
+      /*
+       * Length
+       */
+      if (activeSystem.getLength() == Unit_Length.YARD) {
+
+         net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = true;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
+
+         UNIT_VALUE_DISTANCE_SMALL                                = UNIT_YARD;
+
+      } else {
+
+         // default is the metric measure system
+
+         net.tourbook.common.UI.UNIT_IS_LENGTH_METER              = true;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD       = net.tourbook.common.UI.UNIT_METER;
+
+         UNIT_VALUE_DISTANCE_SMALL                                = 1;
+      }
+
+      /*
+       * Small length
+       */
+      if (activeSystem.getLengthSmall() == Unit_Length_Small.INCH) {
+
+         net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH         = true;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
+
+         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = UNIT_INCH;
+
+      } else {
+
+         // default is the metric measure system
+
+         net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_MILLIMETER   = true;
+         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH    = net.tourbook.common.UI.UNIT_MM;
+
+         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = 1;
       }
 
       /*

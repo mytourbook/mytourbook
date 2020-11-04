@@ -8884,7 +8884,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_SMALL_LENGTH_MILLIMETER) {
+      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
          _spinWeather_PrecipitationValue.setDigits(0);
          _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
       } else {

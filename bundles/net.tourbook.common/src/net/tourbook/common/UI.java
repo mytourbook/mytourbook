@@ -268,8 +268,8 @@ public class UI {
    public static boolean       UNIT_IS_LENGTH_METER;
    public static boolean       UNIT_IS_LENGTH_YARD;
 
-   public static boolean       UNIT_IS_SMALL_LENGTH_MILLIMETER;
-   public static boolean       UNIT_IS_SMALL_LENGTH_INCH;
+   public static boolean       UNIT_IS_LENGTH_SMALL_MILLIMETER;
+   public static boolean       UNIT_IS_LENGTH_SMALL_INCH;
 
    /**
     * Is <code>true</code> when the measurement system for the elevation is meter, which is metric.
@@ -323,6 +323,7 @@ public class UI {
    public static final String          UNIT_ALTITUDE_FT           = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
+   public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
@@ -330,6 +331,7 @@ public class UI {
    public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
+   public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
@@ -787,7 +789,7 @@ public class UI {
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
 
-      if (UNIT_IS_SMALL_LENGTH_MILLIMETER) {
+      if (UNIT_IS_LENGTH_SMALL_MILLIMETER) {
          return precipitation;
       }
 

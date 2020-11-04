@@ -20,7 +20,7 @@ import java.util.Objects;
 import net.tourbook.common.util.StatusUtil;
 
 /**
- * Contains all system measurement data for one profile.
+ * Contains all system measurement data for one system profile.
  */
 public class MeasurementSystem implements Cloneable {
 
@@ -138,11 +138,11 @@ public class MeasurementSystem implements Cloneable {
       return Objects.hash(
             _dayTime,
             _distance,
+            _length,
+            _length_Small,
             _elevation,
             _height,
-            _length,
             _pressure_Atmosphere,
-            _length_Small,
             _temperature,
             _weight_Body);
    }
@@ -237,12 +237,17 @@ public class MeasurementSystem implements Cloneable {
             + "[\n" //$NON-NLS-1$
 
             + "_name=" + _name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_dayTime=" + _dayTime + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_distance=" + _distance + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_elevation=" + _elevation + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_height=" + _height + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_length=" + _length + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_length_Small=" + _length_Small + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_pressure_Atmosphere=" + _pressure_Atmosphere + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_temperature=" + _temperature + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_weight=" + _weight_Body + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_savedState_IsProfileActive=" + _savedState_IsProfileActive + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_weight_Body=" + _weight_Body + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_savedState_IsProfileActive=" + _savedState_IsProfileActive //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "\n]"; //$NON-NLS-1$
    }
 }
