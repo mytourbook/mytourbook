@@ -106,6 +106,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MOTION_DISTANCE;
    public static final String             MOTION_DISTANCE_ID                                 = "MOTION_DISTANCE";                                 //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE_DELTA;
+   public static final String             MOTION_DISTANCE_DELTA_ID                           = "MOTION_DISTANCE_DELTA_ID";                        //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE_DIFF;
    public static final TableColumnFactory MOTION_DISTANCE_TOTAL;
    public static final TableColumnFactory MOTION_LATITUDE;
@@ -1357,7 +1358,7 @@ public abstract class TableColumnFactory {
             final String deltaDistance = UI.SYMBOL_DIFFERENCE_WITH_SPACE
                   + net.tourbook.common.UI.UNIT_LABEL_DISTANCE;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MOTION_DISTANCE_DELTA", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MOTION_DISTANCE_DELTA_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
 
@@ -1367,6 +1368,11 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_3,
+                  columnManager);
 
             return colDef;
          }
