@@ -1376,18 +1376,9 @@ public class UI {
       /*
        * Distance
        */
-
-      // first reset all units that the "true" setting is better readable
-
       net.tourbook.common.UI.UNIT_IS_DISTANCE_KILOMETER        = false;
       net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE             = false;
       net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE    = false;
-
-      net.tourbook.common.UI.UNIT_IS_LENGTH_METER              = false;
-      net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = false;
-
-      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_MILLIMETER   = false;
-      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH         = false;
 
       final Unit_Distance distance = activeSystem.getDistance();
       if (distance == Unit_Distance.MILE) {
@@ -1431,6 +1422,8 @@ public class UI {
       /*
        * Length
        */
+      net.tourbook.common.UI.UNIT_IS_LENGTH_METER              = false;
+      net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = false;
       if (activeSystem.getLength() == Unit_Length.YARD) {
 
          net.tourbook.common.UI.UNIT_IS_LENGTH_YARD               = true;
@@ -1451,6 +1444,8 @@ public class UI {
       /*
        * Small length
        */
+      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_MILLIMETER   = false;
+      net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH         = false;
       if (activeSystem.getLengthSmall() == Unit_Length_Small.INCH) {
 
          net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH         = true;
