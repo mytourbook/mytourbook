@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -33,7 +34,6 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Month extends DataProvider {
 
@@ -230,8 +230,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_MovingTime           = result.getInt(7);
             final int dbValue_Duration             = result.getInt(8);
 
-            final long dbValue_Distance            = (long) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(10) / UI.UNIT_VALUE_ALTITUDE);
+            final long dbValue_Distance            = (long) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
             final int dbValue_NumTours             = result.getInt(11);
 
@@ -286,6 +286,28 @@ public class DataProvider_Tour_Month extends DataProvider {
             allDbBodyFat[monthIndex] = dbValue_BodyFat;
 
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime;
+
+            if (UI.IS_SCRAMBLE_DATA) {
+
+// SET_FORMATTING_OFF
+               dbElevationUp[colorIndex][monthIndex]  = UI.scrambleNumbers(dbElevationUp[colorIndex][monthIndex]);
+               dbDistance[colorIndex][monthIndex]     = UI.scrambleNumbers(dbDistance[colorIndex][monthIndex]);
+               dbDurationTime[colorIndex][monthIndex] = UI.scrambleNumbers(dbDurationTime[colorIndex][monthIndex]);
+
+               dbElapsedTime[colorIndex][monthIndex]  = UI.scrambleNumbers(dbElapsedTime[colorIndex][monthIndex]);
+               dbRecordedTime[colorIndex][monthIndex] = UI.scrambleNumbers(dbRecordedTime[colorIndex][monthIndex]);
+               dbPausedTime[colorIndex][monthIndex]   = UI.scrambleNumbers(dbPausedTime[colorIndex][monthIndex]);
+               dbMovingTime[colorIndex][monthIndex]   = UI.scrambleNumbers(dbMovingTime[colorIndex][monthIndex]);
+               dbBreakTime[colorIndex][monthIndex]    = UI.scrambleNumbers(dbBreakTime[colorIndex][monthIndex]);
+
+               dbNumTours[colorIndex][monthIndex]     = UI.scrambleNumbers(dbNumTours[colorIndex][monthIndex]);
+
+               allDbBodyWeight[monthIndex]            = UI.scrambleNumbers(allDbBodyWeight[monthIndex]);
+               allDbBodyFat[monthIndex]               = UI.scrambleNumbers(allDbBodyFat[monthIndex]);
+
+               tourTypeSum[colorIndex]               += UI.scrambleNumbers(dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime);
+// SET_FORMATTING_ON
+            }
          }
 
          /*
