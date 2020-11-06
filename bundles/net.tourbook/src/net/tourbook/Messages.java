@@ -1898,6 +1898,8 @@ public class Messages extends NLS {
    public static String Pref_System_Label_Length_Info;
    public static String Pref_System_Label_Length_Small;
    public static String Pref_System_Label_Length_Small_Info;
+   public static String Pref_System_Label_Pace;
+   public static String Pref_System_Label_Pace_Info;
    public static String Pref_System_Label_Pressure_Atmosphere;
    public static String Pref_System_Label_Pressure_Atmosphere_Info;
    public static String Pref_System_Label_System;
@@ -1917,6 +1919,8 @@ public class Messages extends NLS {
    public static String Pref_System_Option_Height_Meter;
    public static String Pref_System_Option_Length_Meter;
    public static String Pref_System_Option_Length_Yard;
+   public static String Pref_System_Option_Pace_MinutesPerKilometer;
+   public static String Pref_System_Option_Pace_MinutesPerMile;
    public static String Pref_System_Option_Pressure_Atmosphere_InchOfMercury;
    public static String Pref_System_Option_Pressure_Atmosphere_Millibar;
    public static String Pref_System_Option_SmallLength_Inch;

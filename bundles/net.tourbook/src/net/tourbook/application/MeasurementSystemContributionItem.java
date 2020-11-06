@@ -182,9 +182,10 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
          + Messages.Pref_System_Label_Distance              + DASH + MeasurementSystem_Manager.getActiveSystemOption_Distance().getLabel()      + NL
          + Messages.Pref_System_Label_Length                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length().getLabel()        + NL
-         + Messages.Pref_System_Label_Length_Small           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
+         + Messages.Pref_System_Label_Length_Small          + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
          + Messages.Pref_System_Label_Elevation             + DASH + MeasurementSystem_Manager.getActiveSystemOption_Elevation().getLabel()     + NL
          + Messages.Pref_System_Label_Height                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Height().getLabel()        + NL
+         + Messages.Pref_System_Label_Pace                  + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pace().getLabel()          + NL
          + Messages.Pref_System_Label_Temperature           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Temperature().getLabel()   + NL
          + Messages.Pref_System_Label_DayTime               + DASH + MeasurementSystem_Manager.getActiveSystemOption_DayTime().getLabel()       + NL
          + Messages.Pref_System_Label_Weight                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Weight().getLabel()        + NL

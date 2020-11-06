@@ -45,6 +45,7 @@ import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
 import net.tourbook.measurement_system.Unit_Length;
 import net.tourbook.measurement_system.Unit_Length_Small;
+import net.tourbook.measurement_system.Unit_Pace;
 import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_Temperature;
 import net.tourbook.measurement_system.Unit_Weight;
@@ -1388,9 +1389,7 @@ public class UI {
          net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE             = true;
 
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_MI;
-
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_MPH;
-         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
          UNIT_VALUE_DISTANCE                                      = UNIT_MILE;
 
@@ -1399,9 +1398,7 @@ public class UI {
          net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE = true;
 
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_NMI;
-
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KNOT;
-         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
          UNIT_VALUE_DISTANCE                                      = UNIT_NAUTICAL_MILE;
 
@@ -1412,11 +1409,21 @@ public class UI {
          net.tourbook.common.UI.UNIT_IS_DISTANCE_KILOMETER        = true;
 
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_KM;
-
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KM_H;
-         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
 
          UNIT_VALUE_DISTANCE                                      = 1;
+      }
+
+      /*
+       * Pace
+       */
+      if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
+
+         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
+
+      } else {
+
+         net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
       }
 
       /*

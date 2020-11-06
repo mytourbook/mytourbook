@@ -15,22 +15,15 @@
  *******************************************************************************/
 package net.tourbook.measurement_system;
 
-public class System_LengthSmall {
+public enum Unit_Pace {
 
-   private String            _label;
-   private Unit_Length_Small _smallLength;
+   /**
+    * min/mi
+    */
+   MINUTES_PER_MILE,
 
-   public System_LengthSmall(final Unit_Length_Small smallLength, final String label) {
-
-      _smallLength = smallLength;
-      _label = label;
-   }
-
-   public String getLabel() {
-      return _label;
-   }
-
-   public Unit_Length_Small getLength_Small() {
-      return _smallLength;
-   }
+   /**
+    * min/km
+    */
+   MINUTES_PER_KILOMETER
 }

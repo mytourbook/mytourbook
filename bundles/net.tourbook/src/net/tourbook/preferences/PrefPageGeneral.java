@@ -37,8 +37,9 @@ import net.tourbook.measurement_system.System_Distance;
 import net.tourbook.measurement_system.System_Elevation;
 import net.tourbook.measurement_system.System_Height;
 import net.tourbook.measurement_system.System_Length;
-import net.tourbook.measurement_system.System_Pressure_Atmosphere;
 import net.tourbook.measurement_system.System_LengthSmall;
+import net.tourbook.measurement_system.System_Pace;
+import net.tourbook.measurement_system.System_Pressure_Atmosphere;
 import net.tourbook.measurement_system.System_Temperature;
 import net.tourbook.measurement_system.System_Weight;
 import net.tourbook.measurement_system.Unit_DayTime;
@@ -47,6 +48,7 @@ import net.tourbook.measurement_system.Unit_Elevation;
 import net.tourbook.measurement_system.Unit_Height_Body;
 import net.tourbook.measurement_system.Unit_Length;
 import net.tourbook.measurement_system.Unit_Length_Small;
+import net.tourbook.measurement_system.Unit_Pace;
 import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.measurement_system.Unit_Temperature;
 import net.tourbook.measurement_system.Unit_Weight;
@@ -145,6 +147,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private Combo  _comboSystemOptiop_Height_Body;
    private Combo  _comboSystemOptiop_Length;
    private Combo  _comboSystemOptiop_Length_Small;
+   private Combo  _comboSystemOptiop_Pace;
    private Combo  _comboSystemOptiop_Pressure_Atmosphere;
    private Combo  _comboSystemOptiop_Temperature;
    private Combo  _comboSystemOptiop_Weight;
@@ -409,6 +412,26 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
                labelInfo.setText(Messages.Pref_System_Label_Height_Info);
+               gridData_Label.applyTo(labelInfo);
+            }
+            {
+               /*
+                * Pace
+                */
+
+               // label
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Pref_System_Label_Pace);
+               gridData_Label.applyTo(label);
+
+               // combo
+               _comboSystemOptiop_Pace = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Pace.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Pace);
+
+               // label: info
+               final Label labelInfo = new Label(container, SWT.NONE);
+               labelInfo.setText(Messages.Pref_System_Label_Pace_Info);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -825,13 +848,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       _isInUpdateUI = true;
       {
          _comboSystem_Profile.removeAll();
-         for (final MeasurementSystem systemProfile : _allSystemProfiles) {
-            _comboSystem_Profile.add(systemProfile.getName());
-         }
-
-         _comboSystemOptiop_Pressure_Atmosphere.removeAll();
-         for (final System_Pressure_Atmosphere system : MeasurementSystem_Manager.getAllSystem_AtmosphericPressures()) {
-            _comboSystemOptiop_Pressure_Atmosphere.add(system.getLabel());
+         for (final MeasurementSystem system : _allSystemProfiles) {
+            _comboSystem_Profile.add(system.getName());
          }
 
          _comboSystemOptiop_DayTime.removeAll();
@@ -840,38 +858,48 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          }
 
          _comboSystemOptiop_Distance.removeAll();
-         for (final System_Distance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
-            _comboSystemOptiop_Distance.add(systemDistance.getLabel());
+         for (final System_Distance system : MeasurementSystem_Manager.getAllSystem_Distances()) {
+            _comboSystemOptiop_Distance.add(system.getLabel());
          }
 
          _comboSystemOptiop_Elevation.removeAll();
-         for (final System_Elevation systemElevation : MeasurementSystem_Manager.getAllSystem_Elevations()) {
-            _comboSystemOptiop_Elevation.add(systemElevation.getLabel());
+         for (final System_Elevation system : MeasurementSystem_Manager.getAllSystem_Elevations()) {
+            _comboSystemOptiop_Elevation.add(system.getLabel());
          }
 
          _comboSystemOptiop_Height_Body.removeAll();
-         for (final System_Height systemHeight : MeasurementSystem_Manager.getAllSystem_Heights()) {
-            _comboSystemOptiop_Height_Body.add(systemHeight.getLabel());
+         for (final System_Height system : MeasurementSystem_Manager.getAllSystem_Heights()) {
+            _comboSystemOptiop_Height_Body.add(system.getLabel());
          }
 
          _comboSystemOptiop_Length.removeAll();
-         for (final System_Length systemElevation : MeasurementSystem_Manager.getAllSystem_Length()) {
-            _comboSystemOptiop_Length.add(systemElevation.getLabel());
+         for (final System_Length system : MeasurementSystem_Manager.getAllSystem_Length()) {
+            _comboSystemOptiop_Length.add(system.getLabel());
          }
 
          _comboSystemOptiop_Length_Small.removeAll();
-         for (final System_LengthSmall systemElevation : MeasurementSystem_Manager.getAllSystem_SmallLength()) {
-            _comboSystemOptiop_Length_Small.add(systemElevation.getLabel());
+         for (final System_LengthSmall system : MeasurementSystem_Manager.getAllSystem_Length_Small()) {
+            _comboSystemOptiop_Length_Small.add(system.getLabel());
+         }
+
+         _comboSystemOptiop_Pace.removeAll();
+         for (final System_Pace system : MeasurementSystem_Manager.getAllSystem_Pace()) {
+            _comboSystemOptiop_Pace.add(system.getLabel());
+         }
+
+         _comboSystemOptiop_Pressure_Atmosphere.removeAll();
+         for (final System_Pressure_Atmosphere system : MeasurementSystem_Manager.getAllSystem_Pressures_Atmospheric()) {
+            _comboSystemOptiop_Pressure_Atmosphere.add(system.getLabel());
          }
 
          _comboSystemOptiop_Temperature.removeAll();
-         for (final System_Temperature systemTemperature : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
-            _comboSystemOptiop_Temperature.add(systemTemperature.getLabel());
+         for (final System_Temperature system : MeasurementSystem_Manager.getAllSystem_Temperatures()) {
+            _comboSystemOptiop_Temperature.add(system.getLabel());
          }
 
          _comboSystemOptiop_Weight.removeAll();
-         for (final System_Weight systemWeight : MeasurementSystem_Manager.getAllSystem_Weights()) {
-            _comboSystemOptiop_Weight.add(systemWeight.getLabel());
+         for (final System_Weight system : MeasurementSystem_Manager.getAllSystem_Weights()) {
+            _comboSystemOptiop_Weight.add(system.getLabel());
          }
       }
       _isInUpdateUI = isInUpdateUIBackup;
@@ -982,34 +1010,37 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_activeSystemProfileIndex);
 
 // SET_FORMATTING_OFF
-      final System_Pressure_Atmosphere[]  allAtmosphericPressures = MeasurementSystem_Manager.getAllSystem_AtmosphericPressures();
       final System_DayTime[]              allDayTime              = MeasurementSystem_Manager.getAllSystem_DayTime();
       final System_Distance[]             allDistances            = MeasurementSystem_Manager.getAllSystem_Distances();
       final System_Elevation[]            allElevations           = MeasurementSystem_Manager.getAllSystem_Elevations();
       final System_Height[]               allHeights              = MeasurementSystem_Manager.getAllSystem_Heights();
       final System_Length[]               allLengths              = MeasurementSystem_Manager.getAllSystem_Length();
-      final System_LengthSmall[]          allSmallLengths         = MeasurementSystem_Manager.getAllSystem_SmallLength();
+      final System_LengthSmall[]          allSmallLengths         = MeasurementSystem_Manager.getAllSystem_Length_Small();
+      final System_Pace[]                 allPaces                = MeasurementSystem_Manager.getAllSystem_Pace();
+      final System_Pressure_Atmosphere[]  allAtmosphericPressures = MeasurementSystem_Manager.getAllSystem_Pressures_Atmospheric();
       final System_Temperature[]          allTemperatures         = MeasurementSystem_Manager.getAllSystem_Temperatures();
       final System_Weight[]               allWeights              = MeasurementSystem_Manager.getAllSystem_Weights();
 
-      final Unit_Pressure_Atmosphere      pressure    = allAtmosphericPressures  [_comboSystemOptiop_Pressure_Atmosphere.getSelectionIndex()].getPressure();
       final Unit_DayTime                  dayTime     = allDayTime               [_comboSystemOptiop_DayTime.getSelectionIndex()].getDayTime();
       final Unit_Distance                 distance    = allDistances             [_comboSystemOptiop_Distance.getSelectionIndex()].getDistance();
       final Unit_Elevation                elevation   = allElevations            [_comboSystemOptiop_Elevation.getSelectionIndex()].getElevation();
-      final Unit_Height_Body                   height      = allHeights               [_comboSystemOptiop_Height_Body.getSelectionIndex()].getHeight();
+      final Unit_Height_Body              height      = allHeights               [_comboSystemOptiop_Height_Body.getSelectionIndex()].getHeight();
       final Unit_Length                   length      = allLengths               [_comboSystemOptiop_Length.getSelectionIndex()].getLength();
-      final Unit_Length_Small              smallLength = allSmallLengths          [_comboSystemOptiop_Length_Small.getSelectionIndex()].getSmallLength();
+      final Unit_Length_Small             smallLength = allSmallLengths          [_comboSystemOptiop_Length_Small.getSelectionIndex()].getLength_Small();
+      final Unit_Pace                     pace        = allPaces                 [_comboSystemOptiop_Pace.getSelectionIndex()].getPace();
+      final Unit_Pressure_Atmosphere      pressure    = allAtmosphericPressures  [_comboSystemOptiop_Pressure_Atmosphere.getSelectionIndex()].getPressure();
       final Unit_Temperature              temperature = allTemperatures          [_comboSystemOptiop_Temperature.getSelectionIndex()].getTemperature();
       final Unit_Weight                   weight      = allWeights               [_comboSystemOptiop_Weight.getSelectionIndex()].getWeight();
 // SET_FORMATTING_ON
 
-      selectedSystemProfile.setAtmosphericPressure(pressure);
       selectedSystemProfile.setDayTime(dayTime);
       selectedSystemProfile.setDistance(distance);
       selectedSystemProfile.setElevation(elevation);
       selectedSystemProfile.setHeight(height);
       selectedSystemProfile.setLength(length);
-      selectedSystemProfile.setSmallLength(smallLength);
+      selectedSystemProfile.setLength_Small(smallLength);
+      selectedSystemProfile.setPace(pace);
+      selectedSystemProfile.setPressure_Atmospheric(pressure);
       selectedSystemProfile.setTemperature(temperature);
       selectedSystemProfile.setWeight(weight);
 
@@ -1068,6 +1099,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       _comboSystemOptiop_Height_Body         .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));
       _comboSystemOptiop_Length              .select(MeasurementSystem_Manager.getSystemIndex_Length(selectedSystemProfile));
       _comboSystemOptiop_Length_Small        .select(MeasurementSystem_Manager.getSystemIndex_Length_Small(selectedSystemProfile));
+      _comboSystemOptiop_Pace                .select(MeasurementSystem_Manager.getSystemIndex_Pace(selectedSystemProfile));
       _comboSystemOptiop_Pressure_Atmosphere .select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
       _comboSystemOptiop_Temperature         .select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
       _comboSystemOptiop_Weight              .select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
