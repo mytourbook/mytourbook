@@ -470,10 +470,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withNoSpaceBefore().withSpaceAfter().getHead1()
+                  : UI.EMPTY_STRING)
 
-            + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.withNoSpaceBefore().getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
 
             + HEAD1_TOUR_TYPE
 
@@ -484,8 +486,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD1_COMPUTED_TIME_MOVING
             + HEAD1_COMPUTED_TIME_BREAK
 
-            + HEAD1_ELEVATION
-            + HEAD1_DISTANCE
+            + STAT_VALUE_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+            + STAT_VALUE_ELEVATION.withUnitLabel(UI.UNIT_LABEL_ALTITUDE).getHead1()
 
             + HEAD1_NUMBER_OF_TOURS
 
@@ -493,10 +495,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine2 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withSpaceAfter().getHead2()
+                  : UI.EMPTY_STRING)
 
-            + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
 
             + HEAD2_TOUR_TYPE
 
@@ -507,8 +511,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + HEAD2_COMPUTED_TIME_MOVING
             + HEAD2_COMPUTED_TIME_BREAK
 
-            + HEAD2_ELEVATION
-            + HEAD2_DISTANCE
+            + STAT_VALUE_DISTANCE.getHead2()
+            + STAT_VALUE_ELEVATION.getHead2()
 
             + HEAD2_NUMBER_OF_TOURS
 
@@ -516,10 +520,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withSpaceAfter().getValueFormatting()
+                  : "%s") //$NON-NLS-1$
 
-            + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
 
             + VALUE_TOUR_TYPE
 
@@ -530,8 +536,8 @@ public class DataProvider_Tour_Month extends DataProvider {
             + VALUE_COMPUTED_TIME_MOVING
             + VALUE_COMPUTED_TIME_BREAK
 
-            + VALUE_ELEVATION
-            + VALUE_DISTANCE
+            + STAT_VALUE_DISTANCE.getValueFormatting()
+            + STAT_VALUE_ELEVATION.getValueFormatting()
 
             + VALUE_NUMBER_OF_TOURS
 
@@ -610,8 +616,8 @@ public class DataProvider_Tour_Month extends DataProvider {
                      _tourMonthData.movingTime[tourTypeIndex][monthIndex],
                      _tourMonthData.breakTime[tourTypeIndex][monthIndex],
 
+                     _tourMonthData.distance_High[tourTypeIndex][monthIndex] / 1000f,
                      _tourMonthData.elevationUp_High[tourTypeIndex][monthIndex],
-                     _tourMonthData.distance_High[tourTypeIndex][monthIndex],
 
                      _tourMonthData.numTours_High[tourTypeIndex][monthIndex]
 

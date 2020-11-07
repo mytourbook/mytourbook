@@ -18,6 +18,7 @@ package net.tourbook.statistics.graphs;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.statistic.DurationTime;
 import net.tourbook.ui.TourTypeFilter;
@@ -36,6 +37,7 @@ public abstract class DataProvider {
    static final String HEAD1_DATA_NUMBER                    = "     #  \t ";              //$NON-NLS-1$
    static final String HEAD2_DATA_NUMBER                    = "        \t ";              //$NON-NLS-1$
    static final String VALUE_DATA_NUMBER                    = "%6d\t   ";                 //$NON-NLS-1$
+   static final StatisticValue STAT_VALUE_SEQUENCE_NUMBER   = new StatisticValue("#",        null,    null,    "%6d",   6);
 
    /*
     * Date
@@ -64,6 +66,13 @@ public abstract class DataProvider {
    static final String HEAD2_DATE_DOY                       = "    \t";                   //$NON-NLS-1$
    static final String VALUE_DATE_DOY                       = " %3d\t";                   //$NON-NLS-1$
 
+   static final StatisticValue STAT_VALUE_DATE_YEAR         = new StatisticValue("Year",     null,    null,    "%4d",   4);
+   static final StatisticValue STAT_VALUE_DATE_MONTH        = new StatisticValue("Month",    null,    null,    "%3d",   3);
+   static final StatisticValue STAT_VALUE_DATE_DAY          = new StatisticValue("Day",      null,    null,    "%3d",   3);
+   static final StatisticValue STAT_VALUE_DATE_WEEK         = new StatisticValue("Week",     null,    null,    "%2d",   2);
+   static final StatisticValue STAT_VALUE_DATE_WEEK_START   = new StatisticValue("First",    "Day",   null,    "%8.8s", 8);
+   static final StatisticValue STAT_VALUE_DATE_DOY          = new StatisticValue("DOY",      null,    null,    "%3d",   3);
+
    /*
     * Time
     */
@@ -87,19 +96,25 @@ public abstract class DataProvider {
    static final String HEAD2_COMPUTED_TIME_BREAK            = "        (s)\t";            //$NON-NLS-1$
    static final String VALUE_COMPUTED_TIME_BREAK            = " %10d\t";                  //$NON-NLS-1$
 
+   static final StatisticValue STAT_VALUE_DEVICE_TIME_ELAPSED  = new StatisticValue("Elapsed",  null,    "s",    "%10d",   10);
+   static final StatisticValue STAT_VALUE_DEVICE_TIME_RECORDED = new StatisticValue("Recorded", null,    "s",    "%10d",   10);
+   static final StatisticValue STAT_VALUE_DEVICE_TIME_PAUSED   = new StatisticValue("Paused",   null,    "s",    "%10d",   10);
+   static final StatisticValue STAT_VALUE_COMPUTED_TIME_MOVING = new StatisticValue("Moving",   null,    "s",    "%10d",   10);
+   static final StatisticValue STAT_VALUE_COMPUTED_TIME_BREAK  = new StatisticValue("Break",    null,    "s",    "%10d",   10);
+
    /*
-    * Distance
+    * Distance/Elevation
     */
    static final String HEAD1_DISTANCE                       = "   Distance\t";            //$NON-NLS-1$
    static final String HEAD2_DISTANCE                       = "        (m)\t";            //$NON-NLS-1$
    static final String VALUE_DISTANCE                       = " %10.0f\t";                //$NON-NLS-1$
 
-   /*
-    * Elevation
-    */
    static final String HEAD1_ELEVATION                      = "  Elevation\t";            //$NON-NLS-1$
    static final String HEAD2_ELEVATION                      = "        (m)\t";            //$NON-NLS-1$
    static final String VALUE_ELEVATION                      = " %10.0f\t";                //$NON-NLS-1$
+
+   static final StatisticValue STAT_VALUE_DISTANCE          = new StatisticValue("Distance",    null,    null,    "%12.3f",   12);
+   static final StatisticValue STAT_VALUE_ELEVATION         = new StatisticValue("Elevation",   null,    null,    "%10.0f",   10);
 
    /*
     * Speed
@@ -111,6 +126,9 @@ public abstract class DataProvider {
    static final String HEAD1_PACE                           = "     Pace\t";              //$NON-NLS-1$
    static final String HEAD2_PACE                           = " (min/km)\t";              //$NON-NLS-1$
    static final String VALUE_PACE                           = "   %6.2f\t";               //$NON-NLS-1$
+
+   static final StatisticValue STAT_VALUE_SPEED             = new StatisticValue("Speed",    null,    null,    "%7.2f",   7);
+   static final StatisticValue STAT_VALUE_PACE              = new StatisticValue("Pace",    null,    null,    "%6.2f",   6);
 
    /*
     * HR Zones
@@ -151,6 +169,10 @@ public abstract class DataProvider {
    static final String HEAD2_TRAINING_PERFORMANCE           = "  Perform\t";              //$NON-NLS-1$
    static final String VALUE_TRAINING_PERFORMANCE           = "   %6.2f\t";               //$NON-NLS-1$
 
+   static final StatisticValue STAT_VALUE_TRAINING_AEROB       = new StatisticValue("Training",    "Aerob",    null,  "%6.1f",    6);
+   static final StatisticValue STAT_VALUE_TRAINING_ANAEROB     = new StatisticValue("Training",    "Anaerob",  null,  "%6.1f",    6);
+   static final StatisticValue STAT_VALUE_TRAINING_PERFORMANCE = new StatisticValue("Training",    "Perform",  null,  "%6.2f",    6);
+
    /*
     * Tour
     */
@@ -160,11 +182,16 @@ public abstract class DataProvider {
 
    static final String HEAD1_TOUR_TITLE                     = " Title\t";                 //$NON-NLS-1$
    static final String HEAD2_TOUR_TITLE                     = "\t";                       //$NON-NLS-1$
-   static final String VALUE_TOUR_TITLE                     = " %s\t";                    //$NON-NLS-1$  // do not truncate text, it is displayed at the end
+   static final String VALUE_TOUR_TITLE                     = " %s\t";                    //$NON-NLS-1$
+
 
    static final String HEAD1_TOUR_TYPE                      = " TourType            \t";  //$NON-NLS-1$
    static final String HEAD2_TOUR_TYPE                      = "                     \t";  //$NON-NLS-1$
-   static final String VALUE_TOUR_TYPE                      = " %-20.20s\t";              //$NON-NLS-1$  // truncate 20+ characters to force column layout
+   static final String VALUE_TOUR_TYPE                      = " %-20.20s\t";              //$NON-NLS-1$
+
+   static final StatisticValue STAT_VALUE_NUMBER_OF_TOURS   = new StatisticValue("Tours",    null,    "#",  "%6.0f",    6);
+   static final StatisticValue STAT_VALUE_TOUR_TITLE        = new StatisticValue("Title",    null,    null, "%s",       TourData.DB_LENGTH_TOUR_TITLE).withLeftAlign().withNoPadding();    // do not truncate text, it is displayed at the end
+   static final StatisticValue STAT_VALUE_TOUR_TYPE         = new StatisticValue("TourType", null,    null, "%-20.20s", 20);     // truncate 20+ characters to force column layout
 
 // SET_FORMATTING_ON
 

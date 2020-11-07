@@ -28,5 +28,6 @@ Import-Package: gnu.trove.list.array,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.action,
+ org.apache.commons.lang3,
  org.eclipse.ui.forms.widgets
 Automatic-Module-Name: net.tourbook.statistics

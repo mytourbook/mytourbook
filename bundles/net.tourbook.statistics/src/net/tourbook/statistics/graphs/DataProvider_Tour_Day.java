@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.OptionalDouble;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
@@ -43,7 +44,6 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Day extends DataProvider {
 
@@ -494,10 +494,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllBodyFat.add(bodyFat);
 
                // round distance
-               final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
+               final float distance = dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
                dbAllDistance.add(distance);
-               dbAllElevation.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
+               dbAllElevation.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
 
                dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
                dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);
@@ -749,95 +749,105 @@ public class DataProvider_Tour_Day extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withNoSpaceBefore().withSpaceAfter().getHead1()
+                  : UI.EMPTY_STRING)
 
-            + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
-            + HEAD1_DATE_DAY
-            + HEAD1_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.withNoSpaceBefore().getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
+            + STAT_VALUE_DATE_DAY.getHead1()
+            + STAT_VALUE_DATE_WEEK.getHead1()
 
-            + HEAD1_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead1()
 
-            + HEAD1_DEVICE_TIME_ELAPSED
-            + HEAD1_DEVICE_TIME_RECORDED
-            + HEAD1_DEVICE_TIME_PAUSED
+            + STAT_VALUE_DEVICE_TIME_ELAPSED.getHead1()
+            + STAT_VALUE_DEVICE_TIME_RECORDED.getHead1()
+            + STAT_VALUE_DEVICE_TIME_PAUSED.getHead1()
 
-            + HEAD1_COMPUTED_TIME_MOVING
-            + HEAD1_COMPUTED_TIME_BREAK
+            + STAT_VALUE_COMPUTED_TIME_MOVING.getHead1()
+            + STAT_VALUE_COMPUTED_TIME_BREAK.getHead1()
 
-            + HEAD1_DISTANCE
-            + HEAD1_ELEVATION
+            + STAT_VALUE_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+            + STAT_VALUE_SPEED.withUnitLabel(UI.UNIT_LABEL_SPEED).getHead1()
+            + STAT_VALUE_PACE.withUnitLabel(UI.UNIT_LABEL_PACE).getHead1()
 
-            + HEAD1_SPEED
-            + HEAD1_PACE
+            + STAT_VALUE_ELEVATION.withUnitLabel(UI.UNIT_LABEL_ALTITUDE).getHead1()
 
-            + HEAD1_TRAINING_AEROB
-            + HEAD1_TRAINING_ANAEROB
-            + HEAD1_TRAINING_PERFORMANCE
+            + STAT_VALUE_TRAINING_AEROB.getHead1()
+            + STAT_VALUE_TRAINING_ANAEROB.getHead1()
+            + STAT_VALUE_TRAINING_PERFORMANCE.getHead1()
 
-            + HEAD1_TOUR_TITLE
+            + STAT_VALUE_TOUR_TITLE.getHead1()
 
       ;
 
       final String headerLine2 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withSpaceAfter().getHead2()
+                  : UI.EMPTY_STRING)
 
-            + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
-            + HEAD2_DATE_DAY
-            + HEAD2_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
+            + STAT_VALUE_DATE_DAY.getHead2()
+            + STAT_VALUE_DATE_WEEK.getHead2()
 
-            + HEAD2_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead2()
 
-            + HEAD2_DEVICE_TIME_ELAPSED
-            + HEAD2_DEVICE_TIME_RECORDED
-            + HEAD2_DEVICE_TIME_PAUSED
+            + STAT_VALUE_DEVICE_TIME_ELAPSED.getHead2()
+            + STAT_VALUE_DEVICE_TIME_RECORDED.getHead2()
+            + STAT_VALUE_DEVICE_TIME_PAUSED.getHead2()
 
-            + HEAD2_COMPUTED_TIME_MOVING
-            + HEAD2_COMPUTED_TIME_BREAK
+            + STAT_VALUE_COMPUTED_TIME_MOVING.getHead2()
+            + STAT_VALUE_COMPUTED_TIME_BREAK.getHead2()
 
-            + HEAD2_DISTANCE
-            + HEAD2_ELEVATION
+            + STAT_VALUE_DISTANCE.getHead2()
+            + STAT_VALUE_SPEED.getHead2()
+            + STAT_VALUE_PACE.getHead2()
 
-            + HEAD2_SPEED
-            + HEAD2_PACE
+            + STAT_VALUE_ELEVATION.getHead2()
 
-            + HEAD2_TRAINING_AEROB
-            + HEAD2_TRAINING_ANAEROB
-            + HEAD2_TRAINING_PERFORMANCE
+            + STAT_VALUE_TRAINING_AEROB.getHead2()
+            + STAT_VALUE_TRAINING_ANAEROB.getHead2()
+            + STAT_VALUE_TRAINING_PERFORMANCE.getHead2()
 
-            + HEAD2_TOUR_TITLE;
+            + STAT_VALUE_TOUR_TITLE.getHead2()
+
+      ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
+            + (isShowSequenceNumbers
+                  ? STAT_VALUE_SEQUENCE_NUMBER.withSpaceAfter().getValueFormatting()
+                  : "%s") //$NON-NLS-1$
 
-            + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
-            + VALUE_DATE_DAY
-            + VALUE_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
+            + STAT_VALUE_DATE_DAY.getValueFormatting()
+            + STAT_VALUE_DATE_WEEK.getValueFormatting()
 
-            + VALUE_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getValueFormatting()
 
-            + VALUE_DEVICE_TIME_ELAPSED
-            + VALUE_DEVICE_TIME_RECORDED
-            + VALUE_DEVICE_TIME_PAUSED
+            + STAT_VALUE_DEVICE_TIME_ELAPSED.getValueFormatting()
+            + STAT_VALUE_DEVICE_TIME_RECORDED.getValueFormatting()
+            + STAT_VALUE_DEVICE_TIME_PAUSED.getValueFormatting()
 
-            + VALUE_COMPUTED_TIME_MOVING
-            + VALUE_COMPUTED_TIME_BREAK
+            + STAT_VALUE_COMPUTED_TIME_MOVING.getValueFormatting()
+            + STAT_VALUE_COMPUTED_TIME_BREAK.getValueFormatting()
 
-            + VALUE_DISTANCE
-            + VALUE_ELEVATION
+            + STAT_VALUE_DISTANCE.getValueFormatting()
+            + STAT_VALUE_SPEED.getValueFormatting()
+            + STAT_VALUE_PACE.getValueFormatting()
 
-            + VALUE_SPEED
-            + VALUE_PACE
+            + STAT_VALUE_ELEVATION.getValueFormatting()
 
-            + VALUE_TRAINING_AEROB
-            + VALUE_TRAINING_ANAEROB
-            + VALUE_TRAINING_PERFORMANCE
+            + STAT_VALUE_TRAINING_AEROB.getValueFormatting()
+            + STAT_VALUE_TRAINING_ANAEROB.getValueFormatting()
+            + STAT_VALUE_TRAINING_PERFORMANCE.getValueFormatting()
 
-            + VALUE_TOUR_TITLE;
+            + STAT_VALUE_TOUR_TITLE.getValueFormatting()
+
+      ;
 
       final StringBuilder sb = new StringBuilder();
       sb.append(headerLine1 + NL);
@@ -890,11 +900,11 @@ public class DataProvider_Tour_Day extends DataProvider {
                movingTime,
                breakTime,
 
-               _tourDayData.allDistance[dataIndex],
-               _tourDayData.allElevation[dataIndex],
-
+               _tourDayData.allDistance[dataIndex] / 1000f,
                _tourDayData.allAvgSpeed[dataIndex],
                _tourDayData.allAvgPace[dataIndex],
+
+               _tourDayData.allElevation[dataIndex],
 
                _tourDayData.allTraining_Effect_Aerob[dataIndex],
                _tourDayData.allTraining_Effect_Anaerob[dataIndex],
