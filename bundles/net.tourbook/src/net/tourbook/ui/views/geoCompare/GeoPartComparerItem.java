@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 
 /**
- * Contains data for one comapred tour
+ * Contains data for one compared tour
  */
 public class GeoPartComparerItem {
 
