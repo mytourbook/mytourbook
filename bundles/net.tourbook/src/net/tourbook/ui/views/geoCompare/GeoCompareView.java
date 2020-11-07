@@ -238,10 +238,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    private final Function<Long, Float> _minDiffValueToRelative =
 
          minDiffValue -> {
-                                                                       final float relative = (float) minDiffValue / _maxMinDiff * 100;
+                                                                        final float relative = (float) minDiffValue / _maxMinDiff * 100;
 
-                                                                       return relative;
-                                                                    };
+                                                                        return relative;
+                                                                     };
 
    private class ActionAppTourFilter extends Action {
 
@@ -966,8 +966,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          // this code may be compact and fast but I don't understand it
 
          final ArrayList<GeoPartComparerItem> filteredComparedTours = new ArrayList<>(geoPartItem.comparedTours.stream()
-               .filter(c -> _minDiffValueToRelative.apply(c.minDiffValue) >= 0 &&
-                     _minDiffValueToRelative.apply(c.minDiffValue) < _geoRelativeDifferencesFilter)
+               .filter(c -> isMinDiffValueWithinFilter(c.minDiffValue))
                .collect(Collectors.toList()));
 
          _comparedTours = filteredComparedTours;
@@ -1183,63 +1182,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-//	private void createUI_50_HideFalsePositive(final Composite parent) {
-//
-//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//				onChange_HideFalsePositive();
-//			}
-//		};
-//
-//		/*
-//		 * Hide false positive tours
-//		 */
-//		{
-//			/*
-//			 * Checkbox: live update
-//			 */
-//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
-//			_chkHideFalsePositive.setText("&Hide false positive");
-//			_chkHideFalsePositive.setToolTipText(
-//					"Hide tours which are found but do not contain the requested tour part");
-//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
-//		}
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory
-//				.fillDefaults()
-//				.grab(true, false)
-//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
-//				.applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		{
-//			{
-//				/*
-//				 * Scale: False positive in %
-//				 */
-//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
-//				_scaleHideFalsePositive.setIncrement(1);
-//				_scaleHideFalsePositive.setPageIncrement(10);
-//				_scaleHideFalsePositive.setMinimum(1);
-//				_scaleHideFalsePositive.setMaximum(100);
-//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
-//			}
-//			{
-//				/*
-//				 * Label: %
-//				 */
-//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
-//				GridDataFactory
-//						.fillDefaults()
-//						.align(SWT.FILL, SWT.CENTER)
-//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-//						.applyTo(_lblHideFalsePositiveValue);
-//			}
-//		}
-//	}
-
    private void createUI_80_TableViewer(final Composite parent) {
 
       /*
@@ -1319,6 +1261,63 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       createUI_82_ContextMenu();
    }
+
+//	private void createUI_50_HideFalsePositive(final Composite parent) {
+//
+//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(final SelectionEvent e) {
+//				onChange_HideFalsePositive();
+//			}
+//		};
+//
+//		/*
+//		 * Hide false positive tours
+//		 */
+//		{
+//			/*
+//			 * Checkbox: live update
+//			 */
+//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
+//			_chkHideFalsePositive.setText("&Hide false positive");
+//			_chkHideFalsePositive.setToolTipText(
+//					"Hide tours which are found but do not contain the requested tour part");
+//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
+//		}
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory
+//				.fillDefaults()
+//				.grab(true, false)
+//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
+//				.applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		{
+//			{
+//				/*
+//				 * Scale: False positive in %
+//				 */
+//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
+//				_scaleHideFalsePositive.setIncrement(1);
+//				_scaleHideFalsePositive.setPageIncrement(10);
+//				_scaleHideFalsePositive.setMinimum(1);
+//				_scaleHideFalsePositive.setMaximum(100);
+//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
+//			}
+//			{
+//				/*
+//				 * Label: %
+//				 */
+//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
+//				GridDataFactory
+//						.fillDefaults()
+//						.align(SWT.FILL, SWT.CENTER)
+//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+//						.applyTo(_lblHideFalsePositiveValue);
+//			}
+//		}
+//	}
 
    /**
     * Create the view context menus
@@ -1723,6 +1722,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       });
    }
 
+   @Override
+   public void dispose() {
+
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getSite().getPage().removePartListener(_partListener);
+
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      GeoCompareManager.removeGeoCompareListener(this);
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+
+      super.dispose();
+   }
+
 //	/**
 //	 * Column: Start index
 //	 */
@@ -1792,20 +1805,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		});
 //	}
 
-   @Override
-   public void dispose() {
-
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getSite().getPage().removePartListener(_partListener);
-
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
-      GeoCompareManager.removeGeoCompareListener(this);
-
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
-
-      super.dispose();
-   }
-
    private void enableControls() {
 
       final boolean isCompareEnabled = GeoCompareManager.isGeoComparing();
@@ -1813,6 +1812,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _actionAppTourFilter.setEnabled(isCompareEnabled);
 
 //		_geoPartViewer.getTable().setEnabled(_isCompareEnabled);
+   }
+
+   private void fillToolbar() {
+
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionOnOff);
+      tbm.add(_actionAppTourFilter);
+      tbm.add(_actionGeoCompareOptions);
+
+      tbm.update(true);
    }
 
 //	private void enableControls_HideFalsePositive() {
@@ -1825,17 +1835,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
 //		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
 //	}
-
-   private void fillToolbar() {
-
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionOnOff);
-      tbm.add(_actionAppTourFilter);
-      tbm.add(_actionGeoCompareOptions);
-
-      tbm.update(true);
-   }
 
    private void fireSelection(final ISelection selection) {
 
@@ -1928,6 +1927,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
 
       return false;
+   }
+
+   /**
+    * Evaluates whether a given minDiffValue is between 0 and the current geo
+    * relative difference filter value, false otherwise.
+    *
+    * @param minDiffValue
+    *           A given value
+    * @return true if the minDiffValue is between 0 and the current geo
+    *         relative difference filter value, false otherwise.
+    */
+   private boolean isMinDiffValueWithinFilter(final long minDiffValue) {
+
+      return _minDiffValueToRelative.apply(minDiffValue) >= 0 &&
+            _minDiffValueToRelative.apply(minDiffValue) < _geoRelativeDifferencesFilter;
    }
 
    private void onAction_AppFilter(final boolean isSelected) {
