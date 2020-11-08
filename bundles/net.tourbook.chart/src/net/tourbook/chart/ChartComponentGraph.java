@@ -5342,6 +5342,11 @@ public class ChartComponentGraph extends Canvas {
 
          final Rectangle[][] barRectangeleSeries = drawingData.getBarRectangles();
 
+         if (barRectangeleSeries == null) {
+            // this occurred
+            continue;
+         }
+
          final int markerWidth = BAR_MARKER_WIDTH;
          final int markerWidth2 = markerWidth / 2;
 
