@@ -1268,9 +1268,7 @@ public class TourInfoUI {
 
    private int getWindSpeedTextIndex(final int speed) {
 
-      final int[] unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      final int[] unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       // set speed to max index value
       int speedValueIndex = unitValueWindSpeed.length - 1;

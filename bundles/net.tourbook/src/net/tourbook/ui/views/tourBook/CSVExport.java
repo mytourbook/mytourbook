@@ -1405,7 +1405,7 @@ public class CSVExport {
             int minSurfingDistance = value;
 
             // convert imperial -> metric
-            if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+            if (UI.UNIT_IS_LENGTH_YARD) {
                minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
             }
 

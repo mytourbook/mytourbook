@@ -7625,17 +7625,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getPaceSerie() {
 
-      if (UI.UNIT_VALUE_DISTANCE == 1) {
-
-         // use metric system
-
-         if (paceSerieMinute == null) {
-            computeSpeedSerie();
-         }
-
-         return paceSerieMinute;
-
-      } else {
+      if (net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE) {
 
          // use imperial system
 
@@ -7644,22 +7634,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          return paceSerieMinuteImperial;
+
+      } else {
+
+         // use metric system
+
+         if (paceSerieMinute == null) {
+            computeSpeedSerie();
+         }
+
+         return paceSerieMinute;
       }
    }
 
    public float[] getPaceSerieSeconds() {
 
-      if (UI.UNIT_VALUE_DISTANCE == 1) {
-
-         // use metric system
-
-         if (paceSerieSeconds == null) {
-            computeSpeedSerie();
-         }
-
-         return paceSerieSeconds;
-
-      } else {
+      if (net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE) {
 
          // use imperial system
 
@@ -7668,6 +7658,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          return paceSerieSecondsImperial;
+
+      } else {
+
+         // use metric system
+
+         if (paceSerieSeconds == null) {
+            computeSpeedSerie();
+         }
+
+         return paceSerieSeconds;
       }
    }
 
@@ -7947,29 +7947,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getRunDyn_StepLength() {
 
-      if (UI.UNIT_VALUE_DISTANCE == 1) {
-
-         // use metric system
-
-         if (_runDyn_StepLength_UI == null) {
-
-            if (runDyn_StepLength != null) {
-
-               // create UI data serie
-
-               final int serieSize = runDyn_StepLength.length;
-
-               _runDyn_StepLength_UI = new float[serieSize];
-
-               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-                  _runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
-               }
-            }
-         }
-
-         return _runDyn_StepLength_UI;
-
-      } else {
+      if (net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH) {
 
          // use imperial system
 
@@ -7990,6 +7968,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          return _runDyn_StepLength_UI_Imperial;
+
+      } else {
+
+         // use metric system
+
+         if (_runDyn_StepLength_UI == null) {
+
+            if (runDyn_StepLength != null) {
+
+               // create UI data serie
+
+               final int serieSize = runDyn_StepLength.length;
+
+               _runDyn_StepLength_UI = new float[serieSize];
+
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
+               }
+            }
+         }
+
+         return _runDyn_StepLength_UI;
       }
    }
 
@@ -8010,7 +8010,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getRunDyn_VerticalOscillation() {
 
-      if (UI.UNIT_VALUE_DISTANCE == 1) {
+      if (net.tourbook.common.UI.UNIT_IS_LENGTH_SMALL_INCH) {
+
+         // use imperial system
+
+         if (_runDyn_VerticalOscillation_UI_Imperial == null) {
+
+            if (runDyn_VerticalOscillation != null) {
+
+               // create UI data serie
+
+               final int serieSize = runDyn_VerticalOscillation.length;
+
+               _runDyn_VerticalOscillation_UI_Imperial = new float[serieSize];
+
+               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+                  _runDyn_VerticalOscillation_UI_Imperial[serieIndex] =
+                        runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+               }
+            }
+         }
+
+         return _runDyn_VerticalOscillation_UI_Imperial;
+
+      } else {
 
          // use metric system
 
@@ -8031,29 +8054,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          return _runDyn_VerticalOscillation_UI;
-
-      } else {
-
-         // use imperial system
-
-         if (_runDyn_VerticalOscillation_UI_Imperial == null) {
-
-            if (runDyn_VerticalOscillation != null) {
-
-               // create UI data serie
-
-               final int serieSize = runDyn_VerticalOscillation.length;
-
-               _runDyn_VerticalOscillation_UI_Imperial = new float[serieSize];
-
-               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-                  _runDyn_VerticalOscillation_UI_Imperial[serieIndex] = runDyn_VerticalOscillation[serieIndex] / RUN_DYN_DATA_MULTIPLIER
-                        * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-               }
-            }
-         }
-
-         return _runDyn_VerticalOscillation_UI_Imperial;
       }
    }
 

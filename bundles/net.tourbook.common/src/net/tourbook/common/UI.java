@@ -259,20 +259,47 @@ public class UI {
    public static boolean       UNIT_IS_DAY_TIME_24_HOURS;
 
    /**
-    * Is <code>true</code> when the measurement system for a distance is kilometer, which is metric.
+    * Distance could be km (metric), mile or nautical mile
     */
    public static boolean       UNIT_IS_DISTANCE_KILOMETER;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
    public static boolean       UNIT_IS_DISTANCE_MILE;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
    public static boolean       UNIT_IS_DISTANCE_NAUTICAL_MILE;
 
+   /**
+    * Length could be meter (metric) or yard
+    */
    public static boolean       UNIT_IS_LENGTH_METER;
+
+   /**
+    * Length could be meter (metric) or yard
+    */
    public static boolean       UNIT_IS_LENGTH_YARD;
 
+   /**
+    * Small length could be mm (metric) or inch
+    */
    public static boolean       UNIT_IS_LENGTH_SMALL_MILLIMETER;
+
+   /**
+    * Small length could be mm (metric) or inch
+    */
    public static boolean       UNIT_IS_LENGTH_SMALL_INCH;
 
    /**
-    * Is <code>true</code> when the measurement system for the elevation is meter, which is metric.
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_FOOT;
+
+   /**
+    * Elevation could be meter (metric) or foot
     */
    public static boolean       UNIT_IS_ELEVATION_METER;
 
@@ -284,6 +311,9 @@ public class UI {
     * Is <code>true</code> when the measurement system for a weight is kilogramm, which is metric.
     */
    public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+
+   public static boolean       UNIT_IS_PACE_MIN_PER_KILOMETER;
+   public static boolean       UNIT_IS_PACE_MIN_PER_MILE;
 
    /*
     * Contains the unit label in the current measurement system for the distance values

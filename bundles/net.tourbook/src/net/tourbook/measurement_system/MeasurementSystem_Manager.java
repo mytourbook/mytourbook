@@ -166,66 +166,70 @@ public class MeasurementSystem_Manager {
       readProfiles();
    }
 
+// SET_FORMATTING_OFF
+
    private static final System_DayTime             _allSystem_DayTime[]             = {
 
-         new System_DayTime(Unit_DayTime._24_HOURS, Messages.Pref_System_Option_DayTime_24_Hours),
-         new System_DayTime(Unit_DayTime.AM_PM, Messages.Pref_System_Option_DayTime_AM_PM),
+         new System_DayTime(Unit_DayTime._24_HOURS,            Messages.Pref_System_Option_DayTime_24_Hours),
+         new System_DayTime(Unit_DayTime.AM_PM,                Messages.Pref_System_Option_DayTime_AM_PM),
    };
 
    private static final System_Distance            _allSystem_Distances[]           = {
 
-         new System_Distance(Unit_Distance.KILOMETER, Messages.Pref_System_Option_Distance_Kilometer),
-         new System_Distance(Unit_Distance.MILE, Messages.Pref_System_Option_Distance_Mile),
-         new System_Distance(Unit_Distance.NAUTIC_MILE, Messages.Pref_System_Option_Distance_NauticMile),
+         new System_Distance(Unit_Distance.KILOMETER,          Messages.Pref_System_Option_Distance_Kilometer),
+         new System_Distance(Unit_Distance.MILE,               Messages.Pref_System_Option_Distance_Mile),
+         new System_Distance(Unit_Distance.NAUTIC_MILE,        Messages.Pref_System_Option_Distance_NauticMile),
    };
 
    private static final System_Elevation           _allSystem_Elevations[]          = {
 
-         new System_Elevation(Unit_Elevation.METER, Messages.Pref_System_Option_Elevation_Meter),
-         new System_Elevation(Unit_Elevation.FOOT, Messages.Pref_System_Option_Elevation_Foot),
+         new System_Elevation(Unit_Elevation.METER,            Messages.Pref_System_Option_Elevation_Meter),
+         new System_Elevation(Unit_Elevation.FOOT,             Messages.Pref_System_Option_Elevation_Foot),
    };
 
    private static final System_Height              _allSystem_Heights[]             = {
 
-         new System_Height(Unit_Height_Body.METER, Messages.Pref_System_Option_Height_Meter),
-         new System_Height(Unit_Height_Body.INCH, Messages.Pref_System_Option_Height_Inch),
+         new System_Height(Unit_Height_Body.METER,             Messages.Pref_System_Option_Height_Meter),
+         new System_Height(Unit_Height_Body.INCH,              Messages.Pref_System_Option_Height_Inch),
    };
 
    private static final System_Length              _allSystem_Lengths[]             = {
 
-         new System_Length(Unit_Length.METER, Messages.Pref_System_Option_Length_Meter),
-         new System_Length(Unit_Length.YARD, Messages.Pref_System_Option_Length_Yard),
+         new System_Length(Unit_Length.METER,                  Messages.Pref_System_Option_Length_Meter),
+         new System_Length(Unit_Length.YARD,                   Messages.Pref_System_Option_Length_Yard),
    };
 
    private static final System_LengthSmall         _allSystem_Length_Small[]        = {
 
-         new System_LengthSmall(Unit_Length_Small.MILLIMETER, Messages.Pref_System_Option_SmallLength_Millimeter),
-         new System_LengthSmall(Unit_Length_Small.INCH, Messages.Pref_System_Option_SmallLength_Inch),
+         new System_LengthSmall(Unit_Length_Small.MILLIMETER,  Messages.Pref_System_Option_SmallLength_Millimeter),
+         new System_LengthSmall(Unit_Length_Small.INCH,        Messages.Pref_System_Option_SmallLength_Inch),
    };
 
    private static final System_Pace                _allSystem_Pace[]                = {
 
-         new System_Pace(Unit_Pace.MINUTES_PER_KILOMETER, Messages.Pref_System_Option_Pace_MinutesPerKilometer),
-         new System_Pace(Unit_Pace.MINUTES_PER_MILE, Messages.Pref_System_Option_Pace_MinutesPerMile),
+         new System_Pace(Unit_Pace.MINUTES_PER_KILOMETER,      Messages.Pref_System_Option_Pace_MinutesPerKilometer),
+         new System_Pace(Unit_Pace.MINUTES_PER_MILE,           Messages.Pref_System_Option_Pace_MinutesPerMile),
    };
 
    private static final System_Pressure_Atmosphere _allSystem_Pressure_Atmosphere[] = {
 
-         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.MILLIBAR, Messages.Pref_System_Option_Pressure_Atmosphere_Millibar),
-         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.INCH_OF_MERCURY, Messages.Pref_System_Option_Pressure_Atmosphere_InchOfMercury),
+         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.MILLIBAR,          Messages.Pref_System_Option_Pressure_Atmosphere_Millibar),
+         new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.INCH_OF_MERCURY,   Messages.Pref_System_Option_Pressure_Atmosphere_InchOfMercury),
    };
 
    private static final System_Temperature         _allSystem_Temperatures[]        = {
 
-         new System_Temperature(Unit_Temperature.CELCIUS, Messages.Pref_System_Option_Temperature_Celcius),
-         new System_Temperature(Unit_Temperature.FAHRENHEIT, Messages.Pref_System_Option_Temperature_Fahrenheit),
+         new System_Temperature(Unit_Temperature.CELCIUS,      Messages.Pref_System_Option_Temperature_Celcius),
+         new System_Temperature(Unit_Temperature.FAHRENHEIT,   Messages.Pref_System_Option_Temperature_Fahrenheit),
    };
 
    private static final System_Weight              _allSystem_Weights[]             = {
 
-         new System_Weight(Unit_Weight.KILOGRAM, Messages.Pref_System_Option_BodyWeight_Kilogram),
-         new System_Weight(Unit_Weight.POUND, Messages.Pref_System_Option_BodyWeight_Pound),
+         new System_Weight(Unit_Weight.KILOGRAM,               Messages.Pref_System_Option_BodyWeight_Kilogram),
+         new System_Weight(Unit_Weight.POUND,                  Messages.Pref_System_Option_BodyWeight_Pound),
    };
+
+// SET_FORMATTING_ON
 
    private MeasurementSystem_Manager() {}
 
@@ -270,6 +274,7 @@ public class MeasurementSystem_Manager {
    public static System_Pace getActiveSystemOption_Pace() {
       return _allSystem_Pace[getSystemIndex_Pace(getActiveMeasurementSystem())];
    }
+
    public static System_Pressure_Atmosphere getActiveSystemOption_Pressure_Atmospheric() {
       return _allSystem_Pressure_Atmosphere[getSystemIndex_Pressure_Atmosphere(getActiveMeasurementSystem())];
    }

@@ -8310,9 +8310,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       _unitValueAltitude = net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
-      _unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      _unitValueWindSpeed = IWeather.getAllWindSpeeds();
    }
 
    /**
