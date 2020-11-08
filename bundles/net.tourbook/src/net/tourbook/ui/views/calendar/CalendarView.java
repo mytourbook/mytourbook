@@ -184,7 +184,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
                   || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)
+                  || property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
                refreshCalendar();
 
@@ -644,7 +645,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          _calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
       }
 
-      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
+      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, Long.valueOf(-1));
       _calendarGraph.setSelectionTourId(selectedTourId);
 
       // tooltip
