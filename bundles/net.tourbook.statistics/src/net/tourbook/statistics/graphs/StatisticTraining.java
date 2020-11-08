@@ -349,8 +349,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             chartType,
-            _statisticData_Training.allElevation_Low,
-            _statisticData_Training.allElevation_High);
+            _statisticData_Training.allElevationUp_Low,
+            _statisticData_Training.allElevationUp_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
       yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
