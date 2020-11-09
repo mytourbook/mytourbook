@@ -17,7 +17,7 @@ package net.tourbook.device.mio;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -36,7 +36,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class Cyclo105SAXHandler extends DefaultHandler {
 
-   //TODO FB Get feedback from Matej.
    // Review the file one more time to see if I can import more data.
 
    // root tags
@@ -51,50 +50,50 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    private static final String TAG_TRACKNAME   = "TrackName";   //$NON-NLS-1$
 
    // TrackPoints tags
-   private static final String     TAG_ALTITUDE     = "Altitude";                 //$NON-NLS-1$
-   private static final String     TAG_CADENCE      = "Cadence";                  //$NON-NLS-1$
-   private static final String     TAG_HEARTRATE    = "HeartRate";                //$NON-NLS-1$
-   private static final String     TAG_INTERVALTIME = "IntervalTime";             //$NON-NLS-1$
-   private static final String     TAG_LATITUDE     = "Latitude";                 //$NON-NLS-1$
-   private static final String     TAG_LONGITUDE    = "Longitude";                //$NON-NLS-1$
-   private static final String     TAG_POWER        = "Power";                    //$NON-NLS-1$
-   private static final String     TAG_SPEED        = "Speed";                    //$NON-NLS-1$
+   private static final String   TAG_ALTITUDE     = "Altitude";                 //$NON-NLS-1$
+   private static final String   TAG_CADENCE      = "Cadence";                  //$NON-NLS-1$
+   private static final String   TAG_HEARTRATE    = "HeartRate";                //$NON-NLS-1$
+   private static final String   TAG_INTERVALTIME = "IntervalTime";             //$NON-NLS-1$
+   private static final String   TAG_LATITUDE     = "Latitude";                 //$NON-NLS-1$
+   private static final String   TAG_LONGITUDE    = "Longitude";                //$NON-NLS-1$
+   private static final String   TAG_POWER        = "Power";                    //$NON-NLS-1$
+   private static final String   TAG_SPEED        = "Speed";                    //$NON-NLS-1$
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
+   private Map<Long, TourData>   _alreadyImportedTours;
+   private Map<Long, TourData>   _newlyImportedTours;
+   private TourbookDevice        _device;
+   private String                _importFilePath;
 
-   private ArrayList<TimeData>     _sampleList      = new ArrayList<>();
-   private TimeData                _sampleData;
+   private ArrayList<TimeData>   _sampleList      = new ArrayList<>();
+   private TimeData              _sampleData;
 
-   private ArrayList<Integer>      _markerList      = new ArrayList<>();
+   private ArrayList<Integer>    _markerList      = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private StringBuilder           _characters      = new StringBuilder();
+   private boolean               _isImported;
+   private StringBuilder         _characters      = new StringBuilder();
 
-   private boolean                 _isInRootMagellan;
-   private boolean                 _isInTrackPoints;
-   private boolean                 _isInTrackMaster;
+   private boolean               _isInRootMagellan;
+   private boolean               _isInTrackPoints;
+   private boolean               _isInTrackMaster;
 
-   private boolean                 _isInAccruedTime;
-   private boolean                 _isInAltitude;
-   private boolean                 _isInCalories;
-   private boolean                 _isInLatitude;
-   private boolean                 _isInLongitude;
-   private boolean                 _isInCadence;
-   private boolean                 _isInHR;
-   private boolean                 _isInIntervalTime;
-   private boolean                 _isInPower;
-   private boolean                 _isInSpeed;
-   private boolean                 _isInTrackName;
-   private boolean                 _isInStartTime;
+   private boolean               _isInAccruedTime;
+   private boolean               _isInAltitude;
+   private boolean               _isInCalories;
+   private boolean               _isInLatitude;
+   private boolean               _isInLongitude;
+   private boolean               _isInCadence;
+   private boolean               _isInHR;
+   private boolean               _isInIntervalTime;
+   private boolean               _isInPower;
+   private boolean               _isInSpeed;
+   private boolean               _isInTrackName;
+   private boolean               _isInStartTime;
 
-   private int                     _tourCalories;
-   private Period                  _tourStartTime;
-   private LocalDate               _tourStartDate;
+   private int                   _tourCalories;
+   private Period                _tourStartTime;
+   private LocalDate             _tourStartDate;
 
-   private final PeriodFormatter   periodFormatter  = new PeriodFormatterBuilder()
+   private final PeriodFormatter periodFormatter  = new PeriodFormatterBuilder()
          .appendHours().appendSuffix(UI.SYMBOL_COLON)
          .appendMinutes().appendSuffix(UI.SYMBOL_COLON)
          .appendSeconds()
@@ -102,8 +101,8 @@ public class Cyclo105SAXHandler extends DefaultHandler {
 
    public Cyclo105SAXHandler(final TourbookDevice deviceDataReader,
                              final String importFileName,
-                             final HashMap<Long, TourData> alreadyImportedTours,
-                             final HashMap<Long, TourData> newlyImportedTours) {
+                             final Map<Long, TourData> alreadyImportedTours,
+                             final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -285,7 +284,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    private void finalizeTour() {
 
       // check if data are available
-      if (_sampleList.size() == 0) {
+      if (_sampleList.isEmpty()) {
          return;
       }
 
@@ -321,7 +320,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
       final Long tourId = tourData.createTourId(uniqueId);
 
       // check if the tour is already imported
-      if (_alreadyImportedTours.containsKey(tourId) == false) {
+      if (!_alreadyImportedTours.containsKey(tourId)) {
 
          // add new tour to other tours
          _newlyImportedTours.put(tourId, tourData);

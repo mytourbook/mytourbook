@@ -848,7 +848,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
-      colDef.disableValueFormatter();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -860,7 +859,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             if (markerDistance == -1) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(_nf3.format(markerDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+               final double value = markerDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               colDef.printDetailValue(cell, value);
             }
 
             if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
@@ -902,9 +902,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                   prevDistance = prevDistance < 0 ? 0 : prevDistance;
                }
 
-               cell.setText(_nf3.format((markerDistance - prevDistance)
-                     / 1000
-                     / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+               final double value = (markerDistance - prevDistance) / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               colDef.printDetailValue(cell, value);
             }
          }
       });

@@ -428,36 +428,23 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private void TryFinalizeTour(final TourData tourData) {
 
+      final long tourId = tourData.getTourId();
+
+      // check if the tour is already imported
+      if (_alreadyImportedTours.containsKey(tourId)) {
+         return;
+      }
+
+      // add new tour to other tours
+      _newlyImportedTours.put(tourId, tourData);
+
       tourData.setDeviceId(deviceId);
+      tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
 
-      long tourId;
-      try {
-
-         tourId = tourData.getTourId();
-
-      } catch (final NullPointerException e) {
-         StatusUtil.log(e);
-         tourId = -1;
-      }
-
-      if (tourId != -1) {
-         // check if the tour is already imported
-         if (_alreadyImportedTours.containsKey(tourId)) {
-            _alreadyImportedTours.remove(tourId);
-         }
-
-         // add new tour to other tours
-         if (_newlyImportedTours.containsKey(tourId)) {
-            _newlyImportedTours.remove(tourId);
-         }
-         _newlyImportedTours.put(tourId, tourData);
-
-         tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
-
-         tourData.computeAltitudeUpDown();
-         tourData.computeTourMovingTime();
-         tourData.computeComputedValues();
-      }
+      // create additional data
+      tourData.computeAltitudeUpDown();
+      tourData.computeTourMovingTime();
+      tourData.computeComputedValues();
    }
 
    @Override
