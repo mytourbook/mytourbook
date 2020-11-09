@@ -693,7 +693,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * GOVSS (Gravity Ordered Velocity Stress Score)
     */
-   private int                govss;                                // db-version 41
+   private int                govss;
 
 
    // ############################################# MERGED DATA #############################################
@@ -1741,7 +1741,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
          //In case the govss was previously computed and the tour is not considered a tour for
          //which the govss should be computed anymore
-         govss = 0;
+         setGovss(0);
          return false;
 
       }
@@ -4188,11 +4188,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean computeGovss() {
 
-      if (canGovssBeComputed() == false) {
+      if (!canGovssBeComputed()) {
          return false;
       }
 
-      govss = new Govss(tourPerson, this).Compute();
+      setGovss(new Govss(tourPerson, this).Compute());
 
       tourPerson.addOrUpdateGovssEntry(tourStartTime, tourId);
 
@@ -4363,7 +4363,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public double computeNormalizedPace(final int startIndex, final int endIndex) {
       double result = 0;
 
-      if (canGovssBeComputed() == false) {
+      if (!canGovssBeComputed()) {
          return result;
       }
 
@@ -7425,9 +7425,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _gpsBounds;
    }
 
-   /**
-    * @return the {@link #govss}
-    */
    public int getGovss() {
       return govss;
    }
@@ -10947,5 +10944,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
+   }
+
+   public void setGovss(int govss) {
+      this.govss = govss;
    }
 }

@@ -637,6 +637,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_Calories;
    private Spinner            _spinPerson_FTP;
    private Spinner            _spinPerson_RestPuls;
+   private Spinner            _spinTrainingStress_Govss;
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
@@ -651,7 +652,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text               _txtAltitudeUp;
    private Text               _txtDescription;
    private Text               _txtDistance;
-   private Text               _txtTrainingStress_Govss;
    private Text               _txtWeather;
    //
    private TimeDuration       _deviceTime_Elapsed;                  // Total time of the activity
@@ -4005,12 +4005,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(_linkGovss);
 
             // spinner
-            _txtTrainingStress_Govss = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _spinTrainingStress_Govss = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .hint(_hintValueFieldWidth, SWT.DEFAULT)
                   .applyTo(
-                        _txtTrainingStress_Govss);
+                        _spinTrainingStress_Govss);
 
          }
       }
@@ -6222,18 +6222,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final boolean isTourInDb = isTourInDb();
       final boolean isTourValid = isTourValid() && isTourInDb;
-      final boolean isNotManualTour = _isManualTour == false;
+      final boolean isNotManualTour = !_isManualTour;
       final boolean canEdit = _isEditMode && isTourInDb;
 
       // all actions are disabled when a cell editor is activated
-      final boolean isCellEditorInactive = _isCellEditorActive == false;
+      final boolean isCellEditorInactive = !_isCellEditorActive;
 
       final CTabItem selectedTab = _tabFolder.getSelection();
       final boolean isTimeSlice_ViewerTab = selectedTab == _tab_20_TimeSlices;
       final boolean isSwimSlice_ViewerTab = selectedTab == _tab_30_SwimSlices;
       final boolean isTourData = _tourData != null;
 
-      final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
+      final boolean canUseTool = _isEditMode && isTourValid && (isNotManualTour);
 
       // at least 2 positions are necessary to compute the distance
       final boolean isGeoAvailable = isTourData
@@ -6469,7 +6469,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_Calories.setEnabled(canEdit);
 
       // Training stress data
-      _txtTrainingStress_Govss.setEnabled(isManualAndEdit);
+      _spinTrainingStress_Govss.setEnabled(canEdit);
 
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
@@ -8445,6 +8445,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.setCadenceMultiplier(_comboCadence.getSelectedCadence().getMultiplier());
 
          /*
+          * Training Stress
+          */
+         _tourData.setGovss(_spinTrainingStress_Govss.getSelection());
+
+         /*
           * Weather
           */
          _tourData.setWeather(_txtWeather.getText().trim());
@@ -9091,7 +9096,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _comboCadence.setSelection(cadence);
 
       // Training stress
-      _txtTrainingStress_Govss.setText(String.valueOf(_tourData.getGovss()));
+      _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
 
       /*
        * layout container to resize labels

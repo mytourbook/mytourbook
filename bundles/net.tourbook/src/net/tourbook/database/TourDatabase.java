@@ -101,9 +101,9 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 42;
+   private static final int TOURBOOK_DB_VERSION = 43;
 
-//   private static final int TOURBOOK_DB_VERSION = 42; // 20.?
+//   private static final int TOURBOOK_DB_VERSION = 42; // 20.11
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
