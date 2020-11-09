@@ -125,6 +125,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    //
    private static final float  UNIT_MILE                                          = net.tourbook.ui.UI.UNIT_MILE;
+   private static final float  UNIT_NAUTICAL_MILE                                 = net.tourbook.ui.UI.UNIT_NAUTICAL_MILE;
    private static final float  UNIT_YARD                                          = net.tourbook.ui.UI.UNIT_YARD;
    //
    private static final String DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
@@ -144,6 +145,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final int    SEGMENTER_REQUIRES_POWER                           = 0x10;
    //
    private static final int    MAX_DISTANCE_SPINNER_MILE                          = 80;
+   private static final int    MAX_DISTANCE_SPINNER_NAUTICAL_MILE                 = 70;
    private static final int    MAX_DISTANCE_SPINNER_METRIC                        = 100;
    //
    private static final String STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
@@ -297,7 +299,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             SEGMENTER_REQUIRES_DISTANCE));
 
    }
-
    /**
     * This must be in sync with the columns in the {@link SegmenterComparator}
     */
@@ -316,43 +317,45 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID);
    }
 
-   private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
+   private static final SurfingFilter[] _allSurfingSegmentFilter  = new SurfingFilter[] {
 
          new SurfingFilter(SurfingFilterType.All, Messages.Tour_Segmenter_SurfingFilter_All),
          new SurfingFilter(SurfingFilterType.Surfing, Messages.Tour_Segmenter_SurfingFilter_Surfing),
          new SurfingFilter(SurfingFilterType.NotSurfing, Messages.Tour_Segmenter_SurfingFilter_Paddling),
    };
-
-   private final boolean                _isOSX                   = net.tourbook.common.UI.IS_OSX;
-
    //
-   private TableViewer             _segmentViewer;
-   private SegmenterComparator     _segmentComparator        = new SegmenterComparator();
-   private ColumnManager           _columnManager;
+   private boolean                      CURRENT_UNIT_IS_DISTANCE_MILE;
+   private boolean                      CURRENT_UNIT_IS_DISTANCE_NAUTICAL_MILE;
    //
-   private TourData                _tourData;
-   private int                     _tourStartDayTime;
+   private final boolean                _isOSX                    = net.tourbook.common.UI.IS_OSX;
    //
-   private float                   _dpToleranceAltitude;
-   private float                   _dpToleranceAltitudeMultipleTours;
-   private float                   _dpTolerancePower;
-   private float                   _dpTolerancePulse;
+   private TableViewer                  _segmentViewer;
+   private SegmenterComparator          _segmentComparator        = new SegmenterComparator();
+   private ColumnManager                _columnManager;
    //
-   private float                   _savedDpToleranceAltitude = -1;
+   private TourData                     _tourData;
+   private int                          _tourStartDayTime;
    //
-   private SelectionAdapter        _columnSortListener;
-   private MouseWheelListener      _defaultSurfing_MouseWheelListener;
-   private SelectionAdapter        _defaultSurfing_SelectionListener;
-   private IPartListener2          _partListener;
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private ITourEventListener      _tourEventListener;
+   private float                        _dpToleranceAltitude;
+   private float                        _dpToleranceAltitudeMultipleTours;
+   private float                        _dpTolerancePower;
+   private float                        _dpTolerancePulse;
    //
-   private final NumberFormat      _nf_0_0                   = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf_1_0                   = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf_1_1                   = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf_3_3                   = NumberFormat.getNumberInstance();
+   private float                        _savedDpToleranceAltitude = -1;
+   //
+   private SelectionAdapter             _columnSortListener;
+   private MouseWheelListener           _defaultSurfing_MouseWheelListener;
+   private SelectionAdapter             _defaultSurfing_SelectionListener;
+   private IPartListener2               _partListener;
+   private PostSelectionProvider        _postSelectionProvider;
+   private ISelectionListener           _postSelectionListener;
+   private IPropertyChangeListener      _prefChangeListener;
+   private ITourEventListener           _tourEventListener;
+   //
+   private final NumberFormat           _nf_0_0                   = NumberFormat.getNumberInstance();
+   private final NumberFormat           _nf_1_0                   = NumberFormat.getNumberInstance();
+   private final NumberFormat           _nf_1_1                   = NumberFormat.getNumberInstance();
+   private final NumberFormat           _nf_3_3                   = NumberFormat.getNumberInstance();
    {
       _nf_0_0.setMinimumFractionDigits(0);
       _nf_0_0.setMaximumFractionDigits(0);
@@ -1459,8 +1462,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
          _breakUIShortestBreakTime = _spinnerBreak_ShortestTime.getSelection();
-         _breakUIMaxDistance = _spinnerBreak_MaxDistance.getSelection()
-               * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+         _breakUIMaxDistance = _spinnerBreak_MaxDistance.getSelection() * UI.UNIT_VALUE_DISTANCE_SMALL;
          _breakUISliceDiff = _spinnerBreak_SliceDiff.getSelection();
 
          breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
@@ -1795,13 +1797,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       float minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // convert imperial -> metric
+         // convert mile -> metric
 
          minSpeed_StartStop = (float) (minSpeed_StartStop / UNIT_MILE + 0.5);
          minSpeed_Surfing = (float) (minSpeed_Surfing / UNIT_MILE + 0.5);
 
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // convert nautical mile -> metric
+
+         minSpeed_StartStop = (float) (minSpeed_StartStop / UNIT_NAUTICAL_MILE + 0.5);
+         minSpeed_Surfing = (float) (minSpeed_Surfing / UNIT_NAUTICAL_MILE + 0.5);
+      }
+
+      if (UI.UNIT_IS_LENGTH_YARD) {
          minDistance = (float) (minDistance / UNIT_YARD + 0.5);
       }
 
@@ -4033,9 +4044,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float selectedDistance = _spinnerDistance.getSelection();
       float spinnerDistance;
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // miles are displayed
+         // mile
 
          spinnerDistance = (selectedDistance) * 1000 / 8;
 
@@ -4046,9 +4057,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          // convert mile -> meters
          spinnerDistance *= UNIT_MILE;
 
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // nautical mile
+
+         spinnerDistance = (selectedDistance) * 1000 / 8;
+
+         if (spinnerDistance == 0) {
+            spinnerDistance = 1000 / 8;
+         }
+
+         // convert nautical mile -> meters
+         spinnerDistance *= UNIT_NAUTICAL_MILE;
+
       } else {
 
-         // meters are displayed
+         // km (metric)
 
          spinnerDistance = selectedDistance * MAX_DISTANCE_SPINNER_METRIC;
 
@@ -4312,6 +4336,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             sort_OnSelect_SortColumn(e);
          }
       };
+
+      // keep current measurement system
+      CURRENT_UNIT_IS_DISTANCE_MILE = UI.UNIT_IS_DISTANCE_MILE;
+      CURRENT_UNIT_IS_DISTANCE_NAUTICAL_MILE = UI.UNIT_IS_DISTANCE_NAUTICAL_MILE;
    }
 
    private boolean isSegmentLayerVisible() {
@@ -4844,12 +4872,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isMinDistance = _chkIsMinSurfingDistance.getSelection();
       final int minTimeDuration = _spinnerSurfing_MinTimeDuration.getSelection();
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // convert imperial -> metric
+         // convert mile -> metric
 
          minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_MILE + 0.5);
          minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_MILE + 0.5);
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // convert nautical mile -> metric
+
+         minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_NAUTICAL_MILE + 0.5);
+         minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_NAUTICAL_MILE + 0.5);
+      }
+
+      if (UI.UNIT_IS_LENGTH_YARD) {
 
          minDistance = (int) (minDistance / UNIT_YARD + 0.5);
       }
@@ -5339,13 +5377,24 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       int minSpeed_StartStop = _spinnerSurfing_MinSpeed_StartStop.getSelection();
       int minSpeed_Surfing = _spinnerSurfing_MinSpeed_Surfing.getSelection();
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // convert imperial -> metric
+         // convert mile -> metric
 
-         minSurfingDistance = (int) (minSurfingDistance / UNIT_YARD + 0.5);
          minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_MILE + 0.5);
          minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_MILE + 0.5);
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // convert nautical mile -> metric
+
+         minSpeed_StartStop = (int) (minSpeed_StartStop / UNIT_NAUTICAL_MILE + 0.5);
+         minSpeed_Surfing = (int) (minSpeed_Surfing / UNIT_NAUTICAL_MILE + 0.5);
+      }
+
+      if (UI.UNIT_IS_LENGTH_YARD) {
+
+         minSurfingDistance = (int) (minSurfingDistance / UNIT_YARD + 0.5);
       }
 
       Util.setStateEnum(_state, STATE_SURFING_SEGMENT_FILTER, getSelectedSurfingFilter());
@@ -5506,12 +5555,19 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void setMaxDistanceSpinner() {
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // imperial
+         // mile
 
          _maxDistanceSpinner = MAX_DISTANCE_SPINNER_MILE;
          _spinnerDistancePage = 8;
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // nautical mile
+
+         _maxDistanceSpinner = MAX_DISTANCE_SPINNER_NAUTICAL_MILE;
+         _spinnerDistancePage = 7;
 
       } else {
 
@@ -5824,9 +5880,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       float spinnerDistance = getDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         // imperial
+         // mile
 
          spinnerDistance /= 1000;
 
@@ -5871,7 +5927,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       } else {
 
-         // metric
+         // metric + nautical mile
 
          // update UI, the spinner already displays the correct value
          _lblDistanceValue.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
@@ -5959,29 +6015,117 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
    }
 
+   /**
+    * Convert surfing values into the updated measurement system
+    */
    private void updateUI_Surfing_MeasurementValues() {
 
-      final int minDistance = _spinnerSurfing_MinSurfingDistance.getSelection();
-      final int minSpeed_StartStop = _spinnerSurfing_MinSpeed_StartStop.getSelection();
-      final int minSpeed_Surfing = _spinnerSurfing_MinSpeed_Surfing.getSelection();
+// SET_FORMATTING_OFF
+
+      final int minDistance         = _spinnerSurfing_MinSurfingDistance.getSelection();
+      final int minSpeed_StartStop  = _spinnerSurfing_MinSpeed_StartStop.getSelection();
+      final int minSpeed_Surfing    = _spinnerSurfing_MinSpeed_Surfing.getSelection();
 
       // this conversion is not exactly but the measurement system is not changed very often
 
-      if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == UNIT_MILE) {
+      final double startStop_Mile_2_Km             = (minSpeed_StartStop   / UNIT_MILE) + 0.5;
+      final double surfing_Mile_2_Km               = (minSpeed_Surfing     / UNIT_MILE) + 0.5;
 
-         // imperial -> metric
+      final double startStop_NauticalMile_2_Km     = (minSpeed_StartStop   / UNIT_NAUTICAL_MILE) + 0.5;
+      final double surfing_NauticalMile_2_Km       = (minSpeed_Surfing     / UNIT_NAUTICAL_MILE) + 0.5;
 
-         _spinnerSurfing_MinSpeed_StartStop.setSelection((int) ((minSpeed_StartStop / UNIT_MILE) + 0.5));
-         _spinnerSurfing_MinSpeed_Surfing.setSelection((int) ((minSpeed_Surfing / UNIT_MILE) + 0.5));
+      final float  startStop_Km_2_Mile             = minSpeed_StartStop    * UNIT_MILE;
+      final float  surfing_Km_2_Mile               = minSpeed_Surfing      * UNIT_MILE;
+
+      final float  startStop_Km_2_NauticalMile     = minSpeed_StartStop    * UNIT_NAUTICAL_MILE;
+      final float  surfing_Km_2_NauticalMile       = minSpeed_Surfing      * UNIT_NAUTICAL_MILE;
+
+      final float  startStop_Mile_2_NauticalMile   = minSpeed_StartStop    * net.tourbook.ui.UI.UNIT_MILE_2_NAUTICAL_MILE;
+      final float  surfing_Mile_2_NauticalMile     = minSpeed_Surfing      * net.tourbook.ui.UI.UNIT_MILE_2_NAUTICAL_MILE;
+      final float  startStop_NauticalMile_2_Mile   = minSpeed_StartStop    * net.tourbook.ui.UI.UNIT_NAUTICAL_MILE_2_MILE;
+      final float  surfing_NauticalMile_2_Mile     = minSpeed_Surfing      * net.tourbook.ui.UI.UNIT_NAUTICAL_MILE_2_MILE;
+
+// SET_FORMATTING_ON
+
+      if (CURRENT_UNIT_IS_DISTANCE_MILE) {
+
+         // previous system was mile
+
+         if (UI.UNIT_IS_DISTANCE_MILE) {
+
+            // system was not modified -> ignore
+
+         } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+            // mile -> nautical mile
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_Mile_2_NauticalMile);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_Mile_2_NauticalMile);
+
+         } else {
+
+            // mile -> km
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_Mile_2_Km);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_Mile_2_Km);
+         }
+
+      } else if (CURRENT_UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         // previous system was nautical mile
+
+         if (UI.UNIT_IS_DISTANCE_MILE) {
+
+            // nautical mile -> mile
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_NauticalMile_2_Mile);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_NauticalMile_2_Mile);
+
+         } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+            // system was not modified -> ignore
+
+         } else {
+
+            // nautical mile -> km
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_NauticalMile_2_Km);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_NauticalMile_2_Km);
+         }
+
+      } else {
+
+         // previous system was metric
+
+         if (UI.UNIT_IS_DISTANCE_MILE) {
+
+            // km -> mile
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_Km_2_Mile);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_Km_2_Mile);
+
+         } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+            // km -> nautical mile
+
+            _spinnerSurfing_MinSpeed_StartStop.setSelection((int) startStop_Km_2_NauticalMile);
+            _spinnerSurfing_MinSpeed_Surfing.setSelection((int) surfing_Km_2_NauticalMile);
+
+         } else {
+
+            // system was not modified -> ignore
+         }
+      }
+
+      // keep current measurement system
+      CURRENT_UNIT_IS_DISTANCE_MILE = UI.UNIT_IS_DISTANCE_MILE;
+      CURRENT_UNIT_IS_DISTANCE_NAUTICAL_MILE = UI.UNIT_IS_DISTANCE_NAUTICAL_MILE;
+
+      if (UI.UNIT_IS_LENGTH_YARD) {
 
          _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance / UNIT_YARD + 0.5));
 
       } else {
-
-         // metric -> imperial
-
-         _spinnerSurfing_MinSpeed_StartStop.setSelection((int) (minSpeed_StartStop * UNIT_MILE));
-         _spinnerSurfing_MinSpeed_Surfing.setSelection((int) (minSpeed_Surfing * UNIT_MILE));
 
          _spinnerSurfing_MinSurfingDistance.setSelection((int) (minDistance * UNIT_YARD));
       }

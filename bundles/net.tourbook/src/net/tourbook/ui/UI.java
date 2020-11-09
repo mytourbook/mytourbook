@@ -200,6 +200,20 @@ public class UI {
    public static final float         UNIT_JOULE_2_CALORY            = 1.0f / 4.1868f;
 
    /**
+    * Convert Mile into Nautical mile.
+    * <p>
+    * Multiply miles with this value to get nautical miles
+    */
+   public static final float         UNIT_MILE_2_NAUTICAL_MILE      = 0.868976f;
+
+   /**
+    * Convert Nautical mile into Mile.
+    * <p>
+    * Multiply nautical miles with this value to get miles
+    */
+   public static final float         UNIT_NAUTICAL_MILE_2_MILE      = 1.15078f;
+
+   /**
     * Imperial system for distance
     */
    public static final float         UNIT_MILE                      = 1.609344f;
@@ -230,6 +244,12 @@ public class UI {
    public static final float         UNIT_POUND                     = 2.204623f;
 
    /**
+    * contains the system of measurement value for altitudes relative to the metric system, the
+    * metric system is <code>1</code>
+    */
+   public static float               UNIT_VALUE_ALTITUDE            = 1;
+
+   /**
     * Contains the system of measurement value for distances relative to the metric system.
     * <p>
     * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE} or
@@ -251,22 +271,16 @@ public class UI {
    public static float               UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
 
    /**
-    * contains the system of measurement value for altitudes relative to the metric system, the
-    * metric system is <code>1</code>
+    * Contains the system of measurement value for the power, is set to <code>1</code> for the
+    * metric system Watt/Kg.
     */
-   public static float               UNIT_VALUE_ALTITUDE            = 1;
+   public static float               UNIT_VALUE_POWER;
 
    /**
     * contains the system of measurement value for the temperature, is set to <code>1</code> for the
     * metric system
     */
    public static float               UNIT_VALUE_TEMPERATURE         = 1;
-
-   /**
-    * Contains the system of measurement value for the power, is set to <code>1</code> for the
-    * metric system Watt/Kg.
-    */
-   public static float               UNIT_VALUE_POWER;
 
    /**
     * contains the system of measurement value for the weight, is set to <code>1</code> for the
@@ -1389,7 +1403,6 @@ public class UI {
          // set imperial measure system
 
          net.tourbook.common.UI.UNIT_IS_DISTANCE_MILE             = true;
-
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_MI;
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_MPH;
 
@@ -1398,7 +1411,6 @@ public class UI {
       } else if (distance == Unit_Distance.NAUTIC_MILE) {
 
          net.tourbook.common.UI.UNIT_IS_DISTANCE_NAUTICAL_MILE    = true;
-
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_NMI;
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KNOT;
 
@@ -1409,7 +1421,6 @@ public class UI {
          // default is the metric measure system
 
          net.tourbook.common.UI.UNIT_IS_DISTANCE_KILOMETER        = true;
-
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE               = net.tourbook.common.UI.UNIT_DISTANCE_KM;
          net.tourbook.common.UI.UNIT_LABEL_SPEED                  = net.tourbook.common.UI.UNIT_SPEED_KM_H;
 
@@ -1425,13 +1436,11 @@ public class UI {
       if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
 
          net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_KILOMETER    = true;
-
          net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
       } else {
 
          net.tourbook.common.UI.UNIT_IS_PACE_MIN_PER_MILE         = true;
-
          net.tourbook.common.UI.UNIT_LABEL_PACE                   = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
       }
 
@@ -1519,7 +1528,6 @@ public class UI {
 
          UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
 
-         net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = UNIT_VALUE_TEMPERATURE;
          net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_F;
 
       } else {
@@ -1528,7 +1536,6 @@ public class UI {
 
          UNIT_VALUE_TEMPERATURE = 1;
 
-         net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = 1;
          net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
       }
 
@@ -1541,7 +1548,6 @@ public class UI {
 
          UNIT_VALUE_WEIGHT = UNIT_POUND;
 
-         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
          net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_LBS;
 
       } else {
@@ -1550,9 +1556,17 @@ public class UI {
 
          UNIT_VALUE_WEIGHT = 1;
 
-         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
          net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_KG;
       }
+
+      // update copies in net.tourbook.common.UI
+      net.tourbook.common.UI.UNIT_VALUE_ALTITUDE               = UNIT_VALUE_ALTITUDE;
+      net.tourbook.common.UI.UNIT_VALUE_DISTANCE               = UNIT_VALUE_DISTANCE;
+      net.tourbook.common.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH    = UNIT_VALUE_DISTANCE_MM_OR_INCH;
+      net.tourbook.common.UI.UNIT_VALUE_DISTANCE_SMALL         = UNIT_VALUE_DISTANCE_SMALL;
+      net.tourbook.common.UI.UNIT_VALUE_POWER                  = UNIT_VALUE_POWER;
+      net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE            = UNIT_VALUE_TEMPERATURE;
+      net.tourbook.common.UI.UNIT_VALUE_WEIGHT                 = UNIT_VALUE_WEIGHT;
 
 // SET_FORMATTING_ON
 

@@ -332,15 +332,22 @@ public class UI {
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
 
-   public static float        UNIT_VALUE_TEMPERATURE;
+   /*
+    * These are copies from net.tourbook.ui.UI
+    */
+   public static float UNIT_VALUE_DISTANCE;
+   public static float UNIT_VALUE_DISTANCE_SMALL;
+   public static float UNIT_VALUE_DISTANCE_MM_OR_INCH;
+   public static float UNIT_VALUE_ALTITUDE;
+   public static float UNIT_VALUE_POWER;
+   public static float UNIT_VALUE_TEMPERATURE;
+   public static float UNIT_VALUE_WEIGHT;
 
    // (Celcius * 9/5) + 32 = Fahrenheit
    public static final float UNIT_FAHRENHEIT_MULTI  = 1.8f;
    public static final float UNIT_FAHRENHEIT_ADD    = 32;
 
    public static final float UNIT_METER_TO_INCHES   = 39.37007874f;
-
-   public static float       UNIT_VALUE_WEIGHT;
 
    public static final float UNIT_KILOGRAM_TO_POUND = 2.204623f;
 

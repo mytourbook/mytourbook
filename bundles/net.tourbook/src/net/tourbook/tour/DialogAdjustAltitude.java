@@ -27,13 +27,13 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.IXAxisSelectionListener;
@@ -939,7 +939,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       spinner.setMaximum(99999);
       spinner.setIncrement(1);
       spinner.setPageIncrement(1);
-      UI.setWidth(spinner, convertWidthInCharsToPixels(6));
+      net.tourbook.ui.UI.setWidth(spinner, convertWidthInCharsToPixels(6));
 
       spinner.addModifyListener(new ModifyListener() {
 
@@ -952,13 +952,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
             final Spinner spinner = (Spinner) e.widget;
 
-            if (UI.UNIT_VALUE_ALTITUDE == 1) {
-
-               final float modifiedAlti = spinner.getSelection();
-
-               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
-
-            } else {
+            if (UI.UNIT_IS_ELEVATION_FOOT) {
 
                /**
                 * adjust the non metric (imperial) value, this seems to be complicate and it is
@@ -982,6 +976,15 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                }
 
                spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, newMetricAlti);
+
+            } else {
+
+               // adjust metric elevation
+
+               final float modifiedAlti = spinner.getSelection();
+
+               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
+
             }
 
             onChangeAltitude();
@@ -1359,7 +1362,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP
              */
             _lblElevation_Up = new Label(container, SWT.TRAIL);
-            _lblElevation_Up.setText(UI.SPACE);
+            _lblElevation_Up.setText(UI.SPACE1);
             _lblElevation_Up.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1379,7 +1382,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Adjusted elevation UP
              */
             _lblElevation_UpAdjusted = new Label(container, SWT.TRAIL);
-            _lblElevation_UpAdjusted.setText(UI.SPACE);
+            _lblElevation_UpAdjusted.setText(UI.SPACE1);
             _lblElevation_UpAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1391,7 +1394,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP delta
              */
             _lblElevation_UpAdjustedDiff = new Label(container, SWT.TRAIL);
-            _lblElevation_UpAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_UpAdjustedDiff.setText(UI.SPACE1);
             _lblElevation_UpAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1427,7 +1430,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation DOWN
              */
             _lblElevation_Down = new Label(container, SWT.TRAIL);
-            _lblElevation_Down.setText(UI.SPACE);
+            _lblElevation_Down.setText(UI.SPACE1);
             _lblElevation_Down.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1447,7 +1450,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Adjusted elevation DOWN
              */
             _lblElevation_DownAdjusted = new Label(container, SWT.TRAIL);
-            _lblElevation_DownAdjusted.setText(UI.SPACE);
+            _lblElevation_DownAdjusted.setText(UI.SPACE1);
             _lblElevation_DownAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1459,7 +1462,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP delta
              */
             _lblElevation_DownAdjustedDiff = new Label(container, SWT.TRAIL);
-            _lblElevation_DownAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_DownAdjustedDiff.setText(UI.SPACE1);
             _lblElevation_DownAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
