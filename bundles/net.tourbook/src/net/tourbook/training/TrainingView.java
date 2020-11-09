@@ -18,6 +18,7 @@ package net.tourbook.training;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -1188,8 +1189,8 @@ public class TrainingView extends ViewPart {
       /*
        * check HR zones
        */
-      final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
-      if (personHrZones.size() == 0) {
+      final List<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
+      if (personHrZones.isEmpty()) {
 
          // hr zones are required
 
@@ -1231,7 +1232,7 @@ public class TrainingView extends ViewPart {
       final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
       final int timeSerieSize = timeSerie.length;
 
-      final ArrayList<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
+      final List<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
       final int zoneSize = hrSortedZones.size();
 
       final RGB[] rgbBright = new RGB[zoneSize];

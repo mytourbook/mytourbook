@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -44,17 +45,17 @@ import org.eclipse.jface.preference.IPreferenceStore;
 @Entity
 public class PerformanceModelingData {
 
-   public static final int                     PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
+   public static final int                 PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
 
-   private static IPreferenceStore             _prefStore                               = TourbookPlugin.getPrefStore();
-   private static int                          _fitnessDecayTime                        = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
+   private static IPreferenceStore         _prefStore                               = TourbookPlugin.getPrefStore();
+   private static int                      _fitnessDecayTime                        = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
 
    @Transient
-   private ITrainingStressDataListener         _trainingStressDataListener;
+   private ITrainingStressDataListener     _trainingStressDataListener;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                                PerformanceModelingDataId;
+   private long                            PerformanceModelingDataId;
 
    /**
     * Training Stress data
@@ -62,10 +63,10 @@ public class PerformanceModelingData {
 
    // GOVSS
    @Lob
-   private HashMap<LocalDate, ArrayList<Long>> govssEntries;
+   private Map<LocalDate, ArrayList<Long>> govssEntries;
 
    @Lob
-   private HashMap<Date, long[]>               bikeScoreEntries;
+   private HashMap<Date, long[]>           bikeScoreEntries;
 
    //  private HashMap<Date, long[]>           swimScoreEntries;
    //  private HashMap<Date, long[]>           trimpEntries;
@@ -105,9 +106,7 @@ public class PerformanceModelingData {
     */
    private int computeFitnessValue(final int numberOfDays, final int previousFitnessValue, final int totalGovss) {
 
-      final int fitnessValue = computeResponseValue(_fitnessDecayTime, numberOfDays, previousFitnessValue, totalGovss);
-
-      return fitnessValue;
+      return computeResponseValue(_fitnessDecayTime, numberOfDays, previousFitnessValue, totalGovss);
    }
 
    public void computeFitnessValues() {
@@ -130,16 +129,14 @@ public class PerformanceModelingData {
 
       final float exponent = numberOfDays * -1f / decayTime;
 
-      final int responseValue = (int) (previousResponseValue * Math.exp(exponent) + trainingStressValue);
-
-      return responseValue;
+      return (int) (previousResponseValue * Math.exp(exponent) + trainingStressValue);
    }
 
-   public HashMap<LocalDate, Integer> getFitnessValuesSkiba() {
+   public Map<LocalDate, Integer> getFitnessValuesSkiba() {
       return fitnessValuesSkiba;
    }
 
-   public HashMap<LocalDate, ArrayList<Long>> getGovssEntries() {
+   public Map<LocalDate, ArrayList<Long>> getGovssEntries() {
       return govssEntries;
    }
 
@@ -211,7 +208,7 @@ public class PerformanceModelingData {
 
    }
 
-   public void setGovssEntries(final HashMap<LocalDate, ArrayList<Long>> govssEntries) {
+   public void setGovssEntries(final Map<LocalDate, ArrayList<Long>> govssEntries) {
       this.govssEntries = govssEntries;
    }
 

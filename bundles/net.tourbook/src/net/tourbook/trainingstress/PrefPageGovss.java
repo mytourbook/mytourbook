@@ -122,14 +122,14 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
          super(tourType.getName(), AS_CHECK_BOX);
 
-         if (isChecked == false) {
+         if (!isChecked) {
 
             final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
             setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
          }
 
          setChecked(isChecked);
-         setEnabled(isChecked == false);
+         setEnabled(!isChecked);
 
          _tourType = tourType;
 
@@ -202,7 +202,6 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       @Override
       public Menu getMenu(final Menu arg0) {
-         // TODO Auto-generated method stub
          return null;
       }
 
@@ -263,9 +262,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
     */
    private float computeThresholdVelocity(final float testDistance, final int testDuration) {
 
-      final float thresholdVelocity = testDistance / testDuration;
-
-      return thresholdVelocity;
+      return testDistance / testDuration;
    }
 
    private void createActions() {
@@ -487,8 +484,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
    private void enableControls() {
 
       final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
-      final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
-      _action_TourType_Remove.setEnabled(isTourTypeSelected);
+      _action_TourType_Remove.setEnabled(!currentTourTypeViewerSelection.isEmpty());
 
       _btnComputeValues.setEnabled(_tourTypesViewer.getTable().getItemCount() > 0);
    }
@@ -579,7 +575,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       final StringBuilder criticalPace = new StringBuilder();
       criticalPace.append(String.valueOf(thresholdVelocity_Minutes));
       if (seconds > 0) {
-         criticalPace.append("'" + String.valueOf(seconds)); //$NON-NLS-1$
+         criticalPace.append("'" + seconds); //$NON-NLS-1$
       }
       return criticalPace.toString();
    }
@@ -615,10 +611,10 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
    private void onComputeGovssValues() {
 
-      if (MessageDialog.openConfirm(
+      if (!MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.Compute_GovssValues_Dialog_ComputeForUserTours_Title,
-            Messages.Compute_GovssValues_Dialog_ComputeForUserTours_Message) == false) {
+            Messages.Compute_GovssValues_Dialog_ComputeForUserTours_Message)) {
          return;
       }
 
@@ -636,7 +632,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             // keep old values
             total_Old_GovssValues[0] += originalTourData.getGovss();
 
-            if (originalTourData.computeGovss() == false) {
+            if (!originalTourData.computeGovss()) {
                return false;
             }
 
@@ -702,7 +698,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       final String criticalPace = getThresholdVelocityString(thresholdVelocity);
 
-      _labelThresholdVelocity_Value.setText(criticalPace.toString());
+      _labelThresholdVelocity_Value.setText(criticalPace);
       _labelThresholdVelocity_Value.requestLayout();
    }
 

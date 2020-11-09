@@ -25,7 +25,6 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -212,7 +211,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private ChartDataYSerie addPerformanceValues() {
 
       final float[] predictedPerformanceValues = new float[_numberOfDays];
-      final HashMap<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
+      final Map<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
       LocalDate currentDatetorneame = _oldestEntryDate;
       for (int index = 0; index < _numberOfDays; ++index) {
 
@@ -348,7 +347,7 @@ public class PerformanceModelingChartView extends ViewPart {
          final int yearDays = allYearDays[yearIndex];
 
          segmentStart[yearIndex] = yearDaysSum;
-         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1.0;
          segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
 
          yearDaysSum += yearDays;
@@ -569,7 +568,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   private LocalDate findExtremeDates(final HashMap<LocalDate, ArrayList<Long>> entries, final boolean oldest) {
+   private LocalDate findExtremeDates(final Map<LocalDate, ArrayList<Long>> entries, final boolean oldest) {
       Map.Entry<LocalDate, ArrayList<Long>> oldestEntry = null;
       Map.Entry<LocalDate, ArrayList<Long>> newestEntry = null;
 
@@ -639,7 +638,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       final float[] govssValues = new float[_numberOfDays];
 
-      final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
+      final Map<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
 
       for (final Map.Entry<LocalDate, ArrayList<Long>> entry : govssEntries.entrySet()) {
          final LocalDate currentDate = entry.getKey();
@@ -962,7 +961,7 @@ public class PerformanceModelingChartView extends ViewPart {
          return;
       }
 
-      final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
+      final Map<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
 
       // We find he oldest date
 

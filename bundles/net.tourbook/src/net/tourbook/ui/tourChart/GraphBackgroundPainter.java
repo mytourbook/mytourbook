@@ -15,16 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -39,6 +32,13 @@ import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.TrainingManager;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
+
 /**
  * Draws background color into the graph, e.g. HR zone, swim style
  */
@@ -50,7 +50,7 @@ public class GraphBackgroundPainter implements IFillPainter {
 	private void createColors_HrZone(final GC gcGraph, final TourPerson tourPerson) {
 
 		final Device display = gcGraph.getDevice();
-		final ArrayList<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
+      final List<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
 
 		_hrZone_Colors = new Color[personHrZones.size()];
 

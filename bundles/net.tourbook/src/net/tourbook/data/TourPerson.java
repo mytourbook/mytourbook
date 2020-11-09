@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -445,7 +446,7 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
                                          final ZonedDateTime birthDay,
                                          final ZonedDateTime dateTime) {
 
-      if (hrZones == null || hrZones.size() == 0) {
+      if (hrZones == null || hrZones.isEmpty()) {
          return null;
       }
 
@@ -503,7 +504,7 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
     * @return Returns a list with all HR zones for this person. When the person has no HR zones,
     *         the returned list is empty.
     */
-   public ArrayList<TourPersonHRZone> getHrZonesSorted() {
+   public List<TourPersonHRZone> getHrZonesSorted() {
 
       if (_sortedHrZones == null) {
 

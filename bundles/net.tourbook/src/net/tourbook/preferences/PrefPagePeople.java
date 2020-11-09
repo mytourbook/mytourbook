@@ -293,8 +293,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       if (data instanceof Boolean) {
 
-         final Boolean isCreatePerson = (Boolean) data;
-         if (isCreatePerson && _people.size() == 0) {
+         final boolean isCreatePerson = (Boolean) data;
+         if (isCreatePerson && _people.isEmpty()) {
 
             // this is a request, to create a new person
 
@@ -362,7 +362,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private Set<TourPersonHRZone> cloneHrZones(final ArrayList<TourPersonHRZone> hrZones) {
+   private Set<TourPersonHRZone> cloneHrZones(final List<TourPersonHRZone> hrZones) {
 
       final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<>();
 
@@ -1321,9 +1321,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       innerContainer.addMouseListener(_hrZoneMouseListener);
 //		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         final ArrayList<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
+         final List<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
 
-         if (hrZones.size() == 0) {
+         if (hrZones.isEmpty()) {
             // hr zones are not available, show info
             createUI_81_HrZone_Info(innerContainer);
          } else {
@@ -1769,7 +1769,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final TourPerson currentPerson = getCurrentPerson();
 
       if (currentPerson != null) {
-         isHrZoneAvailable = currentPerson.getHrZonesSorted().size() > 0;
+         isHrZoneAvailable = !currentPerson.getHrZonesSorted().isEmpty();
       }
 
       _btnAddPerson.setEnabled(!_isPersonModified && isValid);
@@ -2006,7 +2006,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       final TourPerson person = getCurrentPerson();
-      final ArrayList<TourPersonHRZone> hrZones = person.getHrZonesSorted();
+      final List<TourPersonHRZone> hrZones = person.getHrZonesSorted();
 
       // check if hr zones are already available
 //		if (hrZones != null && hrZones.size() > 0) {
@@ -2196,7 +2196,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             }
          }
       }
-      if (personSelection == null && _people.size() > 0) {
+      if (personSelection == null && !_people.isEmpty()) {
 
          /*
           * previous person could not be reselected, select first person, a person MUST always be

@@ -43,7 +43,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
    private static final String FOLDER_ID_GEO_COMPARE_TOOL         = "folderGeoCompareTool";                 //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART               = "folderTourChart";                      //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_CHART_COMPARED_TOUR = "folderTourChart_ComparedTour";         //$NON-NLS-1$
-   private static final String FOLDER_ID_TOUR_CHART_REF_Tour      = "folderTourChart_RefTour";              //$NON-NLS-1$
+   private static final String FOLDER_ID_TOUR_CHART_REF_TOUR      = "folderTourChart_RefTour";              //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_DIRECTORIES         = "folderTourDirectories";                //$NON-NLS-1$
    private static final String FOLDER_ID_TOUR_MAPS                = "folderTourMaps";                       //$NON-NLS-1$
    private static final String FOLDER_ID_YEAR_STATISTICS          = "folderYearStatistics";                 //$NON-NLS-1$
@@ -91,7 +91,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 		// Right area
 		//--------------------------------------------------------------------------------
 
-		final IFolderLayout refChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART_REF_Tour,
+		final IFolderLayout refChartFolder = layout.createFolder(FOLDER_ID_TOUR_CHART_REF_TOUR,
 
 				IPageLayout.TOP, 0.5f, IPageLayout.ID_EDITOR_AREA);
 
@@ -101,7 +101,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
 		final IFolderLayout folderComparedTourChart = layout.createFolder(FOLDER_ID_TOUR_CHART_COMPARED_TOUR,
 
-				IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_REF_Tour);
+				IPageLayout.BOTTOM, 0.5f, FOLDER_ID_TOUR_CHART_REF_TOUR);
 
 		folderComparedTourChart.addView(TourCatalogView_ComparedTour.ID);
 
@@ -109,7 +109,7 @@ public class PerspectiveFactoryTourCatalog implements IPerspectiveFactory {
 
 		final IFolderLayout folderMaps = layout.createFolder(FOLDER_ID_TOUR_MAPS,
 
-				IPageLayout.TOP, 0.5f, FOLDER_ID_TOUR_CHART_REF_Tour);
+				IPageLayout.TOP, 0.5f, FOLDER_ID_TOUR_CHART_REF_TOUR);
 
 		folderMaps.addView(Map2View.ID);
 		folderMaps.addPlaceholder(Map25View.ID);

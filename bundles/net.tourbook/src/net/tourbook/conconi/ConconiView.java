@@ -892,7 +892,7 @@ public class ConconiView extends ViewPart {
 
          final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-         if (tourIds != null && tourIds.size() > 0) {
+         if (tourIds != null && tourIds.isEmpty()) {
             updateChart_12(tourIds);
          }
 
@@ -1009,7 +1009,7 @@ public class ConconiView extends ViewPart {
             }
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
+            if (selectedTours != null && selectedTours.isEmpty()) {
                updateChart_22(selectedTours);
             }
          }
@@ -1046,7 +1046,7 @@ public class ConconiView extends ViewPart {
        * tour editor is not opened because it can cause a recursive attempt to active a part in the
        * middle of activating a part
        */
-      if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
+      if (tourDataList == null || tourDataList.isEmpty() || TourManager.isTourEditorModified(false)) {
          // nothing to do
          clearView();
          return;
@@ -1061,8 +1061,6 @@ public class ConconiView extends ViewPart {
       updateChart_30_NewTour(null);
 
       _pageBook.showPage(_page_ConconiTest);
-
-      return;
    }
 
    /**

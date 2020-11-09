@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -305,7 +305,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
       _barOrderStart = selectedIndex;
 
-      final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
+      final List<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
       final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
 
       /*
@@ -338,7 +338,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private void setupBars_10_HrZoneOrder(final boolean isNewPerson) {
 
-      final ArrayList<TourPersonHRZone> originalPersonHrZones = _appPerson.getHrZonesSorted();
+      final List<TourPersonHRZone> originalPersonHrZones = _appPerson.getHrZonesSorted();
       final int[][] weekHrZoneValues = _tourWeekData.hrZoneValues;
 
       /*
@@ -373,7 +373,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
     */
    private void setupBars_20_BarNames(final StatisticContext statContext) {
 
-      final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
+      final List<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
       final int maxSerieSize = Math.min(personHrZones.size(), _tourWeekData.hrZoneValues.length);
 
       if (personHrZones == null || maxSerieSize == 0) {

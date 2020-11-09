@@ -60,17 +60,17 @@ public class ActionComputeCadenceZonesTimes extends Action {
       }
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
          // tours are not selected -> this can occur when loading tour data is canceled
          return;
       }
 
-      if (MessageDialog.openConfirm(
+      if (!MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.Tour_Action_ComputeCadenceZonesTimes_Title,
             NLS.bind(Messages.Tour_Action_ComputeCadenceZonesTimes_Message,
                   selectedTours.size(),
-                  _prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER))) == false) {
+                  _prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER)))) {
          return;
       }
 
