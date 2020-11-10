@@ -207,13 +207,6 @@ public class UI {
    public static final float         UNIT_MILE_2_NAUTICAL_MILE      = 0.868976f;
 
    /**
-    * Convert Nautical mile into Mile.
-    * <p>
-    * Multiply nautical miles with this value to get miles
-    */
-   public static final float         UNIT_NAUTICAL_MILE_2_MILE      = 1.15078f;
-
-   /**
     * Imperial system for distance
     */
    public static final float         UNIT_MILE                      = 1.609344f;
@@ -247,8 +240,8 @@ public class UI {
     * Contains the system of measurement value for altitudes relative to the metric system, the
     * metric system is <code>1</code>
     *
-    * @deprecated {@link #UNIT_VALUE_ALTITUDE} is used in too many locations to rename instead use
-    *             {@link #UNIT_VALUE_ELEVATION}
+    * @deprecated {@link #UNIT_VALUE_ALTITUDE} is used in too many locations to rename them all now.
+    *             Use {@link #UNIT_VALUE_ELEVATION}
     */
    @Deprecated
    public static float               UNIT_VALUE_ALTITUDE            = 1;
