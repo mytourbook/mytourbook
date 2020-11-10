@@ -6424,7 +6424,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean enableWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !StringUtils.isNullOrEmpty(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
 
-      _linkGovss.setEnabled(canEdit && _tourData.canGovssBeComputed());
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
       _comboLocation_Start.setEnabled(canEdit);
@@ -6474,6 +6473,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_Calories.setEnabled(canEdit);
 
       // Training stress data
+      _linkGovss.setEnabled(canEdit && _tourData != null && _tourData.canGovssBeComputed());
       _spinTrainingStress_Govss.setEnabled(canEdit);
 
       _linkTag.setEnabled(canEdit);
@@ -9104,9 +9104,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // cadence rpm/spm
       final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
-
-      // Training stress
-      _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
 
       /*
        * layout container to resize labels
