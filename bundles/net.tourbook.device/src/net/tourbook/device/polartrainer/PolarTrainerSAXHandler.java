@@ -416,6 +416,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
+         tourData.computeTrainingStressData();
       }
 
       _isImported = true;

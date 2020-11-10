@@ -3519,8 +3519,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       computeGeo_Bounds();
       computeGeo_Grid();
-
-      ComputeTrainingStressData();
    }
 
    private void computeDataSeries_NotSmoothed() {
@@ -5047,7 +5045,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   private void ComputeTrainingStressData() {
+   public void computeTrainingStressData() {
       //TODO FB
 
       //GOVSS
@@ -9592,6 +9590,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.rearShiftCount = rearShifts;
    }
 
+   public void setGovss(final int govss) {
+      this.govss = govss;
+   }
+
    public void setHasGeoData(final boolean hasGeoData) {
       this.hasGeoData = hasGeoData;
    }
@@ -10135,7 +10137,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setTourType(final TourType tourType) {
       this.tourType = tourType;
 
-      ComputeTrainingStressData();
+      computeTrainingStressData();
    }
 
    public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
@@ -10944,9 +10946,5 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
-   }
-
-   public void setGovss(int govss) {
-      this.govss = govss;
    }
 }

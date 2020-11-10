@@ -16,6 +16,8 @@
 package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -85,9 +87,9 @@ public class Govss {
       final float athleteThresholdPower = _tourPerson.getGovssThresholdPower();
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
-      final ArrayList<Double> powerValues = computePowerValues();
+      final List<Double> powerValues = computePowerValues();
 
-      if (powerValues == null || powerValues.size() == 0) {
+      if (powerValues == null || powerValues.isEmpty()) {
          return 0;
       }
 
@@ -106,7 +108,7 @@ public class Govss {
       final float intensityWeighingFactor = lactateNormalizedPower / athleteThresholdPower;
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
-      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourDeviceTime_Elapsed());
+      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourDeviceTime_Recorded());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
       float trainingStressValue = normalizedWork * intensityWeighingFactor;
@@ -156,9 +158,8 @@ public class Govss {
     */
    private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
 
-      final double Ckin = distance > 0 ? 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance : 0;
+      return distance > 0 ? 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance : 0;
 
-      return Ckin;
    }
 
    /**
@@ -184,7 +185,7 @@ public class Govss {
       final String nPace = UI.format_mm_ss((long) pace);
       System.out.println("Normalized pace min/mile = " + nPace);
 
-      return Compute(0, _tourData.timeSerie.length);
+      return Compute(startIndex, endIndex);
    }
 
    /**
@@ -204,9 +205,9 @@ public class Govss {
       return power;
    }
 
-   private ArrayList<Double> computePowerValues() {
+   private List<Double> computePowerValues() {
       if (_tourData == null || _tourData.timeSerie == null) {
-         return null;
+         return Collections.emptyList();
       }
 
       final int[] timeSerie = _tourData.timeSerie;
@@ -232,7 +233,7 @@ public class Govss {
 
             ++serieEndIndex;
             currentRecordingTime = Math.max(0,
-                  timeSerie[serieEndIndex] - timeSerie[serieStartIndex] - _tourData.getBreakTime(serieStartIndex, serieEndIndex));
+                  timeSerie[serieEndIndex] - timeSerie[serieStartIndex] - _tourData.getPausedTime(serieStartIndex, serieEndIndex));
          }
 
          currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);

@@ -647,6 +647,7 @@ public class GarminSAXHandler extends DefaultHandler {
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
+         tourData.computeTrainingStressData();
       }
 
       _isImported = true;
