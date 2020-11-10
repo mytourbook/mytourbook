@@ -4009,8 +4009,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .hint(_hintValueFieldWidth, SWT.DEFAULT)
-                  .applyTo(
-                        _spinTrainingStress_Govss);
+                  .applyTo(_spinTrainingStress_Govss);
+
+            _spinTrainingStress_Govss.setMinimum(0);
+            _spinTrainingStress_Govss.setMaximum(5_000);
+
+            _spinTrainingStress_Govss.addMouseWheelListener(_mouseWheelListener);
+            _spinTrainingStress_Govss.addSelectionListener(_selectionListener);
 
          }
       }
@@ -8906,6 +8911,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_FTP.setSelection(_tourData.getPower_FTP());
       _spinPerson_RestPuls.setSelection(_tourData.getRestPulse());
       _spinPerson_Calories.setSelection(_tourData.getCalories());
+
+      /*
+       * Training Stress
+       */
+      _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
 
       /*
        * wind properties
