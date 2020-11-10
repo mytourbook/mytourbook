@@ -470,7 +470,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final float srtmAltitude = _backupSrtmSerie[serieIndex];
 
          diffTo2ndAlti[serieIndex] = 0;
-         adjustedAltiSerie[serieIndex] = srtmAltitude / UI.UNIT_VALUE_ALTITUDE;
+         adjustedAltiSerie[serieIndex] = srtmAltitude / UI.UNIT_VALUE_ELEVATION;
       }
    }
 
@@ -532,7 +532,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             }
 
             final float metric_AdjustedElevation = metric_NewElevation + splineElevation;
-            final float measurementSystem_AdjustedElevation = metric_AdjustedElevation / UI.UNIT_VALUE_ALTITUDE;
+            final float measurementSystem_AdjustedElevation = metric_AdjustedElevation / UI.UNIT_VALUE_ELEVATION;
 
             splineDataSerie[serieIndex] = splineElevation;
 
@@ -544,7 +544,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
             // elevation is not adjusted
 
-            final float measurementSystem_AdjustedElevation = metric_OriginalElevation / UI.UNIT_VALUE_ALTITUDE;
+            final float measurementSystem_AdjustedElevation = metric_OriginalElevation / UI.UNIT_VALUE_ELEVATION;
 
             metric_AdjustedElevationSerie[serieIndex] = metric_OriginalElevation;
             metric_DiffTo2ndElevation[serieIndex] = metric_SrtmValue - metric_OriginalElevation;
@@ -968,8 +968,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                final float modifiedAlti = spinner.getSelection();
                final float metricAlti = (Float) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
 
-               final float oldAlti = metricAlti / UI.UNIT_VALUE_ALTITUDE;
-               float newMetricAlti = modifiedAlti * UI.UNIT_VALUE_ALTITUDE;
+               final float oldAlti = metricAlti / UI.UNIT_VALUE_ELEVATION;
+               float newMetricAlti = modifiedAlti * UI.UNIT_VALUE_ELEVATION;
 
                if (modifiedAlti > oldAlti) {
                   newMetricAlti++;
@@ -1012,7 +1012,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             _isDisableModifyListener = true;
             {
                spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(metricAltitude));
-               spinner.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ALTITUDE));
+               spinner.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ELEVATION));
             }
             _isDisableModifyListener = false;
 
@@ -1901,9 +1901,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * update UI
        */
-      _lblOldStartAlti.setText(Integer.toString((int) (startAlti / UI.UNIT_VALUE_ALTITUDE)));
-      _lblOldEndAlti.setText(Integer.toString((int) (endAlti / UI.UNIT_VALUE_ALTITUDE)));
-      _lblOldMaxAlti.setText(Integer.toString((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE)));
+      _lblOldStartAlti.setText(Integer.toString((int) (startAlti / UI.UNIT_VALUE_ELEVATION)));
+      _lblOldEndAlti.setText(Integer.toString((int) (endAlti / UI.UNIT_VALUE_ELEVATION)));
+      _lblOldMaxAlti.setText(Integer.toString((int) (maxAlti / UI.UNIT_VALUE_ELEVATION)));
 
       _lblOldStartAlti.pack(true);
       _lblOldEndAlti.pack(true);
@@ -1912,13 +1912,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isDisableModifyListener = true;
       {
          _spinnerNewStartAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(startAlti));
-         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ELEVATION));
 
          _spinnerNewEndAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(endAlti));
-         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ELEVATION));
 
          _spinnerNewMaxAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(maxAlti));
-         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ELEVATION));
       }
       _isDisableModifyListener = false;
 
@@ -2487,7 +2487,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final float[] newAltitudeSerie = _tourData.altitudeSerie = new float[dataSerieAdjustedAlti.length];
 
       for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
-         newAltitudeSerie[serieIndex] = dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE;
+         newAltitudeSerie[serieIndex] = dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ELEVATION;
       }
    }
 
@@ -2583,7 +2583,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             maxAlti = metricAltitude;
          }
 
-         adjustedAltitude[serieIndex] = metricAltitude / UI.UNIT_VALUE_ALTITUDE;
+         adjustedAltitude[serieIndex] = metricAltitude / UI.UNIT_VALUE_ELEVATION;
       }
 
       // keep current start/max values
@@ -2600,9 +2600,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       _isDisableModifyListener = true;
       {
-         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ALTITUDE));
-         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ALTITUDE));
-         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ELEVATION));
+         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ELEVATION));
+         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ELEVATION));
       }
       _isDisableModifyListener = false;
 

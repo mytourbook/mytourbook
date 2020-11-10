@@ -497,7 +497,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                final float distance = dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
                dbAllDistance.add(distance);
-               dbAllElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               dbAllElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
 
                dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
                dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);
@@ -768,7 +768,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + STAT_VALUE_MOTION_SPEED.withUnitLabel(UI.UNIT_LABEL_SPEED).getHead1()
             + STAT_VALUE_MOTION_PACE.withUnitLabel(UI.UNIT_LABEL_PACE).getHead1()
 
-            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ALTITUDE).getHead1()
+            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
             + STAT_VALUE_TRAINING_AEROB.getHead1()
             + STAT_VALUE_TRAINING_ANAEROB.getHead1()

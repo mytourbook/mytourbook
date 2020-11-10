@@ -244,9 +244,13 @@ public class UI {
    public static final float         UNIT_POUND                     = 2.204623f;
 
    /**
-    * contains the system of measurement value for altitudes relative to the metric system, the
+    * Contains the system of measurement value for altitudes relative to the metric system, the
     * metric system is <code>1</code>
+    *
+    * @deprecated {@link #UNIT_VALUE_ALTITUDE} is used in too many locations to rename instead use
+    *             {@link #UNIT_VALUE_ELEVATION}
     */
+   @Deprecated
    public static float               UNIT_VALUE_ALTITUDE            = 1;
 
    /**
@@ -269,6 +273,12 @@ public class UI {
     * system, the metric system is 1 mm, imperial is 0.03937008 inch.
     */
    public static float               UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
+
+   /**
+    * Contains the system of measurement value for altitudes relative to the metric system, the
+    * metric system is <code>1</code>
+    */
+   public static float               UNIT_VALUE_ELEVATION           = 1;
 
    /**
     * Contains the system of measurement value for the power, is set to <code>1</code> for the
@@ -1344,8 +1354,9 @@ public class UI {
    }
 
    /**
-    * update units from the pref store into the application variables
+    * Update units from the pref store into the application variables
     */
+   @SuppressWarnings("deprecation")
    public static void updateUnits() {
 
       final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
@@ -1502,10 +1513,12 @@ public class UI {
 
          net.tourbook.common.UI.UNIT_IS_ELEVATION_FOOT            = true;
 
-         UNIT_VALUE_ALTITUDE = UNIT_FOOT;
+         UNIT_VALUE_ALTITUDE                                      = UNIT_FOOT;
+         UNIT_VALUE_ELEVATION                                     = UNIT_FOOT;
 
-         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_FT;
-         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_FT_H;
+         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE               = net.tourbook.common.UI.UNIT_ELEVATION_FT;
+         net.tourbook.common.UI.UNIT_LABEL_ELEVATION              = net.tourbook.common.UI.UNIT_ELEVATION_FT;
+         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER              = net.tourbook.common.UI.UNIT_ALTIMETER_FT_H;
 
       } else {
 
@@ -1513,10 +1526,12 @@ public class UI {
 
          net.tourbook.common.UI.UNIT_IS_ELEVATION_METER           = true;
 
-         UNIT_VALUE_ALTITUDE = 1;
+         UNIT_VALUE_ALTITUDE                                      = 1;
+         UNIT_VALUE_ELEVATION                                     = 1;
 
-         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_M;
-         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_M_H;
+         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE               = net.tourbook.common.UI.UNIT_ELEVATION_M;
+         net.tourbook.common.UI.UNIT_LABEL_ELEVATION              = net.tourbook.common.UI.UNIT_ELEVATION_M;
+         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER              = net.tourbook.common.UI.UNIT_ALTIMETER_M_H;
       }
 
       /*
@@ -1560,10 +1575,10 @@ public class UI {
       }
 
       // update copies in net.tourbook.common.UI
-      net.tourbook.common.UI.UNIT_VALUE_ALTITUDE               = UNIT_VALUE_ALTITUDE;
       net.tourbook.common.UI.UNIT_VALUE_DISTANCE               = UNIT_VALUE_DISTANCE;
       net.tourbook.common.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH    = UNIT_VALUE_DISTANCE_MM_OR_INCH;
       net.tourbook.common.UI.UNIT_VALUE_DISTANCE_SMALL         = UNIT_VALUE_DISTANCE_SMALL;
+      net.tourbook.common.UI.UNIT_VALUE_ELEVATION              = UNIT_VALUE_ELEVATION;
       net.tourbook.common.UI.UNIT_VALUE_POWER                  = UNIT_VALUE_POWER;
       net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE            = UNIT_VALUE_TEMPERATURE;
       net.tourbook.common.UI.UNIT_VALUE_WEIGHT                 = UNIT_VALUE_WEIGHT;

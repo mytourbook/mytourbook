@@ -620,7 +620,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 //      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
 
-      xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+      xData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       chartDataModel.setXData(xData);
 
       // y-axis: elevation

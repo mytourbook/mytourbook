@@ -396,7 +396,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
             _statisticData_Day.allElevationUp_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);

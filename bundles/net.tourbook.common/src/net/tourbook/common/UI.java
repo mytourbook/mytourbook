@@ -318,16 +318,23 @@ public class UI {
    /*
     * Contains the unit label in the current measurement system for the distance values
     */
+   public static String       UNIT_LABEL_ALTIMETER;
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
-   public static String       UNIT_LABEL_ALTITUDE;
-   public static String       UNIT_LABEL_ALTIMETER;
+   public static String       UNIT_LABEL_ELEVATION;
    public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
    public static String       UNIT_LABEL_WEIGHT;
+
+   /**
+    * @deprecated {@link #UNIT_LABEL_ALTITUDE} is used in too many locations to rename it, instead
+    *             use {@link #UNIT_LABEL_ELEVATION}
+    */
+   @Deprecated
+   public static String       UNIT_LABEL_ALTITUDE;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
@@ -338,7 +345,7 @@ public class UI {
    public static float UNIT_VALUE_DISTANCE;
    public static float UNIT_VALUE_DISTANCE_SMALL;
    public static float UNIT_VALUE_DISTANCE_MM_OR_INCH;
-   public static float UNIT_VALUE_ALTITUDE;
+   public static float UNIT_VALUE_ELEVATION;
    public static float UNIT_VALUE_POWER;
    public static float UNIT_VALUE_TEMPERATURE;
    public static float UNIT_VALUE_WEIGHT;
@@ -356,13 +363,13 @@ public class UI {
     */
    public static final String          UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
    public static final String          UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_M            = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_FT           = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
+   public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
+   public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$

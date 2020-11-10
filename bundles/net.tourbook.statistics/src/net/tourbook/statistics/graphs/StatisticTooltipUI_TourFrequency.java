@@ -173,7 +173,7 @@ public class StatisticTooltipUI_TourFrequency {
 
             // set index for the tab folder which should be selected when dialog is opened and applied
             // in net.tourbook.preferences.PrefPageAppearanceDisplayFormat.applyData(Object)
-            new Integer(1));
+            Integer.valueOf(1));
    }
 
    /**
@@ -831,8 +831,8 @@ public class StatisticTooltipUI_TourFrequency {
 
       final String elevationUp_Percentage_Text        = elevationUp_Percentage   == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationUp_Percentage);
 
-      final float elevationUp_WithMeasurement         = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float elevationUp_WithMeasurement         = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
 // SET_FORMATTING_ON
 
@@ -860,7 +860,7 @@ public class StatisticTooltipUI_TourFrequency {
                allGrouped_ElevationUp[_valueIndex]);
       }
 
-      final String unit = UI.UNIT_LABEL_ALTITUDE;
+      final String unit = UI.UNIT_LABEL_ELEVATION;
       final String title = String.format(TITLE_FORMAT, grouped_ElevationUp, unit);
 
       _lblTitle.setText(title);

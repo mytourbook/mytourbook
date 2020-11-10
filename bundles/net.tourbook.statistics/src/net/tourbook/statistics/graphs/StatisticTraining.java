@@ -353,7 +353,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             _statisticData_Training.allElevationUp_High);
 
       yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-      yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+      yData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);

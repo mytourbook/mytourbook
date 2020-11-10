@@ -76,7 +76,7 @@ public class DataProvider_Tour_Time extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
             + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
-            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ALTITUDE).getHead1()
+            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
       ;
 
@@ -394,7 +394,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourComputedTime_Moving.add(dbMovingTime);
 
                allDistances.add(dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-               allElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               allElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
 
                allTourTitle.add(dbTourTitle);
 

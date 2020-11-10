@@ -231,7 +231,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_Duration             = result.getInt(8);
 
             final long dbValue_Distance            = (long) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
 
             final int dbValue_NumTours             = result.getInt(11);
 
@@ -484,7 +484,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
             + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
-            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ALTITUDE).getHead1()
+            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
             + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead1()
 
