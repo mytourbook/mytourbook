@@ -1674,6 +1674,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
+         //TODO: See Linux issue https://github.com/wolfgang-ch/mytourbook/issues/247
          MessageDialog_Customized dialog = new MessageDialog_Customized(
 
                getToolTipShell(),
