@@ -25,6 +25,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ITreeViewer;
@@ -45,6 +46,7 @@ import net.tourbook.ui.action.ActionExpandAll;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -1669,13 +1671,29 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       /*
        * Confirm deletion
        */
-      boolean isDeleteProfile;
+      boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         isDeleteProfile = MessageDialog.openConfirm(
-               Display.getCurrent().getActiveShell(),
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
+
+               getToolTipShell(),
+
                Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
-               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
       }
       setIsKeepOpenInternally(false);
 

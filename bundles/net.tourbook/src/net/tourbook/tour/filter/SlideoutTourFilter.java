@@ -24,6 +24,7 @@ import java.util.Collections;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
@@ -31,6 +32,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.SearchView;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -245,16 +247,29 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       /*
        * Confirm deletion
        */
-      boolean isDeleteProfile;
+      boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         isDeleteProfile = MessageDialog.openConfirm(
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
 
-               Display.getCurrent().getActiveShell(),
+               getToolTipShell(),
+
                Messages.Slideout_TourFilter_Confirm_DeleteProperty_Title,
-               NLS.bind(
-                     Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message,
-                     filterProperty.fieldConfig.name));
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message, filterProperty.fieldConfig.name),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
       }
       setIsKeepOpenInternally(false);
 
@@ -1857,13 +1872,29 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       /*
        * Confirm deletion
        */
-      boolean isDeleteProfile;
+      boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         isDeleteProfile = MessageDialog.openConfirm(
-               Display.getCurrent().getActiveShell(),
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
+
+               getToolTipShell(),
+
                Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
-               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
       }
       setIsKeepOpenInternally(false);
 

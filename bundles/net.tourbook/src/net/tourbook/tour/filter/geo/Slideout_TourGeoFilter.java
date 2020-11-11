@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.dialog.MessageDialogWithToggleState_Customized;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -47,7 +48,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -1301,37 +1301,39 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
          buttonLabelToIdMap.put(Messages.Slideout_TourGeoFilter_Action_Delete_AllWithoutName, IDialogConstants.OK_ID);
          buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
 
-         final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
-
-               getToolTipShell(),
-
-               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
-               null,
-
-               Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message,
-               MessageDialog.QUESTION,
-
-               buttonLabelToIdMap,
-               0, // default index
-
-               Messages.App_ToggleState_DoNotShowAgain,
-               false // toggle default state
-         );
-
+         MessageDialogWithToggleState_Customized dialog;
          int dialogReturnCode;
-
          setIsAnotherDialogOpened(true);
          {
+            dialog = new MessageDialogWithToggleState_Customized(
+
+                  getToolTipShell(),
+
+                  Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Title,
+                  null,
+
+                  Messages.Slideout_TourGeoFilter_Dialog_DeleteAllFilter_Message,
+                  MessageDialog.QUESTION,
+
+                  buttonLabelToIdMap,
+                  0, // default index
+
+                  Messages.App_ToggleState_DoNotShowAgain,
+                  false // toggle default state
+            );
+
+            dialog.withStyleOnTop();
+
             dialogReturnCode = dialog.open();
          }
          setIsAnotherDialogOpened(false);
 
-         // save toggle state
-         _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME, dialog.getToggleState());
-
          if (dialogReturnCode != IDialogConstants.OK_ID) {
             return;
          }
+
+         // save toggle state
+         _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME, dialog.getToggleState());
       }
 
       // update model
