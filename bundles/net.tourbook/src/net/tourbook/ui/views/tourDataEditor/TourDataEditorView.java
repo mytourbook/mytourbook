@@ -633,7 +633,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_BodyWeight;
    private Spinner            _spinPerson_Calories;
    private Spinner            _spinPerson_FTP;
-   private Spinner            _spinPerson_RestPuls;
+   private Spinner            _spinPerson_RestPulse;
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
@@ -3847,18 +3847,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(label);
 
             // spinner
-            _spinPerson_RestPuls = new Spinner(container, SWT.BORDER);
+            _spinPerson_RestPulse = new Spinner(container, SWT.BORDER);
             GridDataFactory
                   .fillDefaults()//
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinPerson_RestPuls);
-            _spinPerson_RestPuls.setMinimum(0);
-            _spinPerson_RestPuls.setMaximum(200);
-            _spinPerson_RestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+                  .applyTo(_spinPerson_RestPulse);
+            _spinPerson_RestPulse.setMinimum(0);
+            _spinPerson_RestPulse.setMaximum(200);
+            _spinPerson_RestPulse.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
 
-            _spinPerson_RestPuls.addMouseWheelListener(_mouseWheelListener);
-            _spinPerson_RestPuls.addSelectionListener(_selectionListener);
+            _spinPerson_RestPulse.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_RestPulse.addSelectionListener(_selectionListener);
 
             // label: bpm
             _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -6400,7 +6400,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_BodyWeight.setEnabled(canEdit);
       _spinPerson_BodyFat.setEnabled(canEdit);
       _spinPerson_FTP.setEnabled(canEdit);
-      _spinPerson_RestPuls.setEnabled(canEdit);
+      _spinPerson_RestPulse.setEnabled(canEdit);
       _spinPerson_Calories.setEnabled(canEdit);
 
       _linkTag.setEnabled(canEdit);
@@ -8351,7 +8351,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.setBodyFat(_spinPerson_BodyFat.getSelection() / 10.0f);
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
-         _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
+         _tourData.setRestPulse(_spinPerson_RestPulse.getSelection());
          _tourData.setCadenceMultiplier(_comboCadence.getSelectedCadence().getMultiplier());
 
          /*
@@ -8809,7 +8809,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_BodyFat.setSelection(Math.round(_tourData.getBodyFat() * 10));
 
       _spinPerson_FTP.setSelection(_tourData.getPower_FTP());
-      _spinPerson_RestPuls.setSelection(_tourData.getRestPulse());
+      _spinPerson_RestPulse.setSelection(_tourData.getRestPulse());
       _spinPerson_Calories.setSelection(_tourData.getCalories());
 
       /*

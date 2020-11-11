@@ -1860,6 +1860,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       boolean isDeleteProfile;
       setIsKeepOpenInternally(true);
       {
+         //TODO: See Linux issue https://github.com/wolfgang-ch/mytourbook/issues/247
          isDeleteProfile = MessageDialog.openConfirm(
                Display.getCurrent().getActiveShell(),
                Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
