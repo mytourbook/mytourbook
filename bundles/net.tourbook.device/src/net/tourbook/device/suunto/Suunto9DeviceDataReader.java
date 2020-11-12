@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -44,7 +45,9 @@ import org.json.JSONObject;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-   private HashMap<TourData, ArrayList<TimeData>> _processedActivities         = new HashMap<>();
+   private static final String JSON_GZ = ".json.gz";
+
+   private HashMap<TourData, List<TimeData>> _processedActivities         = new HashMap<>();
 
    private HashMap<String, String>                _childrenActivitiesToProcess = new HashMap<>();
 
@@ -91,7 +94,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    private void concatenateChildrenActivities(final String filePath,
                                               int currentFileNumber,
                                               final TourData currentActivity,
-                                              final ArrayList<TimeData> sampleListToReUse) {
+                                              final List<TimeData> sampleListToReUse) {
 
       final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
@@ -103,7 +106,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
                FilenameUtils.getBaseName(filePath)) +
                UI.DASH +
                String.valueOf(++currentFileNumber) +
-               ".json.gz"; //$NON-NLS-1$
+               JSON_GZ;
 
          final Map.Entry<String, String> childEntry = getChildActivity(parentFileName);
 
@@ -301,7 +304,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       String fileName = FilenameUtils.removeExtension(filePath);
 
-      if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") { //$NON-NLS-1$
+      if (fileName.substring(fileName.length() - 5, fileName.length()).equals(".json")) { //$NON-NLS-1$
          fileName = FilenameUtils.removeExtension(fileName);
       }
 
@@ -339,16 +342,16 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          // if we find the parent (e.g: The activity just before the
          // current one. Example : If the current is xxx-3, we find xxx-2)
          // then we import it reusing the parent activity AND we check that there is no children waiting to be imported
-         // If nothing is found, we store it for (hopefully) future use.
-         Map.Entry<TourData, ArrayList<TimeData>> parentEntry = null;
-         for (final Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
+         // if nothing is found, we store it for (hopefully) future use.
+         Map.Entry<TourData, List<TimeData>> parentEntry = null;
+         for (final Map.Entry<TourData, List<TimeData>> entry : _processedActivities.entrySet()) {
             final TourData key = entry.getKey();
 
             final String parentFileName = GetFileNameWithoutNumber(
                   FilenameUtils.getBaseName(filePath)) +
                   UI.DASH +
                   String.valueOf(fileNumber - 1) +
-                  ".json.gz"; //$NON-NLS-1$
+                  JSON_GZ;
 
             if (key.getImportFileName().contains(parentFileName)) {
                parentEntry = entry;
@@ -369,9 +372,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             //We remove the parent activity to replace it with the
             //updated one (parent activity concatenated with the current
             //one).
-            final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+            final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
             while (it.hasNext()) {
-               final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
+               final Map.Entry<TourData, List<TimeData>> entry = it.next();
                if (entry.getKey().getTourId() == parentEntry.getKey().getTourId()) {
                   it.remove();
                }
@@ -409,10 +412,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     *           The absolute path of a given activity.
     */
    private void removeProcessedActivity(final String filePath) {
-      final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+      final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
       while (it.hasNext()) {
-         final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-         if (entry.getKey().getImportFilePath() == filePath) {
+         final Map.Entry<TourData, List<TimeData>> entry = it.next();
+         if (entry.getKey().getImportFilePath().equals(filePath)) {
             it.remove();
             return;
          }
@@ -449,7 +452,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      if (!fileName.toLowerCase().endsWith(".json.gz")) { //$NON-NLS-1$
+      if (!fileName.toLowerCase().endsWith(JSON_GZ)) {
          return false;
       }
 
