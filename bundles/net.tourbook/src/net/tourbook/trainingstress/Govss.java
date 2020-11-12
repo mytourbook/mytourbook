@@ -16,7 +16,6 @@
 package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.common.UI;
@@ -62,7 +61,7 @@ public class Govss extends TrainingStress {
     */
    @Override
    public int Compute(final int startIndex, final int endIndex) {
-      if (_tourPerson == null || _tourData == null || startIndex >= endIndex) {
+      if (_tourPerson == null || _tourData == null || _tourData.timeSerie == null || startIndex >= endIndex) {
          return 0;
       }
 
@@ -72,10 +71,6 @@ public class Govss extends TrainingStress {
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final List<Double> powerValues = computePowerValues();
-
-      if (powerValues.isEmpty()) {
-         return 0;
-      }
 
       // 4. Raise the values in step 3 to the 4th power.
       for (int index = 0; index < powerValues.size(); index++) {
@@ -186,14 +181,10 @@ public class Govss extends TrainingStress {
    }
 
    private List<Double> computePowerValues() {
-      if (_tourData == null || _tourData.timeSerie == null) {
-         return Collections.emptyList();
-      }
-
       final int[] timeSerie = _tourData.timeSerie;
       final int timeSeriesLength = timeSerie.length;
 
-      final ArrayList<Double> powerValues = new ArrayList<>();
+      final List<Double> powerValues = new ArrayList<>();
 
       final int rollingAverageInterval = 120; // The formula calls for 120 second rolling averages
       double powerValue = 0;
