@@ -587,11 +587,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
 
-      final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
-      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
       final float tourElevationUp_Diff = adjustedElevationUp - measurementSystem_TourElevationUp;
       final float tourElevationDown_Diff = adjustedElevationDown - measurementSystem_TourElevationDown;
@@ -1406,7 +1406,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Label: Unit
              */
             final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + net.tourbook.common.UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_UP;
 
             final Label label = new Label(container, SWT.NONE);
@@ -1474,7 +1474,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Label: Unit
              */
             final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + net.tourbook.common.UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_DOWN;
 
             final Label label = new Label(container, SWT.NONE);
