@@ -40,7 +40,7 @@ public class Govss extends TrainingStress {
 
 
    public Govss(final TourPerson tourPerson) {
-      super(tourPerson);
+      super(tourPerson, null);
    }
 
    public Govss(final TourPerson tourPerson, final TourData tourData) {

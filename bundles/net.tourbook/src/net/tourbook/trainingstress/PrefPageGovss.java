@@ -137,7 +137,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       @Override
       public void run() {
          _tourTypesViewer.add(_tourType);
-         _personModifiedListener.onPersonModifiedListener();
+         getPersonModifiedListener().onPersonModifiedListener();
          enableControls();
       }
    }
@@ -245,7 +245,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          final int newSelectedIndex = selectedIndex >= listSize ? listSize - 1 : selectedIndex;
          _tourTypesViewer.getTable().setSelection(newSelectedIndex);
 
-         _personModifiedListener.onPersonModifiedListener();
+         getPersonModifiedListener().onPersonModifiedListener();
 
          enableControls();
       }
@@ -681,7 +681,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          return;
       }
 
-      _personModifiedListener.onPersonModifiedListener();
+      getPersonModifiedListener().onPersonModifiedListener();
 
       // Distance in meters
       thresholdPowerDistance *= 1000;

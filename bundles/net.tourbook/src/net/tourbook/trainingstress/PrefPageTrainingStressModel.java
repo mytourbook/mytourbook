@@ -21,7 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 public abstract class PrefPageTrainingStressModel {
-   public IPersonModifiedListener _personModifiedListener;
+
+   private IPersonModifiedListener _personModifiedListener;
 
    public interface IPersonModifiedListener {
       public abstract void onPersonModifiedListener();
@@ -32,6 +33,10 @@ public abstract class PrefPageTrainingStressModel {
    public abstract String getGroupName();
 
    public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
+
+   public IPersonModifiedListener getPersonModifiedListener() {
+      return _personModifiedListener;
+   }
 
    public abstract void restoreState();
 
