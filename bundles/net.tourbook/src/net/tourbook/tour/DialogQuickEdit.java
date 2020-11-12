@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,7 +106,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private Spinner            _spinBodyWeight;
    private Spinner            _spinFTP;
-   private Spinner            _spinRestPuls;
+   private Spinner            _spinRestPulse;
    private Spinner            _spinCalories;
    private Spinner            _spinWeather_Temperature_Avg;
    private Spinner            _spinWeather_Wind_SpeedValue;
@@ -437,16 +437,16 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _firstColumnControls.add(label);
 
             // spinner
-            _spinRestPuls = new Spinner(container, SWT.BORDER);
+            _spinRestPulse = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinRestPuls);
-            _spinRestPuls.setMinimum(0);
-            _spinRestPuls.setMaximum(200);
-            _spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+                  .applyTo(_spinRestPulse);
+            _spinRestPulse.setMinimum(0);
+            _spinRestPulse.setMaximum(200);
+            _spinRestPulse.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
 
-            _spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+            _spinRestPulse.addMouseWheelListener(_mouseWheelListener);
 
             // label: bpm
             _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -982,7 +982,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final float bodyWeight = UI.convertBodyWeightToMetric(_spinBodyWeight.getSelection());
       _tourData.setBodyWeight(bodyWeight / 10.0f);
       _tourData.setPower_FTP(_spinFTP.getSelection());
-      _tourData.setRestPulse(_spinRestPuls.getSelection());
+      _tourData.setRestPulse(_spinRestPulse.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
 
       _tourData.setWeatherWindDir((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
@@ -1036,7 +1036,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
          _spinBodyWeight.setSelection(Math.round(bodyWeight * 10));
          _spinFTP.setSelection(_tourData.getPower_FTP());
-         _spinRestPuls.setSelection(_tourData.getRestPulse());
+         _spinRestPulse.setSelection(_tourData.getRestPulse());
          _spinCalories.setSelection(_tourData.getCalories());
 
          /*

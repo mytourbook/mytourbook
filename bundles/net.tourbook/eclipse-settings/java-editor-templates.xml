@@ -257,8 +257,12 @@ while (!${shell}.isDisposed()) {
 		${display}.sleep();
 }
 ${display}.dispose();</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nano">System.nanoTime()</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nanom in ms">((float) System.nanoTime() / 1000000)</template><template autoinsert="true" context="java" deleted="false" description="measure time in ns, display in ms" enabled="true" name="nano sys out">long start = System.nanoTime();&#13;
+&#13;
+&#13;
+long end = System.nanoTime();&#13;
+&#13;
 System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")&#13;
-				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));&#13;
+				+ (((float) (end - start) / 1000000) + " ms"));&#13;
 // TODO remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="false" context="java" deleted="false" description="create new object" enabled="true" id="org.eclipse.jdt.ui.templates.new" name="new">${type} ${name} = new ${type}(${});</template><template autoinsert="false" context="java-empty" deleted="false" description="create new class" enabled="true" id="org.eclipse.jdt.ui.templates.new_class" name="new_class">${package_declaration}
 

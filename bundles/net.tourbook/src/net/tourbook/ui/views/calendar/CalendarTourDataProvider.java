@@ -776,12 +776,13 @@ public class CalendarTourDataProvider {
 
                   + "      TourDistance," + NL //                                      //$NON-NLS-1$
                   + "      TourDeviceTime_Elapsed," + NL //                            //$NON-NLS-1$
-                  + "      TourComputedTime_Moving," + NL //                                   //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                           //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                         //$NON-NLS-1$
                   + "      TourAltDown," + NL //                                       //$NON-NLS-1$
                   + "      calories," + NL //                                          //$NON-NLS-1$
                   + "      cadenceZone_SlowTime," + NL //                              //$NON-NLS-1$
-                  + "      cadenceZone_FastTime" + NL //                               //$NON-NLS-1$
+                  + "      cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
+                  + "      TourDeviceTime_Recorded" + NL //                            //$NON-NLS-1$
 
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
@@ -810,13 +811,13 @@ public class CalendarTourDataProvider {
                   + "      " + sqlAppFilter.getWhereClause(); //$NON-NLS-1$
          }
 
-         sql = "SELECT" + NL //                                                     //$NON-NLS-1$
+         sql = "SELECT" + NL //                                                        //$NON-NLS-1$
 
                + " SUM(1)," + NL //                                                 1  //$NON-NLS-1$
                + " SUM(TourDistance)," + NL //                                      2  //$NON-NLS-1$
 
                + " SUM(TourDeviceTime_Elapsed)," + NL //                            3  //$NON-NLS-1$
-               + " SUM(TourComputedTime_Moving)," + NL //                                   4  //$NON-NLS-1$
+               + " SUM(TourComputedTime_Moving)," + NL //                           4  //$NON-NLS-1$
 
                + " SUM(TourAltUp)," + NL //                                         5  //$NON-NLS-1$
                + " SUM(TourAltDown)," + NL //                                       6  //$NON-NLS-1$
@@ -825,7 +826,8 @@ public class CalendarTourDataProvider {
 
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
                + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
-               + " SUM(TourDeviceTime_Recorded)" + NL //                                  10  //$NON-NLS-1$
+
+               + " SUM(TourDeviceTime_Recorded)" + NL //                            10 //$NON-NLS-1$
 
                + sqlFromTourData;
 

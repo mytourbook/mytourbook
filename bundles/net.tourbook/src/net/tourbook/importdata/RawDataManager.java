@@ -811,7 +811,7 @@ public class RawDataManager {
 
          TourLogManager.addLog(
                TourLogState.DEFAULT,
-               NLS.bind(LOG_REIMPORT_COMBINED_VALUES, String.join(UI.SPACE1, dataToReimportDetails)),
+               NLS.bind(LOG_REIMPORT_COMBINED_VALUES, String.join(UI.COMMA_SPACE, dataToReimportDetails)),
                TourLogView.CSS_LOG_TITLE);
 
          return true;
