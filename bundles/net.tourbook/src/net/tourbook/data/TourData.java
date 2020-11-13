@@ -7610,7 +7610,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Calculates the total amount of paused time between start and end index
+    * Calculates the total amount of paused time between a start and an end indices
     *
     * @param startIndex
     * @param endIndex
@@ -7620,7 +7620,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      // check required data
       if (timeSerie == null || pausedTime_Start == null) {
          return totalPausedTime;
       }
