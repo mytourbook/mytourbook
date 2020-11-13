@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -76,54 +77,54 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
-   private static final String       STATE_TOUR_TITLE                       = "Title";                         //$NON-NLS-1$
-   private static final String       STATE_TOUR_TYPE_ID                     = "TourTypeId";                    //$NON-NLS-1$
-   private static final String       STATE_PERSON_ID                        = "PersonId";                      //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE                       = "Title";                         //$NON-NLS-1$
+   private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                    //$NON-NLS-1$
+   private static final String   STATE_PERSON_ID                        = "PersonId";                      //$NON-NLS-1$
 
-   private static final String       STATE_IS_KEEP_ORIGINAL_TIME            = "isKeepOriginalTime";            //$NON-NLS-1$
-   private static final String       STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";          //$NON-NLS-1$
-   private static final String       STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";      //$NON-NLS-1$
-   private static final String       STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";            //$NON-NLS-1$
-   private static final String       STATE_IS_INSERT_PAUSES                 = "isInsertPauses";                //$NON-NLS-1$
+   private static final String   STATE_IS_KEEP_ORIGINAL_TIME            = "isKeepOriginalTime";            //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";          //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";      //$NON-NLS-1$
+   private static final String   STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";            //$NON-NLS-1$
+   private static final String   STATE_IS_INSERT_PAUSES                 = "isInsertPauses";                //$NON-NLS-1$
 
-   private static final String       STATE_JOIN_METHOD                      = "JoinMethod";                    //$NON-NLS-1$
-   private static final String       STATE_JOIN_METHOD_ORIGINAL             = "original";                      //$NON-NLS-1$
-   private static final String       STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                  //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD                      = "JoinMethod";                    //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_ORIGINAL             = "original";                      //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                  //$NON-NLS-1$
 
-   private static final String       STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";               //$NON-NLS-1$
-   private static final String       STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                      //$NON-NLS-1$
-   private static final String       STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";               //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                      //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                        //$NON-NLS-1$
 
-   private static final String       STATE_TYPE_SOURCE                      = "TourTypeSource";                //$NON-NLS-1$
-   private static final String       STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                      //$NON-NLS-1$
-   private static final String       STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                      //$NON-NLS-1$
-   private static final String       STATE_TYPE_SOURCE_CUSTOM               = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE                      = "TourTypeSource";                //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                      //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                      //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_CUSTOM               = "custom";                        //$NON-NLS-1$
 
-   private static final String       STATE_MARKER_TYPE                      = "TourMarkerType";                //$NON-NLS-1$
-   private static final String       STATE_MARKER_TYPE_SMALL                = "small";                         //$NON-NLS-1$
-   private static final String       STATE_MARKER_TYPE_MEDIUM               = "medium";                        //$NON-NLS-1$
-   private static final String       STATE_MARKER_TYPE_LARGE                = "large";                         //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE                      = "TourMarkerType";                //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_SMALL                = "small";                         //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_MEDIUM               = "medium";                        //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_LARGE                = "large";                         //$NON-NLS-1$
 
    /**
     * state: join method
     */
-   private static final String[]     ALL_STATES_JOIN_METHOD                 = new String[] {
+   private static final String[] ALL_STATES_JOIN_METHOD                 = new String[] {
          STATE_JOIN_METHOD_ORIGINAL,
-         STATE_JOIN_METHOD_CONCATENATED                                                                        //
+         STATE_JOIN_METHOD_CONCATENATED                                                                    //
    };
-   private static final String[]     STATE_TEXT_JOIN_METHOD                 = new String[] {
+   private static final String[] STATE_TEXT_JOIN_METHOD                 = new String[] {
          Messages.Dialog_JoinTours_ComboText_KeepTime,
-         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                                   //
+         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                               //
    };
 
    /**
     * state: tour title
     */
-   private static final String[]     ALL_STATES_TOUR_TILE_SOURCE            = new String[] {
+   private static final String[] ALL_STATES_TOUR_TILE_SOURCE            = new String[] {
          STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
-         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                       //
+         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                   //
    };
-   private static final String[]     STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
+   private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTitleFromTour,
          Messages.Dialog_JoinTours_ComboText_TourTileCustom,
          //
@@ -132,46 +133,46 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    /**
     * state: tour type
     */
-   private static final String[]     ALL_STATES_TOUR_TYPE                   = new String[] {
+   private static final String[] ALL_STATES_TOUR_TYPE                   = new String[] {
          STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
          STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR,
-         STATE_TYPE_SOURCE_CUSTOM                                                                              //
+         STATE_TYPE_SOURCE_CUSTOM                                                                          //
    };
-   private static final String[]     STATE_TEXT_TOUR_TYPE_SOURCE            = new String[] {
+   private static final String[] STATE_TEXT_TOUR_TYPE_SOURCE            = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTypeFromTour,
          Messages.Dialog_JoinTours_ComboText_TourTypePrevious,
-         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                    //
+         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                //
    };
 
    /**
     * state: tour marker
     */
-   private static final String[]     ALL_STATES_TOUR_MARKER                 = new String[] {
+   private static final String[] ALL_STATES_TOUR_MARKER                 = new String[] {
          STATE_MARKER_TYPE_SMALL,
          STATE_MARKER_TYPE_MEDIUM,
-         STATE_MARKER_TYPE_LARGE                                                                               //
+         STATE_MARKER_TYPE_LARGE                                                                           //
    };
 
-   private final IDialogSettings     _state                                 = TourbookPlugin
-         .getState("DialogJoinTours");                                                                         //$NON-NLS-1$
+   private final IDialogSettings _state                                 = TourbookPlugin
+         .getState("DialogJoinTours");                                                                     //$NON-NLS-1$
 
-   private TagMenuManager            _tagMenuMgr;
-   private ActionOpenPrefDialog      _actionOpenTourTypePrefs;
+   private TagMenuManager        _tagMenuMgr;
+   private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
-   private TourData                  _joinedTourData;
-   private ArrayList<TourData>       _joinedTourDataList;
+   private TourData              _joinedTourData;
+   private ArrayList<TourData>   _joinedTourDataList;
 
-   private final ArrayList<TourData> _selectedTours;
-   private TourPerson[]              _people;
+   private final List<TourData>  _selectedTours;
+   private TourPerson[]          _people;
 
-   private long                      _tourTypeIdFromSelectedTours           = TourDatabase.ENTITY_IS_NOT_SAVED;
-   private long                      _tourTypeIdPreviousJoinedTour          = TourDatabase.ENTITY_IS_NOT_SAVED;
-   private long                      _tourTypeIdCustom                      = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                  _tourTypeIdFromSelectedTours           = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                  _tourTypeIdPreviousJoinedTour          = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                  _tourTypeIdCustom                      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   private String                    _tourTitleFromTour;
-   private String                    _tourTitleFromCustom;
+   private String                _tourTitleFromTour;
+   private String                _tourTitleFromCustom;
 
-   private ITourEventListener        _tourEventListener;
+   private ITourEventListener    _tourEventListener;
 
    /*
     * UI controls
@@ -206,7 +207,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private Combo                            _cboPerson;
    protected Point                          _shellDefaultSize;
 
-   public DialogJoinTours(final Shell parentShell, final ArrayList<TourData> selectedTours) {
+   public DialogJoinTours(final Shell parentShell, final List<TourData> selectedTours) {
 
       super(parentShell);
 
@@ -327,7 +328,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          public void menuAboutToShow(final IMenuManager menuMgr) {
 
             final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
-            final boolean isTagInTour = joinedTourTags != null && joinedTourTags.size() > 0;
+            final boolean isTagInTour = joinedTourTags != null && !joinedTourTags.isEmpty();
 
             _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, joinedTourTags);
@@ -954,7 +955,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedSerieIndex = 0;
       int joinedTourStartIndex = 0;
       int joinedTourStartDistance = 0;
-      int joinedElapsedTime = 0;
       int joinedRecordedTime = 0;
       int joinedPausedTime = 0;
       final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
@@ -1371,7 +1371,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
           */
          tourData.computeTourMovingTime();
          joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
-         joinedElapsedTime += tourData.getTourDeviceTime_Elapsed() + joinedPausedTime;
 
          joinedMovingTime += tourData.getTourComputedTime_Moving();
 
@@ -1418,7 +1417,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setWeatherWindDir(joinedWeatherWindDir);
       _joinedTourData.setWeatherWindSpeed(joinedWeatherWindSpeed);
 
-      _joinedTourData.setTourDeviceTime_Elapsed(joinedElapsedTime);
+      _joinedTourData.setTourDeviceTime_Elapsed(joinedRecordedTime + joinedPausedTime);
       _joinedTourData.setTourDeviceTime_Recorded(joinedRecordedTime);
       _joinedTourData.setTourDeviceTime_Paused(joinedPausedTime);
       _joinedTourData.setPausedTime_Start(joinedPausedTime_Start.stream().mapToLong(l -> l).toArray());
@@ -1655,23 +1654,21 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    @Override
    public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
-      if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-
-         // check if it's the correct tour
-         if (_joinedTourData == modifiedTours.get(0)) {
-
-            // update custom tour type id
-            final String stateTourTypeSource = getStateTourTypeSource();
-
-            if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
-               final TourType tourType = _joinedTourData.getTourType();
-               _tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
-            }
-
-            // tour type or tags can have been changed within this dialog
-            updateUITourTypeTags();
-         }
+      // check if it's not the correct tour
+      if (modifiedTours == null || modifiedTours.isEmpty() || _joinedTourData != modifiedTours.get(0)) {
+         return;
       }
+
+      // update custom tour type id
+      final String stateTourTypeSource = getStateTourTypeSource();
+
+      if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+         final TourType tourType = _joinedTourData.getTourType();
+         _tourTypeIdCustom = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
+      }
+
+      // tour type or tags can have been changed within this dialog
+      updateUITourTypeTags();
    }
 
    private void updateUIFromModel() {
