@@ -7076,9 +7076,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // tour is modified but not yet saved in the database
 
-            //TODO: Issue when a tour is selected and a tour is imported, this is triggered and the UI is blocked
-            // as the tour is unsaved but can't be saved.
-            //LINUX ONLY?
             _messageManager.addMessage(
                   WIDGET_KEY_PERSON,
                   Messages.tour_editor_message_person_is_required,
