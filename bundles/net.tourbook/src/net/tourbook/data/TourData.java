@@ -1694,7 +1694,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "PausedTime_Starts")
    @XmlElement(name = "PausedTime_Start")
    @Transient
-   public long[]           pausedTime_Start;
+   private long[]           pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
@@ -1703,7 +1703,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "PausedTime_Ends")
    @XmlElement(name = "PausedTime_End")
    @Transient
-   public long[]           pausedTime_End;
+   private long[]           pausedTime_End;
 
    // SET_FORMATTING_ON
 
