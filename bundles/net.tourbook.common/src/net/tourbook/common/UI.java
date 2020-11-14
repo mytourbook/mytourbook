@@ -1389,16 +1389,18 @@ public class UI {
 
       boolean isLinuxAsyncEvent = false;
 
-      if (IS_LINUX) {
-         if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-            e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-            isLinuxAsyncEvent = true;
-         }
+      if (!IS_LINUX) {
+         return isLinuxAsyncEvent;
+      }
 
-         if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-            e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
-            isLinuxAsyncEvent = true;
-         }
+      if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+         e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+         isLinuxAsyncEvent = true;
+      }
+
+      if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+         e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+         isLinuxAsyncEvent = true;
       }
 
       return isLinuxAsyncEvent;
