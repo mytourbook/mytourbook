@@ -570,7 +570,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             );
 
-            if (allTourIDs.isEmpty()) {
+            if (allTourIDs.size() == 0) {
 
                MessageDialog.openInformation(getShell(),
                      Messages.Dialog_ReimportTours_Dialog_Title,
