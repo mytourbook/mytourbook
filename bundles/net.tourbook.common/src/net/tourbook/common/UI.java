@@ -55,7 +55,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -87,6 +86,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
@@ -1385,25 +1385,22 @@ public class UI {
       return isCtrlKey;
    }
 
-   public static boolean isLinuxAsyncEvent(final TypedEvent e) {
+   public static boolean isLinuxAsyncEvent(final Widget widget) {
 
-      boolean isLinuxAsyncEvent = false;
+      if (IS_LINUX) {
 
-      if (!IS_LINUX) {
-         return isLinuxAsyncEvent;
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+            return true;
+         }
+
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+            return true;
+         }
       }
 
-      if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-         e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-         isLinuxAsyncEvent = true;
-      }
-
-      if (e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-         e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
-         isLinuxAsyncEvent = true;
-      }
-
-      return isLinuxAsyncEvent;
+      return false;
    }
 
    public static boolean isShiftKey(final MouseEvent event) {

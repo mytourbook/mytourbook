@@ -770,7 +770,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (UI.isLinuxAsyncEvent(e)) {
+               if (UI.isLinuxAsyncEvent(e.widget)) {
                   return;
                }
 

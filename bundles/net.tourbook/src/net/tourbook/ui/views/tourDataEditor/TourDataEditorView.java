@@ -2800,7 +2800,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void modifyText(final ModifyEvent e) {
 
-            if (UI.isLinuxAsyncEvent(e) || _isSetField || _isSavingInProgress) {
+            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                return;
             }
 
@@ -2858,7 +2858,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
-            if (UI.isLinuxAsyncEvent(e) || _isSetField || _isSavingInProgress) {
+            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                return;
             }
 
@@ -3417,7 +3417,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (UI.isLinuxAsyncEvent(e) || _isSetField || _isSavingInProgress) {
+               if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                   return;
                }
 
@@ -3456,7 +3456,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                @Override
                public void widgetSelected(final SelectionEvent e) {
 
-                  if (UI.isLinuxAsyncEvent(e) || _isSetField || _isSavingInProgress) {
+                  if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                      return;
                   }
 
