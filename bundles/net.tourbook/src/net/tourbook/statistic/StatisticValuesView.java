@@ -38,6 +38,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -213,7 +214,12 @@ public class StatisticValuesView extends ViewPart {
 
                // update font
 
-               _txtStatValues.setFont(net.tourbook.ui.UI.getLogFont());
+               final Font logFont = net.tourbook.ui.UI.getLogFont();
+
+               // ensure the font is valid, this case occurred in Ubuntu
+               if (logFont != null) {
+                  _txtStatValues.setFont(logFont);
+               }
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 

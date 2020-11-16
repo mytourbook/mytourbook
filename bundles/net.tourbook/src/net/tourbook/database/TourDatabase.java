@@ -4998,7 +4998,7 @@ public class TourDatabase {
             updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
          }
          if (isPostUpdate42) {
-            updateDbDesign_041_to_042_PostUpdate(conn, splashManager);
+            updateDbDesign_041_to_042_PostUpdate(conn);
          }
 
       } catch (final SQLException e) {
@@ -7683,7 +7683,7 @@ public class TourDatabase {
 //                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 //   }
 
-   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn, final SplashManager splashManager)
+   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn)
          throws SQLException {
 
       final long startTime = System.currentTimeMillis();
@@ -7701,7 +7701,7 @@ public class TourDatabase {
       final long timeDiff = System.currentTimeMillis() - startTime;
 
       StatusUtil.logInfo(String.format(
-            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+            "Database postupdate 41 -> 42 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
    }
 

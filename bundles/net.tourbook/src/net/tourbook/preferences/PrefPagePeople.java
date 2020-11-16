@@ -111,18 +111,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-   public static final String     ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
+   public static final String  ID                         = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
-   /**
-    * On Linux an async selection event is fired since e4
-    */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";           //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";          //$NON-NLS-1$
 
    public static final int        HEART_BEAT_MIN                      = 10;
    public static final int        HEART_BEAT_MAX                      = 300;
@@ -131,14 +126,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";              //$NON-NLS-1$
 
    /**
     * Id to indicate that the person's information should be displayed for the active person when
     * the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";    //$NON-NLS-1$
 
    private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
    private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
@@ -160,9 +155,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
    }
-
-   private final boolean             _isOSX                     = net.tourbook.common.UI.IS_OSX;
-   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
 
    private SelectionListener         _defaultSelectionListener;
    private MouseWheelListener        _defaultMouseWheelListener;
@@ -778,13 +770,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                  return;
-               }
-
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+               if (UI.isLinuxAsyncEvent(e.widget)) {
                   return;
                }
 
@@ -1143,7 +1129,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
       label.dispose();
 
-      final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
+      final int comboWidth = (int) (UI.IS_OSX || UI.IS_LINUX ? comboSize.x * 1.3 : comboSize.x);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -2282,8 +2268,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          _txtFirstName.setText(person.getFirstName());
          _txtLastName.setText(person.getLastName());
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_2, true);
          _dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
 
          final float bodyWeight = UI.convertBodyWeightFromMetric(person.getWeight());
