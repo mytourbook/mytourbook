@@ -6748,8 +6748,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
                                         final List<Long> pausedTime_End) {
 
-      if (pausedTime_Start == null || pausedTime_Start.size() == 0 ||
-            pausedTime_End == null || pausedTime_End.size() == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.isEmpty() ||
+            pausedTime_End == null || pausedTime_End.isEmpty()) {
          return;
       }
 
@@ -10870,7 +10870,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   private void updatePausedTimes(final long startTimeOffset) {
+   public void updatePausedTimes(final long startTimeOffset) {
 
       if (pausedTime_Start == null || pausedTime_End == null) {
          return;
