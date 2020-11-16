@@ -16,7 +16,6 @@
 package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.common.UI;
@@ -36,33 +35,16 @@ import org.apache.commons.math3.exception.NoBracketingException;
  * - Use this equation to display an estimated power graph in the tour chart
  * - Add the GOVSS column in the tour book view
  */
-public class Govss {
+public class Govss extends TrainingStress {
    //TODO; When a tour has its tour type changed, if this new tour type is not in the govss list, we remove the tourid from the performancemodeling table
 
-   private TourPerson _tourPerson;
-   private TourData   _tourData;
 
    public Govss(final TourPerson tourPerson) {
-      this._tourPerson = tourPerson;
+      super(tourPerson, null);
    }
 
    public Govss(final TourPerson tourPerson, final TourData tourData) {
-      this._tourPerson = tourPerson;
-      this._tourData = tourData;
-   }
-
-   /**
-    * Function that calculates the GOVSS (Gravity Ordered Velocity Stress Score) for a given run and
-    * athlete.
-    *
-    * @return The GOVSS value
-    */
-   public int Compute() {
-      if (_tourData == null || _tourData.timeSerie == null || _tourData.timeSerie.length < 2) {
-         return 0;
-      }
-
-      return Compute(0, _tourData.timeSerie.length);
+      super(tourPerson, tourData);
    }
 
    /**
@@ -77,8 +59,9 @@ public class Govss {
     *
     * @return The GOVSS value
     */
+   @Override
    public int Compute(final int startIndex, final int endIndex) {
-      if (_tourPerson == null || _tourData == null || startIndex >= endIndex) {
+      if (_tourPerson == null || _tourData == null || _tourData.timeSerie == null || startIndex >= endIndex) {
          return 0;
       }
 
@@ -88,10 +71,6 @@ public class Govss {
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final List<Double> powerValues = computePowerValues();
-
-      if (powerValues == null || powerValues.isEmpty()) {
-         return 0;
-      }
 
       // 4. Raise the values in step 3 to the 4th power.
       for (int index = 0; index < powerValues.size(); index++) {
@@ -132,9 +111,7 @@ public class Govss {
    private double computeCostAerodynamicDrag(final float speed) {
 
       final double Af = 0.2025 * 0.266 * Math.pow(_tourPerson.getHeight(), 0.725) * Math.pow(_tourPerson.getWeight(), 0.425);
-      final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2) / _tourPerson.getWeight();
-
-      return CAero;
+      return 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2) / _tourPerson.getWeight();
    }
 
    /**
@@ -200,20 +177,14 @@ public class Govss {
       final double Cslope = computeCostDistanceWithSlope(slope);
       final double efficiency = (0.25 + (0.054 * speed)) * (1 - ((0.5 * speed) / 8.33));
 
-      final double power = (CAero + Ckin + Cslope * efficiency) * speed * _tourPerson.getWeight();
-
-      return power;
+      return (CAero + Ckin + Cslope * efficiency) * speed * _tourPerson.getWeight();
    }
 
    private List<Double> computePowerValues() {
-      if (_tourData == null || _tourData.timeSerie == null) {
-         return Collections.emptyList();
-      }
-
       final int[] timeSerie = _tourData.timeSerie;
       final int timeSeriesLength = timeSerie.length;
 
-      final ArrayList<Double> powerValues = new ArrayList<>();
+      final List<Double> powerValues = new ArrayList<>();
 
       final int rollingAverageInterval = 120; // The formula calls for 120 second rolling averages
       double powerValue = 0;

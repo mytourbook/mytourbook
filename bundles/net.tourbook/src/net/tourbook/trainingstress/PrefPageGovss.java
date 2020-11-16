@@ -83,15 +83,15 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class PrefPageGovss extends PrefPageTrainingStressModel {
 
-   private static TableViewer          _tourTypesViewer;
-   private static Label                _labelThresholdPower_Value;
-   private static Label                _labelThresholdVelocity_Value;
+   private TableViewer           _tourTypesViewer;
+   private Label                 _labelThresholdPower_Value;
+   private Label                 _labelThresholdVelocity_Value;
 
-   private static Spinner              _spinnerThresholdPower_Distance;
+   private Spinner               _spinnerThresholdPower_Distance;
 
-   private static Spinner              _spinnerThresholdPower_AverageSlope;
+   private Spinner               _spinnerThresholdPower_AverageSlope;
 
-   private static ActionOpenPrefDialog _actionOpenTourTypePrefs;
+   private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
    private SelectionListener           _defaultSelectionListener;
    private MouseWheelListener          _defaultMouseWheelListener;
 
@@ -109,7 +109,6 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
    private ActionTourType_Remove       _action_TourType_Remove;
    private Font                        _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-   private PixelConverter              _pc;
 
    private class Action_TourType extends Action {
 
@@ -138,7 +137,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       @Override
       public void run() {
          _tourTypesViewer.add(_tourType);
-         _personModifiedListener.onPersonModifiedListener();
+         getPersonModifiedListener().onPersonModifiedListener();
          enableControls();
       }
    }
@@ -246,7 +245,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          final int newSelectedIndex = selectedIndex >= listSize ? listSize - 1 : selectedIndex;
          _tourTypesViewer.getTable().setSelection(newSelectedIndex);
 
-         _personModifiedListener.onPersonModifiedListener();
+         getPersonModifiedListener().onPersonModifiedListener();
 
          enableControls();
       }
@@ -588,9 +587,10 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
    private void initUI(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
+      final PixelConverter _pc = new PixelConverter(parent);
 
-      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
+      final int chars = UI.IS_OSX ? 10 : 5;
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(chars);
 
       _defaultSelectionListener = new SelectionAdapter() {
          @Override
@@ -681,10 +681,10 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          return;
       }
 
-      _personModifiedListener.onPersonModifiedListener();
+      getPersonModifiedListener().onPersonModifiedListener();
 
       // Distance in meters
-      thresholdPowerDistance *= 1000f;
+      thresholdPowerDistance *= 1000;
       // Speed in m/s
       final float thresholdVelocity = computeThresholdVelocity(thresholdPowerDistance, thresholdPowerDuration);
       final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;

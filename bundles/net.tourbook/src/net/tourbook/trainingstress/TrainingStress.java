@@ -15,34 +15,31 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
+public abstract class TrainingStress {
 
-public abstract class PrefPageTrainingStressModel {
+   protected TourPerson _tourPerson;
+   protected TourData   _tourData;
 
-   private IPersonModifiedListener _personModifiedListener;
-
-   public interface IPersonModifiedListener {
-      public abstract void onPersonModifiedListener();
+   public TrainingStress(final TourPerson tourPerson, final TourData tourData) {
+      this._tourPerson = tourPerson;
+      this._tourData = tourData;
    }
 
-   public abstract void dispose();
+   /**
+    * Method that calculates the training stress for a given tour and athlete.
+    *
+    * @return The training stress value
+    */
+   public int Compute() {
+      if (_tourData == null || _tourData.timeSerie == null || _tourData.timeSerie.length < 2) {
+         return 0;
+      }
 
-   public abstract String getGroupName();
-
-   public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
-
-   public IPersonModifiedListener getPersonModifiedListener() {
-      return _personModifiedListener;
+      return Compute(0, _tourData.timeSerie.length);
    }
 
-   public abstract void restoreState();
-
-   public abstract void saveState();
-
-   public void setPersonModifiedListener(final IPersonModifiedListener listener) {
-      _personModifiedListener = listener;
-   }
+   abstract int Compute(final int startIndex, final int endIndex);
 }

@@ -178,7 +178,10 @@ public class PerformanceModelingChartView extends ViewPart {
          return;
       }
 
-      if (showValues == false) {
+      if (showValues) {
+         final ChartDataYSerie govssSerie = addPerformanceValues();
+         _chartDataModel.addYData(govssSerie);
+      } else {
          final ChartDataModel currentData = _chartPerformanceModelingData.getChartDataModel();
          final ArrayList<ChartDataYSerie> ySeries = currentData.getYData();
 
@@ -186,9 +189,6 @@ public class PerformanceModelingChartView extends ViewPart {
          ySeries.removeIf(condition);
 
          _chartDataModel = currentData;
-      } else {
-         final ChartDataYSerie govssSerie = addPerformanceValues();
-         _chartDataModel.addYData(govssSerie);
       }
 
       _chartPerformanceModelingData.updateChart(_chartDataModel, true, true);
@@ -333,8 +333,8 @@ public class PerformanceModelingChartView extends ViewPart {
     */
    private ChartStatisticSegments createChartSegments() {//final TourData_Time tourDataTime) {
 
-      final double segmentStart[] = new double[5];//_numberOfYears];
-      final double segmentEnd[] = new double[5];//_numberOfYears];
+      final double[] segmentStart = new double[5];//_numberOfYears];
+      final double[] segmentEnd = new double[5];//_numberOfYears];
       final String[] segmentTitle = new String[5];//_numberOfYears];
 
       final int[] allYearDays = new int[] { 366 };//tourDataTime.yearDays;
@@ -556,7 +556,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void enableControls() {
 
-      final boolean isCustomScaling = _isShowAllValues == false;
+      final boolean isCustomScaling = !_isShowAllValues;
 
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
       //_actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
