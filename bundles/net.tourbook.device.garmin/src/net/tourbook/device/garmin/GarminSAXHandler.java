@@ -430,6 +430,22 @@ public class GarminSAXHandler extends DefaultHandler {
          prevInvalidTime = currentInvalidTime;
       }
 
+      //We remove any pauses that happened before the official tour start time
+      if (!_pausedTime_Start.isEmpty() && !_pausedTime_End.isEmpty()) {
+
+         final List<Integer> pausesToRemove = new ArrayList<>();
+         for (int index = 0; index < _pausedTime_Start.size(); ++index) {
+            if (_pausedTime_Start.get(index) < timeSlices[0].absoluteTime) {
+               pausesToRemove.add(index);
+            }
+         }
+
+         for (int index = pausesToRemove.size() - 1; index >= 0; --index) {
+            _pausedTime_Start.remove(index);
+            _pausedTime_End.remove(index);
+         }
+      }
+
       StatusUtil.log(//
             NLS.bind(//
                   Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
