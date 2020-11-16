@@ -10008,9 +10008,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourStartTime(final ZonedDateTime zonedStartTime) {
 
+      final long newZonedStartTime = zonedStartTime.toInstant().toEpochMilli();
+      if (tourStartTime != 0) {
+         updatePausedTimes(newZonedStartTime - tourStartTime);
+      }
+
       // set the start of the tour
 
-      tourStartTime = zonedStartTime.toInstant().toEpochMilli();
+      tourStartTime = newZonedStartTime;
 
       startYear = (short) zonedStartTime.getYear();
       startMonth = (short) zonedStartTime.getMonthValue();
@@ -10862,6 +10867,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
+      }
+   }
+
+   private void updatePausedTimes(final long startTimeOffset) {
+
+      if (pausedTime_Start == null || pausedTime_End == null) {
+         return;
+      }
+
+      for (int index = 0; index < pausedTime_Start.length && index < pausedTime_End.length; ++index) {
+         pausedTime_Start[index] += startTimeOffset;
+         pausedTime_End[index] += startTimeOffset;
       }
    }
 }
