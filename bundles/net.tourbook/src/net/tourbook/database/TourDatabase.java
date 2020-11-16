@@ -7654,7 +7654,7 @@ public class TourDatabase {
       final long timeDiff = System.currentTimeMillis() - startTime;
 
       StatusUtil.logInfo(String.format(
-            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+            "Database postupdate 41 -> 42 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
    }
 

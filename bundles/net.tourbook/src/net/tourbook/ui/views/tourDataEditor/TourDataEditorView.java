@@ -227,12 +227,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   /**
-    * On Linux an async selection event is fired since e4
-    */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
-   //
    private static final int       COLUMN_SPACING                = 20;
    //
    private static final String    WIDGET_KEY                    = "widgetKey";                                            //$NON-NLS-1$
@@ -2810,7 +2804,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void modifyText(final ModifyEvent e) {
 
-            if (_isSetField || _isSavingInProgress) {
+            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                return;
             }
 
@@ -2868,12 +2862,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
-            if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-               e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-               return;
-            }
-
-            if (_isSetField || _isSavingInProgress) {
+            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                return;
             }
 
@@ -3432,17 +3421,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                  return;
-               }
-
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
-                  return;
-               }
-
-               if (_isSetField || _isSavingInProgress) {
+               if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                   return;
                }
 
@@ -3481,17 +3460,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                @Override
                public void widgetSelected(final SelectionEvent e) {
 
-                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                     return;
-                  }
-
-                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
-                     return;
-                  }
-
-                  if (_isSetField || _isSavingInProgress) {
+                  if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
                      return;
                   }
 
@@ -8944,7 +8913,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature());
 
-      _spinWeather_Temperature_Average.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
       _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
 
@@ -8953,7 +8922,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Min());
 
-      _spinWeather_Temperature_Min.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Min.setDigits(1);
       _spinWeather_Temperature_Min.setSelection(Math.round(minTemperature * 10));
 
@@ -8962,7 +8931,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Max());
 
-      _spinWeather_Temperature_Max.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Max.setDigits(1);
       _spinWeather_Temperature_Max.setSelection(Math.round(maxTemperature * 10));
 
@@ -8971,7 +8940,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float avgWindChill = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_WindChill());
 
-      _spinWeather_Temperature_WindChill.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_WindChill.setDigits(1);
       _spinWeather_Temperature_WindChill.setSelection(Math.round(avgWindChill * 10));
 
@@ -8980,7 +8949,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final int humidity = _tourData.getWeather_Humidity();
 
-      _spinWeather_Humidity.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_Humidity.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Humidity.setSelection(humidity);
 
       /*
@@ -8996,7 +8965,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_PrecipitationValue.setDigits(2);
          _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
       }
-      _spinWeather_PrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_PrecipitationValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
        * Pressure
@@ -9010,17 +8979,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_PressureValue.setDigits(2);
          _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
       }
-      _spinWeather_PressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWeather_PressureValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
        * Time
        */
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
-      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-      _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_2, true);
-      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-      _dtStartTime.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtTourDate.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtTourDate.setData(UI.FIX_LINUX_ASYNC_EVENT_2, true);
+      _dtStartTime.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+      _dtStartTime.setData(UI.FIX_LINUX_ASYNC_EVENT_2, true);
       _dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue() - 1, tourStartTime.getDayOfMonth());
       _dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
 

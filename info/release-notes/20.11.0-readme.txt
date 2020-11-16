@@ -1,4 +1,4 @@
-20.11.0                                                 ?. November 2020
+20.11.0                                                 XX. November 2020
 
 
 New
@@ -111,6 +111,9 @@ Fixes
 
 * Slideout Message Dialog
   - When a message dialog was opened in a slideout, it was hidden in Ubuntu, Cinnamon desktop crashed
+
+* Tour Editor (Frederic)
+  - Fix for a NPE triggered by a Linux async problem in a specific file import scenario
 
 Translation    
 ===========

@@ -170,9 +170,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _nf2.setMaximumFractionDigits(2);
    }
 
-   private final boolean             _isOSX                     = net.tourbook.common.UI.IS_OSX;
-   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
-
    private SelectionListener         _defaultSelectionListener;
    private MouseWheelListener        _defaultMouseWheelListener;
    private ModifyListener            _defaultModifyListener;
@@ -861,13 +858,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                  return;
-               }
-
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+               if (UI.isLinuxAsyncEvent(e.widget)) {
                   return;
                }
 
@@ -1226,7 +1217,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
       label.dispose();
 
-      final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
+      final int comboWidth = (int) (UI.IS_OSX || UI.IS_LINUX ? comboSize.x * 1.3 : comboSize.x);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -2405,8 +2396,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          _txtFirstName.setText(person.getFirstName());
          _txtLastName.setText(person.getLastName());
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_2, true);
          _dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
 
          final float bodyWeight = UI.convertBodyWeightFromMetric(person.getWeight());

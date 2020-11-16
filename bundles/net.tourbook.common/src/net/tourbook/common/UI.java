@@ -86,6 +86,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
@@ -224,15 +225,21 @@ public class UI {
 	public static final boolean			IS_WIN		= "win32".equals(SWT.getPlatform())		|| "wpf".equals(SWT.getPlatform());									//$NON-NLS-1$ //$NON-NLS-2$
 // SET_FORMATTING_ON
 
-   public static final String  BROWSER_TYPE_MOZILLA      = "mozilla";             //$NON-NLS-1$
+   /**
+    * On Linux an async selection event is fired since e4
+    */
+   public static final String  FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";
 
-   public static final String  UTF_8                     = "UTF-8";               //$NON-NLS-1$
-   public static final String  UTF_16                    = "UTF-16";              //$NON-NLS-1$
-   public static final String  ISO_8859_1                = "ISO-8859-1";          //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA      = "mozilla";                 //$NON-NLS-1$
+
+   public static final String  UTF_8                     = "UTF-8";                   //$NON-NLS-1$
+   public static final String  UTF_16                    = "UTF-16";                  //$NON-NLS-1$
+   public static final String  ISO_8859_1                = "ISO-8859-1";              //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET              = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS  = "additions";           //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS  = "additions";               //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
@@ -526,7 +533,7 @@ public class UI {
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
-   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData"; //$NON-NLS-1$
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
@@ -1376,6 +1383,24 @@ public class UI {
       }
 
       return isCtrlKey;
+   }
+
+   public static boolean isLinuxAsyncEvent(final Widget widget) {
+
+      if (IS_LINUX) {
+
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+            return true;
+         }
+
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public static boolean isShiftKey(final MouseEvent event) {

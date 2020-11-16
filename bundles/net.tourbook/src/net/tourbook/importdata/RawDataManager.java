@@ -1166,8 +1166,6 @@ public class RawDataManager {
 
       TourLogManager.showLogView();
 
-      int numLoggedErrors = 0;
-
       final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
       String message = null;
 
@@ -1187,33 +1185,8 @@ public class RawDataManager {
           * It must be >60 seconds because db version < 7 (9.01) had no saved seconds !!!
           */
          if (timeDiff > 65_000
-
                // disabled for .fit files because they can have different tour start times (of some seconds)
-               && reImportedFile.getName().toLowerCase().endsWith(FILE_EXTENSION_FIT) == false) {
-
-            if (numLoggedErrors == 0) {
-
-               numLoggedErrors++;
-
-               TourLogManager.subLog_Error(NLS.bind(
-                     Messages.Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference,
-                     new Object[] {
-                           oldTourDateTimeShort,
-                           reImportedFile.toString(),
-                           TimeTools.Formatter_DateTime_SM.format(oldTourData.getTourStartTime()),
-                           TimeTools.Formatter_DateTime_SM.format(reimportedTourData.getTourStartTime()),
-                           timeDiff / 1000
-                     }));
-
-            } else if (numLoggedErrors == 1) {
-
-               numLoggedErrors++;
-
-               TourLogManager.subLog_Error(NLS.bind(
-                     Messages.Import_Data_Log_ReimportIsInvalid_TooLargeStartTimeDifference_Subsequent,
-                     new Object[] {
-                           oldTourDateTimeShort }));
-            }
+               && !reImportedFile.getName().toLowerCase().endsWith(FILE_EXTENSION_FIT)) {
 
             continue;
          }
@@ -1761,7 +1734,7 @@ public class RawDataManager {
 
                _importedFileNames.add(_lastImportedFileName);
 
-               if (additionalImportedFiles.size() > 0) {
+               if (!additionalImportedFiles.isEmpty()) {
                   _importedFileNamesChildren.addAll(additionalImportedFiles);
                }
             }
@@ -2136,7 +2109,7 @@ public class RawDataManager {
 
       final ImportRunState importRunState = new ImportRunState();
 
-      if (importFiles.size() == 0) {
+      if (importFiles.isEmpty()) {
          return importRunState;
       }
 
