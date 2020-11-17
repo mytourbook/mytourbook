@@ -283,9 +283,7 @@ public class SplashManager {
       return shell;
    }
 
-   public Shell
-
-         getShell() {
+   public Shell getShell() {
       return splashShell;
    }
 
