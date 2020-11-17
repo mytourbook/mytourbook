@@ -451,8 +451,12 @@ public class DataProvider_Tour_Year extends DataProvider {
             dbDistance[colorIndex][yearIndex] = dbValue_Distance;
             dbElevation[colorIndex][yearIndex] = dbValue_ElevationUp;
             dbNumTours[colorIndex][yearIndex] = dbValue_NumTours;
-            dbBodyWeight[yearIndex].add(dbValue_BodyWeight);
-            dbBodyFat[yearIndex].add(dbValue_BodyFat);
+            if (dbValue_BodyWeight > 0) {
+               dbBodyWeight[yearIndex].add(dbValue_BodyWeight);
+            }
+            if (dbValue_BodyFat > 0) {
+               dbBodyFat[yearIndex].add(dbValue_BodyFat);
+            }
 
             dbDurationTime[colorIndex][yearIndex] = dbValue_Duration;
 
@@ -608,6 +612,7 @@ public class DataProvider_Tour_Year extends DataProvider {
                }
             }
             _tourYearData.athleteBodyWeight_High = weight;
+
             final float[] fat = new float[numYears];
             for (int index = 0; index < numYears; ++index) {
                final OptionalDouble averageDouble = dbBodyFat[index].stream().mapToDouble(d -> d).average();

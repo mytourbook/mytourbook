@@ -546,8 +546,12 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             allDbNumTours[colorIndex][weekIndex] = dbValue_NumTours;
 
-            allDbBodyWeight[weekIndex] = dbValue_BodyWeight;
-            allDbBodyFat[weekIndex] = dbValue_BodyFat;
+            if (dbValue_BodyWeight > 0) {
+               allDbBodyWeight[weekIndex] = dbValue_BodyWeight;
+            }
+            if (dbValue_BodyFat > 0) {
+               allDbBodyFat[weekIndex] = dbValue_BodyFat;
+            }
          }
 
          _tourWeekData.years = allYear_Numbers;
