@@ -5009,7 +5009,7 @@ public class TourDatabase {
 
       // display info for the successful update
       MessageDialog.openInformation(
-            Display.getCurrent().getActiveShell(),
+            splashManager.getShell(),
             Messages.tour_database_version_info_title,
             NLS.bind(Messages.Tour_Database_UpdateInfo, oldVersion, newVersion));
 
