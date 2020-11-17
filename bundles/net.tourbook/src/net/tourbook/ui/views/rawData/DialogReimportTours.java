@@ -504,6 +504,20 @@ public class DialogReimportTours extends TitleAreaDialog {
     */
    private void doReimport(final List<ReImportParts> reImportPartIds) throws IOException {
 
+      /*
+       * There maybe too much tour cleanup but it is very complex how all the caches/selection
+       * provider work together
+       */
+
+      // prevent async error in the save tour method, cleanup environment
+      _tourViewer.getPostSelectionProvider().clearSelection();
+
+      Util.clearSelection();
+
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
+
+      TourManager.getInstance().clearTourDataCache();
+
       final boolean isReimport_AllTours = _rdoReimport_Tours_All.getSelection();
       final boolean isReimport_BetweenDates = _rdoReimport_Tours_BetweenDates.getSelection();
       final boolean skipToursWithFileNotFound = _chkSkip_Tours_With_ImportFile_NotFound.getSelection();
