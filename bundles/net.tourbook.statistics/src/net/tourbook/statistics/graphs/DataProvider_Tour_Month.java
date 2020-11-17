@@ -282,8 +282,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 
             dbNumTours[colorIndex][monthIndex] = dbValue_NumTours;
 
-            allDbBodyWeight[monthIndex] = dbValue_BodyWeight;
-            allDbBodyFat[monthIndex] = dbValue_BodyFat;
+            if (dbValue_BodyWeight > 0) {
+               allDbBodyWeight[monthIndex] = dbValue_BodyWeight;
+            }
+            if (dbValue_BodyFat > 0) {
+               allDbBodyFat[monthIndex] = dbValue_BodyFat;
+            }
 
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_ElevationUp + dbValue_ElapsedTime;
 
