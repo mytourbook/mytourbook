@@ -3813,7 +3813,7 @@ public class TourDatabase {
 
       if (_emFactory == null) {
 
-         // ensure db is valid BEFOR entity manager is initialized which can shutdown the database
+         // ensure db is valid BEFORE entity manager is initialized which can shutdown the database
          if (sqlInit_10_IsDbInitialized() == false) {
             return null;
          }

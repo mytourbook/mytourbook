@@ -10870,7 +10870,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public void updatePausedTimes(final long startTimeOffset) {
+   /**
+    * Adjust paused times when tour start has changed.
+    *
+    * @param startTimeOffset
+    */
+   private void updatePausedTimes(final long startTimeOffset) {
 
       if (pausedTime_Start == null || pausedTime_End == null) {
          return;
