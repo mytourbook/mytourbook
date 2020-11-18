@@ -94,6 +94,7 @@ Fixes
   
 * Tour Book View (flat)
   - Several SQL exception's when view is not sorted by a column
+  - Tours where sorted only within 1000 tours chunk (1000 is the database fetch size for the nattable)
   
 * Statistic View
   - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015

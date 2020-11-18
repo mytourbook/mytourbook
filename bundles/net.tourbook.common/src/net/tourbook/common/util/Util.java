@@ -1001,7 +1001,10 @@ public class Util {
       return comboIndex;
    }
 
-   public static LocalDate getStateDate(final IDialogSettings state, final String stateKey, final LocalDate defaultValue, final DateTime dateTimeControl) {
+   public static LocalDate getStateDate(final IDialogSettings state,
+                                        final String stateKey,
+                                        final LocalDate defaultValue,
+                                        final DateTime dateTimeControl) {
 
       final String value = state.get(stateKey);
       LocalDate parsedValue;
@@ -1779,6 +1782,15 @@ public class Util {
       final File file = new File(fileName);
 
       return file.isDirectory();
+   }
+
+   public static void logSimpleMessage(final Class<?> clazz,
+                                       final String message) {
+
+      System.out.println(String.format("%s [%s] %s",
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            message));
    }
 
    public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {

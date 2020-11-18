@@ -4004,7 +4004,7 @@ public class TourDatabase {
 
    private void logDriverManager_GetConnection(final String dbUrl) {
 
-      StatusUtil.logInfo("Derby command executed: " + dbUrl); //$NON-NLS-1$
+      Util.logSimpleMessage(getClass(), "Derby command executed: " + dbUrl); //$NON-NLS-1$
    }
 
    private void modifyColumn_Type(final String table,
