@@ -4415,7 +4415,7 @@ public class TourDatabase {
                } else if (_dbVersionBeforeUpdate > TOURBOOK_DB_VERSION) {
 
                   MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
+                        splashManager.getShell(),
                         Messages.tour_database_version_info_title,
                         NLS.bind(
                               Messages.tour_database_version_info_message,
