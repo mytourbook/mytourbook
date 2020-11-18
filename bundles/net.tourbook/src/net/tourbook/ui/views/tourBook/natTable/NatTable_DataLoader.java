@@ -36,6 +36,8 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
@@ -52,20 +54,52 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char   NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char   NL                                  = net.tourbook.common.UI.NEW_LINE;
 
-   private static final String SQL_ASCENDING         = "ASC";                          //$NON-NLS-1$
-   private static final String SQL_DESCENDING        = "DESC";                         //$NON-NLS-1$
+   private static final String SQL_ASCENDING                       = "ASC";                                                  //$NON-NLS-1$
+   private static final String SQL_DESCENDING                      = "DESC";                                                 //$NON-NLS-1$
 
-   private static final String SQL_DEFAULT_FIELD     = "TourStartTime";                //$NON-NLS-1$
+   private static final String SQL_DEFAULT_FIELD                   = "TourStartTime";                                        //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String  FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";        //$NON-NLS-1$
+   public static final String  FIELD_WITHOUT_SORTING               = "FIELD_WITHOUT_SORTING";                                //$NON-NLS-1$
 
-//   private static final int                               FETCH_SIZE            = 1000;
-   private static final int                               FETCH_SIZE            = 1000;
+   private static int          FETCH_SIZE                          = 10_000;
+
+   private static final String SYS_PROP__FLAT_TOUR_BOOK_FETCH_SIZE = "flatTourBookFetchSize";                                //$NON-NLS-1$
+
+   /**
+    * Overwrite fetch size.
+    * <p>
+    * VERY IMPORTANT !!!
+    * <p>
+    * Only tours within a fetch size chunk are sorted correctly when the field is not indexed in the
+    * database !!!
+    */
+   private static final String FLAT_TOUR_BOOK_FETCH_SIZE           = System.getProperty(SYS_PROP__FLAT_TOUR_BOOK_FETCH_SIZE);
+
+   static {
+
+      if (FLAT_TOUR_BOOK_FETCH_SIZE != null) {
+
+         try {
+
+            FETCH_SIZE = Integer.parseInt(FLAT_TOUR_BOOK_FETCH_SIZE);
+
+            Util.logSystemProperty_Value(NatTable_DataLoader.class,
+                  SYS_PROP__FLAT_TOUR_BOOK_FETCH_SIZE,
+                  FLAT_TOUR_BOOK_FETCH_SIZE,
+                  "Flat tour book view fetch size is overwritten"); //$NON-NLS-1$
+
+         } catch (final Exception e) {
+
+            StatusUtil.log(e);
+         }
+
+      }
+   }
 
    private static final ExecutorService                   _loadingExecutor      = createExecuter_TourLoading();
    private static final ExecutorService                   _rowIndexExecutor     = createExecuter_TourId_RowIndex();
