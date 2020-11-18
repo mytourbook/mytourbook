@@ -283,6 +283,10 @@ public class SplashManager {
       return shell;
    }
 
+   public Shell getShell() {
+      return splashShell;
+   }
+
    private void onDispose() {
 
    }

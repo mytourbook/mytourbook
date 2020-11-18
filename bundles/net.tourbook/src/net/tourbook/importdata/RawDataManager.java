@@ -582,21 +582,9 @@ public class RawDataManager {
 
       final long start = System.currentTimeMillis();
 
-      // check if the tour editor contains a modified tour
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
-
       if (actionReimportTour_10_Confirm(reimportPartIds) == false) {
          return;
       }
-
-      // prevent async error in the save tour method, cleanup environment
-      tourViewer.getPostSelectionProvider().clearSelection();
-
-      Util.clearSelection();
-
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 
       // get selected tour IDs
 
@@ -609,9 +597,15 @@ public class RawDataManager {
          selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
       }
 
-      if (selectedItems == null) {
+      if (selectedItems == null || selectedItems.length == 0) {
+
+         MessageDialog.openInformation(Display.getDefault().getActiveShell(),
+               Messages.Dialog_ReimportTours_Dialog_Title,
+               Messages.Dialog_ReimportTours_Dialog_ToursAreNotSelected);
+
          return;
       }
+
       /*
        * convert selection to array
        */

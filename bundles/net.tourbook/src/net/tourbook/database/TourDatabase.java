@@ -3813,7 +3813,7 @@ public class TourDatabase {
 
       if (_emFactory == null) {
 
-         // ensure db is valid BEFOR entity manager is inizialized which can shutdown the database
+         // ensure db is valid BEFOR entity manager is initialized which can shutdown the database
          if (sqlInit_10_IsDbInitialized() == false) {
             return null;
          }
@@ -4658,7 +4658,7 @@ public class TourDatabase {
       final String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
       if ((new MessageDialog(
-            Display.getDefault().getActiveShell(),
+            splashManager.getShell(),
             Messages.Database_Confirm_update_title,
             null,
             NLS.bind(
@@ -4683,7 +4683,7 @@ public class TourDatabase {
       if (currentDbVersion < 20) {
 
          if ((new MessageDialog(
-               Display.getDefault().getActiveShell(),
+               splashManager.getShell(),
                Messages.Database_Confirm_update_title,
                null,
                NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
@@ -5009,7 +5009,7 @@ public class TourDatabase {
 
       // display info for the successful update
       MessageDialog.openInformation(
-            Display.getCurrent().getActiveShell(),
+            splashManager.getShell(),
             Messages.tour_database_version_info_title,
             NLS.bind(Messages.Tour_Database_UpdateInfo, oldVersion, newVersion));
 

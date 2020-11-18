@@ -10,9 +10,12 @@ Issues
 ======
 
 * Calendar View
-
   - "Scrambled days" - It's a bug that I can only reproduce in Linux: when scrolling up/down in the calendar view or going to another view and going back to the calendar view, the days get "scrambled" and the saturday and sunday are not on the right anymore but can be anywhere (left, middle...etc)
 
+
+* Tourbook View (flat)
+  - When tour filter is modified then reordered column positions are reset
+  - When too many tours are displayed (some years) then sorting by e.g. Import Filename has some chunks of sorted tours. Each chunk has exactly 1000 tours, is sorted correctly but there should not be multiple chunks !!!
 
 New
 ===
