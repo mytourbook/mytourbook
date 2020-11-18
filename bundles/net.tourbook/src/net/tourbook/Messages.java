@@ -2888,6 +2888,10 @@ public class Messages extends NLS {
    public static String tour_editor_label_tour_type;
    public static String tour_editor_label_trainingstress_govss;
    public static String tour_editor_label_trainingstress_govss_tooltip;
+   public static String tour_editor_label_trainingstress_bikescore;
+   public static String tour_editor_label_trainingstress_bikescore_tooltip;
+   public static String tour_editor_label_trainingstress_swimscore;
+   public static String tour_editor_label_trainingstress_swimscore_tooltip;
    public static String tour_editor_label_wind_direction;
    public static String tour_editor_label_wind_direction_Tooltip;
    public static String tour_editor_label_wind_speed;

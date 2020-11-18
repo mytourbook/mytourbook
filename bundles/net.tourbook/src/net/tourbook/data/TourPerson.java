@@ -44,9 +44,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.trainingstress.TrainingStressType;
 import net.tourbook.ui.UI;
 
 import org.hibernate.annotations.Cascade;
@@ -54,7 +56,7 @@ import org.hibernate.annotations.Cascade;
 @Entity
 public class TourPerson implements Comparable<Object>, ChangeListener {
 
-   public static final ZonedDateTime       DEFAULT_BIRTHDAY                      = ZonedDateTime.of(
+   public static final ZonedDateTime DEFAULT_BIRTHDAY                          = ZonedDateTime.of(
          1977,
          7,
          7,
@@ -63,37 +65,39 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
          0,
          0,
          TimeTools.getDefaultTimeZone());
-   public static final int                 DB_LENGTH_LAST_NAME                   = 80;
-   public static final int                 DB_LENGTH_FIRST_NAME                  = 80;
-   public static final int                 DB_LENGTH_RAW_DATA_PATH               = 255;
-   public static final int                 DB_LENGTH_DEVICE_READER_ID            = 255;
-   public static final int                 DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES = 255;
+   public static final int           DB_LENGTH_LAST_NAME                       = 80;
+   public static final int           DB_LENGTH_FIRST_NAME                      = 80;
+   public static final int           DB_LENGTH_RAW_DATA_PATH                   = 255;
+   public static final int           DB_LENGTH_DEVICE_READER_ID                = 255;
+   public static final int           DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES     = 255;
+   public static final int           DB_LENGTH_BIKESCORE_ASSOCIATED_TOUR_TYPES = 255;
+   public static final int           DB_LENGTH_SWIMSCORE_ASSOCIATED_TOUR_TYPES = 255;
 
-   public static final int                 PERSON_ID_NOT_DEFINED                 = -1;
+   public static final int           PERSON_ID_NOT_DEFINED                     = -1;
 
    /**
     * Default rest pulse
     */
-   public static final int                 DEFAULT_REST_PULSE                    = 60;
+   public static final int           DEFAULT_REST_PULSE                        = 60;
 
    /**
     * manually created person creates a unique id to identify it, saved person is compared with the
     * person id
     */
-   private static int                      _createCounter                        = 0;
+   private static int                _createCounter                            = 0;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                            personId                              = PERSON_ID_NOT_DEFINED;
+   private long                      personId                                  = PERSON_ID_NOT_DEFINED;
 
    @Basic(optional = false)
-   private String                          firstName;
+   private String                    firstName;
 
-   private String                          lastName;
+   private String                    lastName;
 
-   private float                           weight;
+   private float                     weight;
 
-   private float                           height;
+   private float                     height;
 
    /**
     * Person which created this tour or <code>null</code> when the tour is not saved in the
@@ -107,19 +111,25 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
     */
    @OneToOne(targetEntity = PerformanceModelingData.class, cascade = CascadeType.ALL)
    @JoinColumn(name = "PerformanceModelingDataId")
-   private PerformanceModelingData         performanceModelingData;
+   private PerformanceModelingData   performanceModelingData;
 
    /**
     * Training Stress data
     */
 
    // GOVSS
-   private int                             govssThresholdPower;
+   private int                       govssThresholdPower;
 
-   private int                             govssTimeTrialDuration;
-   private int                             govssTimeTrialDistance;
-   private float                           govssTimeTrialAverageSlope;
-   private String                          govssAssociatedTourTypes;
+   private int                       govssTimeTrialDuration;
+   private int                       govssTimeTrialDistance;
+   private float                     govssTimeTrialAverageSlope;
+   private String                    govssAssociatedTourTypes;
+
+   // BikeScore
+   private String bikeScoreAssociatedTourTypes;
+
+   // SwimScore
+   private String                          swimScoreAssociatedTourTypes;
    /**
     * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
     * birthday is not set.
@@ -180,14 +190,14 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<TourPersonHRZone>           hrZones                               = new HashSet<>();
+   private Set<TourPersonHRZone>           hrZones          = new HashSet<>();
 
    /**
     * unique id for manually created person because the {@link #personId} is
     * {@value #PERSON_ID_NOT_DEFINED} when it's not persisted
     */
    @Transient
-   private long                            _createId                             = 0;
+   private long                            _createId        = 0;
 
    @Transient
    private ZonedDateTime                   _zonedBirthDay;
@@ -196,7 +206,7 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
     * Cached HR zones, key is the age of the person
     */
    @Transient
-   private HashMap<Integer, HrZoneContext> _hrZoneMinMaxBpm                      = new HashMap<>();
+   private HashMap<Integer, HrZoneContext> _hrZoneMinMaxBpm = new HashMap<>();
 
    /**
     * Sorted HR zones
@@ -567,12 +577,24 @@ public class TourPerson implements Comparable<Object>, ChangeListener {
       return result;
    }
 
-   public boolean isTourTypeInGovssTourTypes(final long tourTypeId) {
-      if (govssAssociatedTourTypes == null || govssAssociatedTourTypes.equals(UI.EMPTY_STRING)) {
+   public boolean isTourTypeForTrainingStress(final TrainingStressType trainingStressType, final long tourTypeId) {
+
+      String trainingStressAssociatedTourTypes = UI.EMPTY_STRING;
+      switch (trainingStressType) {
+      case GOVSS:
+         trainingStressAssociatedTourTypes = govssAssociatedTourTypes;
+         break;
+      case BIKESCORE:
+         trainingStressAssociatedTourTypes = bikeScoreAssociatedTourTypes;
+         break;
+      case SWIMSCORE:
+         break;
+      }
+      if (StringUtils.isNullOrEmpty(trainingStressAssociatedTourTypes)) {
          return false;
       }
 
-      final String[] associatedTourTypes = govssAssociatedTourTypes.split(";");
+      final String[] associatedTourTypes = trainingStressAssociatedTourTypes.split(";"); //$NON-NLS-1$
 
       for (final String currentTourType : associatedTourTypes) {
 

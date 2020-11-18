@@ -620,7 +620,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Link               _linkDefaultTimeZone;
    private Link               _linkGeoTimeZone;
+   private Link               _linkBikeScore;
    private Link               _linkGovss;
+   private Link               _linkSwimScore;
    private Link               _linkRemoveTimeZone;
    private Link               _linkTag;
    private Link               _linkTourType;
@@ -631,7 +633,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_Calories;
    private Spinner            _spinPerson_FTP;
    private Spinner            _spinPerson_RestPulse;
+   private Spinner            _spinTrainingStress_BikeScore;
    private Spinner            _spinTrainingStress_Govss;
+   private Spinner            _spinTrainingStress_SwimScore;
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
@@ -3933,12 +3937,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _sectionTrainingStress = createSection(parent, _tk, Messages.tour_editor_section_trainingstress, false, true);
       final Composite container = (Composite) _sectionTrainingStress.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults()
+      GridLayoutFactory
+            .fillDefaults()//
             .numColumns(2)
-            .spacing(COLUMN_SPACING, 7)
+            .spacing(COLUMN_SPACING, 5)
             .applyTo(container);
       {
          createUI_Section_141_TrainingStress_Col1(container);
+         createUI_Section_141_TrainingStress_Col2(container);
       }
    }
 
@@ -3946,8 +3952,94 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       _firstColumnContainerControls.add(container);
+      {
+         {
+            /*
+             * BikeScore
+             */
+
+            // label
+            _linkBikeScore = new Link(container, SWT.NONE);
+            _linkBikeScore.setText(Messages.tour_editor_label_trainingstress_bikescore);
+            _linkBikeScore.setToolTipText(Messages.tour_editor_label_trainingstress_bikescore_tooltip);
+            _linkBikeScore.addSelectionListener(new SelectionAdapter() {
+
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  //Compute the BikeScore value
+
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+                  //TODO FB onSelect_Govss_Text();
+               }
+            });
+            _tk.adapt(_linkBikeScore, true, true);
+            _firstColumnControls.add(_linkBikeScore);
+
+            // spinner
+            _spinTrainingStress_BikeScore = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_hintValueFieldWidth, SWT.DEFAULT)
+                  .applyTo(_spinTrainingStress_BikeScore);
+
+            _spinTrainingStress_BikeScore.setMinimum(0);
+            _spinTrainingStress_BikeScore.setMaximum(5_000);
+
+            _spinTrainingStress_BikeScore.addMouseWheelListener(_mouseWheelListener);
+            _spinTrainingStress_BikeScore.addSelectionListener(_selectionListener);
+         }
+         {
+            /*
+             * SwimScore
+             */
+
+            // label
+            _linkSwimScore = new Link(container, SWT.NONE);
+            _linkSwimScore.setText(Messages.tour_editor_label_trainingstress_swimscore);
+            _linkSwimScore.setToolTipText(Messages.tour_editor_label_trainingstress_swimscore_tooltip);
+            _linkSwimScore.addSelectionListener(new SelectionAdapter() {
+
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  //Compute the SwimScore value
+
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+                  //TODO Fb onSelect_Govss_Text();
+               }
+            });
+            _tk.adapt(_linkSwimScore, true, true);
+            _secondColumnControls.add(_linkSwimScore);
+
+            // spinner
+            _spinTrainingStress_SwimScore = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_hintValueFieldWidth, SWT.DEFAULT)
+                  .applyTo(_spinTrainingStress_SwimScore);
+
+            _spinTrainingStress_SwimScore.setMinimum(0);
+            _spinTrainingStress_SwimScore.setMaximum(5_000);
+
+            _spinTrainingStress_SwimScore.addMouseWheelListener(_mouseWheelListener);
+            _spinTrainingStress_SwimScore.addSelectionListener(_selectionListener);
+         }
+      }
+   }
+
+   /**
+    * 2. column
+    */
+   private void createUI_Section_141_TrainingStress_Col2(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -5916,7 +6008,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if ((selectedTours != null) && (selectedTours.size() > 0)) {
+               if ((selectedTours != null) && (!selectedTours.isEmpty())) {
 
                   // get first tour, this view shows only one tour
                   displayTour(selectedTours.get(0));
@@ -6444,6 +6536,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // Training stress data
       _linkGovss.setEnabled(canEdit && _tourData != null && _tourData.canGovssBeComputed());
       _spinTrainingStress_Govss.setEnabled(canEdit);
+      _linkBikeScore.setEnabled(canEdit && _tourData != null && _tourData.canBikeScoreBeComputed());
+      _spinTrainingStress_BikeScore.setEnabled(canEdit);
+      _linkSwimScore.setEnabled(canEdit && _tourData != null && _tourData.canSwimScoreBeComputed());
+      _spinTrainingStress_SwimScore.setEnabled(canEdit);
 
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
@@ -7370,7 +7466,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (!tourIds.isEmpty())) {
             displayTour(tourIds.get(0));
          }
 
@@ -7475,7 +7571,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (!tourIds.isEmpty())) {
 
             _selectionTourId = tourIds.get(0);
 
@@ -8356,7 +8452,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    @Override
    public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
-      if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+      if ((modifiedTours != null) && (!modifiedTours.isEmpty())) {
 
          // check if it's the correct tour
          if (_tourData == modifiedTours.get(0)) {
@@ -8422,6 +8518,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Training Stress
           */
          _tourData.setGovss(_spinTrainingStress_Govss.getSelection());
+         _tourData.setBikeScore(_spinTrainingStress_BikeScore.getSelection());
+         _tourData.setSwimScore(_spinTrainingStress_SwimScore.getSelection());
 
          /*
           * Weather
@@ -8794,7 +8892,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void updateUI_ReferenceTourRanges() {
 
       final Collection<TourReference> refTours = _tourData.getTourReferences();
-      if (refTours.size() > 0) {
+      if (!refTours.isEmpty()) {
          final ArrayList<TourReference> refTourList = new ArrayList<>(refTours);
 
          // sort reference tours by start index
@@ -8885,6 +8983,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * Training Stress
        */
       _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
+      _spinTrainingStress_BikeScore.setSelection(_tourData.getBikeScore());
+      _spinTrainingStress_SwimScore.setSelection(_tourData.getSwimScore());
 
       /*
        * wind properties
