@@ -17,6 +17,7 @@ package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -70,12 +71,10 @@ public class Govss extends TrainingStress {
       final float athleteThresholdPower = _tourPerson.getGovssThresholdPower();
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
-      final List<Double> powerValues = computePowerValues();
+      List<Double> powerValues = computePowerValues();
 
       // 4. Raise the values in step 3 to the 4th power.
-      for (int index = 0; index < powerValues.size(); index++) {
-         powerValues.set(index, Math.pow(powerValues.get(index), 4));
-      }
+      powerValues = powerValues.stream().map(powerValue -> Math.pow(powerValue, 4)).collect(Collectors.toList());
 
       // 5. Average values from step 4.
       final double averagePower = powerValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
@@ -181,6 +180,7 @@ public class Govss extends TrainingStress {
    }
 
    private List<Double> computePowerValues() {
+
       final int[] timeSerie = _tourData.timeSerie;
       final int timeSeriesLength = timeSerie.length;
 
@@ -195,16 +195,16 @@ public class Govss extends TrainingStress {
       float initialSpeed = 0;
       float currentSpeed = 0;
 
-      for (; serieEndIndex < timeSeriesLength - 1;) {
+      while (serieEndIndex < timeSeriesLength - 1) {
 
-         double currentRecordingTime = 0;
+         double currentElapsedTime = 0;
          serieStartIndex = serieEndIndex;
 
-         for (; currentRecordingTime < rollingAverageInterval && serieEndIndex < timeSeriesLength - 1;) {
+         while (currentElapsedTime < rollingAverageInterval && serieEndIndex < timeSeriesLength - 1) {
 
             ++serieEndIndex;
-            currentRecordingTime = Math.max(0,
-                  timeSerie[serieEndIndex] - timeSerie[serieStartIndex] - _tourData.getPausedTime(serieStartIndex, serieEndIndex));
+            currentElapsedTime = Math.max(0,
+                  timeSerie[serieEndIndex] - timeSerie[serieStartIndex]);//- _tourData.getPausedTime(serieStartIndex, serieEndIndex));
          }
 
          currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
@@ -216,9 +216,8 @@ public class Govss extends TrainingStress {
 
          if (currentSlope > -1 && currentSlope < 1 && currentDistance > 0) {
             powerValues.add(powerValue);
+            initialSpeed = currentSpeed;
          }
-
-         initialSpeed = currentSpeed;
       }
 
       return powerValues;
