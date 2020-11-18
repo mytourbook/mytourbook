@@ -39,7 +39,6 @@ import org.apache.commons.math3.exception.NoBracketingException;
 public class Govss extends TrainingStress {
    //TODO; When a tour has its tour type changed, if this new tour type is not in the govss list, we remove the tourid from the performancemodeling table
 
-
    public Govss(final TourPerson tourPerson) {
       super(tourPerson, null);
    }
@@ -207,11 +206,12 @@ public class Govss extends TrainingStress {
                   timeSerie[serieEndIndex] - timeSerie[serieStartIndex]);//- _tourData.getPausedTime(serieStartIndex, serieEndIndex));
          }
 
-         currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
-         //Convert the speed (km/h) to velocity (m/s)
-         currentSpeed /= 3.6;
          currentDistance = TourManager.computeTourDistance(_tourData, serieStartIndex, serieEndIndex);
          currentSlope = TourManager.computeTourAverageGradient(_tourData, serieStartIndex, serieEndIndex);
+
+         //Compute the speed (m/s)
+         currentSpeed = (float) (currentElapsedTime == 0 ? 0 : currentDistance / currentElapsedTime);
+
          powerValue = ComputePower(currentDistance, currentSlope, initialSpeed, currentSpeed);
 
          if (currentSlope > -1 && currentSlope < 1 && currentDistance > 0) {
