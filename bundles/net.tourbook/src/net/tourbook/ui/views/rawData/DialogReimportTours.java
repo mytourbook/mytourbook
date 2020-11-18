@@ -662,8 +662,13 @@ public class DialogReimportTours extends TitleAreaDialog {
       TourManager.getInstance().removeAllToursFromCache();
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
 
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+      // prevent re-importing in the import view
+      RawDataManager.setIsReimportingActive(true);
+      {
+         // fire unique event for all changes
+         TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+      }
+      RawDataManager.setIsReimportingActive(false);
    }
 
    @Override
