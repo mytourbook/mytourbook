@@ -4059,7 +4059,7 @@ public class TourDatabase {
 
    private void logDriverManager_GetConnection(final String dbUrl) {
 
-      StatusUtil.logInfo("Derby command executed: " + dbUrl); //$NON-NLS-1$
+      Util.logSimpleMessage(getClass(), "Derby command executed: " + dbUrl); //$NON-NLS-1$
    }
 
    private void modifyColumn_Type(final String table,
@@ -4471,7 +4471,7 @@ public class TourDatabase {
                } else if (_dbVersionBeforeUpdate > TOURBOOK_DB_VERSION) {
 
                   MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
+                        splashManager.getShell(),
                         Messages.tour_database_version_info_title,
                         NLS.bind(
                               Messages.tour_database_version_info_message,
