@@ -1041,6 +1041,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private void finalizeTour() {
 
+      if (_timeDataList.size() == 0) {
+         // there is not data
+// disabled to imports tour without tracks
+//			return;
+      }
+
       // insert Laps into _timeDataList
       insertLapData();
 
@@ -1057,7 +1063,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setTourDescription(_trkDesc);
       }
 
-      if (!_timeDataList.isEmpty()) {
+      if (_timeDataList.size() > 0) {
 
          // set tour start date/time
 
@@ -1142,7 +1148,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private void finalizeTour_Tags() {
 
-      if (_allImportedTagNames.isEmpty()) {
+      if (_allImportedTagNames.size() == 0) {
          return;
       }
 
