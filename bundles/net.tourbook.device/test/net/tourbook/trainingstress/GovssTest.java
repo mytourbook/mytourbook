@@ -9,6 +9,7 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
@@ -32,6 +33,7 @@ class GovssTest {
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
 
+      TimeTools.setDefaultTimeZone("UTC");
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
             deviceDataReader,
             IMPORT_FILE_PATH,
