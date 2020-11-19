@@ -162,6 +162,9 @@ public class WeatherData {
       case "353": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
+      default:
+         WeatherType = IWeather.cloudIsNotDefined;
+         break;
       }
    }
 
