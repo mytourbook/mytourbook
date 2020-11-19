@@ -68,8 +68,6 @@ class GovssTest {
 
       final TourData tour = newlyImportedTours.get(Long.valueOf(2017930123618648L));
 
-      tour.setTourPerson(tourPerson);
-
       final Integer govss = new Govss(tourPerson, tour).Compute();
       assert govss.equals(114);
    }
