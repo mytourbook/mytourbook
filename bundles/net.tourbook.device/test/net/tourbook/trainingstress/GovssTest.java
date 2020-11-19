@@ -9,16 +9,19 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 class GovssTest {
+   private static IPreferenceStore _prefStore;
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin in test/net.tourbook
     */
@@ -32,7 +35,10 @@ class GovssTest {
 //    final HashMap<Long, TourData> tourDataMap = new HashMap<Long, TourData>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
+      if (_prefStore == null) {
 
+         _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+      }
       TimeTools.setDefaultTimeZone("UTC");
       final GPX_SAX_Handler handler = new GPX_SAX_Handler(
             deviceDataReader,
