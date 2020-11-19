@@ -9,35 +9,40 @@ import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourType;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 class GovssTest {
 
-   private static IPreferenceStore _prefStore;
+   private static TourPerson  tourPerson;
+   private static TourType    runningTourType;
 
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin in test/net.tourbook
     */
-   public static final String      IMPORT_FILE_PATH = "/net/tourbook/trainingStress/Move_2017_09_30_05_36_06_Trail+running-MtWhitney.gpx"; //$NON-NLS-1$
+   public static final String IMPORT_FILE_PATH = "/net/tourbook/trainingStress/files/Move_2017_09_30_05_36_06_Trail+running-MtWhitney.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void setUp() {
-      if (_prefStore == null) {
-         _prefStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, TourbookPlugin.PLUGIN_ID);
-      }
       TimeTools.setDefaultTimeZone("UTC");
+
+      tourPerson = new TourPerson();
+      tourPerson.setGovssThresholdPower(367);
+      tourPerson.setHeight(1.84f);
+      tourPerson.setWeight(70);
+      tourPerson.setGovssTimeTrialDuration(3600);
+
+      runningTourType = new TourType();
+      tourPerson.setGovssAssociatedTourTypes(runningTourType.getName());
    }
 
    @Test
@@ -47,7 +52,6 @@ class GovssTest {
 
       final DeviceData deviceData = new DeviceData();
       final GPXDeviceDataReader deviceDataReader = new GPXDeviceDataReader();
-      final HashMap<Long, TourData> tourDataMap = new HashMap<>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
 
@@ -60,9 +64,12 @@ class GovssTest {
 
       SAXParserFactory.newInstance().newSAXParser().parse(gpx, handler);
 
-      final TourData tour1 = tourDataMap.get(Long.valueOf(201010101205990L));
-      tour1.computeComputedValues();
-      assertEquals(114, tour1.getGovss());
+      final TourData tour = newlyImportedTours.get(Long.valueOf(2017930123618648L));
+
+      tour.setTourPerson(tourPerson);
+
+      final int govss = new Govss(tourPerson, tour).Compute();
+      assertEquals(114, govss);
    }
 
 }
