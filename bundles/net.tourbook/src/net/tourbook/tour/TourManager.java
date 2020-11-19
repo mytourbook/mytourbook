@@ -681,7 +681,7 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeGovss(final Connection conn,
-                                      final ArrayList<TourData> selectedTours) throws SQLException {
+                                      final List<TourData> selectedTours) throws SQLException {
       boolean isUpdated = false;
 
       final PreparedStatement stmtUpdate = conn.prepareStatement(govss_StatementUpdate);
@@ -755,27 +755,6 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the distance
-    */
-   public static float computeTourDistance(final TourData tourData, final int startIndex, final int endIndex) {
-
-      final float[] distanceSerie = tourData.getMetricDistanceSerie();
-
-      if (distanceSerie == null
-            || distanceSerie.length == 0
-            || startIndex >= distanceSerie.length
-            || endIndex >= distanceSerie.length
-            || startIndex > endIndex) {
-         return 0;
-      }
-
-      return distanceSerie[endIndex] - distanceSerie[startIndex];
-   }
-
-   /**
-    * @param tourData
-    * @param startIndex
-    * @param endIndex
     * @return Returns the elapsed time
     */
    public static int computeTourDeviceTime_Elapsed(final TourData tourData, final int startIndex, final int endIndex) {
@@ -792,6 +771,27 @@ public class TourManager {
       }
 
       return timeSerie[endIndex] - timeSerie[startIndex];
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the distance
+    */
+   public static float computeTourDistance(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
+
+      if (distanceSerie == null
+            || distanceSerie.length == 0
+            || startIndex >= distanceSerie.length
+            || endIndex >= distanceSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      return distanceSerie[endIndex] - distanceSerie[startIndex];
    }
 
    /**

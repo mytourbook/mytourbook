@@ -3378,6 +3378,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   private void computeBikeScore() {
+      // TODO Auto-generated method stub
+
+   }
+
    private int computeBreakTime(final int startIndex, int endIndex) {
 
       int totalBreakTime = 0;
@@ -5065,6 +5070,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   private void computeSwimScore() {
+      // TODO Auto-generated method stub
+
+   }
+
    /**
     * Computes the tour moving time in seconds, this is the tour elapsed time - tour break time.
     * This value is store in {@link #tourComputedTime_Moving}.
@@ -5090,10 +5100,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public void computeTrainingStressData() {
-      //TODO FB
-
-      //GOVSS
       computeGovss();
+      computeBikeScore();
+      computeSwimScore();
    }
 
    private float[] convertDataSeries(final int[] intDataSerie, final int scale) {
