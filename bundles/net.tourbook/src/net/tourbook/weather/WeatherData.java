@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2021 Frédéric Bard
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,9 +45,9 @@ public class WeatherData {
    /**
     * Atmospheric pressure in millibars (mb)
     */
-   private int    averagePressure;
+   private int averagePressure;
 
-   private int    windChill;
+   private int windChill;
 
    public int getAverageHumidity() {
       return averageHumidity;
