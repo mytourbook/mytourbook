@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1221,7 +1221,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-         if (tourIds != null && tourIds.size() > 0) {
+         if (tourIds != null && !tourIds.isEmpty()) {
 
             if (tourIds.size() == 1) {
                tourId = tourIds.get(0);

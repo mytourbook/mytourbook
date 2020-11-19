@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,7 @@ public class ActionComputeGovss extends Action {
       }
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
          // tours are not selected -> this can occur when loading tour data is canceled
          return;
       }

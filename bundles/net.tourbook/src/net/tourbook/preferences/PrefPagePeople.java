@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -120,12 +120,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    public static final String                   ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
-   /**
-    * On Linux an async selection event is fired since e4
-    */
-   private static final String                  FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String                  FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
-   //
    private static final String                  STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
    private static final String                  STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
 

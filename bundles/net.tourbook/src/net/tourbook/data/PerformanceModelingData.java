@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,8 +68,8 @@ public class PerformanceModelingData {
    @Lob
    private HashMap<Date, long[]>           bikeScoreEntries;
 
-   //  private HashMap<Date, long[]>           swimScoreEntries;
-   //  private HashMap<Date, long[]>           trimpEntries;
+   @Lob
+   private HashMap<Date, long[]>           swimScoreEntries;
 
    /**
     * Computed data : Fitness and fatigue

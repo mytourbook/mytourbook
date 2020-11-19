@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -362,7 +362,7 @@ public class TrainingView extends ViewPart {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+               if ((modifiedTours != null) && (!modifiedTours.isEmpty())) {
                   updateUI_20(modifiedTours.get(0));
                }
             } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
@@ -992,7 +992,7 @@ public class TrainingView extends ViewPart {
 
          final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-         if (tourIds != null && tourIds.size() > 0) {
+         if (tourIds != null && !tourIds.isEmpty()) {
             updateUI(tourIds.get(0));
          }
 
@@ -1102,7 +1102,7 @@ public class TrainingView extends ViewPart {
             }
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
+            if (selectedTours != null && !selectedTours.isEmpty()) {
                updateUI_20(selectedTours.get(0));
             }
          }
@@ -1493,8 +1493,7 @@ public class TrainingView extends ViewPart {
          _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
-               .format_hh_mm((long) (zoneTime + 30))
-               .toString());
+               .format_hh_mm((long) (zoneTime + 30)));
          _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
          _lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
