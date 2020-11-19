@@ -32,11 +32,10 @@ class GovssTest {
 
   final DeviceData deviceData = new DeviceData();
       final GPXDeviceDataReader deviceDataReader = new GPXDeviceDataReader();
-//    final HashMap<Long, TourData> tourDataMap = new HashMap<Long, TourData>();
+      final HashMap<Long, TourData> tourDataMap = new HashMap<>();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       if (_prefStore == null) {
-
          _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
       }
       TimeTools.setDefaultTimeZone("UTC");
@@ -49,7 +48,9 @@ class GovssTest {
 
       SAXParserFactory.newInstance().newSAXParser().parse(gpx, handler);
 
-      assertEquals(2, 2);
+      final TourData tour1 = tourDataMap.get(Long.valueOf(201010101205990L));
+      tour1.computeComputedValues();
+      assertEquals(114, tour1.getGovss());
    }
 
 }
