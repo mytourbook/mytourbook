@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook,
  net.tourbook.common,
  net.tourbook.ext.rxtx_2.2,
- org.junit;resolution:=optional
+ org.junit,
+ org.junit.jupiter.api
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
  net.tourbook.device.polar.hrm
