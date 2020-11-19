@@ -501,7 +501,6 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
          tourData.computeAltitudeUpDown();
-         tourData.computeTrainingStressData();
 
          createTourData_30_CreateMarkers(tourData);
       }

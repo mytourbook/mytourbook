@@ -1052,7 +1052,6 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataTarget.setTourDeviceTime_Recorded(_tourDataTarget.getTourDeviceTime_Elapsed());
       _tourDataTarget.computeTourMovingTime();
       _tourDataTarget.computeComputedValues();
-      _tourDataTarget.computeTrainingStressData();
 
       // set person which is required to save a tour
       _tourDataTarget.setTourPerson(getSelectedPerson());

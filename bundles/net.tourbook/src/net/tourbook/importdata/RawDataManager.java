@@ -1294,7 +1294,6 @@ public class RawDataManager {
             newTourData.computeAltitudeUpDown();
             newTourData.computeTourMovingTime();
             newTourData.computeComputedValues();
-            newTourData.computeTrainingStressData();
 
             // maintain list, that another call of this method do not find this tour again
             _newlyImportedTours.remove(oldTourData.getTourId());

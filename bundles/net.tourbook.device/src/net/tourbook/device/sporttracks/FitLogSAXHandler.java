@@ -572,7 +572,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();
-         tourData.computeTrainingStressData();
 
          finalizeTour_10_SetTourType(tourData);
          finalizeTour_20_SetTags(tourData);

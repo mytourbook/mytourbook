@@ -445,7 +445,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       tourData.computeAltitudeUpDown();
       tourData.computeTourMovingTime();
       tourData.computeComputedValues();
-      tourData.computeTrainingStressData();
    }
 
    @Override

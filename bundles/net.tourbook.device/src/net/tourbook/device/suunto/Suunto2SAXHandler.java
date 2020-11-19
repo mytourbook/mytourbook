@@ -520,7 +520,6 @@ public class Suunto2SAXHandler extends DefaultHandler {
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
-         tourData.computeTrainingStressData();
       }
 
       _isImported = true;

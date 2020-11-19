@@ -1104,7 +1104,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed());
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
-         _tourData.computeTrainingStressData();
 
          finalizeTour_AdjustMarker();
          finalizeTour_TourType();

@@ -1460,7 +1460,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _joinedTourData.computeAltitudeUpDown();
       _joinedTourData.computeComputedValues();
-      _joinedTourData.computeTrainingStressData();
 
       // set person which is required to save a tour
       _joinedTourData.setTourPerson(getSelectedPerson());
