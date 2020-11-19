@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class SubMenu_TrainingLoad extends Action implements IMenuCreator {
 
-   private Menu                           _menu;
+   private Menu               _menu;
 
    private ActionComputeGovss _action_ComputeGovss;
 
