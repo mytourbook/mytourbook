@@ -21,6 +21,16 @@ package net.tourbook.common.util;
 public final class StringUtils {
 
    /**
+    * Tests if a given string is not <code>null</code> and not empty.
+    *
+    * @param text
+    * @return <code>true</code> when text is not <code>null</code> and is not empty
+    */
+   public static boolean hasContent(final String text) {
+      return !isNullOrEmpty(text);
+   }
+
+   /**
     * Tests if a given string is null or empty.
     *
     * @param string
