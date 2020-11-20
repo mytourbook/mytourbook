@@ -57,6 +57,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -929,7 +930,7 @@ public class TourDatabase {
                   sb.append(tourCounter[0] * 100 / tourListSize[0]);
                   sb.append(UI.SYMBOL_PERCENTAGE);
 
-                  if (runnerSubTaskText != null) {
+                  if (!StringUtils.isNullOrEmpty(runnerSubTaskText)) {
                      sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                      sb.append(runnerSubTaskText);
                   }
