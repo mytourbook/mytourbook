@@ -10,9 +10,14 @@ TODO's
 Issues
 ======
 
-*
+* Calendar View
+  - "Scrambled days" - It's a bug that I can only reproduce in Linux: when scrolling up/down in the calendar view or going to another view and going back to the calendar view, the days get "scrambled" and the saturday and sunday are not on the right anymore but can be anywhere (left, middle...etc)
 
 
+* Tourbook View (flat)
+  - When tour filter is modified then reordered column positions are reset
+  
+  
 New
 ===
 

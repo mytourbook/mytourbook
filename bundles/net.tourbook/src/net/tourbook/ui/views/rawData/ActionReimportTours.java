@@ -17,6 +17,7 @@ package net.tourbook.ui.views.rawData;
 
 import net.tourbook.Messages;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -34,6 +35,12 @@ public class ActionReimportTours extends Action {
 
    @Override
    public void run() {
+
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       new DialogReimportTours(Display.getCurrent().getActiveShell(), _tourViewer).open();
    }
 }

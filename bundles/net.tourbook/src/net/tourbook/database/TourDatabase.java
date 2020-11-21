@@ -57,6 +57,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -922,14 +923,19 @@ public class TourDatabase {
 
                   // create sub task text
                   final StringBuilder sb = new StringBuilder();
-                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
-                        new Object[] { tourCounter[0], tourListSize[0], }));
 
+                  // append: Processed tours: {0} of {1}
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        tourCounter[0],
+                        tourListSize[0]));
+
+                  // append: % of performed task
                   sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                   sb.append(tourCounter[0] * 100 / tourListSize[0]);
                   sb.append(UI.SYMBOL_PERCENTAGE);
 
-                  if (runnerSubTaskText != null) {
+                  // append subsubtask text when available
+                  if (StringUtils.hasContent(runnerSubTaskText)) {
                      sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                      sb.append(runnerSubTaskText);
                   }
@@ -959,11 +965,9 @@ public class TourDatabase {
 
          // create result text
          final StringBuilder sb = new StringBuilder();
-         sb.append(
-               NLS.bind(
-                     Messages.tour_database_computeComputedValues_resultMessage,
-                     tourCounter[0],
-                     tourListSize[0]));
+         sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage,
+               tourCounter[0],
+               tourListSize[0]));
 
          final String runnerResultText = runner.getResultText();
          if (runnerResultText != null) {
@@ -3813,7 +3817,7 @@ public class TourDatabase {
 
       if (_emFactory == null) {
 
-         // ensure db is valid BEFOR entity manager is inizialized which can shutdown the database
+         // ensure db is valid BEFORE entity manager is initialized which can shutdown the database
          if (sqlInit_10_IsDbInitialized() == false) {
             return null;
          }
@@ -4004,7 +4008,7 @@ public class TourDatabase {
 
    private void logDriverManager_GetConnection(final String dbUrl) {
 
-      StatusUtil.logInfo("Derby command executed: " + dbUrl); //$NON-NLS-1$
+      Util.logSimpleMessage(getClass(), "Derby command executed: " + dbUrl); //$NON-NLS-1$
    }
 
    private void modifyColumn_Type(final String table,
@@ -4658,7 +4662,7 @@ public class TourDatabase {
       final String[] buttons = new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL };
 
       if ((new MessageDialog(
-            Display.getDefault().getActiveShell(),
+            splashManager.getShell(),
             Messages.Database_Confirm_update_title,
             null,
             NLS.bind(
@@ -4683,7 +4687,7 @@ public class TourDatabase {
       if (currentDbVersion < 20) {
 
          if ((new MessageDialog(
-               Display.getDefault().getActiveShell(),
+               splashManager.getShell(),
                Messages.Database_Confirm_update_title,
                null,
                NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
@@ -4998,7 +5002,7 @@ public class TourDatabase {
             updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
          }
          if (isPostUpdate42) {
-            updateDbDesign_041_to_042_PostUpdate(conn, splashManager);
+            updateDbDesign_041_to_042_PostUpdate(conn);
          }
 
       } catch (final SQLException e) {
@@ -5009,7 +5013,7 @@ public class TourDatabase {
 
       // display info for the successful update
       MessageDialog.openInformation(
-            Display.getCurrent().getActiveShell(),
+            splashManager.getShell(),
             Messages.tour_database_version_info_title,
             NLS.bind(Messages.Tour_Database_UpdateInfo, oldVersion, newVersion));
 
@@ -7683,7 +7687,7 @@ public class TourDatabase {
 //                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 //   }
 
-   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn, final SplashManager splashManager)
+   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn)
          throws SQLException {
 
       final long startTime = System.currentTimeMillis();
@@ -7701,7 +7705,7 @@ public class TourDatabase {
       final long timeDiff = System.currentTimeMillis() - startTime;
 
       StatusUtil.logInfo(String.format(
-            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+            "Database postupdate 41 -> 42 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
    }
 

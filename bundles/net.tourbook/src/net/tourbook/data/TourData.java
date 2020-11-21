@@ -1703,7 +1703,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "PausedTime_Starts")
    @XmlElement(name = "PausedTime_Start")
    @Transient
-   public long[]           pausedTime_Start;
+   private long[]           pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
@@ -1712,7 +1712,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElementWrapper(name = "PausedTime_Ends")
    @XmlElement(name = "PausedTime_End")
    @Transient
-   public long[]           pausedTime_End;
+   private long[]           pausedTime_End;
 
    // SET_FORMATTING_ON
 
@@ -6798,8 +6798,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void finalizeTour_TimerPauses(List<Long> pausedTime_Start,
                                         final List<Long> pausedTime_End) {
 
-      if (pausedTime_Start == null || pausedTime_Start.size() == 0 ||
-            pausedTime_End == null || pausedTime_End.size() == 0) {
+      if (pausedTime_Start == null || pausedTime_Start.isEmpty() ||
+            pausedTime_End == null || pausedTime_End.isEmpty()) {
          return;
       }
 
@@ -7672,7 +7672,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Calculates the total amount of paused time between start and end index
+    * Calculates the total amount of paused time between a start and an end indices
     *
     * @param startIndex
     * @param endIndex
@@ -7682,7 +7682,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int totalPausedTime = 0;
 
-      // check required data
       if (timeSerie == null || pausedTime_Start == null) {
          return totalPausedTime;
       }
@@ -10079,9 +10078,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourStartTime(final ZonedDateTime zonedStartTime) {
 
+      final long newZonedStartTime = zonedStartTime.toInstant().toEpochMilli();
+      if (tourStartTime != 0) {
+         updatePausedTimes(newZonedStartTime - tourStartTime);
+      }
+
       // set the start of the tour
 
-      tourStartTime = zonedStartTime.toInstant().toEpochMilli();
+      tourStartTime = newZonedStartTime;
 
       startYear = (short) zonedStartTime.getYear();
       startMonth = (short) zonedStartTime.getMonthValue();
@@ -10933,6 +10937,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
+      }
+   }
+
+   /**
+    * Adjust paused times when tour start has changed.
+    *
+    * @param startTimeOffset
+    */
+   private void updatePausedTimes(final long startTimeOffset) {
+
+      if (pausedTime_Start == null || pausedTime_End == null) {
+         return;
+      }
+
+      for (int index = 0; index < pausedTime_Start.length && index < pausedTime_End.length; ++index) {
+         pausedTime_Start[index] += startTimeOffset;
+         pausedTime_End[index] += startTimeOffset;
       }
    }
 }

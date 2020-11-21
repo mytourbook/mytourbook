@@ -1,4 +1,4 @@
-20.11.0                                                 11. November 2020
+20.11.1                                                 20. November 2020
 
 
 New
@@ -94,6 +94,7 @@ Fixes
   
 * Tour Book View (flat)
   - Several SQL exception's when view is not sorted by a column
+  - Tours where sorted only within 1000 tours chunk (1000 is the database fetch size for the nattable)
   
 * Statistic View
   - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015
@@ -111,6 +112,9 @@ Fixes
 
 * Slideout Message Dialog
   - When a message dialog was opened in a slideout, it was hidden in Ubuntu, Cinnamon desktop crashed
+
+* Tour Editor (Frederic)
+  - Fix for a NPE triggered by a Linux async problem in a specific file import scenario
 
 Translation    
 ===========

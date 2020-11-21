@@ -999,7 +999,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
                _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
-               reimportAllImportFiles(false);
+               if (RawDataManager.isReimportingActive() == false) {
+
+                  /*
+                   * Re-import files because computed values could be changed, e.g. elevation gain
+                   */
+
+                  reimportAllImportFiles(false);
+               }
 
             } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
