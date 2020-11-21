@@ -57,6 +57,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
@@ -922,14 +923,19 @@ public class TourDatabase {
 
                   // create sub task text
                   final StringBuilder sb = new StringBuilder();
-                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
-                        new Object[] { tourCounter[0], tourListSize[0], }));
 
+                  // append: Processed tours: {0} of {1}
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        tourCounter[0],
+                        tourListSize[0]));
+
+                  // append: % of performed task
                   sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                   sb.append(tourCounter[0] * 100 / tourListSize[0]);
                   sb.append(UI.SYMBOL_PERCENTAGE);
 
-                  if (runnerSubTaskText != null) {
+                  // append subsubtask text when available
+                  if (StringUtils.hasContent(runnerSubTaskText)) {
                      sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                      sb.append(runnerSubTaskText);
                   }
@@ -959,11 +965,9 @@ public class TourDatabase {
 
          // create result text
          final StringBuilder sb = new StringBuilder();
-         sb.append(
-               NLS.bind(
-                     Messages.tour_database_computeComputedValues_resultMessage,
-                     tourCounter[0],
-                     tourListSize[0]));
+         sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage,
+               tourCounter[0],
+               tourListSize[0]));
 
          final String runnerResultText = runner.getResultText();
          if (runnerResultText != null) {
