@@ -547,8 +547,6 @@ public class Messages extends NLS {
    public static String        App_Action_UncheckAll;
    public static String        App_Action_UpdateNew;
 
-   public static String        App_measurement_imperial;
-   public static String        App_measurement_metric;
    public static String        App_measurement_tooltip;
 
    public static String        App_Cadence_Invalid;
@@ -560,12 +558,7 @@ public class Messages extends NLS {
 
    public static String        App_Dialog_FirstStartup_Message;
    public static String        App_Dialog_FirstStartup_Title;
-   public static String        App_Dialog_FirstStartupSystem_Label_Info;
-   public static String        App_Dialog_FirstStartupSystem_Label_Info2;
    public static String        App_Dialog_FirstStartupSystem_Label_SelectSystem;
-   public static String        App_Dialog_FirstStartupSystem_Label_System;
-   public static String        App_Dialog_FirstStartupSystem_Radio_Imperial;
-   public static String        App_Dialog_FirstStartupSystem_Radio_Metric;
    public static String        App_Dialog_FirstStartupSystem_Title;
    public static String        App_Dialog_FirstStartupTip_Message;
    public static String        App_Dialog_FirstStartupTip_Title;
@@ -1198,7 +1191,6 @@ public class Messages extends NLS {
    public static String        Image__ZeroValues;
    public static String        Image__ZeroValues_Disabled;
    public static String        Image__ZoomFitGraph;
-   public static String        Image__ZoomCentered;
 
    public static String        image__merge_tours;
 
@@ -1375,7 +1367,6 @@ public class Messages extends NLS {
    public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
-   public static String        Log_Reimport_Tour;
    public static String        Log_Reimport_Tour_Skipped;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
@@ -1580,17 +1571,9 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Tab_OneTour;
    public static String        Pref_DisplayFormat_Tab_OneTour_Tooltip;
 
-   public static String        Pref_general_imperial_unit_fahrenheit;
-   public static String        Pref_general_imperial_unit_feet;
-   public static String        Pref_general_imperial_unit_mi;
-   public static String        Pref_general_metric_unit_celcius;
-   public static String        Pref_general_metric_unit_km;
-   public static String        Pref_general_metric_unit_m;
    public static String        Pref_general_show_system_in_ui;
-   public static String        Pref_general_system_altitude;
-   public static String        Pref_general_system_distance;
    public static String        Pref_general_system_measurement;
-   public static String        Pref_general_system_temperature;
+
    public static String        Pref_General_Button_ComputeCalendarWeek;
    public static String        Pref_General_CalendarWeek;
    public static String        Pref_General_Checkbox_SetTimeZone;
@@ -1603,7 +1586,6 @@ public class Messages extends NLS {
    public static String        Pref_General_Label_LocalTimeZone_1;
    public static String        Pref_General_Label_LocalTimeZone_2;
    public static String        Pref_General_Label_LocalTimeZone_3;
-   public static String        Pref_General_Label_MeasurementSystem;
    public static String        Pref_General_Label_MinimalDaysInFirstWeek;
    public static String        Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
    public static String        Pref_General_Label_SetAnotherTimeZone;
@@ -2241,7 +2223,6 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider;
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
-   public static String Slideout_Map25Provider_Label_Copyright;
 
    public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
@@ -2671,8 +2652,6 @@ public class Messages extends NLS {
    public static String Tour_Editor_Link_RetrieveWeather;
    public static String Tour_Editor_Link_RetrieveWeather_Tooltip;
    public static String Tour_Editor_NoSwimData;
-   public static String Tour_Editor_Radio_Cadence_Rpm;
-   public static String Tour_Editor_Radio_Cadence_Spm;
    public static String Tour_Editor_TabLabel_SwimSlices;
 
    public static String Tour_Filter_Action_Tooltip;
@@ -2998,7 +2977,6 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_chart_title_reference_tour;
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
-   public static String tourCatalog_view_tooltip_speed;
 
    public static String tourCatalog_wizard_Action_deselect_all;
    public static String tourCatalog_wizard_Action_select_all;
