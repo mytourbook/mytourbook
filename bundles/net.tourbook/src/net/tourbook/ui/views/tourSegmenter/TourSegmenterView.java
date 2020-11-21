@@ -5394,9 +5394,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _state.put(STATE_SURFING_IS_SHOW_ONLY_SELECTED_SEGMENTS, _chkIsShowOnlySelectedSegments.getSelection());
       _state.put(STATE_SURFING_MIN_TIME_DURATION,              _spinnerSurfing_MinTimeDuration.getSelection());
 
-      _state.put(STATE_SURFING_MIN_DISTANCE,          Math.round(minSurfingDistance));
-      _state.put(STATE_SURFING_MIN_SPEED_START_STOP,  Math.round(minSpeed_StartStop));
-      _state.put(STATE_SURFING_MIN_SPEED_SURFING,     Math.round(minSpeed_Surfing));
+      _state.put(STATE_SURFING_MIN_DISTANCE,                   Math.round(minSurfingDistance));
+      _state.put(STATE_SURFING_MIN_SPEED_START_STOP,           Math.round(minSpeed_StartStop));
+      _state.put(STATE_SURFING_MIN_SPEED_SURFING,              Math.round(minSpeed_Surfing));
 
 // SET_FORMATTING_ON
 

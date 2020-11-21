@@ -262,6 +262,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             onSystemItem_Select();
          }
       };
+
       final SelectionAdapter profileListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
