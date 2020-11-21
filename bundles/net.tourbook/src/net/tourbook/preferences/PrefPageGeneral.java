@@ -437,40 +437,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             }
             {
                /*
-                * Temperature
-                */
-
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Temperature);
-               gridData_Label.applyTo(label);
-
-               // combo
-               _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Temperature.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
-
-               new Label(container, SWT.NONE);
-            }
-            {
-               /*
-                * Daytime
-                */
-
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_DayTime);
-               gridData_Label.applyTo(label);
-
-               // combo
-               _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_DayTime.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
-
-               new Label(container, SWT.NONE);
-            }
-            {
-               /*
                 * Weight
                 */
 
@@ -508,6 +474,40 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
                final Label labelInfo = new Label(container, SWT.NONE);
                labelInfo.setText(Messages.Pref_System_Label_Pressure_Atmosphere_Info);
                gridData_Label.applyTo(labelInfo);
+            }
+            {
+               /*
+                * Temperature
+                */
+
+               // label
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Pref_System_Label_Temperature);
+               gridData_Label.applyTo(label);
+
+               // combo
+               _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_Temperature.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
+
+               new Label(container, SWT.NONE);
+            }
+            {
+               /*
+                * Daytime
+                */
+
+               // label
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Pref_System_Label_DayTime);
+               gridData_Label.applyTo(label);
+
+               // combo
+               _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
+               _comboSystemOptiop_DayTime.addSelectionListener(itemListener);
+               gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
+
+               new Label(container, SWT.NONE);
             }
          }
       }

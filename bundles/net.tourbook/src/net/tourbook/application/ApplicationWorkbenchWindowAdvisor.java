@@ -36,6 +36,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.measurement_system.DialogSelectMeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -115,7 +116,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       _wbAdvisor = wbAdvisor;
 
-      _appTitle = Messages.App_Title + " - " //$NON-NLS-1$
+      _appTitle = Messages.App_Title + UI.DASH_WITH_SPACE
             + ApplicationVersion.getVersionSimple()
             + ApplicationVersion.getDevelopmentId();
    }
@@ -190,7 +191,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             label = currentPage.getLabel();
          }
 
-         if (!StringUtils.isNullOrEmpty(label)) {
+         if (StringUtils.hasContent(label)) {
             title = NLS.bind(shellTitle, label, title);
          }
       }
@@ -222,21 +223,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       final Boolean isCreatePerson = Boolean.TRUE;
 
       // this dialog fires an event that the person list is modified
-      PreferencesUtil
-            .createPreferenceDialogOn(//
-                  activeShell,
-                  PrefPagePeople.ID,
-                  new String[] { PrefPagePeople.ID },
-                  isCreatePerson,
-                  PreferencesUtil.OPTION_FILTER_LOCKED //
-            )
-            .open();
+      PreferencesUtil.createPreferenceDialogOn(
+            activeShell,
+            PrefPagePeople.ID,
+            new String[] { PrefPagePeople.ID },
+            isCreatePerson,
+            PreferencesUtil.OPTION_FILTER_LOCKED).open();
 
       // set first person as active person
       final ArrayList<TourPerson> allPeople = PersonManager.getTourPeople();
       TourbookPlugin.setActivePerson(allPeople.get(0));
       _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-
 
       // tip to save tour
       MessageDialog.openInformation(
@@ -353,22 +350,32 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             }
          }
       };
-
    }
 
    private void loadPeopleData() {
 
-      final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          final ResultSet result = statement.executeQuery();
 
          if (result.next()) {
-            // people are available, nothing more to do
+
+            /**
+             * People are available.
+             * <p>
+             * Check if the user have selected a measurement system, after version
+             * 20.11 the default system would be metric.
+             */
+
+            MeasurementSystem_Manager.selectMeasurementSystem();
+
             return;
+
          } else {
+
             // no people are in the db -> this is the first startup of the application
             firstApplicationStart();
          }

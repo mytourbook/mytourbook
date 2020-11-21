@@ -13,21 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.application;
+package net.tourbook.measurement_system;
 
 import net.tourbook.Messages;
-import net.tourbook.measurement_system.MeasurementSystem;
-import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.System_DayTime;
-import net.tourbook.measurement_system.System_Distance;
-import net.tourbook.measurement_system.System_Elevation;
-import net.tourbook.measurement_system.System_Height;
-import net.tourbook.measurement_system.System_Length;
-import net.tourbook.measurement_system.System_LengthSmall;
-import net.tourbook.measurement_system.System_Pace;
-import net.tourbook.measurement_system.System_Pressure_Atmosphere;
-import net.tourbook.measurement_system.System_Temperature;
-import net.tourbook.measurement_system.System_Weight;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -42,8 +30,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-class DialogSelectMeasurementSystem extends Dialog {
+public class DialogSelectMeasurementSystem extends Dialog {
 
+   private int _selectedSystemProfileIndex;
+
+   /*
+    * UI controls
+    */
    private Combo _comboSystem_Profile;
    private Combo _comboSystemOptiop_DayTime;
    private Combo _comboSystemOptiop_Distance;
@@ -56,28 +49,37 @@ class DialogSelectMeasurementSystem extends Dialog {
    private Combo _comboSystemOptiop_Temperature;
    private Combo _comboSystemOptiop_Weight;
 
-   protected DialogSelectMeasurementSystem(final Shell parentShell) {
+   /**
+    * @param parentShell
+    * @param isSetSelectedSystem
+    *           When <code>true</code> then the system is selected in the
+    *           {@link MeasurementSystem_Manager}.
+    */
+   public DialogSelectMeasurementSystem(final Shell parentShell) {
       super(parentShell);
    }
 
    @Override
    public boolean close() {
 
-      final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
+      // keep selected index
+      _selectedSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(activeSystemProfileIndex, false);
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(_selectedSystemProfileIndex, true);
 
       return super.close();
    }
 
    @Override
    protected void configureShell(final Shell shell) {
+
       super.configureShell(shell);
       shell.setText(Messages.App_Dialog_FirstStartupSystem_Title);
    }
 
    @Override
    protected void createButtonsForButtonBar(final Composite parent) {
+
       createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
    }
 
@@ -91,6 +93,7 @@ class DialogSelectMeasurementSystem extends Dialog {
 
       // select default system which is the metric (first) profile in the first startup
       _comboSystem_Profile.select(0);
+
       onSystemProfile_Select();
 
       return ui;
@@ -105,20 +108,14 @@ class DialogSelectMeasurementSystem extends Dialog {
          {
             // label: measurement system
 
-            final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(label);
-            label.setText(Messages.App_Dialog_FirstStartupSystem_Label_System);
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.App_Dialog_FirstStartupSystem_Label_SelectSystem);
+            GridDataFactory.fillDefaults()
+                  .hint(convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(label);
          }
 
          createUI_10_MeasurementSystem_Data(container);
-
-         {
-            // label: info
-
-            final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(0, 15).applyTo(label);
-            label.setText(Messages.App_Dialog_FirstStartupSystem_Label_Info);
-         }
       }
 
       return container;
@@ -137,7 +134,10 @@ class DialogSelectMeasurementSystem extends Dialog {
       };
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .grab(false, false)
+            .indent(0, 16)
+            .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
@@ -274,38 +274,6 @@ class DialogSelectMeasurementSystem extends Dialog {
          }
          {
             /*
-             * Temperature
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_System_Label_Temperature);
-            gridData_Label.applyTo(label);
-
-            // combo
-            _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
-
-            new Label(container, SWT.NONE);
-         }
-         {
-            /*
-             * Daytime
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_System_Label_DayTime);
-            gridData_Label.applyTo(label);
-
-            // combo
-            _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
-
-            new Label(container, SWT.NONE);
-         }
-         {
-            /*
              * Weight
              */
 
@@ -341,6 +309,38 @@ class DialogSelectMeasurementSystem extends Dialog {
             final Label labelInfo = new Label(container, SWT.NONE);
             labelInfo.setText(Messages.Pref_System_Label_Pressure_Atmosphere_Info);
             gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Temperature
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_Temperature);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
+
+            new Label(container, SWT.NONE);
+         }
+         {
+            /*
+             * Daytime
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_System_Label_DayTime);
+            gridData_Label.applyTo(label);
+
+            // combo
+            _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
+            gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
+
+            new Label(container, SWT.NONE);
          }
       }
    }
@@ -407,12 +407,17 @@ class DialogSelectMeasurementSystem extends Dialog {
 
    }
 
+   public int getSelectedSystem() {
+      return _selectedSystemProfileIndex;
+   }
+
    private void onSystemProfile_Select() {
 
       final int activeSystemProfileIndex = _comboSystem_Profile.getSelectionIndex();
       final MeasurementSystem selectedSystemProfile = MeasurementSystem_Manager.getCurrentProfiles().get(activeSystemProfileIndex);
 
 // SET_FORMATTING_OFF
+
       _comboSystemOptiop_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
       _comboSystemOptiop_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
       _comboSystemOptiop_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
@@ -423,6 +428,7 @@ class DialogSelectMeasurementSystem extends Dialog {
       _comboSystemOptiop_Pressure_Atmosphere .select(MeasurementSystem_Manager.getSystemIndex_Pressure_Atmosphere(selectedSystemProfile));
       _comboSystemOptiop_Temperature         .select(MeasurementSystem_Manager.getSystemIndex_Temperature(selectedSystemProfile));
       _comboSystemOptiop_Weight              .select(MeasurementSystem_Manager.getSystemIndex_Weight(selectedSystemProfile));
+
 // SET_FORMATTING_ON
    }
 }

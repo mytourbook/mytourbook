@@ -561,8 +561,8 @@ public class Messages extends NLS {
    public static String        App_Dialog_FirstStartup_Message;
    public static String        App_Dialog_FirstStartup_Title;
    public static String        App_Dialog_FirstStartupSystem_Label_Info;
-
    public static String        App_Dialog_FirstStartupSystem_Label_Info2;
+   public static String        App_Dialog_FirstStartupSystem_Label_SelectSystem;
    public static String        App_Dialog_FirstStartupSystem_Label_System;
    public static String        App_Dialog_FirstStartupSystem_Radio_Imperial;
    public static String        App_Dialog_FirstStartupSystem_Radio_Metric;

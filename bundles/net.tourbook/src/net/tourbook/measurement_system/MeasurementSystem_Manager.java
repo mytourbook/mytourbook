@@ -38,6 +38,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -50,11 +51,6 @@ import org.w3c.dom.Element;
 public class MeasurementSystem_Manager {
 
    private static final int                    FILE_VERSION              = 1;
-
-   private static ArrayList<MeasurementSystem> ALL_DEFAULT_PROFILES      = new ArrayList<>();
-
-   private static ArrayList<MeasurementSystem> _allSystemProfiles        = new ArrayList<>();
-   private static int                          _activeSystemProfileIndex = 0;
 
    private static final String                 STATE_FILE                = "measurement-system.xml";     //$NON-NLS-1$
 
@@ -76,6 +72,13 @@ public class MeasurementSystem_Manager {
    private static final String                 ATTR_WEIGHT               = "weight";                     //$NON-NLS-1$
 
    private static final String                 ATTR_VERSION              = "version";                    //$NON-NLS-1$
+
+   private static ArrayList<MeasurementSystem> ALL_DEFAULT_PROFILES      = new ArrayList<>();
+
+   private static ArrayList<MeasurementSystem> _allSystemProfiles        = new ArrayList<>();
+   private static int                          _activeSystemProfileIndex = 0;
+
+   private static boolean                      _isDefaultProfileSelected;
 
    private static final IPreferenceStore       _prefStore                = TourbookPlugin.getPrefStore();
 
@@ -168,62 +171,62 @@ public class MeasurementSystem_Manager {
 
 // SET_FORMATTING_OFF
 
-   private static final System_DayTime             _allSystem_DayTime[]             = {
+   private static final System_DayTime                         _allSystem_DayTime[] = {
 
          new System_DayTime(Unit_DayTime._24_HOURS,            Messages.Pref_System_Option_DayTime_24_Hours),
          new System_DayTime(Unit_DayTime.AM_PM,                Messages.Pref_System_Option_DayTime_AM_PM),
    };
 
-   private static final System_Distance            _allSystem_Distances[]           = {
+   private static final System_Distance                        _allSystem_Distances[] = {
 
          new System_Distance(Unit_Distance.KILOMETER,          Messages.Pref_System_Option_Distance_Kilometer),
          new System_Distance(Unit_Distance.MILE,               Messages.Pref_System_Option_Distance_Mile),
          new System_Distance(Unit_Distance.NAUTIC_MILE,        Messages.Pref_System_Option_Distance_NauticMile),
    };
 
-   private static final System_Elevation           _allSystem_Elevations[]          = {
+   private static final System_Elevation                       _allSystem_Elevations[] = {
 
          new System_Elevation(Unit_Elevation.METER,            Messages.Pref_System_Option_Elevation_Meter),
          new System_Elevation(Unit_Elevation.FOOT,             Messages.Pref_System_Option_Elevation_Foot),
    };
 
-   private static final System_Height              _allSystem_Heights[]             = {
+   private static final System_Height                          _allSystem_Heights[] = {
 
          new System_Height(Unit_Height_Body.METER,             Messages.Pref_System_Option_Height_Meter),
          new System_Height(Unit_Height_Body.INCH,              Messages.Pref_System_Option_Height_Inch),
    };
 
-   private static final System_Length              _allSystem_Lengths[]             = {
+   private static final System_Length                          _allSystem_Lengths[] = {
 
          new System_Length(Unit_Length.METER,                  Messages.Pref_System_Option_Length_Meter),
          new System_Length(Unit_Length.YARD,                   Messages.Pref_System_Option_Length_Yard),
    };
 
-   private static final System_LengthSmall         _allSystem_Length_Small[]        = {
+   private static final System_LengthSmall                     _allSystem_Length_Small[] = {
 
          new System_LengthSmall(Unit_Length_Small.MILLIMETER,  Messages.Pref_System_Option_SmallLength_Millimeter),
          new System_LengthSmall(Unit_Length_Small.INCH,        Messages.Pref_System_Option_SmallLength_Inch),
    };
 
-   private static final System_Pace                _allSystem_Pace[]                = {
+   private static final System_Pace                            _allSystem_Pace[] = {
 
          new System_Pace(Unit_Pace.MINUTES_PER_KILOMETER,      Messages.Pref_System_Option_Pace_MinutesPerKilometer),
          new System_Pace(Unit_Pace.MINUTES_PER_MILE,           Messages.Pref_System_Option_Pace_MinutesPerMile),
    };
 
-   private static final System_Pressure_Atmosphere _allSystem_Pressure_Atmosphere[] = {
+   private static final System_Pressure_Atmosphere             _allSystem_Pressure_Atmosphere[] = {
 
          new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.MILLIBAR,          Messages.Pref_System_Option_Pressure_Atmosphere_Millibar),
          new System_Pressure_Atmosphere(Unit_Pressure_Atmosphere.INCH_OF_MERCURY,   Messages.Pref_System_Option_Pressure_Atmosphere_InchOfMercury),
    };
 
-   private static final System_Temperature         _allSystem_Temperatures[]        = {
+   private static final System_Temperature                     _allSystem_Temperatures[] = {
 
          new System_Temperature(Unit_Temperature.CELCIUS,      Messages.Pref_System_Option_Temperature_Celcius),
          new System_Temperature(Unit_Temperature.FAHRENHEIT,   Messages.Pref_System_Option_Temperature_Fahrenheit),
    };
 
-   private static final System_Weight              _allSystem_Weights[]             = {
+   private static final System_Weight                          _allSystem_Weights[] = {
 
          new System_Weight(Unit_Weight.KILOGRAM,               Messages.Pref_System_Option_BodyWeight_Kilogram),
          new System_Weight(Unit_Weight.POUND,                  Messages.Pref_System_Option_BodyWeight_Pound),
@@ -503,6 +506,9 @@ public class MeasurementSystem_Manager {
 
          _activeSystemProfileIndex = 0;
 
+         // set a flag that the user is selecting a system afterwards
+         _isDefaultProfileSelected = true;
+
          return;
       }
 
@@ -572,7 +578,7 @@ public class MeasurementSystem_Manager {
          final Unit_Length                length               = (Unit_Length)               Util.getXmlEnum(xmlProfile, ATTR_LENGTH,                 Unit_Length.METER);
          final Unit_Length_Small          length_Small         = (Unit_Length_Small)         Util.getXmlEnum(xmlProfile, ATTR_LENGTH_SMALL,           Unit_Length_Small.MILLIMETER);
          final Unit_Pace                  pace                 = (Unit_Pace)                 Util.getXmlEnum(xmlProfile, ATTR_PACE,                   Unit_Pace.MINUTES_PER_KILOMETER);
-         final Unit_Pressure_Atmosphere   pressure_Atmospheric = (Unit_Pressure_Atmosphere)  Util.getXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE,   Unit_Pressure_Atmosphere.MILLIBAR);
+         final Unit_Pressure_Atmosphere   pressure_Atmospheric = (Unit_Pressure_Atmosphere)  Util.getXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE,    Unit_Pressure_Atmosphere.MILLIBAR);
          final Unit_Temperature           temperature          = (Unit_Temperature)          Util.getXmlEnum(xmlProfile, ATTR_TEMPERATURE,            Unit_Temperature.CELCIUS);
          final Unit_Weight                weight               = (Unit_Weight)               Util.getXmlEnum(xmlProfile, ATTR_WEIGHT,                 Unit_Weight.KILOGRAM);
 
@@ -696,6 +702,18 @@ public class MeasurementSystem_Manager {
          Util.setXmlEnum(xmlProfile, ATTR_PRESSURE_ATMOSPHERE, system.getPressure_Atmosphere());
          Util.setXmlEnum(xmlProfile, ATTR_TEMPERATURE, system.getTemperature());
          Util.setXmlEnum(xmlProfile, ATTR_WEIGHT, system.getWeight());
+      }
+   }
+
+   /**
+    * Select measurement system when it is not yet selected
+    */
+   public static void selectMeasurementSystem() {
+
+      if (_isDefaultProfileSelected) {
+
+         // the user have not yet selected a measurement system after version 20.11
+         new DialogSelectMeasurementSystem(Display.getDefault().getActiveShell()).open();
       }
    }
 
