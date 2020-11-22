@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
@@ -86,6 +87,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                                       // ms
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView");               //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
@@ -96,6 +98,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private ISelectionListener      _selectionListener;
    private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
 
    private ActionCalendarOptions   _actionCalendarOptions;
@@ -184,8 +187,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
                   || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)
-                  || property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
                refreshCalendar();
 
@@ -196,12 +198,25 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
                refreshCalendar();
             }
          }
+      };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               refreshCalendar();
+            }
+         }
       };
 
       // add prop listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    // create and register our selection listener
@@ -440,7 +455,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       getSite().getPage().removePostSelectionListener(_selectionListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

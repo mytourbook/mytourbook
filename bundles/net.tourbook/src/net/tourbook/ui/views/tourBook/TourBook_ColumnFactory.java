@@ -2172,7 +2172,7 @@ public class TourBook_ColumnFactory {
 
                // convert imperial -> metric
                if (UI.UNIT_IS_LENGTH_YARD) {
-                  minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
+                  minSurfingDistance = (int) (minSurfingDistance / UI.UNIT_YARD + 0.5);
                }
 
                return Integer.toString(minSurfingDistance);
@@ -2197,7 +2197,7 @@ public class TourBook_ColumnFactory {
 
                // convert imperial -> metric
                if (UI.UNIT_IS_LENGTH_YARD) {
-                  minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
+                  minSurfingDistance = (int) (minSurfingDistance / UI.UNIT_YARD + 0.5);
                }
 
                cell.setText(Integer.toString(minSurfingDistance));

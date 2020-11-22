@@ -262,7 +262,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String           COLUMN_PACE                   = "MOTION_PACE";                                          //$NON-NLS-1$
    //
    private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStoreCommon              = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common             = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _stateTimeSlice               = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    private static final IDialogSettings  _stateSwimSlice               = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
@@ -312,7 +312,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ISelectionListener      _postSelectionListener;
    private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListenerCommon;
+   private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
    private ITourSaveListener       _tourSaveListener;
    //
@@ -2407,11 +2407,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)
-                  || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
                /*
-                * tour data could have been changed but the changes are not reflected in the data
+                * Tour data could have been modified but the changes are not reflected in the data
                 * model, the model needs to be updated from the UI
                 */
                if (isTourValid()) {
@@ -2431,25 +2430,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   discardModifications();
                }
 
-               if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-                  // measurement system has changed
-
-                  net.tourbook.ui.UI.updateUnits();
-
-                  /*
-                   * It is possible that the unit values in the UI class have been updated before
-                   * the model was saved, this can happen when another view called the method
-                   * UI.updateUnits(). Because of this race condition, only the internal units are
-                   * used to calculate values which depend on the measurement system
-                   */
-                  updateInternalUnitValues();
-
-                  recreateViewer();
-
-                  updateUI_FromModel(_tourData, false, true);
-
-               } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+               if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
                   // reload tour data
 
@@ -2466,14 +2447,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
          }
       };
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
 
       /*
        * Common preferences
        */
-      _prefChangeListenerCommon = new IPropertyChangeListener() {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
+
+            if (_tourData == null) {
+               return;
+            }
 
             final String property = event.getProperty();
 
@@ -2482,12 +2466,53 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                // reload tour data
 
                updateUI_FromModel(_tourData, false, true);
+
+            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               /*
+                * Tour data could have been modified but the changes are not reflected in the data
+                * model, the model needs to be updated from the UI
+                */
+               if (isTourValid()) {
+
+// this has been disabled because the measurement has changed and it would update from the wrong measurement system
+// it was also prevented that the measurement can be changed when the tour is modified
+//
+//                  updateModel_FromUI();
+
+               } else {
+
+                  MessageDialog.openInformation(
+                        Display.getCurrent().getActiveShell(),
+                        Messages.tour_editor_dlg_discard_tour_title,
+                        Messages.tour_editor_dlg_discard_tour_message);
+
+                  discardModifications();
+               }
+
+               if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+                  // measurement system has changed
+
+                  /*
+                   * It is possible that the unit values in the UI class have been updated before
+                   * the model was saved, this can happen when another view called the method
+                   * UI.updateUnits(). Because of this race condition, only the internal units are
+                   * used to calculate values which depend on the measurement system
+                   */
+                  updateInternalUnitValues();
+
+                  recreateViewer();
+
+                  updateUI_FromModel(_tourData, false, true);
+               }
             }
          }
       };
 
       // register the listener
-      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -5885,7 +5910,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       page.removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       TourManager.getInstance().removeTourSaveListener(_tourSaveListener);

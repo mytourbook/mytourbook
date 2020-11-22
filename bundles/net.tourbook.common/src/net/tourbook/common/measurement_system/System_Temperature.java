@@ -13,16 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Weight {
+public class System_Temperature {
 
-   String      _label;
-   Unit_Weight _weight;
+   private String           _label;
+   private Unit_Temperature _temperature;
 
-   public System_Weight(final Unit_Weight weight, final String label) {
+   public System_Temperature(final Unit_Temperature temperature, final String label) {
 
-      _weight = weight;
+      _temperature = temperature;
       _label = label;
    }
 
@@ -30,7 +30,7 @@ public class System_Weight {
       return _label;
    }
 
-   public Unit_Weight getWeight() {
-      return _weight;
+   public Unit_Temperature getTemperature() {
+      return _temperature;
    }
 }

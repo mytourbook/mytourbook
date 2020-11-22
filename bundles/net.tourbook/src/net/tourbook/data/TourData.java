@@ -71,6 +71,7 @@ import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.time.TimeTools;
@@ -96,7 +97,6 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
@@ -2271,13 +2271,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float timeDiff = deviceTimeInterval * (indexHigh - indexLow);
 
          // keep altimeter data
-         dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+         dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ELEVATION;
 
          // keep gradient data
          dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
       }
 
-      if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ELEVATION != 1) {
 
          // set imperial system
 
@@ -2431,7 +2431,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // compute altimeter
             if (timeDiff > 0) {
-               final float altimeter = 3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+               final float altimeter = 3600f * altitudeDiff / timeDiff / UI.UNIT_VALUE_ELEVATION;
                dataSerieAltimeter[serieIndex] = altimeter;
             } else {
 //               dataSerieAltimeter[serieIndex] = -100;
@@ -2450,7 +2450,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ELEVATION != 1) {
 
          // set imperial system
 
@@ -3600,13 +3600,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final float altitudeDiff = altitudeSerie[serieIndex] - altitudeSerie[serieIndex - 1];
 
             // keep altimeter data
-            dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+            dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ELEVATION;
 
             // keep gradient data
             dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
          }
 
-         if (UI.UNIT_VALUE_ALTITUDE != 1) {
+         if (UI.UNIT_VALUE_ELEVATION != 1) {
 
             // set imperial system
 
@@ -5439,7 +5439,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             final float altiUpDownHour = segmentMovingTime == 0 //
                   ? 0
-                  : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentMovingTime * 3600;
+                  : (altitudeDiff / UI.UNIT_VALUE_ELEVATION) / segmentMovingTime * 3600;
 
             segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
             segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
@@ -6818,7 +6818,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getAltimeterSerie() {
 
-      if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ELEVATION != 1) {
 
          // use imperial system
 
@@ -6848,7 +6848,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ELEVATION != 1) {
 
          // imperial system is used
 
@@ -6894,7 +6894,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // return already smoothed altitude values
 
-         if (UI.UNIT_VALUE_ALTITUDE != 1) {
+         if (UI.UNIT_VALUE_ELEVATION != 1) {
 
             // imperial system is used
 
@@ -6913,7 +6913,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else {
 
-         if (UI.UNIT_VALUE_ALTITUDE != 1) {
+         if (UI.UNIT_VALUE_ELEVATION != 1) {
 
             // imperial system is used
 
@@ -8184,7 +8184,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      if (UI.UNIT_VALUE_ALTITUDE != 1) {
+      if (UI.UNIT_VALUE_ELEVATION != 1) {
 
          // imperial system is used
 

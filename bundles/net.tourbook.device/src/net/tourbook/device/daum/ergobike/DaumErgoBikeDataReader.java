@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -34,7 +35,6 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 

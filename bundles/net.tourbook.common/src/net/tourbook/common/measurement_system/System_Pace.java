@@ -13,16 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_LengthSmall {
+public class System_Pace {
 
-   private String            _label;
-   private Unit_Length_Small _smallLength;
+   private String    _label;
+   private Unit_Pace _pace;
 
-   public System_LengthSmall(final Unit_Length_Small smallLength, final String label) {
+   public System_Pace(final Unit_Pace pace, final String label) {
 
-      _smallLength = smallLength;
+      _pace = pace;
       _label = label;
    }
 
@@ -30,7 +30,7 @@ public class System_LengthSmall {
       return _label;
    }
 
-   public Unit_Length_Small getLength_Small() {
-      return _smallLength;
+   public Unit_Pace getPace() {
+      return _pace;
    }
 }

@@ -13,16 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Temperature {
+public class System_Pressure_Atmosphere {
 
-   private String           _label;
-   private Unit_Temperature _temperature;
+   private String                   _label;
+   private Unit_Pressure_Atmosphere _pressure;
 
-   public System_Temperature(final Unit_Temperature temperature, final String label) {
+   public System_Pressure_Atmosphere(final Unit_Pressure_Atmosphere pressure, final String label) {
 
-      _temperature = temperature;
+      _pressure = pressure;
       _label = label;
    }
 
@@ -30,7 +30,7 @@ public class System_Temperature {
       return _label;
    }
 
-   public Unit_Temperature getTemperature() {
-      return _temperature;
+   public Unit_Pressure_Atmosphere getPressure() {
+      return _pressure;
    }
 }

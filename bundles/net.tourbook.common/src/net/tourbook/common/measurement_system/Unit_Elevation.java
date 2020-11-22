@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public enum Unit_Height_Body {
+public enum Unit_Elevation {
 
    /**
     * Metric measurement system: meter
@@ -23,7 +23,7 @@ public enum Unit_Height_Body {
    METER,
 
    /**
-    * Imperial measurement system: inch
+    * Imperial measurement system: foot
     */
-   INCH
+   FOOT
 }

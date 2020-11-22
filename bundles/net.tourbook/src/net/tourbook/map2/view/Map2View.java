@@ -46,6 +46,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -53,6 +54,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -306,6 +308,7 @@ public class Map2View extends ViewPart implements
 
 
    private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore_Common                      = CommonActivator.getPrefStore();
    private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
 
    private final ImageDescriptor    _imageSyncWithSlider                   = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider);
@@ -332,6 +335,7 @@ public class Map2View extends ViewPart implements
    private IPartListener2                    _partListener;
    private ISelectionListener                _postSelectionListener;
    private IPropertyChangeListener           _prefChangeListener;
+   private IPropertyChangeListener           _prefChangeListener_Common;
    private ITourEventListener                _tourEventListener;
 
    /**
@@ -1156,17 +1160,6 @@ public class Map2View extends ViewPart implements
 
                actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               net.tourbook.ui.UI.updateUnits();
-               _map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
-
-               _map.paint();
-
             } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
                   || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
 
@@ -1209,7 +1202,27 @@ public class Map2View extends ViewPart implements
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+
+               createLegendImage(_tourPainterConfig.getMapColorProvider());
+
+               _map.paint();
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -1771,6 +1784,7 @@ public class Map2View extends ViewPart implements
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

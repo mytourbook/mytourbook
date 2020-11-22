@@ -27,7 +27,9 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -126,6 +128,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private static final TourPhotoManager      _photoMgr                       = TourPhotoManager.getInstance();
 
    private final IPreferenceStore             _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore             _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings              _state                          = TourbookPlugin.getState(ID);
 
    private ArrayList<TourPhotoLink>           _visibleTourPhotoLinks          = new ArrayList<>();
@@ -156,6 +159,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private ISelectionListener                 _postSelectionListener;
    private IPropertyChangeListener            _prefChangeListener;
+   private IPropertyChangeListener            _prefChangeListener_Common;
    private IPartListener2                     _partListener;
 
    private PixelConverter                     _pc;
@@ -530,20 +534,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-//					// measurement system has changed
-//
-//					UI.updateUnits();
-//					updateInternalUnitValues();
-//
-//					_columnManager.saveState(_state);
-//					_columnManager.clearColumns();
-//					defineAllColumns(_viewerContainer);
-//
-//					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
-
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
                // app filter is modified
 
@@ -565,7 +556,31 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+//					// measurement system has changed
+//
+//					UI.updateUnits();
+//					updateInternalUnitValues();
+//
+//					_columnManager.saveState(_state);
+//					_columnManager.clearColumns();
+//					defineAllColumns(_viewerContainer);
+//
+//					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -1262,6 +1277,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       page.removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

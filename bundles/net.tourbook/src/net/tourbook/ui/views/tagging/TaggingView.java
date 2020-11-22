@@ -21,13 +21,14 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -171,6 +172,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    private final IPreferenceStore              _prefStore                               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore              _prefStore_Common                        = CommonActivator.getPrefStore();
 
    private final IDialogSettings               _state                                   = TourbookPlugin.getState(ID);
 
@@ -201,6 +203,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ISelectionListener                  _postSelectionListener;
    private PostSelectionProvider               _postSelectionProvider;
    private IPropertyChangeListener             _prefChangeListener;
+   private IPropertyChangeListener             _prefChangeListener_Common;
    private ITourEventListener                  _tourEventListener;
 
    private TagMenuManager                      _tagMenuManager;
@@ -553,18 +556,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               UI.updateUnits();
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns();
-
-               _tagViewer = (TreeViewer) recreateViewer(_tagViewer);
-
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
                _tagViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -579,8 +570,28 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns();
+
+               _tagViewer = (TreeViewer) recreateViewer(_tagViewer);
+            }
+         }
+      };
+
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -1003,7 +1014,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final double dbAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1028,7 +1039,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final long dbMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
-            final double value = dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1053,7 +1064,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final long dbAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
-            final double value = dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1482,7 +1493,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       _imgTag.dispose();
       _imgTagRoot.dispose();
@@ -1521,8 +1534,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       TVITagView_Tour firstTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selection) {
+         
          if (treeItem instanceof TVITagView_Tour) {
             if (numTours == 0) {
                firstTour = (TVITagView_Tour) treeItem;
@@ -2090,8 +2103,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          final ArrayList<Long> tourIds = new ArrayList<>();
 
-         for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-            final Object viewItem = tourIterator.next();
+         for (final Object viewItem : selectedTours) {
+            
             if (viewItem instanceof TVITagView_Tour) {
                tourIds.add(((TVITagView_Tour) viewItem).getTourId());
             }

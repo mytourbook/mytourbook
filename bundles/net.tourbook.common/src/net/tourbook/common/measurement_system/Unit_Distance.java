@@ -13,24 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Distance {
+public enum Unit_Distance {
 
-   private String        _label;
-   private Unit_Distance _distance;
+   /**
+    * Metric measurement system - km
+    */
+   KILOMETER,
 
-   public System_Distance(final Unit_Distance distance, final String label) {
+   /**
+    * Imperial measurement system - mi
+    */
+   MILE,
 
-      _distance = distance;
-      _label = label;
-   }
-
-   public Unit_Distance getDistance() {
-      return _distance;
-   }
-
-   public String getLabel() {
-      return _label;
-   }
+   /**
+    * Nautical mile - nmi
+    */
+   NAUTIC_MILE
 }

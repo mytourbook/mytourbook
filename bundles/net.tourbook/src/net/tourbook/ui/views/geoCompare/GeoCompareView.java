@@ -29,7 +29,9 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -147,10 +149,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private static final IDialogSettings   _state                                     = TourbookPlugin.getState(ID);
    private static final IPreferenceStore  _prefStore                                 = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common                          = CommonActivator.getPrefStore();
 
    private IPartListener2                 _partListener;
    private SelectionAdapter               _columnSortListener;
    private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
    private ISelectionListener             _postSelectionListener;
    private ITourEventListener             _tourEventListener;
    private PostSelectionProvider          _postSelectionProvider;
@@ -514,8 +518,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                // map options can have be changed
                _slideoutGeoCompareOptions.restoreState();
+            }
+         }
+      };
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
 //					updateUI_GeoAccuracy();
             }
@@ -524,6 +537,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -1732,6 +1746,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       GeoCompareManager.removeGeoCompareListener(this);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

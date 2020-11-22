@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-import net.tourbook.Messages;
+import net.tourbook.common.Messages;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -73,7 +73,8 @@ public class DialogSelectMeasurementSystem extends Dialog {
    protected void configureShell(final Shell shell) {
 
       super.configureShell(shell);
-      shell.setText(Messages.App_Dialog_FirstStartupSystem_Title);
+      
+      shell.setText(Messages.Dialog_MeasurementSystem_Title);
    }
 
    @Override
@@ -108,7 +109,9 @@ public class DialogSelectMeasurementSystem extends Dialog {
             // label: measurement system
 
             final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.App_Dialog_FirstStartupSystem_Label_SelectSystem);
+            label.setText(Messages.Dialog_MeasurementSystem_Label_SelectSystem);
+//            App_Dialog_FirstStartupSystem_Label_SelectSystem=Select a measurement system, the system and the individual parts can be changed afterwards in the settings
+
             GridDataFactory.fillDefaults()
                   .hint(convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(label);

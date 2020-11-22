@@ -26,30 +26,30 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.measurement_system.System_Distance;
+import net.tourbook.common.measurement_system.System_Elevation;
+import net.tourbook.common.measurement_system.System_Height;
+import net.tourbook.common.measurement_system.System_Length;
+import net.tourbook.common.measurement_system.System_LengthSmall;
+import net.tourbook.common.measurement_system.System_Pace;
+import net.tourbook.common.measurement_system.System_Pressure_Atmosphere;
+import net.tourbook.common.measurement_system.System_Temperature;
+import net.tourbook.common.measurement_system.System_Weight;
+import net.tourbook.common.measurement_system.Unit_Distance;
+import net.tourbook.common.measurement_system.Unit_Elevation;
+import net.tourbook.common.measurement_system.Unit_Height_Body;
+import net.tourbook.common.measurement_system.Unit_Length;
+import net.tourbook.common.measurement_system.Unit_Length_Small;
+import net.tourbook.common.measurement_system.Unit_Pace;
+import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
+import net.tourbook.common.measurement_system.Unit_Temperature;
+import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.measurement_system.MeasurementSystem;
-import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.System_Distance;
-import net.tourbook.measurement_system.System_Elevation;
-import net.tourbook.measurement_system.System_Height;
-import net.tourbook.measurement_system.System_Length;
-import net.tourbook.measurement_system.System_LengthSmall;
-import net.tourbook.measurement_system.System_Pace;
-import net.tourbook.measurement_system.System_Pressure_Atmosphere;
-import net.tourbook.measurement_system.System_Temperature;
-import net.tourbook.measurement_system.System_Weight;
-import net.tourbook.measurement_system.Unit_Distance;
-import net.tourbook.measurement_system.Unit_Elevation;
-import net.tourbook.measurement_system.Unit_Height_Body;
-import net.tourbook.measurement_system.Unit_Length;
-import net.tourbook.measurement_system.Unit_Length_Small;
-import net.tourbook.measurement_system.Unit_Pace;
-import net.tourbook.measurement_system.Unit_Pressure_Atmosphere;
-import net.tourbook.measurement_system.Unit_Temperature;
-import net.tourbook.measurement_system.Unit_Weight;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -81,9 +81,27 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                         = "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
+   private static final String PREF_SYSTEM_LABEL_DISTANCE                 = net.tourbook.common.Messages.Pref_System_Label_Distance;
+   private static final String PREF_SYSTEM_LABEL_DISTANCE_INFO            = net.tourbook.common.Messages.Pref_System_Label_Distance_Info;
+   private static final String PREF_SYSTEM_LABEL_ELEVATION                = net.tourbook.common.Messages.Pref_System_Label_Elevation;
+   private static final String PREF_SYSTEM_LABEL_ELEVATION_INFO           = net.tourbook.common.Messages.Pref_System_Label_Elevation_Info;
+   private static final String PREF_SYSTEM_LABEL_HEIGHT                   = net.tourbook.common.Messages.Pref_System_Label_Height;
+   private static final String PREF_SYSTEM_LABEL_HEIGHT_INFO              = net.tourbook.common.Messages.Pref_System_Label_Height_Info;
+   private static final String PREF_SYSTEM_LABEL_LENGTH_SMALL             = net.tourbook.common.Messages.Pref_System_Label_Length_Small;
+   private static final String PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO        = net.tourbook.common.Messages.Pref_System_Label_Length_Small_Info;
+   private static final String PREF_SYSTEM_LABEL_LENGTH                   = net.tourbook.common.Messages.Pref_System_Label_Length;
+   private static final String PREF_SYSTEM_LABEL_LENGTH_INFO              = net.tourbook.common.Messages.Pref_System_Label_Length_Info;
+   private static final String PREF_SYSTEM_LABEL_PACE                     = net.tourbook.common.Messages.Pref_System_Label_Pace;
+   private static final String PREF_SYSTEM_LABEL_PACE_INFO                = net.tourbook.common.Messages.Pref_System_Label_Pace_Info;
+   private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE      = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
+   private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere_Info;
+   private static final String PREF_SYSTEM_LABEL_TEMPERATURE              = net.tourbook.common.Messages.Pref_System_Label_Temperature;
+   private static final String PREF_SYSTEM_LABEL_WEIGHT                   = net.tourbook.common.Messages.Pref_System_Label_Weight;
+   private static final String PREF_SYSTEM_LABEL_WEIGHT_INFO              = net.tourbook.common.Messages.Pref_System_Label_Weight_Info;
 
-   private static final String STATE_GENERAL_SELECTED_TAB = "STATE_GENERAL_SELECTED_TAB";                 //$NON-NLS-1$
+   public static final String  ID                                         = "net.tourbook.preferences.PrefPageGeneralId";                           //$NON-NLS-1$
+
+   private static final String STATE_GENERAL_SELECTED_TAB                 = "STATE_GENERAL_SELECTED_TAB";                                           //$NON-NLS-1$
 
    // tab folder indices
    public static final int              TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
@@ -91,7 +109,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    public static final int              TAB_FOLDER_CALENDAR_WEEK      = 2;
 
    private IPreferenceStore             _prefStore                    = TourbookPlugin.getPrefStore();
-   private IPreferenceStore             _prefStoreCommon              = CommonActivator.getPrefStore();
+   private IPreferenceStore             _prefStore_Common             = CommonActivator.getPrefStore();
    private String                       _timeZoneId_1;
    private String                       _timeZoneId_2;
 
@@ -275,7 +293,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       };
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_System_Group_MeasurementSystem);
+      group.setText(net.tourbook.common.Messages.Pref_System_Group_MeasurementSystem);
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(0, 5)
@@ -297,7 +315,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_System);
+               label.setText(net.tourbook.common.Messages.Pref_System_Label_System);
                gridData_Label.applyTo(label);
 
                // combo
@@ -319,7 +337,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Distance);
+               label.setText(PREF_SYSTEM_LABEL_DISTANCE);
                gridData_Label.applyTo(label);
 
                // combo
@@ -329,7 +347,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Distance_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_DISTANCE_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -339,7 +357,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Length);
+               label.setText(PREF_SYSTEM_LABEL_LENGTH);
                gridData_Label.applyTo(label);
 
                // combo
@@ -349,7 +367,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Length_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -359,7 +377,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Length_Small);
+               label.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL);
                gridData_Label.applyTo(label);
 
                // combo
@@ -369,7 +387,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Length_Small_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -379,7 +397,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Elevation);
+               label.setText(PREF_SYSTEM_LABEL_ELEVATION);
                gridData_Label.applyTo(label);
 
                // combo
@@ -389,7 +407,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Elevation_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_ELEVATION_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -399,7 +417,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Height);
+               label.setText(PREF_SYSTEM_LABEL_HEIGHT);
                gridData_Label.applyTo(label);
 
                // combo
@@ -409,7 +427,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Height_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_HEIGHT_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -419,7 +437,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Pace);
+               label.setText(PREF_SYSTEM_LABEL_PACE);
                gridData_Label.applyTo(label);
 
                // combo
@@ -429,7 +447,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Pace_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_PACE_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -439,7 +457,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Weight);
+               label.setText(PREF_SYSTEM_LABEL_WEIGHT);
                gridData_Label.applyTo(label);
 
                // combo
@@ -449,7 +467,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Weight_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_WEIGHT_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -459,7 +477,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Pressure_Atmosphere);
+               label.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE);
                gridData_Label.applyTo(label);
 
                // combo
@@ -469,7 +487,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label: info
                final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(Messages.Pref_System_Label_Pressure_Atmosphere_Info);
+               labelInfo.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO);
                gridData_Label.applyTo(labelInfo);
             }
             {
@@ -479,7 +497,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_Temperature);
+               label.setText(PREF_SYSTEM_LABEL_TEMPERATURE);
                gridData_Label.applyTo(label);
 
                // combo
@@ -915,7 +933,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       setPreferenceStore(_prefStore);
 
-      _isShowMeasurementSystemInUI = _prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+      _isShowMeasurementSystemInUI = _prefStore_Common.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
    }
 
    private void initUI(final Composite parent) {
@@ -941,10 +959,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       saveState();
 
       _currentFirstDayOfWeek = _backupFirstDayOfWeek =
-            _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+            _prefStore_Common.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
       _currentMinimalDaysInFirstWeek = _backupMinimalDaysInFirstWeek =
-            _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+            _prefStore_Common.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {
          @Override
@@ -967,7 +985,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       }
 
       // fire modify event to update tour statistics and tour editor
-      _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+      _prefStore_Common.setValue(ICommonPreferences.MEASUREMENT_SYSTEM, Math.random());
    }
 
    private void onSelectCalendarWeek() {
@@ -1119,16 +1137,16 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          } else if (selectedTab == TAB_FOLDER_TIME_ZONE) {
 
             // time zone
-            final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
+            final int activeZone = _prefStore_Common.getDefaultInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-            _chkTimeZone_LiveUpdate.setSelection(_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+            _chkTimeZone_LiveUpdate.setSelection(_prefStore_Common.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
 
-            _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStoreCommon.getDefaultBoolean(
+            _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStore_Common.getDefaultBoolean(
                   ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
-            _timeZoneId_1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
-            _timeZoneId_2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
-            _timeZoneId_3 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
+            _timeZoneId_1 = _prefStore_Common.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
+            _timeZoneId_2 = _prefStore_Common.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
+            _timeZoneId_3 = _prefStore_Common.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
 
             _rdoTimeZone_1.setSelection(activeZone != 2 && activeZone != 3);
             _rdoTimeZone_2.setSelection(activeZone == 2);
@@ -1141,10 +1159,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // calendar week
             _backupFirstDayOfWeek =
-                  _currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+                  _currentFirstDayOfWeek = _prefStore_Common.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
             _backupMinimalDaysInFirstWeek =
-                  _currentMinimalDaysInFirstWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+                  _currentMinimalDaysInFirstWeek = _prefStore_Common.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
             updateUI_CalendarWeek();
          }
@@ -1193,7 +1211,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // measurement system
 
-         _chkSystem_ShowMeasurementInAppToolbar.setSelection(_prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
+         _chkSystem_ShowMeasurementInAppToolbar.setSelection(_prefStore_Common.getBoolean(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
 
          _allSystemProfiles = new ArrayList<>();
 
@@ -1214,14 +1232,14 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       {
          // time zone
 
-         final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
+         final int activeZone = _prefStore_Common.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-         _chkTimeZone_LiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-         _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+         _chkTimeZone_LiveUpdate.setSelection(_prefStore_Common.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+         _chkTimeZone_UseAnotherTimeZone.setSelection(_prefStore_Common.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
-         _timeZoneId_1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
-         _timeZoneId_2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
-         _timeZoneId_3 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
+         _timeZoneId_1 = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
+         _timeZoneId_2 = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
+         _timeZoneId_3 = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
 
          _rdoTimeZone_1.setSelection(activeZone != 2 && activeZone != 3);
          _rdoTimeZone_2.setSelection(activeZone == 2);
@@ -1234,10 +1252,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          // calendar week
 
          _backupFirstDayOfWeek =
-               _currentFirstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+               _currentFirstDayOfWeek = _prefStore_Common.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
          _backupMinimalDaysInFirstWeek =
-               _currentMinimalDaysInFirstWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+               _currentMinimalDaysInFirstWeek = _prefStore_Common.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
          updateUI_CalendarWeek();
       }
@@ -1267,7 +1285,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             MeasurementSystem_Manager.saveState(_allSystemProfiles, _activeSystemProfileIndex);
 
-            _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkSystem_ShowMeasurementInAppToolbar.getSelection());
+            _prefStore_Common.setValue(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, _chkSystem_ShowMeasurementInAppToolbar.getSelection());
 
             // fire modify event
             MeasurementSystem_Manager.setActiveSystemProfileIndex(_activeSystemProfileIndex, true);
@@ -1285,13 +1303,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          TimeTools.setDefaultTimeZone(selectedTimeZoneId);
 
          // time zone
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkTimeZone_LiveUpdate.getSelection());
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId_1);
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId_2);
-         _prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, _timeZoneId_3);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkTimeZone_LiveUpdate.getSelection());
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId_1);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId_2);
+         _prefStore_Common.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, _timeZoneId_3);
       }
 
       {
@@ -1300,8 +1318,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          final int firstDayOfWeek = _comboWeek_FirstDay.getSelectionIndex() + 1;
          final int minDays = _comboWeek_MinDaysInFirstWeek.getSelectionIndex() + 1;
 
-         _prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
-         _prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
+         _prefStore_Common.setValue(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
+         _prefStore_Common.setValue(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
 
          TimeTools.setCalendarWeek(firstDayOfWeek, minDays);
       }

@@ -61,12 +61,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED, true);
 
       /*
-       * regional settings
+       * Regional settings
        */
-
-      // disabled since version 11.7
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, false);
-
       store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
       store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, UI.SYMBOL_DOT);
       store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$

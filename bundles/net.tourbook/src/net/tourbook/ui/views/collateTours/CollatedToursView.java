@@ -23,8 +23,10 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -137,17 +139,19 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
    }
 
-   private final IPreferenceStore  _prefStore  = TourbookPlugin.getPrefStore();
-   private final IDialogSettings   _state      = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
    //
    private ColumnManager           _columnManager;
-   private OpenDialogManager       _openDlgMgr = new OpenDialogManager();
+   private OpenDialogManager       _openDlgMgr       = new OpenDialogManager();
    //
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
    private IPartListener2          _partListener;
    private ITourEventListener      _tourPropertyListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    //
    private TVICollatedTour_Root    _rootItem;
    //
@@ -376,18 +380,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
                updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-//               UI.updateUnits();
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
-
-               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
-
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 //               updateDisplayFormats();
@@ -404,8 +396,28 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
+
+               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
+            }
+         }
+      };
+
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -818,7 +830,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final double dbAltitudeDown = ((TVICollatedTour) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -841,7 +853,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbMaxAltitude = ((TVICollatedTour) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -865,7 +877,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbAltitudeUp = ((TVICollatedTour) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1774,6 +1786,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

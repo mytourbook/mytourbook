@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,13 +27,12 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -52,25 +51,25 @@ public class MeasurementSystem_Manager {
 
    private static final int                    FILE_VERSION              = 1;
 
-   private static final String                 STATE_FILE                = "measurement-system.xml";     //$NON-NLS-1$
+   private static final String                 STATE_FILE                = "measurement-system.xml";      //$NON-NLS-1$
 
-   private static final String                 TAG_ROOT                  = "measurementSystem";          //$NON-NLS-1$
-   private static final String                 TAG_PROFILE               = "profile";                    //$NON-NLS-1$
+   private static final String                 TAG_ROOT                  = "measurementSystem";           //$NON-NLS-1$
+   private static final String                 TAG_PROFILE               = "profile";                     //$NON-NLS-1$
 
-   private static final String                 ATTR_NAME                 = "name";                       //$NON-NLS-1$
-   private static final String                 ATTR_IS_ACTIVE            = "isActive";                   //$NON-NLS-1$
+   private static final String                 ATTR_NAME                 = "name";                        //$NON-NLS-1$
+   private static final String                 ATTR_IS_ACTIVE            = "isActive";                    //$NON-NLS-1$
 
-   private static final String                 ATTR_DISTANCE             = "distance";                   //$NON-NLS-1$
-   private static final String                 ATTR_ELEVATION            = "elevation";                  //$NON-NLS-1$
-   private static final String                 ATTR_HEIGHT               = "height";                     //$NON-NLS-1$
-   private static final String                 ATTR_LENGTH               = "length";                     //$NON-NLS-1$
-   private static final String                 ATTR_LENGTH_SMALL         = "lengthSmall";                //$NON-NLS-1$
-   private static final String                 ATTR_PACE                 = "pace";                       //$NON-NLS-1$
-   private static final String                 ATTR_PRESSURE_ATMOSPHERE  = "pressureAtmosphere";         //$NON-NLS-1$
-   private static final String                 ATTR_TEMPERATURE          = "temperature";                //$NON-NLS-1$
-   private static final String                 ATTR_WEIGHT               = "weight";                     //$NON-NLS-1$
+   private static final String                 ATTR_DISTANCE             = "distance";                    //$NON-NLS-1$
+   private static final String                 ATTR_ELEVATION            = "elevation";                   //$NON-NLS-1$
+   private static final String                 ATTR_HEIGHT               = "height";                      //$NON-NLS-1$
+   private static final String                 ATTR_LENGTH               = "length";                      //$NON-NLS-1$
+   private static final String                 ATTR_LENGTH_SMALL         = "lengthSmall";                 //$NON-NLS-1$
+   private static final String                 ATTR_PACE                 = "pace";                        //$NON-NLS-1$
+   private static final String                 ATTR_PRESSURE_ATMOSPHERE  = "pressureAtmosphere";          //$NON-NLS-1$
+   private static final String                 ATTR_TEMPERATURE          = "temperature";                 //$NON-NLS-1$
+   private static final String                 ATTR_WEIGHT               = "weight";                      //$NON-NLS-1$
 
-   private static final String                 ATTR_VERSION              = "version";                    //$NON-NLS-1$
+   private static final String                 ATTR_VERSION              = "version";                     //$NON-NLS-1$
 
    private static ArrayList<MeasurementSystem> ALL_DEFAULT_PROFILES      = new ArrayList<>();
 
@@ -79,7 +78,7 @@ public class MeasurementSystem_Manager {
 
    private static boolean                      _isDefaultProfileSelected;
 
-   private static final IPreferenceStore       _prefStore                = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore       _prefStoreCommon          = CommonActivator.getPrefStore();
 
    /**
     * Define default measurement systems
@@ -690,12 +689,12 @@ public class MeasurementSystem_Manager {
       _activeSystemProfileIndex = activeSystemProfileIndex;
 
       // setup measurement system data which are used in the app
-      net.tourbook.ui.UI.updateUnits();
+      UI.updateUnits();
 
       if (isFireEvent) {
 
          // fire modify event
-         _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+         _prefStoreCommon.setValue(ICommonPreferences.MEASUREMENT_SYSTEM, Math.random());
       }
    }
 }

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -36,8 +38,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
-import net.tourbook.measurement_system.DialogSelectMeasurementSystem;
-import net.tourbook.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -564,9 +564,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public IStatus restoreState(final IMemento memento) {
 
-      // this is the first entry point - setup unit values otherwise views show "null"
-
-      net.tourbook.ui.UI.updateUnits();
       P2_Activator.setUpdateSites(memento);
 
       return super.restoreState(memento);

@@ -19,10 +19,11 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -116,6 +117,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private static final String    MEMENTO_TOUR_CATALOG_LINK_TOUR     = "tour.catalog.link.tour";                         //$NON-NLS-1$
 
    private final IPreferenceStore _prefStore                         = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore_Common                  = CommonActivator.getPrefStore();
    private final IDialogSettings  _state                             = TourbookPlugin.getState(ID);
 
    private TVICatalogRootItem     _rootItem;
@@ -131,6 +133,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private ISelectionListener        _postSelectionListener;
    private IPartListener2            _partListener;
    private IPropertyChangeListener   _prefChangeListener;
+   private IPropertyChangeListener   _prefChangeListener_Common;
    private ITourEventListener        _tourEventListener;
 
    /**
@@ -405,17 +408,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
-
-               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
-
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
 
                updateToolTipState();
 
@@ -437,7 +430,28 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
+
+               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
@@ -959,6 +973,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -973,9 +988,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       TVICatalogComparedTour firstTourItem = null;
 
       // count number of items
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-
-         final Object treeItem = iter.next();
+      for (Object treeItem : selection) {
 
          if (treeItem instanceof TVICatalogRefTourItem) {
             refItems++;
@@ -1114,9 +1127,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+      for (Object treeItem : selectedTours) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICatalogRefTourItem) {
 
             return ((TVICatalogRefTourItem) treeItem);
@@ -1136,9 +1148,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+      for (Object treeItem : selectedTours) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICatalogComparedTour) {
 
             return ((TVICatalogComparedTour) treeItem);
@@ -1158,9 +1169,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+      for (Object treeItem : selectedTours) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICatalogYearItem) {
 
             return ((TVICatalogYearItem) treeItem);
@@ -1177,9 +1187,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final ArrayList<Long> selectedReferenceTour = new ArrayList<>();
 
       // loop: all selected items
-      for (final Iterator<?> iter = selectedItems.iterator(); iter.hasNext();) {
-         final Object treeItem = iter.next();
-
+      for (Object treeItem : selectedItems) {
          if (treeItem instanceof TVICatalogRefTourItem) {
             selectedReferenceTour.add(((TVICatalogRefTourItem) treeItem).refId);
          }
@@ -1197,9 +1205,8 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected items
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
+      for (Object treeItem : selectedTours) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICatalogComparedTour) {
 
             final TVICatalogComparedTour tourItem = ((TVICatalogComparedTour) treeItem);

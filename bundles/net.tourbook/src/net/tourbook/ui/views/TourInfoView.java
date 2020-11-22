@@ -28,7 +28,9 @@ import java.util.TreeSet;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
@@ -83,6 +85,7 @@ public class TourInfoView extends ViewPart {
    private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common          = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
 
    private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
@@ -90,6 +93,7 @@ public class TourInfoView extends ViewPart {
    private PostSelectionProvider         _postSelectionProvider;
    private ISelectionListener            _postSelectionListener;
    private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
    private ITourEventListener            _tourEventListener;
 
    private boolean                       _isUIRestored;
@@ -273,11 +277,7 @@ public class TourInfoView extends ViewPart {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-            } else if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
 
                // update font
 
@@ -293,7 +293,22 @@ public class TourInfoView extends ViewPart {
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -631,6 +646,7 @@ public class TourInfoView extends ViewPart {
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

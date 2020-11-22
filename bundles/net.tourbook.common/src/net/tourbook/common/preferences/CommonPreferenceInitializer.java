@@ -60,11 +60,14 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 
 // SET_FORMATTING_OFF
 
+      // measurement system is hidden by default since version 11.7
+      store.setDefault(ICommonPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,        false);
+
       /*
        * Display formats
        */
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE,   true);
-      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SELECTED_TAB,     0);
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE,        true);
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SELECTED_TAB,          0);
 
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE,              ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE,               ValueFormat.NUMBER_1_0.name());

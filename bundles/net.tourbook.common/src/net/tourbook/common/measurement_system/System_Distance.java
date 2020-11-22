@@ -13,24 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Pressure_Atmosphere {
+public class System_Distance {
 
-   private String                   _label;
-   private Unit_Pressure_Atmosphere _pressure;
+   private String        _label;
+   private Unit_Distance _distance;
 
-   public System_Pressure_Atmosphere(final Unit_Pressure_Atmosphere pressure, final String label) {
+   public System_Distance(final Unit_Distance distance, final String label) {
 
-      _pressure = pressure;
+      _distance = distance;
       _label = label;
+   }
+
+   public Unit_Distance getDistance() {
+      return _distance;
    }
 
    public String getLabel() {
       return _label;
-   }
-
-   public Unit_Pressure_Atmosphere getPressure() {
-      return _pressure;
    }
 }

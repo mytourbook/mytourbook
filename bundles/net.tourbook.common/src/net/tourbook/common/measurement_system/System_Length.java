@@ -13,17 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public enum Unit_Pressure_Atmosphere {
+public class System_Length {
 
-   /**
-    * Metric measurement system - mbar
-    */
-   MILLIBAR,
+   private String      _label;
+   private Unit_Length _length;
 
-   /**
-    * Imperial measurement system - inHg
-    */
-   INCH_OF_MERCURY,
+   public System_Length(final Unit_Length length, final String label) {
+
+      _length = length;
+      _label = label;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
+
+   public Unit_Length getLength() {
+      return _length;
+   }
 }

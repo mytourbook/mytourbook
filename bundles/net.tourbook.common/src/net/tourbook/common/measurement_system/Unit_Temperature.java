@@ -13,17 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public enum Unit_Length_Small {
-
-   /**
-    * Millimeter (mm)
-    */
-   MILLIMETER,
+public enum Unit_Temperature {
 
    /**
-    * Inch (inch)
+    * Metric measurement system: °C
     */
-   INCH
+   CELCIUS,
+
+   /**
+    * Imperial measurement system: °F
+    */
+   FAHRENHEIT
 }

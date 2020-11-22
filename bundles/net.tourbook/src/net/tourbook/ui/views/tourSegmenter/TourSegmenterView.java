@@ -32,7 +32,9 @@ import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -123,10 +125,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    public static final String ID = "net.tourbook.views.TourSegmenter"; //$NON-NLS-1$
 
    //
-   private static final float  UNIT_MILE                                          = net.tourbook.ui.UI.UNIT_MILE;
-   private static final float  UNIT_MILE_2_NAUTICAL_MILE                          = net.tourbook.ui.UI.UNIT_MILE_2_NAUTICAL_MILE;
-   private static final float  UNIT_NAUTICAL_MILE                                 = net.tourbook.ui.UI.UNIT_NAUTICAL_MILE;
-   private static final float  UNIT_YARD                                          = net.tourbook.ui.UI.UNIT_YARD;
+   private static final float  UNIT_MILE                                          = UI.UNIT_MILE;
+   private static final float  UNIT_MILE_2_NAUTICAL_MILE                          = UI.UNIT_MILE_2_NAUTICAL_MILE;
+   private static final float  UNIT_NAUTICAL_MILE                                 = UI.UNIT_NAUTICAL_MILE;
+   private static final float  UNIT_YARD                                          = UI.UNIT_YARD;
    //
    private static final String DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
    private static final String DISTANCE_MILES_1_4                                 = "1/4";                                        //$NON-NLS-1$
@@ -238,6 +240,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final float                    SPEED_DIGIT_VALUE = 10.0f;
    //
    private static final IPreferenceStore         _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore         _prefStore_Common = CommonActivator.getPrefStore();
    private static final IDialogSettings          _state            = TourbookPlugin.getState(ID);
    //
    /**
@@ -351,6 +354,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private PostSelectionProvider        _postSelectionProvider;
    private ISelectionListener           _postSelectionListener;
    private IPropertyChangeListener      _prefChangeListener;
+   private IPropertyChangeListener      _prefChangeListener_Common;
    private ITourEventListener           _tourEventListener;
    //
    private final NumberFormat           _nf_0_0                   = NumberFormat.getNumberInstance();
@@ -813,11 +817,41 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+
+               // marker is hidden/visible
+
+               final TourSegmenter selectedSegmenter = getSelectedSegmenter();
+               if (SegmenterType.ByAltitudeWithMarker.equals(selectedSegmenter.segmenterType)) {
+
+                  // this could be optimized to check if marker visibility has changed or not
+
+                  onSelect_SegmenterType(false);
+               }
+
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+               _segmentViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+               _segmentViewer.refresh();
+
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _segmentViewer.getTable().redraw();
+            }
+         }
+      };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                // measurement system has changed
-
-               net.tourbook.ui.UI.updateUnits();
 
                /*
                 * update viewer
@@ -848,34 +882,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                // different unit labels have different widths
                _pageSegmenter.layout(true, true);
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
-
-               // marker is hidden/visible
-
-               final TourSegmenter selectedSegmenter = getSelectedSegmenter();
-               if (SegmenterType.ByAltitudeWithMarker.equals(selectedSegmenter.segmenterType)) {
-
-                  // this could be optimized to check if marker visibility has changed or not
-
-                  onSelect_SegmenterType(false);
-               }
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _segmentViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _segmentViewer.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _segmentViewer.getTable().redraw();
             }
          }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -3918,6 +3930,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       wbPage.removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
+
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _colorCache.dispose();

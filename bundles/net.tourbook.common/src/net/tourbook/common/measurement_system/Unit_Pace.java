@@ -13,24 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Height {
+public enum Unit_Pace {
 
-   private String           _label;
-   private Unit_Height_Body _height;
+   /**
+    * min/mi
+    */
+   MINUTES_PER_MILE,
 
-   public System_Height(final Unit_Height_Body height, final String label) {
-
-      _height = height;
-      _label = label;
-   }
-
-   public Unit_Height_Body getHeight() {
-      return _height;
-   }
-
-   public String getLabel() {
-      return _label;
-   }
+   /**
+    * min/km
+    */
+   MINUTES_PER_KILOMETER
 }

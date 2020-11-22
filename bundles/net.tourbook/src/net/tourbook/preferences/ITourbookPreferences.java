@@ -366,12 +366,6 @@ public interface ITourbookPreferences {
    public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
 
    /*
-    * Measurement system
-    */
-   public static final String MEASUREMENT_SYSTEM            = "MEASUREMENT_SYSTEM";            //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_SHOW_IN_UI = "MEASUREMENT_SYSTEM_SHOW_IN_UI"; //$NON-NLS-1$
-
-   /*
     * map settings
     */
    public static final String MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING = "map.view.confirmation.show-dim-warning"; //$NON-NLS-1$

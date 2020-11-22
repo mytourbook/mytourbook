@@ -13,24 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public class System_Pace {
+public enum Unit_Weight {
 
-   private String    _label;
-   private Unit_Pace _pace;
+   /**
+    * Metric measurement system: kg
+    */
+   KILOGRAM,
 
-   public System_Pace(final Unit_Pace pace, final String label) {
-
-      _pace = pace;
-      _label = label;
-   }
-
-   public String getLabel() {
-      return _label;
-   }
-
-   public Unit_Pace getPace() {
-      return _pace;
-   }
+   /**
+    * Imperial measurement system: lb
+    */
+   POUND
 }

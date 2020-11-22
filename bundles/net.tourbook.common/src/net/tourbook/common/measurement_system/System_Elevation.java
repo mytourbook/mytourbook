@@ -13,17 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.measurement_system;
+package net.tourbook.common.measurement_system;
 
-public enum Unit_Elevation {
+public class System_Elevation {
 
-   /**
-    * Metric measurement system: meter
-    */
-   METER,
+   private String         _label;
+   private Unit_Elevation _elevation;
 
-   /**
-    * Imperial measurement system: foot
-    */
-   FOOT
+   public System_Elevation(final Unit_Elevation elevation, final String label) {
+
+      _elevation = elevation;
+      _label = label;
+   }
+
+   public Unit_Elevation getElevation() {
+      return _elevation;
+   }
+
+   public String getLabel() {
+      return _label;
+   }
 }
