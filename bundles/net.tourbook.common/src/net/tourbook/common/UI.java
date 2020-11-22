@@ -260,12 +260,6 @@ public class UI {
    public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
 
    /**
-    * Is <code>true</code> when the measurement system for daytime is 24-hours, otherwise it is
-    * 12-hour (am/pm)
-    */
-   public static boolean       UNIT_IS_DAY_TIME_24_HOURS;
-
-   /**
     * Distance could be km (metric), mile or nautical mile
     */
    public static boolean       UNIT_IS_DISTANCE_KILOMETER;

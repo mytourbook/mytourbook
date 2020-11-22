@@ -38,7 +38,6 @@ public class DialogSelectMeasurementSystem extends Dialog {
     * UI controls
     */
    private Combo _comboSystem_Profile;
-   private Combo _comboSystemOptiop_DayTime;
    private Combo _comboSystemOptiop_Distance;
    private Combo _comboSystemOptiop_Elevation;
    private Combo _comboSystemOptiop_Height_Body;
@@ -326,28 +325,11 @@ public class DialogSelectMeasurementSystem extends Dialog {
 
             new Label(container, SWT.NONE);
          }
-         {
-            /*
-             * Daytime
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_System_Label_DayTime);
-            gridData_Label.applyTo(label);
-
-            // combo
-            _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
-            gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
-
-            new Label(container, SWT.NONE);
-         }
       }
    }
 
    private void enableControls() {
 
-      _comboSystemOptiop_DayTime.setEnabled(false);
       _comboSystemOptiop_Distance.setEnabled(false);
       _comboSystemOptiop_Elevation.setEnabled(false);
       _comboSystemOptiop_Height_Body.setEnabled(false);
@@ -363,10 +345,6 @@ public class DialogSelectMeasurementSystem extends Dialog {
 
       for (final MeasurementSystem systemProfile : MeasurementSystem_Manager.getCurrentProfiles()) {
          _comboSystem_Profile.add(systemProfile.getName());
-      }
-
-      for (final System_DayTime system : MeasurementSystem_Manager.getAllSystem_DayTime()) {
-         _comboSystemOptiop_DayTime.add(system.getLabel());
       }
 
       for (final System_Distance systemDistance : MeasurementSystem_Manager.getAllSystem_Distances()) {
@@ -418,7 +396,6 @@ public class DialogSelectMeasurementSystem extends Dialog {
 
 // SET_FORMATTING_OFF
 
-      _comboSystemOptiop_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
       _comboSystemOptiop_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
       _comboSystemOptiop_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
       _comboSystemOptiop_Height_Body         .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));

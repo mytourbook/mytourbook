@@ -60,7 +60,6 @@ public class MeasurementSystem_Manager {
    private static final String                 ATTR_NAME                 = "name";                       //$NON-NLS-1$
    private static final String                 ATTR_IS_ACTIVE            = "isActive";                   //$NON-NLS-1$
 
-   private static final String                 ATTR_DAY_TIME             = "dayTime";                    //$NON-NLS-1$
    private static final String                 ATTR_DISTANCE             = "distance";                   //$NON-NLS-1$
    private static final String                 ATTR_ELEVATION            = "elevation";                  //$NON-NLS-1$
    private static final String                 ATTR_HEIGHT               = "height";                     //$NON-NLS-1$
@@ -89,7 +88,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Metric,
 
-            Unit_DayTime._24_HOURS,
             Unit_Distance.KILOMETER,
             Unit_Length.METER,
             Unit_Length_Small.MILLIMETER,
@@ -102,7 +100,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Imperial,
 
-            Unit_DayTime.AM_PM,
             Unit_Distance.MILE,
             Unit_Length.YARD,
             Unit_Length_Small.INCH,
@@ -115,7 +112,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Nautic,
 
-            Unit_DayTime._24_HOURS,
             Unit_Distance.NAUTIC_MILE,
             Unit_Length.METER,
             Unit_Length_Small.MILLIMETER,
@@ -128,7 +124,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other1,
 
-            Unit_DayTime._24_HOURS,
             Unit_Distance.KILOMETER,
             Unit_Length.METER,
             Unit_Length_Small.MILLIMETER,
@@ -141,7 +136,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other2,
 
-            Unit_DayTime._24_HOURS,
             Unit_Distance.KILOMETER,
             Unit_Length.METER,
             Unit_Length_Small.MILLIMETER,
@@ -154,7 +148,6 @@ public class MeasurementSystem_Manager {
 
       ALL_DEFAULT_PROFILES.add(new MeasurementSystem(Messages.Measurement_System_Profile_Other3,
 
-            Unit_DayTime._24_HOURS,
             Unit_Distance.KILOMETER,
             Unit_Length.METER,
             Unit_Length_Small.MILLIMETER,
@@ -170,12 +163,6 @@ public class MeasurementSystem_Manager {
    }
 
 // SET_FORMATTING_OFF
-
-   private static final System_DayTime                         _allSystem_DayTime[] = {
-
-         new System_DayTime(Unit_DayTime._24_HOURS,            Messages.Pref_System_Option_DayTime_24_Hours),
-         new System_DayTime(Unit_DayTime.AM_PM,                Messages.Pref_System_Option_DayTime_AM_PM),
-   };
 
    private static final System_Distance                        _allSystem_Distances[] = {
 
@@ -250,10 +237,6 @@ public class MeasurementSystem_Manager {
       return _activeSystemProfileIndex;
    }
 
-   public static System_DayTime getActiveSystemOption_DayTime() {
-      return _allSystem_DayTime[getSystemIndex_DayTime(getActiveMeasurementSystem())];
-   }
-
    public static System_Distance getActiveSystemOption_Distance() {
       return _allSystem_Distances[getSystemIndex_Distance(getActiveMeasurementSystem())];
    }
@@ -288,10 +271,6 @@ public class MeasurementSystem_Manager {
 
    public static System_Weight getActiveSystemOption_Weight() {
       return _allSystem_Weights[getSystemIndex_Weight(getActiveMeasurementSystem())];
-   }
-
-   public static System_DayTime[] getAllSystem_DayTime() {
-      return _allSystem_DayTime;
    }
 
    public static System_Distance[] getAllSystem_Distances() {
@@ -339,21 +318,6 @@ public class MeasurementSystem_Manager {
     */
    public static ArrayList<MeasurementSystem> getDefaultProfiles() {
       return ALL_DEFAULT_PROFILES;
-   }
-
-   public static int getSystemIndex_DayTime(final MeasurementSystem selectedSystemProfile) {
-
-      final Unit_DayTime profileUnit = selectedSystemProfile.getDayTime();
-
-      for (int systemIndex = 0; systemIndex < _allSystem_DayTime.length; systemIndex++) {
-
-         if (profileUnit.equals(_allSystem_DayTime[systemIndex].getDayTime())) {
-            return systemIndex;
-         }
-      }
-
-      // return default
-      return 0;
    }
 
    public static int getSystemIndex_Distance(final MeasurementSystem selectedSystemProfile) {
@@ -571,7 +535,6 @@ public class MeasurementSystem_Manager {
 
 // SET_FORMATTING_OFF
 
-         final Unit_DayTime               dayTime              = (Unit_DayTime)              Util.getXmlEnum(xmlProfile, ATTR_DAY_TIME,               Unit_DayTime._24_HOURS);
          final Unit_Distance              distance             = (Unit_Distance)             Util.getXmlEnum(xmlProfile, ATTR_DISTANCE,               Unit_Distance.KILOMETER);
          final Unit_Elevation             elevation            = (Unit_Elevation)            Util.getXmlEnum(xmlProfile, ATTR_ELEVATION,              Unit_Elevation.METER);
          final Unit_Height_Body           height               = (Unit_Height_Body)          Util.getXmlEnum(xmlProfile, ATTR_HEIGHT,                 Unit_Height_Body.METER);
@@ -585,7 +548,6 @@ public class MeasurementSystem_Manager {
 // SET_FORMATTING_ON
 
          final MeasurementSystem systemProfile = new MeasurementSystem(profileName,
-               dayTime,
                distance,
                length,
                length_Small,
@@ -692,7 +654,6 @@ public class MeasurementSystem_Manager {
             xmlProfile.putBoolean(ATTR_IS_ACTIVE, true);
          }
 
-         Util.setXmlEnum(xmlProfile, ATTR_DAY_TIME, system.getDayTime());
          Util.setXmlEnum(xmlProfile, ATTR_DISTANCE, system.getDistance());
          Util.setXmlEnum(xmlProfile, ATTR_ELEVATION, system.getElevation());
          Util.setXmlEnum(xmlProfile, ATTR_HEIGHT, system.getHeight());

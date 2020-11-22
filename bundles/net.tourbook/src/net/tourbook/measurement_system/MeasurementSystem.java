@@ -26,7 +26,6 @@ public class MeasurementSystem implements Cloneable {
 
    private String                   _name;
 
-   private Unit_DayTime             _dayTime;
    private Unit_Distance            _distance;
    private Unit_Elevation           _elevation;
    private Unit_Height_Body         _height;
@@ -40,7 +39,6 @@ public class MeasurementSystem implements Cloneable {
    private boolean                  _savedState_IsProfileActive;
 
    public MeasurementSystem(final String name,
-                            final Unit_DayTime dayTime,
                             final Unit_Distance distance,
                             final Unit_Length length,
                             final Unit_Length_Small smallLength,
@@ -53,7 +51,6 @@ public class MeasurementSystem implements Cloneable {
 
       _name = name;
 
-      _dayTime = dayTime;
       _distance = distance;
       _length = length;
       _length_Small = smallLength;
@@ -79,10 +76,6 @@ public class MeasurementSystem implements Cloneable {
       }
 
       return clonedProfile;
-   }
-
-   public Unit_DayTime getDayTime() {
-      return _dayTime;
    }
 
    /**
@@ -143,7 +136,6 @@ public class MeasurementSystem implements Cloneable {
    public int getSystemDataHash() {
 
       return Objects.hash(
-            _dayTime,
             _distance,
             _length,
             _length_Small,
@@ -166,18 +158,6 @@ public class MeasurementSystem implements Cloneable {
     */
    public Unit_Weight getWeight() {
       return _weight_Body;
-   }
-
-   /**
-    * @param atmosphericPressure
-    *           the _atmosphericPressure to set
-    */
-   public void setPressure_Atmospheric(final Unit_Pressure_Atmosphere atmosphericPressure) {
-      _pressure_Atmosphere = atmosphericPressure;
-   }
-
-   public void setDayTime(final Unit_DayTime dayTime) {
-      _dayTime = dayTime;
    }
 
    /**
@@ -204,6 +184,10 @@ public class MeasurementSystem implements Cloneable {
       _length = length;
    }
 
+   public void setLength_Small(final Unit_Length_Small smallLength) {
+      _length_Small = smallLength;
+   }
+
    /**
     * @param name
     *           the name to set
@@ -216,12 +200,16 @@ public class MeasurementSystem implements Cloneable {
       _pace = pace;
    }
 
-   public void setSavedState_IsProfileActive(final boolean isProfileActive) {
-      _savedState_IsProfileActive = isProfileActive;
+   /**
+    * @param atmosphericPressure
+    *           the _atmosphericPressure to set
+    */
+   public void setPressure_Atmospheric(final Unit_Pressure_Atmosphere atmosphericPressure) {
+      _pressure_Atmosphere = atmosphericPressure;
    }
 
-   public void setLength_Small(final Unit_Length_Small smallLength) {
-      _length_Small = smallLength;
+   public void setSavedState_IsProfileActive(final boolean isProfileActive) {
+      _savedState_IsProfileActive = isProfileActive;
    }
 
    /**
@@ -248,7 +236,6 @@ public class MeasurementSystem implements Cloneable {
             + "[\n" //$NON-NLS-1$
 
             + "_name=" + _name + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "_dayTime=" + _dayTime + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_distance=" + _distance + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_elevation=" + _elevation + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_height=" + _height + "\n" //$NON-NLS-1$ //$NON-NLS-2$

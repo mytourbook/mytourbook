@@ -760,7 +760,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
-            final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
             return colDef_NatTable.printValue_0(value);
          }
@@ -775,7 +775,7 @@ public class TourBook_ColumnFactory {
             if (element instanceof TVITourBookTour) {
 
                final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
-               final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
                colDef_Tree.printValue_0(cell, value);
 
@@ -838,8 +838,8 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final float value = ((TVITourBookItem) element).colAltitude_AvgChange
-                  / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_ELEVATION
+                  * UI.UNIT_VALUE_DISTANCE;
 
             return colDef_NatTable.printValue_0(value);
          }
@@ -853,8 +853,8 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / UI.UNIT_VALUE_ELEVATION
+                  * UI.UNIT_VALUE_DISTANCE;
 
             colDef_Tree.printValue_0(cell, dbAvgAltitudeChange);
 
@@ -875,7 +875,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             return colDef_NatTable.printValue_0(value);
          }
@@ -889,7 +889,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
 
             final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             colDef_Tree.printValue_0(cell, value);
 
@@ -910,7 +910,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             return colDef_NatTable.printValue_0(value);
          }
@@ -924,7 +924,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
 
             final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             colDef_Tree.printValue_0(cell, value);
 
@@ -946,7 +946,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             return colDef_NatTable.printValue_0(value);
          }
@@ -961,7 +961,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
 
             final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             colDef_Tree.printValue_0(cell, value);
 
@@ -981,7 +981,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                return UI.EMPTY_STRING;
@@ -997,7 +997,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double pace = ((TVITourBookItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1021,7 +1021,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -1033,7 +1033,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVITourBookItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -1056,7 +1056,7 @@ public class TourBook_ColumnFactory {
 
             final double value = ((TVITourBookItem) element).colTourDistance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -1071,7 +1071,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colTourDistance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -1091,7 +1091,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = ((TVITourBookItem) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVITourBookItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -1103,7 +1103,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVITourBookItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -1814,7 +1814,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -1831,7 +1831,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -1856,7 +1856,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -1873,7 +1873,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -1898,7 +1898,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -1915,7 +1915,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -1940,7 +1940,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -1957,7 +1957,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -1982,7 +1982,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -1999,7 +1999,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -2024,7 +2024,7 @@ public class TourBook_ColumnFactory {
          public String getValueText(final Object element) {
 
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                return colDef_NatTable.printValue_0(value);
@@ -2041,7 +2041,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+                  * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
             if (UI.UNIT_IS_DISTANCE_KILOMETER) {
                colDef_Tree.printValue_0(cell, value);
@@ -3671,7 +3671,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                return UI.EMPTY_STRING;
@@ -3688,7 +3688,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                cell.setText(UI.EMPTY_STRING);

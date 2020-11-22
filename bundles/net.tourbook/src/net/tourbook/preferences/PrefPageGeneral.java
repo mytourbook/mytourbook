@@ -32,7 +32,6 @@ import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.System_DayTime;
 import net.tourbook.measurement_system.System_Distance;
 import net.tourbook.measurement_system.System_Elevation;
 import net.tourbook.measurement_system.System_Height;
@@ -42,7 +41,6 @@ import net.tourbook.measurement_system.System_Pace;
 import net.tourbook.measurement_system.System_Pressure_Atmosphere;
 import net.tourbook.measurement_system.System_Temperature;
 import net.tourbook.measurement_system.System_Weight;
-import net.tourbook.measurement_system.Unit_DayTime;
 import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
 import net.tourbook.measurement_system.Unit_Height_Body;
@@ -141,7 +139,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private Button _chkSystem_ShowMeasurementInAppToolbar;
 
    private Combo  _comboSystem_Profile;
-   private Combo  _comboSystemOptiop_DayTime;
    private Combo  _comboSystemOptiop_Distance;
    private Combo  _comboSystemOptiop_Elevation;
    private Combo  _comboSystemOptiop_Height_Body;
@@ -492,23 +489,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                new Label(container, SWT.NONE);
             }
-            {
-               /*
-                * Daytime
-                */
-
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(Messages.Pref_System_Label_DayTime);
-               gridData_Label.applyTo(label);
-
-               // combo
-               _comboSystemOptiop_DayTime = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_DayTime.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_DayTime);
-
-               new Label(container, SWT.NONE);
-            }
          }
       }
    }
@@ -853,11 +833,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _comboSystem_Profile.add(system.getName());
          }
 
-         _comboSystemOptiop_DayTime.removeAll();
-         for (final System_DayTime system : MeasurementSystem_Manager.getAllSystem_DayTime()) {
-            _comboSystemOptiop_DayTime.add(system.getLabel());
-         }
-
          _comboSystemOptiop_Distance.removeAll();
          for (final System_Distance system : MeasurementSystem_Manager.getAllSystem_Distances()) {
             _comboSystemOptiop_Distance.add(system.getLabel());
@@ -1011,7 +986,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_activeSystemProfileIndex);
 
 // SET_FORMATTING_OFF
-      final System_DayTime[]              allDayTime              = MeasurementSystem_Manager.getAllSystem_DayTime();
       final System_Distance[]             allDistances            = MeasurementSystem_Manager.getAllSystem_Distances();
       final System_Elevation[]            allElevations           = MeasurementSystem_Manager.getAllSystem_Elevations();
       final System_Height[]               allHeights              = MeasurementSystem_Manager.getAllSystem_Heights();
@@ -1022,7 +996,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final System_Temperature[]          allTemperatures         = MeasurementSystem_Manager.getAllSystem_Temperatures();
       final System_Weight[]               allWeights              = MeasurementSystem_Manager.getAllSystem_Weights();
 
-      final Unit_DayTime                  dayTime     = allDayTime               [_comboSystemOptiop_DayTime.getSelectionIndex()].getDayTime();
       final Unit_Distance                 distance    = allDistances             [_comboSystemOptiop_Distance.getSelectionIndex()].getDistance();
       final Unit_Elevation                elevation   = allElevations            [_comboSystemOptiop_Elevation.getSelectionIndex()].getElevation();
       final Unit_Height_Body              height      = allHeights               [_comboSystemOptiop_Height_Body.getSelectionIndex()].getHeight();
@@ -1034,7 +1007,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final Unit_Weight                   weight      = allWeights               [_comboSystemOptiop_Weight.getSelectionIndex()].getWeight();
 // SET_FORMATTING_ON
 
-      selectedSystemProfile.setDayTime(dayTime);
       selectedSystemProfile.setDistance(distance);
       selectedSystemProfile.setElevation(elevation);
       selectedSystemProfile.setHeight(height);
@@ -1094,7 +1066,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final MeasurementSystem selectedSystemProfile = _allSystemProfiles.get(_activeSystemProfileIndex);
 
 // SET_FORMATTING_OFF
-      _comboSystemOptiop_DayTime             .select(MeasurementSystem_Manager.getSystemIndex_DayTime(selectedSystemProfile));
       _comboSystemOptiop_Distance            .select(MeasurementSystem_Manager.getSystemIndex_Distance(selectedSystemProfile));
       _comboSystemOptiop_Elevation           .select(MeasurementSystem_Manager.getSystemIndex_Elevation(selectedSystemProfile));
       _comboSystemOptiop_Height_Body         .select(MeasurementSystem_Manager.getSystemIndex_Height(selectedSystemProfile));

@@ -40,7 +40,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.measurement_system.MeasurementSystem;
 import net.tourbook.measurement_system.MeasurementSystem_Manager;
-import net.tourbook.measurement_system.Unit_DayTime;
 import net.tourbook.measurement_system.Unit_Distance;
 import net.tourbook.measurement_system.Unit_Elevation;
 import net.tourbook.measurement_system.Unit_Length;
@@ -1376,23 +1375,6 @@ public class UI {
          net.tourbook.common.UI.UNIT_IS_PRESSURE_MILLIBAR         = true;
          net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG    = net.tourbook.common.UI.UNIT_PRESSURE_MB;
       }
-
-      /*
-       * Daytime
-       */
-      if (activeSystem.getDayTime() == Unit_DayTime.AM_PM) {
-
-         // set imperial measure system
-
-         net.tourbook.common.UI.UNIT_IS_DAY_TIME_24_HOURS         = false;
-
-      } else {
-
-         // default is the metric measure system
-
-         net.tourbook.common.UI.UNIT_IS_DAY_TIME_24_HOURS         = true;
-      }
-
 
       /*
        * Distance
