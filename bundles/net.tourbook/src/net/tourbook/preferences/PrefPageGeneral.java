@@ -96,6 +96,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE      = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
    private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere_Info;
    private static final String PREF_SYSTEM_LABEL_TEMPERATURE              = net.tourbook.common.Messages.Pref_System_Label_Temperature;
+   private static final String PREF_SYSTEM_LABEL_USING_INFO               = net.tourbook.common.Messages.Pref_System_Label_UsingInfo;
+   private static final String PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP       = net.tourbook.common.Messages.Pref_System_Label_UsingInfo_Tooltip;
    private static final String PREF_SYSTEM_LABEL_WEIGHT                   = net.tourbook.common.Messages.Pref_System_Label_Weight;
    private static final String PREF_SYSTEM_LABEL_WEIGHT_INFO              = net.tourbook.common.Messages.Pref_System_Label_Weight_Info;
 
@@ -306,7 +308,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
          {
             // vertical spacer
-            UI.createtSpacer_Vertical(container, 2, 3);
+            UI.createSpacer_Vertical(container, 2, 3);
 
             {
                /*
@@ -326,10 +328,23 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
                new Label(container, SWT.NONE);
             }
+            {
+               /*
+                * Info
+                */
 
-            // vertical spacer
-            UI.createtSpacer_Vertical(container, 5, 3);
+               // vertical spacer
+               UI.createSpacer_Vertical(container, 5, 3);
 
+               new Label(container, SWT.NONE);
+               new Label(container, SWT.NONE);
+
+               // label
+               final Label labelInfo = new Label(container, SWT.NONE);
+               labelInfo.setText(PREF_SYSTEM_LABEL_USING_INFO);
+               labelInfo.setToolTipText(PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP);
+               gridData_Label.applyTo(labelInfo);
+            }
             {
                /*
                 * Distance

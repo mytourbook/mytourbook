@@ -1106,14 +1106,14 @@ public class UI {
       return image;
    }
 
-   public static void createtSpacer_Horizontal(final Composite parent, final int columns) {
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
 
       final Label label = new Label(parent, SWT.NONE);
 
       GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
    }
 
-   public static void createtSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
 
       final Label label = new Label(parent, SWT.NONE);
 

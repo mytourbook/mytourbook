@@ -16,6 +16,7 @@
 package net.tourbook.common.measurement_system;
 
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -31,7 +32,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogSelectMeasurementSystem extends Dialog {
-
    private int _selectedSystemProfileIndex;
 
    /*
@@ -73,7 +73,7 @@ public class DialogSelectMeasurementSystem extends Dialog {
    protected void configureShell(final Shell shell) {
 
       super.configureShell(shell);
-      
+
       shell.setText(Messages.Dialog_MeasurementSystem_Title);
    }
 
@@ -159,6 +159,23 @@ public class DialogSelectMeasurementSystem extends Dialog {
 
             // spacer
             new Label(container, SWT.NONE);
+         }
+         {
+            /*
+             * Info
+             */
+
+            // vertical spacer
+            UI.createSpacer_Vertical(container, 5, 3);
+
+            new Label(container, SWT.NONE);
+            new Label(container, SWT.NONE);
+
+            // label
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(Messages.Pref_System_Label_UsingInfo);
+            labelInfo.setToolTipText(Messages.Pref_System_Label_UsingInfo_Tooltip);
+            gridData_Label.applyTo(labelInfo);
          }
          {
             /*

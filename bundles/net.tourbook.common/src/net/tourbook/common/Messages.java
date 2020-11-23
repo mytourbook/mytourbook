@@ -263,6 +263,8 @@ public class Messages extends NLS {
    public static String        Pref_System_Label_Pressure_Atmosphere_Info;
    public static String        Pref_System_Label_System;
    public static String        Pref_System_Label_Temperature;
+   public static String        Pref_System_Label_UsingInfo;
+   public static String        Pref_System_Label_UsingInfo_Tooltip;
    public static String        Pref_System_Label_Weight;
    public static String        Pref_System_Label_Weight_Info;
    public static String        Pref_System_Option_BodyWeight_Kilogram;
