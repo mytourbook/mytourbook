@@ -231,7 +231,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int dbValue_Duration             = result.getInt(8);
 
             final long dbValue_Distance            = (long) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
 
             final int dbValue_NumTours             = result.getInt(11);
 
@@ -474,70 +474,67 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead1() : UI.EMPTY_STRING)
 
-            + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
 
-            + HEAD1_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead1()
 
-            + HEAD1_DEVICE_TIME_ELAPSED
-            + HEAD1_DEVICE_TIME_RECORDED
-            + HEAD1_DEVICE_TIME_PAUSED
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead1()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead1()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead1()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead1()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
-            + HEAD1_COMPUTED_TIME_MOVING
-            + HEAD1_COMPUTED_TIME_BREAK
+            + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
-            + HEAD1_ELEVATION
-            + HEAD1_DISTANCE
-
-            + HEAD1_NUMBER_OF_TOURS
+            + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead1()
 
       ;
 
       final String headerLine2 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead2() : UI.EMPTY_STRING)
 
-            + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
 
-            + HEAD2_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead2()
 
-            + HEAD2_DEVICE_TIME_ELAPSED
-            + HEAD2_DEVICE_TIME_RECORDED
-            + HEAD2_DEVICE_TIME_PAUSED
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead2()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead2()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead2()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead2()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead2()
 
-            + HEAD2_COMPUTED_TIME_MOVING
-            + HEAD2_COMPUTED_TIME_BREAK
+            + STAT_VALUE_MOTION_DISTANCE.getHead2()
+            + STAT_VALUE_ELEVATION_UP.getHead2()
 
-            + HEAD2_ELEVATION
-            + HEAD2_DISTANCE
-
-            + HEAD2_NUMBER_OF_TOURS
+            + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getHead2()
 
       ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getValueFormatting() : VALUE_FORMAT_S)
 
-            + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
 
-            + VALUE_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getValueFormatting()
 
-            + VALUE_DEVICE_TIME_ELAPSED
-            + VALUE_DEVICE_TIME_RECORDED
-            + VALUE_DEVICE_TIME_PAUSED
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getValueFormatting()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getValueFormatting()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getValueFormatting()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getValueFormatting()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getValueFormatting()
 
-            + VALUE_COMPUTED_TIME_MOVING
-            + VALUE_COMPUTED_TIME_BREAK
+            + STAT_VALUE_MOTION_DISTANCE.getValueFormatting()
+            + STAT_VALUE_ELEVATION_UP.getValueFormatting()
 
-            + VALUE_ELEVATION
-            + VALUE_DISTANCE
-
-            + VALUE_NUMBER_OF_TOURS
+            + STAT_VALUE_TOUR_NUMBER_OF_TOURS.getValueFormatting()
 
       ;
 
@@ -614,8 +611,8 @@ public class DataProvider_Tour_Month extends DataProvider {
                      _tourMonthData.movingTime[tourTypeIndex][monthIndex],
                      _tourMonthData.breakTime[tourTypeIndex][monthIndex],
 
+                     _tourMonthData.distance_High[tourTypeIndex][monthIndex] / 1000f,
                      _tourMonthData.elevationUp_High[tourTypeIndex][monthIndex],
-                     _tourMonthData.distance_High[tourTypeIndex][monthIndex],
 
                      _tourMonthData.numTours_High[tourTypeIndex][monthIndex]
 

@@ -26,7 +26,9 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -124,14 +126,16 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String     HREF_MARKER_ITEM = "#MarkerItem";                //$NON-NLS-1$
+   private static final String     HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore       = TourbookPlugin.getPrefStore();
-   private final IDialogSettings   _state           = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
 
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
    private IPartListener2          _partListener;
 
@@ -207,17 +211,28 @@ public class TourBlogView extends ViewPart {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
                updateUI();
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -686,6 +701,7 @@ public class TourBlogView extends ViewPart {
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

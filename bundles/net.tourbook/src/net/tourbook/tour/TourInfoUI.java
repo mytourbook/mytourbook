@@ -1268,9 +1268,7 @@ public class TourInfoUI {
 
    private int getWindSpeedTextIndex(final int speed) {
 
-      final int[] unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      final int[] unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       // set speed to max index value
       int speedValueIndex = unitValueWindSpeed.length - 1;
@@ -1594,7 +1592,7 @@ public class TourInfoUI {
          _lblRunDyn_StanceTimeBalance_Avg.setText(_nf1.format(_tourData.getRunDyn_StanceTimeBalance_Avg()));
          _lblRunDyn_StanceTimeBalance_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
 
-         if (UI.UNIT_IS_METRIC) {
+         if (UI.UNIT_IS_DISTANCE_KILOMETER) {
 
             _lblRunDyn_StepLength_Min.setText(_nf0.format(_tourData.getRunDyn_StepLength_Min() * mmOrInch));
             _lblRunDyn_StepLength_Max.setText(_nf0.format(_tourData.getRunDyn_StepLength_Max() * mmOrInch));

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@ import org.eclipse.jface.action.Action;
 
 public class ActionXAxisDistance extends Action {
 
-   private TourChart fTourChart;
+   private TourChart _tourChart;
 
    public ActionXAxisDistance(final TourChart tourChart) {
 
       super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
 
-      this.fTourChart = tourChart;
+      this._tourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
 
@@ -41,21 +41,31 @@ public class ActionXAxisDistance extends Action {
 
    @Override
    public void run() {
-      fTourChart.actionXAxisDistance(isChecked());
+      _tourChart.actionXAxisDistance(isChecked());
    }
 
    public void setImages() {
 
-      String imagePath = Messages.Image__show_distance_on_x_axis;
-      String disabledImagePath = Messages.Image__show_distance_on_x_axis_disabled;
+      String imagePath;
+      String disabledImagePath;
 
-      if (!UI.UNIT_IS_METRIC) {
+      if (UI.UNIT_IS_DISTANCE_MILE) {
+
          imagePath = Messages.Image__show_distance_on_x_axis_imperial;
          disabledImagePath = Messages.Image__show_distance_on_x_axis_imperial_disabled;
+
+      } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
+
+         imagePath = Messages.Image__show_distance_on_x_axis_NauticMile;
+         disabledImagePath = Messages.Image__show_distance_on_x_axis_NauticMile_disabled;
+
+      } else {
+
+         imagePath = Messages.Image__show_distance_on_x_axis;
+         disabledImagePath = Messages.Image__show_distance_on_x_axis_disabled;
       }
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImagePath));
    }
-
 }

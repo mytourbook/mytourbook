@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,35 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
@@ -60,106 +89,81 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-
 public class TourWaypointView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String			ID								= "net.tourbook.views.TourWaypointView";	//$NON-NLS-1$
+   public static final String      ID                     = "net.tourbook.views.TourWaypointView"; //$NON-NLS-1$
 
-	public static final int				COLUMN_TIME					= 0;
+   public static final int         COLUMN_TIME            = 0;
 
-	public static final int				COLUMN_DISTANCE			= 1;
-	public static final int				COLUMN_REMARK				= 2;
-	public static final int				COLUMN_VISUAL_POSITION	= 3;
-	public static final int				COLUMN_X_OFFSET			= 4;
-	public static final int				COLUMN_Y_OFFSET			= 5;
+   public static final int         COLUMN_DISTANCE        = 1;
+   public static final int         COLUMN_REMARK          = 2;
+   public static final int         COLUMN_VISUAL_POSITION = 3;
+   public static final int         COLUMN_X_OFFSET        = 4;
+   public static final int         COLUMN_Y_OFFSET        = 5;
 
-	private final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state						= TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common      = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state                 = TourbookPlugin.getState(ID);
 
-	private TourData						_tourData;
+   private TourData                _tourData;
 
-	private PostSelectionProvider		_postSelectionProvider;
-	private ISelectionListener			_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener			_tourPropertyListener;
-	private IPartListener2				_partListener;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
+   private ITourEventListener      _tourPropertyListener;
+   private IPartListener2          _partListener;
 
-	private PixelConverter				_pc;
+   private PixelConverter          _pc;
 
-	/*
-	 * UI controls
-	 */
-	private PageBook						_pageBook;
+   /*
+    * UI controls
+    */
+   private PageBook            _pageBook;
 
-	private TableViewer					_wpViewer;
+   private TableViewer         _wpViewer;
 
-	private Composite						_pageNoData;
-	private Composite						_viewerContainer;
+   private Composite           _pageNoData;
+   private Composite           _viewerContainer;
 
-	private ActionModifyColumns		_actionModifyColumns;
+   private ActionModifyColumns _actionModifyColumns;
 
-	/*
-	 * none UI
-	 */
-	private ColumnManager				_columnManager;
+   /*
+    * none UI
+    */
+   private ColumnManager _columnManager;
 
-	/*
-	 * measurement unit values
-	 */
-	private float							_unitValueAltitude;
+   /*
+    * measurement unit values
+    */
+   private float              _unitValueAltitude;
 
-	private final NumberFormat			_nf_1_1						= NumberFormat.getNumberInstance();
+   private final NumberFormat _nf_1_1 = NumberFormat.getNumberInstance();
 
-	{
-		_nf_1_1.setMinimumFractionDigits(1);
-		_nf_1_1.setMaximumFractionDigits(1);
-	}
+   {
+      _nf_1_1.setMinimumFractionDigits(1);
+      _nf_1_1.setMaximumFractionDigits(1);
+   }
 
-	private static class WayPointComparator extends ViewerComparator {
+   private static class WayPointComparator extends ViewerComparator {
 
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			final TourWayPoint wp1 = (TourWayPoint) e1;
-			final TourWayPoint wp2 = (TourWayPoint) e2;
+         final TourWayPoint wp1 = (TourWayPoint) e1;
+         final TourWayPoint wp2 = (TourWayPoint) e2;
 
-			/*
-			 * sort by time
-			 */
-			final long wp1Time = wp1.getTime();
-			final long wp2Time = wp2.getTime();
+         /*
+          * sort by time
+          */
+         final long wp1Time = wp1.getTime();
+         final long wp2Time = wp2.getTime();
 
-			if (wp1Time != 0 && wp2Time != 0) {
-				return wp1Time > wp2Time ? 1 : -1;
-			}
+         if (wp1Time != 0 && wp2Time != 0) {
+            return wp1Time > wp2Time ? 1 : -1;
+         }
 
-			return wp1Time != 0 ? 1 : -1;
+         return wp1Time != 0 ? 1 : -1;
 
 //			/*
 //			 * sort by creation sequence
@@ -189,609 +193,620 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 //
 //				return -1;
 //			}
-		}
-	}
+      }
+   }
 
-	class WaypointViewerContentProvider implements IStructuredContentProvider {
+   class WaypointViewerContentProvider implements IStructuredContentProvider {
 
-		@Override
-		public void dispose() {}
+      @Override
+      public void dispose() {}
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			if (_tourData == null) {
-				return new Object[0];
-			} else {
-				return _tourData.getTourWayPoints().toArray();
-			}
-		}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         if (_tourData == null) {
+            return new Object[0];
+         } else {
+            return _tourData.getTourWayPoints().toArray();
+         }
+      }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-	public TourWaypointView() {
-		super();
-	}
+   public TourWaypointView() {
+      super();
+   }
 
-	private void addPartListener() {
+   private void addPartListener() {
 
-		_partListener = new IPartListener2() {
+      _partListener = new IPartListener2() {
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-	private void addPrefListener() {
+   private void addPrefListener() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					// measurement system has changed
+               _wpViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _wpViewer.refresh();
 
-					UI.updateUnits();
-					updateInternalUnitValues();
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _wpViewer.getTable().redraw();
+            }
+         }
+      };
 
-					_columnManager.saveState(_state);
-					_columnManager.clearColumns();
-					defineAllColumns(_viewerContainer);
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-					_wpViewer = (TableViewer) recreateViewer(_wpViewer);
+            final String property = event.getProperty();
 
-				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-					_wpViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-					_wpViewer.refresh();
+               // measurement system has changed
 
-					/*
-					 * the tree must be redrawn because the styled text does not show with the new color
-					 */
-					_wpViewer.getTable().redraw();
-				}
-			}
-		};
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+               updateInternalUnitValues();
 
-	/**
-	 * listen for events when a tour is selected
-	 */
-	private void addSelectionListener() {
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
 
-		_postSelectionListener = new ISelectionListener() {
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				if (part == TourWaypointView.this) {
-					return;
-				}
-				onSelectionChanged(selection);
-			}
-		};
-		getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
+               _wpViewer = (TableViewer) recreateViewer(_wpViewer);
+            }
+         }
+      };
 
-	private void addTourEventListener() {
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
+   }
 
-		_tourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+   /**
+    * listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
 
-				if ((_tourData == null) || (part == TourWaypointView.this)) {
-					return;
-				}
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            if (part == TourWaypointView.this) {
+               return;
+            }
+            onSelectionChanged(selection);
+         }
+      };
+      getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
 
-				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
+   private void addTourEventListener() {
 
-					// check if a tour must be updated
+      _tourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-					final long viewTourId = _tourData.getTourId();
+            if ((_tourData == null) || (part == TourWaypointView.this)) {
+               return;
+            }
 
-					if (UI.containsTourId(eventData, viewTourId) != null) {
+            if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
-						// reload tour data
-						_tourData = TourManager.getInstance().getTourData(viewTourId);
+               // check if a tour must be updated
 
-						_wpViewer.setInput(new Object[0]);
+               final long viewTourId = _tourData.getTourId();
 
-						// removed old tour data from the selection provider
-						_postSelectionProvider.clearSelection();
+               if (UI.containsTourId(eventData, viewTourId) != null) {
 
-					} else {
-						clearView();
-					}
+                  // reload tour data
+                  _tourData = TourManager.getInstance().getTourData(viewTourId);
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+                  _wpViewer.setInput(new Object[0]);
 
-					clearView();
-				}
-			}
-		};
+                  // removed old tour data from the selection provider
+                  _postSelectionProvider.clearSelection();
 
-		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
-	}
+               } else {
+                  clearView();
+               }
 
-	private void clearView() {
+            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-		_tourData = null;
+               clearView();
+            }
+         }
+      };
 
-		_wpViewer.setInput(new Object[0]);
+      TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+   }
 
-		_postSelectionProvider.clearSelection();
+   private void clearView() {
 
-		_pageBook.showPage(_pageNoData);
-	}
+      _tourData = null;
 
-	private void createActions() {
+      _wpViewer.setInput(new Object[0]);
 
-		_actionModifyColumns = new ActionModifyColumns(this);
+      _postSelectionProvider.clearSelection();
 
-	}
+      _pageBook.showPage(_pageNoData);
+   }
 
-	/**
-	 * create the views context menu
-	 */
-	private void createContextMenu() {
+   private void createActions() {
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
+      _actionModifyColumns = new ActionModifyColumns(this);
 
-		final Control viewerControl = _wpViewer.getControl();
-		final Menu menu = menuMgr.createContextMenu(viewerControl);
-		viewerControl.setMenu(menu);
+   }
 
-		getSite().registerContextMenu(menuMgr, _wpViewer);
-	}
+   /**
+    * create the views context menu
+    */
+   private void createContextMenu() {
 
-	@Override
-	public void createPartControl(final Composite parent) {
+      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
 
-		_pc = new PixelConverter(parent);
+      final Control viewerControl = _wpViewer.getControl();
+      final Menu menu = menuMgr.createContextMenu(viewerControl);
+      viewerControl.setMenu(menu);
 
-		updateInternalUnitValues();
+      getSite().registerContextMenu(menuMgr, _wpViewer);
+   }
 
-		_columnManager = new ColumnManager(this, _state);
-		_columnManager.setIsCategoryAvailable(true);
-		defineAllColumns(parent);
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		createUI(parent);
+      _pc = new PixelConverter(parent);
 
-		createActions();
-		createContextMenu();
-		fillToolbar();
+      updateInternalUnitValues();
+
+      _columnManager = new ColumnManager(this, _state);
+      _columnManager.setIsCategoryAvailable(true);
+      defineAllColumns(parent);
+
+      createUI(parent);
+
+      createActions();
+      createContextMenu();
+      fillToolbar();
 
 //		_actionEditTourWaypoints = new ActionOpenMarkerDialog(this, true);
 
-		addSelectionListener();
-		addTourEventListener();
-		addPrefListener();
-		addPartListener();
+      addSelectionListener();
+      addTourEventListener();
+      addPrefListener();
+      addPartListener();
 
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      // this part is a selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		// show default page
-		_pageBook.showPage(_pageNoData);
+      // show default page
+      _pageBook.showPage(_pageNoData);
 
-		// show marker from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+      // show marker from last selection
+      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		if (_tourData == null) {
-			showTourFromTourProvider();
-		}
-	}
+      if (_tourData == null) {
+         showTourFromTourProvider();
+      }
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
+      _pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+      _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-		_viewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		{
-			createUI_10_WaypointViewer(_viewerContainer);
-		}
-	}
+      _viewerContainer = new Composite(_pageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      {
+         createUI_10_WaypointViewer(_viewerContainer);
+      }
+   }
 
-	private void createUI_10_WaypointViewer(final Composite parent) {
+   private void createUI_10_WaypointViewer(final Composite parent) {
 
-		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+      final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		table.setHeaderVisible(true);
+      table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+      table.setHeaderVisible(true);
 //		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-		table.setLinesVisible(true);
+      table.setLinesVisible(true);
 
-		table.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
+      table.addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-				if (isTourInDb() == false) {
-					return;
-				}
+            if (isTourInDb() == false) {
+               return;
+            }
 
-				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
-				if ((selection.size() > 0) && (e.keyCode == SWT.CR)) {
+            final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
+            if ((selection.size() > 0) && (e.keyCode == SWT.CR)) {
 
-					// run async, otherwise it would pop up the dialog two times
+               // run async, otherwise it would pop up the dialog two times
 //					Display.getCurrent().asyncExec(new Runnable() {
 //						public void run() {
 //							_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
 //							_actionEditTourWaypoints.run();
 //						}
 //					});
-				}
-			}
-		});
+            }
+         }
+      });
 
-		/*
-		 * create table viewer
-		 */
-		_wpViewer = new TableViewer(table);
-		_columnManager.createColumns(_wpViewer);
+      /*
+       * create table viewer
+       */
+      _wpViewer = new TableViewer(table);
+      _columnManager.createColumns(_wpViewer);
 
-		_wpViewer.setContentProvider(new WaypointViewerContentProvider());
-		_wpViewer.setComparator(new WayPointComparator());
+      _wpViewer.setContentProvider(new WaypointViewerContentProvider());
+      _wpViewer.setComparator(new WayPointComparator());
 
-		_wpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				final StructuredSelection selection = (StructuredSelection) event.getSelection();
-				if (selection != null) {
-					fireWaypointPosition(selection);
-				}
-			}
-		});
+      _wpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            final StructuredSelection selection = (StructuredSelection) event.getSelection();
+            if (selection != null) {
+               fireWaypointPosition(selection);
+            }
+         }
+      });
 
-		_wpViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _wpViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
 
-				if (isTourInDb() == false) {
-					return;
-				}
+            if (isTourInDb() == false) {
+               return;
+            }
 
-				// edit selected marker
+            // edit selected marker
 //				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
 //				if (selection.size() > 0) {
 //					_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
 //					_actionEditTourWaypoints.run();
 //				}
-			}
-		});
-
-		// the context menu must be created in this method otherwise it will not work when the viewer is recreated
-		createUI_20_ContextMenu();
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
-
-		final Table table = (Table) _wpViewer.getControl();
-
-		_columnManager.createHeaderContextMenu(table, null);
-	}
-
-	private void defineAllColumns(final Composite parent) {
-
-		defineColumn_Name();
-		defineColumn_Description();
-		defineColumn_Comment();
-
-		defineColumn_Category();
-		defineColumn_Symbol();
-		defineColumn_Altitude();
-
-		defineColumn_Time();
-		defineColumn_Date();
-		defineColumn_Latitude();
-		defineColumn_Longitude();
-
-		defineColumn_Url();
-		defineColumn_Id();
-	}
-
-	/**
-	 * column: altitude
-	 */
-	private void defineColumn_Altitude() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ALTITUDE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				final float dbAltitude = wp.getAltitude();
-
-				if (dbAltitude == Float.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					final float altitude = dbAltitude / _unitValueAltitude;
-
-					cell.setText(_nf_1_1.format(altitude));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: category
-	 */
-	private void defineColumn_Category() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_CATEGORY.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(wp.getCategory());
-			}
-		});
-	}
-
-	/**
-	 * column: comment
-	 */
-	private void defineColumn_Comment() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_COMMENT.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(wp.getComment());
-			}
-		});
-	}
-
-	/**
-	 * column: date/time
-	 */
-	private void defineColumn_Date() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DATE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				final long time = wp.getTime();
-
-				cell.setText(time == 0 //
-						? UI.EMPTY_STRING
-						: TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Date_S));
-			}
-		});
-	}
-
-	/**
-	 * column: description
-	 */
-	private void defineColumn_Description() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(wp.getDescription());
-			}
-		});
-	}
-
-	/**
-	 * column: id
-	 */
-	private void defineColumn_Id() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ID.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				long wpId = wp.getWayPointId();
-
-				if (wpId == TourDatabase.ENTITY_IS_NOT_SAVED) {
-					wpId = wp.getCreateId();
-				}
-
-				cell.setText(Long.toString(wpId));
-			}
-		});
-	}
-
-	/**
-	 * column: latitude
-	 */
-	private void defineColumn_Latitude() {
-
-		final ColumnDefinition colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(Double.toString(wp.getLatitude()));
-			}
-		});
-	}
-
-	/**
-	 * column: longitude
-	 */
-	private void defineColumn_Longitude() {
-
-		final ColumnDefinition colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(true);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(Double.toString(wp.getLongitude()));
-			}
-		});
-	}
-
-	/**
-	 * column: name
-	 */
-	private void defineColumn_Name() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(wp.getName());
-			}
-		});
-	}
-
-	/**
-	 * column: symbol
-	 */
-	private void defineColumn_Symbol() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_SYMBOL.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				cell.setText(wp.getSymbol());
-			}
-		});
-	}
-
-	/**
-	 * column: time
-	 */
-	private void defineColumn_Time() {
-
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_TIME.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint wp = (TourWayPoint) cell.getElement();
-				final long time = wp.getTime();
-
-				cell.setText(time == 0 //
-						? UI.EMPTY_STRING
-						: TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Time_M));
-			}
-		});
-	}
-
-	/**
-	 * Column: Url
-	 */
-	private void defineColumn_Url() {
-
-		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourWayPoint marker = (TourWayPoint) cell.getElement();
-
-				String columnText = UI.EMPTY_STRING;
-
-				final String urlText = marker.getUrlText();
-				final String urlAddress = marker.getUrlAddress();
-
-				final boolean isText = urlText != null && urlText.length() > 0;
-				final boolean isAddress = urlAddress != null && urlAddress.length() > 0;
-
-				if (isText || isAddress) {
-
-					if (isAddress == false) {
-
-						// only text is in the link -> this is not a internet address but create a link of it
-
-						columnText = urlText;
-
-					} else {
-
-						columnText = urlAddress;
-					}
-				}
-
-				cell.setText(columnText);
-			}
-		});
-	}
-
-	@Override
-	public void dispose() {
-
-		final IWorkbenchPage page = getViewSite().getPage();
-
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
-		page.removePostSelectionListener(_postSelectionListener);
-		page.removePartListener(_partListener);
-
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
-
-		super.dispose();
-	}
-
-	private void fillContextMenu(final IMenuManager menuMgr) {
+         }
+      });
+
+      // the context menu must be created in this method otherwise it will not work when the viewer is recreated
+      createUI_20_ContextMenu();
+   }
+
+   /**
+    * create the views context menu
+    */
+   private void createUI_20_ContextMenu() {
+
+      final Table table = (Table) _wpViewer.getControl();
+
+      _columnManager.createHeaderContextMenu(table, null);
+   }
+
+   private void defineAllColumns(final Composite parent) {
+
+      defineColumn_Name();
+      defineColumn_Description();
+      defineColumn_Comment();
+
+      defineColumn_Category();
+      defineColumn_Symbol();
+      defineColumn_Altitude();
+
+      defineColumn_Time();
+      defineColumn_Date();
+      defineColumn_Latitude();
+      defineColumn_Longitude();
+
+      defineColumn_Url();
+      defineColumn_Id();
+   }
+
+   /**
+    * column: altitude
+    */
+   private void defineColumn_Altitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ALTITUDE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            final float dbAltitude = wp.getAltitude();
+
+            if (dbAltitude == Float.MIN_VALUE) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+
+               final float altitude = dbAltitude / _unitValueAltitude;
+
+               cell.setText(_nf_1_1.format(altitude));
+            }
+         }
+      });
+   }
+
+   /**
+    * column: category
+    */
+   private void defineColumn_Category() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_CATEGORY.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(wp.getCategory());
+         }
+      });
+   }
+
+   /**
+    * column: comment
+    */
+   private void defineColumn_Comment() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_COMMENT.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(wp.getComment());
+         }
+      });
+   }
+
+   /**
+    * column: date/time
+    */
+   private void defineColumn_Date() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DATE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            final long time = wp.getTime();
+
+            cell.setText(time == 0 //
+                  ? UI.EMPTY_STRING
+                  : TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Date_S));
+         }
+      });
+   }
+
+   /**
+    * column: description
+    */
+   private void defineColumn_Description() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(wp.getDescription());
+         }
+      });
+   }
+
+   /**
+    * column: id
+    */
+   private void defineColumn_Id() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ID.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            long wpId = wp.getWayPointId();
+
+            if (wpId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+               wpId = wp.getCreateId();
+            }
+
+            cell.setText(Long.toString(wpId));
+         }
+      });
+   }
+
+   /**
+    * column: latitude
+    */
+   private void defineColumn_Latitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(Double.toString(wp.getLatitude()));
+         }
+      });
+   }
+
+   /**
+    * column: longitude
+    */
+   private void defineColumn_Longitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(true);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(Double.toString(wp.getLongitude()));
+         }
+      });
+   }
+
+   /**
+    * column: name
+    */
+   private void defineColumn_Name() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(wp.getName());
+         }
+      });
+   }
+
+   /**
+    * column: symbol
+    */
+   private void defineColumn_Symbol() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_SYMBOL.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            cell.setText(wp.getSymbol());
+         }
+      });
+   }
+
+   /**
+    * column: time
+    */
+   private void defineColumn_Time() {
+
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_TIME.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint wp = (TourWayPoint) cell.getElement();
+            final long time = wp.getTime();
+
+            cell.setText(time == 0 //
+                  ? UI.EMPTY_STRING
+                  : TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Time_M));
+         }
+      });
+   }
+
+   /**
+    * Column: Url
+    */
+   private void defineColumn_Url() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourWayPoint marker = (TourWayPoint) cell.getElement();
+
+            String columnText = UI.EMPTY_STRING;
+
+            final String urlText = marker.getUrlText();
+            final String urlAddress = marker.getUrlAddress();
+
+            final boolean isText = urlText != null && urlText.length() > 0;
+            final boolean isAddress = urlAddress != null && urlAddress.length() > 0;
+
+            if (isText || isAddress) {
+
+               if (isAddress == false) {
+
+                  // only text is in the link -> this is not a internet address but create a link of it
+
+                  columnText = urlText;
+
+               } else {
+
+                  columnText = urlAddress;
+               }
+            }
+
+            cell.setText(columnText);
+         }
+      });
+   }
+
+   @Override
+   public void dispose() {
+
+      final IWorkbenchPage page = getViewSite().getPage();
+
+      TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+      page.removePostSelectionListener(_postSelectionListener);
+      page.removePartListener(_partListener);
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
+
+      super.dispose();
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
 //		menuMgr.add(_actionEditTourWaypoints);
 //
@@ -808,202 +823,202 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 //		final boolean tourInDb = isTourInDb();
 //
 //		_actionEditTourWaypoints.setEnabled(tourInDb);
-	}
+   }
 
-	private void fillToolbar() {
+   private void fillToolbar() {
 
-		/*
-		 * fill view menu
-		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+      /*
+       * fill view menu
+       */
+      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionModifyColumns);
-	}
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionModifyColumns);
+   }
 
-	/**
-	 * fire waypoint position
-	 */
-	private void fireWaypointPosition(final StructuredSelection selection) {
-		_postSelectionProvider.setSelection(selection);
-	}
+   /**
+    * fire waypoint position
+    */
+   private void fireWaypointPosition(final StructuredSelection selection) {
+      _postSelectionProvider.setSelection(selection);
+   }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<>();
-		selectedTours.add(_tourData);
+      final ArrayList<TourData> selectedTours = new ArrayList<>();
+      selectedTours.add(_tourData);
 
-		return selectedTours;
-	}
+      return selectedTours;
+   }
 
-	@Override
-	public ColumnViewer getViewer() {
-		return _wpViewer;
-	}
+   @Override
+   public ColumnViewer getViewer() {
+      return _wpViewer;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the tour is saved in the database
-	 */
-	private boolean isTourInDb() {
+   /**
+    * @return Returns <code>true</code> when the tour is saved in the database
+    */
+   private boolean isTourInDb() {
 
-		if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
-			return true;
-		}
+      if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
+         return true;
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	private void onSelectionChanged(final ISelection selection) {
+   private void onSelectionChanged(final ISelection selection) {
 
-		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-		if (selection instanceof SelectionTourData) {
+      if (selection instanceof SelectionTourData) {
 
-			// a tour was selected, get the chart and update the waypoint viewer
+         // a tour was selected, get the chart and update the waypoint viewer
 
-			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
-			_tourData = tourDataSelection.getTourData();
+         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+         _tourData = tourDataSelection.getTourData();
 
-			if (_tourData != null) {
-				tourId = _tourData.getTourId();
-			}
+         if (_tourData != null) {
+            tourId = _tourData.getTourId();
+         }
 
-		} else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof SelectionTourId) {
 
-			tourId = ((SelectionTourId) selection).getTourId();
+         tourId = ((SelectionTourId) selection).getTourId();
 
-		} else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof SelectionTourIds) {
 
-			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-			if ((tourIds != null) && (tourIds.size() > 0)) {
-				tourId = tourIds.get(0);
-			}
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         if ((tourIds != null) && (tourIds.size() > 0)) {
+            tourId = tourIds.get(0);
+         }
 
-		} else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionTourCatalogView) {
 
-			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-			if (refItem != null) {
-				tourId = refItem.getTourId();
-			}
+         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+         if (refItem != null) {
+            tourId = refItem.getTourId();
+         }
 
-		} else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof StructuredSelection) {
 
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-			if (firstElement instanceof TVICatalogComparedTour) {
-				tourId = ((TVICatalogComparedTour) firstElement).getTourId();
-			} else if (firstElement instanceof TVICompareResultComparedTour) {
-				tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
-			}
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (firstElement instanceof TVICatalogComparedTour) {
+            tourId = ((TVICatalogComparedTour) firstElement).getTourId();
+         } else if (firstElement instanceof TVICompareResultComparedTour) {
+            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+         }
 
-		} else if (selection instanceof SelectionDeletedTours) {
+      } else if (selection instanceof SelectionDeletedTours) {
 
-			clearView();
-		}
+         clearView();
+      }
 
-		if (tourId > TourDatabase.ENTITY_IS_NOT_SAVED) {
+      if (tourId > TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-			final TourData tourData = TourManager.getInstance().getTourData(tourId);
-			if (tourData != null) {
-				_tourData = tourData;
-			}
-		}
+         final TourData tourData = TourManager.getInstance().getTourData(tourId);
+         if (tourData != null) {
+            _tourData = tourData;
+         }
+      }
 
-		final boolean isTour = (tourId >= 0) && (_tourData != null);
+      final boolean isTour = (tourId >= 0) && (_tourData != null);
 
-		if (isTour) {
-			_pageBook.showPage(_viewerContainer);
-			_wpViewer.setInput(new Object[0]);
-		}
+      if (isTour) {
+         _pageBook.showPage(_viewerContainer);
+         _wpViewer.setInput(new Object[0]);
+      }
 
 //		_actionEditTourWaypoints.setEnabled(isTour);
-	}
+   }
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_viewerContainer.setRedraw(false);
-		{
-			_wpViewer.getTable().dispose();
+      _viewerContainer.setRedraw(false);
+      {
+         _wpViewer.getTable().dispose();
 
-			createUI_10_WaypointViewer(_viewerContainer);
-			_viewerContainer.layout();
+         createUI_10_WaypointViewer(_viewerContainer);
+         _viewerContainer.layout();
 
-			// update the viewer
-			reloadViewer();
-		}
-		_viewerContainer.setRedraw(true);
+         // update the viewer
+         reloadViewer();
+      }
+      _viewerContainer.setRedraw(true);
 
-		return _wpViewer;
-	}
+      return _wpViewer;
+   }
 
-	@Override
-	public void reloadViewer() {
-		_wpViewer.setInput(new Object[0]);
-	}
+   @Override
+   public void reloadViewer() {
+      _wpViewer.setInput(new Object[0]);
+   }
 
-	@PersistState
-	private void saveState() {
+   @PersistState
+   private void saveState() {
 
-		// check if UI is disposed
-		final Table table = _wpViewer.getTable();
-		if (table.isDisposed()) {
-			return;
-		}
+      // check if UI is disposed
+      final Table table = _wpViewer.getTable();
+      if (table.isDisposed()) {
+         return;
+      }
 
-		_columnManager.saveState(_state);
-	}
+      _columnManager.saveState(_state);
+   }
 
-	@Override
-	public void setFocus() {
-		_wpViewer.getTable().setFocus();
-	}
+   @Override
+   public void setFocus() {
+      _wpViewer.getTable().setFocus();
+   }
 
-	private void showTourFromTourProvider() {
+   private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoData);
+      _pageBook.showPage(_pageNoData);
 
-		// a tour is not displayed, find a tour provider which provides a tour
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
+      // a tour is not displayed, find a tour provider which provides a tour
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				// validate widget
-				if (_pageBook.isDisposed()) {
-					return;
-				}
+            // validate widget
+            if (_pageBook.isDisposed()) {
+               return;
+            }
 
-				/*
-				 * check if tour was set from a selection provider
-				 */
-				if (_tourData != null) {
-					return;
-				}
+            /*
+             * check if tour was set from a selection provider
+             */
+            if (_tourData != null) {
+               return;
+            }
 
-				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-				if ((selectedTours != null) && (selectedTours.size() > 0)) {
-					onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-				}
-			}
-		});
-	}
+            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            if ((selectedTours != null) && (selectedTours.size() > 0)) {
+               onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+            }
+         }
+      });
+   }
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      // TODO Auto-generated method stub
 
-	}
+   }
 
-	private void updateInternalUnitValues() {
+   private void updateInternalUnitValues() {
 
-		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;
-	}
+      _unitValueAltitude = UI.UNIT_VALUE_ELEVATION;
+   }
 
 }

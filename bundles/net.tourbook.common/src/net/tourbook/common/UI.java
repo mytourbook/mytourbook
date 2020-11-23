@@ -23,6 +23,17 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.measurement_system.Unit_Distance;
+import net.tourbook.common.measurement_system.Unit_Elevation;
+import net.tourbook.common.measurement_system.Unit_Length;
+import net.tourbook.common.measurement_system.Unit_Length_Small;
+import net.tourbook.common.measurement_system.Unit_Pace;
+import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
+import net.tourbook.common.measurement_system.Unit_Temperature;
+import net.tourbook.common.measurement_system.Unit_Weight;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -228,75 +239,246 @@ public class UI {
    /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";
 
-   public static final String  BROWSER_TYPE_MOZILLA      = "mozilla";                 //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
 
-   public static final String  UTF_8                     = "UTF-8";                   //$NON-NLS-1$
-   public static final String  UTF_16                    = "UTF-16";                  //$NON-NLS-1$
-   public static final String  ISO_8859_1                = "ISO-8859-1";              //$NON-NLS-1$
+   public static final String  UTF_8                          = "UTF-8";                   //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                  //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";              //$NON-NLS-1$
 
-   public static final Charset UTF8_CHARSET              = Charset.forName(UTF_8);
+   public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS  = "additions";               //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";               //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
     */
-   public static final int     DEFAULT_DESCRIPTION_WIDTH = 350;
-   public static final int     DEFAULT_FIELD_WIDTH       = 40;
+   public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
+   public static final int     DEFAULT_FIELD_WIDTH            = 40;
 
    /**
-    * Is <code>true</code> when the measurement system is metric, otherwise it is imperial.
+    * Convert Joule in Calorie
+    * <p>
+    * 1 cal = 4.1868 J<br>
+    * 1 J = 0.238846 cal
     */
-   public static boolean       UNIT_IS_METRIC;
+   public static final float   UNIT_CALORIE_2_JOULE           = 4.1868f;
+
+   /**
+    * Convert Calorie to Joule
+    * <p>
+    * 1 cal = 4.1868 J<br>
+    * 1 J = 0.238846 cal
+    */
+   public static final float   UNIT_JOULE_2_CALORY            = 1.0f / 4.1868f;
+
+   /**
+    * Convert Mile into Nautical mile.
+    * <p>
+    * Multiply miles with this value to get nautical miles
+    */
+   public static final float   UNIT_MILE_2_NAUTICAL_MILE      = 0.868976f;
+
+   /**
+    * Imperial system for distance
+    */
+   public static final float   UNIT_MILE                      = 1.609344f;
+
+   /**
+    * Nautical mile is exact 1852 meter
+    */
+   public static final float   UNIT_NAUTICAL_MILE             = 1.852f;
+
+   /**
+    * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
+    */
+   public static final float   UNIT_YARD                      = 0.9144f;
+
+   /**
+    * Imperial system for very small distance, 1 mm = 0.03937008 inches, 1 inch = 25.4 mm
+    */
+   public static final float   UNIT_INCH                      = 0.03937008f;
+
+   /**
+    * Imperial system for height
+    */
+   public static final float   UNIT_FOOT                      = 0.3048f;
+
+   /**
+    * Imperial system for weight
+    */
+   public static final float   UNIT_POUND                     = 2.204623f;
+
+   /**
+    * Imperial system for temperature
+    * <p>
+    * (Celcius * 9/5) + 32 = Fahrenheit
+    */
+   public static final float   UNIT_FAHRENHEIT_MULTI          = 1.8f;
+   public static final float   UNIT_FAHRENHEIT_ADD            = 32;
+
+   public static final float   UNIT_METER_TO_INCHES           = 39.37007874f;
+
+   public static final float   UNIT_KILOGRAM_TO_POUND         = 2.204623f;
+
+   /**
+    * Hash code including all system measurement data. This can be used to easily find out if the
+    * system has changed.
+    */
+   public static int           UNIT_HASH_CODE;
+
+   /**
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is millibar
+    * (mb), otherwise it is inch of mercury (inHg)
+    */
+   public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_KILOMETER;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_MILE;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_NAUTICAL_MILE;
+
+   /**
+    * Length could be meter (metric) or yard
+    */
+   public static boolean       UNIT_IS_LENGTH_METER;
+
+   /**
+    * Length could be meter (metric) or yard
+    */
+   public static boolean       UNIT_IS_LENGTH_YARD;
+
+   /**
+    * Small length could be mm (metric) or inch
+    */
+   public static boolean       UNIT_IS_LENGTH_SMALL_MILLIMETER;
+
+   /**
+    * Small length could be mm (metric) or inch
+    */
+   public static boolean       UNIT_IS_LENGTH_SMALL_INCH;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_FOOT;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_METER;
+
+   /**
+    */
+   public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
+
+   /**
+    * Is <code>true</code> when the measurement system for a weight is kilogramm, which is metric.
+    */
+   public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+
+   public static boolean       UNIT_IS_PACE_MIN_PER_KILOMETER;
+   public static boolean       UNIT_IS_PACE_MIN_PER_MILE;
+
+   /**
+    * Contains the system of measurement value for distances relative to the metric system.
+    * <p>
+    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE} or
+    * {@link #UNIT_NAUTICAL_MILE}
+    */
+   public static float         UNIT_VALUE_DISTANCE            = 1;
+
+   /**
+    * contains the system of measurement value for small distances relative to the metric system.
+    * <p>
+    * The metric system is <code>1</code>, imperial system is {@link #UNIT_YARD}
+    */
+   public static float         UNIT_VALUE_DISTANCE_SMALL      = 1;
+
+   /**
+    * Contains the system of measurement value for very small distances relative to the metric
+    * system, the metric system is 1 mm, imperial is 0.03937008 inch.
+    */
+   public static float         UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
+
+   /**
+    * Contains the system of measurement value for altitudes relative to the metric system, the
+    * metric system is <code>1</code>
+    */
+   public static float         UNIT_VALUE_ELEVATION           = 1;
+
+   /**
+    * Contains the system of measurement value for the power, is set to <code>1</code> for the
+    * metric system Watt/Kg.
+    */
+   public static float         UNIT_VALUE_POWER;
+
+   /**
+    * contains the system of measurement value for the temperature, is set to <code>1</code> for the
+    * metric system
+    */
+   public static float         UNIT_VALUE_TEMPERATURE         = 1;
+
+   /**
+    * contains the system of measurement value for the weight, is set to <code>1</code> for the
+    * metric system
+    */
+   public static float         UNIT_VALUE_WEIGHT              = 1;
 
    /*
     * Contains the unit label in the current measurement system for the distance values
     */
+   public static String       UNIT_LABEL_ALTIMETER;
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
-   public static String       UNIT_LABEL_ALTITUDE;
-   public static String       UNIT_LABEL_ALTIMETER;
+   public static String       UNIT_LABEL_ELEVATION;
    public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
    public static String       UNIT_LABEL_WEIGHT;
 
+   /**
+    * @deprecated {@link #UNIT_LABEL_ALTITUDE} is used in too many locations to rename it, instead
+    *             use {@link #UNIT_LABEL_ELEVATION}
+    */
+   @Deprecated
+   public static String       UNIT_LABEL_ALTITUDE;
+
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
-
-   public static float        UNIT_VALUE_TEMPERATURE;
-
-   // (Celcius * 9/5) + 32 = Fahrenheit
-   public static final float UNIT_FAHRENHEIT_MULTI  = 1.8f;
-   public static final float UNIT_FAHRENHEIT_ADD    = 32;
-
-   public static final float UNIT_METER_TO_INCHES   = 39.37007874f;
-
-   public static float       UNIT_VALUE_WEIGHT;
-
-   public static final float UNIT_KILOGRAM_TO_POUND = 2.204623f;
 
    /*
     * Labels for the different measurement systems
     */
    public static final String          UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
    public static final String          UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_M            = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_FT           = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
+   public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
+   public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
+   public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
+   public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
@@ -417,6 +599,8 @@ public class UI {
        * https://en.it1352.com/article/fb82e2d4ec294636ba29f786e3335066.html
        */
       PlatformUI.createDisplay();
+
+      updateUnits();
 
       setupUI_FontMetrics();
 
@@ -643,7 +827,7 @@ public class UI {
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_ELEVATION_METER) {
          return height;
       }
 
@@ -652,7 +836,7 @@ public class UI {
 
    public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
 
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_ELEVATION_METER) {
          return primaryHeight;
       }
 
@@ -754,7 +938,7 @@ public class UI {
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_LENGTH_SMALL_MILLIMETER) {
          return precipitation;
       }
 
@@ -920,6 +1104,23 @@ public class UI {
       gc.dispose();
 
       return image;
+   }
+
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
+   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults()
+            .hint(SWT.DEFAULT, height)
+            .span(spanHorizontal, 1)
+            .applyTo(label);
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
@@ -2234,6 +2435,213 @@ public class UI {
          child = parent;
          parent = parent.getParent();
       }
+   }
+
+   /**
+    * Update units from the pref store into the application variables
+    */
+   public static void updateUnits() {
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      UNIT_HASH_CODE = activeSystem.getSystemDataHash();
+
+// SET_FORMATTING_OFF
+
+      /*
+       * Atmospheric pressure
+       */
+
+      if (activeSystem.getPressure_Atmosphere() == Unit_Pressure_Atmosphere.INCH_OF_MERCURY) {
+
+         // set imperial measure system
+
+         UNIT_IS_PRESSURE_MILLIBAR         = false;
+         UNIT_LABEL_PRESSURE_MB_OR_INHG    = UNIT_PRESSURE_INHG;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_PRESSURE_MILLIBAR         = true;
+         UNIT_LABEL_PRESSURE_MB_OR_INHG    = UNIT_PRESSURE_MB;
+      }
+
+      /*
+       * Distance
+       */
+      UNIT_IS_DISTANCE_KILOMETER           = false;
+      UNIT_IS_DISTANCE_MILE                = false;
+      UNIT_IS_DISTANCE_NAUTICAL_MILE       = false;
+
+      final Unit_Distance distance = activeSystem.getDistance();
+      if (distance == Unit_Distance.MILE) {
+
+         // set imperial measure system
+
+         UNIT_IS_DISTANCE_MILE             = true;
+         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_MI;
+         UNIT_LABEL_SPEED                  = UNIT_SPEED_MPH;
+
+         UNIT_VALUE_DISTANCE                                      = UNIT_MILE;
+
+      } else if (distance == Unit_Distance.NAUTIC_MILE) {
+
+         UNIT_IS_DISTANCE_NAUTICAL_MILE    = true;
+         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_NMI;
+         UNIT_LABEL_SPEED                  = UNIT_SPEED_KNOT;
+
+         UNIT_VALUE_DISTANCE                                      = UNIT_NAUTICAL_MILE;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_DISTANCE_KILOMETER        = true;
+         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_KM;
+         UNIT_LABEL_SPEED                  = UNIT_SPEED_KM_H;
+
+         UNIT_VALUE_DISTANCE                                      = 1;
+      }
+
+      /*
+       * Pace
+       */
+      UNIT_IS_PACE_MIN_PER_KILOMETER       = false;
+      UNIT_IS_PACE_MIN_PER_MILE            = false;
+
+      if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
+
+         UNIT_IS_PACE_MIN_PER_KILOMETER    = true;
+         UNIT_LABEL_PACE                   = UNIT_PACE_MIN_P_MILE;
+
+      } else {
+
+         UNIT_IS_PACE_MIN_PER_MILE         = true;
+         UNIT_LABEL_PACE                   = UNIT_PACE_MIN_P_KM;
+      }
+
+      /*
+       * Length
+       */
+      UNIT_IS_LENGTH_METER                 = false;
+      UNIT_IS_LENGTH_YARD                  = false;
+
+      if (activeSystem.getLength() == Unit_Length.YARD) {
+
+         UNIT_IS_LENGTH_YARD               = true;
+         UNIT_LABEL_DISTANCE_M_OR_YD       = UNIT_DISTANCE_YARD;
+
+         UNIT_VALUE_DISTANCE_SMALL                                = UNIT_YARD;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_LENGTH_METER              = true;
+         UNIT_LABEL_DISTANCE_M_OR_YD       = UNIT_METER;
+
+         UNIT_VALUE_DISTANCE_SMALL                                = 1;
+      }
+
+      /*
+       * Small length
+       */
+      UNIT_IS_LENGTH_SMALL_MILLIMETER      = false;
+      UNIT_IS_LENGTH_SMALL_INCH            = false;
+
+      if (activeSystem.getLengthSmall() == Unit_Length_Small.INCH) {
+
+         UNIT_IS_LENGTH_SMALL_INCH         = true;
+         UNIT_LABEL_DISTANCE_MM_OR_INCH    = UNIT_DISTANCE_INCH;
+
+         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = UNIT_INCH;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_LENGTH_SMALL_MILLIMETER   = true;
+         UNIT_LABEL_DISTANCE_MM_OR_INCH    = UNIT_MM;
+
+         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = 1;
+      }
+
+      /*
+       * Elevation
+       */
+      UNIT_IS_ELEVATION_FOOT               = false;
+      UNIT_IS_ELEVATION_METER              = false;
+
+      if (activeSystem.getElevation() == Unit_Elevation.FOOT) {
+
+         // set imperial measure system
+
+         UNIT_IS_ELEVATION_FOOT            = true;
+
+         UNIT_VALUE_ELEVATION                                     = UNIT_FOOT;
+
+         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_FT;
+         UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_FT;
+         UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_FT_H;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_ELEVATION_METER           = true;
+
+         UNIT_VALUE_ELEVATION                                     = 1;
+
+         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_M;
+         UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_M;
+         UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_M_H;
+      }
+
+      /*
+       * Temperature
+       */
+      if (activeSystem.getTemperature() == Unit_Temperature.FAHRENHEIT) {
+
+         // set imperial measure system
+
+         UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
+
+         UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_F;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_VALUE_TEMPERATURE = 1;
+
+         UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_C;
+      }
+
+      /*
+       * Weight
+       */
+      if (activeSystem.getWeight() == Unit_Weight.POUND) {
+
+         // set imperial measure system
+
+         UNIT_VALUE_WEIGHT = UNIT_POUND;
+
+         UNIT_LABEL_WEIGHT = UNIT_WEIGHT_LBS;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_VALUE_WEIGHT = 1;
+
+         UNIT_LABEL_WEIGHT = UNIT_WEIGHT_KG;
+      }
+
+// SET_FORMATTING_ON
+
+      // update system which is using the old code, will be sometimes removed when all code is converted
+      CommonActivator.getPrefStore().setValue(ICommonPreferences.MEASUREMENT_SYSTEM_OLD_CODE, Math.random());
    }
 
    public static VerifyListener verifyFilenameInput() {

@@ -96,9 +96,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private int                DEFAULT_DESCRIPTION_WIDTH;
    private int                DEFAULT_V_DISTANCE_PARAGRAPH;
-   private boolean            INITIAL_UNIT_IS_METRIC;
 
    private IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
+
+   private int                _initialUnitHashCode;
 
    private NumberFormat       _nf0                     = NumberFormat.getNumberInstance();
    private NumberFormat       _nf1                     = NumberFormat.getNumberInstance();
@@ -896,7 +897,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
-      INITIAL_UNIT_IS_METRIC = net.tourbook.common.UI.UNIT_IS_METRIC;
+
+      _initialUnitHashCode = net.tourbook.common.UI.UNIT_HASH_CODE;
 
       _selectionListener = new SelectionAdapter() {
          @Override
@@ -1352,7 +1354,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       //If the saveState() was triggered by the change of measurement system,
       //we don't save the values as they were already saved and it would convert
       //those values by error
-      if (INITIAL_UNIT_IS_METRIC != net.tourbook.common.UI.UNIT_IS_METRIC) {
+      if (_initialUnitHashCode != net.tourbook.common.UI.UNIT_HASH_CODE) {
          return;
       }
 

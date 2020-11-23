@@ -187,7 +187,7 @@ public class StatisticTooltipUI_CategorizedData {
 
    private void createActions() {
 
-      final Integer selectedTabFolder = new Integer(1);
+      final Integer selectedTabFolder = Integer.valueOf(1);
 
       _actionPrefDialog = new Action_ToolTip_EditPreferences(_toolTipProvider,
             Messages.Tour_Tooltip_Action_EditFormatPreferences,
@@ -762,8 +762,8 @@ public class StatisticTooltipUI_CategorizedData {
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
       final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
 
-      final float elevationUp_WithMeasurement            = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float elevationUp_WithMeasurement            = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
       final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
       final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);
@@ -805,7 +805,7 @@ public class StatisticTooltipUI_CategorizedData {
       _lblDistance_Unit                      .setText(distance                      == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
       _lblElevationUp                        .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_WithMeasurement));
-      _lblElevationUp_Unit                   .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
+      _lblElevationUp_Unit                   .setText(elevationUp_WithMeasurement   == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
       _lblNumberOfTours                      .setText(Integer.toString((int) (numTours + 0.5)));
 
@@ -827,7 +827,7 @@ public class StatisticTooltipUI_CategorizedData {
          _lblDistance_Summary_Unit           .setText(distance_Summary  == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_DISTANCE);
 
          _lblElevationUp_Summary             .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : FormatManager.formatElevation_Summary     (elevationUp_Summary_WithMeasurement));
-         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ALTITUDE);
+         _lblElevationUp_Summary_Unit        .setText(elevationUp_Summary_WithMeasurement == 0 ? UI.EMPTY_STRING : UI.UNIT_LABEL_ELEVATION);
 
          _lblNumberOfTours_Summary           .setText(Integer.toString((int) (numTours_Summary + 0.5)));
       }

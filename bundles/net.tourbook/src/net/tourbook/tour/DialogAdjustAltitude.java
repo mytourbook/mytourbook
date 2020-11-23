@@ -27,13 +27,13 @@ import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.IXAxisSelectionListener;
@@ -470,7 +470,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final float srtmAltitude = _backupSrtmSerie[serieIndex];
 
          diffTo2ndAlti[serieIndex] = 0;
-         adjustedAltiSerie[serieIndex] = srtmAltitude / UI.UNIT_VALUE_ALTITUDE;
+         adjustedAltiSerie[serieIndex] = srtmAltitude / UI.UNIT_VALUE_ELEVATION;
       }
    }
 
@@ -532,7 +532,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             }
 
             final float metric_AdjustedElevation = metric_NewElevation + splineElevation;
-            final float measurementSystem_AdjustedElevation = metric_AdjustedElevation / UI.UNIT_VALUE_ALTITUDE;
+            final float measurementSystem_AdjustedElevation = metric_AdjustedElevation / UI.UNIT_VALUE_ELEVATION;
 
             splineDataSerie[serieIndex] = splineElevation;
 
@@ -544,7 +544,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
             // elevation is not adjusted
 
-            final float measurementSystem_AdjustedElevation = metric_OriginalElevation / UI.UNIT_VALUE_ALTITUDE;
+            final float measurementSystem_AdjustedElevation = metric_OriginalElevation / UI.UNIT_VALUE_ELEVATION;
 
             metric_AdjustedElevationSerie[serieIndex] = metric_OriginalElevation;
             metric_DiffTo2ndElevation[serieIndex] = metric_SrtmValue - metric_OriginalElevation;
@@ -587,11 +587,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
 
-      final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
-      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
 
       final float tourElevationUp_Diff = adjustedElevationUp - measurementSystem_TourElevationUp;
       final float tourElevationDown_Diff = adjustedElevationDown - measurementSystem_TourElevationDown;
@@ -939,7 +939,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       spinner.setMaximum(99999);
       spinner.setIncrement(1);
       spinner.setPageIncrement(1);
-      UI.setWidth(spinner, convertWidthInCharsToPixels(6));
+      net.tourbook.ui.UI.setWidth(spinner, convertWidthInCharsToPixels(6));
 
       spinner.addModifyListener(new ModifyListener() {
 
@@ -952,13 +952,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
             final Spinner spinner = (Spinner) e.widget;
 
-            if (UI.UNIT_VALUE_ALTITUDE == 1) {
-
-               final float modifiedAlti = spinner.getSelection();
-
-               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
-
-            } else {
+            if (UI.UNIT_IS_ELEVATION_FOOT) {
 
                /**
                 * adjust the non metric (imperial) value, this seems to be complicate and it is
@@ -974,14 +968,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                final float modifiedAlti = spinner.getSelection();
                final float metricAlti = (Float) spinner.getData(WIDGET_DATA_METRIC_ALTITUDE);
 
-               final float oldAlti = metricAlti / UI.UNIT_VALUE_ALTITUDE;
-               float newMetricAlti = modifiedAlti * UI.UNIT_VALUE_ALTITUDE;
+               final float oldAlti = metricAlti / UI.UNIT_VALUE_ELEVATION;
+               float newMetricAlti = modifiedAlti * UI.UNIT_VALUE_ELEVATION;
 
                if (modifiedAlti > oldAlti) {
                   newMetricAlti++;
                }
 
                spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, newMetricAlti);
+
+            } else {
+
+               // adjust metric elevation
+
+               final float modifiedAlti = spinner.getSelection();
+
+               spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, modifiedAlti);
+
             }
 
             onChangeAltitude();
@@ -1009,7 +1012,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             _isDisableModifyListener = true;
             {
                spinner.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(metricAltitude));
-               spinner.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ALTITUDE));
+               spinner.setSelection((int) (metricAltitude / UI.UNIT_VALUE_ELEVATION));
             }
             _isDisableModifyListener = false;
 
@@ -1359,7 +1362,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP
              */
             _lblElevation_Up = new Label(container, SWT.TRAIL);
-            _lblElevation_Up.setText(UI.SPACE);
+            _lblElevation_Up.setText(UI.SPACE1);
             _lblElevation_Up.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1379,7 +1382,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Adjusted elevation UP
              */
             _lblElevation_UpAdjusted = new Label(container, SWT.TRAIL);
-            _lblElevation_UpAdjusted.setText(UI.SPACE);
+            _lblElevation_UpAdjusted.setText(UI.SPACE1);
             _lblElevation_UpAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1391,7 +1394,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP delta
              */
             _lblElevation_UpAdjustedDiff = new Label(container, SWT.TRAIL);
-            _lblElevation_UpAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_UpAdjustedDiff.setText(UI.SPACE1);
             _lblElevation_UpAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1403,7 +1406,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Label: Unit
              */
             final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + net.tourbook.common.UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_UP;
 
             final Label label = new Label(container, SWT.NONE);
@@ -1427,7 +1430,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation DOWN
              */
             _lblElevation_Down = new Label(container, SWT.TRAIL);
-            _lblElevation_Down.setText(UI.SPACE);
+            _lblElevation_Down.setText(UI.SPACE1);
             _lblElevation_Down.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1447,7 +1450,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Adjusted elevation DOWN
              */
             _lblElevation_DownAdjusted = new Label(container, SWT.TRAIL);
-            _lblElevation_DownAdjusted.setText(UI.SPACE);
+            _lblElevation_DownAdjusted.setText(UI.SPACE1);
             _lblElevation_DownAdjusted.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1459,7 +1462,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Value: Elevation UP delta
              */
             _lblElevation_DownAdjustedDiff = new Label(container, SWT.TRAIL);
-            _lblElevation_DownAdjustedDiff.setText(UI.SPACE);
+            _lblElevation_DownAdjustedDiff.setText(UI.SPACE1);
             _lblElevation_DownAdjustedDiff.setToolTipText(Messages.Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -1471,7 +1474,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              * Label: Unit
              */
             final String unitLabel = net.tourbook.common.UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                  + net.tourbook.common.UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE + net.tourbook.common.UI.SYMBOL_ARROW_DOWN;
 
             final Label label = new Label(container, SWT.NONE);
@@ -1898,9 +1901,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * update UI
        */
-      _lblOldStartAlti.setText(Integer.toString((int) (startAlti / UI.UNIT_VALUE_ALTITUDE)));
-      _lblOldEndAlti.setText(Integer.toString((int) (endAlti / UI.UNIT_VALUE_ALTITUDE)));
-      _lblOldMaxAlti.setText(Integer.toString((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE)));
+      _lblOldStartAlti.setText(Integer.toString((int) (startAlti / UI.UNIT_VALUE_ELEVATION)));
+      _lblOldEndAlti.setText(Integer.toString((int) (endAlti / UI.UNIT_VALUE_ELEVATION)));
+      _lblOldMaxAlti.setText(Integer.toString((int) (maxAlti / UI.UNIT_VALUE_ELEVATION)));
 
       _lblOldStartAlti.pack(true);
       _lblOldEndAlti.pack(true);
@@ -1909,13 +1912,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isDisableModifyListener = true;
       {
          _spinnerNewStartAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(startAlti));
-         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ELEVATION));
 
          _spinnerNewEndAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(endAlti));
-         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ELEVATION));
 
          _spinnerNewMaxAlti.setData(WIDGET_DATA_METRIC_ALTITUDE, Float.valueOf(maxAlti));
-         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ELEVATION));
       }
       _isDisableModifyListener = false;
 
@@ -2484,7 +2487,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final float[] newAltitudeSerie = _tourData.altitudeSerie = new float[dataSerieAdjustedAlti.length];
 
       for (int serieIndex = 0; serieIndex < dataSerieAdjustedAlti.length; serieIndex++) {
-         newAltitudeSerie[serieIndex] = dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ALTITUDE;
+         newAltitudeSerie[serieIndex] = dataSerieAdjustedAlti[serieIndex] * UI.UNIT_VALUE_ELEVATION;
       }
    }
 
@@ -2580,7 +2583,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             maxAlti = metricAltitude;
          }
 
-         adjustedAltitude[serieIndex] = metricAltitude / UI.UNIT_VALUE_ALTITUDE;
+         adjustedAltitude[serieIndex] = metricAltitude / UI.UNIT_VALUE_ELEVATION;
       }
 
       // keep current start/max values
@@ -2597,9 +2600,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       _isDisableModifyListener = true;
       {
-         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ALTITUDE));
-         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ALTITUDE));
-         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ALTITUDE));
+         _spinnerNewStartAlti.setSelection((int) (startAlti / UI.UNIT_VALUE_ELEVATION));
+         _spinnerNewEndAlti.setSelection((int) (endAlti / UI.UNIT_VALUE_ELEVATION));
+         _spinnerNewMaxAlti.setSelection((int) (maxAlti / UI.UNIT_VALUE_ELEVATION));
       }
       _isDisableModifyListener = false;
 

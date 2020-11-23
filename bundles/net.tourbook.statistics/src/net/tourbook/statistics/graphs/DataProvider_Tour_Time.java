@@ -28,6 +28,7 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
@@ -38,11 +39,10 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.UI;
 
 public class DataProvider_Tour_Time extends DataProvider {
 
-   private Long          _selectedTourId;
+   private Long                   _selectedTourId;
 
    private TourStatisticData_Time _tourDataTime;
 
@@ -60,67 +60,67 @@ public class DataProvider_Tour_Time extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead1() : UI.EMPTY_STRING)
 
-            + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
-            + HEAD1_DATE_DAY
-            + HEAD1_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
+            + STAT_VALUE_DATE_DAY.getHead1()
+            + STAT_VALUE_DATE_WEEK.getHead1()
 
-            + HEAD1_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead1()
 
-            + HEAD1_DEVICE_TIME_ELAPSED
-            + HEAD1_DEVICE_TIME_RECORDED
-            + HEAD1_DEVICE_TIME_PAUSED
-            + HEAD1_COMPUTED_TIME_MOVING
-            + HEAD1_COMPUTED_TIME_BREAK
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead1()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead1()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead1()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead1()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead1()
 
-            + HEAD1_DISTANCE
-            + HEAD1_ELEVATION
+            + STAT_VALUE_MOTION_DISTANCE.withUnitLabel(UI.UNIT_LABEL_DISTANCE).getHead1()
+            + STAT_VALUE_ELEVATION_UP.withUnitLabel(UI.UNIT_LABEL_ELEVATION).getHead1()
 
       ;
 
       final String headerLine2 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead2() : UI.EMPTY_STRING)
 
-            + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
-            + HEAD2_DATE_DAY
-            + HEAD2_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
+            + STAT_VALUE_DATE_DAY.getHead2()
+            + STAT_VALUE_DATE_WEEK.getHead2()
 
-            + HEAD2_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getHead2()
 
-            + HEAD2_DEVICE_TIME_ELAPSED
-            + HEAD2_DEVICE_TIME_RECORDED
-            + HEAD2_DEVICE_TIME_PAUSED
-            + HEAD2_COMPUTED_TIME_MOVING
-            + HEAD2_COMPUTED_TIME_BREAK
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getHead2()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getHead2()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getHead2()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getHead2()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getHead2()
 
-            + HEAD2_DISTANCE
-            + HEAD2_ELEVATION
+            + STAT_VALUE_MOTION_DISTANCE.getHead2()
+            + STAT_VALUE_ELEVATION_UP.getHead2()
 
       ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getValueFormatting() : "%s") //$NON-NLS-1$
 
-            + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
-            + VALUE_DATE_DAY
-            + VALUE_DATE_WEEK
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
+            + STAT_VALUE_DATE_DAY.getValueFormatting()
+            + STAT_VALUE_DATE_WEEK.getValueFormatting()
 
-            + VALUE_TOUR_TYPE
+            + STAT_VALUE_TOUR_TYPE.getValueFormatting()
 
-            + VALUE_DEVICE_TIME_ELAPSED
-            + VALUE_DEVICE_TIME_RECORDED
-            + VALUE_DEVICE_TIME_PAUSED
-            + VALUE_COMPUTED_TIME_MOVING
-            + VALUE_COMPUTED_TIME_BREAK
+            + STAT_VALUE_TIME_DEVICE_ELAPSED.getValueFormatting()
+            + STAT_VALUE_TIME_DEVICE_RECORDED.getValueFormatting()
+            + STAT_VALUE_TIME_DEVICE_PAUSED.getValueFormatting()
+            + STAT_VALUE_TIME_COMPUTED_MOVING.getValueFormatting()
+            + STAT_VALUE_TIME_COMPUTED_BREAK.getValueFormatting()
 
-            + VALUE_DISTANCE
-            + VALUE_ELEVATION
+            + STAT_VALUE_MOTION_DISTANCE.getValueFormatting()
+            + STAT_VALUE_ELEVATION_UP.getValueFormatting()
 
       ;
 
@@ -170,7 +170,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                movingTime,
                breakTime,
 
-               _tourDataTime.allTourDistances[dataIndex],
+               _tourDataTime.allTourDistances[dataIndex] / 1000,
                _tourDataTime.allTourElevations[dataIndex]
 
          ));
@@ -200,10 +200,10 @@ public class DataProvider_Tour_Time extends DataProvider {
     * @return
     */
    TourStatisticData_Time getTourTimeData(final TourPerson person,
-                                 final TourTypeFilter tourTypeFilter,
-                                 final int lastYear,
-                                 final int numberOfYears,
-                                 final boolean isForceUpdate) {
+                                          final TourTypeFilter tourTypeFilter,
+                                          final int lastYear,
+                                          final int numberOfYears,
+                                          final boolean isForceUpdate) {
 
       // don't reload data which are already here
       if (statistic_ActivePerson == person
@@ -393,8 +393,8 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourDeviceTime_Paused.add(dbPausedTime);
                allTourComputedTime_Moving.add(dbMovingTime);
 
-               allDistances.add(dbDistance / UI.UNIT_VALUE_DISTANCE);
-               allElevationUp.add(dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE);
+               allDistances.add(dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+               allElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
 
                allTourTitle.add(dbTourTitle);
 

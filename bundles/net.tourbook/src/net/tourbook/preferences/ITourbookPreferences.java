@@ -366,32 +366,6 @@ public interface ITourbookPreferences {
    public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
 
    /*
-    * measurement system
-    */
-   public static final String MEASUREMENT_SYSTEM                = "system.of.measurement";             //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_SHOW_IN_UI     = "system.of.measurement.show.in.ui";  //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_DISTANCE       = "system.of.measurement.distance";    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_DISTANCE_KM    = "metric.km";                         //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_DISTANCE_MI    = "imperial.mi";                       //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE       = "system.of.measurement.altitude";    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE_M     = "metric.m";                          //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE_FOOT  = "imperial.foot";                     //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_TEMPERATURE    = "system.of.measurement.temperature"; //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_TEMPERATURE_C  = "metric.celcius";                    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_TEMPTERATURE_F = "metric.fahrenheit";                 //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_ENERGY         = "system.of.energy";                  //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ENERGY_JOULE   = "energy.joule";                      //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ENERGY_CALORIE = "energy.calorie";                    //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_WEIGHT         = "system.of.weight";                  //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_WEIGHT_KG      = "weight.kilogram";                   //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_WEIGHT_LBS     = "weight.pound";                      //$NON-NLS-1$
-
-   /*
     * map settings
     */
    public static final String MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING = "map.view.confirmation.show-dim-warning"; //$NON-NLS-1$

@@ -232,9 +232,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       _unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       _unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
-      _unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      _unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       _tk = new FormToolkit(parent.getDisplay());
 
