@@ -2642,9 +2642,6 @@ public class UI {
 
       // update system which is using the old code, will be sometimes removed when all code is converted
       CommonActivator.getPrefStore().setValue(ICommonPreferences.MEASUREMENT_SYSTEM_OLD_CODE, Math.random());
-
-// 20.12 I'm not sure if this is necessary here
-//      TourFilterManager.updateUnits();
    }
 
    public static VerifyListener verifyFilenameInput() {

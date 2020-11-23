@@ -1298,7 +1298,10 @@ public class UI {
    }
 
    /**
-    * Update units from the pref store into the application variables
+    * Update units from the pref store into the app vars.
+    * <p>
+    * <b>This code will be removed when the old UNIT_ vars are replaced with vars from the common
+    * plugin.</b>
     */
    public static void updateUnits_OLD_Code() {
 
@@ -1316,9 +1319,6 @@ public class UI {
       UNIT_VALUE_ALTITUDE              = UNIT_VALUE_ELEVATION;
 
 // SET_FORMATTING_ON
-
-// 20.12 I'm not sure if this is necessary here
-//      TourFilterManager.updateUnits();
    }
 
 }

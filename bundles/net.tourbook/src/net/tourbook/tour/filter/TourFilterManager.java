@@ -312,14 +312,17 @@ public class TourFilterManager {
    }
 
    private static final Bundle            _bundle           = TourbookPlugin.getDefault().getBundle();
-
    private static final IPath             _stateLocation    = Platform.getStateLocation(_bundle);
+
    private final static IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
    private final static IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
 
    private static IPropertyChangeListener _prefChangeListener_Common;
 
    static {
+
+      // load unit very early
+      updateUnits();
 
       _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override

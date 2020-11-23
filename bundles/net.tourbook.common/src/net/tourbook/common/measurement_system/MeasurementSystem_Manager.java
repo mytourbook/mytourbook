@@ -78,7 +78,7 @@ public class MeasurementSystem_Manager {
 
    private static boolean                      _isDefaultProfileSelected;
 
-   private static final IPreferenceStore       _prefStoreCommon          = CommonActivator.getPrefStore();
+   private static final IPreferenceStore       _prefStore_Common         = CommonActivator.getPrefStore();
 
    /**
     * Define default measurement systems
@@ -694,7 +694,7 @@ public class MeasurementSystem_Manager {
       if (isFireEvent) {
 
          // fire modify event
-         _prefStoreCommon.setValue(ICommonPreferences.MEASUREMENT_SYSTEM, Math.random());
+         _prefStore_Common.setValue(ICommonPreferences.MEASUREMENT_SYSTEM, Math.random());
       }
    }
 }
