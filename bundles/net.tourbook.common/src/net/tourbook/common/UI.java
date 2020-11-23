@@ -451,13 +451,6 @@ public class UI {
    public static String       UNIT_LABEL_PACE;
    public static String       UNIT_LABEL_WEIGHT;
 
-   /**
-    * @deprecated {@link #UNIT_LABEL_ALTITUDE} is used in too many locations to rename it, instead
-    *             use {@link #UNIT_LABEL_ELEVATION}
-    */
-   @Deprecated
-   public static String       UNIT_LABEL_ALTITUDE;
-
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
 
@@ -1037,6 +1030,23 @@ public class UI {
       return new Cursor(display, sourceData, 0, 0);
    }
 
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
+   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults()
+            .hint(SWT.DEFAULT, height)
+            .span(spanHorizontal, 1)
+            .applyTo(label);
+   }
+
    /**
     * Creates one action in a toolbar.
     *
@@ -1104,23 +1114,6 @@ public class UI {
       gc.dispose();
 
       return image;
-   }
-
-   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
-
-      final Label label = new Label(parent, SWT.NONE);
-
-      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
-   }
-
-   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
-
-      final Label label = new Label(parent, SWT.NONE);
-
-      GridDataFactory.fillDefaults()
-            .hint(SWT.DEFAULT, height)
-            .span(spanHorizontal, 1)
-            .applyTo(label);
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
@@ -2581,7 +2574,6 @@ public class UI {
 
          UNIT_VALUE_ELEVATION                                     = UNIT_FOOT;
 
-         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_FT;
          UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_FT;
          UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_FT_H;
 
@@ -2593,7 +2585,6 @@ public class UI {
 
          UNIT_VALUE_ELEVATION                                     = 1;
 
-         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_M;
          UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_M;
          UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_M_H;
       }

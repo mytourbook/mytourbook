@@ -768,7 +768,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statElevation_Sum_Low,
             _statElevation_Sum_High,
             _statElevation_Sum_ColorIndex,
-            UI.UNIT_LABEL_ALTITUDE,
+            UI.UNIT_LABEL_ELEVATION,
             Messages.LABEL_GRAPH_ALTITUDE);
 
       updateChartTime(

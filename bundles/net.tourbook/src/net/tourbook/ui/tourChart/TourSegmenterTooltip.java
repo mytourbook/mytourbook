@@ -742,19 +742,19 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
        * Elevation Gain
        */
       _lblElevation_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff));
-      _lblElevation_Diff_Unit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblElevation_Diff_Unit.setText(UI.UNIT_LABEL_ELEVATION);
 
-      final float altiDown = (tourSegment.altitude_Segment_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
+      final float altiDown = (tourSegment.altitude_Segment_Down / UI.UNIT_VALUE_ELEVATION)
             / tourSegment.deviceTime_Elapsed
             * 3600;
       _lblElevation_DownHour.setText(_nf_1_0.format(altiDown));
-      _lblElevation_DownHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
+      _lblElevation_DownHour_Unit.setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
 
-      final float altiUp = (tourSegment.altitude_Segment_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
+      final float altiUp = (tourSegment.altitude_Segment_Up / UI.UNIT_VALUE_ELEVATION)
             / tourSegment.deviceTime_Elapsed
             * 3600;
       _lblElevation_UpHour.setText(_nf_1_0.format(altiUp));
-      _lblElevation_UpHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
+      _lblElevation_UpHour_Unit.setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
 
       _lblGradient.setText(_nf_1_1.format(tourSegment.gradient));
 

@@ -288,7 +288,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             _spinner_ElevationValue.addMouseWheelListener(_defaultMouseWheelListener);
 
             // label: m or ft
-            _label_ElevationUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+            _label_ElevationUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
 
             final Composite containerElevation = _tk.createComposite(container);
             GridDataFactory.fillDefaults()
@@ -542,7 +542,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
        * Keep selected values that they can be retrieved after the dialog is closed
        */
       final float altitudeValue = _spinner_ElevationValue.getSelection() / 10f;
-      _newElevationValue = _checkbox_Elevation.getSelection() ? altitudeValue * net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE : Float.MIN_VALUE;
+      _newElevationValue = _checkbox_Elevation.getSelection() ? altitudeValue * UI.UNIT_VALUE_ELEVATION : Float.MIN_VALUE;
 
       final int pulseValue = _spinner_PulseValue.getSelection();
       _newPulseValue = _checkbox_Pulse.getSelection() ? pulseValue : Integer.MIN_VALUE;

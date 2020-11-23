@@ -392,7 +392,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                createUI_72_ValueField(
                      container,
                      GRAPH_LABEL_ALTITUDE,
-                     UI.UNIT_LABEL_ALTITUDE,
+                     UI.UNIT_LABEL_ELEVATION,
                      FormatManager.formatElevation(value));
             }
          }

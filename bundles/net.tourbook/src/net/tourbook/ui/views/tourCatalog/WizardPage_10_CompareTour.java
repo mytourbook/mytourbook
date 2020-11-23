@@ -309,7 +309,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
                final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
 
-               final long value = (long) (tourItem.colAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               final long value = (long) (tourItem.colAltitudeUp / UI.UNIT_VALUE_ELEVATION);
                cell.setText(Long.toString(value));
 
             } else {
@@ -320,7 +320,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
       });
 
       final TreeColumn tc = tvc.getColumn();
-      tc.setText(UI.UNIT_LABEL_ALTITUDE);
+      tc.setText(UI.UNIT_LABEL_ELEVATION);
       tc.setToolTipText(Messages.tourCatalog_wizard_Column_altitude_up_tooltip);
       treeLayout.setColumnData(tc, new ColumnWeightData(10));
    }
