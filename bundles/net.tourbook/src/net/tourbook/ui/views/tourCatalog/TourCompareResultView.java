@@ -787,7 +787,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final float value = compareItem.compareDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+               final float value = compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE);
 
                colDef.printDetailValue(cell, value);
                setCellColor(cell, element);
@@ -822,7 +822,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             if (element instanceof TVICompareResultComparedTour) {
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-               final double value = compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -858,7 +858,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final double value = compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -894,7 +894,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final double value = compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 

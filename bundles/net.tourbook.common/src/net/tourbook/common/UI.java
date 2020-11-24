@@ -33,7 +33,6 @@ import net.tourbook.common.measurement_system.Unit_Pace;
 import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -231,16 +230,16 @@ public class UI {
          '|', };
 
 // SET_FORMATTING_OFF
-	public static final boolean			IS_LINUX		= "gtk".equals(SWT.getPlatform());																						//$NON-NLS-1$
-	public static final boolean			IS_OSX		= "carbon".equals(SWT.getPlatform())	|| "cocoa".equals(SWT.getPlatform());								//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean			IS_WIN		= "win32".equals(SWT.getPlatform())		|| "wpf".equals(SWT.getPlatform());									//$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean   IS_LINUX    = "gtk".equals(SWT.getPlatform());                                                                  //$NON-NLS-1$
+   public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
 // SET_FORMATTING_ON
 
    /**
     * On Linux an async selection event is fired since e4
     */
    public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2"; //$NON-NLS-1$
 
    public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
 
@@ -330,12 +329,6 @@ public class UI {
    public static int           UNIT_HASH_CODE;
 
    /**
-    * Is <code>true</code> when the measurement system for the atmospheric pressure is millibar
-    * (mb), otherwise it is inch of mercury (inHg)
-    */
-   public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
-
-   /**
     * Distance could be km (metric), mile or nautical mile
     */
    public static boolean       UNIT_IS_DISTANCE_KILOMETER;
@@ -349,6 +342,16 @@ public class UI {
     * Distance could be km (metric), mile or nautical mile
     */
    public static boolean       UNIT_IS_DISTANCE_NAUTICAL_MILE;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_FOOT;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_METER;
 
    /**
     * Length could be meter (metric) or yard
@@ -371,23 +374,36 @@ public class UI {
    public static boolean       UNIT_IS_LENGTH_SMALL_INCH;
 
    /**
-    * Elevation could be meter (metric) or foot
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is millibar
+    * (mb), otherwise it is inch of mercury (inHg)
     */
-   public static boolean       UNIT_IS_ELEVATION_FOOT;
+   public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
 
    /**
-    * Elevation could be meter (metric) or foot
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is inch of
+    * mercury (inHg), otherwise it is millibar (mb)
     */
-   public static boolean       UNIT_IS_ELEVATION_METER;
+   public static boolean       UNIT_IS_PRESSURE_MERCURY;
 
    /**
+    * Temperature could be celcius (metric) or fahrenheit
     */
    public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
 
    /**
-    * Is <code>true</code> when the measurement system for a weight is kilogramm, which is metric.
+    * Temperature could be celcius (metric) or fahrenheit
+    */
+   public static boolean       UNIT_IS_TEMPERATURE_FAHRENHEIT;
+
+   /**
+    * Weight could be kilogramm (metric) or pound
     */
    public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+
+   /**
+    * Weight could be kilogramm (metric) or pound
+    */
+   public static boolean       UNIT_IS_WEIGHT_POUND;
 
    public static boolean       UNIT_IS_PACE_MIN_PER_KILOMETER;
    public static boolean       UNIT_IS_PACE_MIN_PER_MILE;
@@ -420,12 +436,6 @@ public class UI {
    public static float         UNIT_VALUE_ELEVATION           = 1;
 
    /**
-    * Contains the system of measurement value for the power, is set to <code>1</code> for the
-    * metric system Watt/Kg.
-    */
-   public static float         UNIT_VALUE_POWER;
-
-   /**
     * contains the system of measurement value for the temperature, is set to <code>1</code> for the
     * metric system
     */
@@ -451,13 +461,6 @@ public class UI {
    public static String       UNIT_LABEL_PACE;
    public static String       UNIT_LABEL_WEIGHT;
 
-   /**
-    * @deprecated {@link #UNIT_LABEL_ALTITUDE} is used in too many locations to rename it, instead
-    *             use {@link #UNIT_LABEL_ELEVATION}
-    */
-   @Deprecated
-   public static String       UNIT_LABEL_ALTITUDE;
-
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
 
@@ -473,6 +476,19 @@ public class UI {
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
+   public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
+   public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
+   public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
+   public static final String          UNIT_MBYTES                = "MByte";                    //$NON-NLS-1$
+   public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
+   public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
+   public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
+   public static final String          UNIT_PERCENT               = "%";                        //$NON-NLS-1$
+   public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
+   public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
+   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
@@ -482,22 +498,8 @@ public class UI {
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
-
-   public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
-   public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
-   public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_MBYTES                = "MByte";                    //$NON-NLS-1$
-   public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
-   public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
-   public static final String          UNIT_PERCENT               = "%";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
-   public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
-   public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -507,14 +509,12 @@ public class UI {
 
    private static FontMetrics          _fontMetrics;
 
-   /*
-	 * SET_FORMATTING_OFF
-	 */
-	public	static final long beforeCET		= ZonedDateTime.of(1893, 4, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant().toEpochMilli();
-	public	static final long afterCETBegin	= ZonedDateTime.of(1893, 4, 1, 0, 6, 32, 0,ZoneOffset.UTC).toInstant().toEpochMilli();
-	/*
-	 * SET_FORMATTING_ON
-	 */
+// SET_FORMATTING_OFF
+
+   public   static final long beforeCET      = ZonedDateTime.of(1893, 4, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant().toEpochMilli();
+   public   static final long afterCETBegin  = ZonedDateTime.of(1893, 4, 1, 0, 6, 32, 0,ZoneOffset.UTC).toInstant().toEpochMilli();
+
+// SET_FORMATTING_ON
 
    public static final int     BERLIN_HISTORY_ADJUSTMENT = 6 * 60 + 32;
 
@@ -569,19 +569,19 @@ public class UI {
 
 // SET_FORMATTING_OFF
 
-	private static final Random 		RANDOM_GENERATOR						= new Random();
-	private static final String			ALL_SCRAMBLED_CHARS_LOWER				= "abcdefghklmnoprsu";						//$NON-NLS-1$
-	private static final String			ALL_SCRAMBLED_CHARS_UPPER				= "ABCDEFGHKLMNOPRSU";						//$NON-NLS-1$
+   private static final Random   RANDOM_GENERATOR                       = new Random();
+   private static final String   ALL_SCRAMBLED_CHARS_LOWER              = "abcdefghklmnoprsu";                       //$NON-NLS-1$
+   private static final String   ALL_SCRAMBLED_CHARS_UPPER              = "ABCDEFGHKLMNOPRSU";                       //$NON-NLS-1$
 
-	/*
-	 * image keys for images which are stored in the image registry
-	 */
-	public static final String			IMAGE_ACTION_PHOTO_FILTER				= "IMAGE_ACTION_PHOTO_FILTER";						//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS		= "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";			//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS	= "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";																				//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED		= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";				//$NON-NLS-1$
-	public static final String			IMAGE_CONFIGURE_COLUMNS					= "IMAGE_CONFIGURE_COLUMNS";						//$NON-NLS-1$
-	public static final String			IMAGE_EMPTY_16							= "_empty16";										//$NON-NLS-1$
+   /*
+    * image keys for images which are stored in the image registry
+    */
+   public static final String    IMAGE_ACTION_PHOTO_FILTER              = "IMAGE_ACTION_PHOTO_FILTER";               //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS    = "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";     //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS  = "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";   //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_DISABLED     = "IMAGE_ACTION_PHOTO_FILTER_DISABLED";      //$NON-NLS-1$
+   public static final String    IMAGE_CONFIGURE_COLUMNS                = "IMAGE_CONFIGURE_COLUMNS";                 //$NON-NLS-1$
+   public static final String    IMAGE_EMPTY_16                         = "_empty16";                                //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -715,7 +715,7 @@ public class UI {
    /**
     * Number of vertical dialog units per character, value <code>8</code>.
     */
-//	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+//   private static final int   VERTICAL_DIALOG_UNITS_PER_CHAR   = 8;
 
    private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
@@ -781,11 +781,11 @@ public class UI {
       if (IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -808,11 +808,11 @@ public class UI {
       if (IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -849,7 +849,7 @@ public class UI {
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
 
-      if (UNIT_VALUE_WEIGHT == 1) {
+      if (UNIT_IS_WEIGHT_KILOGRAMM) {
          return bodyWeight;
       }
 
@@ -863,7 +863,7 @@ public class UI {
     */
    public static float convertBodyWeightToMetric(final float weight) {
 
-      if (UNIT_VALUE_WEIGHT == 1) {
+      if (UNIT_IS_WEIGHT_KILOGRAMM) {
          return weight;
       }
 
@@ -874,10 +874,10 @@ public class UI {
     * Returns the number of pixels corresponding to the given number of horizontal dialog units.
     * <p>
     * The required <code>FontMetrics</code> parameter may be created in the following way: <code>
-    * 	GC gc = new GC(control);
-    *	gc.setFont(control.getFont());
-    *	fontMetrics = gc.getFontMetrics();
-    *	gc.dispose();
+    *    GC gc = new GC(control);
+    *   gc.setFont(control.getFont());
+    *   fontMetrics = gc.getFontMetrics();
+    *   gc.dispose();
     * </code>
     * </p>
     *
@@ -925,7 +925,7 @@ public class UI {
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return precipitation;
       }
 
@@ -951,7 +951,7 @@ public class UI {
     */
    public static float convertPressure_FromMetric(final float weatherPressure) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return weatherPressure;
       }
 
@@ -964,7 +964,7 @@ public class UI {
     */
    public static float convertPressure_ToMetric(final float weatherPressure) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return weatherPressure;
       }
 
@@ -977,7 +977,7 @@ public class UI {
     */
    public static float convertTemperatureFromMetric(final float temperature) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return temperature;
       }
 
@@ -991,7 +991,7 @@ public class UI {
     */
    public static float convertTemperatureToMetric(final float temperature) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return temperature;
       }
 
@@ -1035,6 +1035,23 @@ public class UI {
       sourceData.transparentPixel = 0;
 
       return new Cursor(display, sourceData, 0, 0);
+   }
+
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
+   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults()
+            .hint(SWT.DEFAULT, height)
+            .span(spanHorizontal, 1)
+            .applyTo(label);
    }
 
    /**
@@ -1104,23 +1121,6 @@ public class UI {
       gc.dispose();
 
       return image;
-   }
-
-   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
-
-      final Label label = new Label(parent, SWT.NONE);
-
-      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
-   }
-
-   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
-
-      final Label label = new Label(parent, SWT.NONE);
-
-      GridDataFactory.fillDefaults()
-            .hint(SWT.DEFAULT, height)
-            .span(spanHorizontal, 1)
-            .applyTo(label);
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
@@ -2055,26 +2055,26 @@ public class UI {
           * FOREGROUND CANNOT BE SET
           */
 
-//			final ToolBar tb = (ToolBar) child;
+//         final ToolBar tb = (ToolBar) child;
 //
-//			for (final ToolItem toolItem : tb.getItems()) {
+//         for (final ToolItem toolItem : tb.getItems()) {
 //
-//				final Object data = toolItem.getData();
+//            final Object data = toolItem.getData();
 //
-//				if (data instanceof ActionContributionItem) {
+//            if (data instanceof ActionContributionItem) {
 //
-//					final ActionContributionItem action = (ActionContributionItem) data;
+//               final ActionContributionItem action = (ActionContributionItem) data;
 //
-//					final Widget widget = action.getWidget();
+//               final Widget widget = action.getWidget();
 //
-//					if (widget instanceof Button) {
+//               if (widget instanceof Button) {
 //
-//						final Button button = (Button) widget;
+//                  final Button button = (Button) widget;
 //
-//						button.setForeground(fgColor);
-//					}
-//				}
-//			}
+//                  button.setForeground(fgColor);
+//               }
+//            }
+//         }
       }
 
       child.setForeground(fgColor);
@@ -2451,197 +2451,212 @@ public class UI {
       /*
        * Atmospheric pressure
        */
+      UNIT_IS_PRESSURE_MERCURY            = false;
+      UNIT_IS_PRESSURE_MILLIBAR           = false;
 
       if (activeSystem.getPressure_Atmosphere() == Unit_Pressure_Atmosphere.INCH_OF_MERCURY) {
 
          // set imperial measure system
 
-         UNIT_IS_PRESSURE_MILLIBAR         = false;
-         UNIT_LABEL_PRESSURE_MB_OR_INHG    = UNIT_PRESSURE_INHG;
+         UNIT_IS_PRESSURE_MERCURY         = true;
+
+         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_INHG;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_IS_PRESSURE_MILLIBAR         = true;
-         UNIT_LABEL_PRESSURE_MB_OR_INHG    = UNIT_PRESSURE_MB;
+         UNIT_IS_PRESSURE_MILLIBAR        = true;
+         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_MB;
       }
 
       /*
        * Distance
        */
-      UNIT_IS_DISTANCE_KILOMETER           = false;
-      UNIT_IS_DISTANCE_MILE                = false;
-      UNIT_IS_DISTANCE_NAUTICAL_MILE       = false;
+      UNIT_IS_DISTANCE_KILOMETER          = false;
+      UNIT_IS_DISTANCE_MILE               = false;
+      UNIT_IS_DISTANCE_NAUTICAL_MILE      = false;
 
       final Unit_Distance distance = activeSystem.getDistance();
       if (distance == Unit_Distance.MILE) {
 
          // set imperial measure system
 
-         UNIT_IS_DISTANCE_MILE             = true;
-         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_MI;
-         UNIT_LABEL_SPEED                  = UNIT_SPEED_MPH;
+         UNIT_IS_DISTANCE_MILE            = true;
 
-         UNIT_VALUE_DISTANCE                                      = UNIT_MILE;
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_MI;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_MPH;
+
+         UNIT_VALUE_DISTANCE              = UNIT_MILE;
 
       } else if (distance == Unit_Distance.NAUTIC_MILE) {
 
-         UNIT_IS_DISTANCE_NAUTICAL_MILE    = true;
-         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_NMI;
-         UNIT_LABEL_SPEED                  = UNIT_SPEED_KNOT;
+         UNIT_IS_DISTANCE_NAUTICAL_MILE   = true;
 
-         UNIT_VALUE_DISTANCE                                      = UNIT_NAUTICAL_MILE;
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_NMI;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_KNOT;
+
+         UNIT_VALUE_DISTANCE              = UNIT_NAUTICAL_MILE;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_IS_DISTANCE_KILOMETER        = true;
-         UNIT_LABEL_DISTANCE               = UNIT_DISTANCE_KM;
-         UNIT_LABEL_SPEED                  = UNIT_SPEED_KM_H;
+         UNIT_IS_DISTANCE_KILOMETER       = true;
 
-         UNIT_VALUE_DISTANCE                                      = 1;
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_KM;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_KM_H;
+
+         UNIT_VALUE_DISTANCE              = 1;
       }
 
       /*
        * Pace
        */
-      UNIT_IS_PACE_MIN_PER_KILOMETER       = false;
-      UNIT_IS_PACE_MIN_PER_MILE            = false;
+      UNIT_IS_PACE_MIN_PER_KILOMETER      = false;
+      UNIT_IS_PACE_MIN_PER_MILE           = false;
 
       if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
 
-         UNIT_IS_PACE_MIN_PER_KILOMETER    = true;
-         UNIT_LABEL_PACE                   = UNIT_PACE_MIN_P_MILE;
+         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
+
+         UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
 
       } else {
 
-         UNIT_IS_PACE_MIN_PER_MILE         = true;
-         UNIT_LABEL_PACE                   = UNIT_PACE_MIN_P_KM;
+         UNIT_IS_PACE_MIN_PER_MILE        = true;
+
+         UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
       }
 
       /*
        * Length
        */
-      UNIT_IS_LENGTH_METER                 = false;
-      UNIT_IS_LENGTH_YARD                  = false;
+      UNIT_IS_LENGTH_METER                = false;
+      UNIT_IS_LENGTH_YARD                 = false;
 
       if (activeSystem.getLength() == Unit_Length.YARD) {
 
-         UNIT_IS_LENGTH_YARD               = true;
-         UNIT_LABEL_DISTANCE_M_OR_YD       = UNIT_DISTANCE_YARD;
+         UNIT_IS_LENGTH_YARD              = true;
 
-         UNIT_VALUE_DISTANCE_SMALL                                = UNIT_YARD;
+         UNIT_LABEL_DISTANCE_M_OR_YD      = UNIT_DISTANCE_YARD;
+         UNIT_VALUE_DISTANCE_SMALL        = UNIT_YARD;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_IS_LENGTH_METER              = true;
-         UNIT_LABEL_DISTANCE_M_OR_YD       = UNIT_METER;
+         UNIT_IS_LENGTH_METER             = true;
 
-         UNIT_VALUE_DISTANCE_SMALL                                = 1;
+         UNIT_LABEL_DISTANCE_M_OR_YD      = UNIT_METER;
+         UNIT_VALUE_DISTANCE_SMALL        = 1;
       }
 
       /*
        * Small length
        */
-      UNIT_IS_LENGTH_SMALL_MILLIMETER      = false;
-      UNIT_IS_LENGTH_SMALL_INCH            = false;
+      UNIT_IS_LENGTH_SMALL_MILLIMETER     = false;
+      UNIT_IS_LENGTH_SMALL_INCH           = false;
 
       if (activeSystem.getLengthSmall() == Unit_Length_Small.INCH) {
 
-         UNIT_IS_LENGTH_SMALL_INCH         = true;
-         UNIT_LABEL_DISTANCE_MM_OR_INCH    = UNIT_DISTANCE_INCH;
+         UNIT_IS_LENGTH_SMALL_INCH        = true;
 
-         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = UNIT_INCH;
+         UNIT_LABEL_DISTANCE_MM_OR_INCH   = UNIT_DISTANCE_INCH;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = UNIT_INCH;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_IS_LENGTH_SMALL_MILLIMETER   = true;
-         UNIT_LABEL_DISTANCE_MM_OR_INCH    = UNIT_MM;
+         UNIT_IS_LENGTH_SMALL_MILLIMETER  = true;
 
-         UNIT_VALUE_DISTANCE_MM_OR_INCH                           = 1;
+         UNIT_LABEL_DISTANCE_MM_OR_INCH   = UNIT_MM;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = 1;
       }
 
       /*
        * Elevation
        */
-      UNIT_IS_ELEVATION_FOOT               = false;
-      UNIT_IS_ELEVATION_METER              = false;
+      UNIT_IS_ELEVATION_FOOT              = false;
+      UNIT_IS_ELEVATION_METER             = false;
 
       if (activeSystem.getElevation() == Unit_Elevation.FOOT) {
 
          // set imperial measure system
 
-         UNIT_IS_ELEVATION_FOOT            = true;
+         UNIT_IS_ELEVATION_FOOT           = true;
 
-         UNIT_VALUE_ELEVATION                                     = UNIT_FOOT;
+         UNIT_LABEL_ELEVATION             = UNIT_ELEVATION_FT;
+         UNIT_LABEL_ALTIMETER             = UNIT_ALTIMETER_FT_H;
 
-         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_FT;
-         UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_FT;
-         UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_FT_H;
+         UNIT_VALUE_ELEVATION             = UNIT_FOOT;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_IS_ELEVATION_METER           = true;
+         UNIT_IS_ELEVATION_METER          = true;
 
-         UNIT_VALUE_ELEVATION                                     = 1;
+         UNIT_LABEL_ELEVATION             = UNIT_ELEVATION_M;
+         UNIT_LABEL_ALTIMETER             = UNIT_ALTIMETER_M_H;
 
-         UNIT_LABEL_ALTITUDE               = UNIT_ELEVATION_M;
-         UNIT_LABEL_ELEVATION              = UNIT_ELEVATION_M;
-         UNIT_LABEL_ALTIMETER              = UNIT_ALTIMETER_M_H;
+         UNIT_VALUE_ELEVATION             = 1;
       }
 
       /*
        * Temperature
        */
+      UNIT_IS_TEMPERATURE_CELCIUS         = false;
+      UNIT_IS_TEMPERATURE_FAHRENHEIT      = false;
+
       if (activeSystem.getTemperature() == Unit_Temperature.FAHRENHEIT) {
 
          // set imperial measure system
 
-         UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
+         UNIT_IS_TEMPERATURE_FAHRENHEIT   = true;
 
-         UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_F;
+         UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_F;
+         UNIT_VALUE_TEMPERATURE           = UNIT_FAHRENHEIT_ADD;
+
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_VALUE_TEMPERATURE = 1;
+         UNIT_IS_TEMPERATURE_CELCIUS      = true;
 
-         UNIT_LABEL_TEMPERATURE = UNIT_TEMPERATURE_C;
+         UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_C;
+         UNIT_VALUE_TEMPERATURE           = 1;
       }
 
       /*
        * Weight
        */
+      UNIT_IS_WEIGHT_KILOGRAMM            = false;
+      UNIT_IS_WEIGHT_POUND                = false;
+
       if (activeSystem.getWeight() == Unit_Weight.POUND) {
 
          // set imperial measure system
 
-         UNIT_VALUE_WEIGHT = UNIT_POUND;
+         UNIT_IS_WEIGHT_POUND             = true;
 
-         UNIT_LABEL_WEIGHT = UNIT_WEIGHT_LBS;
+         UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_LBS;
+         UNIT_VALUE_WEIGHT                = UNIT_POUND;
 
       } else {
 
          // default is the metric measure system
 
-         UNIT_VALUE_WEIGHT = 1;
+         UNIT_IS_WEIGHT_KILOGRAMM         = true;
 
-         UNIT_LABEL_WEIGHT = UNIT_WEIGHT_KG;
+         UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_KG;
+         UNIT_VALUE_WEIGHT                = 1;
       }
 
 // SET_FORMATTING_ON
 
-      // update system which is using the old code, will be sometimes removed when all code is converted
-      CommonActivator.getPrefStore().setValue(ICommonPreferences.MEASUREMENT_SYSTEM_OLD_CODE, Math.random());
    }
 
    public static VerifyListener verifyFilenameInput() {
@@ -2756,108 +2771,108 @@ public class UI {
 
 //this conversion is not working for all png images, found SWT2Dutil.java
 //
-//	/**
-//	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
-//	 *
-//	 * @param bufferedImage
-//	 *            the image to be converted
-//	 * @param originalImagePathName
-//	 * @return An ImageData that represents the same image as bufferedImage
-//	 */
-//	public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
+//   /**
+//    * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
+//    *
+//    * @param bufferedImage
+//    *            the image to be converted
+//    * @param originalImagePathName
+//    * @return An ImageData that represents the same image as bufferedImage
+//    */
+//   public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
 //
-//		try {
+//      try {
 //
-//			if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-//				final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
-//				final PaletteData palette = new PaletteData(
-//						colorModel.getRedMask(),
-//						colorModel.getGreenMask(),
-//						colorModel.getBlueMask());
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[3];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
+//         if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+//            final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
+//            final PaletteData palette = new PaletteData(
+//                  colorModel.getRedMask(),
+//                  colorModel.getGreenMask(),
+//                  colorModel.getBlueMask());
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
+//            final WritableRaster raster = bufferedImage.getRaster();
+//            final int[] pixelArray = new int[3];
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//                  data.setPixel(x, y, pixel);
+//               }
+//            }
+//            return data;
 //
-//			} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+//         } else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
 //
-//				final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
-//				final int size = colorModel.getMapSize();
-//				final byte[] reds = new byte[size];
-//				final byte[] greens = new byte[size];
-//				final byte[] blues = new byte[size];
-//				colorModel.getReds(reds);
-//				colorModel.getGreens(greens);
-//				colorModel.getBlues(blues);
-//				final RGB[] rgbs = new RGB[size];
-//				for (int i = 0; i < rgbs.length; i++) {
-//					rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
-//				}
-//				final PaletteData palette = new PaletteData(rgbs);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				data.transparentPixel = colorModel.getTransparentPixel();
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[1];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						data.setPixel(x, y, pixelArray[0]);
-//					}
-//				}
-//				return data;
+//            final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
+//            final int size = colorModel.getMapSize();
+//            final byte[] reds = new byte[size];
+//            final byte[] greens = new byte[size];
+//            final byte[] blues = new byte[size];
+//            colorModel.getReds(reds);
+//            colorModel.getGreens(greens);
+//            colorModel.getBlues(blues);
+//            final RGB[] rgbs = new RGB[size];
+//            for (int i = 0; i < rgbs.length; i++) {
+//               rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
+//            }
+//            final PaletteData palette = new PaletteData(rgbs);
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
+//            data.transparentPixel = colorModel.getTransparentPixel();
+//            final WritableRaster raster = bufferedImage.getRaster();
+//            final int[] pixelArray = new int[1];
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  data.setPixel(x, y, pixelArray[0]);
+//               }
+//            }
+//            return data;
 //
-//			} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
+//         } else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
 //
-//				final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
+//            final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
 //
-//				//ASSUMES: 3 BYTE BGR IMAGE TYPE
+//            //ASSUMES: 3 BYTE BGR IMAGE TYPE
 //
-//				final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
+//            final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
 //
-//				//This is valid because we are using a 3-byte Data model with no transparent pixels
-//				data.transparentPixel = -1;
+//            //This is valid because we are using a 3-byte Data model with no transparent pixels
+//            data.transparentPixel = -1;
 //
-//				final WritableRaster raster = bufferedImage.getRaster();
+//            final WritableRaster raster = bufferedImage.getRaster();
 //
-////				final int[] pixelArray = new int[3];
-//				final int[] pixelArray = colorModel.getComponentSize();
+////            final int[] pixelArray = new int[3];
+//            final int[] pixelArray = colorModel.getComponentSize();
 //
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
-//			}
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//                  data.setPixel(x, y, pixel);
+//               }
+//            }
+//            return data;
+//         }
 //
-//		} catch (final Exception e) {
+//      } catch (final Exception e) {
 //
-//			System.out.println(NLS.bind(//
-//					UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
-//					imagePathName));
-//		}
+//         System.out.println(NLS.bind(//
+//               UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
+//               imagePathName));
+//      }
 //
-//		return null;
-//	}
+//      return null;
+//   }

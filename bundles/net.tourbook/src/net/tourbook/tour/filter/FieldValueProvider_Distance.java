@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 public class FieldValueProvider_Distance extends FieldValueConverter {
 

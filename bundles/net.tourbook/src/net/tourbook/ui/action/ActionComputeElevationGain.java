@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeNoDataserieValues;
 import net.tourbook.database.TourDatabase;
@@ -29,7 +30,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderByID;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -65,7 +65,7 @@ public class ActionComputeElevationGain extends Action {
          differenceResult.append(net.tourbook.common.UI.SYMBOL_PLUS);
       }
 
-      differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));
+      differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ELEVATION));
       return differenceResult.toString();
    }
 
@@ -77,8 +77,7 @@ public class ActionComputeElevationGain extends Action {
       final float prefDPTolerance = TourbookPlugin.getPrefStore().getFloat(
             ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
 
-      final String dpToleranceWithUnit = _nf1.format(prefDPTolerance / UI.UNIT_VALUE_ALTITUDE) + net.tourbook.common.UI.SPACE1
-            + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE;
+      final String dpToleranceWithUnit = _nf1.format(prefDPTolerance / UI.UNIT_VALUE_ELEVATION) + UI.SPACE1 + UI.UNIT_LABEL_ELEVATION;
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
@@ -129,7 +128,7 @@ public class ActionComputeElevationGain extends Action {
                   new Object[] {
                         dpToleranceWithUnit,
                         differenceResult,
-                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
+                        UI.UNIT_LABEL_ELEVATION
                   });
          }
 

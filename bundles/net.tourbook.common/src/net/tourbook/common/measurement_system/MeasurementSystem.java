@@ -141,6 +141,7 @@ public class MeasurementSystem implements Cloneable {
             _length_Small,
             _elevation,
             _height,
+            _pace,
             _pressure_Atmosphere,
             _temperature,
             _weight_Body);

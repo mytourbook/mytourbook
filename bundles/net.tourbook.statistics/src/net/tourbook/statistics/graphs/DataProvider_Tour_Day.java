@@ -494,10 +494,10 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllBodyFat.add(bodyFat);
 
                // round distance
-               final float distance = dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;
 
                dbAllDistance.add(distance);
-               dbAllElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
+               dbAllElevationUp.add(dbAltitudeUp / UI.UNIT_VALUE_ELEVATION);
 
                dbAllAvgPace.add(distance == 0 ? 0 : dbMovingTime * 1000f / distance / 60.0f);
                dbAllAvgSpeed.add(dbMovingTime == 0 ? 0 : 3.6f * distance / dbMovingTime);

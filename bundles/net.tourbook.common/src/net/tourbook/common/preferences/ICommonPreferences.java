@@ -21,7 +21,6 @@ public interface ICommonPreferences {
     * Measurement system
     */
    public static final String MEASUREMENT_SYSTEM            = "MEASUREMENT_SYSTEM";            //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_OLD_CODE   = "MEASUREMENT_SYSTEM_OLD_CODE";   //$NON-NLS-1$
    public static final String MEASUREMENT_SYSTEM_SHOW_IN_UI = "MEASUREMENT_SYSTEM_SHOW_IN_UI"; //$NON-NLS-1$
 
    /*

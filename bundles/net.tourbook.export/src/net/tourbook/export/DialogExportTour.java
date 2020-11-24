@@ -600,10 +600,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
                         _nf3.format(distanceSerie[_tourStartIndex]
                               / 1000
-                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+                              / UI.UNIT_VALUE_DISTANCE),
                         _nf3.format(distanceSerie[_tourEndIndex]
                               / 1000
-                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+                              / UI.UNIT_VALUE_DISTANCE),
 
                         UI.UNIT_LABEL_DISTANCE,
 
@@ -1018,7 +1018,7 @@ public class DialogExportTour extends TitleAreaDialog {
       _exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
 
       _exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
-      _exportState_CamouflageSpeed *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE / 3.6f;
+      _exportState_CamouflageSpeed *= UI.UNIT_VALUE_DISTANCE / 3.6f;
       _exportState_FileCollisionBehaviour = new FileCollisionBehavior();
 
       if (_isSetup_TourRange) {

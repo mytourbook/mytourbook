@@ -405,8 +405,8 @@ public class DataProvider_Tour_Year extends DataProvider {
             final int dbValue_MovingTime           = result.getInt(6);
             final int dbValue_Duration             = result.getInt(7);
 
-            final long dbValue_Distance            = (long) (result.getInt(8) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-            final long dbValue_ElevationUp         = (long) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
+            final long dbValue_Distance            = (long) (result.getInt(8) / UI.UNIT_VALUE_DISTANCE);
+            final long dbValue_ElevationUp         = (long) (result.getInt(9) / UI.UNIT_VALUE_ELEVATION);
 
             final int dbValue_NumTours             = result.getInt(10);
             final float dbValue_BodyWeight         = result.getFloat(11) * UI.UNIT_VALUE_WEIGHT;

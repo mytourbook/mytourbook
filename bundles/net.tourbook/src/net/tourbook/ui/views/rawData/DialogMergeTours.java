@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,29 @@ package net.tourbook.ui.views.rawData;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ISliderMoveListener;
+import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.IDataModelListener;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
+import net.tourbook.ui.tourChart.I2ndAltiLayer;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -53,29 +76,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ChartDataModel;
-import net.tourbook.chart.ISliderMoveListener;
-import net.tourbook.chart.SelectionChartInfo;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.IDataModelListener;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
-import net.tourbook.ui.tourChart.I2ndAltiLayer;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.ui.tourChart.TourChartConfiguration;
 
 //import net.tourbook.ui.UI;
 
@@ -530,7 +530,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
 				_sourceTour.dataSerieAdjustedAlti = adjustedTargetAltitudeSerie;
 
-				startAltiDiff /= net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            startAltiDiff /= UI.UNIT_VALUE_ELEVATION;
 
 				final int targetEndTime = targetTimeSerie[endIndex];
 				final float targetEndDistance = targetDistanceSerie[endIndex];
@@ -543,7 +543,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				// meter/meter
 				altiDiffDist = targetEndDistance == 0 ? //
 						0f
-						: ((startAltiDiff * 1000) / targetEndDistance) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+						: ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
 
 			} else if (_chkAdjustAltiFromSource.getSelection()) {
 
@@ -1232,7 +1232,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				.applyTo(_lblAdjustAltiValueTime);
 
 		_lblAdjustAltiValueTimeUnit = new Label(aaContainer, SWT.NONE);
-		_lblAdjustAltiValueTimeUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/min"); //$NON-NLS-1$
+      _lblAdjustAltiValueTimeUnit.setText(UI.UNIT_LABEL_ELEVATION + "/min"); //$NON-NLS-1$
 
 		_lblAdjustAltiValueDistance = new Label(aaContainer, SWT.TRAIL);
 		GridDataFactory
@@ -1241,7 +1241,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				.applyTo(_lblAdjustAltiValueDistance);
 
 		_lblAdjustAltiValueDistanceUnit = new Label(aaContainer, SWT.NONE);
-		_lblAdjustAltiValueDistanceUnit.setText(UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
+      _lblAdjustAltiValueDistanceUnit.setText(UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
 
 		/*
 		 * checkbox: set tour type
@@ -1496,11 +1496,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 		final int altiDiff1 = _scaleAltitude1.getSelection() - MAX_ADJUST_ALTITUDE_1;
 		final int altiDiff10 = (_scaleAltitude10.getSelection() - MAX_ADJUST_ALTITUDE_10) * 10;
 
-		final float localAltiDiff1 = altiDiff1 / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-		final float localAltiDiff10 = altiDiff10 / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float localAltiDiff1 = altiDiff1 / UI.UNIT_VALUE_ELEVATION;
+      final float localAltiDiff10 = altiDiff10 / UI.UNIT_VALUE_ELEVATION;
 
-		_lblAltitudeDiff1.setText(Integer.toString((int) localAltiDiff1) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
-		_lblAltitudeDiff10.setText(Integer.toString((int) localAltiDiff10) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
+      _lblAltitudeDiff1.setText(Integer.toString((int) localAltiDiff1) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
+      _lblAltitudeDiff10.setText(Integer.toString((int) localAltiDiff10) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
 
 		return altiDiff1 + altiDiff10;
 	}

@@ -1028,7 +1028,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
                      _DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
 
                      _avgPulse.add(tourItem.getAvgPulse());
-                     _tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+                     _tourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
                   }
                }
             }

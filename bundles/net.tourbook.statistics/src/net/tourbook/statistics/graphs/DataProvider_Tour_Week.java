@@ -502,8 +502,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             final int dbValue_DurationTime      = result.getInt(8);
 
-            final int dbValue_Distance          = (int) (result.getInt(9) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-            final int dbValue_Elevation         = (int) (result.getInt(10) / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
+            final int dbValue_Distance          = (int) (result.getInt(9) / UI.UNIT_VALUE_DISTANCE);
+            final int dbValue_Elevation         = (int) (result.getInt(10) / UI.UNIT_VALUE_ELEVATION);
 
             final int dbValue_NumTours          = result.getInt(11);
 

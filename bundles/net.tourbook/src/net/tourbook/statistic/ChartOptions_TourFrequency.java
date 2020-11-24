@@ -245,7 +245,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
                // unit
                final Label label = new Label(group, SWT.NONE);
-               label.setText(UI.UNIT_LABEL_ALTITUDE);
+               label.setText(UI.UNIT_LABEL_ELEVATION);
                GridDataFactory.fillDefaults()//
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(label);
@@ -269,7 +269,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
                // unit
                final Label label = new Label(group, SWT.NONE);
-               label.setText(UI.UNIT_LABEL_ALTITUDE);
+               label.setText(UI.UNIT_LABEL_ELEVATION);
                GridDataFactory.fillDefaults()//
                      .align(SWT.FILL, SWT.CENTER)
                      .applyTo(label);

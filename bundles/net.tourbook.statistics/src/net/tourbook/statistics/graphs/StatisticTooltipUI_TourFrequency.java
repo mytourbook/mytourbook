@@ -831,8 +831,8 @@ public class StatisticTooltipUI_TourFrequency {
 
       final String elevationUp_Percentage_Text        = elevationUp_Percentage   == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(elevationUp_Percentage);
 
-      final float elevationUp_WithMeasurement         = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
-      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_WithMeasurement         = elevationUp / UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_Summary_WithMeasurement = elevationUp_Summary / UI.UNIT_VALUE_ELEVATION;
 
 // SET_FORMATTING_ON
 

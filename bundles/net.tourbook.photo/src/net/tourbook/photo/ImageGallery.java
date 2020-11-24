@@ -995,7 +995,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //            if (altitude == Double.MIN_VALUE) {
 //               cell.setText(UI.EMPTY_STRING);
 //            } else {
-//               cell.setText(Integer.toString((int) (altitude / UI.UNIT_VALUE_ALTITUDE)));
+//               cell.setText(Integer.toString((int) (altitude / UI.UNIT_VALUE_ELEVATION)));
 //            }
 //         }
 //      });

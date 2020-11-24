@@ -463,7 +463,7 @@ public class TourInfoUI {
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
 
-         final Integer selectedTabFolder = new Integer(0);
+         final Integer selectedTabFolder = Integer.valueOf(0);
 
          _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
                Messages.Tour_Tooltip_Action_EditFormatPreferences,
@@ -1441,7 +1441,7 @@ public class TourInfoUI {
       }
 
       int windSpeed = _tourData.getWeatherWindSpeed();
-      windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+      windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
 
       _lblWindSpeed.setText(Integer.toString(windSpeed));
       _lblWindSpeedUnit.setText(
@@ -1459,10 +1459,10 @@ public class TourInfoUI {
 
       // temperature
       float temperature = _tourData.getAvgTemperature();
-      if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+      if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
          temperature = temperature
-               * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-               + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+               * UI.UNIT_FAHRENHEIT_MULTI
+               + UI.UNIT_FAHRENHEIT_ADD;
       }
       _lblTemperature.setText(_nf1.format(temperature));
 
@@ -1477,16 +1477,16 @@ public class TourInfoUI {
       /*
        * column: right
        */
-      final float distance = _tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      final float distance = _tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
 
       _lblDistance.setText(FormatManager.formatDistance(distance / 1000.0));
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
-      _lblAltitudeUp.setText(Integer.toString((int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-      _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblAltitudeUp.setText(Integer.toString((int) (_tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION)));
+      _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
-      _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-      _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblAltitudeDown.setText(Integer.toString((int) (_tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION)));
+      _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
       final long time = isPaceAndSpeedFromRecordedTime ? recordedTime : movingTime;
@@ -1533,16 +1533,16 @@ public class TourInfoUI {
       /*
        * Max values
        */
-      _lblMaxAltitude.setText(Integer.toString((int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-      _lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblMaxAltitude.setText(Integer.toString((int) (_tourData.getMaxAltitude() / UI.UNIT_VALUE_ELEVATION)));
+      _lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
       _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
       _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-      _lblMaxPace.setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+      _lblMaxPace.setText(UI.format_mm_ss((long) (_tourData.getMaxPace() * UI.UNIT_VALUE_DISTANCE)));
       _lblMaxPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
-      _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+      _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / UI.UNIT_VALUE_DISTANCE));
       _lblMaxSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
       // gears
@@ -1576,7 +1576,7 @@ public class TourInfoUI {
        */
       if (_hasRunDyn) {
 
-         final float mmOrInch = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+         final float mmOrInch = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
          _lblRunDyn_StanceTime_Min.setText(Integer.toString(_tourData.getRunDyn_StanceTime_Min()));
          _lblRunDyn_StanceTime_Min_Unit.setText(UI.UNIT_MS);
