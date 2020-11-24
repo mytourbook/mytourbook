@@ -1459,7 +1459,7 @@ public class TourInfoUI {
 
       // temperature
       float temperature = _tourData.getAvgTemperature();
-      if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+      if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
          temperature = temperature
                * UI.UNIT_FAHRENHEIT_MULTI
                + UI.UNIT_FAHRENHEIT_ADD;

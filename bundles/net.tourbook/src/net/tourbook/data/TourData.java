@@ -2277,7 +2277,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
       }
 
-      if (UI.UNIT_VALUE_ELEVATION != 1) {
+      if (UI.UNIT_IS_ELEVATION_FOOT) {
 
          // set imperial system
 
@@ -2450,7 +2450,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      if (UI.UNIT_VALUE_ELEVATION != 1) {
+      if (UI.UNIT_IS_ELEVATION_FOOT) {
 
          // set imperial system
 
@@ -3606,7 +3606,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
          }
 
-         if (UI.UNIT_VALUE_ELEVATION != 1) {
+         if (UI.UNIT_IS_ELEVATION_FOOT) {
 
             // set imperial system
 
@@ -6818,7 +6818,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getAltimeterSerie() {
 
-      if (UI.UNIT_VALUE_ELEVATION != 1) {
+      if (UI.UNIT_IS_ELEVATION_FOOT) {
 
          // use imperial system
 
@@ -6848,7 +6848,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      if (UI.UNIT_VALUE_ELEVATION != 1) {
+      if (UI.UNIT_IS_ELEVATION_FOOT) {
 
          // imperial system is used
 
@@ -6894,7 +6894,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // return already smoothed altitude values
 
-         if (UI.UNIT_VALUE_ELEVATION != 1) {
+         if (UI.UNIT_IS_ELEVATION_FOOT) {
 
             // imperial system is used
 
@@ -6913,7 +6913,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else {
 
-         if (UI.UNIT_VALUE_ELEVATION != 1) {
+         if (UI.UNIT_IS_ELEVATION_FOOT) {
 
             // imperial system is used
 
@@ -8184,7 +8184,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      if (UI.UNIT_VALUE_ELEVATION != 1) {
+      if (UI.UNIT_IS_ELEVATION_FOOT) {
 
          // imperial system is used
 

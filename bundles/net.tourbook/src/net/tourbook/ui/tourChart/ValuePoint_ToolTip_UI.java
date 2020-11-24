@@ -1670,7 +1670,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          float temperature = _tourData.temperatureSerie[valueIndex];
 
-         if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+         if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
             // get imperial temperature
 

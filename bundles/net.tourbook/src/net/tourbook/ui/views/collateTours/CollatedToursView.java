@@ -1682,9 +1682,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             float value = ((TVICollatedTour) element).colAvgTemperature;
 
-            if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+            if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
-               value = value //
+               value = value
                      * UI.UNIT_FAHRENHEIT_MULTI
                      + UI.UNIT_FAHRENHEIT_ADD;
             }
