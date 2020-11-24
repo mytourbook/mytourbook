@@ -364,7 +364,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
                final TVIWizardCompareTour tourItem = (TVIWizardCompareTour) element;
 
-               final float distance = (tourItem.colDistance) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+               final float distance = (tourItem.colDistance) / (1000 * UI.UNIT_VALUE_DISTANCE);
 
                cell.setText(_nf1.format(distance));
 

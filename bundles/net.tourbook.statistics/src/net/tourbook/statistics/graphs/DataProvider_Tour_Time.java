@@ -393,8 +393,8 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourDeviceTime_Paused.add(dbPausedTime);
                allTourComputedTime_Moving.add(dbMovingTime);
 
-               allDistances.add(dbDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-               allElevationUp.add(dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION);
+               allDistances.add(dbDistance / UI.UNIT_VALUE_DISTANCE);
+               allElevationUp.add(dbAltitudeUp / UI.UNIT_VALUE_ELEVATION);
 
                allTourTitle.add(dbTourTitle);
 

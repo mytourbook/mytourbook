@@ -543,7 +543,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 				// meter/meter
 				altiDiffDist = targetEndDistance == 0 ? //
 						0f
-						: ((startAltiDiff * 1000) / targetEndDistance) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+						: ((startAltiDiff * 1000) / targetEndDistance) / UI.UNIT_VALUE_DISTANCE;
 
 			} else if (_chkAdjustAltiFromSource.getSelection()) {
 

@@ -762,8 +762,8 @@ public class StatisticTooltipUI_CategorizedData {
       final float elevationUp_Percentage                 = elevationUp_Summary == 0 ? 0 : elevationUp / elevationUp_Summary   * 100;
       final float numTours_Percentage                    = numTours_Summary    == 0 ? 0 : numTours    / numTours_Summary      * 100;
 
-      final float elevationUp_WithMeasurement            = elevationUp / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
-      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / net.tourbook.ui.UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_WithMeasurement            = elevationUp / UI.UNIT_VALUE_ELEVATION;
+      final float elevationUp_Summary_WithMeasurement    = elevationUp_Summary / UI.UNIT_VALUE_ELEVATION;
 
       final String deviceTime_Elapsed_Percentage_Text    = deviceTime_Elapsed_Percentage  == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Elapsed_Percentage);
       final String deviceTime_Recorded_Percentage_Text   = deviceTime_Recorded_Percentage == 0  ? UI.EMPTY_STRING : VALUE_FORMATTER_1_0.printDouble(deviceTime_Recorded_Percentage);

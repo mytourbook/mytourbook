@@ -866,7 +866,7 @@ public class CalendarProfileManager {
 
             if (data.distance > 0) {
 
-               final double distance = data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double distance = data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = valueFormatter.printDouble(distance);
 
@@ -980,7 +980,7 @@ public class CalendarProfileManager {
 
             if (data.elevationGain > 0 && data.distance > 0) {
 
-               final float totalDistance = data.distance / 1000f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final float totalDistance = data.distance / 1000f / UI.UNIT_VALUE_DISTANCE;
                final float totalElevationChange = (data.elevationGain + data.elevationLoss) / UI.UNIT_VALUE_ELEVATION;
                final float elevationChangePerDistanceUnit = totalElevationChange / totalDistance;
                final String valueText = valueFormatter.printDouble(elevationChangePerDistanceUnit);
@@ -1204,7 +1204,7 @@ public class CalendarProfileManager {
 
                final float pace = data.distance == 0
                      ? 0
-                     : 1000 * time / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     : 1000 * time / data.distance * UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = UI.format_mm_ss((long) pace);
 
@@ -1364,7 +1364,7 @@ public class CalendarProfileManager {
                      : data.distance / (time / 3.6f);
 
                //convert to the current measurement system
-               speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speed /= UI.UNIT_VALUE_DISTANCE;
                final String valueText = valueFormatter.printDouble(speed);
 
                return isShowValueUnit

@@ -1528,7 +1528,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
-            final float avgpace = item.avgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float avgpace = item.avgPace * UI.UNIT_VALUE_DISTANCE;
 
             if (avgpace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1558,7 +1558,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
-            final double speed = item.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double speed = item.avgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, speed);
          }
@@ -1582,7 +1582,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final double value = item.distance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, value);
          }

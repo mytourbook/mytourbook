@@ -318,8 +318,8 @@ public class RawDataManager {
          float avgTemperature = oldTourData.getAvgTemperature();
          if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
          previousData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS
@@ -328,8 +328,8 @@ public class RawDataManager {
          avgTemperature = newTourData.getAvgTemperature();
          if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
          newData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS

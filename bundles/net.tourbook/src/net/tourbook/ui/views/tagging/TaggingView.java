@@ -27,6 +27,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
@@ -63,7 +64,6 @@ import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -968,13 +968,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
 
-               styledString.append(viewItem.treeColumn, UI.TAG_STYLER);
+               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.TAG_STYLER);
                styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
                cell.setImage(tagItem.isRoot ? _imgTagRoot : _imgTag);
 
             } else if (viewItem instanceof TVITagView_TagCategory) {
 
-               styledString.append(viewItem.treeColumn, UI.TAG_CATEGORY_STYLER);
+               styledString.append(viewItem.treeColumn, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
                cell.setImage(_imgTagCategory);
 
             } else if (viewItem instanceof TVITagView_Year || viewItem instanceof TVITagView_Month) {
@@ -983,9 +983,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                styledString.append("   " + viewItem.colTourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
                if (viewItem instanceof TVITagView_Month) {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
+                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
                } else {
-                  cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
+                  cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
                }
 
             } else {
@@ -1535,7 +1535,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       TVITagView_Tour firstTour = null;
 
       for (final Object treeItem : selection) {
-         
+
          if (treeItem instanceof TVITagView_Tour) {
             if (numTours == 0) {
                firstTour = (TVITagView_Tour) treeItem;
@@ -2104,7 +2104,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          final ArrayList<Long> tourIds = new ArrayList<>();
 
          for (final Object viewItem : selectedTours) {
-            
+
             if (viewItem instanceof TVITagView_Tour) {
                tourIds.add(((TVITagView_Tour) viewItem).getTourId());
             }
@@ -2463,11 +2463,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set color
       if (element instanceof TVITagView_Tag) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TITLE));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_TITLE));
       } else if (element instanceof TVITagView_Year) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
       } else if (element instanceof TVITagView_Month) {
-         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
+         cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
 //      } else if (element instanceof TVITagView_Tour) {
 //         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
       }

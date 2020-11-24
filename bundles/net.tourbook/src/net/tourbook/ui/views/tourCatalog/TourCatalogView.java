@@ -23,6 +23,7 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -49,7 +50,6 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -760,7 +760,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                final TVICatalogRefTourItem refItem = (TVICatalogRefTourItem) element;
 
                final StyledString styledString = new StyledString();
-               styledString.append(refItem.label, UI.TAG_STYLER);
+               styledString.append(refItem.label, net.tourbook.ui.UI.TAG_STYLER);
 
                cell.setText(styledString.getString());
                cell.setStyleRanges(styledString.getStyleRanges());
@@ -771,7 +771,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
                final TVICatalogYearItem yearItem = (TVICatalogYearItem) element;
                final StyledString styledString = new StyledString();
-               styledString.append(Integer.toString(yearItem.year), UI.TAG_SUB_STYLER);
+               styledString.append(Integer.toString(yearItem.year), net.tourbook.ui.UI.TAG_SUB_STYLER);
                styledString.append("   " + yearItem.tourCounter, StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 
                cell.setText(styledString.getString());
@@ -988,7 +988,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       TVICatalogComparedTour firstTourItem = null;
 
       // count number of items
-      for (Object treeItem : selection) {
+      for (final Object treeItem : selection) {
 
          if (treeItem instanceof TVICatalogRefTourItem) {
             refItems++;
@@ -1127,7 +1127,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (Object treeItem : selectedTours) {
+      for (final Object treeItem : selectedTours) {
 
          if (treeItem instanceof TVICatalogRefTourItem) {
 
@@ -1148,7 +1148,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (Object treeItem : selectedTours) {
+      for (final Object treeItem : selectedTours) {
 
          if (treeItem instanceof TVICatalogComparedTour) {
 
@@ -1169,7 +1169,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
       // loop: all selected items
-      for (Object treeItem : selectedTours) {
+      for (final Object treeItem : selectedTours) {
 
          if (treeItem instanceof TVICatalogYearItem) {
 
@@ -1187,7 +1187,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final ArrayList<Long> selectedReferenceTour = new ArrayList<>();
 
       // loop: all selected items
-      for (Object treeItem : selectedItems) {
+      for (final Object treeItem : selectedItems) {
          if (treeItem instanceof TVICatalogRefTourItem) {
             selectedReferenceTour.add(((TVICatalogRefTourItem) treeItem).refId);
          }
@@ -1205,7 +1205,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected items
-      for (Object treeItem : selectedTours) {
+      for (final Object treeItem : selectedTours) {
 
          if (treeItem instanceof TVICatalogComparedTour) {
 

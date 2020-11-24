@@ -3950,7 +3950,7 @@ public class Map extends Canvas {
             TOUR_TOOLTIP_LABEL_RECORDED_TIME,
             FormatManager.formatRecordedTime(recordedTime));
 
-      final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),

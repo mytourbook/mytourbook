@@ -1864,7 +1864,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             }
 
             final long tourTypeId = speedTT.tourTypeId;
-            final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+            final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
 
             ttText.append((int) avgSpeed);
             ttText.append(UI.SPACE);
@@ -1923,7 +1923,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // last marker
       {
-         final double distance = importLauncher.lastMarkerDistance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final double distance = importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
 
@@ -2940,7 +2940,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final float pace = tourDistance == 0 ? //
             0
-                  : time * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : time * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2973,7 +2973,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             double value = 0;
 
             if (time != 0) {
-               value = tourDistance / time * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               value = tourDistance / time * 3.6 / UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
@@ -2994,7 +2994,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void update(final ViewerCell cell) {
 
             final double tourDistance = ((TourData) cell.getElement()).getTourDistance();
-            final double value = tourDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = tourDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, value);
          }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -40,7 +41,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -328,7 +328,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
                final long viewTourId = _tourData.getTourId();
 
-               if (UI.containsTourId(eventData, viewTourId) != null) {
+               if (net.tourbook.ui.UI.containsTourId(eventData, viewTourId) != null) {
 
                   // reload tour data
                   _tourData = TourManager.getInstance().getTourData(viewTourId);

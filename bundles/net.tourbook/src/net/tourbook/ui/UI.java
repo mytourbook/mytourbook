@@ -31,9 +31,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -173,26 +171,6 @@ public class UI {
    public static final String        SYMBOL_WIND_WITH_SPACE        = "W ";                                                                    //$NON-NLS-1$
    public static final String        SYMBOL_EXCLAMATION_POINT      = "!";                                                                     //$NON-NLS-1$
 
-   /**
-    * Contains the system of measurement value for distances relative to the metric system.
-    * <p>
-    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE} or
-    * {@link #UNIT_NAUTICAL_MILE}
-    */
-   public static float               UNIT_VALUE_DISTANCE           = 1;
-
-   /**
-    * Contains the system of measurement value for altitudes relative to the metric system, the
-    * metric system is <code>1</code>
-    */
-   public static float               UNIT_VALUE_ELEVATION          = 1;
-
-   /**
-    * (Celcius * 9/5) + 32 = Fahrenheit
-    */
-   public static final float         UNIT_FAHRENHEIT_MULTI         = 1.8f;
-   public static final float         UNIT_FAHRENHEIT_ADD           = 32;
-
    public final static ImageRegistry IMAGE_REGISTRY;
 
    private static final String       PART_NAME_GRAPH_ID            = "graphId-";                                                              //$NON-NLS-1$
@@ -215,21 +193,6 @@ public class UI {
    private static Font               _fontForLogging;
 
    static {
-
-      CommonActivator.getPrefStore().addPropertyChangeListener(new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            final String property = event.getProperty();
-
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM_OLD_CODE)) {
-
-               // measurement was modified
-
-               updateUnits_OLD_Code();
-            }
-         }
-      });
 
       setViewColorsFromPrefStore();
       setupFonts();
@@ -1255,22 +1218,4 @@ public class UI {
       lblTourType.pack(true);
       lblTourType.redraw(); // display changed tour image
    }
-
-   /**
-    * Update units from the pref store into the app vars.
-    * <p>
-    * <b>This code will be removed when the old UNIT_ vars are replaced with vars from the common
-    * plugin.</b>
-    */
-   public static void updateUnits_OLD_Code() {
-
-// SET_FORMATTING_OFF
-
-      // update from net.tourbook.common.UI
-      UNIT_VALUE_DISTANCE              = net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
-      UNIT_VALUE_ELEVATION             = net.tourbook.common.UI.UNIT_VALUE_ELEVATION;
-
-// SET_FORMATTING_ON
-   }
-
 }

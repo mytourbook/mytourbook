@@ -33,7 +33,6 @@ import net.tourbook.common.measurement_system.Unit_Pace;
 import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
 import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -2631,8 +2630,6 @@ public class UI {
 
 // SET_FORMATTING_ON
 
-      // update system which is using the old code, will be sometimes removed when all code is converted
-      CommonActivator.getPrefStore().setValue(ICommonPreferences.MEASUREMENT_SYSTEM_OLD_CODE, Math.random());
    }
 
    public static VerifyListener verifyFilenameInput() {
