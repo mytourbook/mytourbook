@@ -19,8 +19,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
@@ -108,58 +108,58 @@ public class Suunto2SAXHandler extends DefaultHandler {
       TIME_FORMAT_RFC822.setTimeZone(utc);
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
+   private Map<Long, TourData> _alreadyImportedTours;
+   private Map<Long, TourData> _newlyImportedTours;
+   private TourbookDevice      _device;
+   private String              _importFilePath;
    //
-   private TimeData                _sampleData;
+   private TimeData            _sampleData;
 
-   private ArrayList<TimeData>     _sampleList       = new ArrayList<>();
-   private TimeData                _gpsData;
+   private ArrayList<TimeData> _sampleList       = new ArrayList<>();
+   private TimeData            _gpsData;
 
-   private ArrayList<TimeData>     _gpsList          = new ArrayList<>();
-   private TimeData                _markerData;
+   private ArrayList<TimeData> _gpsList          = new ArrayList<>();
+   private TimeData            _markerData;
 
-   private ArrayList<TimeData>     _markerList       = new ArrayList<>();
+   private ArrayList<TimeData> _markerList       = new ArrayList<>();
 
-   private final List<Long>        _pausedTime_Start = new ArrayList<>();
-   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private final List<Long>    _pausedTime_Start = new ArrayList<>();
+   private List<Long>          _pausedTime_End   = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private StringBuilder           _characters       = new StringBuilder();
-   private String                  _currentSampleType;
-   private long                    _currentTime;
+   private boolean             _isImported;
+   private StringBuilder       _characters       = new StringBuilder();
+   private String              _currentSampleType;
+   private long                _currentTime;
 
-   private long                    _prevSampleTime;
-   private boolean                 _isInRootDevice;
-   private boolean                 _isInRootSamples;
+   private long                _prevSampleTime;
+   private boolean             _isInRootDevice;
+   private boolean             _isInRootSamples;
 
-   private boolean                 _isInRootHeader;
-   private boolean                 _isInAltitude;
-   private boolean                 _isInCadence;
-   private boolean                 _isInDistance;
-   private boolean                 _isInEnergy;
-   private boolean                 _isInEvents;
-   private boolean                 _isInHR;
-   private boolean                 _isInLatitude;
-   private boolean                 _isInLongitude;
-   private boolean                 _isInPause;
-   private boolean                 _isInSample;
-   private boolean                 _isInSampleType;
-   private boolean                 _isInState;
-   private boolean                 _isInSW;
-   private boolean                 _isInUTC;
+   private boolean             _isInRootHeader;
+   private boolean             _isInAltitude;
+   private boolean             _isInCadence;
+   private boolean             _isInDistance;
+   private boolean             _isInEnergy;
+   private boolean             _isInEvents;
+   private boolean             _isInHR;
+   private boolean             _isInLatitude;
+   private boolean             _isInLongitude;
+   private boolean             _isInPause;
+   private boolean             _isInSample;
+   private boolean             _isInSampleType;
+   private boolean             _isInState;
+   private boolean             _isInSW;
+   private boolean             _isInUTC;
 
-   private boolean                 _isInTemperature;
-   private int                     _tourCalories;
+   private boolean             _isInTemperature;
+   private int                 _tourCalories;
 
-   private String                  _tourSW;
+   private String              _tourSW;
 
    public Suunto2SAXHandler(final TourbookDevice deviceDataReader,
                             final String importFileName,
-                            final HashMap<Long, TourData> alreadyImportedTours,
-                            final HashMap<Long, TourData> newlyImportedTours) {
+                            final Map<Long, TourData> alreadyImportedTours,
+                            final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -287,7 +287,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
          } else if (stateValue.equalsIgnoreCase(Boolean.FALSE.toString())) {
 
-            if (_pausedTime_Start.size() == 0) {
+            if (_pausedTime_Start.isEmpty()) {
                return;
             }
 
@@ -475,7 +475,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
    private void finalizeTour() {
 
       // check if data are available
-      if (_sampleList.size() == 0) {
+      if (_sampleList.isEmpty()) {
          return;
       }
 
@@ -540,7 +540,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
     */
    private void setData_GPS() {
 
-      if (_gpsList.size() == 0) {
+      if (_gpsList.isEmpty()) {
          return;
       }
 
@@ -628,11 +628,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
          final long sampleTime = sampleData.absoluteTime;
 
-         if (sampleTime < markerTime) {
-
-            continue;
-
-         } else {
+         if (sampleTime >= markerTime) {
 
             // markerTime >= sampleTime
 
