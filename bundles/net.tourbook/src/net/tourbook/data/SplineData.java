@@ -17,19 +17,23 @@ package net.tourbook.data;
 
 public class SplineData {
 
-   public double[]  relativePositionX;
-   public double[]  relativePositionY;
+   /*
+    * Spline point positions
+    */
+   public double[]  posX_RelativeValues;
+   public double[]  posY_RelativeValues;
 
-   public double[]  graphXValues;
-   public double[]  graphYValues;
+   public double[]  posX_GraphValues;
+   public double[]  posY_GraphValues;
 
-   public double[]  graphXMinValues;
-   public double[]  graphXMaxValues;
+   public double[]  posX_GraphMinValues;
+   public double[]  posX_GraphMaxValues;
 
    /**
-    * Serie index for the spline point in the data serie (distance or time)
+    * Serie index for the spline point in the data serie (distance or time), the points are
+    * <b>NOT</b> sorted by data serie index !!!
     */
-   public int[]     serieIndex;
+   public int[]     splinePoint_DataSerieIndex;
 
    public boolean[] isPointMovable;
 
