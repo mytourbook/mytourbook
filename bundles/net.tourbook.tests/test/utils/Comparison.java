@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
@@ -82,13 +85,20 @@ public class Comparison {
    }
 
    private static String readFile(final String path, final Charset encoding) {
+
+      if (StringUtils.isNullOrEmpty(path)) {
+         return UI.EMPTY_STRING;
+      }
+
       byte[] encoded = null;
       try {
          encoded = Files.readAllBytes(Paths.get(path));
+         return new String(encoded, encoding);
       } catch (final IOException e) {
          e.printStackTrace();
       }
-      return new String(encoded, encoding);
+
+      return UI.EMPTY_STRING;
    }
 
    public static TourData RetrieveImportedTour(final HashMap<Long, TourData> newlyImportedTours) {
