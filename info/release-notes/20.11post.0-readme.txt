@@ -35,14 +35,14 @@ Changes
 =======
 
 * Dialog Adjust Elevation
-  - Set the elevation of the rightmost spline point to the SRTM value when the adjustment type is "Approach elevation with SRTM data"
+  - The elevation of the rightmost spline point is now set to the SRTM value when the adjustment type is "Approach elevation with SRTM data"
 
 
 Fixes   
 =====
 
 * Calendar View
-  - Calendar week did not start always with the first day of week, it depended on the selected tour date 
+  - The calendar week did not start always with the first day of week, it depended on the selected tour date 
 
 
 Translation    
