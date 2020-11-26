@@ -34,10 +34,10 @@ public class DataProvider_HrZone_Month extends DataProvider {
    private TourStatisticData_MonthHrZones _monthData;
 
    TourStatisticData_MonthHrZones getMonthData(final TourPerson person,
-                                      final TourTypeFilter tourTypeFilter,
-                                      final int lastYear,
-                                      final int numYears,
-                                      final boolean refreshData) {
+                                               final TourTypeFilter tourTypeFilter,
+                                               final int lastYear,
+                                               final int numYears,
+                                               final boolean refreshData) {
 
       /*
        * check if the required data are already loaded
@@ -205,70 +205,70 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
       final String headerLine1 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD1_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead1() : UI.EMPTY_STRING)
 
-            + HEAD1_DATE_YEAR
-            + HEAD1_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getHead1()
+            + STAT_VALUE_DATE_MONTH.getHead1()
 
-            + HEAD1_HR_ZONE_1
-            + HEAD1_HR_ZONE_2
-            + HEAD1_HR_ZONE_3
-            + HEAD1_HR_ZONE_4
-            + HEAD1_HR_ZONE_5
-            + HEAD1_HR_ZONE_6
-            + HEAD1_HR_ZONE_7
-            + HEAD1_HR_ZONE_8
-            + HEAD1_HR_ZONE_9
-            + HEAD1_HR_ZONE_10
+            + STAT_VALUE_HR_ZONE_1.getHead1()
+            + STAT_VALUE_HR_ZONE_2.getHead1()
+            + STAT_VALUE_HR_ZONE_3.getHead1()
+            + STAT_VALUE_HR_ZONE_4.getHead1()
+            + STAT_VALUE_HR_ZONE_5.getHead1()
+            + STAT_VALUE_HR_ZONE_6.getHead1()
+            + STAT_VALUE_HR_ZONE_7.getHead1()
+            + STAT_VALUE_HR_ZONE_8.getHead1()
+            + STAT_VALUE_HR_ZONE_9.getHead1()
+            + STAT_VALUE_HR_ZONE_10.getHead1()
 
-            + HEAD1_HR_SUMMARY
-            + HEAD1_HR_SUMMARY
+            + STAT_VALUE_HR_SUMMARY_SECONDS.getHead1()
+            + STAT_VALUE_HR_SUMMARY_HHMMSS.getHead1()
 
       ;
 
       final String headerLine2 = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? HEAD2_DATA_NUMBER : UI.EMPTY_STRING)
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getHead2() : UI.EMPTY_STRING)
 
-            + HEAD2_DATE_YEAR
-            + HEAD2_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getHead2()
+            + STAT_VALUE_DATE_MONTH.getHead2()
 
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
-            + HEAD2_HR_ZONE
+            + STAT_VALUE_HR_ZONE_1.getHead2()
+            + STAT_VALUE_HR_ZONE_2.getHead2()
+            + STAT_VALUE_HR_ZONE_3.getHead2()
+            + STAT_VALUE_HR_ZONE_4.getHead2()
+            + STAT_VALUE_HR_ZONE_5.getHead2()
+            + STAT_VALUE_HR_ZONE_6.getHead2()
+            + STAT_VALUE_HR_ZONE_7.getHead2()
+            + STAT_VALUE_HR_ZONE_8.getHead2()
+            + STAT_VALUE_HR_ZONE_9.getHead2()
+            + STAT_VALUE_HR_ZONE_10.getHead2()
 
-            + HEAD2_HR_SUMMARY_SECONDS
-            + HEAD2_HR_SUMMARY_HHMMSS
+            + STAT_VALUE_HR_SUMMARY_SECONDS.getHead2()
+            + STAT_VALUE_HR_SUMMARY_HHMMSS.getHead2()
 
       ;
 
       final String valueFormatting = UI.EMPTY_STRING
 
-            + (isShowSequenceNumbers ? VALUE_DATA_NUMBER : "%s") //$NON-NLS-1$
+            + (isShowSequenceNumbers ? STAT_VALUE_SEQUENCE_NUMBER.getValueFormatting() : VALUE_FORMAT_S)
 
-            + VALUE_DATE_YEAR
-            + VALUE_DATE_MONTH
+            + STAT_VALUE_DATE_YEAR.getValueFormatting()
+            + STAT_VALUE_DATE_MONTH.getValueFormatting()
 
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
-            + VALUE_HR_ZONE
+            + STAT_VALUE_HR_ZONE_1.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_2.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_3.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_4.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_5.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_6.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_7.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_8.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_9.getValueFormatting()
+            + STAT_VALUE_HR_ZONE_10.getValueFormatting()
 
-            + VALUE_HR_SUMMARY_SECONDS
-            + VALUE_HR_SUMMARY_HHMMSS
+            + STAT_VALUE_HR_SUMMARY_SECONDS.getValueFormatting()
+            + STAT_VALUE_HR_SUMMARY_HHMMSS.getValueFormatting()
 
       ;
 

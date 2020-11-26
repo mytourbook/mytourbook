@@ -23,8 +23,10 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -137,17 +139,19 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
    }
 
-   private final IPreferenceStore  _prefStore  = TourbookPlugin.getPrefStore();
-   private final IDialogSettings   _state      = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
    //
    private ColumnManager           _columnManager;
-   private OpenDialogManager       _openDlgMgr = new OpenDialogManager();
+   private OpenDialogManager       _openDlgMgr       = new OpenDialogManager();
    //
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
    private IPartListener2          _partListener;
    private ITourEventListener      _tourPropertyListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    //
    private TVICollatedTour_Root    _rootItem;
    //
@@ -376,18 +380,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
                updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-//               UI.updateUnits();
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
-
-               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
-
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 //               updateDisplayFormats();
@@ -404,8 +396,28 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
+
+               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
+            }
+         }
+      };
+
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -818,7 +830,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final double dbAltitudeDown = ((TVICollatedTour) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -841,7 +853,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbMaxAltitude = ((TVICollatedTour) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -865,7 +877,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbAltitudeUp = ((TVICollatedTour) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1073,7 +1085,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             if (element instanceof TVICollatedTour_Tour) {
 
                final long dbStartDistance = ((TVICollatedTour_Tour) element).getColumnStartDistance();
-               final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printValue_0(cell, value);
 
@@ -1095,7 +1107,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float pace = ((TVICollatedTour) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float pace = ((TVICollatedTour) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1120,7 +1132,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float value = ((TVICollatedTour) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float value = ((TVICollatedTour) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1144,7 +1156,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             final double value = ((TVICollatedTour) element).colDistance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1165,7 +1177,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVICollatedTour) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVICollatedTour) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1670,11 +1682,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             float value = ((TVICollatedTour) element).colAvgTemperature;
 
-            if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+            if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
-               value = value //
-                     * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                     + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+               value = value
+                     * UI.UNIT_FAHRENHEIT_MULTI
+                     + UI.UNIT_FAHRENHEIT_ADD;
             }
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1753,7 +1765,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
             final Object element = cell.getElement();
             final int windSpeed = (int) (((TVICollatedTour) element).colWindSpd
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+                  / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1774,6 +1786,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -2038,7 +2051,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
        * This ensures that the unit's are set otherwise they can be null
        */
       @SuppressWarnings("unused")
-      final boolean is = net.tourbook.ui.UI.IS_WIN;
+      final boolean is = UI.IS_WIN;
    }
 
    boolean isInUIUpdate() {

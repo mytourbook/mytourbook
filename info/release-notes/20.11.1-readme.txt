@@ -1,0 +1,132 @@
+20.11.1                                                 20. November 2020
+
+
+New
+===
+
+* Elapsed Time - Recorded Time - Paused Time (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/222
+ 
+  Device time - when the user pressed start/stop/pause:
+  - Elapsed time (formerly Recording Time)
+  - Recorded Time (new)
+  - Paused Time = Elapsed Time - Recorded Time (new)
+
+  Computed time - is dependend on the break time algorithm:
+  - Moving Time
+  - Break Time = Elapsed Time - Moving Time
+    
+  - The recorded/paused time are imported from the following formats Garmin FIT, Suunto (Ambit 2 xml, Ambit 2 sml, Suunto Spartan/9 .json.gz), SportTracks Fitlog, Garmin TCX
+  - Added the ability to re-import, for existing tours, only the timer pauses (and hence also the recorded time)
+  - The new tour times (Recorded & Paused Times) are available for display in the TourDataEditor, TourBook view, Calendar view & Statistics view
+  - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
+
+* Statistic Values View
+  - Displays the values of the statistic graphs
+  - Statistic values can be copied in csv format to the clipboard
+
+* Import Magellan/Mio Cyclo 105 *.act Files (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/219
+
+
+Improvements
+============
+
+* Tour Book View (flat)
+  - Sort also by computed break time
+  - Show markers and tags columns with the saved content (no dummy text)
+  
+* Calendar View
+  - New toolbar action: Go to today
+
+* Statistics View
+  - Displays athlete's data (body weight and fat) for any given day/week/month/year (Frederic)
+  - New toolbar action: Copy statistic values to the clipboard
+  - Show total/percentage values in the tooltip - https://sourceforge.net/p/mytourbook/feature-requests/180/
+  - Statistic tooltip values (a summary of tours) can be formatted differently compared with tour tooltip values
+
+* Tour Editor (Frederic)
+  - Added a body fat percentage field in the Personal Details section
+
+* Geo Compare View (Frederic)
+  - Added a relative geo differences filter to only display the compared tours for which the relative geo difference is under that threshold (see feature request https://sourceforge.net/p/mytourbook/feature-requests/183/)
+  - Added the recorded time column
+  - Added the Average Pace column
+  
+* Tour Tag Filter
+  - Tags can also be combined with AND, so a tour will only be displayed when it contain ALL selected tags. 
+    In the previous version, tags were combined with OR, so a tour was displayed when it contained ONE of the selected tags. 
+  - Unchecked tags in the "Selected Tags" list will also be saved in the tag filter profile, in the previous version they got lost.
+    These unchecked tags can be deleted with the DELETE key in the "Selected Tags" or by unchecking it in "Available Tags"
+
+* Dialog Adjust Elevation
+  - Adjustment Type: "Approach elevation with SRTM data"
+    New action: "Set last point to SRTM elevation", this sets the elevation of the horizontally most right point to it's SRTM elevation value
+
+* Dropbox (Frederic)
+  - Dropbox file/folder dialog: Sorting alphabetically the Dropbox folders and files
+
+* Tour re-import(Frederic)
+  - Added a contextual menu "Reimport Tours..." to give the ability to select several data to re-import for selected tours or all tours in the database
+  - When re-importing data, the previous and current data is displayed (whenever possible) in the Log view to show the users the differences before and after the re-import
+  - Added the ability for the user to skip a file if the filepath is unknown or not found
+  - Correct the import filepath location (Wolfgang)
+  - Re-import tours between two dates (Wolfgang)
+  - Re-import keeps manually selected paths during a session and tries to reuse it for subsequent files when necessary (Wolfgang)
+
+* Improved Cadence Support (rtdog)
+  - Added new cadence type "none" for tours with no cadence
+  - Added default cadence assignment during Easy Import Launcher when setting tour type
+  - Created import preference for default cadence to use during import launcher configuration
+  - Added language support for cadence type names (none/rpm/spm)
+
+
+Changes  
+=======
+
+* All time columns in the column profiles must be added because it's internal names are modified
+
+
+Fixes   
+=====
+
+* Tour Book View
+  - Tour tag filter caused SQL exception in flat layout view https://github.com/wolfgang-ch/mytourbook/issues/220
+  - All summarized values are wrong when a tour contains multiple tags and the tour tag filter is activated https://github.com/wolfgang-ch/mytourbook/issues/223
+  
+* Tour Book View (flat)
+  - Several SQL exception's when view is not sorted by a column
+  - Tours where sorted only within 1000 tours chunk (1000 is the database fetch size for the nattable)
+  
+* Statistic View
+  - Week graphs tooltip can show (it depends on the start year and number of displayed years) the wrong week/year number when the first week in a year is a weekyear from the previous year, e.g. 1. January 2016 -> week number: 53, weekyear: 2015
+  - Month/year statistic shows the wrong time values in the tooltip when the tour types are resorted
+
+* GPX/TCX Export
+  - Fixed total distance issue https://sourceforge.net/p/mytourbook/discussion/622811/thread/fd281c265a/?limit=25#c72b 
+
+* FitLogEx Import (Frederic)
+  - Fixed a possible import failure for manual tours with a Time Offset
+  - Fixed an issue where importing large files (> 100MB) could possibly result in a OutOfMemory error when parsing Custom Data Field Definitions
+
+* Tour Log (rtdog)
+  - Suppressed spurious error in Tour Log when switching away from Dropbox-based Easy Import configuration
+
+* Slideout Message Dialog
+  - When a message dialog was opened in a slideout, it was hidden in Ubuntu, Cinnamon desktop crashed
+
+* Tour Editor (Frederic)
+  - Fix for a NPE triggered by a Linux async problem in a specific file import scenario
+
+Translation    
+===========
+
+ - Czech 20.8 (Lukas)
+ - Dutch 20.8 (Maarten)
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+
+* FIT SDK 21.40

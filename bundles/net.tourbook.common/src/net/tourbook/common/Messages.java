@@ -105,6 +105,9 @@ public class Messages extends NLS {
    public static String        Color_Chooser_Link_CustomColors_Tooltip;
    public static String        Color_Chooser_SelectedColor_Tooltip;
 
+   public static String        Dialog_MeasurementSystem_Title;
+   public static String        Dialog_MeasurementSystem_Label_SelectSystem;
+
    public static String        Font_Editor_Label_FontSize;
 
    public static String        Format_hh;
@@ -204,6 +207,14 @@ public class Messages extends NLS {
    public static String        Map3_PropertyTooltip_Action_Close_Tooltip;
    public static String        Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
+   public static String        Measurement_System_Profile_Imperial;
+   public static String        Measurement_System_Profile_Metric;
+   public static String        Measurement_System_Profile_Nautic;
+   public static String        Measurement_System_Profile_Other1;
+   public static String        Measurement_System_Profile_Other2;
+   public static String        Measurement_System_Profile_Other3;
+   public static String        Measurement_System_Tooltip;
+
    public static String        Period_Format_Space;
    public static String        Period_Format_Comma;
    public static String        Period_Format_CommaAndAnd;
@@ -234,6 +245,49 @@ public class Messages extends NLS {
    public static String        Period_Format_Millisecond;
    public static String        Period_Format_Milliseconds;
    public static String        Period_Format_Millisecond_Short;
+
+   public static String        Pref_System_Group_MeasurementSystem;
+   public static String        Pref_System_Label_Distance;
+   public static String        Pref_System_Label_Distance_Info;
+   public static String        Pref_System_Label_Elevation;
+   public static String        Pref_System_Label_Elevation_Info;
+   public static String        Pref_System_Label_Height;
+   public static String        Pref_System_Label_Height_Info;
+   public static String        Pref_System_Label_Length;
+   public static String        Pref_System_Label_Length_Info;
+   public static String        Pref_System_Label_Length_Small;
+   public static String        Pref_System_Label_Length_Small_Info;
+   public static String        Pref_System_Label_Pace;
+   public static String        Pref_System_Label_Pace_Info;
+   public static String        Pref_System_Label_Pressure_Atmosphere;
+   public static String        Pref_System_Label_Pressure_Atmosphere_Info;
+   public static String        Pref_System_Label_System;
+   public static String        Pref_System_Label_Temperature;
+   public static String        Pref_System_Label_UsingInfo;
+   public static String        Pref_System_Label_UsingInfo_Tooltip;
+   public static String        Pref_System_Label_Weight;
+   public static String        Pref_System_Label_Weight_Info;
+   public static String        Pref_System_Option_BodyWeight_Kilogram;
+   public static String        Pref_System_Option_BodyWeight_Pound;
+   public static String        Pref_System_Option_DayTime_24_Hours;
+   public static String        Pref_System_Option_DayTime_AM_PM;
+   public static String        Pref_System_Option_Distance_Kilometer;
+   public static String        Pref_System_Option_Distance_Mile;
+   public static String        Pref_System_Option_Distance_NauticMile;
+   public static String        Pref_System_Option_Elevation_Foot;
+   public static String        Pref_System_Option_Elevation_Meter;
+   public static String        Pref_System_Option_Height_Inch;
+   public static String        Pref_System_Option_Height_Meter;
+   public static String        Pref_System_Option_Length_Meter;
+   public static String        Pref_System_Option_Length_Yard;
+   public static String        Pref_System_Option_Pace_MinutesPerKilometer;
+   public static String        Pref_System_Option_Pace_MinutesPerMile;
+   public static String        Pref_System_Option_Pressure_Atmosphere_InchOfMercury;
+   public static String        Pref_System_Option_Pressure_Atmosphere_Millibar;
+   public static String        Pref_System_Option_SmallLength_Inch;
+   public static String        Pref_System_Option_SmallLength_Millimeter;
+   public static String        Pref_System_Option_Temperature_Celcius;
+   public static String        Pref_System_Option_Temperature_Fahrenheit;
 
    public static String        Weather_Clounds_Clouds;
    public static String        Weather_Clounds_Clouny;

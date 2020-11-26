@@ -23,10 +23,11 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -136,12 +137,14 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    private static int                  GPS_MARKER_FILTER_WITHOUT_GPS     = 2;
    //
    private final IPreferenceStore      _prefStore                        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore      _prefStore_Common                 = CommonActivator.getPrefStore();
    private final IDialogSettings       _state                            = TourbookPlugin.getState(ID);
    //
    private PostSelectionProvider       _postSelectionProvider;
    //
    private IPartListener2              _partListener;
    private IPropertyChangeListener     _prefChangeListener;
+   private IPropertyChangeListener     _prefChangeListener_Common;
    private ITourEventListener          _tourEventListener;
    //
    private MenuManager                 _viewerMenuManager;
@@ -569,18 +572,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-
-               defineAllColumns();
-
-               _markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
                _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
@@ -590,11 +582,32 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
                 * the tree must be redrawn because the styled text does not show with the new color
                 */
                _markerViewer.getTable().redraw();
-
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+
+               defineAllColumns();
+
+               _markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
@@ -830,7 +843,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
             if (altitude == TourDatabase.DEFAULT_FLOAT) {
                valueText = UI.EMPTY_STRING;
             } else {
-               valueText = _nf1.format(altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+               valueText = _nf1.format(altitude / UI.UNIT_VALUE_ELEVATION);
             }
 
             cell.setText(valueText);
@@ -1100,6 +1113,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -1166,8 +1180,8 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       // get unique tour id's
       final HashSet<Long> tourIds = new HashSet<>();
-      for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
-         tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
+      for (final Object name : selection) {
+         tourIds.add(((TourMarkerItem) name).tourId);
       }
 
       final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
@@ -1188,9 +1202,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
          final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
 
-         for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+         for (final Object name : selection) {
 
-            final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
+            final long selectedMarkerId = ((TourMarkerItem) name).markerId;
 
             // get marker by id
             for (final TourMarker tourMarker : tourData.getTourMarkers()) {
@@ -1289,9 +1303,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       final StructuredSelection selection = getViewerSelection();
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-
-         final Object element = iterator.next();
+      for (final Object element : selection) {
 
          if (element instanceof TourMarkerItem) {
 

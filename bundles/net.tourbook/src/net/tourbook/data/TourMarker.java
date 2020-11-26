@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,15 +37,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.swt.graphics.Rectangle;
-
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * A tour marker has a position within a tour.
@@ -64,6 +67,7 @@ import net.tourbook.ui.tourChart.ChartLabel;
 @XmlType(name = "TourMarker")
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
 
    public static final int      DB_LENGTH_URL_TEXT    = 1024;

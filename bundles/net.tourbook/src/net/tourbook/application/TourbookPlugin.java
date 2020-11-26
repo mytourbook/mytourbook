@@ -237,6 +237,11 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
       // log version that this info is easier accessable
       final Version version = TourbookPlugin.getDefault().getVersion();
+
+      /**
+       * StatusUtil will force to load net.tourbook.common plugin which forces to load
+       * net.tourbook.common.UI which is initializing the measurement system.
+       */
       StatusUtil.logInfo("AppVersion: " + version.toString());//$NON-NLS-1$
    }
 

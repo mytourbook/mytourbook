@@ -230,11 +230,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _pc = new PixelConverter(parent);
       _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
-      _unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-      _unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
-      _unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      _unitValueDistance = UI.UNIT_VALUE_DISTANCE;
+      _unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
+      _unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       _tk = new FormToolkit(parent.getDisplay());
 
@@ -1007,12 +1005,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setWeather(_txtWeather.getText().trim());
 
       if (_isTemperatureManuallyModified) {
-         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
-         if (_unitValueTemperature != 1) {
 
-            temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
-                  / net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI);
+         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
+
+         if (_unitValueTemperature != 1) {
+            temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
          }
+
          _tourData.setAvgTemperature(temperature);
       }
 
@@ -1071,8 +1070,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
          if (_unitValueTemperature != 1) {
             final float metricTemperature = avgTemperature;
             avgTemperature = metricTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
 
          _spinWeather_Temperature_Avg.setDigits(1);

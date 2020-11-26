@@ -283,7 +283,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
          final int typeColorIndex = statData_Day.allTypeColorIndices[tourIndex];
 
          final int diffDistance = (int) ((statData_Day.allDistance_High[tourIndex] - statData_Day.allDistance_Low[tourIndex] + 500) / 1000);
-         final int diffElevation = (int) (statData_Day.allElevation_High[tourIndex] - statData_Day.allElevation_Low[tourIndex]);
+         final int diffElevation = (int) (statData_Day.allElevationUp_High[tourIndex] - statData_Day.allElevationUp_Low[tourIndex]);
          final int diffDurationTime = (int) (statData_Day.getDurationHighFloat()[tourIndex] - statData_Day.getDurationLowFloat()[tourIndex]);
 
          // distance
@@ -620,7 +620,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       xData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 //      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
 
-      xData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+      xData.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
       chartDataModel.setXData(xData);
 
       // y-axis: elevation
@@ -768,7 +768,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
             _statElevation_Sum_Low,
             _statElevation_Sum_High,
             _statElevation_Sum_ColorIndex,
-            UI.UNIT_LABEL_ALTITUDE,
+            UI.UNIT_LABEL_ELEVATION,
             Messages.LABEL_GRAPH_ALTITUDE);
 
       updateChartTime(

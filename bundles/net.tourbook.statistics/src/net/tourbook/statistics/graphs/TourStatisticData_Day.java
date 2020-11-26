@@ -53,9 +53,9 @@ public class TourStatisticData_Day {
    float[]                        allDistance;
    float[]                        allDistance_Low;
    float[]                        allDistance_High;
-   float[]                        allElevation;
-   float[]                        allElevation_Low;
-   float[]                        allElevation_High;
+   float[]                        allElevationUp;
+   float[]                        allElevationUp_Low;
+   float[]                        allElevationUp_High;
 
    float[]                        allAvgPace;
    float[]                        allAvgPace_Low;

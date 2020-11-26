@@ -525,7 +525,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       //Converting the distance data to meters if needed
       if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-         _sampleList.forEach((s) -> s.distance *= net.tourbook.ui.UI.UNIT_MILE);
+         _sampleList.forEach((s) -> s.distance *= UI.UNIT_MILE);
       }
 
       //We sort the sample lists as it could be out of order if we added markers above

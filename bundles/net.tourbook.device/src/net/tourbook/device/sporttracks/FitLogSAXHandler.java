@@ -1193,7 +1193,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       float windSpeedValue = Float.parseFloat(windSpeed);
 
       // Converting to the current unit
-      windSpeedValue *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      windSpeedValue *= UI.UNIT_VALUE_DISTANCE;
 
       return Math.round(windSpeedValue);
    }

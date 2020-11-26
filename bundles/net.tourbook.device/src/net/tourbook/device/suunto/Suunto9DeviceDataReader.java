@@ -301,7 +301,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       String fileName = FilenameUtils.removeExtension(filePath);
 
-      if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") { //$NON-NLS-1$
+      if (fileName.substring(fileName.length() - 5, fileName.length()).equals(".json")) { //$NON-NLS-1$
          fileName = FilenameUtils.removeExtension(fileName);
       }
 
@@ -372,7 +372,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
             while (it.hasNext()) {
                final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-               if (entry.getKey().getTourId() == parentEntry.getKey().getTourId()) {
+               if (entry.getKey().getTourId().equals(parentEntry.getKey().getTourId())) {
                   it.remove();
                }
             }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.tourbook.statistics;singleton:=true
-Bundle-Version: 20.11.0.qualifier
+Bundle-Version: 20.11.1.qualifier
 Bundle-Activator: net.tourbook.statistics.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
@@ -28,5 +28,6 @@ Import-Package: gnu.trove.list.array,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.action,
+ org.apache.commons.lang3,
  org.eclipse.ui.forms.widgets
 Automatic-Module-Name: net.tourbook.statistics

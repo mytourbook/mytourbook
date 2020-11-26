@@ -42,6 +42,41 @@ public class Messages extends NLS {
 
    public static String        Statistic_Label_Invers;
 
+   public static String        Statistic_Value_Date_Day_Header1;
+   public static String        Statistic_Value_Date_DOY_Header1;
+   public static String        Statistic_Value_Date_FirstDay_Header1;
+   public static String        Statistic_Value_Date_FirstDay_Header2;
+   public static String        Statistic_Value_Date_Month_Header1;
+   public static String        Statistic_Value_Date_Week_Header1;
+   public static String        Statistic_Value_Date_Year_Header1;
+   public static String        Statistic_Value_Elevation_ElevationUp_Header1;
+   public static String        Statistic_Value_HR_Summary_Header1;
+   public static String        Statistic_Value_HR_Zone_1_Header1;
+   public static String        Statistic_Value_HR_Zone_10_Header1;
+   public static String        Statistic_Value_HR_Zone_2_Header1;
+   public static String        Statistic_Value_HR_Zone_3_Header1;
+   public static String        Statistic_Value_HR_Zone_4_Header1;
+   public static String        Statistic_Value_HR_Zone_5_Header1;
+   public static String        Statistic_Value_HR_Zone_6_Header1;
+   public static String        Statistic_Value_HR_Zone_7_Header1;
+   public static String        Statistic_Value_HR_Zone_8_Header1;
+   public static String        Statistic_Value_HR_Zone_9_Header1;
+   public static String        Statistic_Value_Motion_Distance_Header1;
+   public static String        Statistic_Value_Motion_Pace_Header1;
+   public static String        Statistic_Value_Motion_Speed_Header1;
+   public static String        Statistic_Value_Time_Computed_Break_Header1;
+   public static String        Statistic_Value_Time_Computed_Moving_Header1;
+   public static String        Statistic_Value_Time_Device_Elapsed_Header1;
+   public static String        Statistic_Value_Time_Device_Paused_Header1;
+   public static String        Statistic_Value_Time_Device_Recorded_Header1;
+   public static String        Statistic_Value_Tour_NumberOfTours_Header1;
+   public static String        Statistic_Value_Tour_Title_Header1;
+   public static String        Statistic_Value_Tour_TourType_Header1;
+   public static String        Statistic_Value_Training_Aerob_Header1;
+   public static String        Statistic_Value_Training_Anaerob_Header1;
+   public static String        Statistic_Value_Training_Header1;
+   public static String        Statistic_Value_Training_Performance_Header1;
+
    public static String        Statistic_Week_Tooltip_ColumnHeaderTitle;
    public static String        Statistic_Week_Tooltip_Title;
 

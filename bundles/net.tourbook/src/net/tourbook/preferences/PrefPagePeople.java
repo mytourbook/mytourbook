@@ -890,7 +890,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          _spinnerHeightInches = new Spinner(containerHeight, SWT.BORDER);
 
-         if (UI.UNIT_IS_METRIC) { // Metric units
+         if (UI.UNIT_IS_ELEVATION_METER) {
+
+            // Metric units
+
             _spinnerHeight.setDigits(2);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(300); // 3.00 m
@@ -898,7 +901,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _spinnerHeightInches.setVisible(false);
 
             label.setText(UI.UNIT_METER);
-         } else { // Imperial units
+
+         } else {
+
+            // Imperial units
+
             _spinnerHeight.setDigits(0);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(10);
@@ -1590,7 +1597,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
       tc = tvc.getColumn();
 
-      if (UI.UNIT_IS_METRIC) {
+      if (UI.UNIT_IS_ELEVATION_METER) {
          tc.setText(Messages.Pref_People_Column_height);
       } else {
          tc.setText(UI.UNIT_HEIGHT_FT + UI.DASH + UI.UNIT_HEIGHT_IN);
@@ -1600,7 +1607,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          @Override
          public void update(final ViewerCell cell) {
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_ELEVATION_METER) {
                final float height = ((TourPerson) cell.getElement()).getHeight();
                cell.setText(_nf2.format(height));
             } else {
@@ -2277,7 +2284,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final float bodyHeight = UI.convertBodyHeightFromMetric(person.getHeight());
 
-         if (UI.UNIT_IS_METRIC) {
+         if (UI.UNIT_IS_ELEVATION_METER) {
             _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
          } else {
             _spinnerHeight.setSelection((int) Math.floor(bodyHeight / 12));

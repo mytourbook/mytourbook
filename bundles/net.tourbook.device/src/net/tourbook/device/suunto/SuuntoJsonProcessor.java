@@ -104,7 +104,7 @@ public class SuuntoJsonProcessor {
             currentSampleJson.getJSONObject(TAG_RR).toString(),
             TAG_DATA);
 
-      if (RRValues.size() == 0) {
+      if (RRValues.isEmpty()) {
          return;
       }
 
@@ -267,7 +267,7 @@ public class SuuntoJsonProcessor {
 
          final long currentTime = adjustedCurrentZonedDateTime.toInstant().toEpochMilli();
 
-         if (currentSampleData.toString().contains(TAG_RR)) {
+         if (currentSampleData.contains(TAG_RR)) {
             BuildRRDataList(_allRRData, currentSampleSml);
 
             if (_rrDataStartTime == Integer.MIN_VALUE) {
@@ -282,7 +282,7 @@ public class SuuntoJsonProcessor {
             continue;
          }
 
-         if (_sampleList.size() > 0) {
+         if (!_sampleList.isEmpty()) {
             // Looking in the last 10 entries to see if their time is identical to the
             // current sample's time.
             for (int index = _sampleList.size() - 1; index > _sampleList.size() - 11 && index >= 0; --index) {
@@ -381,7 +381,7 @@ public class SuuntoJsonProcessor {
       }
 
       // We clean-up the data series ONLY if we're not in a swimming activity.
-      if (_allSwimData.size() == 0) {
+      if (_allSwimData.isEmpty()) {
          cleanUpActivity(_sampleList, isIndoorTour);
       }
 
@@ -427,7 +427,7 @@ public class SuuntoJsonProcessor {
          for (final TourMarker tourMarker : tourMarkers) {
             _numLaps = Integer.valueOf(tourMarker.getLabel());
          }
-         activityToReUse.setTourMarkers(new HashSet<TourMarker>());
+         activityToReUse.setTourMarkers(new HashSet<>());
 
          tourData = activityToReUse;
          _sampleList = sampleListToReUse;
@@ -605,7 +605,7 @@ public class SuuntoJsonProcessor {
       final JSONObject array = (JSONObject) Events.get(0);
       final String swimmingSample = ((JSONObject) array.get(Swimming)).toString();
 
-      final SwimData previousSwimData = allSwimData.size() == 0 ? null : allSwimData.get(allSwimData.size() - 1);
+      final SwimData previousSwimData = allSwimData.isEmpty() ? null : allSwimData.get(allSwimData.size() - 1);
 
       final String swimmingType = TryRetrieveStringElementValue(
             swimmingSample,
@@ -699,7 +699,7 @@ public class SuuntoJsonProcessor {
    private void TryComputeHeartRateData(final ArrayList<TimeData> activityData,
                                         final List<Integer> rrDataList,
                                         final long rrDataStartTime) {
-      if (rrDataList.size() == 0) {
+      if (rrDataList.isEmpty()) {
          return;
       }
 
@@ -766,17 +766,17 @@ public class SuuntoJsonProcessor {
     * @return The element value, if found.
     */
    private String TryRetrieveStringElementValue(final String token, final String elementName) {
-      if (!token.toString().contains(elementName)) {
+      if (!token.contains(elementName)) {
          return null;
       }
 
       String result = null;
       try {
          result = new JSONObject(token).get(elementName).toString();
+         if (result.equals("null")) { //$NON-NLS-1$
+            return null;
+         }
       } catch (final Exception e) {}
-      if (result == "null") { //$NON-NLS-1$
-         return null;
-      }
 
       return result;
    }

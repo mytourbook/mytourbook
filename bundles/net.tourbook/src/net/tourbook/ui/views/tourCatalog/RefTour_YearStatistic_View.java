@@ -30,8 +30,10 @@ import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -78,7 +80,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
    private static final String GRAPH_LABEL_HEARTBEAT      = net.tourbook.common.Messages.Graph_Label_Heartbeat;
    private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-
    public static final String  ID                         = "net.tourbook.views.tourCatalog.yearStatisticView";     //$NON-NLS-1$
 
    static final String         STATE_NUMBER_OF_YEARS      = "numberOfYearsToDisplay";                               //$NON-NLS-1$
@@ -94,18 +95,20 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private static final boolean          _isOSX     = net.tourbook.common.UI.IS_OSX;
-   private static final boolean          _isLinux   = net.tourbook.common.UI.IS_LINUX;
+   private static final boolean          _isOSX            = net.tourbook.common.UI.IS_OSX;
+   private static final boolean          _isLinux          = net.tourbook.common.UI.IS_LINUX;
 
-   private static final IDialogSettings  _state     = TourbookPlugin.getState("TourCatalogViewYearStatistic"); //$NON-NLS-1$
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state            = TourbookPlugin.getState("TourCatalogViewYearStatistic"); //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
    private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
    private IPartListener2                _partListener;
    private ISelectionListener            _postSelectionListener;
    private PostSelectionProvider         _postSelectionProvider;
 
-   private NumberFormat                  _nf1       = NumberFormat.getNumberInstance();
+   private NumberFormat                  _nf1              = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -241,32 +244,38 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(GRID_HORIZONTAL_DISTANCE)
+                  || property.equals(GRID_VERTICAL_DISTANCE)
+                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
-               // measurement system has changed
+               updateUI_YearChart(false);
+            }
+         }
+      };
 
-               net.tourbook.ui.UI.updateUnits();
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-               // recreate the chart
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed -> recreate the chart
+
                _yearChart.dispose();
                createUI_30_Chart(_pageChart);
 
                _pageChart.layout();
 
                updateUI_YearChart(false);
-
-            } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-            //
-            ) {
-
-               updateUI_YearChart(false);
             }
          }
       };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -499,7 +508,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
             .plusDays(tourDOY);
       final String title = tourDate.format(TimeTools.Formatter_Date_F);
 
-
       new RefTour_YearStatistic_TooltipUI().createContentArea(
 
             parent,
@@ -658,6 +666,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -1019,7 +1028,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
                      _DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
 
                      _avgPulse.add(tourItem.getAvgPulse());
-                     _tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+                     _tourSpeed.add(tourItem.getTourSpeed() / UI.UNIT_VALUE_DISTANCE);
                   }
                }
             }

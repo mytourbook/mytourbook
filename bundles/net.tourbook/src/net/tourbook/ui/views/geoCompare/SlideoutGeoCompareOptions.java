@@ -685,7 +685,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
       final double distDiff = MtMath.distanceVincenty(latStart, lonStart, latEnd, lonEnd);
 
-      final double distValue = distDiff / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double distValue = distDiff / UI.UNIT_VALUE_DISTANCE_SMALL;
 
       final String valueFormatting = distValue > 100
             ? VALUE_FORMAT_1_0
@@ -715,7 +715,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
       } else {
 
-         final float distance = slideoutState.normalizedDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final float distance = slideoutState.normalizedDistance / UI.UNIT_VALUE_DISTANCE;
 
          _lblGeo_NormalizedDistance_Value.setText(FormatManager.formatDistance(distance / 1000.0));
          _lblGeo_NormalizedDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);

@@ -392,7 +392,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                createUI_72_ValueField(
                      container,
                      GRAPH_LABEL_ALTITUDE,
-                     UI.UNIT_LABEL_ALTITUDE,
+                     UI.UNIT_LABEL_ELEVATION,
                      FormatManager.formatElevation(value));
             }
          }
@@ -425,7 +425,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
                final double value = distance //
                      / 1000
-                     / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     / UI.UNIT_VALUE_DISTANCE;
 
                createUI_72_ValueField(
                      container,

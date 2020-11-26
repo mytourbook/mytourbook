@@ -159,6 +159,11 @@ public class RawDataManager {
    private static IPath                    _previousReimportFolder;
 
    /**
+    * Is <code>true</code> when currently a re-importing is running
+    */
+   private static boolean                  _isReimportingActive;
+
+   /**
     * contains the device data imported from the device/file
     */
    private final DeviceData                _deviceData                         = new DeviceData();
@@ -257,11 +262,11 @@ public class RawDataManager {
 
       case TIME_SLICES_ELEVATION:
 
-         final String heightLabel = UI.UNIT_IS_METRIC ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
-         final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-         final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-         final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-         final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+         final String heightLabel = UI.UNIT_IS_ELEVATION_METER ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+         final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
+         final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
+         final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
+         final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
 
          previousData = UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
                + UI.DASH
@@ -311,22 +316,22 @@ public class RawDataManager {
 
       case TIME_SLICES_TEMPERATURE:
          float avgTemperature = oldTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_METRIC) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
-         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC
+         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
 
          avgTemperature = newTourData.getAvgTemperature();
-         if (!UI.UNIT_IS_METRIC) {
+         if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
-         newData = Math.round(avgTemperature) + (UI.UNIT_IS_METRIC
+         newData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS
                : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
          break;
@@ -402,6 +407,13 @@ public class RawDataManager {
       return _importState_IsIgnoreInvalidFile;
    }
 
+   /**
+    * @return Returns <code>true</code> when currently a re-importing is running
+    */
+   public static boolean isReimportingActive() {
+      return _isReimportingActive;
+   }
+
    public static boolean isSetBodyWeight() {
       return _importState_IsSetBodyWeight;
    }
@@ -467,6 +479,10 @@ public class RawDataManager {
       } catch (final IOException e) {
          e.printStackTrace();
       }
+   }
+
+   public static void setIsReimportingActive(final boolean isReimportingActive) {
+      _isReimportingActive = isReimportingActive;
    }
 
    public void actionImportFromDevice() {

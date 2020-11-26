@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,10 +16,13 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.CustomControlContribution;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -37,15 +40,26 @@ import org.eclipse.swt.widgets.Control;
 
 public class MeasurementSystemContributionItem extends CustomControlContribution {
 
-   private static final String           ID                    = "net.tourbook.measurementSelector";              //$NON-NLS-1$
+   private static final String           MEASUREMENT_SYSTEM_TOOLTIP            = net.tourbook.common.Messages.Measurement_System_Tooltip;
+   private static final String           PREF_SYSTEM_LABEL_DISTANCE            = net.tourbook.common.Messages.Pref_System_Label_Distance;
+   private static final String           PREF_SYSTEM_LABEL_ELEVATION           = net.tourbook.common.Messages.Pref_System_Label_Elevation;
+   private static final String           PREF_SYSTEM_LABEL_HEIGHT              = net.tourbook.common.Messages.Pref_System_Label_Height;
+   private static final String           PREF_SYSTEM_LABEL_LENGTH              = net.tourbook.common.Messages.Pref_System_Label_Length;
+   private static final String           PREF_SYSTEM_LABEL_LENGTH_SMALL        = net.tourbook.common.Messages.Pref_System_Label_Length_Small;
+   private static final String           PREF_SYSTEM_LABEL_PACE                = net.tourbook.common.Messages.Pref_System_Label_Pace;
+   private static final String           PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
+   private static final String           PREF_SYSTEM_LABEL_TEMPERATURE         = net.tourbook.common.Messages.Pref_System_Label_Temperature;
+   private static final String           PREF_SYSTEM_LABEL_WEIGHT              = net.tourbook.common.Messages.Pref_System_Label_Weight;
 
-   private final static IPreferenceStore _prefStore            = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final String           ID                                    = "net.tourbook.measurementSelector";                                //$NON-NLS-1$
 
-   private static int                    _oldSystemIndex       = Integer.MIN_VALUE;
+   private static final char             NL                                    = UI.NEW_LINE;
 
-   private IPropertyChangeListener       _prefChangeListener;
+   private final static IPreferenceStore _prefStore_Common                     = CommonActivator.getPrefStore();
 
-   private boolean                       _isFireSelectionEvent = true;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+
+   private boolean                       _isFireSelectionEvent                 = true;
 
    private Combo                         _combo;
 
@@ -57,108 +71,31 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       super(id);
    }
 
-   public static void selectSystemFromPrefStore(final Combo combo) {
-
-      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
-
-      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
-         combo.select(0);
-      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-         combo.select(1);
-      } else {
-         combo.select(0);
-      }
-
-      _oldSystemIndex = combo.getSelectionIndex();
-   }
-
-   /**
-    * Sets measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}... var's
-    * and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
-    *
-    * @param systemIndex
-    *           0...metric, 1...imperial
-    */
-   public static void selectSystemInPrefStore(final int systemIndex) {
-
-      if (systemIndex == _oldSystemIndex) {
-         // nothing has changed
-         return;
-      }
-
-      _oldSystemIndex = systemIndex;
-
-      if (systemIndex == 0) {
-
-         // set metric system
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_KG);
-
-      } else {
-
-         // set imperial system
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
-
-         _prefStore.putValue(
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
-               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS);
-      }
-
-      UI.updateUnits();
-
-      // fire modify event
-      _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
-   }
-
    /**
     * listen for changes in the person list
     */
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                _isFireSelectionEvent = false;
                {
-                  selectSystemFromPrefStore(_combo);
+                  updateUI_MeasurementSystem();
                }
                _isFireSelectionEvent = true;
             }
          }
 
       };
+
       // register the listener
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    @Override
@@ -175,7 +112,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
       if (net.tourbook.common.UI.IS_OSX) {
 
-         return createUI10ComboBox(parent);
+         return createUI_10_ComboBox(parent);
 
       } else {
 
@@ -186,7 +123,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          final Composite container = new Composite(parent, SWT.NONE);
          GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
          {
-            final Composite control = createUI10ComboBox(container);
+            final Composite control = createUI_10_ComboBox(container);
             control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
          }
 
@@ -194,7 +131,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       }
    }
 
-   private Composite createUI10ComboBox(final Composite parent) {
+   private Composite createUI_10_ComboBox(final Composite parent) {
 
       _combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
       _combo.setToolTipText(Messages.App_measurement_tooltip);
@@ -202,7 +139,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
       _combo.addDisposeListener(new DisposeListener() {
          @Override
          public void widgetDisposed(final DisposeEvent e) {
-            _prefStore.removePropertyChangeListener(_prefChangeListener);
+            _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
          }
       });
 
@@ -221,7 +158,8 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
                _combo.getDisplay().asyncExec(() -> {
 
-                  _combo.select(_oldSystemIndex);
+                  // restore previous selection
+                  selectActiveSystem();
                });
 
             } else {
@@ -231,12 +169,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          }
       });
 
-      // fill combo box
-      _combo.add(Messages.App_measurement_metric); // metric system
-      _combo.add(Messages.App_measurement_imperial); // imperial system
-
-      // select previous value
-      selectSystemFromPrefStore(_combo);
+      updateUI_MeasurementSystem();
 
       return _combo;
    }
@@ -249,6 +182,49 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          return;
       }
 
-      selectSystemInPrefStore(selectedIndex);
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(selectedIndex, true);
+   }
+
+   private void selectActiveSystem() {
+
+      final String DASH = UI.DASH_WITH_SPACE;
+
+// SET_FORMATTING_OFF
+
+      final String tooltipData = UI.EMPTY_STRING
+
+         + PREF_SYSTEM_LABEL_DISTANCE              + DASH + MeasurementSystem_Manager.getActiveSystemOption_Distance().getLabel()      + NL
+         + PREF_SYSTEM_LABEL_LENGTH                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length().getLabel()        + NL
+         + PREF_SYSTEM_LABEL_LENGTH_SMALL          + DASH + MeasurementSystem_Manager.getActiveSystemOption_Length_Small().getLabel()  + NL
+         + PREF_SYSTEM_LABEL_ELEVATION             + DASH + MeasurementSystem_Manager.getActiveSystemOption_Elevation().getLabel()     + NL
+         + PREF_SYSTEM_LABEL_HEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Height().getLabel()        + NL
+         + PREF_SYSTEM_LABEL_PACE                  + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pace().getLabel()          + NL
+         + PREF_SYSTEM_LABEL_TEMPERATURE           + DASH + MeasurementSystem_Manager.getActiveSystemOption_Temperature().getLabel()   + NL
+         + PREF_SYSTEM_LABEL_WEIGHT                + DASH + MeasurementSystem_Manager.getActiveSystemOption_Weight().getLabel()        + NL
+         + PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE   + DASH + MeasurementSystem_Manager.getActiveSystemOption_Pressure_Atmospheric().getLabel()
+
+      ;
+// SET_FORMATTING_ON
+
+      final int activeSystemProfileIndex = MeasurementSystem_Manager.getActiveSystem_ProfileIndex();
+      _combo.select(activeSystemProfileIndex);
+
+      _combo.setToolTipText(String.format(MEASUREMENT_SYSTEM_TOOLTIP, tooltipData));
+   }
+
+   private void updateUI_MeasurementSystem() {
+
+      _combo.removeAll();
+
+      // fill combo box
+      for (final MeasurementSystem systemProfile : MeasurementSystem_Manager.getCurrentProfiles()) {
+         _combo.add(systemProfile.getName());
+      }
+
+      // the names could have a different lenght -> show the whole system name
+      _combo.getParent().layout(true, true);
+
+      // select saved system
+      selectActiveSystem();
    }
 }

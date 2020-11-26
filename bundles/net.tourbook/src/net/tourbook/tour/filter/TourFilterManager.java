@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
@@ -28,7 +29,9 @@ import java.util.Arrays;
 import net.tourbook.Messages;
 import net.tourbook.application.ActionTourDataFilter;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
@@ -308,28 +311,33 @@ public class TourFilterManager {
       FILTER_FIELD_CONFIG = allConfigs.toArray(new TourFilterFieldConfig[allConfigs.size()]);
    }
 
-   private static final Bundle            _bundle        = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle            _bundle           = TourbookPlugin.getDefault().getBundle();
+   private static final IPath             _stateLocation    = Platform.getStateLocation(_bundle);
 
-   private static final IPath             _stateLocation = Platform.getStateLocation(_bundle);
-   private final static IPreferenceStore  _prefStore     = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
 
-   private static IPropertyChangeListener _prefChangeListener;
+   private static IPropertyChangeListener _prefChangeListener_Common;
+
    static {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      // load unit very early
+      updateUnits();
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                updateUnits();
             }
          }
       };
 
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -353,26 +361,26 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Altitude_Ascent)
-                  .unitLabel(UI.UNIT_LABEL_ALTITUDE)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
                   .fieldId(TourFilterFieldId.ALTITUDE_UP)
                   .pageIncrement(100)
                   .fieldValueProvider(_fieldValueProvider_Altitude));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Altitude_Descent)
-                  .unitLabel(UI.UNIT_LABEL_ALTITUDE)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
                   .fieldId(TourFilterFieldId.ALTITUDE_DOWN)
                   .pageIncrement(100)
                   .minValue(Integer.MIN_VALUE)
                   .fieldValueProvider(_fieldValueProvider_Altitude));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Altitude_Max)
-                  .unitLabel(UI.UNIT_LABEL_ALTITUDE)
+                  .unitLabel(UI.UNIT_LABEL_ELEVATION)
                   .fieldId(TourFilterFieldId.ALTITUDE_MAX)
                   .pageIncrement(100)
                   .fieldValueProvider(_fieldValueProvider_Altitude));
@@ -455,28 +463,28 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWER, TourFilterFieldId.POWER_AVERAGE));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWER_AVG)
                   .fieldId(TourFilterFieldId.POWER_AVERAGE)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .unitLabel(UI.UNIT_POWER_SHORT));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWER_MAX)
                   .fieldId(TourFilterFieldId.POWER_MAX)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .unitLabel(UI.UNIT_POWER_SHORT));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWER_NORMALIZED)
                   .fieldId(TourFilterFieldId.POWER_NORMALIZED)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .unitLabel(UI.UNIT_POWER_SHORT));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWER_TOTAL_WORK)
                   .fieldId(TourFilterFieldId.POWER_TOTAL_WORK)
                   .fieldType(TourFilterFieldType.NUMBER_FLOAT)
@@ -1765,13 +1773,13 @@ public class TourFilterManager {
 
       final int decimals = 5;
 
-      return BigDecimal//
+      return BigDecimal
             .valueOf(doubleValue)
-            .setScale(decimals, BigDecimal.ROUND_HALF_UP)
+            .setScale(decimals, RoundingMode.HALF_UP)
             .doubleValue();
    }
 
-   public static void updateUnits() {
+   private static void updateUnits() {
 
       // set label km or mi
       getFieldConfig(TourFilterFieldId.MOTION_DISTANCE).unitLabel(UI.UNIT_LABEL_DISTANCE);
@@ -1780,9 +1788,9 @@ public class TourFilterManager {
       getFieldConfig(TourFilterFieldId.WEATHER_TEMPERATURE).unitLabel(UI.UNIT_LABEL_TEMPERATURE);
 
       // set km or mi
-      getFieldConfig(TourFilterFieldId.ALTITUDE_UP).unitLabel(UI.UNIT_LABEL_ALTITUDE);
-      getFieldConfig(TourFilterFieldId.ALTITUDE_DOWN).unitLabel(UI.UNIT_LABEL_ALTITUDE);
-      getFieldConfig(TourFilterFieldId.ALTITUDE_MAX).unitLabel(UI.UNIT_LABEL_ALTITUDE);
+      getFieldConfig(TourFilterFieldId.ALTITUDE_UP).unitLabel(UI.UNIT_LABEL_ELEVATION);
+      getFieldConfig(TourFilterFieldId.ALTITUDE_DOWN).unitLabel(UI.UNIT_LABEL_ELEVATION);
+      getFieldConfig(TourFilterFieldId.ALTITUDE_MAX).unitLabel(UI.UNIT_LABEL_ELEVATION);
    }
 
    /**

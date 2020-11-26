@@ -418,11 +418,11 @@ public class CSVExport {
 //    defineColumn_Elevation_Max();
 //    defineColumn_Elevation_AvgChange();
 
-      final String avgEle_UnitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
+      final String avgEle_UnitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
-      csvHeader(sb, String.format(  HEADER_ELEVATION_UP,                UI.UNIT_LABEL_ALTITUDE));
-      csvHeader(sb, String.format(  HEADER_ELEVATION_DOWN,              UI.UNIT_LABEL_ALTITUDE));
-      csvHeader(sb, String.format(  HEADER_ELEVATION_MAX,               UI.UNIT_LABEL_ALTITUDE));
+      csvHeader(sb, String.format(  HEADER_ELEVATION_UP,                UI.UNIT_LABEL_ELEVATION));
+      csvHeader(sb, String.format(  HEADER_ELEVATION_DOWN,              UI.UNIT_LABEL_ELEVATION));
+      csvHeader(sb, String.format(  HEADER_ELEVATION_MAX,               UI.UNIT_LABEL_ELEVATION));
       csvHeader(sb, String.format(  HEADER_ELEVATION_AVERAGE_CHANGE,    avgEle_UnitLabel));
 
 // SET_FORMATTING_ON
@@ -946,7 +946,7 @@ public class CSVExport {
 
          final float dbDistance = tviItem.colTourDistance;
          if (dbDistance != 0) {
-            sb.append(_nf1.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+            sb.append(_nf1.format(dbDistance / 1000 / UI.UNIT_VALUE_DISTANCE));
          }
          sb.append(UI.TAB);
       }
@@ -955,14 +955,14 @@ public class CSVExport {
 
          final float dbMaxSpeed = tviItem.colMaxSpeed;
          if (dbMaxSpeed != 0) {
-            sb.append(_nf1.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+            sb.append(_nf1.format(dbMaxSpeed / UI.UNIT_VALUE_DISTANCE));
          }
          sb.append(UI.TAB);
       }
 
       { // HEADER_AVERAGE_SPEED
 
-         final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final float speed = tviItem.colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
          if (speed != 0) {
             sb.append(_nf1.format(speed));
          }
@@ -971,7 +971,7 @@ public class CSVExport {
 
       { // HEADER_AVERAGE_PACE
 
-         final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final float pace = tviItem.colAvgPace * UI.UNIT_VALUE_DISTANCE;
          if (pace != 0) {
             sb.append(net.tourbook.common.UI.format_mm_ss((long) pace));
          }
@@ -989,16 +989,16 @@ public class CSVExport {
 //    defineColumn_Elevation_Max();
 //    defineColumn_Elevation_AvgChange();
 //
-//    csvField_Str(sb, String.format(  HEADER_ELEVATION_UP,                UI.UNIT_LABEL_ALTITUDE));
-//    csvField_Str(sb, String.format(  HEADER_ELEVATION_DOWN,              UI.UNIT_LABEL_ALTITUDE));
-//    csvField_Str(sb, String.format(  HEADER_ELEVATION_MAX,               UI.UNIT_LABEL_ALTITUDE));
+//    csvField_Str(sb, String.format(  HEADER_ELEVATION_UP,                UI.UNIT_LABEL_ELEVATION));
+//    csvField_Str(sb, String.format(  HEADER_ELEVATION_DOWN,              UI.UNIT_LABEL_ELEVATION));
+//    csvField_Str(sb, String.format(  HEADER_ELEVATION_MAX,               UI.UNIT_LABEL_ELEVATION));
 //    csvField_Str(sb, String.format(  HEADER_ELEVATION_AVERAGE_CHANGE,    avgEle_UnitLabel));
 
       { // HEADER_ALTITUDE_UP
 
          final long dbAltitudeUp = tviItem.colAltitudeUp;
          if (dbAltitudeUp != 0) {
-            sb.append(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+            sb.append(Long.toString((long) (dbAltitudeUp / UI.UNIT_VALUE_ELEVATION)));
          }
          sb.append(UI.TAB);
       }
@@ -1007,7 +1007,7 @@ public class CSVExport {
 
          final long dbAltitudeDown = tviItem.colAltitudeDown;
          if (dbAltitudeDown != 0) {
-            sb.append(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+            sb.append(Long.toString((long) (-dbAltitudeDown / UI.UNIT_VALUE_ELEVATION)));
          }
          sb.append(UI.TAB);
       }
@@ -1016,15 +1016,15 @@ public class CSVExport {
 
          final long dbMaxAltitude = tviItem.colMaxAltitude;
          if (dbMaxAltitude != 0) {
-            sb.append(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+            sb.append(Long.toString((long) (dbMaxAltitude / UI.UNIT_VALUE_ELEVATION)));
          }
          sb.append(UI.TAB);
       }
 
       { // HEADER_ELEVATION_AVERAGE_CHANGE
 
-         final double dbValue = (tviItem).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-               * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final double dbValue = (tviItem).colAltitude_AvgChange / UI.UNIT_VALUE_ELEVATION
+               * UI.UNIT_VALUE_DISTANCE;
 
          if (dbValue != 0) {
             sb.append(_nf0.format(dbValue));
@@ -1102,7 +1102,7 @@ public class CSVExport {
 
       { // HEADER_WEATHER_WIND_SPEED
 
-         final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+         final int windSpeed = (int) (tviItem.colWindSpd / UI.UNIT_VALUE_DISTANCE);
          if (windSpeed != 0) {
             sb.append(Integer.toString(windSpeed));
          }
@@ -1405,8 +1405,8 @@ public class CSVExport {
             int minSurfingDistance = value;
 
             // convert imperial -> metric
-            if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
-               minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
+            if (UI.UNIT_IS_LENGTH_YARD) {
+               minSurfingDistance = (int) (minSurfingDistance / UI.UNIT_YARD + 0.5);
             }
 
             sb.append(Long.toString(minSurfingDistance));
@@ -1446,7 +1446,7 @@ public class CSVExport {
          if (isTour) {
             final long dbStartDistance = tviTour.colStartDistance;
             if (dbStartDistance != 0) {
-               sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+               sb.append(Long.toString((long) (dbStartDistance / UI.UNIT_VALUE_DISTANCE)));
             }
          }
          sb.append(UI.TAB);

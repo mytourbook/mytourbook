@@ -2,17 +2,19 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Reader for different devices
 Bundle-SymbolicName: net.tourbook.device;singleton:=true
-Bundle-Version: 20.11.0.qualifier
+Bundle-Version: 20.11.1.qualifier
 Bundle-Activator: net.tourbook.device.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
  net.tourbook.common,
- net.tourbook.ext.rxtx_2.2,
- org.junit;resolution:=optional
+ net.tourbook.ext.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
- net.tourbook.device.polar.hrm
+ net.tourbook.device.gpx,
+ net.tourbook.device.polar.hrm,
+ net.tourbook.device.sporttracks,
+ net.tourbook.device.suunto
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: de.byteholder.geoclipse.map,
