@@ -4,13 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry exported="true" kind="lib" path="json-unit-assertj-2.21.0.jar"/> <!-- https://mvnrepository.com/artifact/net.javacrumbs.json-unit/json-unit-assertj -->
-	<classpathentry exported="true" kind="lib" path="assertj-core-3.18.1.jar"/> <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
-	<classpathentry exported="true" kind="lib" path="json-unit-core-2.21.0.jar"/> <!-- https://mvnrepository.com/artifact/net.javacrumbs.json-unit/json-unit-core -->
-	<classpathentry exported="true" kind="lib" path="json-unit-json-path-2.21.0.jar"/> <!-- https://mvnrepository.com/artifact/net.javacrumbs.json-unit/json-unit-json-path -->
-	<classpathentry exported="true" kind="lib" path="json-path-2.4.0.jar"/> <!-- https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
-	<classpathentry exported="true" kind="lib" path="json-smart-2.3.jar"/> <!-- https://mvnrepository.com/artifact/net.minidev/json-smart -->
-	<classpathentry exported="true" kind="lib" path="asm-1.0.2.jar"/> <!-- https://mvnrepository.com/artifact/net.minidev/asm -->
 	<classpathentry exported="true" kind="lib" path="activation-1.1.1.jar"/> <!-- https://mvnrepository.com/artifact/net.minidev/asm -->
 	<classpathentry exported="true" kind="lib" path="jaxb-api-2.3.0.jar"/> <!-- https://mvnrepository.com/artifact/net.minidev/asm -->
 	<classpathentry exported="true" kind="lib" path="jaxb-runtime-2.3.0.jar"/> <!-- https://mvnrepository.com/artifact/net.minidev/asm -->
