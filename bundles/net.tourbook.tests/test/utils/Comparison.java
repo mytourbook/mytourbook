@@ -15,7 +15,7 @@
  *******************************************************************************/
 package utils;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import de.byteholder.geoclipse.map.UI;
 
@@ -31,15 +31,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssert;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-
-import org.skyscreamer.jsonassert.ArrayValueMatcher;
-import org.skyscreamer.jsonassert.Customization;
-import org.skyscreamer.jsonassert.JSONCompare;
-import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.skyscreamer.jsonassert.JSONCompareResult;
-import org.skyscreamer.jsonassert.comparator.CustomComparator;
 
 public class Comparison {
 
@@ -64,25 +58,20 @@ public class Comparison {
 
       final String testJson = testTourData.toJson();
 
-      final ArrayValueMatcher<Object> arrValMatch = new ArrayValueMatcher<>(new CustomComparator(
-            JSONCompareMode.NON_EXTENSIBLE,
-            new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
-
-      final Customization arrayValueMatchCustomization = new Customization("tourMarkers", arrValMatch); //$NON-NLS-1$
-      final CustomComparator customArrayValueComparator = new CustomComparator(
-            JSONCompareMode.LENIENT,
-            arrayValueMatchCustomization,
-            new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("startTimeOfDay", (o1, o2) -> true)); //$NON-NLS-1$
-
-      final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
-
-      if (result.failed()) {
-         WriteErroneousFiles(controlFileName, testJson);
-      }
-
-      assertTrue(result.passed());
+      // compares two JSON documents (note lenient parsing of expected value)
+      final JsonAssert toto = assertThatJson(testJson)
+            .whenIgnoringPaths("tourMarkers[*].deviceLapTime")
+            .whenIgnoringPaths("tourMarkers[*].tourData")
+            //.whenIgnoringPaths("tourId")
+            .whenIgnoringPaths("startTimeOfDay")
+            //.when(Option.IGNORING_ARRAY_ORDER).node("tourMarkers")
+            .isEqualTo(controlDocument);
+//
+//      if (result.failed()) {
+//         WriteErroneousFiles(controlFileName, testJson);
+//      }
+//
+//      assertTrue(result.passed());
    }
 
    private static String readFile(final String path, final Charset encoding) {
