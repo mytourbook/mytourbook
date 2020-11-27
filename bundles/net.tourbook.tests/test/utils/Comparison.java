@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.byteholder.geoclipse.map.UI;
 
 import java.io.BufferedWriter;
@@ -63,7 +65,7 @@ public class Comparison {
       final String testJson = testTourData.toJson();
 
       final ArrayValueMatcher<Object> arrValMatch = new ArrayValueMatcher<>(new CustomComparator(
-            JSONCompareMode.LENIENT,
+            JSONCompareMode.NON_EXTENSIBLE,
             new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
 
@@ -74,14 +76,13 @@ public class Comparison {
             new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("startTimeOfDay", (o1, o2) -> true)); //$NON-NLS-1$
 
-      final JSONCompareResult result =
-            JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
+      final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
-//      if (result.failed()) {
-//         WriteErroneousFiles(controlFileName, testJson);
-//      }
+      if (result.failed()) {
+         WriteErroneousFiles(controlFileName, testJson);
+      }
 
-      assert result.passed();
+      assertTrue(result.passed());
    }
 
    private static String readFile(final String path, final Charset encoding) {
