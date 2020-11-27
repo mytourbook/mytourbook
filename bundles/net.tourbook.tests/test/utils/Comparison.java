@@ -15,7 +15,7 @@
  *******************************************************************************/
 package utils;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.byteholder.geoclipse.map.UI;
 
@@ -31,9 +31,14 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.javacrumbs.jsonunit.assertj.JsonAssert;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
+
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public class Comparison {
 
@@ -58,20 +63,27 @@ public class Comparison {
 
       final String testJson = testTourData.toXml();
 
-      // compares two JSON documents (note lenient parsing of expected value)
-      final JsonAssert toto = assertThatJson(testJson)
-            .whenIgnoringPaths("tourMarkers[*].deviceLapTime")
-            .whenIgnoringPaths("tourMarkers[*].tourData")
-            //.whenIgnoringPaths("tourId")
-            .whenIgnoringPaths("startTimeOfDay")
-//            .node("tourMarkers").isArray()//.when(Option.IGNORING_ARRAY_ORDER)
-            .isEqualTo(controlDocument);
+      final Diff myDiff = DiffBuilder.compare(Input.fromString(controlDocument))
+            .withTest(Input.fromString(testJson))
+            .ignoreWhitespace()
+            .checkForSimilar() // a different order is always 'similar' but not equals.
+            .withNodeMatcher(new DefaultNodeMatcher(
+                  ElementSelectors.conditionalBuilder()
+                        .whenElementIsNamed("TourMarker") //$NON-NLS-1$
+                        // When the comparison is done on the
+                        //TourMarker elements, we want to compare its content but not its order
+                        .thenUse(ElementSelectors.byXPath("./label", //$NON-NLS-1$
+                              ElementSelectors.byNameAndText))
+                        .elseUse(ElementSelectors.Default)
+                        .build()))
+            .build();
+
 //
 //      if (result.failed()) {
 //         WriteErroneousFiles(controlFileName, testJson);
 //      }
 //
-//      assertTrue(result.passed());
+      assertTrue(!myDiff.hasDifferences());
    }
 
    private static String readFile(final String path, final Charset encoding) {

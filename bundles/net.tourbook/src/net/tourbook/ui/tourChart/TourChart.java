@@ -19,7 +19,6 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.tourbook.Messages;
@@ -1958,7 +1957,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final ArrayList<List<Long>> allTourPauses = _tourData.multiTourPauses;
+         final ArrayList<ArrayList<Long>> allTourPauses = _tourData.multiTourPauses;
          String pauseDurationText;
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {

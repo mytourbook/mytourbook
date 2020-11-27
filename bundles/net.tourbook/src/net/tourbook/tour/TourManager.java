@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -837,7 +836,7 @@ public class TourManager {
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
       final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
       final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
-      final ArrayList<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
+      final ArrayList<ArrayList<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
       final int[] allTourPausesNumbers = joinedTourData.multipleNumberOfPauses = new int[numTours];
       final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
 
@@ -1071,7 +1070,7 @@ public class TourManager {
             final long[] pausedTime_End = fromTourData.getPausedTime_End();
             for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-               final List<Long> fromTourPausesList = new ArrayList<>();
+               final ArrayList<Long> fromTourPausesList = new ArrayList<>();
 
                fromTourPausesList.add(pausedTime_Start[index]);
                fromTourPausesList.add(pausedTime_End[index]);
