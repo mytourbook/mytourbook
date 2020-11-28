@@ -636,7 +636,7 @@
 
          <!-- Tour Info -->
          <command
-            commandId   ="command.net.tourbook.views.TourInfoView"
+            commandId   ="command.net.tourbook.views.TourInfo_View"
             icon        ="icons/tour-info.png"
             label       ="%View_Name_TourInfo"
             mnemonic    ="%View_Name_TourInfo_Mnemonic"/>
@@ -669,6 +669,13 @@
             label       ="%View_Name_Waypoint"
             mnemonic    ="%View_Name_Waypoint_Mnemonic"
          />
+
+         <!-- Tour Data -->
+         <command
+            commandId   ="command.net.tourbook.views.TourData_View"
+            icon        ="icons/tour-data.png"
+            label       ="%View_Name_TourData"
+            mnemonic    ="%View_Name_TourData_Mnemonic"/>
 
       </menuContribution>
 
@@ -1251,8 +1258,14 @@ THIS IS NOT YET FULLY IMPLEMENTED
       />
 
       <command
-         id             ="command.net.tourbook.views.TourInfoView"
-         name           ="%View_Name_TourBlog"
+         id             ="command.net.tourbook.views.TourData_View"
+         name           ="%View_Name_TourData"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourData"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourInfo_View"
+         name           ="%View_Name_TourInfo"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourInfo"
       />
 
@@ -1671,9 +1684,9 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            class       ="net.tourbook.ui.views.TourInfoView"
+            class       ="net.tourbook.ui.views.TourInfo_View"
             icon        ="icons/tour-info.png"
-            id          ="net.tourbook.ui.views.TourInfoView"
+            id          ="net.tourbook.ui.views.TourInfo_View"
             name        ="%View_Name_TourInfo"/>
 
          <view
@@ -1683,14 +1696,21 @@ THIS IS NOT YET FULLY IMPLEMENTED
             id          ="net.tourbook.views.TourWaypointView"
             name        ="%View_Name_Waypoint"/>
 
-         <!--
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            class       ="net.tourbook.ui.views.signImages.TourSignView"
-            icon        ="icons/sign-image.png"
-            id          ="net.tourbook.ui.views.signImages.TourSignView"
-            name        ="%View_Name_SignImage">
-         </view>
+            class       ="net.tourbook.ui.views.TourData_View"
+            icon        ="icons/tour-data.png"
+            id          ="net.tourbook.ui.views.TourData_View"
+            name        ="%View_Name_TourData"/>
+
+         <!--
+            <view
+               category    ="net.tourbook.category.Tour_Properties"
+               class       ="net.tourbook.ui.views.signImages.TourSignView"
+               icon        ="icons/sign-image.png"
+               id          ="net.tourbook.ui.views.signImages.TourSignView"
+               name        ="%View_Name_SignImage">
+            </view>
          -->
 
 

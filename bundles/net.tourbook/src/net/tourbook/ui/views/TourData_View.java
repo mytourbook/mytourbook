@@ -78,9 +78,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourInfoView extends ViewPart {
+public class TourData_View extends ViewPart {
 
-   public static final String            ID                         = "net.tourbook.ui.views.TourInfoView"; //$NON-NLS-1$
+   public static final String            ID                         = "net.tourbook.ui.views.TourData_View"; //$NON-NLS-1$
 
    private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
 
@@ -319,7 +319,7 @@ public class TourInfoView extends ViewPart {
       _postSelectionListener = new ISelectionListener() {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourInfoView.this) {
+            if (part == TourData_View.this) {
                return;
             }
             onSelectionChanged(selection);
@@ -334,7 +334,7 @@ public class TourInfoView extends ViewPart {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-            if (part == TourInfoView.this) {
+            if (part == TourData_View.this) {
                return;
             }
 

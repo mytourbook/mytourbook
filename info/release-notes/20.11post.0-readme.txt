@@ -17,7 +17,12 @@ New
 ===
 
 * Measurement System
- - Select measurement system for each unit separately
+  - Select measurement system for each unit separately
+ 
+* Tour Info View
+  - Tour info which is displayed in a tooltip is now also displayed in a separate view
+    https://sourceforge.net/p/mytourbook/feature-requests/167/
+  - The old "Tour Info" view ins now renamed into "Tour Data" view
 
 
 Improvements

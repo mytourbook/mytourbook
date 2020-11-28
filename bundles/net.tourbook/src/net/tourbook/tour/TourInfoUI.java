@@ -131,6 +131,12 @@ public class TourInfoUI {
    private boolean                        _isActionsVisible = false;
 
    /**
+    * When <code>true</code> then the tour info is embedded in a view and do not need the toolbar to
+    * close the tooltip.
+    */
+   private boolean                        _isUIEmbedded;
+
+   /**
     * Tour which is displayed in the tool tip
     */
    private TourData                       _tourData;
@@ -277,6 +283,13 @@ public class TourInfoUI {
       _actionEditQuick.run();
    }
 
+   /**
+    * @param parent
+    * @param tourData
+    * @param tourToolTipProvider
+    * @param tourProvider
+    * @return Returns the content area control
+    */
    public Composite createContentArea(final Composite parent,
                                       final TourData tourData,
                                       final IToolTipProvider tourToolTipProvider,
@@ -402,87 +415,100 @@ public class TourInfoUI {
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * tour type
-          */
-         if (_uiTourTypeName != null) {
+         {
+            /*
+             * Tour type
+             */
+            if (_uiTourTypeName != null) {
 
-            _lblTourType_Image = new CLabel(container, SWT.NONE);
-            GridDataFactory
-                  .swtDefaults()//
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_lblTourType_Image);
-            _lblTourType_Image.setForeground(_fgColor);
-            _lblTourType_Image.setBackground(_bgColor);
+               _lblTourType_Image = new CLabel(container, SWT.NONE);
+               GridDataFactory
+                     .swtDefaults()//
+                     .align(SWT.BEGINNING, SWT.BEGINNING)
+                     .applyTo(_lblTourType_Image);
+               _lblTourType_Image.setForeground(_fgColor);
+               _lblTourType_Image.setBackground(_bgColor);
+            }
          }
-
-         /*
-          * title
-          */
-         _lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
-               .grab(true, false)
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblTitle);
-         _lblTitle.setForeground(_fgColor);
-         _lblTitle.setBackground(_bgColor);
-         MTFont.setBannerFont(_lblTitle);
-
-         /*
-          * action toolbar in the top right corner
-          */
-         createUI_12_Toolbar(container);
-
-         /*
-          * date
-          */
-         _lblDate = createUI_LabelValue(container, SWT.LEAD);
-         GridDataFactory.fillDefaults().span(3, 1).applyTo(_lblDate);
+         {
+            /*
+             * Title
+             */
+            _lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
+            GridDataFactory
+                  .fillDefaults()//
+                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+                  .grab(true, false)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblTitle);
+            _lblTitle.setForeground(_fgColor);
+            _lblTitle.setBackground(_bgColor);
+            MTFont.setBannerFont(_lblTitle);
+         }
+         {
+            /*
+             * Action toolbar in the top right corner
+             */
+            createUI_12_Toolbar(container);
+         }
+         {
+            /*
+             * Date
+             */
+            _lblDate = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_lblDate);
+         }
       }
    }
 
    private void createUI_12_Toolbar(final Composite container) {
 
-      /*
-       * Create toolbar
-       */
-      final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-      GridDataFactory.fillDefaults().applyTo(toolbar);
-      toolbar.setForeground(_fgColor);
-      toolbar.setBackground(_bgColor);
+      if (_isUIEmbedded) {
 
-      final ToolBarManager tbm = new ToolBarManager(toolbar);
+         // spacer
+         new Label(container, SWT.NONE);
 
-      /*
-       * Fill toolbar
-       */
-      if (_isActionsVisible) {
+      } else {
 
-         _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
-         _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
+         /*
+          * Create toolbar
+          */
+         final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+         GridDataFactory.fillDefaults().applyTo(toolbar);
+         toolbar.setForeground(_fgColor);
+         toolbar.setBackground(_bgColor);
 
-         final Integer selectedTabFolder = Integer.valueOf(0);
+         final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-         _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
-               Messages.Tour_Tooltip_Action_EditFormatPreferences,
-               PrefPageAppearanceDisplayFormat.ID,
-               selectedTabFolder);
+         /*
+          * Fill toolbar
+          */
+         if (_isActionsVisible) {
 
-         tbm.add(_actionEditTour);
-         tbm.add(_actionEditQuick);
-         tbm.add(_actionPrefDialog);
+            _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
+            _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
+
+            final Integer selectedTabFolder = Integer.valueOf(0);
+
+            _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
+                  Messages.Tour_Tooltip_Action_EditFormatPreferences,
+                  PrefPageAppearanceDisplayFormat.ID,
+                  selectedTabFolder);
+
+            tbm.add(_actionEditTour);
+            tbm.add(_actionEditQuick);
+            tbm.add(_actionPrefDialog);
+         }
+
+         /**
+          * The close action is ALWAYS visible, sometimes there is a bug that the tooltip do not
+          * automatically close when hovering out.
+          */
+         _actionCloseTooltip = new ActionCloseTooltip();
+         tbm.add(_actionCloseTooltip);
+
+         tbm.update(true);
       }
-
-      /**
-       * The close action is ALWAYS visible, sometimes there is a bug that the tooltip do not
-       * automatically close when hovering out.
-       */
-      _actionCloseTooltip = new ActionCloseTooltip();
-      tbm.add(_actionCloseTooltip);
-
-      tbm.update(true);
    }
 
    private void createUI_30_Column_1(final Composite parent) {
@@ -1303,6 +1329,16 @@ public class TourInfoUI {
     */
    public void setActionsEnabled(final boolean isEnabled) {
       _isActionsVisible = isEnabled;
+   }
+
+   /**
+    * @param isUIEmbedded
+    *           When <code>true</code> then the tour info is embedded in a view and do not need the
+    *           toolbar
+    *           to close the tooltip.
+    */
+   public void setIsUIEmbedded(final boolean isUIEmbedded) {
+      _isUIEmbedded = isUIEmbedded;
    }
 
    /**
