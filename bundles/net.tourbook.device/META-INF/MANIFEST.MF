@@ -8,11 +8,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook,
  net.tourbook.common,
- net.tourbook.ext.rxtx_2.2,
- org.junit;resolution:=optional
+ net.tourbook.ext.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
- net.tourbook.device.polar.hrm
+ net.tourbook.device.gpx,
+ net.tourbook.device.polar.hrm,
+ net.tourbook.device.sporttracks,
+ net.tourbook.device.suunto
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: de.byteholder.geoclipse.map,

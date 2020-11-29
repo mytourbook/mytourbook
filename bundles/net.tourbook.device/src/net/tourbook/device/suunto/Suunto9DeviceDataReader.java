@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -44,12 +45,12 @@ import org.json.JSONObject;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-   private HashMap<TourData, ArrayList<TimeData>> _processedActivities         = new HashMap<>();
+   private HashMap<TourData, List<TimeData>> _processedActivities         = new HashMap<>();
 
-   private HashMap<String, String>                _childrenActivitiesToProcess = new HashMap<>();
+   private HashMap<String, String>           _childrenActivitiesToProcess = new HashMap<>();
 
-   private HashMap<Long, TourData>                _newlyImportedTours          = new HashMap<>();
-   private HashMap<Long, TourData>                _alreadyImportedTours        = new HashMap<>();
+   private HashMap<Long, TourData>           _newlyImportedTours          = new HashMap<>();
+   private HashMap<Long, TourData>           _alreadyImportedTours        = new HashMap<>();
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -91,7 +92,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    private void concatenateChildrenActivities(final String filePath,
                                               int currentFileNumber,
                                               final TourData currentActivity,
-                                              final ArrayList<TimeData> sampleListToReUse) {
+                                              final List<TimeData> sampleListToReUse) {
 
       final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
@@ -301,7 +302,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       String fileName = FilenameUtils.removeExtension(filePath);
 
-      if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") { //$NON-NLS-1$
+      if (fileName.substring(fileName.length() - 5, fileName.length()).equals(".json")) { //$NON-NLS-1$
          fileName = FilenameUtils.removeExtension(fileName);
       }
 
@@ -340,8 +341,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          // current one. Example : If the current is xxx-3, we find xxx-2)
          // then we import it reusing the parent activity AND we check that there is no children waiting to be imported
          // If nothing is found, we store it for (hopefully) future use.
-         Map.Entry<TourData, ArrayList<TimeData>> parentEntry = null;
-         for (final Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
+         Map.Entry<TourData, List<TimeData>> parentEntry = null;
+         for (final Map.Entry<TourData, List<TimeData>> entry : _processedActivities.entrySet()) {
             final TourData key = entry.getKey();
 
             final String parentFileName = GetFileNameWithoutNumber(
@@ -369,10 +370,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             //We remove the parent activity to replace it with the
             //updated one (parent activity concatenated with the current
             //one).
-            final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+            final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
             while (it.hasNext()) {
-               final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-               if (entry.getKey().getTourId() == parentEntry.getKey().getTourId()) {
+               final Map.Entry<TourData, List<TimeData>> entry = it.next();
+               if (entry.getKey().getTourId().equals(parentEntry.getKey().getTourId())) {
                   it.remove();
                }
             }
@@ -409,10 +410,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     *           The absolute path of a given activity.
     */
    private void removeProcessedActivity(final String filePath) {
-      final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+      final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
       while (it.hasNext()) {
-         final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-         if (entry.getKey().getImportFilePath() == filePath) {
+         final Map.Entry<TourData, List<TimeData>> entry = it.next();
+         if (entry.getKey().getImportFilePath().equals(filePath)) {
             it.remove();
             return;
          }

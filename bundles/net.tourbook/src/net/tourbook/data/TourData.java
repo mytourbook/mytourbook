@@ -18,6 +18,14 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skedgo.converter.TimezoneMapper;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -78,6 +86,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
@@ -115,6 +124,7 @@ import org.hibernate.annotations.Cascade;
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
 @XmlAccessorType(XmlAccessType.NONE)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
    public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
@@ -7162,6 +7172,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
     *         date/time is not available
     */
+   @JsonIgnore
    public ZonedDateTime getDateTimeCreated() {
 
       if (_dateTimeCreated != null || dateTimeCreated == 0) {
@@ -7177,6 +7188,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
     *         date/time is not available
     */
+   @JsonIgnore
    public ZonedDateTime getDateTimeModified() {
 
       if (_dateTimeModified != null || dateTimeModified == 0) {
@@ -7455,11 +7467,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public String getImportFileName() {
 
-      if (tourImportFileName == null || tourImportFileName.length() == 0) {
-         return null;
-      }
-
-      return tourImportFileName;
+      return StringUtils.hasContent(tourImportFileName) ? tourImportFileName : null;
    }
 
    /**
@@ -7467,11 +7475,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public String getImportFilePath() {
 
-      if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
-         return null;
-      }
-
-      return tourImportFilePath;
+      return StringUtils.hasContent(tourImportFilePath) ? tourImportFilePath : null;
    }
 
    /**
@@ -7500,7 +7504,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public String getImportFilePathNameText() {
 
-      if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+      if (StringUtils.isNullOrEmpty(tourImportFilePath)) {
 
          if (isManualTour()) {
             return UI.EMPTY_STRING;
@@ -8204,6 +8208,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         <p>
     *         or <code>null</code> when SRTM data serie is not available
     */
+   @JsonIgnore
    public float[][] getSRTMValues() {
 
       if (latitudeSerie == null) {
@@ -8471,6 +8476,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
     *         the default time zone is returned which is defined in the preferences.
     */
+   @JsonIgnore
    public ZoneId getTimeZoneIdWithDefault() {
 
       final String zoneIdRaw = timeZoneId == null //
@@ -8527,6 +8533,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
+   @JsonIgnore
    public TourDateTime getTourDateTime() {
 
       return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
@@ -8593,6 +8600,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
     */
+   @JsonIgnore
    public Set<TourMarker> getTourMarkers() {
       return tourMarkers;
    }
@@ -8600,6 +8608,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns {@link TourMarker}'s sorted by serie index.
     */
+   @JsonProperty("tourMarkers")
    public ArrayList<TourMarker> getTourMarkersSorted() {
 
       if (_sortedMarkers != null) {
@@ -8649,6 +8658,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour start date time with the tour time zone, when not available with the
     *         default time zone.
     */
+   @JsonIgnore
    public ZonedDateTime getTourStartTime() {
 
       if (_zonedStartTime == null) {
@@ -10823,6 +10833,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                                          final String projectionId) {
 
       _twpWorldPosition.put(projectionId.hashCode() + zoomLevel, worldPositions);
+   }
+
+   public String toJson() {
+
+      final ObjectMapper mapper = new ObjectMapper();
+      mapper.setSerializationInclusion(Include.NON_NULL);
+      mapper.setSerializationInclusion(Include.NON_EMPTY);
+      mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+
+      String jsonString = UI.EMPTY_STRING;
+      try {
+         jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+      } catch (final JsonProcessingException e) {
+         e.printStackTrace();
+      }
+      return jsonString;
    }
 
    @Override
