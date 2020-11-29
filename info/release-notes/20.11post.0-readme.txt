@@ -10,11 +10,8 @@ TODO's
 Issues
 ======
 
+*
 
-
-* Tourbook View (flat)
-  - When tour filter is modified then reordered column positions are reset
-  
   
 New
 ===
@@ -41,6 +38,9 @@ Changes
 Fixes   
 =====
 
+* Tourbook View (flat)
+  - When tour filter is modified then reordered column positions are reset
+  
 * Calendar View
   - The calendar week did not start always with the first day of week, it depended on the selected tour date 
 
