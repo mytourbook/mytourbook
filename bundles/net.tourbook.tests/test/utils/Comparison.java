@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.byteholder.geoclipse.map.UI;
 
 import java.io.BufferedWriter;
@@ -81,7 +83,7 @@ public class Comparison {
 //         WriteErroneousFiles(controlFileName, testJson);
 //      }
 //
-//      assertTrue(!myDiff.hasDifferences());
+      assertTrue(!myDiff.hasDifferences());
    }
 
    private static String readFile(final String path, final Charset encoding) {
