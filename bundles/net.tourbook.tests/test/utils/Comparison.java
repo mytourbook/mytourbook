@@ -56,7 +56,7 @@ public class Comparison {
       final String controlDocumentFilePath = Paths.get(controlFileName + JSON).toAbsolutePath().toString();
       final String controlDocument = readFile(controlDocumentFilePath, StandardCharsets.US_ASCII);
 
-      final String testJson = testTourData.toXml();
+      final String testJson = testTourData.toJson();
 
       // compares two JSON documents (note lenient parsing of expected value)
       final JsonAssert toto = assertThatJson(testJson)
@@ -64,7 +64,7 @@ public class Comparison {
             .whenIgnoringPaths("tourMarkers[*].tourData")
             //.whenIgnoringPaths("tourId")
             .whenIgnoringPaths("startTimeOfDay")
-//            .node("tourMarkers").isArray()//.when(Option.IGNORING_ARRAY_ORDER)
+            //.when(Option.IGNORING_ARRAY_ORDER).node("tourMarkers")
             .isEqualTo(controlDocument);
 //
 //      if (result.failed()) {
