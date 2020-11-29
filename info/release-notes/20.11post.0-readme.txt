@@ -38,6 +38,9 @@ Changes
 
 * Dialog Adjust Elevation
   - The elevation of the rightmost spline point is now set to the SRTM value when the adjustment type is "Approach elevation with SRTM data"
+  
+* Tour Editor
+  - Number of visible lines for the tour description is moved from pref page "Appearance/Tour Editor" into the slideout "Tour Editor Options"
 
 
 Fixes   

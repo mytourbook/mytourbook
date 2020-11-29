@@ -377,7 +377,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,  new RGB(0xff, 0x00, 0x80));
 
       /*
-       * tour data editor
+       * Tour data editor
        */
       store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 3);
 

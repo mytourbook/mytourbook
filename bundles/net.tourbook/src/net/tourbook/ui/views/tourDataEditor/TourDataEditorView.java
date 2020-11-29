@@ -220,55 +220,58 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
-   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String           VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String           VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   private static final int              COLUMN_SPACING                = 20;
+   private static final int              COLUMN_SPACING                            = 20;
    //
-   private static final String           WIDGET_KEY                    = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOURDISTANCE       = "tourDistance";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP        = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN      = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON             = "tourPerson";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION = "anotherSelection";                                     //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS          = 5000;
+   private static final int              BUSY_INDICATOR_ITEMS                      = 5000;
    //
-   private static final String           STATE_SELECTED_TAB            = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE           = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE            = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH         = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME       = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL        = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE           = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER         = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
    //
-   static final String                   STATE_LAT_LON_DIGITS          = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int                      DEFAULT_LAT_LON_DIGITS        = 5;
-   private static final String           COLUMN_DATA_SEQUENCE          = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String           COLUMN_ALTITUDE               = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                  = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE            = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
-   private static final String           COLUMN_POWER                  = "POWER";                                                //$NON-NLS-1$
-   private static final String           COLUMN_PACE                   = "MOTION_PACE";                                          //$NON-NLS-1$
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
+   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
+   static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
    //
-   private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common             = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateTimeSlice               = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
-   private static final IDialogSettings  _stateSwimSlice               = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
+   private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                      = UI.IS_LINUX;
-   private static final boolean          IS_OSX                        = UI.IS_OSX;
+   private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
+   private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   //
+   private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
+   private static final boolean          IS_OSX                                    = UI.IS_OSX;
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -512,6 +515,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private int                              _latLonDigits;
 
+   /**
+    * Number of lines for the description text.
+    */
+   private int                              _descriptionNumLines;
+
    private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
 
    private TourData                         _tourData;
@@ -681,7 +689,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutViewSettings(_pageBook, toolbar, _state, TourDataEditorView.this);
+         return new Slideout_TourEditorOptions(_pageBook, toolbar, _state, TourDataEditorView.this);
       }
    }
 
@@ -1375,7 +1383,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * hour
              */
             _spinHours = new Spinner(_pageEditMode, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
 //                .hint(spinnerWidthHour, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinHours);
@@ -1407,7 +1415,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * seconds
              */
             _spinSeconds = new Spinner(_pageEditMode, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
 //                .hint(spinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinSeconds);
@@ -1428,7 +1436,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * @return Returns time in seconds
        */
       public int getTime() {
-         return (_spinHours.getSelection() * 3600) //
+         return (_spinHours.getSelection() * 3600)
                + (_spinMinutes.getSelection() * 60)
                + _spinSeconds.getSelection();
       }
@@ -3283,7 +3291,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          {
             /*
-             * description
+             * Description
              */
             final Label label = _tk.createLabel(container, Messages.tour_editor_label_description);
             GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
@@ -3298,16 +3306,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                         | SWT.H_SCROLL//
             );
 
-            int descLines = _prefStore.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-            descLines = descLines == 0 ? 5 : descLines;
-
             // description will grab all vertical space in the tour tab
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   //
                   // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
                   //
-                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(descLines))
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(_descriptionNumLines))
                   .applyTo(_txtDescription);
 
             _txtDescription.addModifyListener(_modifyListener);
@@ -7737,8 +7742,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isRowEditMode = _state.getBoolean(STATE_ROW_EDIT_MODE);
       _isEditMode = _state.getBoolean(STATE_IS_EDIT_MODE);
 
-      _latLonDigits = Util.getStateInt(_state, STATE_LAT_LON_DIGITS, DEFAULT_LAT_LON_DIGITS);
+      _latLonDigits = Util.getStateInt(_state, STATE_LAT_LON_DIGITS, STATE_LAT_LON_DIGITS_DEFAULT);
       setup_LatLonDigits();
+
+      _descriptionNumLines = Util.getStateInt(_state, STATE_DESCRIPTION_NUMBER_OF_LINES, STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT);
    }
 
    private void restoreState_WithUI() {
@@ -8552,6 +8559,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // display modified time slices in other views
       fireModifyNotification();
+   }
+
+   void updateUI_DescriptionNumLines(final int numLines) {
+
+      if (numLines == _descriptionNumLines) {
+
+         // nothing has changed
+         return;
+      }
+
+      _descriptionNumLines = numLines;
+
+      // update layout
+      final GridData gd = (GridData) _txtDescription.getLayoutData();
+      gd.heightHint = _pc.convertHeightInCharsToPixels(_descriptionNumLines);
+
+      onResizeTab1();
    }
 
    /**
