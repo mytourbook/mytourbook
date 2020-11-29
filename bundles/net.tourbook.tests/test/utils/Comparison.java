@@ -62,6 +62,7 @@ public class Comparison {
       final String controlDocumentFilePath = Paths.get(controlFileName + JSON).toAbsolutePath().toString();
       final String controlDocument = readFile(controlDocumentFilePath, StandardCharsets.US_ASCII);
 
+      testTourData.getTourMarkersSorted();
       final String testJson = testTourData.toJson();
 
       final ArrayValueMatcher<Object> arrValMatch = new ArrayValueMatcher<>(new CustomComparator(

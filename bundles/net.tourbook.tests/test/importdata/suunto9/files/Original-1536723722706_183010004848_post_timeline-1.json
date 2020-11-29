@@ -205,7 +205,6 @@
     "validForSave" : true,
     "visibleType" : 0
   } ],
-  "tourMarkersSorted" : [ -1, -1, -1 ],
   "tourSaved" : false,
   "tourStartTimeMS" : 1536672428557,
   "training_TrainingEffect_Aerob" : 0.0,
