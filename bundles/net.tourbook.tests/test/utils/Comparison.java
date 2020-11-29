@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import de.byteholder.geoclipse.map.UI;
 
 import java.io.BufferedWriter;
@@ -26,7 +28,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.common.util.StringUtils;
@@ -60,28 +61,31 @@ public class Comparison {
       final String controlDocumentFilePath = Paths.get(controlFileName + JSON).toAbsolutePath().toString();
       final String controlDocument = readFile(controlDocumentFilePath, StandardCharsets.US_ASCII);
 
+      testTourData.getTourMarkersSorted();
       final String testJson = testTourData.toJson();
 
       final ArrayValueMatcher<Object> arrValMatch = new ArrayValueMatcher<>(new CustomComparator(
-            JSONCompareMode.LENIENT,
+            JSONCompareMode.STRICT,
             new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
 
       final Customization arrayValueMatchCustomization = new Customization("tourMarkers", arrValMatch); //$NON-NLS-1$
       final CustomComparator customArrayValueComparator = new CustomComparator(
-            JSONCompareMode.LENIENT,
+            JSONCompareMode.STRICT,
             arrayValueMatchCustomization,
+            new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("startTimeOfDay", (o1, o2) -> true)); //$NON-NLS-1$
 
-      final JSONCompareResult result =
-            JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
+      final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
-//      if (result.failed()) {
-//         WriteErroneousFiles(controlFileName, testJson);
-//      }
+      if (result.failed()) {
+         WriteErroneousFiles(controlFileName, testJson);
+      }
 
-      assert result.passed();
+      assertTrue(result.passed());
    }
 
    private static String readFile(final String path, final Charset encoding) {
@@ -101,10 +105,9 @@ public class Comparison {
       return UI.EMPTY_STRING;
    }
 
-   public static TourData RetrieveImportedTour(final HashMap<Long, TourData> newlyImportedTours) {
+   public static TourData RetrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
       final Map.Entry<Long, TourData> entry = newlyImportedTours.entrySet().iterator().next();
-      final TourData tour = entry.getValue();
-      return tour;
+      return entry.getValue();
    }
 
    /**

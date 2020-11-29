@@ -959,7 +959,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               reloadViewer();
+               /*
+                * Flat view do not preserve column reordering when reloaded -> recreate it
+                */
+               if (_isLayoutNatTable) {
+
+                  // save column ordering
+                  saveState();
+
+                  recreateViewer_NatTable();
+
+               } else {
+
+                  reloadViewer();
+               }
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 

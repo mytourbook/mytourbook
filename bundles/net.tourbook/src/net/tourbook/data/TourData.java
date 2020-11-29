@@ -21,6 +21,7 @@ import static javax.persistence.FetchType.EAGER;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -7472,7 +7473,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the import file path (folder) or <code>null</code> when not available.
     */
-   @JsonIgnore
    public String getImportFilePath() {
 
       return StringUtils.hasContent(tourImportFilePath) ? tourImportFilePath : null;
@@ -7481,7 +7481,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the full import file path name or <code>null</code> when not available.
     */
-   @JsonIgnore
    public String getImportFilePathName() {
 
       if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
@@ -7503,7 +7502,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the full import file path name or an empty string when not available.
     */
-   @JsonIgnore
    public String getImportFilePathNameText() {
 
       if (StringUtils.isNullOrEmpty(tourImportFilePath)) {
@@ -8602,6 +8600,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
     */
+   @JsonIgnore
    public Set<TourMarker> getTourMarkers() {
       return tourMarkers;
    }
@@ -8609,6 +8608,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns {@link TourMarker}'s sorted by serie index.
     */
+   @JsonProperty("tourMarkers")
    public ArrayList<TourMarker> getTourMarkersSorted() {
 
       if (_sortedMarkers != null) {

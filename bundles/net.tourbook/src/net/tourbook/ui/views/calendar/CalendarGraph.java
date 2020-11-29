@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -108,8 +108,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
    private int                               _lastDayOfWeekToGoTo  = -1;
    private long                              _lastFiredTourId      = -1;
    //
-   private List<FocusItem>                   _allDayFocusItems     = new ArrayList<FocusItem>();
-   private List<FocusItem>                   _allTourFocusItems    = new ArrayList<FocusItem>();
+   private List<FocusItem>                   _allDayFocusItems     = new ArrayList<>();
+   private List<FocusItem>                   _allTourFocusItems    = new ArrayList<>();
    private boolean                           _isGraphDirty         = true;
    private boolean                           _isHoveredModified;
    private boolean                           _isHoveredPainted;
@@ -287,7 +287,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          //can't get here
          return null;
       }
-   };
+   }
 
    private class CalendarItemTransferData {
 
@@ -382,7 +382,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       /**
        * Focusitem is a tour
-       * 
+       *
        * @param rect
        * @param id
        * @param calendarTourData
@@ -397,7 +397,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
       /**
        * Focusitem is a day
-       * 
+       *
        * @param rect
        * @param id
        * @param dayItem
@@ -447,10 +447,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
       _dataProvider = CalendarTourDataProvider.getInstance();
       _dataProvider.setCalendarGraph(this);
 
-      _rgbBright = new ArrayList<RGB>();
-      _rgbDark = new ArrayList<RGB>();
-      _rgbLine = new ArrayList<RGB>();
-      _rgbText = new ArrayList<RGB>();
+      _rgbBright = new ArrayList<>();
+      _rgbDark = new ArrayList<>();
+      _rgbLine = new ArrayList<>();
+      _rgbText = new ArrayList<>();
 
       // setup profile BEFORE updating tour type colors !!!
       setupProfile();
@@ -873,7 +873,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    /**
     * Paint calendar
-    * 
+    *
     * @param gc
     */
    private void drawCalendar(final GC calendarGC) {
@@ -1539,7 +1539,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    /**
     * Tour background
-    * 
+    *
     * @param data
     * @return Background RGB or <code>null</code> when background is not painted
     */
@@ -2579,7 +2579,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
    @Override
    public ArrayList<TourData> getSelectedTours() {
 
-      final ArrayList<TourData> selectedTourData = new ArrayList<TourData>();
+      final ArrayList<TourData> selectedTourData = new ArrayList<>();
       if (_selectedItem.isTour()) {
          selectedTourData.add(TourManager.getInstance().getTourData(_selectedItem.id));
       }
@@ -2716,11 +2716,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
             _firstVisibleDay = requestedDateTime
 
                   // center date vertically on screen
-                  .minusWeeks(_numWeeksInOneColumn / 2);
+                  .minusWeeks(_numWeeksInOneColumn / 2)
+
+                  .with(getFirstDayOfWeek_SameOrPrevious());
 
          } else {
 
-            _firstVisibleDay = requestedDateTime;
+            _firstVisibleDay = requestedDateTime.with(getFirstDayOfWeek_SameOrPrevious());
          }
       }
 
@@ -3028,7 +3030,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    /**
     * Mouse move/down event handler
-    * 
+    *
     * @param event
     */
    private void onMouse_Down(final MouseEvent event) {
@@ -3108,7 +3110,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    /**
     * Mouse move/down event handler
-    * 
+    *
     * @param event
     */
    private void onMouse_Move(final MouseEvent event) {
@@ -3435,7 +3437,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    /**
     * Called when scrolled with the scrollbar slider
-    * 
+    *
     * @param event
     */
    private void scrollBar_onScroll(final SelectionEvent event) {
