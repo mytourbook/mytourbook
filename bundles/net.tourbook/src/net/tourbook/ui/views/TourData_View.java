@@ -82,13 +82,13 @@ public class TourData_View extends ViewPart {
 
    public static final String            ID                         = "net.tourbook.ui.views.TourData_View"; //$NON-NLS-1$
 
-   private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
+   private static final String           ANNOTATION_TRANSIENT       = "Transient";                           //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common          = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
 
-   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
+   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";          //$NON-NLS-1$
 
    private PostSelectionProvider         _postSelectionProvider;
    private ISelectionListener            _postSelectionListener;
@@ -341,25 +341,37 @@ public class TourData_View extends ViewPart {
             if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+
+               if (!modifiedTours.isEmpty()) {
 
                   // update modified tour
 
-                  final long viewTourId = _tourData.getTourId();
+                  if (_tourData == null) {
 
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == viewTourId) {
+                     // this happens when tour is opened/edited from the tour tooltip and saved
 
-                        // get modified tour
-                        _tourData = tourData;
+                     _tourData = modifiedTours.get(0);
 
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
+                     updateUI();
 
-                        updateUI();
+                  } else {
 
-                        // nothing more to do, the view contains only one tour
-                        return;
+                     final long viewTourId = _tourData.getTourId();
+
+                     for (final TourData tourData : modifiedTours) {
+                        if (tourData.getTourId() == viewTourId) {
+
+                           // get modified tour
+                           _tourData = tourData;
+
+                           // remove old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
+
+                           updateUI();
+
+                           // nothing more to do, the view contains only one tour
+                           return;
+                        }
                      }
                   }
                }

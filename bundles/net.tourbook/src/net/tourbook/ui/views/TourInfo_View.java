@@ -128,25 +128,37 @@ public class TourInfo_View extends ViewPart {
             if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+
+               if (!modifiedTours.isEmpty()) {
 
                   // update modified tour
 
-                  final long viewTourId = _tourData.getTourId();
+                  if (_tourData == null) {
 
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == viewTourId) {
+                     // this happens when tour is opened/edited from the tour tooltip and saved
 
-                        // get modified tour
-                        _tourData = tourData;
+                     _tourData = modifiedTours.get(0);
 
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
+                     updateUI();
 
-                        updateUI();
+                  } else {
 
-                        // nothing more to do, the view contains only one tour
-                        return;
+                     final long viewTourId = _tourData.getTourId();
+
+                     for (final TourData tourData : modifiedTours) {
+                        if (tourData.getTourId() == viewTourId) {
+
+                           // get modified tour
+                           _tourData = tourData;
+
+                           // remove old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
+
+                           updateUI();
+
+                           // nothing more to do, the view contains only one tour
+                           return;
+                        }
                      }
                   }
                }
@@ -394,10 +406,8 @@ public class TourInfo_View extends ViewPart {
          _tourInfoUIContent = _tourInfoUI.createContentArea(_infoContainer, _tourData, null, null);
       }
 
-      // layout container to resize the labels
-      _infoContainer.getDisplay().asyncExec(() -> {
+      _uiContainer.layout(true, true);
 
-         onResize();
-      });
+      onResize();
    }
 }
