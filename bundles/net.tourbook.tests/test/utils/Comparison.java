@@ -28,7 +28,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.common.util.StringUtils;
@@ -66,14 +65,17 @@ public class Comparison {
       final String testJson = testTourData.toJson();
 
       final ArrayValueMatcher<Object> arrValMatch = new ArrayValueMatcher<>(new CustomComparator(
-            JSONCompareMode.NON_EXTENSIBLE,
+            JSONCompareMode.STRICT,
             new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
 
       final Customization arrayValueMatchCustomization = new Customization("tourMarkers", arrValMatch); //$NON-NLS-1$
       final CustomComparator customArrayValueComparator = new CustomComparator(
-            JSONCompareMode.LENIENT,
+            JSONCompareMode.STRICT,
             arrayValueMatchCustomization,
+            new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("startTimeOfDay", (o1, o2) -> true)); //$NON-NLS-1$
 
@@ -103,10 +105,9 @@ public class Comparison {
       return UI.EMPTY_STRING;
    }
 
-   public static TourData RetrieveImportedTour(final HashMap<Long, TourData> newlyImportedTours) {
+   public static TourData RetrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
       final Map.Entry<Long, TourData> entry = newlyImportedTours.entrySet().iterator().next();
-      final TourData tour = entry.getValue();
-      return tour;
+      return entry.getValue();
    }
 
    /**

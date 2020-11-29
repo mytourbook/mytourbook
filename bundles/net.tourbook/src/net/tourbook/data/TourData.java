@@ -7473,7 +7473,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the import file path (folder) or <code>null</code> when not available.
     */
-   @JsonIgnore
    public String getImportFilePath() {
 
       return StringUtils.hasContent(tourImportFilePath) ? tourImportFilePath : null;
@@ -7482,7 +7481,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the full import file path name or <code>null</code> when not available.
     */
-   @JsonIgnore
    public String getImportFilePathName() {
 
       if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
@@ -7504,7 +7502,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns the full import file path name or an empty string when not available.
     */
-   @JsonIgnore
    public String getImportFilePathNameText() {
 
       if (StringUtils.isNullOrEmpty(tourImportFilePath)) {
