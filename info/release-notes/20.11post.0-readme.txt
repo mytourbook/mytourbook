@@ -28,6 +28,10 @@ New
 Improvements
 ============
 
+* 2D Map
+  - Draw value point from the tour chart
+  - Sync map location with value point in the tour chart
+
 * Statistic Values View
   - Show values with the selected measurement system
   - Show value labels with the selected language

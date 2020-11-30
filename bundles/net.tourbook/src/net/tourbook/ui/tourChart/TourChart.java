@@ -41,7 +41,7 @@ import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
-import net.tourbook.chart.IHoveredValueListener;
+import net.tourbook.chart.IHoveredValueTooltipListener;
 import net.tourbook.chart.IKeyListener;
 import net.tourbook.chart.ILineSelectionPainter;
 import net.tourbook.chart.IMouseListener;
@@ -603,7 +603,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private class HoveredValueListener implements IHoveredValueListener {
+   private class HoveredValueTooltipListener implements IHoveredValueTooltipListener {
 
       @Override
       public void hideTooltip() {
@@ -639,7 +639,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          if (_tcc.isShowTourPhotoTooltip) {
 
-            _photoTooltip.showChartPhotoToolTip(//
+            _photoTooltip.showChartPhotoToolTip(
                   _layerPhoto,
                   eventTime,
                   devHoveredValue,
@@ -647,7 +647,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   devYMouseMove);
          }
       }
-
    }
 
    private class MouseListener_SegmenterSegment extends MouseAdapter {
@@ -865,7 +864,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // show delayed that it is not flickering when moving the mouse fast
       _tourMarkerTooltip.setFadeInDelayTime(50);
 
-      setHoveredListener(new HoveredValueListener());
+      setHoveredValueTooltipListener(new HoveredValueTooltipListener());
       setLineSelectionPainter(this);
    }
 

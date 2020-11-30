@@ -41,6 +41,7 @@ public class Messages extends NLS {
    public static String        Image_Action_ShowSliderInMap;
    public static String        Image_Action_ShowSliderInMap_Left;
    public static String        Image_Action_ShowStartEndInMap;
+   public static String        Image_Action_ShowValuePoint;
    public static String        Image_Action_SynchWithSlider_Centered;
    public static String        Image_Action_SynchWithSlider_Centered_Disabled;
    public static String        Image_Action_TourWayPoint;
@@ -52,6 +53,7 @@ public class Messages extends NLS {
    public static String        Image_Map_MarkerSliderRight;
    public static String        Image_Map_TourEndMarker;
    public static String        Image_Map_TourStartMarker;
+   public static String        Image_Map_ValuePoint;
    public static String        Image_Map_WayPoint;
    public static String        Image_Map_WayPoint_Hovered;
 
@@ -107,6 +109,7 @@ public class Messages extends NLS {
    public static String        Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String        Map_Action_ShowPhotos_Tooltip;
    public static String        Map_Action_ShowTourInfoInMap;
+   public static String        Map_Action_ShowValuePoint;
    public static String        Map_Action_ShowWayPoints;
    public static String        Map_Action_SynchWithSlider_Centered;
    public static String        Map_Action_SyncPhotoWithMap_Tooltip;

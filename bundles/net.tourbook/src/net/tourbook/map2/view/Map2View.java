@@ -98,6 +98,7 @@ import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowTourPauses;
+import net.tourbook.map2.action.ActionShowValuePoint;
 import net.tourbook.map2.action.ActionShowWayPoints;
 import net.tourbook.map2.action.ActionSyncMapWithOtherMap;
 import net.tourbook.map2.action.ActionSyncMapWithPhoto;
@@ -138,6 +139,7 @@ import net.tourbook.tour.photo.PhotoPropertiesEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
@@ -374,12 +376,12 @@ public class Map2View extends ViewPart implements
    private GeoPosition                       _defaultPosition;
 
    /**
-    * when <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
+    * When <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
     */
    private boolean                           _isTourOrWayPoint;
 
    /*
-    * tool tips
+    * Tool tips
     */
    private TourToolTip _tourToolTip;
    private String      _poiName;
@@ -387,18 +389,18 @@ public class Map2View extends ViewPart implements
    private int         _poiZoomLevel;
 
    /*
-    * current position for the x-sliders
+    * Current position for the x-sliders and value point
     */
    private int                            _currentLeftSliderValueIndex;
    private int                            _currentRightSliderValueIndex;
-
    private int                            _currentSelectedSliderValueIndex;
+   private int                            _currentValuePointIndex;
 
    private MapLegend                      _mapLegend;
 
    private long                           _previousOverlayKey;
-   private int                            _mapDimLevel         = -1;
 
+   private int                            _mapDimLevel         = -1;
    private RGB                            _mapDimColor;
 
    private int                            _selectedProfileKey  = 0;
@@ -458,6 +460,7 @@ public class Map2View extends ViewPart implements
    private ActionShowTourInfoInMap        _actionShowTourInfoInMap;
    private ActionShowTourMarker           _actionShowTourMarker;
    private ActionShowTourPauses           _actionShowTourPauses;
+   private ActionShowValuePoint           _actionShowValuePoint;
    private ActionShowWayPoints            _actionShowWayPoints;
    private ActionSyncZoomLevelAdjustment  _actionSyncZoomLevelAdjustment;
    private ActionSyncMapWithOtherMap      _actionSyncMap_WithOtherMap;
@@ -469,7 +472,6 @@ public class Map2View extends ViewPart implements
    private ActionZoomOut                  _actionZoom_Out;
    private ActionZoomCentered             _actionZoom_Centered;
    private ActionZoomShowEntireMap        _actionZoom_ShowEntireMap;
-
    private ActionZoomShowEntireTour       _actionZoom_ShowEntireTour;
 
    private org.eclipse.swt.graphics.Point _geoFilter_Loaded_TopLeft_E2;
@@ -900,16 +902,27 @@ public class Map2View extends ViewPart implements
 
       // repaint map
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             _allTourData.get(0),
+
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
+            _currentValuePointIndex,
+
             isShowSliderInMap,
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
       _map.redraw();
+   }
+
+   public void actionShowValuePoint() {
+      // TODO Auto-generated method stub
+
    }
 
    public void actionZoomIn() {
@@ -1307,6 +1320,10 @@ public class Map2View extends ViewPart implements
                   hideGeoGrid();
                }
 
+            } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
+
+               onSelection_HoveredValue((HoveredValueData) eventData);
+
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
                resetMap();
@@ -1499,6 +1516,7 @@ public class Map2View extends ViewPart implements
       _actionShowLegendInMap = new ActionShowLegendInMap(this);
       _actionShowScaleInMap = new ActionShowScaleInMap(this);
       _actionShowStartEndInMap = new ActionShowStartEndInMap(this);
+      _actionShowValuePoint = new ActionShowValuePoint(this);
 
       _actionShowPOI = new ActionShowPOI(this);
       _actionShowTour = new ActionShowTour();
@@ -1963,6 +1981,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowScaleInMap);
       menuMgr.add(_actionShowSliderInMap);
       menuMgr.add(_actionShowSliderInLegend);
+      menuMgr.add(_actionShowValuePoint);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCreateTourMarkerFromMap);
@@ -2430,6 +2449,34 @@ public class Map2View extends ViewPart implements
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
 
+   private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
+
+      _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
+
+      final boolean isShowValuePoint = _actionShowValuePoint.isChecked();
+      if (isShowValuePoint) {
+
+         // set the paint context (slider position) for the direct mapping painter
+         _directMappingPainter.setPaintContext(
+
+               _map,
+               _isShowTour,
+               _allTourData.get(0),
+
+               _currentLeftSliderValueIndex,
+               _currentRightSliderValueIndex,
+               _currentValuePointIndex,
+
+               _actionShowSliderInMap.isChecked(),
+               _actionShowSliderInLegend.isChecked(),
+               isShowValuePoint,
+
+               _sliderPathPaintingData);
+
+         positionMapTo_ValueIndex(hoveredValueData.tourData, hoveredValueData.hoveredValuePointIndex);
+      }
+   }
+
    /**
     * @param selection
     * @param isExternalEvent
@@ -2606,7 +2653,7 @@ public class Map2View extends ViewPart implements
                               ? leftSliderValueIndex
                               : rightSliderValueIndex;
 
-                  positionMapTo_0_TourSliders(//
+                  positionMapTo_0_TourSliders(
                         tourData,
                         leftSliderValueIndex,
                         rightSliderValueIndex,
@@ -2635,7 +2682,7 @@ public class Map2View extends ViewPart implements
                ? valueIndex1
                : valueIndex2;
 
-         positionMapTo_0_TourSliders(//
+         positionMapTo_0_TourSliders(
                mapPositionSelection.getTourData(),
                valueIndex1,
                valueIndex2,
@@ -2711,7 +2758,7 @@ public class Map2View extends ViewPart implements
 
             paintTours_10_All();
 
-            positionMapTo_0_TourSliders(//
+            positionMapTo_0_TourSliders(
                   comparedTourData,
                   geoCompareItem.tourFirstIndex,
                   geoCompareItem.tourLastIndex,
@@ -2811,7 +2858,7 @@ public class Map2View extends ViewPart implements
 
          if (isDrawSlider) {
 
-            positionMapTo_0_TourSliders(//
+            positionMapTo_0_TourSliders(
                   tourData,
                   leftSliderValueIndex,
                   rightSliderValueIndex,
@@ -2851,18 +2898,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
-
-//      final TourData firstTourData = _allTourData.get(0);
-//
-//      // set slider position
-//      _directMappingPainter.setPaintContext(
-//            _map,
-//            _isShowTour,
-//            firstTourData,
-//            _currentLeftSliderValueIndex,
-//            _currentRightSliderValueIndex,
-//            _actionShowSliderInMap.isChecked(),
-//            _actionShowSliderInLegend.isChecked());
 
       final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
 
@@ -3108,13 +3143,19 @@ public class Map2View extends ViewPart implements
 
       // set the paint context (slider position) for the direct mapping painter
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             tourData,
+
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
+            _currentValuePointIndex,
+
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
       // set the tour bounds
@@ -3280,13 +3321,19 @@ public class Map2View extends ViewPart implements
       _currentSelectedSliderValueIndex = selectedSliderIndex;
 
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             tourData,
+
             leftSliderValuesIndex,
             rightSliderValuesIndex,
+            _currentValuePointIndex,
+
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
       if (_isMapSynched_WithChartSlider) {
@@ -3797,7 +3844,7 @@ public class Map2View extends ViewPart implements
          mapPositions.add(leftPosition);
          mapPositions.add(rightPosition);
 
-         positionMapTo_0_TourSliders(//
+         positionMapTo_0_TourSliders(
                mapTourData,
                leftSliderValueIndex,
                rightSliderValueIndex,
@@ -3837,7 +3884,21 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.resetTourData();
 
       // update direct painter to draw nothing
-      _directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderPathPaintingData);
+      _directMappingPainter.setPaintContext(
+
+            _map,
+            false,
+            null,
+
+            0,
+            0,
+            0,
+
+            false,
+            false,
+            false, // show value point
+
+            _sliderPathPaintingData);
 
       _map.tourBreadcrumb().resetTours();
 
