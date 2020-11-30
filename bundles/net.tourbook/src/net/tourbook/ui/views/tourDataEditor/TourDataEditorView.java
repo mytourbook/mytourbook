@@ -543,7 +543,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private CTabItem                 _tab_30_SwimSlices;
    //
    /**
-    * contains the controls which are displayed in the first column, these controls are used to get
+    * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
@@ -689,7 +689,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new Slideout_TourEditorOptions(_pageBook, toolbar, _state, TourDataEditorView.this);
+         return new Slideout_TourEditor_Options(_pageBook, toolbar, _state, TourDataEditorView.this);
       }
    }
 

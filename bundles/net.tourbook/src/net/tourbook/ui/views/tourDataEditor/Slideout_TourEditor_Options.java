@@ -28,6 +28,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -42,13 +43,15 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour data editor options.
  */
-public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_TourEditor_Options extends ToolbarSlideout implements IColorSelectorListener {
 
    private final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
    private TourDataEditorView    _tourEditorView;
 
    private Action                _actionRestoreDefaults;
+
+   private PixelConverter        _pc;
 
    /*
     * UI controls
@@ -58,10 +61,12 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
    private Spinner   _spinnerLatLonDigits;
    private Spinner   _spinnerDescriptionNumLines;
 
-   public Slideout_TourEditorOptions(final Control ownerControl,
-                                     final ToolBar toolBar,
-                                     final IDialogSettings state,
-                                     final TourDataEditorView tourEditorView) {
+   private int       _hintValueFieldWidth;
+
+   public Slideout_TourEditor_Options(final Control ownerControl,
+                                      final ToolBar toolBar,
+                                      final IDialogSettings state,
+                                      final TourDataEditorView tourEditorView) {
 
       super(ownerControl, toolBar);
 
@@ -92,6 +97,8 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
 
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
+
+      initUI(parent);
 
       createActions();
 
@@ -150,6 +157,9 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
 
    private void createUI_20_Options(final Composite parent) {
 
+      final GridDataFactory spinnerGridData = GridDataFactory.fillDefaults()
+            .hint(_hintValueFieldWidth, SWT.DEFAULT)
+            .align(SWT.END, SWT.CENTER);
       {
          /*
           * Number of description lines
@@ -180,9 +190,7 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
                onSelect_NumDescriptionLines();
             }
          });
-         GridDataFactory.fillDefaults()
-               .align(SWT.END, SWT.CENTER)
-               .applyTo(_spinnerDescriptionNumLines);
+         spinnerGridData.applyTo(_spinnerDescriptionNumLines);
       }
       {
          /*
@@ -214,10 +222,15 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
                onSelect_LatLonDigits();
             }
          });
-         GridDataFactory.fillDefaults()
-               .align(SWT.END, SWT.CENTER)
-               .applyTo(_spinnerLatLonDigits);
+         spinnerGridData.applyTo(_spinnerLatLonDigits);
       }
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(3);
    }
 
    private void onSelect_LatLonDigits() {
@@ -240,8 +253,19 @@ public class Slideout_TourEditorOptions extends ToolbarSlideout implements IColo
 
    private void resetToDefaults() {
 
-      _spinnerLatLonDigits.setSelection(TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT);
-      _spinnerDescriptionNumLines.setSelection(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT);
+      final int descriptionNumberOfLines = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+      final int latLonDigits = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
+
+      // update model
+      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, descriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS, latLonDigits);
+
+      // update UI
+      _spinnerDescriptionNumLines.setSelection(descriptionNumberOfLines);
+      _spinnerLatLonDigits.setSelection(latLonDigits);
+
+      _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines);
+      _tourEditorView.updateUI_LatLonDigits(latLonDigits);
    }
 
    private void restoreState() {

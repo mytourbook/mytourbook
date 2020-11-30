@@ -282,13 +282,6 @@
          />
         
          <page
-            name="%preference_page_tourEditor"
-            id="net.tourbook.preferences.PrefPageTourEditor"
-            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
-            category    ="net.tourbook.preferences.PrefPageAppearance"
-         />
-         
-         <page
             name="%preference_page_Chart_Colors"
             id="net.tourbook.preferences.PrefPageChartColors"
             class="net.tourbook.preferences.PrefPageAppearanceColors"

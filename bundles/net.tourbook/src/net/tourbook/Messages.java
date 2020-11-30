@@ -1770,8 +1770,6 @@ public class Messages extends NLS {
 
    public static String        pref_tour_editor_description_height;
    public static String        pref_tour_editor_description_height_tooltip;
-   public static String        pref_tour_editor_dlg_desc_height_message;
-   public static String        pref_tour_editor_dlg_desc_height_title;
 
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;
