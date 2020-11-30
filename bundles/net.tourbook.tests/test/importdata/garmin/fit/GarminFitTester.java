@@ -55,8 +55,8 @@ public class GarminFitTester {
       final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
       fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 }

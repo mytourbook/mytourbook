@@ -52,7 +52,7 @@ public class Comparison {
     * @param controlFileName
     *           The control's file name.
     */
-   public static void CompareTourDataAgainstControl(final TourData testTourData,
+   public static void compareTourDataAgainstControl(final TourData testTourData,
                                                     final String controlFileName) {
 
       // When using Java 11, convert the line below to the Java 11 method
@@ -82,7 +82,7 @@ public class Comparison {
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
       if (result.failed()) {
-         WriteErroneousFiles(controlFileName, testJson);
+         writeErroneousFiles(controlFileName, testJson);
       }
 
       assertTrue(result.passed());
@@ -105,7 +105,7 @@ public class Comparison {
       return UI.EMPTY_STRING;
    }
 
-   public static TourData RetrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
+   public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
       final Map.Entry<Long, TourData> entry = newlyImportedTours.entrySet().iterator().next();
       return entry.getValue();
    }
@@ -117,7 +117,7 @@ public class Comparison {
     * @param controlFileName
     * @param testJson
     */
-   private static void WriteErroneousFiles(final String controlFileName, final String testJson) {
+   private static void writeErroneousFiles(final String controlFileName, final String testJson) {
 
       final File myFile = new File(
             controlFileName + ".json"); //$NON-NLS-1$
