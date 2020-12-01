@@ -45,8 +45,7 @@ public class GarminFitTester {
    }
 
    /**
-    * Regression test. This test can be useful when updating the FIT SDK and ensuring that the FIT
-    * import still works as expected.
+    * Regression test
     */
    @Test
    void testFitImportConeyLake() {
