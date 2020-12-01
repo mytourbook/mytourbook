@@ -135,7 +135,7 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
 

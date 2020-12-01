@@ -625,7 +625,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-            if (_allTours.size() == 0) {
+            if (_allTours.isEmpty()) {
                _tourInfoToolTipProvider.setTourId(-1);
                return;
             }
@@ -850,7 +850,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
       // get selected tour
       long selectedTourId = 0;
-      if (_allTours.size() == 0) {
+      if (_allTours.isEmpty()) {
          selectedTourId = -1;
       } else {
          final int selectedTourIndex = Math.min(_selectedTourIndex, _allTours.size() - 1);
@@ -903,7 +903,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private void selectTourInYearChart(final long selectedTourId) {
 
-      if (_allTours.size() == 0) {
+      if (_allTours.isEmpty()) {
          _tourInfoToolTipProvider.setTourId(-1);
          return;
       }

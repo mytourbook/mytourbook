@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2017 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,232 +53,232 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TourContextMenu {
 
-	private TagMenuManager								_tagMenuMgr;
+   private TagMenuManager                             _tagMenuMgr;
 
-	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
-	private ActionDuplicateTour							_actionDuplicateTour;
-	private ActionEditQuick								_actionEditQuick;
-	private ActionEditTour								_actionEditTour;
-	private ActionExport								_actionExportTour;
-	private ActionJoinTours								_actionJoinTours;
-	private ActionOpenTour								_actionOpenTour;
-	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
-	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
-	private ActionMergeTour								_actionMergeTour;
-	private ActionPrint									_actionPrintTour;
-	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
-	private ActionSetPerson								_actionSetOtherPerson;
-	private ActionSetTourTypeMenu						_actionSetTourType;
+   private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
+   private ActionDuplicateTour                        _actionDuplicateTour;
+   private ActionEditQuick                            _actionEditQuick;
+   private ActionEditTour                             _actionEditTour;
+   private ActionExport                               _actionExportTour;
+   private ActionJoinTours                            _actionJoinTours;
+   private ActionOpenTour                             _actionOpenTour;
+   private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
+   private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
+   private ActionMergeTour                            _actionMergeTour;
+   private ActionPrint                                _actionPrintTour;
+   private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
+   private ActionSetPerson                            _actionSetOtherPerson;
+   private ActionSetTourTypeMenu                      _actionSetTourType;
 
-	public TourContextMenu() {}
+   public TourContextMenu() {}
 
-	private void createActions(final ITourProvider tourProvider) {
+   private void createActions(final ITourProvider tourProvider) {
 
-		_actionDuplicateTour = new ActionDuplicateTour(tourProvider);
-		_actionEditQuick = new ActionEditQuick(tourProvider);
-		_actionEditTour = new ActionEditTour(tourProvider);
-		_actionOpenTour = new ActionOpenTour(tourProvider);
-		// _actionDeleteTour = new ActionDeleteTourMenu(tourProvider);
+      _actionDuplicateTour = new ActionDuplicateTour(tourProvider);
+      _actionEditQuick = new ActionEditQuick(tourProvider);
+      _actionEditTour = new ActionEditTour(tourProvider);
+      _actionOpenTour = new ActionOpenTour(tourProvider);
+      // _actionDeleteTour = new ActionDeleteTourMenu(tourProvider);
 
-		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(tourProvider, true);
-		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(tourProvider);
-		_actionMergeTour = new ActionMergeTour(tourProvider);
-		_actionJoinTours = new ActionJoinTours(tourProvider);
-		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
-		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(tourProvider);
-		_actionSetOtherPerson = new ActionSetPerson(tourProvider);
+      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(tourProvider, true);
+      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(tourProvider);
+      _actionMergeTour = new ActionMergeTour(tourProvider);
+      _actionJoinTours = new ActionJoinTours(tourProvider);
+      _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
+      _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(tourProvider);
+      _actionSetOtherPerson = new ActionSetPerson(tourProvider);
 
-		_actionSetTourType = new ActionSetTourTypeMenu(tourProvider);
+      _actionSetTourType = new ActionSetTourTypeMenu(tourProvider);
 
-		_actionExportTour = new ActionExport(tourProvider);
-		_actionPrintTour = new ActionPrint(tourProvider);
+      _actionExportTour = new ActionExport(tourProvider);
+      _actionPrintTour = new ActionPrint(tourProvider);
 
-		_tagMenuMgr = new TagMenuManager(tourProvider, true);
+      _tagMenuMgr = new TagMenuManager(tourProvider, true);
 
-	}
+   }
 
-	public Menu createContextMenu(	final CalendarView calendarView,
-									final Control control,
-									final ArrayList<Action> localActions) {
+   public Menu createContextMenu(final CalendarView calendarView,
+                                 final Control control,
+                                 final ArrayList<Action> localActions) {
 
-		createActions(calendarView);
+      createActions(calendarView);
 
-		// final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		final MenuManager menuMgr = new MenuManager();
-		final TagMenuManager tagMenuMgr = new TagMenuManager(calendarView, true);
+      // final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      final MenuManager menuMgr = new MenuManager();
+      final TagMenuManager tagMenuMgr = new TagMenuManager(calendarView, true);
 
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
 
-				// hide tour tooltip when opened
-				calendarView.getTourInfoTooltip().hideToolTip();
+            // hide tour tooltip when opened
+            calendarView.getTourInfoTooltip().hideToolTip();
 
-				fillContextMenu(manager, calendarView, localActions);
-			}
-		});
+            fillContextMenu(manager, calendarView, localActions);
+         }
+      });
 
-		final Menu contextMenu = menuMgr.createContextMenu(control);
+      final Menu contextMenu = menuMgr.createContextMenu(control);
 
-		contextMenu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuHidden(final MenuEvent e) {
-				tagMenuMgr.onHideMenu();
-			}
+      contextMenu.addMenuListener(new MenuAdapter() {
+         @Override
+         public void menuHidden(final MenuEvent e) {
+            tagMenuMgr.onHideMenu();
+         }
 
-			@Override
-			public void menuShown(final MenuEvent menuEvent) {
-				// tagMenuMgr.onShowMenu(menuEvent, _control, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-				tagMenuMgr.onShowMenu(menuEvent, control, Display.getCurrent().getCursorLocation(), null);
-			}
-		});
+         @Override
+         public void menuShown(final MenuEvent menuEvent) {
+            // tagMenuMgr.onShowMenu(menuEvent, _control, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            tagMenuMgr.onShowMenu(menuEvent, control, Display.getCurrent().getCursorLocation(), null);
+         }
+      });
 
-		menuMgr.add(_actionEditQuick);
-		menuMgr.add(_actionEditTour);
-		menuMgr.add(_actionOpenMarkerDialog);
-		menuMgr.add(_actionOpenAdjustAltitudeDialog);
-		menuMgr.add(_actionOpenTour);
-		menuMgr.add(_actionDuplicateTour);
-		menuMgr.add(_actionMergeTour);
-		// menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
-		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-		menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionEditQuick);
+      menuMgr.add(_actionEditTour);
+      menuMgr.add(_actionOpenMarkerDialog);
+      menuMgr.add(_actionOpenAdjustAltitudeDialog);
+      menuMgr.add(_actionOpenTour);
+      menuMgr.add(_actionDuplicateTour);
+      menuMgr.add(_actionMergeTour);
+      // menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
+      menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+      menuMgr.add(_actionSetAltitudeFromSRTM);
 
       tagMenuMgr.fillTagMenu(menuMgr, true);
 
-		// tour type actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, calendarView, true);
+      // tour type actions
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetTourType);
+      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, calendarView, true);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionExportTour);
-		menuMgr.add(_actionPrintTour);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionExportTour);
+      menuMgr.add(_actionPrintTour);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetOtherPerson);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetOtherPerson);
 
-		return contextMenu;
+      return contextMenu;
 
-	}
+   }
 
-	private void enableActions(final ITourProvider tourProvider) {
+   private void enableActions(final ITourProvider tourProvider) {
 
-		/*
-		 * count number of selected items
-		 */
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      /*
+       * count number of selected items
+       */
+      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
-		final int tourItems = selectedTours.size();
-		final boolean isTourSelected = tourItems > 0;
-		final boolean isOneTour = tourItems == 1;
-		boolean isDeviceTour = false;
+      final int tourItems = selectedTours.size();
+      final boolean isTourSelected = tourItems > 0;
+      final boolean isOneTour = tourItems == 1;
+      boolean isDeviceTour = false;
 
-		TourData firstSavedTour = null;
+      TourData firstSavedTour = null;
 
-		if (isOneTour) {
-			firstSavedTour = TourManager.getInstance().getTourData(selectedTours.get(0).getTourId());
-			isDeviceTour = firstSavedTour.isManualTour() == false;
-		}
+      if (isOneTour) {
+         firstSavedTour = TourManager.getInstance().getTourData(selectedTours.get(0).getTourId());
+         isDeviceTour = firstSavedTour.isManualTour() == false;
+      }
 
-		/*
-		 * enable actions
-		 */
-		// _tourDoubleClickState.canEditTour = isOneTour;
-		// _tourDoubleClickState.canOpenTour = isOneTour;
-		// _tourDoubleClickState.canQuickEditTour = isOneTour;
-		// _tourDoubleClickState.canEditMarker = isOneTour;
-		// _tourDoubleClickState.canAdjustAltitude = isOneTour;
+      /*
+       * enable actions
+       */
+      // _tourDoubleClickState.canEditTour = isOneTour;
+      // _tourDoubleClickState.canOpenTour = isOneTour;
+      // _tourDoubleClickState.canQuickEditTour = isOneTour;
+      // _tourDoubleClickState.canEditMarker = isOneTour;
+      // _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-		_actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
-		_actionEditTour.setEnabled(isOneTour);
-		_actionEditQuick.setEnabled(isOneTour);
-		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
-		_actionOpenTour.setEnabled(isOneTour);
+      _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+      _actionEditTour.setEnabled(isOneTour);
+      _actionEditQuick.setEnabled(isOneTour);
+      _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+      _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+      _actionOpenTour.setEnabled(isOneTour);
 
-		_actionMergeTour.setEnabled(
-				isOneTour
-						&& isDeviceTour
-						&& firstSavedTour != null
-						&& firstSavedTour.getMergeSourceTourId() != null);
-		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
-		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
+      _actionMergeTour.setEnabled(
+            isOneTour
+                  && isDeviceTour
+                  && firstSavedTour != null
+                  && firstSavedTour.getMergeSourceTourId() != null);
+      _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
+      _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
 
-		// enable delete ation when at least one tour is selected
+      // enable delete ation when at least one tour is selected
 //		if (isTourSelected) {
 //			_actionDeleteTour.setEnabled(true);
 //		} else {
 //			_actionDeleteTour.setEnabled(false);
 //		}
 
-		_actionJoinTours.setEnabled(tourItems > 1);
-		_actionSetOtherPerson.setEnabled(isTourSelected);
+      _actionJoinTours.setEnabled(tourItems > 1);
+      _actionSetOtherPerson.setEnabled(isTourSelected);
 
-		_actionExportTour.setEnabled(isTourSelected);
-		_actionPrintTour.setEnabled(isTourSelected);
+      _actionExportTour.setEnabled(isTourSelected);
+      _actionPrintTour.setEnabled(isTourSelected);
 
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-		_actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
 
-		Long tourTypeId = new Long(-1); // TODO -> NOTOUR
-		if (null != firstSavedTour) {
-			final ArrayList<Long> tagIds = new ArrayList<>();
-			for (final TourTag tag : firstSavedTour.getTourTags()) {
-				tagIds.add(tag.getTagId());
-			}
-			_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, tagIds);
-			if (isOneTour && null != firstSavedTour.getTourType()) {
-				tourTypeId = firstSavedTour.getTourType().getTypeId();
-			}
-			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
-		} else {
-			_tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<Long>());
-			TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
-		}
-	}
+      Long tourTypeId = new Long(-1); // TODO -> NOTOUR
+      if (null != firstSavedTour) {
+         final ArrayList<Long> tagIds = new ArrayList<>();
+         for (final TourTag tag : firstSavedTour.getTourTags()) {
+            tagIds.add(tag.getTagId());
+         }
+         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, tagIds);
+         if (isOneTour && null != firstSavedTour.getTourType()) {
+            tourTypeId = firstSavedTour.getTourType().getTypeId();
+         }
+         TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+      } else {
+         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<Long>());
+         TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+      }
+   }
 
-	private void fillContextMenu(	final IMenuManager menuMgr,
-									final ITourProvider tourProvider,
-									final ArrayList<Action> localActions) {
+   private void fillContextMenu(final IMenuManager menuMgr,
+                                final ITourProvider tourProvider,
+                                final ArrayList<Action> localActions) {
 
-		// if a local menu exists and no tour is selected show only the local menu
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-		if (null != localActions && selectedTours.size() < 1) {
-			for (final Action action : localActions) {
-				menuMgr.add(action);
-			}
-			return;
-		}
+      // if a local menu exists and no tour is selected show only the local menu
+      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      if (null != localActions && selectedTours.isEmpty()) {
+         for (final Action action : localActions) {
+            menuMgr.add(action);
+         }
+         return;
+      }
 
-		menuMgr.add(_actionEditQuick);
-		menuMgr.add(_actionEditTour);
-		menuMgr.add(_actionOpenMarkerDialog);
-		menuMgr.add(_actionOpenAdjustAltitudeDialog);
-		menuMgr.add(_actionOpenTour);
-		menuMgr.add(_actionDuplicateTour);
-		menuMgr.add(_actionMergeTour);
-		menuMgr.add(_actionJoinTours);
-		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-		menuMgr.add(_actionSetAltitudeFromSRTM);
+      menuMgr.add(_actionEditQuick);
+      menuMgr.add(_actionEditTour);
+      menuMgr.add(_actionOpenMarkerDialog);
+      menuMgr.add(_actionOpenAdjustAltitudeDialog);
+      menuMgr.add(_actionOpenTour);
+      menuMgr.add(_actionDuplicateTour);
+      menuMgr.add(_actionMergeTour);
+      menuMgr.add(_actionJoinTours);
+      menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+      menuMgr.add(_actionSetAltitudeFromSRTM);
 
       _tagMenuMgr.fillTagMenu(menuMgr, true);
 
-		// tour type actions
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
+      // tour type actions
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetTourType);
+      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionExportTour);
-		menuMgr.add(_actionPrintTour);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionExportTour);
+      menuMgr.add(_actionPrintTour);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetOtherPerson);
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionSetOtherPerson);
 //		menuMgr.add(_actionDeleteTour);
 
-		enableActions(tourProvider);
-	}
+      enableActions(tourProvider);
+   }
 
 }

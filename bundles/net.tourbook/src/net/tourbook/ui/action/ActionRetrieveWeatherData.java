@@ -51,7 +51,7 @@ public class ActionRetrieveWeatherData extends Action {
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
          MessageDialog.openInformation(

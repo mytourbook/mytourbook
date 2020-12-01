@@ -256,7 +256,7 @@ public class TourGeoFilter_Manager {
          sqlWhere = sb.toString();
       }
 
-      if (allLatLonParts.size() == 0) {
+      if (allLatLonParts.isEmpty()) {
 
          // prevent invalid sql
          return null;

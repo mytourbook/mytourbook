@@ -205,7 +205,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
       // get rectangle from first layer
 
-      if (_displayedLayers.size() == 0) {
+      if (_displayedLayers.isEmpty()) {
          return;
       }
 
@@ -1100,7 +1100,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
       _allMtLayers.addAll(allMtLayers);
 
       // check layers
-      if (_allMtLayers.size() == 0) {
+      if (_allMtLayers.isEmpty()) {
          StatusUtil.showStatus(
                NLS.bind(Messages.DBG034_Wms_Error_LayersAreNotAvailable, _mpWms.getName()),
                new Exception());

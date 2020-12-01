@@ -3213,7 +3213,7 @@ public class CalendarProfileManager {
          _allCalendarProfiles.addAll(missingDefaultDefaultProfiles);
 
          // ensure profiles are created
-         if (_allCalendarProfiles.size() == 0) {
+         if (_allCalendarProfiles.isEmpty()) {
             createProfile_0_AllDefaultDefaultProfiles(_allCalendarProfiles);
          }
 

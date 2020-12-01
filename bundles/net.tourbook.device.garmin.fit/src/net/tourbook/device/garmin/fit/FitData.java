@@ -377,7 +377,7 @@ public class FitData {
 
    private void finalizeTour_Marker(final TourData tourData, final List<TourMarker> allTourMarkers) {
 
-      if (allTourMarkers == null || allTourMarkers.size() == 0) {
+      if (allTourMarkers == null || allTourMarkers.isEmpty()) {
          return;
       }
 

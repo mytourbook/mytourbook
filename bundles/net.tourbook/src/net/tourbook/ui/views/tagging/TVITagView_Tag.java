@@ -107,7 +107,7 @@ public class TVITagView_Tag extends TVITagViewItem {
     */
    private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
 
-      if (modifiedTours.size() == 0) {
+      if (modifiedTours.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 

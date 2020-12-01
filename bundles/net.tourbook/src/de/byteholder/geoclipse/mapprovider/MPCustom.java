@@ -74,7 +74,7 @@ public class MPCustom extends MP {
    @Override
    public String getTileUrl(final Tile tile) {
 
-      if (_urlParts.size() == 0) {
+      if (_urlParts.isEmpty()) {
 
          // url parts are not set yet, display openstreetmap
 

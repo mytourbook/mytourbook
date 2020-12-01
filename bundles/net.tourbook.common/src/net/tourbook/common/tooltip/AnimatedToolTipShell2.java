@@ -846,7 +846,7 @@ public abstract class AnimatedToolTipShell2 {
     */
    private void closeOldShells(final boolean isWithFadeOut) {
 
-      if (_oldShells.size() == 0) {
+      if (_oldShells.isEmpty()) {
          // nothing to do
          return;
       }

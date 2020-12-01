@@ -2076,7 +2076,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       }
 
       ISelection selection;
-      if (tourIds.size() == 0) {
+      if (tourIds.isEmpty()) {
 
          // fire selection that nothing is selected
 

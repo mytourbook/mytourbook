@@ -146,7 +146,7 @@ public class ColumnContextMenu extends Action implements IMenuCreator {
          }
       }
 
-      if (categoryColDefs.size() == 0) {
+      if (categoryColDefs.isEmpty()) {
          return;
       }
 
