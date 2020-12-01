@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,43 +31,43 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ActionSetTimeZone extends Action {
 
-	private final ITourProvider2	_tourProvider;
+   private final ITourProvider2 _tourProvider;
 
-	public ActionSetTimeZone(final ITourProvider2 tourProvider) {
+   public ActionSetTimeZone(final ITourProvider2 tourProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_tourProvider = tourProvider;
+      _tourProvider = tourProvider;
 
-		setText(Messages.Tour_Action_SetTimeZone);
-	}
+      setText(Messages.Tour_Action_SetTimeZone);
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		// check if the tour editor contains a modified tour
-		if (TourManager.isTourEditorModified()) {
-			return;
-		}
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
-		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-		final Shell shell = Display.getCurrent().getActiveShell();
-		if (selectedTours == null || selectedTours.size() < 1) {
+      final Shell shell = Display.getCurrent().getActiveShell();
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
-			// a tour is not selected
+         // a tour is not selected
 
-			MessageDialog.openInformation(
-					shell,
-					Messages.Dialog_SetTimeZone_Dialog_Title,
-					Messages.UI_Label_TourIsNotSelected);
+         MessageDialog.openInformation(
+               shell,
+               Messages.Dialog_SetTimeZone_Dialog_Title,
+               Messages.UI_Label_TourIsNotSelected);
 
-			return;
-		}
+         return;
+      }
 
-		final DialogSetTimeZone_Wizard wizard = new DialogSetTimeZone_Wizard(selectedTours, _tourProvider);
-		final DialogSetTimeZone dialog = new DialogSetTimeZone(shell, wizard);
+      final DialogSetTimeZone_Wizard wizard = new DialogSetTimeZone_Wizard(selectedTours, _tourProvider);
+      final DialogSetTimeZone dialog = new DialogSetTimeZone(shell, wizard);
 
-		dialog.open();
-	}
+      dialog.open();
+   }
 }
