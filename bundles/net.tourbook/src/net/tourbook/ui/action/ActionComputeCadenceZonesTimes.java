@@ -24,7 +24,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
@@ -100,15 +99,10 @@ public class ActionComputeCadenceZonesTimes extends Action {
                public void run() {
 
                   TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-                  // prevent re-importing in the import view
-                  RawDataManager.setIsReimportingActive(true);
-                  {
-                     // fire unique event for all changes
-                     TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-                  }
-                  RawDataManager.setIsReimportingActive(false);
+                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
                }
             });
+
          }
       }
    }
