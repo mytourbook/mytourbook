@@ -15,7 +15,7 @@
  *******************************************************************************/
 package utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.byteholder.geoclipse.map.UI;
 
@@ -85,7 +85,7 @@ public class Comparison {
          writeErroneousFiles(controlFileName, testJson);
       }
 
-      assertEquals(true, result.passed(), result.getMessage());
+      assertTrue(result.passed());
    }
 
    private static String readFile(final String path, final Charset encoding) {
