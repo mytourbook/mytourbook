@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package de.byteholder.geoclipse.map;
 import de.byteholder.geoclipse.Messages;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.data.TourData;
 
@@ -161,7 +162,7 @@ public class MapTourBreadcrumb {
 
    public void paint(final GC gc, final boolean isShowTourPaintMethodEnhancedWarning) {
 
-      if (_allTours.size() == 0) {
+      if (_allTours.isEmpty()) {
          return;
       }
 
@@ -290,7 +291,7 @@ public class MapTourBreadcrumb {
       _outline = null;
    }
 
-   public void setTours(final ArrayList<TourData> allTourData) {
+   public void setTours(final List<TourData> allTourData) {
 
       // keep only tour id's, allTourData list will be reused !!!
 

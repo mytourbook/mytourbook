@@ -1180,7 +1180,7 @@ public class UI {
       // tour tags
       final Set<TourTag> tourTags = tourData.getTourTags();
 
-      if (tourTags == null || tourTags.size() == 0) {
+      if (tourTags == null || tourTags.isEmpty()) {
 
          tourTagLabel.setText(UI.EMPTY_STRING);
 

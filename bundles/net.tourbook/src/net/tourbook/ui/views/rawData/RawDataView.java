@@ -785,7 +785,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    void actionRemoveTour() {
 
       final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -1737,7 +1737,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
       final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
 
-      if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
+      if (allImportLauncher.isEmpty() || allImportConfigs.isEmpty()) {
 
          // this case should not happen
          TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
@@ -3259,7 +3259,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final Set<TourTag> tourTags = tourData.getTourTags();
 
-            if (tourTags.size() == 0) {
+            if (tourTags.isEmpty()) {
 
                // the tags could have been removed, set empty field
 
@@ -3535,7 +3535,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
 
       // update viewer, fire selection event
-      if (savedTours.size() == 0) {
+      if (savedTours.isEmpty()) {
          return;
       }
 
@@ -4335,7 +4335,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
          final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 
-         if (removedTours.size() == 0) {
+         if (removedTours.isEmpty()) {
             return;
          }
 

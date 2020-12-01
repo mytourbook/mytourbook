@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -990,7 +991,7 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);

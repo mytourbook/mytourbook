@@ -1080,7 +1080,7 @@ public class SearchMgr implements XHRHandler {
          proposals = FTSearchManager.getProposals(searchText);
       }
 
-      if (proposals == null || proposals.size() == 0) {
+      if (proposals == null || proposals.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 

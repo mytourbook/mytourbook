@@ -5152,7 +5152,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          remainingWayPoints.removeAll(removedWayPoints);
 
-         if (remainingWayPoints.size() == 0) {
+         if (remainingWayPoints.isEmpty()) {
 
             // all waypoints are converted
 
@@ -7338,7 +7338,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public ArrayList<Photo> getGalleryPhotos() {
 
-      if (tourPhotos.size() == 0) {
+      if (tourPhotos.isEmpty()) {
          return null;
       }
 
@@ -10006,7 +10006,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                final HashMap<Long, TourPhotoReference> photoRefs = oldGalleryPhoto.getTourPhotoReferences();
 
-               if (photoRefs.size() == 0) {
+               if (photoRefs.isEmpty()) {
 
                   oldGalleryPhoto.isSavedInTour = false;
                   oldGalleryPhoto.ratingStars = 0;
@@ -10730,7 +10730,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // remove old way points
       tourWayPoints.clear();
 
-      if ((wptList == null) || (wptList.size() == 0)) {
+      if ((wptList == null) || (wptList.isEmpty())) {
          return;
       }
 

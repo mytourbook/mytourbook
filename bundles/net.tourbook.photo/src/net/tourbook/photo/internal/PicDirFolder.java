@@ -1156,79 +1156,79 @@ public class PicDirFolder {
 //				removeFolderFromWaitingQueue((TVIFolderFolder) treeViewerItem);
 //			}
 //		}
-}
+   }
 
-public void restoreState() {
+   public void restoreState() {
 
-   _isBehaviourAutoExpandCollapse = Util.getStateBoolean(_state, STATE_IS_SINGLE_CLICK_EXPAND, false);
-   _actionAutoExpandCollapse.setChecked(_isBehaviourAutoExpandCollapse);
+      _isBehaviourAutoExpandCollapse = Util.getStateBoolean(_state, STATE_IS_SINGLE_CLICK_EXPAND, false);
+      _actionAutoExpandCollapse.setChecked(_isBehaviourAutoExpandCollapse);
 
-   _isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
-         _state,
-         STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
-         false);
-   _actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
+      _isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
+            _state,
+            STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
+            false);
+      _actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
 
-   updateColors(true);
-   enableActions();
+      updateColors(true);
+      enableActions();
 
-   /*
-    * delay folder retrieval so that the UI can be updated immediately
-    */
-   final Job folderJob = new UIJob(UI.EMPTY_STRING) {
+      /*
+       * delay folder retrieval so that the UI can be updated immediately
+       */
+      final Job folderJob = new UIJob(UI.EMPTY_STRING) {
 
-      @Override
-      public IStatus runInUIThread(final IProgressMonitor monitor) {
+         @Override
+         public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-         final String previousSelectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
+            final String previousSelectedFolder = Util.getStateString(_state, STATE_SELECTED_FOLDER, null);
 
-         restoreStateFolder(previousSelectedFolder);
+            restoreStateFolder(previousSelectedFolder);
 
-         return Status.OK_STATUS;
-      }
-   };
+            return Status.OK_STATUS;
+         }
+      };
 
-   folderJob.setSystem(true);
-   folderJob.schedule();
-}
+      folderJob.setSystem(true);
+      folderJob.schedule();
+   }
 
-private void restoreStateFolder(final String restoreFolderName) {
+   private void restoreStateFolder(final String restoreFolderName) {
 
-   BusyIndicator.showWhile(_display, new Runnable() {
-      @Override
-      public void run() {
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
 
-         // set root item
-         _rootItem = new TVIFolderRoot(PicDirFolder.this, _folderViewer, getRootsSorted());
+            // set root item
+            _rootItem = new TVIFolderRoot(PicDirFolder.this, _folderViewer, getRootsSorted());
 
-         _folderViewer.setInput(new Object());
+            _folderViewer.setInput(new Object());
 
-         _selectedFolder = null;
-         _selectedTVIFolder = null;
+            _selectedFolder = null;
+            _selectedTVIFolder = null;
 
-         _picDirImages.showRestoreFolder(restoreFolderName);
+            _picDirImages.showRestoreFolder(restoreFolderName);
 
 //				/*
 //				 * first select only the root item because there is an effect, that the restored
 //				 * folder is expanded and ms later the last device is displayed multiple times (for
 //				 * each root entry)
 //				 */
-         selectFolder(restoreFolderName, true, false, false);
+            selectFolder(restoreFolderName, true, false, false);
 
 //				_display.asyncExec(new Runnable() {
 //					public void run() {
 //						selectFolder(restoreFolderName, true, false, false);
 //					}
 //				});
-      }
-   });
-}
+         }
+      });
+   }
 
-public void saveState() {
+   public void saveState() {
 
-   // selected folder
-   if (_selectedFolder != null) {
-      _state.put(STATE_SELECTED_FOLDER, _selectedFolder.getAbsolutePath());
+      // selected folder
+      if (_selectedFolder != null) {
+         _state.put(STATE_SELECTED_FOLDER, _selectedFolder.getAbsolutePath());
       }
 
       _state.put(STATE_IS_SINGLE_CLICK_EXPAND, _actionAutoExpandCollapse.isChecked());
@@ -1369,7 +1369,7 @@ public void saveState() {
          }
       }
 
-      if (treePathItems.size() == 0) {
+      if (treePathItems.isEmpty()) {
          // there is nothing which can be selected
          return false;
       }

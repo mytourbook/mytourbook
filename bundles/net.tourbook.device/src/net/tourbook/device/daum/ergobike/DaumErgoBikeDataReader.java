@@ -262,7 +262,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             previousDistance = distance;
          }
 
-         if (timeDataList.size() == 0) {
+         if (timeDataList.isEmpty()) {
             /*
              * data are valid but have no data points
              */

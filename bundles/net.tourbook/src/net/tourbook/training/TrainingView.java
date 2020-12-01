@@ -1189,7 +1189,7 @@ public class TrainingView extends ViewPart {
        * check HR zones
        */
       final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
-      if (personHrZones.size() == 0) {
+      if (personHrZones.isEmpty()) {
 
          // hr zones are required
 

@@ -1922,7 +1922,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -2139,7 +2139,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -6005,7 +6005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
       final Object[] selectedTimeSlices = selection.toArray();
@@ -7288,8 +7288,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         if ((tourIds != null) && (!tourIds.isEmpty())) {
             displayTour(tourIds.get(0));
          }
 
@@ -7393,7 +7393,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
 
             _selectionTourId = tourIds.get(0);

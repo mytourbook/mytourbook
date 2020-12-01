@@ -46,7 +46,7 @@ public class MapUtils {
                                                 final ColorProviderConfig config,
                                                 final int legendHeight) {
 
-      if (allTourData.size() == 0) {
+      if (allTourData.isEmpty()) {
          return false;
       }
 

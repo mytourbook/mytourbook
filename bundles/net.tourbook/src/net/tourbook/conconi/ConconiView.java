@@ -1046,7 +1046,7 @@ public class ConconiView extends ViewPart {
        * tour editor is not opened because it can cause a recursive attempt to active a part in the
        * middle of activating a part
        */
-      if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
+      if (tourDataList == null || tourDataList.isEmpty() || TourManager.isTourEditorModified(false)) {
          // nothing to do
          clearView();
          return;

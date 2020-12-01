@@ -383,7 +383,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
       // check if a tour is selected
       _selectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
-      if (_selectedTours == null || _selectedTours.size() == 0) {
+      if (_selectedTours == null || _selectedTours.isEmpty()) {
          // a tour is not selected
          return;
       }

@@ -401,7 +401,7 @@ public class EasyImportManager {
          }
       }
 
-      if (existingDeviceFiles.size() == 0 && movedFiles.size() == 0) {
+      if (existingDeviceFiles.isEmpty() && movedFiles.isEmpty()) {
 
          // there is nothing to be imported
          return;
@@ -636,7 +636,7 @@ public class EasyImportManager {
        * Create default import config.
        */
       final ArrayList<ImportConfig> importConfigs = easyConfig.importConfigs;
-      if (importConfigs.size() == 0) {
+      if (importConfigs.isEmpty()) {
 
          final ImportConfig defaultConfig = new ImportConfig();
 
@@ -654,7 +654,7 @@ public class EasyImportManager {
        * Create default import launcher
        */
       final ArrayList<ImportLauncher> importLaunchers = easyConfig.importLaunchers;
-      if (importLaunchers.size() == 0) {
+      if (importLaunchers.isEmpty()) {
 
          final ImportLauncher defaultLauncher = new ImportLauncher();
 
@@ -909,7 +909,7 @@ public class EasyImportManager {
        * Check import files
        */
       final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
-      if (notImportedFiles.size() == 0) {
+      if (notImportedFiles.isEmpty()) {
 
          if (NIO.isTourBookFileSystem(deviceOSFolder)) {
 
@@ -1028,7 +1028,7 @@ public class EasyImportManager {
 
       final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
-      if (importedTours.size() == 0) {
+      if (importedTours.isEmpty()) {
          // nothing is imported
          return;
       }

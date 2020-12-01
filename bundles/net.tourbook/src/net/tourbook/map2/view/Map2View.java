@@ -576,7 +576,7 @@ public class Map2View extends ViewPart implements
 
    public void action_SyncWith_ChartSlider() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -666,7 +666,7 @@ public class Map2View extends ViewPart implements
 
    public void action_SyncWith_Tour() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -889,7 +889,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowSlider() {
 
-      if ((_allTourData == null) || (_allTourData.size() == 0)) {
+      if ((_allTourData == null) || (_allTourData.isEmpty())) {
          return;
       }
 
@@ -1590,7 +1590,7 @@ public class Map2View extends ViewPart implements
    private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider,
                                                           final int legendHeight) {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return false;
       }
 
@@ -1704,7 +1704,7 @@ public class Map2View extends ViewPart implements
             restoreState();
             enableActions();
 
-            if (_allTourData.size() == 0) {
+            if (_allTourData.isEmpty()) {
                // a tour is not displayed, find a tour provider which provides a tour
                showToursFromTourProvider();
             } else {
@@ -2485,7 +2485,7 @@ public class Map2View extends ViewPart implements
          hideGeoGrid();
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
 
@@ -3032,7 +3032,7 @@ public class Map2View extends ViewPart implements
     */
    private void paintTours_10_All() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          _tourInfoToolTipProvider.setTourData(null);
          return;
       }
@@ -3382,7 +3382,7 @@ public class Map2View extends ViewPart implements
 
    private void resetMap() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 

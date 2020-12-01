@@ -159,7 +159,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          return pts;
       }
 
-      if (galleryPhotos.size() == 0) {
+      if (galleryPhotos.isEmpty()) {
          debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
          return pts;
       }

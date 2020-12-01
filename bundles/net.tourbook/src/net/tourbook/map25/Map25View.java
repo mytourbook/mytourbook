@@ -450,7 +450,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    public void actionSync_WithChartSlider() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -701,7 +701,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void checkSliderIndices() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -850,7 +850,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
 
-         if (tourMarkerList.size() == 0) {
+         if (tourMarkerList.isEmpty()) {
             continue;
          }
 
@@ -1198,7 +1198,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          // paint all selected tours
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
 

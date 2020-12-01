@@ -631,7 +631,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
             }
 
-            if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
+            if (isChartPainted == false && tourIds != null && !tourIds.isEmpty()) {
 
                // paint regular tour
 

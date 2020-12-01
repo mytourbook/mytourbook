@@ -2272,7 +2272,7 @@ public class Map extends Canvas {
       }
 
       final ArrayList<Rectangle> allPainted_HoveredRectangleList = hoveredTile.allPainted_HoverRectangle;
-      if (allPainted_HoveredRectangleList.size() == 0) {
+      if (allPainted_HoveredRectangleList.isEmpty()) {
 
          // nothing is painted in this tile
          return false;

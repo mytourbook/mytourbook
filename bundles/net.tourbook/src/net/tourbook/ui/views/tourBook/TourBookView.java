@@ -786,7 +786,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // get selected items
       final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
 
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -1982,7 +1982,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             tourIds.add(tviTourBookTour.tourId);
          }
 
-//         if (tourIds.size() == 0 && _hoveredTourId != -1) {
+//         if (tourIds.isEmpty() && _hoveredTourId != -1) {
 //
 //            // when nothing is selected but mouse is hovering a tour, return this tour id
 //
@@ -2363,7 +2363,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void onSelect_CreateTourSelection(final HashSet<Long> tourIds) {
 
       ISelection selection;
-      if (tourIds.size() == 0) {
+      if (tourIds.isEmpty()) {
 
          // fire selection that nothing is selected
 

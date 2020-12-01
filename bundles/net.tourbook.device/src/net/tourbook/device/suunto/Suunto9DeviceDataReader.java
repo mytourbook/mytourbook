@@ -267,7 +267,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       _alreadyImportedTours = alreadyImportedTours;
 
       // When a new import is started, we need to clean the previous saved activities
-      if (newlyImportedTours.size() == 0 && alreadyImportedTours.size() == 0) {
+      if (newlyImportedTours.isEmpty() && alreadyImportedTours.isEmpty()) {
          cleanUpActivities();
       }
 
