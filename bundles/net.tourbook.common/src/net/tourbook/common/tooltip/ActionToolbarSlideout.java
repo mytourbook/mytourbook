@@ -50,13 +50,26 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    /*
     * UI controls
     */
-   private Image     _imageEnabled;
-   private Image     _imageDisabled;
+   private Image _imageEnabled;
+   private Image _imageDisabled;
+
+   // additional enabled images
+   private Image     _imageEnabled_2;
+   private Image     _imageEnabled_3;
+   private Image     _imageEnabled_4;
+   private Image     _imageEnabled_5;
+   private Image     _imageEnabled_6;
 
    /**
     * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
     */
    protected boolean isToggleAction;
+
+   /**
+    * When <code>true</code> then the slideout is always displayed when mouse is hovering the
+    * action.
+    */
+   protected boolean isShowSlideoutAlways;
 
    /**
     * This tooltip will be displayed when the action is not selected.
@@ -96,8 +109,20 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       Util.disposeResource(_imageEnabled);
       Util.disposeResource(_imageDisabled);
 
+      Util.disposeResource(_imageEnabled_2);
+      Util.disposeResource(_imageEnabled_3);
+      Util.disposeResource(_imageEnabled_4);
+      Util.disposeResource(_imageEnabled_5);
+      Util.disposeResource(_imageEnabled_6);
+
       _imageEnabled = null;
       _imageDisabled = null;
+
+      _imageEnabled_2 = null;
+      _imageEnabled_3 = null;
+      _imageEnabled_4 = null;
+      _imageEnabled_5 = null;
+      _imageEnabled_6 = null;
    }
 
    @Override
@@ -213,7 +238,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       }
 
       // ignore when not selected
-      if (isToggleAction && _actionToolItem.getSelection() == false) {
+      if (isShowSlideoutAlways == false && isToggleAction && _actionToolItem.getSelection() == false) {
          return;
       }
 
@@ -284,6 +309,26 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       }
    }
 
+   public void setImageEnabled_2(final ImageDescriptor imageDescriptor) {
+      _imageEnabled_2 = imageDescriptor.createImage();
+   }
+
+   public void setImageEnabled_3(final ImageDescriptor imageDescriptor) {
+      _imageEnabled_3 = imageDescriptor.createImage();
+   }
+
+   public void setImageEnabled_4(final ImageDescriptor imageDescriptor) {
+      _imageEnabled_4 = imageDescriptor.createImage();
+   }
+
+   public void setImageEnabled_5(final ImageDescriptor imageDescriptor) {
+      _imageEnabled_5 = imageDescriptor.createImage();
+   }
+
+   public void setImageEnabled_6(final ImageDescriptor imageDescriptor) {
+      _imageEnabled_6 = imageDescriptor.createImage();
+   }
+
    public void setSelection(final boolean isSelected) {
 
       if (_actionToolItem == null) {
@@ -295,6 +340,30 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       _actionToolItem.setSelection(isSelected);
 
       updateUI_Tooltip();
+   }
+
+   public void showImageEnabled_2() {
+      _actionToolItem.setImage(_imageEnabled_2);
+   }
+
+   public void showImageEnabled_3() {
+      _actionToolItem.setImage(_imageEnabled_3);
+   }
+
+   public void showImageEnabled_4() {
+      _actionToolItem.setImage(_imageEnabled_4);
+   }
+
+   public void showImageEnabled_5() {
+      _actionToolItem.setImage(_imageEnabled_5);
+   }
+
+   public void showImageEnabled_6() {
+      _actionToolItem.setImage(_imageEnabled_6);
+   }
+
+   public void showImageEnabled_Default() {
+      _actionToolItem.setImage(_imageEnabled);
    }
 
    private void updateUI_Tooltip() {

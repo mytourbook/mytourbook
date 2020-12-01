@@ -44,6 +44,8 @@ public class Messages extends NLS {
    public static String        Image_Action_ShowValuePoint;
    public static String        Image_Action_SynchWithSlider_Centered;
    public static String        Image_Action_SynchWithSlider_Centered_Disabled;
+   public static String        Image_Action_SyncMap;
+   public static String        Image_Action_SyncMap_Disabled;
    public static String        Image_Action_TourWayPoint;
    public static String        Image_Action_TourWayPoint_Disabled;
    public static String        Image_Action_Zoom_CenterTour;
