@@ -3850,7 +3850,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _icViewer.refresh();
 
       // select config at the same position
-      if (configItems.size() > 0) {
+      if (configItems.isEmpty() == false) {
 
          if (selectedIndex >= configItems.size()) {
             selectedIndex--;
@@ -4023,7 +4023,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       // select config at the same position
 
-      if (configItems.size() > 0) {
+      if (configItems.isEmpty() == false) {
 
          if (selectedIndex >= configItems.size()) {
             selectedIndex--;

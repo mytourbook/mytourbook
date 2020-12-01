@@ -673,7 +673,7 @@ public class TourDatabase {
          }
       }
 
-      final boolean isNewTags = newTags.size() > 0;
+      final boolean isNewTags = newTags.isEmpty() == false;
 
       if (isNewTags) {
 

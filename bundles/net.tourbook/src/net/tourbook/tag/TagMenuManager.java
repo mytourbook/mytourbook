@@ -274,7 +274,7 @@ public class TagMenuManager {
          return;
       }
 
-      final boolean isExistingTagIds = _allTourTagIds != null && _allTourTagIds.size() > 0;
+      final boolean isExistingTagIds = _allTourTagIds != null && _allTourTagIds.isEmpty() == false;
       for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
          final TourTag actionTag = actionRecentTag._tag;
@@ -399,7 +399,7 @@ public class TagMenuManager {
          _state.put(STATE_RECENT_TAGS, tagIds);
       }
 
-      if (_allPreviousTags.size() > 0) {
+      if (_allPreviousTags.isEmpty() == false) {
 
          final String[] tagIds = new String[_allPreviousTags.size()];
          int tagIndex = 0;
@@ -505,7 +505,7 @@ public class TagMenuManager {
 
          // one tour is selected
 
-         if (oneTourTagIds != null && oneTourTagIds.size() > 0) {
+         if (oneTourTagIds != null && oneTourTagIds.isEmpty() == false) {
 
             // at least one tag is within the tour
 
@@ -570,7 +570,7 @@ public class TagMenuManager {
       }
 
       // add all previous tags
-      if (_allPreviousTags.size() > 0) {
+      if (_allPreviousTags.isEmpty() == false) {
 
          final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
 

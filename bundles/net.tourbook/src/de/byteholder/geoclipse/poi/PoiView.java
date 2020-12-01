@@ -152,7 +152,7 @@ public class PoiView extends ViewPart implements Observer {
 				final StringBuilder sb = new StringBuilder(poi.getName());
 
 				final List<? extends Waypoint> nearestPlaces = poi.getNearestPlaces();
-				if (nearestPlaces != null && nearestPlaces.size() > 0) {
+				if (nearestPlaces != null && nearestPlaces.isEmpty() == false) {
 
 					// create a string with all nearest waypoints
 					boolean isFirstPoi = true;

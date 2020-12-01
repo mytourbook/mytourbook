@@ -498,7 +498,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          }
       }
 
-      if (tourPhotoLinksWithGps.size() > 0) {
+      if (tourPhotoLinksWithGps.isEmpty() == false) {
          setTourGpsIntoPhotos(tourPhotoLinksWithGps);
       }
    }
@@ -547,7 +547,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       TourPhotoLink currentTourPhotoLink = null;
 
-      if (_dbTourPhotoLinks.size() > 0) {
+      if (_dbTourPhotoLinks.isEmpty() == false) {
 
          // real tours are available
 
@@ -1157,7 +1157,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<>();
 
-      if (modifiedImages.size() > 0) {
+      if (modifiedImages.isEmpty() == false) {
 
          BusyIndicator.showWhile(display, new Runnable() {
             @Override
@@ -1175,7 +1175,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       /*
        * show error message with all invalid image names
        */
-      if (validImages.size() > 0 && inValidImageNames.size() > 0) {
+      if (validImages.isEmpty() == false && inValidImageNames.isEmpty() == false) {
 
          // sort names
          Collections.sort(inValidImageNames);
@@ -1290,7 +1290,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
             final int ratingStars = photo.ratingStars;
             final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
 
-            if (photoRefs.size() > 0) {
+            if (photoRefs.isEmpty() == false) {
 
                for (final TourPhotoReference photoRef : photoRefs) {
 
@@ -1314,7 +1314,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
             }
          }
 
-         if (updatedPhotos.size() > 0) {
+         if (updatedPhotos.isEmpty() == false) {
 
             // fire notification to update all galleries with the modified rating stars
 

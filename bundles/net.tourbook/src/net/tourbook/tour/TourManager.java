@@ -1533,7 +1533,7 @@ public class TourManager {
                            }
                         }
 
-                        if (geoTours.size() > 0) {
+                        if (geoTours.isEmpty() == false) {
                            return geoTours;
                         }
 
@@ -1541,7 +1541,7 @@ public class TourManager {
 
                         // return all tours
 
-                        if (selectedTours.size() > 0) {
+                        if (selectedTours.isEmpty() == false) {
 
                            /*
                             * a tour provider is found which also provides tours
@@ -1564,7 +1564,7 @@ public class TourManager {
 
       final ArrayList<TourData> selectedTours = getSelectedTours();
 
-      if (selectedTours != null && selectedTours.size() > 0) {
+      if (selectedTours != null && selectedTours.isEmpty() == false) {
 
          if (selectedTours.size() > 1) {
 

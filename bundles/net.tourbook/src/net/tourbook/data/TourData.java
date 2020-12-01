@@ -6485,7 +6485,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      if (pulseTimes.size() > 0) {
+      if (pulseTimes.isEmpty() == false) {
          pulseTimeSerie = pulseTimes.toArray();
       }
    }
@@ -7344,7 +7344,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       // photos are available in this tour
 
-      if (_galleryPhotos.size() > 0) {
+      if (_galleryPhotos.isEmpty() == false) {
 
          // photos are set
          return _galleryPhotos;
@@ -8885,7 +8885,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (tourReferences == null) {
          return false;
       } else {
-         return tourReferences.size() > 0;
+         return tourReferences.isEmpty() == false;
       }
    }
 

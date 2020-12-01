@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -551,7 +551,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
             _mpWrappers.add(mpWrapperClone);
          }
 
-         if (remainingMpWrappers.size() > 0) {
+         if (remainingMpWrappers.isEmpty() == false) {
 
             /*
              * there are mappers in the profile which do not exist in the available map

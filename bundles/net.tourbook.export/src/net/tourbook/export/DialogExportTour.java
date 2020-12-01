@@ -1279,9 +1279,9 @@ public class DialogExportTour extends TitleAreaDialog {
       vc.put(VC_TOUR_MARKERS, tourMarkers);
       vc.put(VC_TOUR_DATA, tourData);
 
-      vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.size() > 0));
-      vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.size() > 0));
-      vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.size() > 0));
+      vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.isEmpty() == false));
+      vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.isEmpty() == false));
+      vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.isEmpty() == false));
 
       vc.put("dateformat", _dateFormat); //$NON-NLS-1$
       vc.put("dtIso", _dtIso); //$NON-NLS-1$

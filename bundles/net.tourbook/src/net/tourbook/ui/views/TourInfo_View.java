@@ -305,7 +305,7 @@ public class TourInfo_View extends ViewPart {
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (tourIds.isEmpty() == false)) {
             tourId = tourIds.get(0);
          }
 
@@ -377,7 +377,7 @@ public class TourInfo_View extends ViewPart {
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            if ((selectedTours != null) && (selectedTours.isEmpty() == false)) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
             }
          }
