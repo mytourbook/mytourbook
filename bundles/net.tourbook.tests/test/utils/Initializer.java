@@ -15,8 +15,6 @@
  *******************************************************************************/
 package utils;
 
-import de.byteholder.geoclipse.map.UI;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -25,14 +23,13 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 
 public class Initializer {
-
    public static SAXParser initializeParser() {
       final SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser parser = null;
       try {
          parser = factory.newSAXParser();
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
+         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
       } catch (final ParserConfigurationException | SAXException e) {
          e.printStackTrace();
       }

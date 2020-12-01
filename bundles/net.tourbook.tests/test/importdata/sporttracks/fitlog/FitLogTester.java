@@ -71,8 +71,8 @@ class FitLogTester {
 
       parser.parse(fitLogFile, handler);
 
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
 
-      Comparison.compareTourDataAgainstControl(tour, "test/" + filePathWithoutExtension); //$NON-NLS-1$
+      Comparison.CompareTourDataAgainstControl(tour, "test/" + filePathWithoutExtension); //$NON-NLS-1$
    }
 }
