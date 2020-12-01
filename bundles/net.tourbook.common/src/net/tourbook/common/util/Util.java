@@ -2476,7 +2476,7 @@ public class Util {
          }
       }
 
-      if (allEnumNames.size() > 0) {
+      if (allEnumNames.isEmpty() == false) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
       }
    }

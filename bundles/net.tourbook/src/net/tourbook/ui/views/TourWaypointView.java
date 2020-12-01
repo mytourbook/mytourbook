@@ -459,7 +459,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
             }
 
             final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
-            if ((selection.size() > 0) && (e.keyCode == SWT.CR)) {
+            if ((selection.isEmpty() == false) && (e.keyCode == SWT.CR)) {
 
                // run async, otherwise it would pop up the dialog two times
 //					Display.getCurrent().asyncExec(new Runnable() {
@@ -501,7 +501,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
             // edit selected marker
 //				final IStructuredSelection selection = (IStructuredSelection) _wpViewer.getSelection();
-//				if (selection.size() > 0) {
+//				if (selection.isEmpty() == false) {
 //					_actionEditTourWaypoints.setSelectedMarker((TourMarker) selection.getFirstElement());
 //					_actionEditTourWaypoints.run();
 //				}
@@ -896,7 +896,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (tourIds.isEmpty() == false)) {
             tourId = tourIds.get(0);
          }
 
@@ -1003,7 +1003,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
             }
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            if ((selectedTours != null) && (selectedTours.isEmpty() == false)) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
             }
          }

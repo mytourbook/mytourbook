@@ -711,7 +711,7 @@ public class TourData_View extends ViewPart {
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (tourIds.isEmpty() == false)) {
             tourId = tourIds.get(0);
          }
 
@@ -809,7 +809,7 @@ public class TourData_View extends ViewPart {
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            if ((selectedTours != null) && (selectedTours.isEmpty() == false)) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
             }
          }
@@ -872,7 +872,7 @@ public class TourData_View extends ViewPart {
        * reference tours
        */
       final Collection<TourReference> refTours = _tourData.getTourReferences();
-      if (refTours.size() > 0) {
+      if (refTours.isEmpty() == false) {
          updateUI_RefTourInfo(refTours);
       } else {
          _txtRefTour.setText(Messages.tour_editor_label_ref_tour_none);

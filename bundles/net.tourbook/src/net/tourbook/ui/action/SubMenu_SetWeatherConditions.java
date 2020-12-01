@@ -159,7 +159,7 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
          }
       }
 
-      if (modifiedTours.size() > 0) {
+      if (modifiedTours.isEmpty() == false) {
          TourManager.saveModifiedTours(modifiedTours);
       }
 
