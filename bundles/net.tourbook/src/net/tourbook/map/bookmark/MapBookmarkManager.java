@@ -433,7 +433,7 @@ public class MapBookmarkManager {
          }
       }
 
-      if (getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+      if (getAllRecentBookmarks().isEmpty() || numberOfRecentBookmarks <= 0) {
          return;
       }
 
@@ -490,7 +490,7 @@ public class MapBookmarkManager {
          }
       }
 
-      if (getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+      if (getAllRecentBookmarks().isEmpty() || numberOfRecentBookmarks <= 0) {
          return;
       }
 
