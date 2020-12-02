@@ -576,7 +576,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             // edit selected marker
             final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-            if (selection.size() > 0) {
+            if (selection.isEmpty() == false) {
                _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
                _actionEditTourMarkers.run();
             }
@@ -1203,7 +1203,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-         if (tourIds != null && tourIds.size() > 0) {
+         if (tourIds != null && tourIds.isEmpty() == false) {
 
             if (tourIds.size() == 1) {
                tourId = tourIds.get(0);

@@ -408,7 +408,7 @@ public class Util {
          return UI.EMPTY_STRING;
       }
 
-      if (allTexts.size() == 0) {
+      if (allTexts.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
@@ -1092,7 +1092,7 @@ public class Util {
       }
 
       final String[] allStateValues = state.getArray(key);
-      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.size() == 0) {
+      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.isEmpty()) {
          return allDefaultValues;
       }
 
@@ -2476,7 +2476,7 @@ public class Util {
          }
       }
 
-      if (allEnumNames.size() > 0) {
+      if (allEnumNames.isEmpty() == false) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
       }
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -122,7 +122,7 @@ public class TourPainterConfiguration {
          _photos.addAll(allPhotos);
       }
 
-      isPhotoVisible = isShowPhoto && _photos.size() > 0;
+      isPhotoVisible = isShowPhoto && _photos.isEmpty() == false;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }
@@ -149,7 +149,7 @@ public class TourPainterConfiguration {
          _tourDataList.addAll(tourDataList);
       }
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _tourDataList.isEmpty() == false;
    }
 
    /**
@@ -164,6 +164,6 @@ public class TourPainterConfiguration {
       _tourDataList.clear();
       _tourDataList.add(tourData);
 
-      isTourVisible = isShowTour && _tourDataList.size() > 0;
+      isTourVisible = isShowTour && _tourDataList.isEmpty() == false;
    }
 }

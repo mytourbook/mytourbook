@@ -2309,7 +2309,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.size() > 0) {
+               if (selectedTours != null && selectedTours.isEmpty() == false) {
 
                   for (final TourData tourData : selectedTours) {
 

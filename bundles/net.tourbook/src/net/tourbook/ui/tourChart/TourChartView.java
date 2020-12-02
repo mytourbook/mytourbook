@@ -616,7 +616,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
                final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
 
-               if (tourPhotoLinks.size() > 0) {
+               if (tourPhotoLinks.isEmpty() == false) {
 
                   _tourPhotoLink = tourPhotoLinks.get(0);
 
@@ -631,7 +631,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
             }
 
-            if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
+            if (isChartPainted == false && tourIds != null && tourIds.isEmpty() == false) {
 
                // paint regular tour
 
@@ -869,7 +869,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.size() > 0) {
+               if (selectedTours != null && selectedTours.isEmpty() == false) {
                   updateChart(selectedTours.get(0));
                }
             }

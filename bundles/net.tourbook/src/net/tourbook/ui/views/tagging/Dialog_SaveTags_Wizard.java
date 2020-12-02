@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -148,7 +148,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
       TourLogManager.addLog(TourLogState.INFO, startLogMessage);
 
       // log selected tags
-      if (_allCheckedTagIds.size() > 0) {
+      if (_allCheckedTagIds.isEmpty() == false) {
          final String tagNamesText = TourDatabase.getTagNamesText(_allCheckedTagIds, false);
          TourLogManager.subLog_Default(tagNamesText);
       }
@@ -288,7 +288,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
             }
 
             // update the UI
-            if (savedTours.size() > 0) {
+            if (savedTours.isEmpty() == false) {
 
                Display.getDefault().asyncExec(new Runnable() {
                   @Override

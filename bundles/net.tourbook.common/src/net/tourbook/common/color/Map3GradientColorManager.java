@@ -925,7 +925,7 @@ public class Map3GradientColorManager {
       for (final Map3ColorDefinition xmlColorDef : xmlColorDefinitions) {
 
          final ArrayList<Map3GradientColorProvider> xmlColorProvider = xmlColorDef.getColorProviders();
-         if (xmlColorProvider.size() > 0) {
+         if (xmlColorProvider.isEmpty() == false) {
 
             final MapGraphId xmlGraphId = xmlColorDef.getGraphId();
             final Map3ColorDefinition defaultColorDef = getColorDefinition(xmlGraphId);

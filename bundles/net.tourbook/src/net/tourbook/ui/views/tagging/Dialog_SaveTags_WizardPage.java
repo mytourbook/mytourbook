@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,7 +152,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
             _rdoRemoveAllTags.setText(Messages.Dialog_SaveTags_Radio_RemoveTags_All);
          }
 
-         if (_allCheckedTagIds.size() > 0) {
+         if (_allCheckedTagIds.isEmpty() == false) {
 
             // tags are selected
             {
@@ -174,7 +174,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
    private void enableControls() {
 
-      final boolean isTagSelected = _allCheckedTagIds.size() > 0;
+      final boolean isTagSelected = _allCheckedTagIds.isEmpty() == false;
 
       _rdoAppendNewTags.setEnabled(isTagSelected);
       _rdoReplaceTags.setEnabled(isTagSelected);
@@ -197,7 +197,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
 // SET_FORMATTING_ON
 
-      if (_allCheckedTagIds.size() > 0) {
+      if (_allCheckedTagIds.isEmpty() == false) {
          _lblSelectedTags.setText(TourDatabase.getTagNamesText(_allCheckedTagIds, true));
       }
    }

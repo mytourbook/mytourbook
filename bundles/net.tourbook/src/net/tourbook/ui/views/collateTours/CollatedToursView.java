@@ -1862,7 +1862,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionReimport_Tours.setEnabled(isTourSelected);
       _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
 
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
       _actionExpandSelection.setEnabled(
@@ -2076,7 +2076,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       }
 
       ISelection selection;
-      if (tourIds.size() == 0) {
+      if (tourIds.isEmpty()) {
 
          // fire selection that nothing is selected
 

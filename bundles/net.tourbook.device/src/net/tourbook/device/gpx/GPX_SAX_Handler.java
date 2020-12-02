@@ -427,7 +427,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 //			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
 //
-//			if (tourMarkers.size() > 0) {
+//			if (tourMarkers.isEmpty() == false) {
 //
 //				// this happened
 //

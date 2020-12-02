@@ -273,7 +273,7 @@ public class GarminExternalDevice extends ExternalDevice {
                }
             }
 
-            if (destinationTracks.size() > 0) {
+            if (destinationTracks.isEmpty() == false) {
 
                for (final Object obj : activeLog.getWaypoints()) {
                   if (obj instanceof GPSTrackpoint) {
@@ -407,7 +407,7 @@ public class GarminExternalDevice extends ExternalDevice {
                   }
 
                   // merge
-                  if (srcTrack != null && destTracks.size() > 0) {
+                  if (srcTrack != null && destTracks.isEmpty() == false) {
                      mergeActiveLog(srcTrack, destTracks);
                   }
 

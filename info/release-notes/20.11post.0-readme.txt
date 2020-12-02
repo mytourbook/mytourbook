@@ -17,7 +17,12 @@ New
 ===
 
 * Measurement System
- - Select measurement system for each unit separately
+  - Select measurement system for each unit separately
+ 
+* Tour Info View
+  - Tour info which is displayed in a tooltip is now also displayed in a separate view
+    https://sourceforge.net/p/mytourbook/feature-requests/167/
+  - The old "Tour Info" view ins now renamed into "Tour Data" view
 
 
 Improvements
@@ -33,6 +38,9 @@ Changes
 
 * Dialog Adjust Elevation
   - The elevation of the rightmost spline point is now set to the SRTM value when the adjustment type is "Approach elevation with SRTM data"
+  
+* Tour Editor
+  - Number of visible lines for the tour description is moved from pref page "Appearance/Tour Editor" into the slideout "Tour Editor Options"
 
 
 Fixes   

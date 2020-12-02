@@ -2753,7 +2753,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void gotoTour(int direction) {
 
-      if (_allTourFocusItems.size() < 1) {
+      if (_allTourFocusItems.isEmpty()) {
 
          // there are no tours -> scroll a week
 
@@ -2875,7 +2875,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void gotoTour_SameWeekday(final int direction) {
 
-      if (_allTourFocusItems.size() < 1) {
+      if (_allTourFocusItems.isEmpty()) {
 
          scroll_ByDate_WithKeys(direction);
 

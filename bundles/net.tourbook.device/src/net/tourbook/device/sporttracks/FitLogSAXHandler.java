@@ -430,7 +430,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
       }
 
-      if (_currentActivity.customDataFields.size() > 0) {
+      if (_currentActivity.customDataFields.isEmpty() == false) {
 
          final StringBuilder tourNotes = new StringBuilder(tourData.getTourDescription());
 
@@ -454,7 +454,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       tourData.setDeviceTimeInterval((short) -1);
 
-      if (_currentActivity.timeSlices.size() == 0) {
+      if (_currentActivity.timeSlices.isEmpty()) {
 
          // tour do not contain a track
 
@@ -513,7 +513,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
-      if (_currentActivity.pauses.size() > 0) {
+      if (_currentActivity.pauses.isEmpty() == false) {
 
          final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
          final ArrayList<Long> _pausedTime_End = new ArrayList<>();
@@ -547,7 +547,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                .collect(Collectors.toList());
 
          //We set the first found time zone that corresponds to the activity offset
-         if (finalZoneIds.size() > 0) {
+         if (finalZoneIds.isEmpty() == false) {
             tourData.setTimeZoneId(finalZoneIds.get(0));
          }
       }
@@ -643,7 +643,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
       final ArrayList<Equipment> equipmentNames = _currentActivity.equipmentNames;
-      if (equipmentNames.size() == 0) {
+      if (equipmentNames.isEmpty()) {
          return;
       }
 
@@ -655,7 +655,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       boolean searchTagById = false;
       // If we are in a FitLogEx file, then we have parsed equipments
       // and we need to map tour tags using each equipment's GUID.
-      if (_equipments != null && _equipments.size() > 0) {
+      if (_equipments != null && _equipments.isEmpty() == false) {
          searchTagById = true;
       }
 
@@ -722,7 +722,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
       final ArrayList<Lap> _laps = _currentActivity.laps;
-      if (_laps.size() == 0) {
+      if (_laps.isEmpty()) {
          return;
       }
 
@@ -1207,7 +1207,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void saveEquipmentsAsTags() {
 
-      if (_equipments.size() == 0) {
+      if (_equipments.isEmpty()) {
          return;
       }
 

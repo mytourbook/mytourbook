@@ -28,7 +28,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -36,7 +35,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
@@ -313,17 +311,15 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
             );
 
-            final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-            int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-            descLines = descLines == 0 ? 5 : descLines;
+            // this is used as default, when the dialog is resized then the description field is also resized
+            final int descriptionHeight = _pc.convertHeightInCharsToPixels(5);
 
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   //
                   // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
                   //
-                  .hint(defaultTextWidth, _pc.convertHeightInCharsToPixels(descLines))
+                  .hint(defaultTextWidth, descriptionHeight)
                   .applyTo(_txtDescription);
          }
          {

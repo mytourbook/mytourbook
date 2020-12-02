@@ -629,7 +629,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          // check if photos are available
-         if (_tourData.tourPhotoLink == null && _tourData.getTourPhotos().size() == 0) {
+         if (_tourData.tourPhotoLink == null && _tourData.getTourPhotos().isEmpty()) {
             return;
          }
 
@@ -2072,7 +2072,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
           * get saved photos
           */
          final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
-         if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
+         if (srcTourPhotos != null && srcTourPhotos.isEmpty() == false) {
 
             final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
             createChartPhotos(srcTourPhotos, chartPhotos, true);
@@ -2089,7 +2089,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             final ArrayList<Photo> srcLinkPhotos = tourPhotoLink.linkPhotos;
 
-            if (srcLinkPhotos.size() > 0) {
+            if (srcLinkPhotos.isEmpty() == false) {
 
                final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
                createChartPhotos(srcLinkPhotos, chartPhotos, false);
@@ -2099,7 +2099,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
          }
 
-         if (chartPhotoGroups.size() == 0) {
+         if (chartPhotoGroups.isEmpty()) {
             // there are no photos
             break;
          }
@@ -2288,7 +2288,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedSegments();
       final ArrayList<RGB> selectedAltitudeRGB = new ArrayList<>();
 
-      if (paintedSegments_Altitude.size() > 0) {
+      if (paintedSegments_Altitude.isEmpty() == false) {
 
          selectedAltitudePath = createSelectedLines_Values(
                paintedSegments_Altitude,
@@ -2557,7 +2557,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          for (int pathIndex = 0; pathIndex < _selectedOtherPoints.size(); pathIndex++) {
 
             final TIntArrayList graphLine = _selectedOtherPoints.get(pathIndex);
-            if (graphLine.size() == 0) {
+            if (graphLine.isEmpty()) {
                // can be empty when small values are hidden
                continue;
             }
@@ -4199,10 +4199,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _selectedSegmenterSegment_2 = null;
 
       ArrayList<SegmenterSegment> paintedSegmentLabels = _layerTourSegmenterAltitude.getPaintedSegments();
-      if (paintedSegmentLabels.size() == 0) {
+      if (paintedSegmentLabels.isEmpty()) {
 
          for (final ArrayList<SegmenterSegment> paintedLabels : _layerTourSegmenterOther.getPaintedSegments()) {
-            if (paintedLabels.size() > 0) {
+            if (paintedLabels.isEmpty() == false) {
 
                paintedSegmentLabels = paintedLabels;
                break;
@@ -4210,7 +4210,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
       }
 
-      if (paintedSegmentLabels.size() == 0) {
+      if (paintedSegmentLabels.isEmpty()) {
          // this case do probably not occur;
          return;
       }

@@ -932,7 +932,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                   final TourEvent tourEvent = (TourEvent) eventData;
                   final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-                  if (modifiedTours == null || modifiedTours.size() == 0) {
+                  if (modifiedTours == null || modifiedTours.isEmpty()) {
                      return;
                   }
 
@@ -4126,7 +4126,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private TourSegmenter getSelectedSegmenter() {
 
-      if (_availableSegmenter.size() == 0) {
+      if (_availableSegmenter.isEmpty()) {
          return null;
       }
 
@@ -4744,7 +4744,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-               if (tourIds != null && tourIds.size() > 0) {
+               if (tourIds != null && tourIds.isEmpty() == false) {
 
                   if (tourIds.size() == 1) {
 

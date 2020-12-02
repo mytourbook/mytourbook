@@ -61,7 +61,7 @@ public class ActionMultiplyCaloriesBy1000 extends Action {
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected -> this should not happen, action should be disabled
 

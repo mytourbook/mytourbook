@@ -450,7 +450,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    public void actionSync_WithChartSlider() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -666,7 +666,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-//					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+//					if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
 //
 //						_allTourData.clear();
 //						_allTourData.addAll(modifiedTours);
@@ -701,7 +701,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void checkSliderIndices() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -850,7 +850,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
 
-         if (tourMarkerList.size() == 0) {
+         if (tourMarkerList.isEmpty()) {
             continue;
          }
 
@@ -1014,8 +1014,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final TourLayer tourLayer = _mapApp.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
-      final boolean isTourAvailable = _allTourData.size() > 0;
-      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
+      final boolean isTourAvailable = _allTourData.isEmpty() == false;
+      final boolean isAllPhotoAvailable = _allPhotos.isEmpty() == false;
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
@@ -1198,7 +1198,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          // paint all selected tours
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
 

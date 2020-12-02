@@ -234,7 +234,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
       _tagMenuMgr.enableTagActions(//
             isTourSaved,
-            isTourSaved && tourTags.size() > 0,
+            isTourSaved && tourTags.isEmpty() == false,
             tourTags);
 
       _actionSetTourType.setEnabled(isTourSaved);

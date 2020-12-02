@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,620 +55,624 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class PicDirImages implements IPhotoGalleryProvider {
 
-	private static final int						MAX_HISTORY_ENTRIES			= 500;
+   private static final int                      MAX_HISTORY_ENTRIES       = 500;
 
-	private static final String						STATE_FOLDER_HISTORY		= "STATE_FOLDER_HISTORY";		//$NON-NLS-1$
-	private static final String						STATE_IS_SHOW_ONLY_PHOTOS	= "STATE_IS_SHOW_ONLY_PHOTOS";	//$NON-NLS-1$
+   private static final String                   STATE_FOLDER_HISTORY      = "STATE_FOLDER_HISTORY";      //$NON-NLS-1$
+   private static final String                   STATE_IS_SHOW_ONLY_PHOTOS = "STATE_IS_SHOW_ONLY_PHOTOS"; //$NON-NLS-1$
 
-	private IDialogSettings							_state;
+   private IDialogSettings                       _state;
 
-	private int										_selectedHistoryIndex;
-	private ArrayList<String>						_folderHistory				= new ArrayList<String>();
+   private int                                   _selectedHistoryIndex;
+   private ArrayList<String>                     _folderHistory            = new ArrayList<>();
 
-	private PicDirFolder							_picDirFolder;
+   private PicDirFolder                          _picDirFolder;
 
-	private boolean									_isComboKeyPressed;
+   private boolean                               _isComboKeyPressed;
 
-	/**
-	 * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
-	 * when only photos are displayed.
-	 */
-	private boolean									_isShowOnlyPhotos;
+   /**
+    * Is <code>true</code> when folders and gallery photos are displayed, is <code>false</code>
+    * when only photos are displayed.
+    */
+   private boolean                               _isShowOnlyPhotos;
 
-	private ActionNavigateHistoryBackward			_actionNavigateBackward;
-	private ActionNavigateHistoryForward			_actionNavigateForward;
-	private ActionClearNavigationHistory			_actionClearNavigationHistory;
-	private ActionRemoveInvalidFoldersFromHistory	_actionRemoveInvalidFoldersFromHistory;
-	private ActionSortFolderHistory					_actionSortFolderHistory;
-	private ActionToggleFolderGallery				_actionToggleFolderGallery;
+   private ActionNavigateHistoryBackward         _actionNavigateBackward;
+   private ActionNavigateHistoryForward          _actionNavigateForward;
+   private ActionClearNavigationHistory          _actionClearNavigationHistory;
+   private ActionRemoveInvalidFoldersFromHistory _actionRemoveInvalidFoldersFromHistory;
+   private ActionSortFolderHistory               _actionSortFolderHistory;
+   private ActionToggleFolderGallery             _actionToggleFolderGallery;
 
-	private PicDirView								_picDirView;
+   private PicDirView                            _picDirView;
 
-	/*
-	 * UI controls
-	 */
-	private Display									_display;
+   /*
+    * UI controls
+    */
+   private Display      _display;
 
-	private Combo									_comboHistory;
-	private ToolBar									_galleryToolbar;
-	private PhotoGallery							_photoGallery;
+   private Combo        _comboHistory;
+   private ToolBar      _galleryToolbar;
+   private PhotoGallery _photoGallery;
 
-	public PicDirImages(final PicDirView picDirView, final IDialogSettings state) {
+   public PicDirImages(final PicDirView picDirView, final IDialogSettings state) {
 
-		_picDirView = picDirView;
-		_state = state;
-	}
+      _picDirView = picDirView;
+      _state = state;
+   }
 
-	void actionClearHistory() {
+   void actionClearHistory() {
 
-		final String selectedFolder = _comboHistory.getText();
+      final String selectedFolder = _comboHistory.getText();
 
-		_comboHistory.removeAll();
-		_comboHistory.add(selectedFolder);
-		_comboHistory.select(0);
+      _comboHistory.removeAll();
+      _comboHistory.add(selectedFolder);
+      _comboHistory.select(0);
 
-		_folderHistory.clear();
-		_folderHistory.add(selectedFolder);
+      _folderHistory.clear();
+      _folderHistory.add(selectedFolder);
 
-		_actionClearNavigationHistory.setEnabled(false);
-		_actionRemoveInvalidFoldersFromHistory.setEnabled(false);
-		_actionNavigateBackward.setEnabled(false);
-		_actionNavigateForward.setEnabled(false);
-	}
+      _actionClearNavigationHistory.setEnabled(false);
+      _actionRemoveInvalidFoldersFromHistory.setEnabled(false);
+      _actionNavigateBackward.setEnabled(false);
+      _actionNavigateForward.setEnabled(false);
+   }
 
-	void actionNavigateBackward() {
+   void actionNavigateBackward() {
 
-		final int historySize = _folderHistory.size();
-		if (_selectedHistoryIndex >= historySize - 1) {
+      final int historySize = _folderHistory.size();
+      if (_selectedHistoryIndex >= historySize - 1) {
 
-			// last entry is already selected
+         // last entry is already selected
 
-			_selectedHistoryIndex = historySize - 1;
-			_actionNavigateBackward.setEnabled(false);
+         _selectedHistoryIndex = historySize - 1;
+         _actionNavigateBackward.setEnabled(false);
 
-			return;
-		}
+         return;
+      }
 
-		_selectedHistoryIndex++;
+      _selectedHistoryIndex++;
 
-		// select combo history
-		_comboHistory.select(_selectedHistoryIndex);
+      // select combo history
+      _comboHistory.select(_selectedHistoryIndex);
 
-		// enabel/disable history navigation
-		_actionNavigateBackward.setEnabled(_selectedHistoryIndex < historySize - 1);
-		_actionNavigateForward.setEnabled(true);
+      // enabel/disable history navigation
+      _actionNavigateBackward.setEnabled(_selectedHistoryIndex < historySize - 1);
+      _actionNavigateForward.setEnabled(true);
 
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
 
-				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
+            final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
+            final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
 
-				if (isFolderAvailable == false) {
-					removeInvalidFolder(prevFolderPathName);
-				}
-			}
-		});
-	}
+            if (isFolderAvailable == false) {
+               removeInvalidFolder(prevFolderPathName);
+            }
+         }
+      });
+   }
 
-	void actionNavigateForward() {
+   void actionNavigateForward() {
 
-		final int historySize = _folderHistory.size();
-		if (_selectedHistoryIndex == 0) {
+      final int historySize = _folderHistory.size();
+      if (_selectedHistoryIndex == 0) {
 
-			// first entry is already selected
+         // first entry is already selected
 
-			_actionNavigateForward.setEnabled(false);
+         _actionNavigateForward.setEnabled(false);
 
-			return;
-		}
+         return;
+      }
 
-		_selectedHistoryIndex--;
+      _selectedHistoryIndex--;
 
-		// select combo history
-		_comboHistory.select(_selectedHistoryIndex);
+      // select combo history
+      _comboHistory.select(_selectedHistoryIndex);
 
-		// enabel/disable history navigation
-		_actionNavigateBackward.setEnabled(historySize > 1);
-		_actionNavigateForward.setEnabled(_selectedHistoryIndex > 0);
+      // enabel/disable history navigation
+      _actionNavigateBackward.setEnabled(historySize > 1);
+      _actionNavigateForward.setEnabled(_selectedHistoryIndex > 0);
 
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
-				final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
+            final String prevFolderPathName = _folderHistory.get(_selectedHistoryIndex);
+            final boolean isFolderAvailable = _picDirFolder.selectFolder(prevFolderPathName, false, true, false);
 
-				if (isFolderAvailable == false) {
-					removeInvalidFolder(prevFolderPathName);
-				}
-			}
-		});
-	}
+            if (isFolderAvailable == false) {
+               removeInvalidFolder(prevFolderPathName);
+            }
+         }
+      });
+   }
 
-	void actionRemoveInvalidFolders() {
+   void actionRemoveInvalidFolders() {
 
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
-				removeInvalidFolders();
-			}
-		});
-	}
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
+            removeInvalidFolders();
+         }
+      });
+   }
 
-	void actionShowNavigationHistory() {
+   void actionShowNavigationHistory() {
 
-		_comboHistory.setFocus();
+      _comboHistory.setFocus();
 
-		// this is not working with osx: https://bugs.eclipse.org/bugs/show_bug.cgi?id=300979
-		_comboHistory.setListVisible(true);
-	}
+      // this is not working with osx: https://bugs.eclipse.org/bugs/show_bug.cgi?id=300979
+      _comboHistory.setListVisible(true);
+   }
 
-	void actionSortFolderHistory() {
+   void actionSortFolderHistory() {
 
-		final int selectedIndex = _comboHistory.getSelectionIndex();
-		String selectedFolder = null;
+      final int selectedIndex = _comboHistory.getSelectionIndex();
+      String selectedFolder = null;
 
-		if (selectedIndex != -1) {
-			selectedFolder = _comboHistory.getItem(selectedIndex);
-		}
+      if (selectedIndex != -1) {
+         selectedFolder = _comboHistory.getItem(selectedIndex);
+      }
 
-		Collections.sort(_folderHistory);
+      Collections.sort(_folderHistory);
 
-		_comboHistory.removeAll();
+      _comboHistory.removeAll();
 
-		int newSelectedIndex = -1;
+      int newSelectedIndex = -1;
 
-		for (int folderIndex = 0; folderIndex < _folderHistory.size(); folderIndex++) {
+      for (int folderIndex = 0; folderIndex < _folderHistory.size(); folderIndex++) {
 
-			final String folder = _folderHistory.get(folderIndex);
+         final String folder = _folderHistory.get(folderIndex);
 
-			if (newSelectedIndex == -1 && folder.equals(selectedFolder)) {
-				newSelectedIndex = folderIndex;
-			}
+         if (newSelectedIndex == -1 && folder.equals(selectedFolder)) {
+            newSelectedIndex = folderIndex;
+         }
 
-			_comboHistory.add(folder);
-		}
+         _comboHistory.add(folder);
+      }
 
-		if (selectedIndex == -1) {
-			_comboHistory.select(0);
-		} else {
-			_comboHistory.select(newSelectedIndex);
-		}
-	}
+      if (selectedIndex == -1) {
+         _comboHistory.select(0);
+      } else {
+         _comboHistory.select(newSelectedIndex);
+      }
+   }
 
-	void actionToggleFolderGallery() {
+   void actionToggleFolderGallery() {
 
-		_isShowOnlyPhotos = _isShowOnlyPhotos ? false : true;
+      _isShowOnlyPhotos = _isShowOnlyPhotos ? false : true;
 
-		updateUI_Action_FolderGallery();
-	}
+      updateUI_Action_FolderGallery();
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		_actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
-		_actionNavigateForward = new ActionNavigateHistoryForward(this, _picDirView);
+      _actionNavigateBackward = new ActionNavigateHistoryBackward(this, _picDirView);
+      _actionNavigateForward = new ActionNavigateHistoryForward(this, _picDirView);
 
-		// this action activates the shortcut key <Ctrl><Shift>H but the action is not displayed
-		new ActionNavigateShowHistory(this, _picDirView);
+      // this action activates the shortcut key <Ctrl><Shift>H but the action is not displayed
+      new ActionNavigateShowHistory(this, _picDirView);
 
-		_actionClearNavigationHistory = new ActionClearNavigationHistory(this);
-		_actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
-		_actionSortFolderHistory = new ActionSortFolderHistory(this);
+      _actionClearNavigationHistory = new ActionClearNavigationHistory(this);
+      _actionRemoveInvalidFoldersFromHistory = new ActionRemoveInvalidFoldersFromHistory(this);
+      _actionSortFolderHistory = new ActionSortFolderHistory(this);
 
-		_actionToggleFolderGallery = new ActionToggleFolderGallery(this);
-	}
+      _actionToggleFolderGallery = new ActionToggleFolderGallery(this);
+   }
 
-	public void createUI(final Composite parent, final PicDirFolder picDirFolder) {
+   public void createUI(final Composite parent, final PicDirFolder picDirFolder) {
 
-		_display = parent.getDisplay();
-		_picDirFolder = picDirFolder;
+      _display = parent.getDisplay();
+      _picDirFolder = picDirFolder;
 
-		_photoGallery = new PhotoGallery(_state);
+      _photoGallery = new PhotoGallery(_state);
 
-		_photoGallery.setShowCustomActionBar();
-		_photoGallery.setShowThumbnailSize();
+      _photoGallery.setShowCustomActionBar();
+      _photoGallery.setShowThumbnailSize();
 
-		_photoGallery.createPhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
+      _photoGallery.createPhotoGallery(parent, SWT.V_SCROLL | SWT.MULTI, this);
 
-		createActions();
+      createActions();
 
-		_photoGallery.createActionBar();
+      _photoGallery.createActionBar();
 
-		final Composite galleryActionBarContainer = _photoGallery.getCustomActionBarContainer();
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(galleryActionBarContainer);
+      final Composite galleryActionBarContainer = _photoGallery.getCustomActionBarContainer();
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(galleryActionBarContainer);
 //		galleryActionBarContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		{
-			createUI_20_GalleryToolbars(galleryActionBarContainer);
-			createUI_30_ComboHistory(galleryActionBarContainer);
-		}
-	}
-
-	/**
-	 * fill gallery actionbar
-	 * 
-	 * @param galleryActionBarContainer
-	 */
-	private void createUI_20_GalleryToolbars(final Composite galleryActionBarContainer) {
-
-		/*
-		 * toolbar actions
-		 */
-		_galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.BEGINNING, SWT.CENTER)
-				.applyTo(_galleryToolbar);
-
-		final ToolBarManager tbm = new ToolBarManager(_galleryToolbar);
-
-		tbm.add(_actionToggleFolderGallery);
-		tbm.add(_actionNavigateBackward);
-		tbm.add(_actionNavigateForward);
-
-		tbm.update(true);
-	}
-
-	/**
-	 * combo: path history
-	 */
-	private void createUI_30_ComboHistory(final Composite parent) {
-
-		_comboHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(_comboHistory);
-		_comboHistory.setVisibleItemCount(60);
-
-		_comboHistory.addMouseListener(new MouseListener() {
+      {
+         createUI_20_GalleryToolbars(galleryActionBarContainer);
+         createUI_30_ComboHistory(galleryActionBarContainer);
+      }
+   }
+
+   /**
+    * fill gallery actionbar
+    *
+    * @param galleryActionBarContainer
+    */
+   private void createUI_20_GalleryToolbars(final Composite galleryActionBarContainer) {
+
+      /*
+       * toolbar actions
+       */
+      _galleryToolbar = new ToolBar(galleryActionBarContainer, SWT.FLAT);
+      GridDataFactory.fillDefaults()//
+            .align(SWT.BEGINNING, SWT.CENTER)
+            .applyTo(_galleryToolbar);
+
+      final ToolBarManager tbm = new ToolBarManager(_galleryToolbar);
+
+      tbm.add(_actionToggleFolderGallery);
+      tbm.add(_actionNavigateBackward);
+      tbm.add(_actionNavigateForward);
+
+      tbm.update(true);
+   }
+
+   /**
+    * combo: path history
+    */
+   private void createUI_30_ComboHistory(final Composite parent) {
+
+      _comboHistory = new Combo(parent, SWT.SIMPLE | SWT.DROP_DOWN);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .align(SWT.FILL, SWT.CENTER)
+            .applyTo(_comboHistory);
+      _comboHistory.setVisibleItemCount(60);
+
+      _comboHistory.addMouseListener(new MouseListener() {
+
+         @Override
+         public void mouseDoubleClick(final MouseEvent e) {}
+
+         @Override
+         public void mouseDown(final MouseEvent e) {
 
-			@Override
-			public void mouseDoubleClick(final MouseEvent e) {}
+            // show list
+            _comboHistory.setListVisible(true);
+         }
 
-			@Override
-			public void mouseDown(final MouseEvent e) {
+         @Override
+         public void mouseUp(final MouseEvent e) {}
+      });
 
-				// show list
-				_comboHistory.setListVisible(true);
-			}
+      /**
+       * This combination of key and selection listener causes a folder selection only with the
+       * <Enter> key or with a selection with the mouse in the drop down box
+       */
+      _comboHistory.addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-			@Override
-			public void mouseUp(final MouseEvent e) {}
-		});
+            _isComboKeyPressed = true;
 
-		/**
-		 * This combination of key and selection listener causes a folder selection only with the
-		 * <Enter> key or with a selection with the mouse in the drop down box
-		 */
-		_comboHistory.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
+            if (e.keyCode == SWT.CR) {
+               onSelectHistoryFolder(_comboHistory.getText());
+            }
+         }
+      });
+
+      _comboHistory.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
 
-				_isComboKeyPressed = true;
+            final boolean isKey = _isComboKeyPressed;
+            _isComboKeyPressed = false;
 
-				if (e.keyCode == SWT.CR) {
-					onSelectHistoryFolder(_comboHistory.getText());
-				}
-			}
-		});
+            if (isKey == false) {
+               onSelectHistoryFolder(_comboHistory.getText());
+            }
+         }
+      });
+   }
 
-		_comboHistory.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
+   private void enableControls() {
+
+      _actionNavigateBackward.setEnabled(false);
+      _actionNavigateForward.setEnabled(false);
+   }
+
+   public void fillViewMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionSortFolderHistory);
+      menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
+      menuMgr.add(_actionClearNavigationHistory);
+   }
+
+   public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
+      return _photoGallery.getSelectedPhotosWithExif(isAllImages);
+   }
 
-				final boolean isKey = _isComboKeyPressed;
-				_isComboKeyPressed = false;
+   @Override
+   public IStatusLineManager getStatusLineManager() {
+      return _picDirView.getViewSite().getActionBars().getStatusLineManager();
+   }
 
-				if (isKey == false) {
-					onSelectHistoryFolder(_comboHistory.getText());
-				}
-			}
-		});
-	}
+   @Override
+   public IToolBarManager getToolBarManager() {
+      return _picDirView.getViewSite().getActionBars().getToolBarManager();
+   }
 
-	private void enableControls() {
-
-		_actionNavigateBackward.setEnabled(false);
-		_actionNavigateForward.setEnabled(false);
-	}
-
-	public void fillViewMenu(final IMenuManager menuMgr) {
-
-		menuMgr.add(_actionSortFolderHistory);
-		menuMgr.add(_actionRemoveInvalidFoldersFromHistory);
-		menuMgr.add(_actionClearNavigationHistory);
-	}
+   public void handlePrefStoreModifications(final PropertyChangeEvent event) {
+      _photoGallery.handlePrefStoreModifications(event);
+   }
 
-	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
-		return _photoGallery.getSelectedPhotosWithExif(isAllImages);
-	}
+   private void onSelectHistoryFolder(final String selectedFolder) {
 
-	@Override
-	public IStatusLineManager getStatusLineManager() {
-		return _picDirView.getViewSite().getActionBars().getStatusLineManager();
-	}
+      updateHistory(selectedFolder);
 
-	@Override
-	public IToolBarManager getToolBarManager() {
-		return _picDirView.getViewSite().getActionBars().getToolBarManager();
-	}
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
 
-	public void handlePrefStoreModifications(final PropertyChangeEvent event) {
-		_photoGallery.handlePrefStoreModifications(event);
-	}
+            final boolean isFolderAvailable = _picDirFolder.selectFolder(selectedFolder, false, false, false);
 
-	private void onSelectHistoryFolder(final String selectedFolder) {
+            if (isFolderAvailable == false) {
+               removeInvalidFolder(selectedFolder);
+            }
+         }
+      });
+   }
 
-		updateHistory(selectedFolder);
+   public void photoEvent(final PhotoEventId photoEventId, final Object data) {
 
-		BusyIndicator.showWhile(_display, new Runnable() {
-			public void run() {
+      if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
 
-				final boolean isFolderAvailable = _picDirFolder.selectFolder(selectedFolder, false, false, false);
+         if (data instanceof ArrayList<?>) {
 
-				if (isFolderAvailable == false) {
-					removeInvalidFolder(selectedFolder);
-				}
-			}
-		});
-	}
+            final ArrayList<?> arrayList = (ArrayList<?>) data;
 
-	public void photoEvent(final PhotoEventId photoEventId, final Object data) {
+            _photoGallery.updatePhotos(arrayList);
+         }
 
-		if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
+      } else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
 
-			if (data instanceof ArrayList<?>) {
+         _photoGallery.refreshUI();
+      }
+   }
 
-				final ArrayList<?> arrayList = (ArrayList<?>) data;
+   public void refreshUI() {
+      _photoGallery.refreshUI();
+   }
 
-				_photoGallery.updatePhotos(arrayList);
-			}
+   @Override
+   public void registerContextMenu(final String menuId, final MenuManager menuManager) {
+      _picDirView.registerContextMenu(menuId, menuManager);
+   }
 
-		} else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
+   private void removeInvalidFolder(final String invalidFolderPathName) {
 
-			_photoGallery.refreshUI();
-		}
-	}
+      // search invalid folder in history
+      int invalidIndex = -1;
+      int historyIndex = 0;
+      for (final String historyFolder : _folderHistory) {
 
-	public void refreshUI() {
-		_photoGallery.refreshUI();
-	}
+         if (historyFolder.equals(invalidFolderPathName)) {
+            invalidIndex = historyIndex;
+            break;
+         }
 
-	@Override
-	public void registerContextMenu(final String menuId, final MenuManager menuManager) {
-		_picDirView.registerContextMenu(menuId, menuManager);
-	}
+         historyIndex++;
+      }
 
-	private void removeInvalidFolder(final String invalidFolderPathName) {
+      if (invalidIndex == -1) {
+         // this should not happen
+         return;
+      }
 
-		// search invalid folder in history
-		int invalidIndex = -1;
-		int historyIndex = 0;
-		for (final String historyFolder : _folderHistory) {
+      // remove invalid folder
+      _folderHistory.remove(invalidIndex);
+      _comboHistory.remove(invalidIndex);
 
-			if (historyFolder.equals(invalidFolderPathName)) {
-				invalidIndex = historyIndex;
-				break;
-			}
+      // display previously successfully loaded folder
+      final File photoFolder = _photoGallery.getPhotoFolder();
+      if (photoFolder != null) {
+         _comboHistory.setText(photoFolder.getAbsolutePath());
+      }
+   }
 
-			historyIndex++;
-		}
+   /**
+    * Checks all folders in the history and removes all folders which are not available any more.
+    */
+   private void removeInvalidFolders() {
 
-		if (invalidIndex == -1) {
-			// this should not happen
-			return;
-		}
+      final ArrayList<String> invalidFolders = new ArrayList<>();
+      final ArrayList<Integer> invalidFolderIndexes = new ArrayList<>();
 
-		// remove invalid folder
-		_folderHistory.remove(invalidIndex);
-		_comboHistory.remove(invalidIndex);
+      int folderIndex = 0;
 
-		// display previously successfully loaded folder
-		final File photoFolder = _photoGallery.getPhotoFolder();
-		if (photoFolder != null) {
-			_comboHistory.setText(photoFolder.getAbsolutePath());
-		}
-	}
+      for (final String historyFolder : _folderHistory) {
 
-	/**
-	 * Checks all folders in the history and removes all folders which are not available any more.
-	 */
-	private void removeInvalidFolders() {
+         final File folder = new File(historyFolder);
+         if (folder.isDirectory() == false) {
+            invalidFolders.add(historyFolder);
+            invalidFolderIndexes.add(folderIndex);
+         }
 
-		final ArrayList<String> invalidFolders = new ArrayList<String>();
-		final ArrayList<Integer> invalidFolderIndexes = new ArrayList<Integer>();
+         folderIndex++;
+      }
 
-		int folderIndex = 0;
+      if (invalidFolders.isEmpty()) {
+         // nothing to do
+         return;
+      }
 
-		for (final String historyFolder : _folderHistory) {
+      _folderHistory.removeAll(invalidFolders);
 
-			final File folder = new File(historyFolder);
-			if (folder.isDirectory() == false) {
-				invalidFolders.add(historyFolder);
-				invalidFolderIndexes.add(folderIndex);
-			}
+      final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
 
-			folderIndex++;
-		}
+      // remove from the end that the index numbers do not disappear
+      for (int index = invalidIndexes.length - 1; index >= 0; index--) {
+         _comboHistory.remove(invalidIndexes[index]);
+      }
+   }
 
-		if (invalidFolders.size() == 0) {
-			// nothing to do
-			return;
-		}
+   public void restoreState() {
 
-		_folderHistory.removeAll(invalidFolders);
+      _isShowOnlyPhotos = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_PHOTOS, true);
+      updateUI_Action_FolderGallery();
 
-		final Integer[] invalidIndexes = invalidFolderIndexes.toArray(new Integer[invalidFolderIndexes.size()]);
+      /*
+       * history
+       */
+      final String[] historyEntries = Util.getStateArray(_state, STATE_FOLDER_HISTORY, null);
+      if (historyEntries != null) {
 
-		// remove from the end that the index numbers do not disappear
-		for (int index = invalidIndexes.length - 1; index >= 0; index--) {
-			_comboHistory.remove(invalidIndexes[index]);
-		}
-	}
+         // update history and combo
+         for (final String history : historyEntries) {
+            _folderHistory.add(history);
+            _comboHistory.add(history);
+         }
+      }
 
-	public void restoreState() {
+      _photoGallery.restoreState();
 
-		_isShowOnlyPhotos = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_PHOTOS, true);
-		updateUI_Action_FolderGallery();
+      enableControls();
+   }
 
-		/*
-		 * history
-		 */
-		final String[] historyEntries = Util.getStateArray(_state, STATE_FOLDER_HISTORY, null);
-		if (historyEntries != null) {
+   public void saveState() {
 
-			// update history and combo
-			for (final String history : historyEntries) {
-				_folderHistory.add(history);
-				_comboHistory.add(history);
-			}
-		}
+      _state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
 
-		_photoGallery.restoreState();
+      _state.put(STATE_IS_SHOW_ONLY_PHOTOS, _isShowOnlyPhotos);
 
-		enableControls();
-	}
+      _photoGallery.saveState();
+   }
 
-	public void saveState() {
+   public void setFocus() {
+      _photoGallery.setFocus();
+   }
 
-		_state.put(STATE_FOLDER_HISTORY, _folderHistory.toArray(new String[_folderHistory.size()]));
+   @Override
+   public void setSelection(final PhotoSelection photoSelection) {
+      _picDirView.setSelection(photoSelection);
+   }
 
-		_state.put(STATE_IS_SHOW_ONLY_PHOTOS, _isShowOnlyPhotos);
+   void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
 
-		_photoGallery.saveState();
-	}
+      _photoGallery.showImages(imageFolder, isReloadFolder, false);
 
-	public void setFocus() {
-		_photoGallery.setFocus();
-	}
+      if (imageFolder != null && isFromNavigationHistory == false) {
 
-	@Override
-	public void setSelection(final PhotoSelection photoSelection) {
-		_picDirView.setSelection(photoSelection);
-	}
+         /*
+          * don't update history when navigation in the history has caused to display the images
+          */
+         updateHistory(imageFolder.getAbsolutePath());
+      }
+   }
 
-	void showImages(final File imageFolder, final boolean isFromNavigationHistory, final boolean isReloadFolder) {
+   void showRestoreFolder(final String restoreFolderName) {
+      _photoGallery.showRestoreFolder(restoreFolderName);
+   }
 
-		_photoGallery.showImages(imageFolder, isReloadFolder, false);
+   public void stopLoadingImages() {
+      _photoGallery.stopLoadingImages();
+   }
 
-		if (imageFolder != null && isFromNavigationHistory == false) {
+   void updateColors(final Color fgColor,
+                     final Color bgColor,
+                     final Color selectionFgColor,
+                     final Color noFocusSelectionFgColor,
+                     final boolean isRestore) {
 
-			/*
-			 * don't update history when navigation in the history has caused to display the images
-			 */
-			updateHistory(imageFolder.getAbsolutePath());
-		}
-	}
+      _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
 
-	void showRestoreFolder(final String restoreFolderName) {
-		_photoGallery.showRestoreFolder(restoreFolderName);
-	}
+      // combobox list entries are almost invisible when colors are set on osx
 
-	public void stopLoadingImages() {
-		_photoGallery.stopLoadingImages();
-	}
-
-	void updateColors(	final Color fgColor,
-						final Color bgColor,
-						final Color selectionFgColor,
-						final Color noFocusSelectionFgColor,
-						final boolean isRestore) {
-
-		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
-
-		// combobox list entries are almost invisible when colors are set on osx
-
-		/*
-		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
-		 * good
-		 */
-		if (UI.IS_OSX == false) {
+      /*
+       * set color in action bar only for Linux & Windows, setting color in OSX looks not very
+       * good
+       */
+      if (UI.IS_OSX == false) {
 
 //			_comboHistory.setForeground(fgColor);
 //			_comboHistory.setBackground(bgColor);
 //
 //			_galleryToolbar.setForeground(fgColor);
 //			_galleryToolbar.setBackground(bgColor);
-		}
-	}
+      }
+   }
 
-	private void updateHistory(final String newFolderPathName) {
+   private void updateHistory(final String newFolderPathName) {
 
-		int historyIndex = -1;
-		int historyCounter = 0;
+      int historyIndex = -1;
+      int historyCounter = 0;
 
-		// check if new path is already in the history
-		for (final String historyItem : _folderHistory) {
-			if (historyItem.equals(newFolderPathName)) {
-				historyIndex = historyCounter;
-				break;
-			}
-			historyCounter++;
-		}
+      // check if new path is already in the history
+      for (final String historyItem : _folderHistory) {
+         if (historyItem.equals(newFolderPathName)) {
+            historyIndex = historyCounter;
+            break;
+         }
+         historyCounter++;
+      }
 
-		if (historyIndex != -1) {
+      if (historyIndex != -1) {
 
-			// this is an existing history entry, move it to the top
+         // this is an existing history entry, move it to the top
 
-			// remove from history
-			_folderHistory.remove(historyIndex);
+         // remove from history
+         _folderHistory.remove(historyIndex);
 
-			// remove from combo
-			_comboHistory.remove(historyIndex);
-		}
+         // remove from combo
+         _comboHistory.remove(historyIndex);
+      }
 
-		// check max history size
-		int historySize = _folderHistory.size();
-		if (historySize > MAX_HISTORY_ENTRIES) {
+      // check max history size
+      int historySize = _folderHistory.size();
+      if (historySize > MAX_HISTORY_ENTRIES) {
 
-			_folderHistory.remove(historySize - 1);
-			_comboHistory.remove(historySize - 1);
-		}
+         _folderHistory.remove(historySize - 1);
+         _comboHistory.remove(historySize - 1);
+      }
 
-		// update history
-		_folderHistory.add(0, newFolderPathName);
+      // update history
+      _folderHistory.add(0, newFolderPathName);
 
-		// update combo
-		_comboHistory.add(newFolderPathName, 0);
+      // update combo
+      _comboHistory.add(newFolderPathName, 0);
 
-		// must be selected otherwise the text field can be empty when selected from the dropdown list
-		_comboHistory.select(0);
+      // must be selected otherwise the text field can be empty when selected from the dropdown list
+      _comboHistory.select(0);
 
-		/*
-		 * enabel/disable history navigation
-		 */
-		_selectedHistoryIndex = 0;
-		historySize = _folderHistory.size();
+      /*
+       * enabel/disable history navigation
+       */
+      _selectedHistoryIndex = 0;
+      historySize = _folderHistory.size();
 
-		_actionNavigateBackward.setEnabled(historySize > 1);
-		_actionNavigateForward.setEnabled(false);
+      _actionNavigateBackward.setEnabled(historySize > 1);
+      _actionNavigateForward.setEnabled(false);
 
-		_actionClearNavigationHistory.setEnabled(historySize > 1);
-		_actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
-	}
+      _actionClearNavigationHistory.setEnabled(historySize > 1);
+      _actionRemoveInvalidFoldersFromHistory.setEnabled(historySize > 1);
+   }
 
-	private void updateUI_Action_FolderGallery() {
+   private void updateUI_Action_FolderGallery() {
 
-		if (_isShowOnlyPhotos) {
+      if (_isShowOnlyPhotos) {
 
-			// show folder and gallery
+         // show folder and gallery
 
-			_actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
-			_actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
-			_actionToggleFolderGallery.setImageDescriptor(Activator
-					.getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+         _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
+         _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
+         _actionToggleFolderGallery.setImageDescriptor(Activator
+               .getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
 
-		} else {
+      } else {
 
-			// show only photos
+         // show only photos
 
-			_actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery);
-			_actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_Tooltip);
-			_actionToggleFolderGallery.setImageDescriptor(Activator
-					.getImageDescriptor(Messages.Image__PhotoFolderGallery));
-		}
+         _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery);
+         _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_Tooltip);
+         _actionToggleFolderGallery.setImageDescriptor(Activator
+               .getImageDescriptor(Messages.Image__PhotoFolderGallery));
+      }
 
-		_picDirView.setMaximizedControl(_isShowOnlyPhotos);
-	}
+      _picDirView.setMaximizedControl(_isShowOnlyPhotos);
+   }
 
-	void updateUI_StatusMessage(final String statusMessage) {
-		_photoGallery.updateUI_StatusMessage(statusMessage);
-	}
+   void updateUI_StatusMessage(final String statusMessage) {
+      _photoGallery.updateUI_StatusMessage(statusMessage);
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -184,7 +184,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
 
       // check if a tour is selected
       _selectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
-      if (_selectedTours == null || _selectedTours.size() == 0) {
+      if (_selectedTours == null || _selectedTours.isEmpty()) {
          // a tour is not selected
          return;
       }
@@ -212,7 +212,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       // ensure tags are available
       final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
-      super.setEnabled(enabled && allTags.size() > 0);
+      super.setEnabled(enabled && allTags.isEmpty() == false);
    }
 
 }

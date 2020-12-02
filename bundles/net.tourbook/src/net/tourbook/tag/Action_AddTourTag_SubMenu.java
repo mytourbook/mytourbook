@@ -307,7 +307,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          // check the tag when it's set in the tour
          final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
 
-         final boolean isModifiedTags = _modifiedTags.size() > 0;
+         final boolean isModifiedTags = _modifiedTags.isEmpty() == false;
          final boolean isSelectedTags = _selectedTourTags != null;
 
          boolean isTagChecked = false;
@@ -383,7 +383,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
       // check if a tour is selected
       _selectedTours = _tagMenuMgr.getTourProvider().getSelectedTours();
-      if (_selectedTours == null || _selectedTours.size() == 0) {
+      if (_selectedTours == null || _selectedTours.isEmpty()) {
          // a tour is not selected
          return;
       }
@@ -424,7 +424,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          fillRecentTags(menu);
 
-         final boolean isModifiedTags = _modifiedTags.size() > 0;
+         final boolean isModifiedTags = _modifiedTags.isEmpty() == false;
 
          (new Separator()).fill(menu, -1);
          {
@@ -470,7 +470,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     */
    private void fillRecentTags(final Menu menu) {
 
-      if ((TourDatabase.getAllTourTags().size() > 0)) {
+      if ((TourDatabase.getAllTourTags().isEmpty() == false)) {
 
          // tags are available
 
@@ -566,7 +566,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
    private void saveTags() {
 
-      if (_modifiedTags.size() > 0) {
+      if (_modifiedTags.isEmpty() == false) {
          _tagMenuMgr.saveTourTags(_modifiedTags, true);
       }
    }
@@ -584,7 +584,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          // ensure tags are available
          final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
-         super.setEnabled(enabled && allTags.size() > 0);
+         super.setEnabled(enabled && allTags.isEmpty() == false);
 
       } else {
 

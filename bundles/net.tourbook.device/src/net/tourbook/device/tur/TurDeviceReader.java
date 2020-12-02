@@ -294,7 +294,7 @@ public class TurDeviceReader extends TourbookDevice {
          /*
           * disable data series when no data are available
           */
-         if (timeDataList.size() > 0) {
+         if (timeDataList.isEmpty() == false) {
 
             final TimeData firstTimeData = timeDataList.get(0);
 

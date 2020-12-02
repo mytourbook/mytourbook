@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -29,49 +29,49 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionSplitTour extends Action {
 
-	private TourDataEditorView	_tourDataEditor;
+   private TourDataEditorView _tourDataEditor;
 
-	private int					_tourSplitIndex;
+   private int                _tourSplitIndex;
 
-	/**
-	 * @param tourDataEditor
-	 * @param tourProvider
-	 */
-	public ActionSplitTour(final TourDataEditorView tourDataEditor) {
+   /**
+    * @param tourDataEditor
+    * @param tourProvider
+    */
+   public ActionSplitTour(final TourDataEditorView tourDataEditor) {
 
-		_tourDataEditor = tourDataEditor;
+      _tourDataEditor = tourDataEditor;
 
-		setText(Messages.App_Action_SplitTour);
-	}
+      setText(Messages.App_Action_SplitTour);
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		// check if the tour editor contains a modified tour
-		if (TourManager.isTourEditorModified()) {
-			return;
-		}
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
-		// get tour
-		final ArrayList<TourData> selectedTours = _tourDataEditor.getSelectedTours();
-		if (selectedTours == null || selectedTours.size() == 0) {
-			return;
-		}
+      // get tour
+      final ArrayList<TourData> selectedTours = _tourDataEditor.getSelectedTours();
+      if (selectedTours == null || selectedTours.isEmpty()) {
+         return;
+      }
 
-		// check person
-		if (PersonManager.isPersonAvailable() == false) {
-			return;
-		}
+      // check person
+      if (PersonManager.isPersonAvailable() == false) {
+         return;
+      }
 
-		new DialogExtractTour(
-				Display.getCurrent().getActiveShell(),
-				selectedTours.get(0),
-				_tourSplitIndex,
-				-1,
-				_tourDataEditor).open();
-	}
+      new DialogExtractTour(
+            Display.getCurrent().getActiveShell(),
+            selectedTours.get(0),
+            _tourSplitIndex,
+            -1,
+            _tourDataEditor).open();
+   }
 
-	public void setTourRange(final int tourSplitIndex) {
-		_tourSplitIndex = tourSplitIndex;
-	}
+   public void setTourRange(final int tourSplitIndex) {
+      _tourSplitIndex = tourSplitIndex;
+   }
 }
