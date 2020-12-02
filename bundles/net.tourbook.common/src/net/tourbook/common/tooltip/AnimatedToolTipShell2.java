@@ -846,7 +846,7 @@ public abstract class AnimatedToolTipShell2 {
     */
    private void closeOldShells(final boolean isWithFadeOut) {
 
-      if (_oldShells.size() == 0) {
+      if (_oldShells.isEmpty()) {
          // nothing to do
          return;
       }
@@ -912,7 +912,7 @@ public abstract class AnimatedToolTipShell2 {
 
          _oldShells.removeAll(disposedShells);
 
-         if (_oldShells.size() > 0) {
+         if (_oldShells.isEmpty() == false) {
 
             // there are still visible shells
             _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);

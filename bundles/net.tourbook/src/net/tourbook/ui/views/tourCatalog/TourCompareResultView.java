@@ -274,7 +274,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                   final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
                   getComparedTours(comparedTours, _rootItem, compareIds);
 
-                  if (comparedTours.size() > 0) {
+                  if (comparedTours.isEmpty() == false) {
 
                      final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
 
@@ -984,7 +984,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final Set<TourTag> tourTags = ((TVICompareResultComparedTour) element).comparedTourData
                      .getTourTags();
-               if (tourTags.size() == 0) {
+               if (tourTags.isEmpty()) {
 
                   // the tags could have been removed, set empty field
 
@@ -1154,7 +1154,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
       // action: tour type
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
 
       // tags: add/remove/remove all
       Set<TourTag> allExistingTags = null;
@@ -1401,7 +1401,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             // ref tour is selected
 
             final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
-            if (refChildren.size() > 0) {
+            if (refChildren.isEmpty() == false) {
 
                // navigate to the first child and ignore direction
 
@@ -1464,7 +1464,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
          final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
 
-         if (persistedCompareResults.size() > 0) {
+         if (persistedCompareResults.isEmpty() == false) {
 
             final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
 
@@ -1538,7 +1538,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          }
       }
 
-      if (removedComparedTours.size() > 0) {
+      if (removedComparedTours.isEmpty() == false) {
 
          _postSelectionProvider.setSelection(selectionRemovedCompareTours);
 
@@ -1554,7 +1554,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       /*
        * return when there are no removed tours or when the selection has not changed
        */
-      if (removedTourCompareIds.size() == 0 || removedTourSelection == _oldRemoveSelection) {
+      if (removedTourCompareIds.isEmpty() || removedTourSelection == _oldRemoveSelection) {
          return;
       }
 

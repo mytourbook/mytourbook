@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1109,7 +1109,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void enableControls() {
 
-      boolean isTourAvailable = _allSelectedTours.size() > 0;
+      boolean isTourAvailable = _allSelectedTours.isEmpty() == false;
       isTourAvailable = true;
 
       _action_CollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
@@ -1213,7 +1213,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             final TVIPrefTagCategory tagCategory = (TVIPrefTagCategory) tvItem;
             final ArrayList<TreeViewerItem> tagCategoryChildren = tagCategory.getFetchedChildren();
 
-            if (tagCategoryChildren.size() > 0) {
+            if (tagCategoryChildren.isEmpty() == false) {
 
                final boolean isTagFound = getTagItems(tagCategoryChildren, tagItems, tagId);
 
@@ -1267,7 +1267,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.size());
 
-      if (tagIds.size() > 0) {
+      if (tagIds.isEmpty() == false) {
 
          // get all tag viewer items which should be checked
 
@@ -1755,7 +1755,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       // try to use selection from selection service
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-      if (_allSelectedTours.size() == 0) {
+      if (_allSelectedTours.isEmpty()) {
 
          // a tour is not displayed, find a tour provider which provides a tour
          Display.getCurrent().asyncExec(new Runnable() {
@@ -1770,12 +1770,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                /*
                 * check if tour was set from a selection provider
                 */
-               if (_allSelectedTours.size() > 0) {
+               if (_allSelectedTours.isEmpty() == false) {
                   return;
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.size() > 0) {
+               if (selectedTours != null && selectedTours.isEmpty() == false) {
                   setSelectedTours(selectedTours);
                   updateUI_Tags();
                }
@@ -1987,7 +1987,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          final Set<TourTag> allTourTags = tourData.getTourTags();
 
-         if (allTourTags != null && allTourTags.size() > 0) {
+         if (allTourTags != null && allTourTags.isEmpty() == false) {
 
             _allTaggedTours.add(tourData);
 
@@ -2007,7 +2007,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
        */
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(_allCheckedTagIds.size());
 
-      if (_allCheckedTagIds.size() > 0) {
+      if (_allCheckedTagIds.isEmpty() == false) {
 
          final ArrayList<TreeViewerItem> rootItems = _rootItem.getFetchedChildren();
 

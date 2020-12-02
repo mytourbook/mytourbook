@@ -2272,7 +2272,7 @@ public class Map extends Canvas {
       }
 
       final ArrayList<Rectangle> allPainted_HoveredRectangleList = hoveredTile.allPainted_HoverRectangle;
-      if (allPainted_HoveredRectangleList.size() == 0) {
+      if (allPainted_HoveredRectangleList.isEmpty()) {
 
          // nothing is painted in this tile
          return false;
@@ -2340,7 +2340,7 @@ public class Map extends Canvas {
          ((IHoveredTourListener) listener).setHoveredTourId(event);
       }
 
-      if (_allHoveredTourIds.size() > 0) {
+      if (_allHoveredTourIds.isEmpty() == false) {
 
          return true;
 
@@ -2714,7 +2714,7 @@ public class Map extends Canvas {
 
          setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
 
-      } else if (_allHoveredTourIds.size() > 0) {
+      } else if (_allHoveredTourIds.isEmpty() == false) {
 
          if (_allHoveredTourIds.size() == 1) {
 
@@ -4230,7 +4230,7 @@ public class Map extends Canvas {
                   final long currentTime = System.currentTimeMillis();
 
                   if (currentTime > _nextOverlayRedrawTime + 50) {
-                     if (_tileOverlayPaintQueue.size() > 0) {
+                     if (_tileOverlayPaintQueue.isEmpty() == false) {
 
                         // create overlay images
                         paint_Overlay_10_RunThread();
@@ -4532,7 +4532,7 @@ public class Map extends Canvas {
       final int maxTiles = (int) Math.pow(2, tileZoom);
 
       final ArrayList<Rectangle> partMarkerBounds = tile.getPartMarkerBounds(tileZoom);
-      final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.size() > 0;
+      final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.isEmpty() == false;
 
       for (int yIndex = 0; yIndex < 3; yIndex++) {
          for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -5082,7 +5082,7 @@ public class Map extends Canvas {
 
       if (tile.isLoadingError()
             || tile.isOfflineError()
-            || ((childrenWithErrors != null) && (childrenWithErrors.size() > 0))) {
+            || ((childrenWithErrors != null) && (childrenWithErrors.isEmpty() == false))) {
 
          paint_TileInfo_Error(gc, devTileViewport, tile);
 
@@ -5146,7 +5146,7 @@ public class Map extends Canvas {
       }
 
       final ConcurrentHashMap<String, Tile> childrenLoadingError = tile.getChildrenWithErrors();
-      if ((childrenLoadingError != null) && (childrenLoadingError.size() > 0)) {
+      if ((childrenLoadingError != null) && (childrenLoadingError.isEmpty() == false)) {
 
          for (final Tile childTile : childrenLoadingError.values()) {
             sb.append(childTile.getLoadingError());

@@ -424,7 +424,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
          return;
       }
 
-      if (statContext.appPerson.getHrZonesSorted().size() == 0) {
+      if (statContext.appPerson.getHrZonesSorted().isEmpty()) {
          _chart.setErrorMessage(NLS.bind(
                Messages.Statistic_HrZone_Error_NoHrZoneInPerson,
                statContext.appPerson.getName()));

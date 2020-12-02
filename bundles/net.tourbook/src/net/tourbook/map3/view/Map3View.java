@@ -697,7 +697,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+               if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
                   updateModifiedTours(modifiedTours);
                }
 
@@ -1002,7 +1002,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
                _lastHiddenSelection = null;
 
-            } else if (_allTours.size() == 0) {
+            } else if (_allTours.isEmpty()) {
 
                // a tour is not displayed, find a tour provider which provides a tour
                showToursFromTourProvider();
@@ -1185,7 +1185,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
       final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
 
-      final boolean isTourAvailable = _allTours.size() > 0;
+      final boolean isTourAvailable = _allTours.isEmpty() == false;
       final boolean canTourBeDisplayed = isTrackVisible && isTourAvailable;
 
       final boolean isPulsePresent = _allTours.stream().anyMatch(t -> t.pulseSerie != null);
@@ -1224,7 +1224,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
 
       final boolean isTourSelected = selectedTrack != null;
-      final boolean isTourAvailable = _allTours.size() > 0;
+      final boolean isTourAvailable = _allTours.isEmpty() == false;
       final boolean isTrackPositionHovered = _currentHoveredTrack != null && _currentHoveredTrackPosition != null;
 
       _actionSetTrackSliderLeft.setEnabled(isTrackPositionHovered);
@@ -1472,7 +1472,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       if (selectedTrack == null) {
 
-         if (_allTours.size() == 0) {
+         if (_allTours.isEmpty()) {
 
             return null;
 
@@ -1717,7 +1717,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // paint all selected tours
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             clearView();
 
@@ -1806,7 +1806,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void restoreState() {
 
-      final boolean isTourAvailable = _allTours.size() > 0;
+      final boolean isTourAvailable = _allTours.isEmpty() == false;
 
       // sync map with tour
       _isMapSynched_WithTour = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, true);
@@ -2162,7 +2162,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
-         final boolean isTourAvailable = _allTours.size() > 0;
+         final boolean isTourAvailable = _allTours.isEmpty() == false;
 
          Map3Manager.getLayer_TourLegend().updateLegendImage(isTourAvailable);
 
@@ -2320,7 +2320,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             }
 
             // check if tour is set from a selection provider
-            if (_allTours.size() > 0) {
+            if (_allTours.isEmpty() == false) {
                return;
             }
 

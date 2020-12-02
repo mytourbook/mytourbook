@@ -1922,7 +1922,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -2139,7 +2139,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -3090,7 +3090,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          public void menuAboutToShow(final IMenuManager menuMgr) {
 
             final Set<TourTag> tourTags = _tourData.getTourTags();
-            final boolean isTagInTour = tourTags.size() > 0;
+            final boolean isTagInTour = tourTags.isEmpty() == false;
 
             _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
@@ -5859,7 +5859,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if ((selectedTours != null) && (selectedTours.size() > 0)) {
+               if ((selectedTours != null) && (selectedTours.isEmpty() == false)) {
 
                   // get first tour, this view shows only one tour
                   displayTour(selectedTours.get(0));
@@ -6005,7 +6005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
       final Object[] selectedTimeSlices = selection.toArray();
@@ -7289,7 +7289,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (tourIds.isEmpty() == false)) {
             displayTour(tourIds.get(0));
          }
 
@@ -7394,7 +7394,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if ((tourIds != null) && (tourIds.isEmpty() == false)) {
 
             _selectionTourId = tourIds.get(0);
 
@@ -8275,7 +8275,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    @Override
    public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
-      if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+      if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
 
          // check if it's the correct tour
          if (_tourData == modifiedTours.get(0)) {
@@ -8723,7 +8723,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void updateUI_ReferenceTourRanges() {
 
       final Collection<TourReference> refTours = _tourData.getTourReferences();
-      if (refTours.size() > 0) {
+      if (refTours.isEmpty() == false) {
          final ArrayList<TourReference> refTourList = new ArrayList<>(refTours);
 
          // sort reference tours by start index

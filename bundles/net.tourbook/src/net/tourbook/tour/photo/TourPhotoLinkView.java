@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -379,7 +379,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
                final ArrayList<Photo> linkPhotos = photoLink.linkPhotos;
 
-               if (linkPhotos.size() > 0) {
+               if (linkPhotos.isEmpty() == false) {
 
                   final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
@@ -1284,7 +1284,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void enableControls() {
 
-      final boolean isPhotoAvailable = _allPhotos.size() > 0;
+      final boolean isPhotoAvailable = _allPhotos.isEmpty() == false;
       final boolean isOneHistory = _actionFilterOneHistory.isChecked();
       final boolean isNoHistory = !isOneHistory;
       final boolean isPhotoFilter = isPhotoAvailable && isNoHistory;
@@ -1440,7 +1440,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void onSelectTimeAdjustment() {
 
-      if (_selectedLinks.size() == 0) {
+      if (_selectedLinks.isEmpty()) {
          // a tour is not selected
          return;
       }
@@ -1488,7 +1488,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                selectedTourIds.add(selectedLink.tourId);
             }
 
-            if (isRealTour && selectedLink.linkPhotos.size() > 0) {
+            if (isRealTour && selectedLink.linkPhotos.isEmpty() == false) {
 
                final TourData tourData = TourManager.getInstance().getTourData(selectedLink.tourId);
 
@@ -1587,7 +1587,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void selectTour(final TourPhotoLink prevTourPhotoLink) {
 
-      if (_visibleTourPhotoLinks.size() == 0) {
+      if (_visibleTourPhotoLinks.isEmpty()) {
          return;
       }
 
@@ -1627,7 +1627,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          TourPhotoLink linkSelection = null;
 
          final ArrayList<Photo> tourPhotos = prevTourPhotoLink.linkPhotos;
-         if (tourPhotos.size() > 0) {
+         if (tourPhotos.isEmpty() == false) {
 
             // get tour for the first photo
 
@@ -1805,14 +1805,14 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
                          final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected) {
 
-      if (_allPhotos.size() == 0) {
+      if (_allPhotos.isEmpty()) {
          // view is not fully initialized, this happend in the pref listener
          return;
       }
 
       // get previous selected tour
       final TourPhotoLink prevTourPhotoLink[] = { null };
-      if (tourPhotoLinksWhichShouldBeSelected != null && tourPhotoLinksWhichShouldBeSelected.size() > 0) {
+      if (tourPhotoLinksWhichShouldBeSelected != null && tourPhotoLinksWhichShouldBeSelected.isEmpty() == false) {
          prevTourPhotoLink[0] = tourPhotoLinksWhichShouldBeSelected.get(0);
       }
 
@@ -1857,7 +1857,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
             updateAnnotationsInPicDirView();
 
-            if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
+            if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.isEmpty() == false) {
 
                _tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
 

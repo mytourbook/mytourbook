@@ -376,7 +376,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
 
-      if (tourTypes == null || tourTypes.size() == 0) {
+      if (tourTypes == null || tourTypes.isEmpty()) {
          return;
       }
 

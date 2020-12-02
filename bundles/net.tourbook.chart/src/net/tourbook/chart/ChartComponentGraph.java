@@ -526,7 +526,7 @@ public class ChartComponentGraph extends Canvas {
 
       boolean[] selectedBarItems;
 
-      if (_allGraphDrawingData.size() == 0) {
+      if (_allGraphDrawingData.isEmpty()) {
          selectedBarItems = null;
       } else {
 
@@ -1210,7 +1210,7 @@ public class ChartComponentGraph extends Canvas {
 //       * check if the mouse has reached the left or right border
 //       */
 //      if (_graphDrawingData == null
-//            || _graphDrawingData.size() == 0
+//            || _graphDrawingData.isEmpty()
 //            || _hoveredLineValueIndex == 0
 //            || _hoveredLineValueIndex == _graphDrawingData.get(0).getXData()._highValues.length - 1) {
 //
@@ -1501,7 +1501,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      if (_allGraphDrawingData.size() == 0) {
+      if (_allGraphDrawingData.isEmpty()) {
          // drawing data are not set
          return;
       }
@@ -3178,7 +3178,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * paint skipped values
        */
-      if (isShowSkippedValues && skippedValues.size() > 0) {
+      if (isShowSkippedValues && skippedValues.isEmpty() == false) {
          for (final Point skippedPoint : skippedValues) {
             gc.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
          }
@@ -4336,7 +4336,7 @@ public class ChartComponentGraph extends Canvas {
 //      System.out.println(UI.timeStampNano() + " drawSync_000_onPaint: START");
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
-      if (_allGraphDrawingData == null || _allGraphDrawingData.size() == 0) {
+      if (_allGraphDrawingData == null || _allGraphDrawingData.isEmpty()) {
 
          // fill the image area when there is no graphic
          gc.setBackground(_chart.getBackgroundColor());
@@ -4665,7 +4665,7 @@ public class ChartComponentGraph extends Canvas {
             _isHoveredBarDirty = false;
          }
 
-         if (_hoveredValuePointIndex != -1 && _lineDevPositions.size() > 0) {
+         if (_hoveredValuePointIndex != -1 && _lineDevPositions.isEmpty() == false) {
 
             // hovered lines are set -> draw it
             drawSync_460_HoveredLine(gcOverlay);
@@ -5594,7 +5594,7 @@ public class ChartComponentGraph extends Canvas {
              * This feature is used to optimize painting is currently used for tour markers and
              * photos.
              */
-            if (customFgLayers.size() == 0) {
+            if (customFgLayers.isEmpty()) {
                continue;
             }
 
@@ -5779,7 +5779,7 @@ public class ChartComponentGraph extends Canvas {
     * @return Returns the x-Data in the drawing data list
     */
    private ChartDataXSerie getXData() {
-      if (_allGraphDrawingData.size() == 0) {
+      if (_allGraphDrawingData.isEmpty()) {
          return null;
       } else {
          return _allGraphDrawingData.get(0).getXData();
@@ -8008,7 +8008,7 @@ public class ChartComponentGraph extends Canvas {
     */
    private void setHoveredLineValue() {
 
-      if (_lineDevPositions.size() == 0) {
+      if (_lineDevPositions.isEmpty()) {
          return;
       }
 
@@ -8060,7 +8060,7 @@ public class ChartComponentGraph extends Canvas {
 
          // set focus to first bar item
 
-         if (_allGraphDrawingData.size() == 0) {
+         if (_allGraphDrawingData.isEmpty()) {
             _selectedBarItems = null;
          } else {
 
@@ -8300,7 +8300,7 @@ public class ChartComponentGraph extends Canvas {
     */
    private void switchSliderTo2ndXData(final ChartXSlider slider) {
 
-      if (_allGraphDrawingData.size() == 0) {
+      if (_allGraphDrawingData.isEmpty()) {
          return;
       }
 

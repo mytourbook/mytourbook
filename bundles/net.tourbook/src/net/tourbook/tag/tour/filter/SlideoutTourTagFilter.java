@@ -1510,7 +1510,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             final TVIPrefTagCategory tagCategory = (TVIPrefTagCategory) tvItem;
             final ArrayList<TreeViewerItem> tagCategoryChildren = tagCategory.getFetchedChildren();
 
-            if (tagCategoryChildren.size() > 0) {
+            if (tagCategoryChildren.isEmpty() == false) {
 
                final boolean isTagFound = getTagItems(tagCategoryChildren, tagItems, tagId);
 
@@ -1583,7 +1583,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.size());
 
-      if (tagIds.size() > 0) {
+      if (tagIds.isEmpty() == false) {
 
          // get all tag viewer items which should be checked
 

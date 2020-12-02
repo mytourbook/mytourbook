@@ -472,7 +472,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
       } else {
 
          // select first ref tour
-         if (_refTours.size() > 0) {
+         if (_refTours.isEmpty() == false) {
             _refTourViewer.setSelection(new StructuredSelection(_refTours.get(0)), true);
          }
       }

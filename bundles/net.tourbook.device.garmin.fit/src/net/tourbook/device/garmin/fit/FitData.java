@@ -179,7 +179,7 @@ public class FitData {
    public void finalizeTour() {
 
       // reset speed at first position
-      if (_allTimeData.size() > 0) {
+      if (_allTimeData.isEmpty() == false) {
          _allTimeData.get(0).speed = Float.MIN_VALUE;
       }
 
@@ -195,7 +195,7 @@ public class FitData {
       _tourData.setDeviceTimeInterval((short) -1);
 
       long recordStartTime;
-      if (_allTimeData.size() > 0) {
+      if (_allTimeData.isEmpty() == false) {
 
          // this is the normal case
 
@@ -358,7 +358,7 @@ public class FitData {
          }
       }
 
-      if (validatedGearList.size() > 0) {
+      if (validatedGearList.isEmpty() == false) {
 
          // set end gear
          final GearData lastGearData = validatedGearList.get(validatedGearList.size() - 1);
@@ -377,7 +377,7 @@ public class FitData {
 
    private void finalizeTour_Marker(final TourData tourData, final List<TourMarker> allTourMarkers) {
 
-      if (allTourMarkers == null || allTourMarkers.size() == 0) {
+      if (allTourMarkers == null || allTourMarkers.isEmpty()) {
          return;
       }
 

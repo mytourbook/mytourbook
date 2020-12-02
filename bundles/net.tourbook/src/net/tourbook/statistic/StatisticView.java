@@ -836,7 +836,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       // add all years of the tours and the current year
       final int thisYear = LocalDate.now().getYear();
 
-      int firstYear = allAvailableYears.size() > 0
+      int firstYear = allAvailableYears.isEmpty() == false
             ? allAvailableYears.get(0)
             : thisYear;
 
@@ -866,7 +866,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    void restoreState() {
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return;
       }
 
@@ -909,7 +909,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private void saveState() {
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return;
       }
 
@@ -970,7 +970,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       }
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return false;
       }
 

@@ -191,7 +191,7 @@ public class ActionSaveTourInDatabase extends Action {
       dialog.create();
 
       // disable ok button when no people are available
-      if (_people.size() == 0) {
+      if (_people.isEmpty()) {
          dialog.getOkButton().setEnabled(false);
       }
 

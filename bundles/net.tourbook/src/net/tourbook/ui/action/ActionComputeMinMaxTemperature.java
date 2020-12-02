@@ -71,7 +71,7 @@ public class ActionComputeMinMaxTemperature extends Action {
       // Performed in %.3f s
       TourLogManager.logDefault(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
 
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // tours are not selected -> this can occure when loading tour data is canceled
 

@@ -176,7 +176,7 @@ public class FTSearchManager {
          __indexReader = indexReader;
          __docCount = __indexReader.maxDoc() - 1;
 
-         __liveDocs = (__indexReader.leaves().size() > 0) ? MultiFields.getLiveDocs(__indexReader) : null;
+         __liveDocs = (__indexReader.leaves().isEmpty() == false) ? MultiFields.getLiveDocs(__indexReader) : null;
 
          __fieldsToLoad = new HashSet<>();
          __fieldsToLoad.add(SEARCH_FIELD_TITLE);
@@ -1050,7 +1050,7 @@ public class FTSearchManager {
                                            final int[] docids,
                                            final int docStartIndex) throws IOException {
 
-      if (highlights.size() == 0) {
+      if (highlights.isEmpty()) {
          return;
       }
 

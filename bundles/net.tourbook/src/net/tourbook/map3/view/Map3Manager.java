@@ -1335,7 +1335,7 @@ public class Map3Manager {
       }
 
       // update UI
-      if (_map3LayerSlideout != null && insertedLayers.size() > 0) {
+      if (_map3LayerSlideout != null && insertedLayers.isEmpty() == false) {
          _map3LayerSlideout.updateUI_NewLayer(insertedLayers);
       }
 
