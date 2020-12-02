@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,25 +21,25 @@ import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSyncMap_WithSlider_One extends Action {
+public class ActionSyncMapWith_ValuePoint extends Action {
 
    private Map2View _map2View;
 
-   public ActionSyncMap_WithSlider_One(final Map2View map2View) {
+   public ActionSyncMapWith_ValuePoint(final Map2View map2View) {
 
       super(null, AS_CHECK_BOX);
 
       _map2View = map2View;
 
-      setToolTipText(Messages.map_action_synch_with_slider);
+      setToolTipText(Messages.Map_Action_SynchWith_ValuePoint);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint_Disabled));
    }
 
    @Override
    public void run() {
-      _map2View.action_SyncWith_ChartSlider(false);
+      _map2View.action_SyncWith_ValuePoint();
    }
 
 }

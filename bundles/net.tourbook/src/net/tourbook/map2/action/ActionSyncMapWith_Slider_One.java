@@ -21,25 +21,25 @@ import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSyncMap_WithSlider_Centered extends Action {
+public class ActionSyncMapWith_Slider_One extends Action {
 
    private Map2View _map2View;
 
-   public ActionSyncMap_WithSlider_Centered(final Map2View map2View) {
+   public ActionSyncMapWith_Slider_One(final Map2View map2View) {
 
       super(null, AS_CHECK_BOX);
 
       _map2View = map2View;
 
-      setToolTipText(Messages.Map_Action_SynchWithSlider_Centered);
+      setToolTipText(Messages.map_action_synch_with_slider);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled));
    }
 
    @Override
    public void run() {
-      _map2View.action_SyncWith_ChartSlider(true);
+      _map2View.action_SyncWith_ChartSlider(false);
    }
 
 }

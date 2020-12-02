@@ -17,11 +17,9 @@ package net.tourbook.map2.view;
 
 public enum MapSyncId {
 
+   SyncMapWith_Tour, //
+   SyncMapWith_ValuePoint, //
    SyncMapWith_ChartSlider_One, //
    SyncMapWith_ChartSlider_Centered, //
-
    SyncMapWith_OtherMap, //
-
-   SyncMapWith_Tour, // 
-
 }

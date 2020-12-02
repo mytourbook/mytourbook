@@ -85,16 +85,11 @@ public class Slideout_Map2_SyncMap extends ToolbarSlideout {
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-
          final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-//         GridDataFactory.fillDefaults()
-//               .grab(true, false)
-//               .align(SWT.END, SWT.BEGINNING)
-//               .applyTo(toolbar);
-
          final ToolBarManager tbm = new ToolBarManager(toolbar);
 
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Tour));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ValuePoint));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ChartSlider_One));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ChartSlider_Centered));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_OtherMap));
