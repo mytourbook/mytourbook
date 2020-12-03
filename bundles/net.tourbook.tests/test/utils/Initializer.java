@@ -15,13 +15,11 @@
  *******************************************************************************/
 package utils;
 
-import de.byteholder.geoclipse.map.UI;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
+import net.tourbook.common.UI;
 import org.xml.sax.SAXException;
 
 public class Initializer {
