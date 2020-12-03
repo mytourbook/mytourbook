@@ -91,7 +91,7 @@ class GPX_SAX_HandlerTest {
 
       parser.parse(gpx, handler);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
       final Set<TourWayPoint> tourWayPoints = tour.getTourWayPoints();
 
