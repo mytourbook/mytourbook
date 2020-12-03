@@ -234,6 +234,8 @@ public class Map2View extends ViewPart implements
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT           = true;
    static final String           STATE_IS_ZOOM_WITH_MOUSE_POSITION                     = "STATE_IS_ZOOM_WITH_MOUSE_POSITION";                   //$NON-NLS-1$
    static final boolean          STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT             = true;
+   private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";//$NON-NLS-1$
+   private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
    //
    private static final String   STATE_IS_SYNC_MAP2_WITH_OTHER_MAP                     = "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";                   //$NON-NLS-1$
    private static final String   STATE_IS_SYNC_WITH_PHOTO                              = "STATE_IS_SYNC_WITH_PHOTO";                            //$NON-NLS-1$
@@ -309,6 +311,7 @@ public class Map2View extends ViewPart implements
 
          MapGraphId.HrZone,
    };
+
 
 
 // SET_FORMATTING_ON
@@ -411,15 +414,18 @@ public class Map2View extends ViewPart implements
    private SliderPathPaintingData            _sliderPathPaintingData;
    private OpenDialogManager                 _openDlgMgr           = new OpenDialogManager();
    //
+   /**
+    * Keep map sync mode when map sync action get's unchecked
+    */
+   private MapSyncMode                       _currentMapSyncMode   = MapSyncMode.IsSyncWith_NONE;
    private boolean                           _isInMapSync;
-   private boolean                           _isMapSynchedWith_ChartSlider_One;
-   private boolean                           _isMapSynchedWith_ChartSlider_IsCentered;
-   private boolean                           _isMapSynchedWith_OtherMap;
-   private boolean                           _isMapSynchedWith_Photo;
-   private boolean                           _isMapSynchedWith_Tour;
-   private boolean                           _isMapSynchedWith_ValuePoint;
+   private boolean                           _isMapSyncWith_ChartSlider_One;
+   private boolean                           _isMapSyncWith_ChartSlider_Centered;
+   private boolean                           _isMapSyncWith_OtherMap;
+   private boolean                           _isMapSyncWith_Photo;
+   private boolean                           _isMapSyncWith_Tour;
+   private boolean                           _isMapSyncWith_ValuePoint;
    private long                              _lastFiredSyncEventTime;
-   private MapSyncMode                       _mapSyncMode;
    //
    private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
    private ActionTourColor                   _actionTourColor_Altitude;
@@ -614,13 +620,17 @@ public class Map2View extends ViewPart implements
 
    private enum MapSyncMode {
 
-      IsSyncWith_NONE, //
+      IsSyncWith_Tour,
 
-      IsSyncWith_Tour, //
-      IsSyncWith_ValuePoint, //
-      IsSyncWith_ChartSlider_One, //
-      IsSyncWith_ChartSlider_Center, //
-      IsSyncWith_OtherMap, //
+      IsSyncWith_ValuePoint,
+
+      IsSyncWith_ChartSlider_One,
+
+      IsSyncWith_ChartSlider_Center,
+
+      IsSyncWith_OtherMap,
+
+      IsSyncWith_NONE,
    }
 
    public Map2View() {}
@@ -636,37 +646,37 @@ public class Map2View extends ViewPart implements
          // sync with both centered sliders
 
          _actionSyncMapWith_ChartSlider_One.setChecked(false);
-         _mapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_Center;
+         _currentMapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_Center;
 
       } else {
 
          // sync with one slider
 
          _actionSyncMapWith_ChartSlider_Centered.setChecked(false);
-         _mapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_One;
+         _currentMapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_One;
       }
 
       /*
        * Change state
        */
-      _isMapSynchedWith_ChartSlider_One = isChecked_One || isChecked_Center;
-      _isMapSynchedWith_ChartSlider_IsCentered = isActionCentered;
+      _isMapSyncWith_ChartSlider_One = isChecked_One || isChecked_Center;
+      _isMapSyncWith_ChartSlider_Centered = isActionCentered;
 
       // ensure data are available
       if (_allTourData.isEmpty()) {
          return;
       }
 
-      if (_isMapSynchedWith_ChartSlider_One) {
+      if (_isMapSyncWith_ChartSlider_One) {
 
-         deactivateMapSync();
+         deactivateSyncWith_OtherMap();
          deactivatePhotoSync();
          deactivateSyncWith_ValuePoint();
 
          _actionShowTour.setSelection(true);
 
          // map must be synched with selected tour
-         _isMapSynchedWith_Tour = true;
+         _isMapSyncWith_Tour = true;
          _actionSyncMapWith_Tour.setChecked(true);
 
          _map.setShowOverlays(true);
@@ -681,23 +691,23 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_UpdateUI();
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ChartSlider_One);
    }
 
    public void action_SyncWith_OtherMap(final boolean isSelected) {
 
-      _isMapSynchedWith_OtherMap = isSelected;
-      _mapSyncMode = MapSyncMode.IsSyncWith_OtherMap;
+      _isMapSyncWith_OtherMap = isSelected;
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_OtherMap;
 
-      if (_isMapSynchedWith_OtherMap) {
+      if (_isMapSyncWith_OtherMap) {
 
          deactivatePhotoSync();
-         deactivateTourSync();
-         deactivateSliderSync();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_Slider();
          deactivateSyncWith_ValuePoint();
       }
 
-      syncMap_UpdateUI();
+      syncMap_ShowCurrentSyncModeImage(isSelected);
    }
 
    /**
@@ -705,13 +715,13 @@ public class Map2View extends ViewPart implements
     */
    public void action_SyncWith_Photo() {
 
-      _isMapSynchedWith_Photo = _actionSyncMapWith_Photo.isChecked();
+      _isMapSyncWith_Photo = _actionSyncMapWith_Photo.isChecked();
 
-      if (_isMapSynchedWith_Photo) {
+      if (_isMapSyncWith_Photo) {
 
-         deactivateMapSync();
-         deactivateTourSync();
-         deactivateSliderSync();
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_Slider();
          deactivateSyncWith_ValuePoint();
 
          centerPhotos(_filteredPhotos, false);
@@ -719,23 +729,23 @@ public class Map2View extends ViewPart implements
          _map.paint();
       }
 
-      syncMap_UpdateUI();
+      syncMap_ShowCurrentSyncModeImage(false);
 
       enableActions(true);
    }
 
    public void action_SyncWith_Tour() {
 
-      _isMapSynchedWith_Tour = _actionSyncMapWith_Tour.isChecked();
-      _mapSyncMode = MapSyncMode.IsSyncWith_Tour;
+      _isMapSyncWith_Tour = _actionSyncMapWith_Tour.isChecked();
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_Tour;
 
       if (_allTourData.isEmpty()) {
          return;
       }
 
-      if (_isMapSynchedWith_Tour) {
+      if (_isMapSyncWith_Tour) {
 
-         deactivateMapSync();
+         deactivateSyncWith_OtherMap();
          deactivatePhotoSync();
 
          // force tour to be repainted, that it is synched immediately
@@ -748,32 +758,32 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         deactivateSliderSync();
+         deactivateSyncWith_Slider();
          deactivateSyncWith_ValuePoint();
       }
 
-      syncMap_UpdateUI();
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Tour);
    }
 
    public void action_SyncWith_ValuePoint() {
 
-      _isMapSynchedWith_ValuePoint = _actionSyncMapWith_ValuePoint.isChecked();
-      _mapSyncMode = MapSyncMode.IsSyncWith_ValuePoint;
+      _isMapSyncWith_ValuePoint = _actionSyncMapWith_ValuePoint.isChecked();
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_ValuePoint;
 
       if (_allTourData.isEmpty()) {
          return;
       }
 
-      if (_isMapSynchedWith_ValuePoint) {
+      if (_isMapSyncWith_ValuePoint) {
 
-         deactivateMapSync();
+         deactivateSyncWith_OtherMap();
          deactivatePhotoSync();
-         deactivateSliderSync();
+         deactivateSyncWith_Slider();
 
          _actionShowTour.setSelection(true);
 
          // map must be synched with selected tour
-         _isMapSynchedWith_Tour = true;
+         _isMapSyncWith_Tour = true;
          _actionSyncMapWith_Tour.setChecked(true);
 
          _map.setShowOverlays(true);
@@ -788,7 +798,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_UpdateUI();
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ValuePoint);
    }
 
    public void actionDimMap(final int dimLevel) {
@@ -1847,44 +1857,44 @@ public class Map2View extends ViewPart implements
       });
    }
 
-   private void deactivateMapSync() {
-
-      // disable map sync
-
-      _isMapSynchedWith_OtherMap = false;
-      _actionSyncMapWith_OtherMap.setChecked(false);
-   }
-
    private void deactivatePhotoSync() {
 
       // disable photo sync
 
-      _isMapSynchedWith_Photo = false;
+      _isMapSyncWith_Photo = false;
       _actionSyncMapWith_Photo.setChecked(false);
    }
 
-   private void deactivateSliderSync() {
+   private void deactivateSyncWith_OtherMap() {
+
+      // disable map sync
+
+      _isMapSyncWith_OtherMap = false;
+      _actionSyncMapWith_OtherMap.setChecked(false);
+   }
+
+   private void deactivateSyncWith_Slider() {
 
       // disable slider sync
 
-      _isMapSynchedWith_ChartSlider_One = false;
+      _isMapSyncWith_ChartSlider_One = false;
 
       _actionSyncMapWith_ChartSlider_One.setChecked(false);
       _actionSyncMapWith_ChartSlider_Centered.setChecked(false);
    }
 
-   private void deactivateSyncWith_ValuePoint() {
-
-      _isMapSynchedWith_ValuePoint = false;
-      _actionSyncMapWith_ValuePoint.setChecked(false);
-   }
-
-   private void deactivateTourSync() {
+   private void deactivateSyncWith_Tour() {
 
       // disable tour sync
 
-      _isMapSynchedWith_Tour = false;
+      _isMapSyncWith_Tour = false;
       _actionSyncMapWith_Tour.setChecked(false);
+   }
+
+   private void deactivateSyncWith_ValuePoint() {
+
+      _isMapSyncWith_ValuePoint = false;
+      _actionSyncMapWith_ValuePoint.setChecked(false);
    }
 
    @Override
@@ -1986,7 +1996,13 @@ public class Map2View extends ViewPart implements
       _actionSyncMapWith_Tour.setEnabled(isTourAvailable);
       _actionSyncMapWith_ValuePoint.setEnabled(isTourAvailable);
 
-      syncMap_UpdateUI();
+      final boolean isMapSynched = _isMapSyncWith_ValuePoint
+            || _isMapSyncWith_ChartSlider_One
+            || _isMapSyncWith_ChartSlider_Centered
+            || _isMapSyncWith_Tour
+            || _isMapSyncWith_OtherMap;
+
+      syncMap_ShowCurrentSyncModeImage(isMapSynched);
 
       if (numberOfTours == 0) {
 
@@ -2095,9 +2111,9 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionShowLegendInMap);
       menuMgr.add(_actionShowScaleInMap);
+      menuMgr.add(_actionShowValuePoint);
       menuMgr.add(_actionShowSliderInMap);
       menuMgr.add(_actionShowSliderInLegend);
-      menuMgr.add(_actionShowValuePoint);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCreateTourMarkerFromMap);
@@ -2954,7 +2970,7 @@ public class Map2View extends ViewPart implements
          }
       }
 
-      if (_isMapSynchedWith_Tour || _isMapSynchedWith_ChartSlider_One) {
+      if (_isMapSyncWith_Tour || _isMapSyncWith_ChartSlider_One) {
 
          if (isDrawSlider) {
 
@@ -3041,7 +3057,7 @@ public class Map2View extends ViewPart implements
 
       runPhotoFilter();
 
-      if (_isShowPhoto && _isMapSynchedWith_Photo) {
+      if (_isShowPhoto && _isMapSyncWith_Photo) {
          centerPhotos(_filteredPhotos, false);
       }
 
@@ -3148,7 +3164,7 @@ public class Map2View extends ViewPart implements
          _map.disposeOverlayImageCache();
       }
 
-      if (_isMapSynchedWith_Tour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
 
          // use default position for the tour
 
@@ -3274,7 +3290,7 @@ public class Map2View extends ViewPart implements
       /*
        * set position and zoom level for the tour
        */
-      if (_isMapSynchedWith_Tour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
 
          if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
@@ -3436,7 +3452,7 @@ public class Map2View extends ViewPart implements
 
             _sliderPathPaintingData);
 
-      if (_isMapSynchedWith_ChartSlider_One) {
+      if (_isMapSyncWith_ChartSlider_One) {
 
          if (geoPositions != null) {
 
@@ -3446,7 +3462,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            if (_isMapSynchedWith_ChartSlider_IsCentered) {
+            if (_isMapSyncWith_ChartSlider_Centered) {
 
                // center to the left AND right slider
 
@@ -3554,6 +3570,8 @@ public class Map2View extends ViewPart implements
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
       _actionShowLegendInMap.setChecked(_isShowLegend);
 
+      _actionShowValuePoint.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_VALUE_POINT, STATE_IS_SHOW_VALUE_POINT_DEFAULT));
+
       // is tour centered
       final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
       _actionZoom_Centered.setChecked(isTourCentered);
@@ -3562,23 +3580,32 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       // synch map with ...
-      _isMapSynchedWith_ChartSlider_IsCentered  = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED, false);
-      _isMapSynchedWith_ChartSlider_One         = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOURCHART_SLIDER, true);
-      _isMapSynchedWith_OtherMap                = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, false);
-      _isMapSynchedWith_Tour                    = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOUR, true);
-      _isMapSynchedWith_ValuePoint              = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_VALUE_POINT, false);
+      _isMapSyncWith_ChartSlider_Centered       = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED,  false);
+      _isMapSyncWith_ChartSlider_One            = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOURCHART_SLIDER,              false);
+      _isMapSyncWith_OtherMap                   = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP,                false);
+      _isMapSyncWith_Tour                       = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOUR,                          true);
+      _isMapSyncWith_ValuePoint                 = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_VALUE_POINT,                   false);
 
-      _actionSyncMapWith_ChartSlider_Centered   .setChecked(_isMapSynchedWith_ChartSlider_IsCentered);
-      _actionSyncMapWith_ChartSlider_One        .setChecked(_isMapSynchedWith_ChartSlider_One);
-      _actionSyncMapWith_OtherMap               .setChecked(_isMapSynchedWith_OtherMap);
-      _actionSyncMapWith_Tour                   .setChecked(_isMapSynchedWith_Tour);
-      _actionSyncMapWith_ValuePoint             .setChecked(_isMapSynchedWith_ValuePoint);
+      _actionSyncMapWith_ChartSlider_Centered   .setChecked(_isMapSyncWith_ChartSlider_Centered);
+      _actionSyncMapWith_ChartSlider_One        .setChecked(_isMapSyncWith_ChartSlider_One);
+      _actionSyncMapWith_OtherMap               .setChecked(_isMapSyncWith_OtherMap);
+      _actionSyncMapWith_Tour                   .setChecked(_isMapSyncWith_Tour);
+      _actionSyncMapWith_ValuePoint             .setChecked(_isMapSyncWith_ValuePoint);
+
+      // ensure that only one sync mode is set
+      if (_isMapSyncWith_ValuePoint) {                      _currentMapSyncMode = MapSyncMode.IsSyncWith_ValuePoint;
+      } else if (_isMapSyncWith_ChartSlider_One) {          _currentMapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_One;
+      } else if (_isMapSyncWith_ChartSlider_Centered) {     _currentMapSyncMode = MapSyncMode.IsSyncWith_ChartSlider_Center;
+      } else if (_isMapSyncWith_Tour) {                     _currentMapSyncMode = MapSyncMode.IsSyncWith_Tour;
+      } else if (_isMapSyncWith_OtherMap) {                 _currentMapSyncMode = MapSyncMode.IsSyncWith_OtherMap;
+      } else {                                              _currentMapSyncMode = MapSyncMode.IsSyncWith_NONE;
+      }
 
 // SET_FORMATTING_ON
 
       // sync map with photo
-      _isMapSynchedWith_Photo = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_PHOTO, false);
-      _actionSyncMapWith_Photo.setChecked(_isMapSynchedWith_Photo);
+      _isMapSyncWith_Photo = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_PHOTO, false);
+      _actionSyncMapWith_Photo.setChecked(_isMapSyncWith_Photo);
 
       // zoom level adjustment
       _actionZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, STATE_ZOOM_LEVEL_ADJUSTMENT, 0));
@@ -3839,48 +3866,57 @@ public class Map2View extends ViewPart implements
    @PersistState
    private void saveState() {
 
-      // save checked actions
-      _state.put(STATE_IS_SHOW_TOUR_IN_MAP, _isShowTour);
-      _state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
-      _state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynchedWith_OtherMap);
-      _state.put(STATE_IS_SYNC_WITH_PHOTO, _isMapSynchedWith_Photo);
-      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER, _isMapSynchedWith_ChartSlider_One);
-      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED, _isMapSynchedWith_ChartSlider_IsCentered);
+      _state.put(STATE_IS_SHOW_TOUR_IN_MAP,                       _isShowTour);
+      _state.put(STATE_IS_SHOW_PHOTO_IN_MAP,                      _isShowPhoto);
+      _state.put(STATE_IS_SHOW_LEGEND_IN_MAP,                     _isShowLegend);
 
-      _state.put(MEMENTO_ZOOM_CENTERED, _actionZoom_Centered.isChecked());
-      _state.put(STATE_IS_SYNC_WITH_TOUR, _actionSyncMapWith_Tour.isChecked());
-      _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT, _actionZoomLevelAdjustment.getZoomLevel());
+      _state.put(STATE_IS_SHOW_VALUE_POINT,                       _actionShowValuePoint.isChecked());
+      _state.put(MEMENTO_SHOW_START_END_IN_MAP,                   _actionShowStartEndInMap.isChecked());
+      _state.put(MEMENTO_SHOW_SCALE_IN_MAP,                       _actionShowScaleInMap.isChecked());
+      _state.put(MEMENTO_SHOW_SLIDER_IN_MAP,                      _actionShowSliderInMap.isChecked());
+      _state.put(MEMENTO_SHOW_SLIDER_IN_LEGEND,                   _actionShowSliderInLegend.isChecked());
+      _state.put(MEMENTO_SHOW_TOUR_MARKER,                        _actionShowTourMarker.isChecked());
+      _state.put(MEMENTO_SHOW_TOUR_PAUSES,                        _actionShowTourPauses.isChecked());
+      _state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP,                   _actionShowTourInfoInMap.isChecked());
+      _state.put(MEMENTO_SHOW_WAY_POINTS,                         _actionShowWayPoints.isChecked());
 
-      _state.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
+      _state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP,               _isMapSyncWith_OtherMap);
+      _state.put(STATE_IS_SYNC_WITH_PHOTO,                        _isMapSyncWith_Photo);
+      _state.put(STATE_IS_SYNC_WITH_TOUR,                         _isMapSyncWith_Tour);
+      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER,             _isMapSyncWith_ChartSlider_One);
+      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED, _isMapSyncWith_ChartSlider_Centered);
+      _state.put(STATE_IS_SYNC_WITH_VALUE_POINT,                  _isMapSyncWith_ValuePoint);
 
-      _state.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_PAUSES, _actionShowTourPauses.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
-      _state.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
+      Util.setStateEnum(_state, STATE_MAP_SYNC_MODE, _currentMapSyncMode);
 
-      _state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionMap2_MapProvider.getSelectedMapProvider().getId());
+      _state.put(MEMENTO_ZOOM_CENTERED,                           _actionZoom_Centered.isChecked());
+      _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT,                     _actionZoomLevelAdjustment.getZoomLevel());
+
+      _state.put(MEMENTO_MAP_DIM_LEVEL,                           _mapDimLevel);
+
+      _state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID,                _actionMap2_MapProvider.getSelectedMapProvider().getId());
 
       if (_defaultPosition == null) {
 
          final MP mapProvider = _map.getMapProvider();
 
-         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null ? //
-               _defaultZoom
+         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null
+               ? _defaultZoom
                : mapProvider.getMinimumZoomLevel());
 
-         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
-         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
+         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE,      0.0F);
+         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE,     0.0F);
+
       } else {
-         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
-         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
-         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
+
+         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM,          _defaultZoom);
+         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE,      (float) _defaultPosition.latitude);
+         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE,     (float) _defaultPosition.longitude);
       }
+
+// SET_FORMATTING_ON
 
       // tour color
       MapGraphId colorId;
@@ -4074,140 +4110,92 @@ public class Map2View extends ViewPart implements
 
    private void syncMap_OnSelectSyncAction(final boolean isActionSelected) {
 
-      // image 2
-      final boolean isSyncWith_Tour = _actionSyncMapWith_Tour.isEnabled()
-            && _actionSyncMapWith_Tour.isChecked();
+      if (isActionSelected) {
 
-      // image 3
-      final boolean isSyncWith_ValuePoint = _actionSyncMapWith_ValuePoint.isEnabled()
-            && _actionSyncMapWith_ValuePoint.isChecked();
+         // sync action is selected but no sync subaction -> check sync which was kept in _currentMapSyncMode
 
-      // image 4
-      final boolean isSyncWith_ChartSlider_One = _actionSyncMapWith_ChartSlider_One.isEnabled()
-            && _actionSyncMapWith_ChartSlider_One.isChecked();
+         switch (_currentMapSyncMode) {
 
-      // image 5
-      final boolean isSyncWith_ChartSlider_Centered = _actionSyncMapWith_ChartSlider_Centered.isEnabled()
-            && _actionSyncMapWith_ChartSlider_Centered.isChecked();
+         case IsSyncWith_ChartSlider_Center:
+            _actionSyncMapWith_ChartSlider_Centered.setChecked(true);
+            action_SyncWith_ChartSlider(true);
+            break;
 
-      // image 6
-      final boolean isSyncWith_OtherMap = _actionSyncMapWith_OtherMap.isEnabled()
-            && _actionSyncMapWith_OtherMap.isChecked();
+         case IsSyncWith_ChartSlider_One:
+            _actionSyncMapWith_ChartSlider_One.setChecked(true);
+            action_SyncWith_ChartSlider(false);
+            break;
 
-      final boolean isMapSynched = isSyncWith_Tour
-            || isSyncWith_ValuePoint
-            || isSyncWith_ChartSlider_One
-            || isSyncWith_ChartSlider_Centered
-            || isSyncWith_OtherMap;
+         case IsSyncWith_OtherMap:
+            _actionSyncMapWith_OtherMap.setChecked(true);
+            action_SyncWith_OtherMap(true);
+            break;
 
-      /*
-       * Check if the map sync action is in sync with the map sync subactions
-       */
+         case IsSyncWith_Tour:
+            _actionSyncMapWith_Tour.setChecked(true);
+            action_SyncWith_Tour();
+            break;
 
-      final Boolean[] isSetSelection = { null };
+         case IsSyncWith_ValuePoint:
+            _actionSyncMapWith_ValuePoint.setChecked(true);
+            action_SyncWith_ValuePoint();
+            break;
 
-      if (isActionSelected && !isMapSynched) {
+         case IsSyncWith_NONE:
+         default:
 
-         // disable map sync
+            // sync action is selected but no sync subaction -> uncheck map sync
+            _actionMap2_SyncMap.setSelection(false);
+            break;
+         }
 
-         isSetSelection[0] = false;
+      } else {
 
-      } else if (isMapSynched && !isActionSelected) {
+         // sync action is not selected
 
-         //
-
-      }
-
-      switch (_mapSyncMode) {
-
-      case IsSyncWith_ChartSlider_Center:
-         break;
-
-      case IsSyncWith_ChartSlider_One:
-         break;
-
-      case IsSyncWith_OtherMap:
-         break;
-
-      case IsSyncWith_Tour:
-         break;
-
-      case IsSyncWith_ValuePoint:
-         break;
-
-      case IsSyncWith_NONE:
-      default:
-         break;
-      }
-
-      if (isSetSelection[0] != null) {
-         // run async as we are currently in the selection event
-         _map.getDisplay().asyncExec(() -> {
-            _actionMap2_SyncMap.setSelection(isSetSelection[0]);
-         });
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_ValuePoint();
       }
    }
 
    /**
     * Set sync map action selected when one of it's subactions are selected.
     */
-   private void syncMap_UpdateUI() {
+   private void syncMap_ShowCurrentSyncModeImage(final boolean isSelectSyncMapAction) {
 
-      // image 2
-      final boolean isSyncWith_Tour = _actionSyncMapWith_Tour.isEnabled()
-            && _actionSyncMapWith_Tour.isChecked();
+      switch (_currentMapSyncMode) {
 
-      // image 3
-      final boolean isSyncWith_ValuePoint = _actionSyncMapWith_ValuePoint.isEnabled()
-            && _actionSyncMapWith_ValuePoint.isChecked();
-
-      // image 4
-      final boolean isSyncWith_ChartSlider_One = _actionSyncMapWith_ChartSlider_One.isEnabled()
-            && _actionSyncMapWith_ChartSlider_One.isChecked();
-
-      // image 5
-      final boolean isSyncWith_ChartSlider_Centered = _actionSyncMapWith_ChartSlider_Centered.isEnabled()
-            && _actionSyncMapWith_ChartSlider_Centered.isChecked();
-
-      // image 6
-      final boolean isSyncWith_OtherMap = _actionSyncMapWith_OtherMap.isEnabled()
-            && _actionSyncMapWith_OtherMap.isChecked();
-
-      /*
-       * This if() sequence is very important because multiple sync actions could be selected !!!
-       */
-      if (isSyncWith_ValuePoint) {
-
-         _actionMap2_SyncMap.showImageEnabled_3();
-
-      } else if (isSyncWith_ChartSlider_One) {
-
-         _actionMap2_SyncMap.showImageEnabled_4();
-
-      } else if (isSyncWith_ChartSlider_Centered) {
-
-         _actionMap2_SyncMap.showImageEnabled_5();
-
-      } else if (isSyncWith_Tour) {
-
+      case IsSyncWith_Tour:
          _actionMap2_SyncMap.showImageEnabled_2();
+         break;
 
-      } else if (isSyncWith_OtherMap) {
+      case IsSyncWith_ValuePoint:
+         _actionMap2_SyncMap.showImageEnabled_3();
+         break;
 
+      case IsSyncWith_ChartSlider_One:
+         _actionMap2_SyncMap.showImageEnabled_4();
+         break;
+
+      case IsSyncWith_ChartSlider_Center:
+         _actionMap2_SyncMap.showImageEnabled_5();
+         break;
+
+      case IsSyncWith_OtherMap:
          _actionMap2_SyncMap.showImageEnabled_6();
+         break;
 
-      } else {
-
+      case IsSyncWith_NONE:
+      default:
          _actionMap2_SyncMap.showImageEnabled_Default();
+         break;
       }
 
-      final boolean isMapSynched = isSyncWith_Tour
-            || isSyncWith_ValuePoint
-            || isSyncWith_ChartSlider_One
-            || isSyncWith_ChartSlider_Centered
-            || isSyncWith_OtherMap;
-
-      _actionMap2_SyncMap.setSelection(isMapSynched);
+      if (isSelectSyncMapAction) {
+         _actionMap2_SyncMap.setSelection(isSelectSyncMapAction);
+      }
    }
 
    @Override
@@ -4215,7 +4203,7 @@ public class Map2View extends ViewPart implements
                                    final ViewPart viewPart,
                                    final int positionFlags) {
 
-      if (!_isMapSynchedWith_OtherMap) {
+      if (!_isMapSyncWith_OtherMap) {
 
          // sync feature is disabled
 
@@ -4285,31 +4273,26 @@ public class Map2View extends ViewPart implements
 
    private void updateUI_HoveredValuePoint(final TourData tourData, final int hoveredValuePointIndex) {
 
-      final boolean isShowValuePoint = _actionShowValuePoint.isChecked();
+      // set the paint context  for the direct mapping painter
+      _directMappingPainter.setPaintContext(
 
-      if (isShowValuePoint) {
+            _map,
+            _isShowTour,
+            _allTourData.get(0),
 
-         // set the paint context (slider position) for the direct mapping painter
-         _directMappingPainter.setPaintContext(
+            _currentLeftSliderValueIndex,
+            _currentRightSliderValueIndex,
+            _currentValuePointIndex,
 
-               _map,
-               _isShowTour,
-               _allTourData.get(0),
+            _actionShowSliderInMap.isChecked(),
+            _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
 
-               _currentLeftSliderValueIndex,
-               _currentRightSliderValueIndex,
-               _currentValuePointIndex,
+            _sliderPathPaintingData);
 
-               _actionShowSliderInMap.isChecked(),
-               _actionShowSliderInLegend.isChecked(),
-               isShowValuePoint,
+      _map.paint();
 
-               _sliderPathPaintingData);
-
-         _map.paint();
-      }
-
-      if (_isMapSynchedWith_ValuePoint) {
+      if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(tourData, hoveredValuePointIndex);
       }
    }

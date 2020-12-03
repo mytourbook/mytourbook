@@ -4,7 +4,7 @@
 TODO's
 ======
   
-* On MT homepage, replace SQL Explorer with DBeaver https://sourceforge.net/p/mytourbook/discussion/622811/thread/9ae30efd93/?limit=25#57b3 
+* At MT homepage, replace SQL Explorer with DBeaver https://sourceforge.net/p/mytourbook/discussion/622811/thread/9ae30efd93/?limit=25#57b3 
 
 
 Issues
