@@ -41,7 +41,7 @@ Changes
 =======
 
 * 2D Map
-  - The actions to synchronize the map are now available at the same position in a new slideout 
+  - The actions to synchronize the map are now available in a new slideout 
 
 * Dialog Adjust Elevation
   - The elevation of the rightmost spline point is now set to the SRTM value when the adjustment type is "Approach elevation with SRTM data"

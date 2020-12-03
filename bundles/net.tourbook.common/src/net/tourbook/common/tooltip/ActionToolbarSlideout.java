@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
+import java.util.ArrayList;
+
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -50,33 +53,30 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    /*
     * UI controls
     */
-   private Image _imageEnabled;
+   private Image _imageEnabled; // this is the default image
    private Image _imageDisabled;
 
    // additional enabled images
-   private Image     _imageEnabled_2;
-   private Image     _imageEnabled_3;
-   private Image     _imageEnabled_4;
-   private Image     _imageEnabled_5;
-   private Image     _imageEnabled_6;
+   private ArrayList<Image>           _allOtherEnabledImages             = new ArrayList<>();
+   private ArrayList<ImageDescriptor> _allOtherEnabledImages_Descriptors = new ArrayList<>();
 
    /**
     * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
     */
-   protected boolean isToggleAction;
+   protected boolean                  isToggleAction;
 
    /**
     * When <code>true</code> then the slideout is always displayed when mouse is hovering the
     * action.
     */
-   protected boolean isShowSlideoutAlways;
+   protected boolean                  isShowSlideoutAlways;
 
    /**
     * This tooltip will be displayed when the action is not selected.
     */
-   protected String  notSelectedTooltip = UI.EMPTY_STRING;
+   protected String                   notSelectedTooltip                 = UI.EMPTY_STRING;
 
-   private boolean   _stateActionSelection;
+   private boolean                    _stateActionSelection;
 
    public ActionToolbarSlideout() {
 
@@ -101,6 +101,15 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       }
    }
 
+   public void addOtherEnabledImage(final ImageDescriptor imageDescriptor) {
+
+      // create image placeholder, image is created when necessary
+      _allOtherEnabledImages.add(null);
+
+      // keep image descriptor
+      _allOtherEnabledImages_Descriptors.add(imageDescriptor);
+   }
+
    protected abstract ToolbarSlideout createSlideout(ToolBar toolbar);
 
    @Override
@@ -109,20 +118,14 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       Util.disposeResource(_imageEnabled);
       Util.disposeResource(_imageDisabled);
 
-      Util.disposeResource(_imageEnabled_2);
-      Util.disposeResource(_imageEnabled_3);
-      Util.disposeResource(_imageEnabled_4);
-      Util.disposeResource(_imageEnabled_5);
-      Util.disposeResource(_imageEnabled_6);
+      for (final Image image : _allOtherEnabledImages) {
+         Util.disposeResource(image);
+      }
+
+      _allOtherEnabledImages.clear();
 
       _imageEnabled = null;
       _imageDisabled = null;
-
-      _imageEnabled_2 = null;
-      _imageEnabled_3 = null;
-      _imageEnabled_4 = null;
-      _imageEnabled_5 = null;
-      _imageEnabled_6 = null;
    }
 
    @Override
@@ -309,26 +312,6 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       }
    }
 
-   public void setImageEnabled_2(final ImageDescriptor imageDescriptor) {
-      _imageEnabled_2 = imageDescriptor.createImage();
-   }
-
-   public void setImageEnabled_3(final ImageDescriptor imageDescriptor) {
-      _imageEnabled_3 = imageDescriptor.createImage();
-   }
-
-   public void setImageEnabled_4(final ImageDescriptor imageDescriptor) {
-      _imageEnabled_4 = imageDescriptor.createImage();
-   }
-
-   public void setImageEnabled_5(final ImageDescriptor imageDescriptor) {
-      _imageEnabled_5 = imageDescriptor.createImage();
-   }
-
-   public void setImageEnabled_6(final ImageDescriptor imageDescriptor) {
-      _imageEnabled_6 = imageDescriptor.createImage();
-   }
-
    public void setSelection(final boolean isSelected) {
 
       if (_actionToolItem == null) {
@@ -342,28 +325,28 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       updateUI_Tooltip();
    }
 
-   public void showImageEnabled_2() {
-      _actionToolItem.setImage(_imageEnabled_2);
-   }
-
-   public void showImageEnabled_3() {
-      _actionToolItem.setImage(_imageEnabled_3);
-   }
-
-   public void showImageEnabled_4() {
-      _actionToolItem.setImage(_imageEnabled_4);
-   }
-
-   public void showImageEnabled_5() {
-      _actionToolItem.setImage(_imageEnabled_5);
-   }
-
-   public void showImageEnabled_6() {
-      _actionToolItem.setImage(_imageEnabled_6);
-   }
-
-   public void showImageEnabled_Default() {
+   public void showDefaultEnabledImage() {
       _actionToolItem.setImage(_imageEnabled);
+   }
+
+   /**
+    * @param imageNumber
+    */
+   public void showOtherEnabledImage(final int imageNumber) {
+
+      Assert.isTrue(imageNumber < _allOtherEnabledImages_Descriptors.size(), "Image number is larger than the available images");//$NON-NLS-1$
+
+      Image image = _allOtherEnabledImages.get(imageNumber);
+
+      if (image == null) {
+
+         // create image
+
+         image = _allOtherEnabledImages_Descriptors.get(imageNumber).createImage();
+         _allOtherEnabledImages.set(imageNumber, image);
+      }
+
+      _actionToolItem.setImage(image);
    }
 
    private void updateUI_Tooltip() {

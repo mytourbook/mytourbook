@@ -88,10 +88,13 @@ public class Slideout_Map2_SyncMap extends ToolbarSlideout {
          final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
          final ToolBarManager tbm = new ToolBarManager(toolbar);
 
+         // actions are managed in the map2 view but they are displayed in this slideout
+
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Tour));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ValuePoint));
-         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ChartSlider_One));
-         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_ChartSlider_Centered));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Slider_One));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Slider_Centered));
+         tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_Photo));
          tbm.add(_map2View.getAction_MapSync(MapSyncId.SyncMapWith_OtherMap));
 
          tbm.update(true);
