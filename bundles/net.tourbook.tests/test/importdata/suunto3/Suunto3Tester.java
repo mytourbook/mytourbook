@@ -54,8 +54,8 @@ class Suunto3Tester {
       final String testFilePath = Paths.get(filePath + ".sml").toAbsolutePath().toString(); //$NON-NLS-1$
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 }
