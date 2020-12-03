@@ -274,7 +274,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                   final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
                   getComparedTours(comparedTours, _rootItem, compareIds);
 
-                  if (comparedTours.isEmpty() == false) {
+                  if (comparedTours.size() > 0) {
 
                      final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
 
@@ -1154,7 +1154,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
       // action: tour type
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       // tags: add/remove/remove all
       Set<TourTag> allExistingTags = null;
@@ -1401,7 +1401,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             // ref tour is selected
 
             final ArrayList<TreeViewerItem> refChildren = selectedRefTour.getFetchedChildren();
-            if (refChildren.isEmpty() == false) {
+            if (refChildren.size() > 0) {
 
                // navigate to the first child and ignore direction
 
@@ -1464,7 +1464,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
          final ArrayList<TVICompareResultComparedTour> persistedCompareResults = selectionPersisted.persistedCompareResults;
 
-         if (persistedCompareResults.isEmpty() == false) {
+         if (persistedCompareResults.size() > 0) {
 
             final TVICompareResultComparedTour comparedTourItem = persistedCompareResults.get(0);
 
@@ -1538,7 +1538,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          }
       }
 
-      if (removedComparedTours.isEmpty() == false) {
+      if (removedComparedTours.size() > 0) {
 
          _postSelectionProvider.setSelection(selectionRemovedCompareTours);
 

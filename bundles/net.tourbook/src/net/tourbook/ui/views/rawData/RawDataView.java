@@ -3683,7 +3683,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _tourDoubleClickState.canOpenTour = isOneSelectedNotDeleteTour;
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.isEmpty() == false));
+      _actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
 
       final ArrayList<Long> existingTagIds = new ArrayList<>();
       long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -3699,7 +3699,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
 
          final Set<TourTag> existingTags = firstSavedTour.getTourTags();
-         if ((existingTags != null) && (existingTags.isEmpty() == false)) {
+         if ((existingTags != null) && (existingTags.size() > 0)) {
 
             // tour contains at least one tag
             for (final TourTag tourTag : existingTags) {
@@ -4547,7 +4547,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                      }
                   }
 
-                  if (viewerTourData.isEmpty() == false) {
+                  if (viewerTourData.size() > 0) {
                      _tourViewer.setSelection(new StructuredSelection(viewerTourData.toArray()), true);
                   }
                }
@@ -4556,7 +4556,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       // show error log
-      if (notImportedFiles.isEmpty() == false) {
+      if (notImportedFiles.size() > 0) {
          TourLogManager.showLogView();
       }
    }

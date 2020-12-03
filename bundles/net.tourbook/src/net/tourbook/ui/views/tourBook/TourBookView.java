@@ -1763,7 +1763,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       _actionCollapseAll.setEnabled(isTreeLayout);
       _actionCollapseOthers.setEnabled(isTreeLayout &&
@@ -2434,7 +2434,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       }
 
-      if (allSelectedRowPos.isEmpty() == false) {
+      if (allSelectedRowPos.size() > 0) {
 
          final int[] allRowPositions = allSelectedRowPos.toArray();
          boolean isSelectedTourHovered = false;
@@ -2826,7 +2826,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       // select year/month/tour in the viewer
-      if (reselectTourItems.isEmpty() == false) {
+      if (reselectTourItems.size() > 0) {
 
          _tourViewer_Tree.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
@@ -2838,7 +2838,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
-      } else if (rootItems.isEmpty() == false)
+      } else if (rootItems.size() > 0)
 
       {
 

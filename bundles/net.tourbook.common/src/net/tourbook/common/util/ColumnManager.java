@@ -2715,7 +2715,7 @@ public class ColumnManager {
        * When no columns are visible (which is the first time), show only the default columns
        * because every column reduces performance
        */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.isEmpty() == false)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ArrayList<String> columnIds = new ArrayList<>();
          int createIndex = 0;
@@ -2736,7 +2736,7 @@ public class ColumnManager {
       /*
        * When no default columns are set, use the first column
        */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.isEmpty() == false)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
          firstColumn.setCreateIndex(0);
@@ -2763,7 +2763,7 @@ public class ColumnManager {
          }
       }
 
-      if (notAddedColumns.isEmpty() == false) {
+      if (notAddedColumns.size() > 0) {
 
          visibleColDefs.addAll(notAddedColumns);
 

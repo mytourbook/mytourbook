@@ -187,7 +187,7 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
 		}
 
 		final List<Float> dataUnits = getLegendUnits(legendSize, legendMinValue, legendMaxValue, unitFormat);
-		Assert.isTrue(dataUnits.isEmpty() == false);
+		Assert.isTrue(dataUnits.size() > 0);
 
 		final Float adjustedLegendMinValue = dataUnits.get(0);
 		final Float adjustedLegendMaxValue = dataUnits.get(dataUnits.size() - 1);

@@ -376,7 +376,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          final ArrayList<Long> allHoveredTours = hoveredTourData.allHoveredTourIds;
 
-         final String debugText = allHoveredTours.isEmpty() == false ? UI.EMPTY_STRING + allHoveredTours.get(0) : UI.EMPTY_STRING;
+         final String debugText = allHoveredTours.size() > 0 ? UI.EMPTY_STRING + allHoveredTours.get(0) : UI.EMPTY_STRING;
 
          _label.setText(debugText);
       }

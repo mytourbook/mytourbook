@@ -3178,7 +3178,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * paint skipped values
        */
-      if (isShowSkippedValues && skippedValues.isEmpty() == false) {
+      if (isShowSkippedValues && skippedValues.size() > 0) {
          for (final Point skippedPoint : skippedValues) {
             gc.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
          }
@@ -4665,7 +4665,7 @@ public class ChartComponentGraph extends Canvas {
             _isHoveredBarDirty = false;
          }
 
-         if (_hoveredValuePointIndex != -1 && _lineDevPositions.isEmpty() == false) {
+         if (_hoveredValuePointIndex != -1 && _lineDevPositions.size() > 0) {
 
             // hovered lines are set -> draw it
             drawSync_460_HoveredLine(gcOverlay);

@@ -361,7 +361,7 @@ public class TrainingView extends ViewPart {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
-               if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
+               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
                   updateUI_20(modifiedTours.get(0));
                }
             } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
@@ -991,7 +991,7 @@ public class TrainingView extends ViewPart {
 
          final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-         if (tourIds != null && tourIds.isEmpty() == false) {
+         if (tourIds != null && tourIds.size() > 0) {
             updateUI(tourIds.get(0));
          }
 
@@ -1101,7 +1101,7 @@ public class TrainingView extends ViewPart {
             }
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.isEmpty() == false) {
+            if (selectedTours != null && selectedTours.size() > 0) {
                updateUI_20(selectedTours.get(0));
             }
          }
