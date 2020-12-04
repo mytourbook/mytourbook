@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import de.byteholder.geoclipse.map.UI;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
