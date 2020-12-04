@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,35 +23,35 @@ import net.tourbook.photo.PhotoLoadManager;
 
 public class PhotoExifLoader {
 
-   private Photo         _photo;
-   private ILoadCallBack _loadCallBack;
+	private Photo			_photo;
+	private ILoadCallBack	_loadCallBack;
 
-   public PhotoExifLoader(final Photo photo, final ILoadCallBack imageLoadCallback) {
+	public PhotoExifLoader(final Photo photo, final ILoadCallBack imageLoadCallback) {
 
-      _photo = photo;
-      _loadCallBack = imageLoadCallback;
-   }
+		_photo = photo;
+		_loadCallBack = imageLoadCallback;
+	}
 
-   public void loadExif(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueThumb,
-                        final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
+	public void loadExif(	final LinkedBlockingDeque<PhotoImageLoader> waitingQueueThumb,
+							final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
 
-      /*
-       * wait until thumb images and original images are loaded
-       */
-      try {
-         while (waitingQueueThumb.isEmpty() == false || waitingQueueOriginal.isEmpty() == false) {
-            Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
-         }
-      } catch (final InterruptedException e) {
-         // should not happen, I hope so
-      }
+		/*
+		 * wait until thumb images and original images are loaded
+		 */
+		try {
+			while (waitingQueueThumb.size() > 0 || waitingQueueOriginal.size() > 0) {
+				Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
+			}
+		} catch (final InterruptedException e) {
+			// should not happen, I hope so
+		}
 
-      // load metadata
-      _photo.getImageMetaData();
+		// load metadata
+		_photo.getImageMetaData();
 
-      if (_loadCallBack != null) {
-         _loadCallBack.callBackImageIsLoaded(false);
-      }
-   }
+		if (_loadCallBack != null) {
+			_loadCallBack.callBackImageIsLoaded(false);
+		}
+	}
 
 }

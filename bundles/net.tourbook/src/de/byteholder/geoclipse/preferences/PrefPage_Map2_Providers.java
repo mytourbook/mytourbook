@@ -3558,7 +3558,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final StringBuilder sbTotal = new StringBuilder();
 
-      if (_visibleMp.isEmpty() == false) {
+      if (_visibleMp.size() > 0) {
 
          int tileCounter = 0;
          long tileSize = 0;

@@ -345,7 +345,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
                final ArrayList<TVICompareResultComparedTour> persistedCompareResults =
                      selectionPersisted.persistedCompareResults;
 
-               if (persistedCompareResults.isEmpty() == false) {
+               if (persistedCompareResults.size() > 0) {
                   updateTourViewer(persistedCompareResults);
                }
 
@@ -481,7 +481,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
                   getComparedTours(comparedTours, _rootItem, compareIds);
 
-                  if (comparedTours.isEmpty() == false) {
+                  if (comparedTours.size() > 0) {
 
                      final TVICatalogComparedTour comparedTour = comparedTours.get(0);
 
@@ -1035,7 +1035,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _actionRenameRefTour.setEnabled(refItems == 1 && tourItems == 0 && yearItems == 0);
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       _actionExpandSelection.setEnabled(firstElement == null ? false : //
             selectedItems == 1 ? firstElementHasChildren : //

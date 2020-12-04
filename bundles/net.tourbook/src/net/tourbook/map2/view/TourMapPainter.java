@@ -1140,7 +1140,7 @@ public class TourMapPainter extends MapPainter {
 
                // check if way points are available
                final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
-               if (wayPoints.isEmpty() == false) {
+               if (wayPoints.size() > 0) {
 
                   /*
                    * world positions are cached to optimize performance
@@ -1180,7 +1180,7 @@ public class TourMapPainter extends MapPainter {
          }
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.isEmpty() == false) {
+      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
 
          /*
           * world positions are cached to optimize performance
@@ -1289,7 +1289,7 @@ public class TourMapPainter extends MapPainter {
          final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
 
          // check if markers are available
-         if (sortedMarkers.isEmpty() == false) {
+         if (sortedMarkers.size() > 0) {
 
             // draw tour marker
 
@@ -2584,7 +2584,7 @@ public class TourMapPainter extends MapPainter {
       final int tileWorldPixelTop = tile.getY() * tileSize;
       final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-      if (_tourPaintConfig.isTourVisible && tourDataList.isEmpty() == false) {
+      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0) {
 
          if (isPaintingNeeded_Tours(
                tourDataList,
@@ -2600,7 +2600,7 @@ public class TourMapPainter extends MapPainter {
          }
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.isEmpty() == false) {
+      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
 
          if (isPaintingNeeded_Photos(
                photoList,
@@ -2724,7 +2724,7 @@ public class TourMapPainter extends MapPainter {
           * check way points
           */
          final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
-         if (wayPoints.isEmpty() == false) {
+         if (wayPoints.size() > 0) {
 
             TIntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
                   projectionId,

@@ -142,7 +142,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
             }
          }
 
-         if (powerDataList.isEmpty() == false) {
+         if (powerDataList.size() > 0) {
 
             fitData.isComputeAveragePower = true;
 

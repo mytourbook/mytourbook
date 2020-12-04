@@ -912,7 +912,7 @@ public abstract class AnimatedToolTipShell2 {
 
          _oldShells.removeAll(disposedShells);
 
-         if (_oldShells.isEmpty() == false) {
+         if (_oldShells.size() > 0) {
 
             // there are still visible shells
             _display.timerExec(FADE_TIME_INTERVAL, _animationTimer);

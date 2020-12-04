@@ -41,7 +41,7 @@ import net.tourbook.chart.ChartYDataMinMaxKeeper;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IFillPainter;
-import net.tourbook.chart.IHoveredValueListener;
+import net.tourbook.chart.IHoveredValueTooltipListener;
 import net.tourbook.chart.IKeyListener;
 import net.tourbook.chart.ILineSelectionPainter;
 import net.tourbook.chart.IMouseListener;
@@ -603,7 +603,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
    }
 
-   private class HoveredValueListener implements IHoveredValueListener {
+   private class HoveredValueTooltipListener implements IHoveredValueTooltipListener {
 
       @Override
       public void hideTooltip() {
@@ -639,7 +639,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          if (_tcc.isShowTourPhotoTooltip) {
 
-            _photoTooltip.showChartPhotoToolTip(//
+            _photoTooltip.showChartPhotoToolTip(
                   _layerPhoto,
                   eventTime,
                   devHoveredValue,
@@ -647,7 +647,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   devYMouseMove);
          }
       }
-
    }
 
    private class MouseListener_SegmenterSegment extends MouseAdapter {
@@ -865,7 +864,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // show delayed that it is not flickering when moving the mouse fast
       _tourMarkerTooltip.setFadeInDelayTime(50);
 
-      setHoveredListener(new HoveredValueListener());
+      setHoveredValueTooltipListener(new HoveredValueTooltipListener());
       setLineSelectionPainter(this);
    }
 
@@ -2072,7 +2071,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
           * get saved photos
           */
          final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
-         if (srcTourPhotos != null && srcTourPhotos.isEmpty() == false) {
+         if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
 
             final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
             createChartPhotos(srcTourPhotos, chartPhotos, true);
@@ -2089,7 +2088,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             final ArrayList<Photo> srcLinkPhotos = tourPhotoLink.linkPhotos;
 
-            if (srcLinkPhotos.isEmpty() == false) {
+            if (srcLinkPhotos.size() > 0) {
 
                final ArrayList<ChartPhoto> chartPhotos = new ArrayList<>();
                createChartPhotos(srcLinkPhotos, chartPhotos, false);
@@ -2288,7 +2287,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedSegments();
       final ArrayList<RGB> selectedAltitudeRGB = new ArrayList<>();
 
-      if (paintedSegments_Altitude.isEmpty() == false) {
+      if (paintedSegments_Altitude.size() > 0) {
 
          selectedAltitudePath = createSelectedLines_Values(
                paintedSegments_Altitude,
@@ -4202,7 +4201,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       if (paintedSegmentLabels.isEmpty()) {
 
          for (final ArrayList<SegmenterSegment> paintedLabels : _layerTourSegmenterOther.getPaintedSegments()) {
-            if (paintedLabels.isEmpty() == false) {
+            if (paintedLabels.size() > 0) {
 
                paintedSegmentLabels = paintedLabels;
                break;

@@ -1541,7 +1541,7 @@ public class MapProviderManager {
    public ArrayList<MP> importMapProvider(final String importFilePath) {
 
       final ArrayList<MP> importedMPList = readXml_MP_1(importFilePath, true, true);
-      if (importedMPList.isEmpty() == false) {
+      if (importedMPList.size() > 0) {
 
          // validate map provider
          final ArrayList<MP> allValidMPs = validateImportedMP(importedMPList);

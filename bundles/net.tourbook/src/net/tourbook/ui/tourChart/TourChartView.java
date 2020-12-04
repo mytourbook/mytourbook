@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.IHoveredValueListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -447,6 +448,14 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
             fireSliderPosition();
          }
       });
+
+      _tourChart.addHoveredValueListener(new IHoveredValueListener() {
+
+         @Override
+         public void hoveredValue(final int hoveredValuePointIndex) {
+            fireHoveredValue(hoveredValuePointIndex);
+         }
+      });
    }
 
    @Override
@@ -464,6 +473,18 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       super.dispose();
+   }
+
+   private void fireHoveredValue(final int hoveredValuePointIndex) {
+
+      final TourData tourData = _tourChart.getTourData();
+
+      final HoveredValueData hoveredValueData = new HoveredValueData(tourData, hoveredValuePointIndex);
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.HOVERED_VALUE_POSITION,
+            hoveredValueData,
+            TourChartView.this);
    }
 
    /**
@@ -492,7 +513,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
             }
 
-            TourManager.fireEventWithCustomData(//
+            TourManager.fireEventWithCustomData(
                   TourEventId.SLIDER_POSITION_CHANGED,
                   chartInfo,
                   TourChartView.this);
@@ -616,7 +637,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
                final ArrayList<TourPhotoLink> tourPhotoLinks = ((TourPhotoLinkSelection) selection).tourPhotoLinks;
 
-               if (tourPhotoLinks.isEmpty() == false) {
+               if (tourPhotoLinks.size() > 0) {
 
                   _tourPhotoLink = tourPhotoLinks.get(0);
 
@@ -631,7 +652,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
             }
 
-            if (isChartPainted == false && tourIds != null && tourIds.isEmpty() == false) {
+            if (isChartPainted == false && tourIds != null && tourIds.size() > 0) {
 
                // paint regular tour
 
@@ -869,7 +890,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.isEmpty() == false) {
+               if (selectedTours != null && selectedTours.size() > 0) {
                   updateChart(selectedTours.get(0));
                }
             }

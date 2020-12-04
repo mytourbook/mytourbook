@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ public class TourPainterConfiguration {
     */
    private Set<GeoPosition>                _tourBounds;
 
-   private int                             _synchTourZoomLevel;
+   private int                             _zoomLevelAdjustment;
 
    private IMapColorProvider               _mapColorProvider;
 
@@ -74,10 +74,6 @@ public class TourPainterConfiguration {
       return _photos;
    }
 
-   public int getSynchTourZoomLevel() {
-      return _synchTourZoomLevel;
-   }
-
    /**
     * @return Returns the tour bounds or <code>null</code> when a tour is not set
     */
@@ -90,6 +86,10 @@ public class TourPainterConfiguration {
     */
    public ArrayList<TourData> getTourData() {
       return _tourDataList;
+   }
+
+   public int getZoomLevelAdjustment() {
+      return _zoomLevelAdjustment;
    }
 
    /**
@@ -122,13 +122,13 @@ public class TourPainterConfiguration {
          _photos.addAll(allPhotos);
       }
 
-      isPhotoVisible = isShowPhoto && _photos.isEmpty() == false;
+      isPhotoVisible = isShowPhoto && _photos.size() > 0;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }
 
-   public void setSynchZoomLevelAdjustment(final int zoomLevel) {
-      _synchTourZoomLevel = zoomLevel;
+   public void setZoomLevelAdjustment(final int zoomLevel) {
+      _zoomLevelAdjustment = zoomLevel;
    }
 
    public void setTourBounds(final Set<GeoPosition> mapPositions) {
@@ -149,7 +149,7 @@ public class TourPainterConfiguration {
          _tourDataList.addAll(tourDataList);
       }
 
-      isTourVisible = isShowTour && _tourDataList.isEmpty() == false;
+      isTourVisible = isShowTour && _tourDataList.size() > 0;
    }
 
    /**
@@ -164,6 +164,6 @@ public class TourPainterConfiguration {
       _tourDataList.clear();
       _tourDataList.add(tourData);
 
-      isTourVisible = isShowTour && _tourDataList.isEmpty() == false;
+      isTourVisible = isShowTour && _tourDataList.size() > 0;
    }
 }

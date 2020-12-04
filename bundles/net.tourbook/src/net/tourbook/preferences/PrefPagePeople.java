@@ -1673,7 +1673,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final TourPerson currentPerson = getCurrentPerson();
 
       if (currentPerson != null) {
-         isHrZoneAvailable = currentPerson.getHrZonesSorted().isEmpty() == false;
+         isHrZoneAvailable = currentPerson.getHrZonesSorted().size() > 0;
       }
 
       _btnAddPerson.setEnabled(!_isPersonModified && isValid);
@@ -1893,7 +1893,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final ArrayList<TourPersonHRZone> hrZones = person.getHrZonesSorted();
 
       // check if hr zones are already available
-//		if (hrZones != null && hrZones.isEmpty() == false) {
+//		if (hrZones != null && hrZones.size() > 0) {
 //
 //			// hr zones are available
 //			if (MessageDialog.openQuestion(
@@ -2073,7 +2073,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             }
          }
       }
-      if (personSelection == null && _people.isEmpty() == false) {
+      if (personSelection == null && _people.size() > 0) {
 
          /*
           * previous person could not be reselected, select first person, a person MUST always be

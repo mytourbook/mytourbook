@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,36 +28,36 @@ import org.eclipse.jface.action.Action;
 
 public class ActionEditTour extends Action {
 
-   private ITourProvider _tourProvider;
+	private ITourProvider	_tourProvider;
 
-   public ActionEditTour(final ITourProvider tourProvider) {
+	public ActionEditTour(final ITourProvider tourProvider) {
 
-      setText(Messages.App_Action_edit_tour);
+		setText(Messages.App_Action_edit_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
 
-      setEnabled(false);
+		setEnabled(false);
 
-      _tourProvider = tourProvider;
-   }
+		_tourProvider = tourProvider;
+	}
 
-   public static void doAction(final ITourProvider tourProvider) {
+	public static void doAction(final ITourProvider tourProvider) {
 
-      final TourDataEditorView tourEditorView = TourManager.openTourEditor(true);
+		final TourDataEditorView tourEditorView = TourManager.openTourEditor(true);
 
-      if (tourEditorView != null) {
+		if (tourEditorView != null) {
 
-         final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-         if (selectedTours != null && selectedTours.isEmpty() == false) {
-            tourEditorView.setTourData(selectedTours.get(0));
-         }
-      }
-   }
+			final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+			if (selectedTours != null && selectedTours.size() > 0) {
+				tourEditorView.setTourData(selectedTours.get(0));
+			}
+		}
+	}
 
-   @Override
-   public void run() {
-      doAction(_tourProvider);
-   }
+	@Override
+	public void run() {
+		doAction(_tourProvider);
+	}
 
 }

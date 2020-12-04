@@ -1109,7 +1109,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void enableControls() {
 
-      boolean isTourAvailable = _allSelectedTours.isEmpty() == false;
+      boolean isTourAvailable = _allSelectedTours.size() > 0;
       isTourAvailable = true;
 
       _action_CollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
@@ -1213,7 +1213,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             final TVIPrefTagCategory tagCategory = (TVIPrefTagCategory) tvItem;
             final ArrayList<TreeViewerItem> tagCategoryChildren = tagCategory.getFetchedChildren();
 
-            if (tagCategoryChildren.isEmpty() == false) {
+            if (tagCategoryChildren.size() > 0) {
 
                final boolean isTagFound = getTagItems(tagCategoryChildren, tagItems, tagId);
 
@@ -1267,7 +1267,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.size());
 
-      if (tagIds.isEmpty() == false) {
+      if (tagIds.size() > 0) {
 
          // get all tag viewer items which should be checked
 
@@ -1770,12 +1770,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                /*
                 * check if tour was set from a selection provider
                 */
-               if (_allSelectedTours.isEmpty() == false) {
+               if (_allSelectedTours.size() > 0) {
                   return;
                }
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.isEmpty() == false) {
+               if (selectedTours != null && selectedTours.size() > 0) {
                   setSelectedTours(selectedTours);
                   updateUI_Tags();
                }
@@ -1987,7 +1987,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          final Set<TourTag> allTourTags = tourData.getTourTags();
 
-         if (allTourTags != null && allTourTags.isEmpty() == false) {
+         if (allTourTags != null && allTourTags.size() > 0) {
 
             _allTaggedTours.add(tourData);
 
@@ -2007,7 +2007,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
        */
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(_allCheckedTagIds.size());
 
-      if (_allCheckedTagIds.isEmpty() == false) {
+      if (_allCheckedTagIds.size() > 0) {
 
          final ArrayList<TreeViewerItem> rootItems = _rootItem.getFetchedChildren();
 

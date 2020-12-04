@@ -235,7 +235,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          _tourSportMap.put(tourId, _currentExercise.sport);
       }
 
-      if (_exerciseFiles.isEmpty() == false) {
+      if (_exerciseFiles.size() > 0) {
          _additionalImportedFiles.addAll(_exerciseFiles);
       }
 
@@ -444,7 +444,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    @Override
    public ArrayList<String> getAdditionalImportedFiles() {
 
-      if (_additionalImportedFiles.isEmpty() == false) {
+      if (_additionalImportedFiles.size() > 0) {
          return _additionalImportedFiles;
       }
 

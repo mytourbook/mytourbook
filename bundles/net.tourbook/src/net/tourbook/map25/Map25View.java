@@ -124,8 +124,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = net.tourbook.map2.Messages.Image__Tour_Disabled;
    private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = net.tourbook.map2.Messages.Image_Action_ShowPhotosInMap;
    private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = net.tourbook.map2.Messages.Image_Action_ShowAllPhotosInMap_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = net.tourbook.map2.Messages.Image_Action_SyncWith_Slider_Centered_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = net.tourbook.map2.Messages.Image_Action_SyncWith_Slider_Centered;
    private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = net.tourbook.map2.Messages.image_action_change_tile_factory;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = net.tourbook.map2.Messages.image_action_synch_with_slider;
@@ -666,7 +666,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-//					if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
+//					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 //
 //						_allTourData.clear();
 //						_allTourData.addAll(modifiedTours);
@@ -1014,8 +1014,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final TourLayer tourLayer = _mapApp.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
-      final boolean isTourAvailable = _allTourData.isEmpty() == false;
-      final boolean isAllPhotoAvailable = _allPhotos.isEmpty() == false;
+      final boolean isTourAvailable = _allTourData.size() > 0;
+      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 

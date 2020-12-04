@@ -2003,7 +2003,7 @@ public class RawDataManager {
       final File currentTourImportFile = actionReimportTour_20_GetImportFile(tourData, skipToursWithFileNotFound, reImportStatus);
 
       if (reimportedFile[0] != null && reimportedFile[0].equals(currentTourImportFile)
-            && _newlyImportedTours.isEmpty() == false) {
+            && _newlyImportedTours.size() > 0) {
 
          // this case occurs when a file contains multiple tours
 

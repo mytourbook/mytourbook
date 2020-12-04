@@ -212,7 +212,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       // ensure tags are available
       final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
-      super.setEnabled(enabled && allTags.isEmpty() == false);
+      super.setEnabled(enabled && allTags.size() > 0);
    }
 
 }

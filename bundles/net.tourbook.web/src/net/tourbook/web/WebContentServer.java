@@ -531,7 +531,7 @@ public class WebContentServer {
       final Map<String, Object> params = (Map<String, Object>) httpExchange
             .getAttribute(RequestParameterFilter.ATTRIBUTE_PARAMETERS);
 
-      if (params.isEmpty() == false) {
+      if (params.size() > 0) {
          log.append("\tparams: " + params);//$NON-NLS-1$
       }
    }

@@ -332,7 +332,7 @@ public class TourInfoUI {
 
       _hasDescription = tourDescription != null && tourDescription.length() > 0;
       _hasGears = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
-      _hasTags = tourTags != null && tourTags.isEmpty() == false;
+      _hasTags = tourTags != null && tourTags.size() > 0;
       _hasTourType = tourType != null;
       _hasWeather = _tourData.getWeather().length() > 0;
 

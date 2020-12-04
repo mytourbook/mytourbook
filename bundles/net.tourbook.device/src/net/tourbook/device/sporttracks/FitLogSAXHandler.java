@@ -430,7 +430,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
       }
 
-      if (_currentActivity.customDataFields.isEmpty() == false) {
+      if (_currentActivity.customDataFields.size() > 0) {
 
          final StringBuilder tourNotes = new StringBuilder(tourData.getTourDescription());
 
@@ -513,7 +513,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
-      if (_currentActivity.pauses.isEmpty() == false) {
+      if (_currentActivity.pauses.size() > 0) {
 
          final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
          final ArrayList<Long> _pausedTime_End = new ArrayList<>();
@@ -547,7 +547,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                .collect(Collectors.toList());
 
          //We set the first found time zone that corresponds to the activity offset
-         if (finalZoneIds.isEmpty() == false) {
+         if (finalZoneIds.size() > 0) {
             tourData.setTimeZoneId(finalZoneIds.get(0));
          }
       }
@@ -655,7 +655,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       boolean searchTagById = false;
       // If we are in a FitLogEx file, then we have parsed equipments
       // and we need to map tour tags using each equipment's GUID.
-      if (_equipments != null && _equipments.isEmpty() == false) {
+      if (_equipments != null && _equipments.size() > 0) {
          searchTagById = true;
       }
 

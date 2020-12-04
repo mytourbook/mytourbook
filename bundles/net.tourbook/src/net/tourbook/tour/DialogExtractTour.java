@@ -376,7 +376,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
          public void menuAboutToShow(final IMenuManager menuMgr) {
 
             final Set<TourTag> targetTourTags = _tourDataTarget.getTourTags();
-            final boolean isTagInTour = targetTourTags != null && targetTourTags.isEmpty() == false;
+            final boolean isTagInTour = targetTourTags != null && targetTourTags.size() > 0;
 
             _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, targetTourTags);
@@ -1357,7 +1357,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    @Override
    public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
-      if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
+      if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
          // check if it's the correct tour
          if (_tourDataTarget == modifiedTours.get(0)) {

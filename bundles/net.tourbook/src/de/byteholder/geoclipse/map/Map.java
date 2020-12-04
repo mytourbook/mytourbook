@@ -380,19 +380,19 @@ public class Map extends Canvas {
    private String                                     _overlayKey;
 
    /**
-    * this painter is called when the map is painted in the onPaint event
+    * This painter is called when the map is painted in the onPaint event
     */
    private IDirectPainter                             _directMapPainter;
 
    private final DirectPainterContext                 _directMapPainterContext  = new DirectPainterContext();
 
    /**
-    * when <code>true</code> the overlays are painted
+    * When <code>true</code> the overlays are painted
     */
    private boolean                                    _isDrawOverlays;
 
    /**
-    * contains a legend which is painted in the map
+    * Contains a legend which is painted in the map
     */
    private MapLegend                                  _mapLegend;
 
@@ -2340,7 +2340,7 @@ public class Map extends Canvas {
          ((IHoveredTourListener) listener).setHoveredTourId(event);
       }
 
-      if (_allHoveredTourIds.isEmpty() == false) {
+      if (_allHoveredTourIds.size() > 0) {
 
          return true;
 
@@ -2714,7 +2714,7 @@ public class Map extends Canvas {
 
          setMapCenter(new GeoPosition(_grid_MapGeoCenter.latitude, _grid_MapGeoCenter.longitude));
 
-      } else if (_allHoveredTourIds.isEmpty() == false) {
+      } else if (_allHoveredTourIds.size() > 0) {
 
          if (_allHoveredTourIds.size() == 1) {
 
@@ -3131,8 +3131,8 @@ public class Map extends Canvas {
          if (_hoveredAreaContext != null) {
             final Image hoveredImage = _hoveredAreaContext.hoveredImage;
             if (hoveredImage != null) {
-               gc.drawImage( //
-                     hoveredImage,
+
+               gc.drawImage(hoveredImage,
                      _hoveredAreaContext.hoveredTopLeftX,
                      _hoveredAreaContext.hoveredTopLeftY);
             }
@@ -4230,7 +4230,7 @@ public class Map extends Canvas {
                   final long currentTime = System.currentTimeMillis();
 
                   if (currentTime > _nextOverlayRedrawTime + 50) {
-                     if (_tileOverlayPaintQueue.isEmpty() == false) {
+                     if (_tileOverlayPaintQueue.size() > 0) {
 
                         // create overlay images
                         paint_Overlay_10_RunThread();
@@ -4532,7 +4532,7 @@ public class Map extends Canvas {
       final int maxTiles = (int) Math.pow(2, tileZoom);
 
       final ArrayList<Rectangle> partMarkerBounds = tile.getPartMarkerBounds(tileZoom);
-      final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.isEmpty() == false;
+      final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.size() > 0;
 
       for (int yIndex = 0; yIndex < 3; yIndex++) {
          for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -5082,7 +5082,7 @@ public class Map extends Canvas {
 
       if (tile.isLoadingError()
             || tile.isOfflineError()
-            || ((childrenWithErrors != null) && (childrenWithErrors.isEmpty() == false))) {
+            || ((childrenWithErrors != null) && (childrenWithErrors.size() > 0))) {
 
          paint_TileInfo_Error(gc, devTileViewport, tile);
 
@@ -5146,7 +5146,7 @@ public class Map extends Canvas {
       }
 
       final ConcurrentHashMap<String, Tile> childrenLoadingError = tile.getChildrenWithErrors();
-      if ((childrenLoadingError != null) && (childrenLoadingError.isEmpty() == false)) {
+      if ((childrenLoadingError != null) && (childrenLoadingError.size() > 0)) {
 
          for (final Tile childTile : childrenLoadingError.values()) {
             sb.append(childTile.getLoadingError());
@@ -6365,7 +6365,7 @@ public class Map extends Canvas {
       final PoiToolTip poiTT = getPoi();
       final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
 
-      poiTT.show(//
+      poiTT.show(
             poiDisplayPosition.x,
             poiDisplayPosition.y,
             _poiImageBounds.width,

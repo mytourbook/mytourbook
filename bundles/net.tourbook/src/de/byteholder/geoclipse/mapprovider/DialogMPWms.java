@@ -1184,7 +1184,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
             checkedLayers.add(mtLayer);
          }
       }
-      if (checkedLayers.isEmpty() == false) {
+      if (checkedLayers.size() > 0) {
          _layerViewer.setCheckedElements(checkedLayers.toArray());
       }
 

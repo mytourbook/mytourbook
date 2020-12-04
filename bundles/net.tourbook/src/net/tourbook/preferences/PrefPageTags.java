@@ -920,7 +920,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             }
          }
 
-         if (allSelectedTags.isEmpty() == false) {
+         if (allSelectedTags.size() > 0) {
 
             if (TagManager.deleteTourTag(allSelectedTags)) {
 

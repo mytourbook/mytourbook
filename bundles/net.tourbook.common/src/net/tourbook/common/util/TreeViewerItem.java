@@ -181,7 +181,7 @@ public abstract class TreeViewerItem {
           */
          return true;
       } else {
-         return _children.isEmpty() == false;
+         return _children.size() > 0;
       }
    }
 

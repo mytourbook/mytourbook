@@ -187,7 +187,7 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
          }
       }
 
-      if (modifiedTours.isEmpty() == false) {
+      if (modifiedTours.size() > 0) {
          TourManager.saveModifiedTours(modifiedTours);
       }
    }

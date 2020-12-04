@@ -1573,7 +1573,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // action: set tour type
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       // enable rename action
       if (selectedItems == 1) {
@@ -1822,7 +1822,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       }
 
-      if (allSelectedTags.isEmpty() == false) {
+      if (allSelectedTags.size() > 0) {
 
          // delete tags
 
@@ -2110,7 +2110,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
          }
 
-         if (tourIds.isEmpty() == false) {
+         if (tourIds.size() > 0) {
             _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
          }
       }
@@ -2234,12 +2234,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                treeItems = restoreState_Viewer_ExpandItem(pathSegments, treeItems, stateSegment);
             }
 
-            if (pathSegments.isEmpty() == false) {
+            if (pathSegments.size() > 0) {
                viewerTreePaths.add(new TreePath(pathSegments.toArray()));
             }
          }
 
-         if (viewerTreePaths.isEmpty() == false) {
+         if (viewerTreePaths.size() > 0) {
             _tagViewer.setExpandedTreePaths(viewerTreePaths.toArray(new TreePath[viewerTreePaths.size()]));
          }
       }
@@ -2360,7 +2360,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             // a new tree path starts
 
-            if (currentSegments.isEmpty() == false) {
+            if (currentSegments.size() > 0) {
 
                // keep current tree path segments
 
@@ -2384,7 +2384,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       }
 
-      if (currentSegments.isEmpty() == false) {
+      if (currentSegments.size() > 0) {
          allTreePathSegments.add(currentSegments.toArray(new StateSegment[currentSegments.size()]));
       }
 
@@ -2641,7 +2641,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       }
 
-      if (deletedTourItems.isEmpty() == false) {
+      if (deletedTourItems.size() > 0) {
 
          // update model
          parentChildren.removeAll(deletedTourItems);

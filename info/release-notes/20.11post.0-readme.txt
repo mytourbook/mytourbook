@@ -4,7 +4,7 @@
 TODO's
 ======
   
-* 
+* At MT homepage, replace SQL Explorer with DBeaver https://sourceforge.net/p/mytourbook/discussion/622811/thread/9ae30efd93/?limit=25#57b3 
 
 
 Issues
@@ -28,13 +28,22 @@ New
 Improvements
 ============
 
+* 2D Map
+  - Draw value point from the tour chart
+  - Sync map location with value point in the tour chart
+
 * Statistic Values View
   - Show values with the selected measurement system
   - Show value labels with the selected language
 
+* Tour Photos View
+  - Select next/previous photo with the mousewheel
 
 Changes  
 =======
+
+* 2D Map
+  - The actions to synchronize the map are now available in a new slideout 
 
 * Dialog Adjust Elevation
   - The elevation of the rightmost spline point is now set to the SRTM value when the adjustment type is "Approach elevation with SRTM data"

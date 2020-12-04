@@ -447,7 +447,7 @@ public class HAC4DeviceReader extends TourbookDevice {
             /*
              * disable data series when no data are available
              */
-            if (timeDataList.isEmpty() == false) {
+            if (timeDataList.size() > 0) {
 
                final TimeData firstTimeData = timeDataList.get(0);
 
