@@ -1922,7 +1922,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -2139,7 +2139,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -6005,7 +6005,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
       final Object[] selectedTimeSlices = selection.toArray();

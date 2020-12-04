@@ -148,7 +148,7 @@ public class StatisticServices {
 
       } else {
 
-         if (allTourTypes == null || allTourTypes.size() == 0 || numUsedTypes == 0) {
+         if (allTourTypes == null || allTourTypes.isEmpty() || numUsedTypes == 0) {
 
             statContext.outIsUpdateBarNames = true;
             statContext.outBarNames = null;

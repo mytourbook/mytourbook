@@ -976,7 +976,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
       _graphDrawingData = _chartDrawingData.graphDrawingData;
 
-      if ((_graphDrawingData == null) || (_graphDrawingData.size() == 0) || (_graphDrawingData.get(0) == null)) {
+      if ((_graphDrawingData == null) || (_graphDrawingData.isEmpty()) || (_graphDrawingData.get(0) == null)) {
          // this happened
          clearView();
          return;

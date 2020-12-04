@@ -718,7 +718,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
    private void updateUI() {
 
       final ArrayList<TourSegment> tourSegments = _tourChart.getTourSegments();
-      if (tourSegments == null || tourSegments.size() == 0) {
+      if (tourSegments == null || tourSegments.isEmpty()) {
          return;
       }
 

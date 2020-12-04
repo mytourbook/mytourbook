@@ -459,7 +459,7 @@ public class MeasurementSystem_Manager {
       // get loaded system profiles
       final ArrayList<MeasurementSystem> allLoadedProfiles = readProfiles_10_FromXmlFile();
 
-      if (allLoadedProfiles == null || allLoadedProfiles.size() == 0) {
+      if (allLoadedProfiles == null || allLoadedProfiles.isEmpty()) {
 
          // profiles are not yet available -> create defaults
 

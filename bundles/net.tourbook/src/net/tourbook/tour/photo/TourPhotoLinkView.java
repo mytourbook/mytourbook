@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1440,7 +1440,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void onSelectTimeAdjustment() {
 
-      if (_selectedLinks.size() == 0) {
+      if (_selectedLinks.isEmpty()) {
          // a tour is not selected
          return;
       }
@@ -1587,7 +1587,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void selectTour(final TourPhotoLink prevTourPhotoLink) {
 
-      if (_visibleTourPhotoLinks.size() == 0) {
+      if (_visibleTourPhotoLinks.isEmpty()) {
          return;
       }
 
@@ -1805,7 +1805,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
                          final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected) {
 
-      if (_allPhotos.size() == 0) {
+      if (_allPhotos.isEmpty()) {
          // view is not fully initialized, this happend in the pref listener
          return;
       }

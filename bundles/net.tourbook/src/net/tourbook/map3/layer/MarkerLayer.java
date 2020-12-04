@@ -87,7 +87,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
       for (final TourData tourData : allTours) {
 
          final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
-         if (tourMarkerList.size() == 0) {
+         if (tourMarkerList.isEmpty()) {
             continue;
          }
 

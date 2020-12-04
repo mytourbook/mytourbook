@@ -1164,7 +1164,7 @@ public class TourTrackConfigManager {
          parse_000_All(_allConfigs, xmlRoot, true);
 
          // ensure a config is created
-         if (_allConfigs.size() == 0) {
+         if (_allConfigs.isEmpty()) {
             createAllDefaults();
             isSetConfigDefaultValues = true;
          }

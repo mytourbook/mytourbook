@@ -2583,7 +2583,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             // optimize
-            if (modifiedTags.size() == 0) {
+            if (modifiedTags.isEmpty()) {
                return;
             }
 

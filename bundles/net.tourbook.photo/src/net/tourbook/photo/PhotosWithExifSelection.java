@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,18 +24,18 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class PhotosWithExifSelection implements ISelection {
 
-	/**
-	 * Contains photos sorted by date/time, EXIF data are loaded for the photos.
-	 */
-	public ArrayList<Photo>	photos;
+   /**
+    * Contains photos sorted by date/time, EXIF data are loaded for the photos.
+    */
+   public ArrayList<Photo> photos;
 
-	public PhotosWithExifSelection(final ArrayList<Photo> selectedPhotos) {
-		photos = selectedPhotos;
-	}
+   public PhotosWithExifSelection(final ArrayList<Photo> selectedPhotos) {
+      photos = selectedPhotos;
+   }
 
-	@Override
-	public boolean isEmpty() {
-		return photos.size() == 0;
-	}
+   @Override
+   public boolean isEmpty() {
+      return photos.isEmpty();
+   }
 
 }

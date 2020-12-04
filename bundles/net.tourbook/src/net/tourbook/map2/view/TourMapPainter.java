@@ -931,7 +931,7 @@ public class TourMapPainter extends MapPainter {
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
-      if (tourDataList.size() == 0 && photoList.size() == 0) {
+      if (tourDataList.isEmpty() && photoList.isEmpty()) {
          return false;
       }
 
@@ -2564,7 +2564,7 @@ public class TourMapPainter extends MapPainter {
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
-      if (tourDataList.size() == 0 && photoList.size() == 0) {
+      if (tourDataList.isEmpty() && photoList.isEmpty()) {
          return false;
       }
 

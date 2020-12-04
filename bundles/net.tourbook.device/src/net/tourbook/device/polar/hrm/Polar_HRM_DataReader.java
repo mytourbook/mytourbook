@@ -568,7 +568,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    private void createTourData_20_SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
 
-      if (_sectionLapData.size() == 0) {
+      if (_sectionLapData.isEmpty()) {
          return;
       }
 
@@ -609,7 +609,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     */
    private void createTourData_30_CreateMarkers(final TourData tourData) {
 
-      if (_sectionLapData.size() == 0) {
+      if (_sectionLapData.isEmpty()) {
          return;
       }
 

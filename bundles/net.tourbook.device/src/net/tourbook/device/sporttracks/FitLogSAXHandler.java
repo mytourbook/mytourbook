@@ -454,7 +454,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       tourData.setDeviceTimeInterval((short) -1);
 
-      if (_currentActivity.timeSlices.size() == 0) {
+      if (_currentActivity.timeSlices.isEmpty()) {
 
          // tour do not contain a track
 
@@ -643,7 +643,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
       final ArrayList<Equipment> equipmentNames = _currentActivity.equipmentNames;
-      if (equipmentNames.size() == 0) {
+      if (equipmentNames.isEmpty()) {
          return;
       }
 
@@ -722,7 +722,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
       final ArrayList<Lap> _laps = _currentActivity.laps;
-      if (_laps.size() == 0) {
+      if (_laps.isEmpty()) {
          return;
       }
 
@@ -1207,7 +1207,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void saveEquipmentsAsTags() {
 
-      if (_equipments.size() == 0) {
+      if (_equipments.isEmpty()) {
          return;
       }
 
