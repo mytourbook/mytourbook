@@ -627,7 +627,7 @@ public class Map2View extends ViewPart implements
    private enum MapSyncMode {
 
       /**
-       * Image 0
+       * Image: 0
        */
       IsSyncWith_Tour,
 
@@ -637,17 +637,17 @@ public class Map2View extends ViewPart implements
       IsSyncWith_ValuePoint,
 
       /**
-       * Image 2
+       * Image: 2
        */
       IsSyncWith_Slider_One,
 
       /**
-       * Image 3
+       * Image: 3
        */
       IsSyncWith_Slider_Center,
 
       /**
-       * Image 4
+       * Image: 4
        */
       IsSyncWith_OtherMap,
 
@@ -3078,7 +3078,13 @@ public class Map2View extends ViewPart implements
 
       runPhotoFilter();
 
-      if (_isShowPhoto && _isMapSyncWith_Photo) {
+      /**
+       * It is possible that sync photo action is disabled but map can be synched with photos. This
+       * occure when show photos are deactivated but the photo sync is still selected.
+       * <p>
+       * To reactivate photo sync, first photos must be set visible.
+       */
+      if (_isMapSyncWith_Photo) {
          centerPhotos(_filteredPhotos, false);
       }
 
