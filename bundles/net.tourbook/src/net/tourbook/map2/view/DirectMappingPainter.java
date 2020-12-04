@@ -100,8 +100,8 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param isYPosCenter
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawSliderMarker(final DirectPainterContext painterContext,
-                                    int sliderValueIndex,
+   private boolean drawMarker(final DirectPainterContext painterContext,
+                              final int sliderValueIndex,
                                     final Image markerImage,
                                     final boolean isYPosCenter) {
 
@@ -112,16 +112,24 @@ public class DirectMappingPainter implements IDirectPainter {
       final double[] longitudeSerie = _tourData.longitudeSerie;
 
       // force array bounds
-      sliderValueIndex = Math.min(Math.max(sliderValueIndex, 0), latitudeSerie.length - 1);
+      final int sliderValueIndexAdjusted = Math.min(Math.max(sliderValueIndex, 0), latitudeSerie.length - 1);
 
       // get world position for the slider coordinates
 
       final java.awt.Point worldPixelMarkerAWT = mp.geoToPixel(new GeoPosition(
-            latitudeSerie[sliderValueIndex],
-            longitudeSerie[sliderValueIndex]), zoomLevel);
+            latitudeSerie[sliderValueIndexAdjusted],
+            longitudeSerie[sliderValueIndexAdjusted]), zoomLevel);
 
       // convert awt to swt point
       final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
+
+      if (isYPosCenter) {
+
+         System.out.println((System.currentTimeMillis() + " drawMarker() - sliderValueIndex:" + sliderValueIndex));
+         System.out.println((System.currentTimeMillis() + " drawMarker() - serie size      :" + _tourData.latitudeSerie.length));
+         // TODO remove SYSTEM.OUT.PRINTLN
+
+      }
 
       // check if slider is visible
       final Rectangle viewport = painterContext.viewport;
@@ -479,12 +487,12 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       if (_isShowSliderInMap) {
-         drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
-         drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
+         drawMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
+         drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
       }
 
       if (_isShowValuePoint) {
-         drawSliderMarker(painterContext, _valuePointIndex, _imageValuePoint, true);
+         drawMarker(painterContext, _valuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {

@@ -477,9 +477,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
-      final TourData tourData = _tourChart.getTourData();
+//      TourData tourData;
+//      if (_tourData.isMultipleTours()) {
+//
+//      } else {
+//
+//         tourData = _tourChart.getTourData();
+//      }
 
-      final HoveredValueData hoveredValueData = new HoveredValueData(tourData, hoveredValuePointIndex);
+      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData, hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,
@@ -609,11 +615,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
                      // set slider positions
 
-                     _tourChart.setXSliderPosition(
-                           new SelectionChartXSliderPosition(//
-                                 _tourChart,
-                                 tourDataSelection.getLeftSliderValueIndex(),
-                                 tourDataSelection.getRightSliderValueIndex()));
+                     _tourChart.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart,
+                           tourDataSelection.getLeftSliderValueIndex(),
+                           tourDataSelection.getRightSliderValueIndex()));
                   }
                }
             }

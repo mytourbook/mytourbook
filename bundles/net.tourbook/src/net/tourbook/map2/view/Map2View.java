@@ -1050,7 +1050,7 @@ public class Map2View extends ViewPart implements
 
       if (_allTourData != null && !_allTourData.isEmpty()) {
 
-         updateUI_HoveredValuePoint(_allTourData.get(0), _currentValuePointIndex);
+         updateUI_HoveredValuePoint(_currentValuePointIndex);
       }
    }
 
@@ -2611,7 +2611,7 @@ public class Map2View extends ViewPart implements
 
       _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
-      updateUI_HoveredValuePoint(hoveredValueData.tourData, hoveredValueData.hoveredValuePointIndex);
+      updateUI_HoveredValuePoint(hoveredValueData.hoveredValuePointIndex);
    }
 
    /**
@@ -4274,7 +4274,7 @@ public class Map2View extends ViewPart implements
       tbm.update(true);
    }
 
-   private void updateUI_HoveredValuePoint(final TourData tourData, final int hoveredValuePointIndex) {
+   private void updateUI_HoveredValuePoint(final int hoveredValuePointIndex) {
 
       // set the paint context  for the direct mapping painter
       _directMappingPainter.setPaintContext(
@@ -4296,6 +4296,22 @@ public class Map2View extends ViewPart implements
       _map.paint();
 
       if (_isMapSyncWith_ValuePoint) {
+
+         /**
+          * Discovered issue:
+          * <p>
+          * When multiple tours are selected in the tourbook view, _allTourData contains multiple
+          * tours. However when tour chart is selected and it contains multiple tours, then one
+          * TourData with isMultipleTour is displayed in the map.
+          * <p>
+          * This issue needs now to be managed
+          * <p>
+          * <p>
+          * <p>
+          */
+
+         _allTourData.get(0);
+
          positionMapTo_ValueIndex(tourData, hoveredValuePointIndex);
       }
    }
