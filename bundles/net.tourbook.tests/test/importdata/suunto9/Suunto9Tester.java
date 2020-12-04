@@ -57,7 +57,7 @@ class Suunto9Tester {
     *
     * @return If any, the last processed activity.
     */
-   private TourData GetLastTourDataImported() {
+   private TourData getLastTourDataImported() {
       Field field = null;
       try {
          field = Suunto9DeviceDataReader.class.getDeclaredField("_processedActivities"); //$NON-NLS-1$
@@ -95,9 +95,9 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 
    /**
@@ -110,9 +110,9 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 
    /**
@@ -125,9 +125,9 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 
    /**
@@ -140,9 +140,9 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 
    /**
@@ -183,8 +183,8 @@ class Suunto9Tester {
       deviceDataReader.processDeviceData(maxWell2FilePath, deviceData, alreadyImportedTours, newlyImportedTours);
       deviceDataReader.processDeviceData(maxWell3FilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData entry = GetLastTourDataImported();
-      Comparison.CompareTourDataAgainstControl(entry, controlDocumentPath);
+      final TourData entry = getLastTourDataImported();
+      Comparison.compareTourDataAgainstControl(entry, controlDocumentPath);
    }
 
    /**
@@ -198,9 +198,9 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 
    /**
@@ -213,8 +213,23 @@ class Suunto9Tester {
       final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
       deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
+   }
+
+   /**
+    * Pauses lasting less then 1000ms should not be imported
+    */
+   @Test
+   void testImportTinyPause() {
+      final String filePath = IMPORT_FILE_PATH + "1594598677631_183010004848_post_timeline-1"; //$NON-NLS-1$
+
+      final String testFilePath = Paths.get(filePath + JSON_GZ).toAbsolutePath().toString();
+      deviceDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 }

@@ -653,7 +653,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       /*
        * check if a photo is selected
        */
-      if (loadedExifData.size() == 0) {
+      if (loadedExifData.isEmpty()) {
 
          if (isAllImages) {
 

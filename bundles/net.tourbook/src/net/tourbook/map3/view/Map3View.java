@@ -1002,7 +1002,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
                _lastHiddenSelection = null;
 
-            } else if (_allTours.size() == 0) {
+            } else if (_allTours.isEmpty()) {
 
                // a tour is not displayed, find a tour provider which provides a tour
                showToursFromTourProvider();
@@ -1472,7 +1472,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       if (selectedTrack == null) {
 
-         if (_allTours.size() == 0) {
+         if (_allTours.isEmpty()) {
 
             return null;
 
@@ -1717,7 +1717,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // paint all selected tours
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             clearView();
 

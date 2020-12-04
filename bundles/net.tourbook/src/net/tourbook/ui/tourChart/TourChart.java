@@ -629,7 +629,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          // check if photos are available
-         if (_tourData.tourPhotoLink == null && _tourData.getTourPhotos().size() == 0) {
+         if (_tourData.tourPhotoLink == null && _tourData.getTourPhotos().isEmpty()) {
             return;
          }
 
@@ -2098,7 +2098,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
          }
 
-         if (chartPhotoGroups.size() == 0) {
+         if (chartPhotoGroups.isEmpty()) {
             // there are no photos
             break;
          }
@@ -2556,7 +2556,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          for (int pathIndex = 0; pathIndex < _selectedOtherPoints.size(); pathIndex++) {
 
             final TIntArrayList graphLine = _selectedOtherPoints.get(pathIndex);
-            if (graphLine.size() == 0) {
+            if (graphLine.isEmpty()) {
                // can be empty when small values are hidden
                continue;
             }
@@ -4198,7 +4198,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _selectedSegmenterSegment_2 = null;
 
       ArrayList<SegmenterSegment> paintedSegmentLabels = _layerTourSegmenterAltitude.getPaintedSegments();
-      if (paintedSegmentLabels.size() == 0) {
+      if (paintedSegmentLabels.isEmpty()) {
 
          for (final ArrayList<SegmenterSegment> paintedLabels : _layerTourSegmenterOther.getPaintedSegments()) {
             if (paintedLabels.size() > 0) {
@@ -4209,7 +4209,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
       }
 
-      if (paintedSegmentLabels.size() == 0) {
+      if (paintedSegmentLabels.isEmpty()) {
          // this case do probably not occur;
          return;
       }

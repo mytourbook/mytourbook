@@ -3937,7 +3937,7 @@ public class Map2View extends ViewPart implements
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
 
-      if (_allTourData.size() < 1) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 

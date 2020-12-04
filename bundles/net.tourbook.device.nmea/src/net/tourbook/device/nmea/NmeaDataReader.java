@@ -266,7 +266,7 @@ public class NmeaDataReader extends TourbookDevice {
 
    private boolean setTourData() {
 
-      if (_timeDataList == null || _timeDataList.size() == 0) {
+      if (_timeDataList == null || _timeDataList.isEmpty()) {
          return false;
       }
 

@@ -561,7 +561,7 @@ public class TagMenuManager {
 
    void fillMenuWithRecentTags(final IMenuManager menuMgr, final Menu menu) {
 
-      if (_recentTags.size() == 0) {
+      if (_recentTags.isEmpty()) {
          return;
       }
 
@@ -699,7 +699,7 @@ public class TagMenuManager {
       // get tours which tour type should be changed
       final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
 
-      if (modifiedTours == null || modifiedTours.size() == 0) {
+      if (modifiedTours == null || modifiedTours.isEmpty()) {
          return;
       }
 
@@ -768,7 +768,7 @@ public class TagMenuManager {
             final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
 
             // get tours which tag should be changed
-            if (modifiedTours == null || modifiedTours.size() == 0) {
+            if (modifiedTours == null || modifiedTours.isEmpty()) {
                return;
             }
 

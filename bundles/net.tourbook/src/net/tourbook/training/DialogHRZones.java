@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,421 +58,423 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogHRZones extends TitleAreaDialog {
 
-	private final IDialogSettings		_state		= TourbookPlugin.getDefault() //
-															.getDialogSettingsSection(getClass().getName());
-	private TourPerson					_person;
+   private final IDialogSettings       _state      = TourbookPlugin.getDefault()   //
+         .getDialogSettingsSection(getClass().getName());
+   private TourPerson                  _person;
 
-	private Image						_imageTrash	= TourbookPlugin
-															.getImageDescriptor(Messages.Image__App_Trash)
-															.createImage();
+   private Image                       _imageTrash = TourbookPlugin
+         .getImageDescriptor(Messages.Image__App_Trash)
+         .createImage();
 
-	private ArrayList<TourPersonHRZone>	_hrZones;
-	private boolean						_isUpdateUI;
+   private ArrayList<TourPersonHRZone> _hrZones;
+   private boolean                     _isUpdateUI;
 
-	/*
-	 * UI controls
-	 */
-	private Composite					_hrZoneOuterContainer;
-	private ScrolledComposite			_hrZoneScrolledContainer;
+   /*
+    * UI controls
+    */
+   private Composite         _hrZoneOuterContainer;
+   private ScrolledComposite _hrZoneScrolledContainer;
 
-	// these arrays has the same sequence like _hrZones
-	private Text[]						_txtZoneName;
-	private Text[]						_txtNameShortcut;
-	private Spinner[]					_spinnerMinPulse;
-	private Label[]						_labelMaxPulse;
-	private ColorSelector[]				_colorSelector;
-	private Button[]					_btnTrash;
+   // these arrays has the same sequence like _hrZones
+   private Text[]          _txtZoneName;
+   private Text[]          _txtNameShortcut;
+   private Spinner[]       _spinnerMinPulse;
+   private Label[]         _labelMaxPulse;
+   private ColorSelector[] _colorSelector;
+   private Button[]        _btnTrash;
 
-	private Button						_btnAddZone;
-	private Button						_btnRemoveZone;
-	private Button						_btnSortZones;
+   private Button          _btnAddZone;
+   private Button          _btnRemoveZone;
+   private Button          _btnSortZones;
 
 //	private Button						_btnApply;
 
-	public DialogHRZones(final Shell parentShell, final TourPerson tourPerson) {
+   public DialogHRZones(final Shell parentShell, final TourPerson tourPerson) {
 
-		super(parentShell);
+      super(parentShell);
 
-		_person = tourPerson;
+      _person = tourPerson;
 
-		// clone hr zone's
-		_hrZones = new ArrayList<TourPersonHRZone>();
-		_hrZones.addAll(tourPerson.getHrZonesSorted());
+      // clone hr zone's
+      _hrZones = new ArrayList<>();
+      _hrZones.addAll(tourPerson.getHrZonesSorted());
 
-		// make dialog resizable
-		setShellStyle(getShellStyle() | SWT.RESIZE);
-	}
+      // make dialog resizable
+      setShellStyle(getShellStyle() | SWT.RESIZE);
+   }
 
-	@Override
-	protected void configureShell(final Shell shell) {
+   @Override
+   protected void configureShell(final Shell shell) {
 
-		super.configureShell(shell);
+      super.configureShell(shell);
 
-		shell.setText(Messages.Dialog_HRZone_DialogTitle);
+      shell.setText(Messages.Dialog_HRZone_DialogTitle);
 
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
+      shell.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
-		shell.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
+      shell.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
 
-				// allow resizing the height but not the width
+            // allow resizing the height but not the width
 
-				final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				final Point shellSize = shell.getSize();
+            final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+            final Point shellSize = shell.getSize();
 
-				defaultSize.y = shellSize.y;
+            defaultSize.y = shellSize.y;
 
-				shell.setSize(defaultSize);
-			}
-		});
-	}
+            shell.setSize(defaultSize);
+         }
+      });
+   }
 
-	@Override
-	public void create() {
+   @Override
+   public void create() {
 
-		super.create();
+      super.create();
 
-		setTitle(Messages.Dialog_HRZone_DialogTitle);
-		setMessage(Messages.Dialog_HRZone_DialogMessage);
-	}
+      setTitle(Messages.Dialog_HRZone_DialogTitle);
+      setMessage(Messages.Dialog_HRZone_DialogMessage);
+   }
 
-	@Override
-	protected final void createButtonsForButtonBar(final Composite parent) {
+   @Override
+   protected final void createButtonsForButtonBar(final Composite parent) {
 
-		super.createButtonsForButtonBar(parent);
+      super.createButtonsForButtonBar(parent);
 
-		// set text for the OK button
+      // set text for the OK button
 //		final Button btnOK = getButton(IDialogConstants.OK_ID);
 //		btnOK.setText(Messages.App_Action_Save);
-	}
+   }
 
-	@Override
-	protected Control createDialogArea(final Composite parent) {
+   @Override
+   protected Control createDialogArea(final Composite parent) {
 
-		final Composite ui = (Composite) super.createDialogArea(parent);
+      final Composite ui = (Composite) super.createDialogArea(parent);
 
-		// create ui
-		createUI(ui);
+      // create ui
+      createUI(ui);
 
-		updateUIFromModel();
+      updateUIFromModel();
 
-		return ui;
-	}
+      return ui;
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(2).spacing(20, 0).applyTo(container);
-		{
-			createUI10HRZone(container);
-			createUI50Actions(container);
-		}
-	}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).spacing(20, 0).applyTo(container);
+      {
+         createUI10HRZone(container);
+         createUI50Actions(container);
+      }
+   }
 
-	private void createUI10HRZone(final Composite parent) {
+   private void createUI10HRZone(final Composite parent) {
 
-		/*
-		 * hr zone fields
-		 */
-		_hrZoneOuterContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneOuterContainer);
-		GridLayoutFactory.fillDefaults().applyTo(_hrZoneOuterContainer);
+      /*
+       * hr zone fields
+       */
+      _hrZoneOuterContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneOuterContainer);
+      GridLayoutFactory.fillDefaults().applyTo(_hrZoneOuterContainer);
 
-		createUI20HrZoneScrolledContainer(_hrZoneOuterContainer);
-	}
+      createUI20HrZoneScrolledContainer(_hrZoneOuterContainer);
+   }
 
-	private void createUI20HrZoneScrolledContainer(final Composite parent) {
+   private void createUI20HrZoneScrolledContainer(final Composite parent) {
 
-		Point scrollBackup = null;
+      Point scrollBackup = null;
 
-		// dispose previous ui
-		if (_hrZoneScrolledContainer != null) {
+      // dispose previous ui
+      if (_hrZoneScrolledContainer != null) {
 
-			// get current scroll position
-			scrollBackup = _hrZoneScrolledContainer.getOrigin();
+         // get current scroll position
+         scrollBackup = _hrZoneScrolledContainer.getOrigin();
 
-			// dispose previous fields
-			_hrZoneScrolledContainer.dispose();
-		}
+         // dispose previous fields
+         _hrZoneScrolledContainer.dispose();
+      }
 
-		// scrolled container
-		_hrZoneScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneScrolledContainer);
+      // scrolled container
+      _hrZoneScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_hrZoneScrolledContainer);
 
-		final Composite hrZoneInnerContainer = createUI22HrZoneInnerContainer(_hrZoneScrolledContainer);
+      final Composite hrZoneInnerContainer = createUI22HrZoneInnerContainer(_hrZoneScrolledContainer);
 
-		_hrZoneScrolledContainer.setContent(hrZoneInnerContainer);
-		_hrZoneScrolledContainer.setExpandVertical(true);
-		_hrZoneScrolledContainer.setExpandHorizontal(true);
-		_hrZoneScrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				_hrZoneScrolledContainer.setMinSize(hrZoneInnerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
+      _hrZoneScrolledContainer.setContent(hrZoneInnerContainer);
+      _hrZoneScrolledContainer.setExpandVertical(true);
+      _hrZoneScrolledContainer.setExpandHorizontal(true);
+      _hrZoneScrolledContainer.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
+            _hrZoneScrolledContainer.setMinSize(hrZoneInnerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+         }
+      });
 
-		_hrZoneOuterContainer.layout(true, true);
+      _hrZoneOuterContainer.layout(true, true);
 
-		// set scroll position to previous position
-		if (scrollBackup != null) {
-			_hrZoneScrolledContainer.setOrigin(scrollBackup);
-		}
-	}
+      // set scroll position to previous position
+      if (scrollBackup != null) {
+         _hrZoneScrolledContainer.setOrigin(scrollBackup);
+      }
+   }
 
-	private Composite createUI22HrZoneInnerContainer(final Composite parent) {
+   private Composite createUI22HrZoneInnerContainer(final Composite parent) {
 
-		// hr zone container
-		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(8).applyTo(hrZoneContainer);
+      // hr zone container
+      final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(8).applyTo(hrZoneContainer);
 //		hrZoneContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			createUI23HrZoneHeader(hrZoneContainer);
-			createUI24HrZoneFields(hrZoneContainer);
-		}
+      {
+         createUI23HrZoneHeader(hrZoneContainer);
+         createUI24HrZoneFields(hrZoneContainer);
+      }
 
-		return hrZoneContainer;
-	}
+      return hrZoneContainer;
+   }
 
-	private void createUI23HrZoneHeader(final Composite parent) {
+   private void createUI23HrZoneHeader(final Composite parent) {
 
-		/*
-		 * label: color
-		 */
-		Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.BOTTOM)
-				.applyTo(label);
-		label.setText(Messages.Dialog_HRZone_Label_Header_Color);
+      /*
+       * label: color
+       */
+      Label label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .align(SWT.FILL, SWT.BOTTOM)
+            .applyTo(label);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Color);
 
-		/*
-		 * label: zone name
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()
-				.grab(true, false)
-				.hint(250, SWT.DEFAULT)
-				.align(SWT.FILL, SWT.BOTTOM)
-				.applyTo(label);
-		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
+      /*
+       * label: zone name
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()
+            .grab(true, false)
+            .hint(250, SWT.DEFAULT)
+            .align(SWT.FILL, SWT.BOTTOM)
+            .applyTo(label);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
 
-		/*
-		 * label: zone shortcut
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BOTTOM).applyTo(label);
-		label.setText(Messages.Dialog_HRZone_Label_Header_ZoneShortcut);
+      /*
+       * label: zone shortcut
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BOTTOM).applyTo(label);
+      label.setText(Messages.Dialog_HRZone_Label_Header_ZoneShortcut);
 
-		/*
-		 * header label: pulse
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BOTTOM).span(3, 1).applyTo(label);
-		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
+      /*
+       * header label: pulse
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BOTTOM).span(3, 1).applyTo(label);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
 
-		/*
-		 * label: %
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(UI.EMPTY_STRING);
+      /*
+       * label: %
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(label);
+      label.setText(UI.EMPTY_STRING);
 
-		/*
-		 * label: trash
-		 */
-		final CLabel iconImport = new CLabel(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).indent(10, 0).applyTo(iconImport);
-		iconImport.setImage(_imageTrash);
-		iconImport.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-	}
+      /*
+       * label: trash
+       */
+      final CLabel iconImport = new CLabel(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).indent(10, 0).applyTo(iconImport);
+      iconImport.setImage(_imageTrash);
+      iconImport.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+   }
 
-	private void createUI24HrZoneFields(final Composite parent) {
+   private void createUI24HrZoneFields(final Composite parent) {
 
-		final int hrZoneSize = _hrZones.size();
+      final int hrZoneSize = _hrZones.size();
 
-		final SelectionAdapter minSelectListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
+      final SelectionAdapter minSelectListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
 
-				if (_isUpdateUI) {
-					return;
-				}
-				enableControls();
-			}
-		};
-		final MouseWheelListener minMouseListener = new MouseWheelListener() {
-			public void mouseScrolled(final MouseEvent event) {
+            if (_isUpdateUI) {
+               return;
+            }
+            enableControls();
+         }
+      };
+      final MouseWheelListener minMouseListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
 
-				if (_isUpdateUI) {
-					return;
-				}
-				UI.adjustSpinnerValueOnMouseScroll(event);
+            if (_isUpdateUI) {
+               return;
+            }
+            UI.adjustSpinnerValueOnMouseScroll(event);
 
-				enableControls();
-			}
-		};
-		final IPropertyChangeListener colorListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+            enableControls();
+         }
+      };
+      final IPropertyChangeListener colorListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				if (_isUpdateUI) {
-					return;
-				}
-				enableControls();
-			}
-		};
-		final ModifyListener modifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+            if (_isUpdateUI) {
+               return;
+            }
+            enableControls();
+         }
+      };
+      final ModifyListener modifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
 
-				if (_isUpdateUI) {
-					return;
-				}
-				enableControls();
-			}
-		};
-		final SelectionAdapter trashSelectListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				enableControls();
-			}
-		};
+            if (_isUpdateUI) {
+               return;
+            }
+            enableControls();
+         }
+      };
+      final SelectionAdapter trashSelectListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            enableControls();
+         }
+      };
 
-		/*
-		 * fields
-		 */
-		_txtZoneName = new Text[hrZoneSize];
-		_txtNameShortcut = new Text[hrZoneSize];
-		_spinnerMinPulse = new Spinner[hrZoneSize];
-		_labelMaxPulse = new Label[hrZoneSize];
-		_colorSelector = new ColorSelector[hrZoneSize];
-		_btnTrash = new Button[hrZoneSize];
+      /*
+       * fields
+       */
+      _txtZoneName = new Text[hrZoneSize];
+      _txtNameShortcut = new Text[hrZoneSize];
+      _spinnerMinPulse = new Spinner[hrZoneSize];
+      _labelMaxPulse = new Label[hrZoneSize];
+      _colorSelector = new ColorSelector[hrZoneSize];
+      _btnTrash = new Button[hrZoneSize];
 
-		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+      for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
-			/*
-			 * color: hr zone
-			 */
-			final ColorSelector colorSelector = _colorSelector[zoneIndex] = new ColorSelector(parent);
-			colorSelector.addListener(colorListener);
+         /*
+          * color: hr zone
+          */
+         final ColorSelector colorSelector = _colorSelector[zoneIndex] = new ColorSelector(parent);
+         colorSelector.addListener(colorListener);
 
-			/*
-			 * text: hr zone name
-			 */
-			final Text txtHRZoneName = _txtZoneName[zoneIndex] = new Text(parent, SWT.SINGLE | SWT.LEAD | SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(txtHRZoneName);
-			txtHRZoneName.addModifyListener(modifyListener);
+         /*
+          * text: hr zone name
+          */
+         final Text txtHRZoneName = _txtZoneName[zoneIndex] = new Text(parent, SWT.SINGLE | SWT.LEAD | SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(txtHRZoneName);
+         txtHRZoneName.addModifyListener(modifyListener);
 
-			/*
-			 * text: name shortcut
-			 */
-			final Text txtNameShortcut = _txtNameShortcut[zoneIndex] = new Text(parent, SWT.SINGLE
-					| SWT.LEAD
-					| SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(txtNameShortcut);
-			txtNameShortcut.addModifyListener(modifyListener);
+         /*
+          * text: name shortcut
+          */
+         final Text txtNameShortcut = _txtNameShortcut[zoneIndex] = new Text(parent,
+               SWT.SINGLE
+                     | SWT.LEAD
+                     | SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(txtNameShortcut);
+         txtNameShortcut.addModifyListener(modifyListener);
 
-			/*
-			 * spinner: min pulse
-			 */
-			final Spinner spinnerMinPulse = _spinnerMinPulse[zoneIndex] = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(spinnerMinPulse);
-			spinnerMinPulse.setMinimum(0);
-			spinnerMinPulse.setMaximum(120);
-			spinnerMinPulse.addSelectionListener(minSelectListener);
-			spinnerMinPulse.addMouseWheelListener(minMouseListener);
-			spinnerMinPulse.setData(zoneIndex);
+         /*
+          * spinner: min pulse
+          */
+         final Spinner spinnerMinPulse = _spinnerMinPulse[zoneIndex] = new Spinner(parent, SWT.BORDER);
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(spinnerMinPulse);
+         spinnerMinPulse.setMinimum(0);
+         spinnerMinPulse.setMaximum(120);
+         spinnerMinPulse.addSelectionListener(minSelectListener);
+         spinnerMinPulse.addMouseWheelListener(minMouseListener);
+         spinnerMinPulse.setData(zoneIndex);
 
-			/*
-			 * label: ...
-			 */
-			Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(UI.SYMBOL_DASH);
+         /*
+          * label: ...
+          */
+         Label label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText(UI.SYMBOL_DASH);
 
-			/*
-			 * label: max pulse
-			 */
-			final Label labelMaxPulse = _labelMaxPulse[zoneIndex] = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(labelMaxPulse);
-			labelMaxPulse.setData(zoneIndex);
+         /*
+          * label: max pulse
+          */
+         final Label labelMaxPulse = _labelMaxPulse[zoneIndex] = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(labelMaxPulse);
+         labelMaxPulse.setData(zoneIndex);
 
-			/*
-			 * label: %
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(UI.SYMBOL_PERCENTAGE);
+         /*
+          * label: %
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText(UI.SYMBOL_PERCENTAGE);
 
-			/*
-			 * checkbox: trash
-			 */
-			final Button checkbox = _btnTrash[zoneIndex] = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).indent(10, 0).applyTo(checkbox);
-			checkbox.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-			checkbox.addSelectionListener(trashSelectListener);
-		}
-	}
+         /*
+          * checkbox: trash
+          */
+         final Button checkbox = _btnTrash[zoneIndex] = new Button(parent, SWT.CHECK);
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).indent(10, 0).applyTo(checkbox);
+         checkbox.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+         checkbox.addSelectionListener(trashSelectListener);
+      }
+   }
 
-	private void createUI50Actions(final Composite parent) {
+   private void createUI50Actions(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: add zone
-			 */
-			_btnAddZone = new Button(container, SWT.NONE);
-			_btnAddZone.setText(Messages.Dialog_HRZone_Button_AddZone);
-			setButtonLayoutData(_btnAddZone);
-			_btnAddZone.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAddZone();
-				}
-			});
+      {
+         /*
+          * button: add zone
+          */
+         _btnAddZone = new Button(container, SWT.NONE);
+         _btnAddZone.setText(Messages.Dialog_HRZone_Button_AddZone);
+         setButtonLayoutData(_btnAddZone);
+         _btnAddZone.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAddZone();
+            }
+         });
 
-			/*
-			 * button: sort zones
-			 */
-			_btnSortZones = new Button(container, SWT.NONE);
-			_btnSortZones.setText(Messages.Dialog_HRZone_Button_SortZone);
-			_btnSortZones.setToolTipText(Messages.Dialog_HRZone_Button_SortZone_Tooltip);
-			_btnSortZones.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSortZone();
-				}
-			});
-			setButtonLayoutData(_btnSortZones);
+         /*
+          * button: sort zones
+          */
+         _btnSortZones = new Button(container, SWT.NONE);
+         _btnSortZones.setText(Messages.Dialog_HRZone_Button_SortZone);
+         _btnSortZones.setToolTipText(Messages.Dialog_HRZone_Button_SortZone_Tooltip);
+         _btnSortZones.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSortZone();
+            }
+         });
+         setButtonLayoutData(_btnSortZones);
 
-			/*
-			 * button: remove zone
-			 */
-			_btnRemoveZone = new Button(container, SWT.NONE);
-			_btnRemoveZone.setText(Messages.Dialog_HRZone_Button_RemoveZone);
-			_btnRemoveZone.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onRemoveZone();
-				}
-			});
-			setButtonLayoutData(_btnRemoveZone);
+         /*
+          * button: remove zone
+          */
+         _btnRemoveZone = new Button(container, SWT.NONE);
+         _btnRemoveZone.setText(Messages.Dialog_HRZone_Button_RemoveZone);
+         _btnRemoveZone.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onRemoveZone();
+            }
+         });
+         setButtonLayoutData(_btnRemoveZone);
 
 // this button was disabled because	it's a complex task and time consuming task (tours must be updated)
 //			/*
@@ -488,62 +490,62 @@ public class DialogHRZones extends TitleAreaDialog {
 //				}
 //			});
 //			setButtonLayoutData(_btnApply);
-		}
-	}
+      }
+   }
 
-	private void enableControls() {
+   private void enableControls() {
 
-		final int hrZoneSize = _hrZones.size();
-		boolean isRemoveAllowed = false;
+      final int hrZoneSize = _hrZones.size();
+      boolean isRemoveAllowed = false;
 
-		if (hrZoneSize > 2 && _btnTrash != null) {
+      if (hrZoneSize > 2 && _btnTrash != null) {
 
-			for (final Button btnTrash : _btnTrash) {
-				if (btnTrash.getSelection()) {
-					isRemoveAllowed = true;
-					break;
-				}
-			}
-		}
+         for (final Button btnTrash : _btnTrash) {
+            if (btnTrash.getSelection()) {
+               isRemoveAllowed = true;
+               break;
+            }
+         }
+      }
 
-		_btnAddZone.setEnabled(hrZoneSize < TourData.MAX_HR_ZONES);
-		_btnSortZones.setEnabled(hrZoneSize > 1);
-		_btnRemoveZone.setEnabled(isRemoveAllowed);
+      _btnAddZone.setEnabled(hrZoneSize < TourData.MAX_HR_ZONES);
+      _btnSortZones.setEnabled(hrZoneSize > 1);
+      _btnRemoveZone.setEnabled(isRemoveAllowed);
 //		_btnApply.setEnabled(_isPersonModified);
-	}
+   }
 
-	@Override
-	protected IDialogSettings getDialogBoundsSettings() {
-		// keep window size and position
-		return _state;
-	}
+   @Override
+   protected IDialogSettings getDialogBoundsSettings() {
+      // keep window size and position
+      return _state;
+   }
 
-	@Override
-	protected void okPressed() {
+   @Override
+   protected void okPressed() {
 
-		okPressedActions();
+      okPressedActions();
 
-		super.okPressed();
-	}
+      super.okPressed();
+   }
 
-	private void okPressedActions() {
+   private void okPressedActions() {
 
-		updateModelFromUI();
+      updateModelFromUI();
 
-		_person.setHrZones(new HashSet<TourPersonHRZone>(_hrZones));
-	}
+      _person.setHrZones(new HashSet<>(_hrZones));
+   }
 
-	private void onAddZone() {
+   private void onAddZone() {
 
-		updateModelFromUI();
+      updateModelFromUI();
 
-		final TourPersonHRZone hrZone = new TourPersonHRZone(_person);
-		_hrZones.add(hrZone);
+      final TourPersonHRZone hrZone = new TourPersonHRZone(_person);
+      _hrZones.add(hrZone);
 
-		Collections.sort(_hrZones);
+      Collections.sort(_hrZones);
 
-		updateUIFromModel();
-	}
+      updateUIFromModel();
+   }
 
 //	private void onApply() {
 //
@@ -552,41 +554,41 @@ public class DialogHRZones extends TitleAreaDialog {
 //		_prefStore.setValue(ITourbookPreferences.HR_ZONES_ARE_MODIFIED, Math.random());
 //	}
 
-	private void onDispose() {
+   private void onDispose() {
 
-		if (_imageTrash != null) {
-			_imageTrash.dispose();
-		}
-	}
+      if (_imageTrash != null) {
+         _imageTrash.dispose();
+      }
+   }
 
-	private void onRemoveZone() {
+   private void onRemoveZone() {
 
-		updateModelFromUI();
+      updateModelFromUI();
 
-		final ArrayList<TourPersonHRZone> removedZones = new ArrayList<TourPersonHRZone>();
-		int zoneIndex = 0;
+      final ArrayList<TourPersonHRZone> removedZones = new ArrayList<>();
+      int zoneIndex = 0;
 
-		// collect all hr zones which should be removed
-		for (final Button btnTrash : _btnTrash) {
+      // collect all hr zones which should be removed
+      for (final Button btnTrash : _btnTrash) {
 
-			if (btnTrash.getSelection()) {
-				removedZones.add(_hrZones.get(zoneIndex));
-			}
+         if (btnTrash.getSelection()) {
+            removedZones.add(_hrZones.get(zoneIndex));
+         }
 
-			zoneIndex++;
-		}
+         zoneIndex++;
+      }
 
-		_hrZones.removeAll(removedZones);
+      _hrZones.removeAll(removedZones);
 
-		updateModelMaxValues();
-		updateUIFromModel();
-	}
+      updateModelMaxValues();
+      updateUIFromModel();
+   }
 
-	private void onSortZone() {
+   private void onSortZone() {
 
-		updateModelFromUI();
-		updateUIFromModel();
-	}
+      updateModelFromUI();
+      updateUIFromModel();
+   }
 
 //	private void onSelectMinPulse(final Widget widget) {
 //
@@ -603,111 +605,111 @@ public class DialogHRZones extends TitleAreaDialog {
 //		}
 //	}
 
-	private void updateModelFromUI() {
+   private void updateModelFromUI() {
 
-		final int zoneLength = _txtZoneName.length;
+      final int zoneLength = _txtZoneName.length;
 
-		for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
+      for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
 
-			final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
+         final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
 
-			hrZone.setZoneMinValue(_spinnerMinPulse[zoneIndex].getSelection());
+         hrZone.setZoneMinValue(_spinnerMinPulse[zoneIndex].getSelection());
 
-			hrZone.setZoneName(_txtZoneName[zoneIndex].getText());
-			hrZone.setNameShortcut(_txtNameShortcut[zoneIndex].getText());
+         hrZone.setZoneName(_txtZoneName[zoneIndex].getText());
+         hrZone.setNameShortcut(_txtNameShortcut[zoneIndex].getText());
 
-			hrZone.setColor(_colorSelector[zoneIndex].getColorValue());
-		}
+         hrZone.setColor(_colorSelector[zoneIndex].getColorValue());
+      }
 
-		Collections.sort(_hrZones);
+      Collections.sort(_hrZones);
 
-		updateModelMaxValues();
-	}
+      updateModelMaxValues();
+   }
 
-	/**
-	 * set max value from the previous min value
-	 */
-	private void updateModelMaxValues() {
+   /**
+    * set max value from the previous min value
+    */
+   private void updateModelMaxValues() {
 
-		int maxValue = 0;
-		final int zoneLength = _hrZones.size();
+      int maxValue = 0;
+      final int zoneLength = _hrZones.size();
 
-		for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
+      for (int zoneIndex = 0; zoneIndex < zoneLength; zoneIndex++) {
 
-			final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
+         final TourPersonHRZone hrZone = _hrZones.get(zoneIndex);
 
-			if (zoneIndex < zoneLength - 1) {
+         if (zoneIndex < zoneLength - 1) {
 
-				final int prevZoneMinValue = _hrZones.get(zoneIndex + 1).getZoneMinValue();
+            final int prevZoneMinValue = _hrZones.get(zoneIndex + 1).getZoneMinValue();
 
-				maxValue = prevZoneMinValue - 1;
+            maxValue = prevZoneMinValue - 1;
 
-			} else if (zoneIndex == zoneLength - 1) {
+         } else if (zoneIndex == zoneLength - 1) {
 
-				// set last zone to infinity
+            // set last zone to infinity
 
-				maxValue = Integer.MAX_VALUE;
-			}
+            maxValue = Integer.MAX_VALUE;
+         }
 
-			final int zoneMinValue = hrZone.getZoneMinValue();
-			if (maxValue < zoneMinValue) {
-				maxValue = zoneMinValue;
-			}
+         final int zoneMinValue = hrZone.getZoneMinValue();
+         if (maxValue < zoneMinValue) {
+            maxValue = zoneMinValue;
+         }
 
-			hrZone.setZoneMaxValue(maxValue);
-		}
-	}
+         hrZone.setZoneMaxValue(maxValue);
+      }
+   }
 
-	private void updateUIFromModel() {
+   private void updateUIFromModel() {
 
-		_isUpdateUI = true;
-		{
-			if (_hrZones.size() == 0) {
+      _isUpdateUI = true;
+      {
+         if (_hrZones.isEmpty()) {
 
-				// create default zones
+            // create default zones
 
-				_hrZones.addAll(TrainingManager.createHrZones(_person, TrainingManager.HR_ZONE_TEMPLATE_01));
-			}
+            _hrZones.addAll(TrainingManager.createHrZones(_person, TrainingManager.HR_ZONE_TEMPLATE_01));
+         }
 
-			Collections.sort(_hrZones);
+         Collections.sort(_hrZones);
 
-			createUI20HrZoneScrolledContainer(_hrZoneOuterContainer);
+         createUI20HrZoneScrolledContainer(_hrZoneOuterContainer);
 
-			final int zoneLength = _txtZoneName.length;
+         final int zoneLength = _txtZoneName.length;
 
-			for (int hrIndex = 0; hrIndex < zoneLength; hrIndex++) {
+         for (int hrIndex = 0; hrIndex < zoneLength; hrIndex++) {
 
-				final TourPersonHRZone hrZone = _hrZones.get(hrIndex);
+            final TourPersonHRZone hrZone = _hrZones.get(hrIndex);
 
-				// update UI
-				final String zoneName = hrZone.getZoneName();
-				_txtZoneName[hrIndex].setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
+            // update UI
+            final String zoneName = hrZone.getZoneName();
+            _txtZoneName[hrIndex].setText(zoneName == null ? UI.EMPTY_STRING : zoneName);
 
-				final String nameShortcut = hrZone.getNameShortcut();
-				_txtNameShortcut[hrIndex].setText(nameShortcut == null ? UI.EMPTY_STRING : nameShortcut);
+            final String nameShortcut = hrZone.getNameShortcut();
+            _txtNameShortcut[hrIndex].setText(nameShortcut == null ? UI.EMPTY_STRING : nameShortcut);
 
-				_colorSelector[hrIndex].setColorValue(hrZone.getColor());
+            _colorSelector[hrIndex].setColorValue(hrZone.getColor());
 
-				if (hrIndex == 0 || hrIndex == zoneLength - 1) {
+            if (hrIndex == 0 || hrIndex == zoneLength - 1) {
 
-					_btnTrash[hrIndex].setVisible(false);
-				}
+               _btnTrash[hrIndex].setVisible(false);
+            }
 
-				final int zoneMinValue = hrZone.getZoneMinValue();
-				final int zoneMaxValue = hrZone.getZoneMaxValue();
+            final int zoneMinValue = hrZone.getZoneMinValue();
+            final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-				final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
-						? Messages.App_Label_max
-						: Integer.toString(zoneMaxValue);
+            final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
+                  ? Messages.App_Label_max
+                  : Integer.toString(zoneMaxValue);
 
-				_spinnerMinPulse[hrIndex].setSelection(zoneMinValue);
-				_labelMaxPulse[hrIndex].setText(zoneMaxValueText);
-			}
+            _spinnerMinPulse[hrIndex].setSelection(zoneMinValue);
+            _labelMaxPulse[hrIndex].setText(zoneMaxValueText);
+         }
 
-			_hrZoneOuterContainer.layout(true, true);
+         _hrZoneOuterContainer.layout(true, true);
 
-			enableControls();
-		}
-		_isUpdateUI = false;
-	}
+         enableControls();
+      }
+      _isUpdateUI = false;
+   }
 }

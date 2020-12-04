@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -74,7 +74,7 @@ public class Map25ConfigManager {
          new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker_Grid,      ClusterAlgorithm.FirstMarker_Grid),
          new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,                  ClusterAlgorithm.Grid_Center),
    };
-   
+
 // SET_FORMATTING_ON
 
    public static final String CONFIG_DEFAULT_ID_1  = "#1";  //$NON-NLS-1$
@@ -189,7 +189,7 @@ public class Map25ConfigManager {
    private static final String ATTR_CLUSTER_ORIENTATION     = "clusterOrientation";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_GRID_SIZE       = "clusterGridSize";      //$NON-NLS-1$
    private static final String ATTR_IS_MARKER_CLUSTERED     = "isMarkerClustered";    //$NON-NLS-1$
-   private static final String ATTR_IS_PHOTO_CLUSTERED      = "isPhotoClustered";    //$NON-NLS-1$
+   private static final String ATTR_IS_PHOTO_CLUSTERED      = "isPhotoClustered";     //$NON-NLS-1$
    //
    private static final String ATTR_CLUSTER_FILL_OPACITY    = "clusterFillOpacity";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_OUTLINE_OPACITY = "cluserOutlineOpacity"; //$NON-NLS-1$
@@ -391,7 +391,7 @@ public class Map25ConfigManager {
 
    /**
     * Overwrite default defaults.
-    * 
+    *
     * @param configIndex
     *           Index starts with 1.
     * @return
@@ -458,7 +458,7 @@ public class Map25ConfigManager {
    }
 
 // SET_FORMATTING_OFF
-   
+
    private static void createXml_FromMarkerConfig(final MarkerConfig config, final IMemento xmlMarkers) {
 
       // <Marker>
@@ -535,15 +535,15 @@ public class Map25ConfigManager {
          xmlConfig.putBoolean(   ATTR_IS_SHOW_SLIDER_LOCATION,    config.isShowSliderLocation);
          xmlConfig.putInteger(   ATTR_SLIDER_LOCATION_OPACITY,    config.sliderLocation_Opacity);
          xmlConfig.putInteger(   ATTR_SLIDER_LOCATION_SIZE,       config.sliderLocation_Size);
-         
+
          // <SliderLocation_Left>
          Util.setXmlRgb(xmlConfig, TAG_SLIDER_LOCATION_LEFT,      config.sliderLocation_Left_Color);
-         
+
          // <SliderLocation_Right>
          Util.setXmlRgb(xmlConfig, TAG_SLIDER_LOCATION_RIGHT,     config.sliderLocation_Right_Color);
       }
    }
-   
+
 // SET_FORMATTING_ON
 
    public static MarkerConfig getActiveMarkerConfig() {
@@ -700,7 +700,7 @@ public class Map25ConfigManager {
    private static void parse_050_TrackConfig(final XMLMemento xmlConfig, final Map25TrackConfig config) {
 
 // SET_FORMATTING_OFF
-      
+
       config.id   = Util.getXmlString(xmlConfig, ATTR_ID,            Long.toString(System.nanoTime()));
       config.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,   UI.EMPTY_STRING);
 
@@ -713,16 +713,16 @@ public class Map25ConfigManager {
          final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
 
          switch (xmlConfigChild.getType()) {
-            
+
          case TAG_OUTLINE:
 
             config.outlineColor        = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
             config.outlineOpacity      = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
             config.outlineWidth        = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
             break;
-            
+
          case TAG_SLIDER_PATH:
-            
+
             config.isShowSliderPath    = Util.getXmlBoolean(xmlConfigChild,      ATTR_IS_SHOW_SLIDER_PATH,       DEFAULT_IS_SHOW_SLIDER_PATH);
             config.sliderPath_Color    = Util.getXmlRgb(xmlConfigChild,          DEFAULT_SLIDER_PATH_COLOR);
             config.sliderPath_LineWidth= Util.getXmlFloatFloat(xmlConfigChild,   ATTR_SLIDER_PATH_LINE_WIDTH,    DEFAULT_SLIDER_PATH_LINE_WIDTH, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
@@ -730,16 +730,16 @@ public class Map25ConfigManager {
             break;
 
          case TAG_SLIDER_LOCATION_LEFT:
-            
+
             config.sliderLocation_Left_Color   = Util.getXmlRgb(xmlConfigChild,  DEFAULT_SLIDER_LOCATION_LEFT_COLOR);
             break;
-            
+
          case TAG_SLIDER_LOCATION_RIGHT:
-            
+
             config.sliderLocation_Right_Color   = Util.getXmlRgb(xmlConfigChild, DEFAULT_SLIDER_LOCATION_RIGHT_COLOR);
             break;
          }
-         
+
 // SET_FORMATTING_ON
       }
    }
@@ -747,7 +747,7 @@ public class Map25ConfigManager {
    private static void parse_210_MarkerConfig(final XMLMemento xmlConfig, final MarkerConfig config) {
 
 // SET_FORMATTING_OFF
-      
+
       config.id                     = Util.getXmlString(xmlConfig,      ATTR_ID,                      Long.toString(System.nanoTime()));
       config.name                   = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,             UI.EMPTY_STRING);
 
@@ -756,7 +756,7 @@ public class Map25ConfigManager {
       config.clusterAlgorithm       = Util.getXmlEnum(xmlConfig,        ATTR_CLUSTER_ALGORITHM,       ClusterAlgorithm.FirstMarker_Distance);
       config.clusterGrid_Size       = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_GRID_SIZE,       DEFAULT_CLUSTER_GRID_SIZE,       CLUSTER_GRID_MIN_SIZE,     CLUSTER_GRID_MAX_SIZE);
       config.clusterOrientation     = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_ORIENTATION,     Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-      
+
       config.clusterFill_Opacity    = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_FILL_OPACITY,    DEFAULT_CLUSTER_FILL_OPACITY);
       config.clusterOutline_Opacity = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_OUTLINE_OPACITY, DEFAULT_CLUSTER_OUTLINE_OPACITY);
       config.clusterOutline_Size    = Util.getXmlFloatFloat(xmlConfig,  ATTR_CLUSTER_OUTLINE_SIZE,    DEFAULT_CLUSTER_OUTLINE_SIZE,    CLUSTER_OUTLINE_SIZE_MIN,  CLUSTER_OUTLINE_SIZE_MAX);
@@ -768,7 +768,7 @@ public class Map25ConfigManager {
       config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
       config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-      
+
       config.markerFill_Opacity     = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,     Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
       config.markerOutline_Opacity  = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_OUTLINE_OPACITY,  Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
       config.markerOutline_Size     = Util.getXmlFloatFloat(xmlConfig,  ATTR_MARKER_OUTLINE_SIZE,     DEFAULT_MARKER_OUTLINE_SIZE,     MARKER_OUTLINE_SIZE_MIN,   MARKER_OUTLINE_SIZE_MAX);
@@ -805,7 +805,7 @@ public class Map25ConfigManager {
 
    /**
     * Read or create configuration a xml file
-    * 
+    *
     * @return
     */
    private static void readConfigFromXml() {
@@ -839,11 +839,11 @@ public class Map25ConfigManager {
          restoreState_30_Markers(xmlRoot, _allMarkerConfigs);
 
          // ensure config is created
-         if (_allTrackConfigs.size() == 0) {
+         if (_allTrackConfigs.isEmpty()) {
             createDefaults_Tracks();
          }
 
-         if (_allMarkerConfigs.size() == 0) {
+         if (_allMarkerConfigs.isEmpty()) {
             createDefaults_Markers();
          }
 
@@ -919,7 +919,7 @@ public class Map25ConfigManager {
 
    /**
     * Parse configuration xml.
-    * 
+    *
     * @param xmlRoot
     * @param allTourTrackConfig
     */
@@ -1076,7 +1076,7 @@ public class Map25ConfigManager {
 
    /**
     * Set map location with or without animation
-    * 
+    *
     * @param map
     * @param boundingBox
     * @param locationAnimationTime

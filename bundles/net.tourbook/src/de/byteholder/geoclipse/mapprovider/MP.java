@@ -1280,7 +1280,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
                // this is a parent child, put all child tiles into the loading queue
 
-               if (tileChildren.size() == 0) {
+               if (tileChildren.isEmpty()) {
 
                   /*
                    * there are no child tiles available, this can happen when the zoom factor does

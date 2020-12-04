@@ -984,7 +984,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final Set<TourTag> tourTags = ((TVICompareResultComparedTour) element).comparedTourData
                      .getTourTags();
-               if (tourTags.size() == 0) {
+               if (tourTags.isEmpty()) {
 
                   // the tags could have been removed, set empty field
 
@@ -1554,7 +1554,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       /*
        * return when there are no removed tours or when the selection has not changed
        */
-      if (removedTourCompareIds.size() == 0 || removedTourSelection == _oldRemoveSelection) {
+      if (removedTourCompareIds.isEmpty() || removedTourSelection == _oldRemoveSelection) {
          return;
       }
 

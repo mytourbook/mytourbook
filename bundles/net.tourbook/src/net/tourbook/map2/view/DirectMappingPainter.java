@@ -408,7 +408,7 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       final List<MapPainter> allMapPainter = _map.getMapPainter();
-      if (allMapPainter == null || allMapPainter.size() == 0) {
+      if (allMapPainter == null || allMapPainter.isEmpty()) {
          return;
       }
 

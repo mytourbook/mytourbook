@@ -1077,7 +1077,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private String getSelectedThemeStyle(final List<MapsforgeThemeStyle> cachedThemeStyles) {
 
-      if (cachedThemeStyles == null || cachedThemeStyles.size() == 0) {
+      if (cachedThemeStyles == null || cachedThemeStyles.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
@@ -1689,7 +1689,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
        * Fill combo with styles
        */
 
-      if (mfStyles != null && mfStyles.size() == 0) {
+      if (mfStyles != null && mfStyles.isEmpty()) {
 
          _comboOffline_ThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
          _comboOffline_ThemeStyle.select(0);

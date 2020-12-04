@@ -998,7 +998,7 @@ public class MapProviderManager {
          }
       }
 
-      if (loadedMtLayers.size() == 0) {
+      if (loadedMtLayers.isEmpty()) {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(),
                Messages.MP_Error_DialogTitle_Wms,
@@ -1354,7 +1354,7 @@ public class MapProviderManager {
 
    private void displayError(final String filename) {
 
-      if (_errorLog.size() == 0) {
+      if (_errorLog.isEmpty()) {
          return;
       }
 

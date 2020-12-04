@@ -45,7 +45,8 @@ public class GarminFitTester {
    }
 
    /**
-    * Regression test
+    * Regression test. This test can be useful when updating the FIT SDK and ensuring that the FIT
+    * import still works as expected.
     */
    @Test
    void testFitImportConeyLake() {
@@ -55,8 +56,8 @@ public class GarminFitTester {
       final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
       fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
 
-      final TourData tour = Comparison.RetrieveImportedTour(newlyImportedTours);
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.CompareTourDataAgainstControl(tour, filePath);
+      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 }

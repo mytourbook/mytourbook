@@ -1369,7 +1369,7 @@ public void saveState() {
          }
       }
 
-      if (treePathItems.size() == 0) {
+      if (treePathItems.isEmpty()) {
          // there is nothing which can be selected
          return false;
       }

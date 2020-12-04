@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1755,7 +1755,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       // try to use selection from selection service
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-      if (_allSelectedTours.size() == 0) {
+      if (_allSelectedTours.isEmpty()) {
 
          // a tour is not displayed, find a tour provider which provides a tour
          Display.getCurrent().asyncExec(new Runnable() {
