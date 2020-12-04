@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -313,7 +313,7 @@ public class MapBookmarkManager {
 
    private static void actionBookmark_Rename(final IMapBookmarks mapBookmarks) {
 
-      if (_allRecentBookmarks.isEmpty() == false) {
+      if (_allRecentBookmarks.size() > 0) {
 
          final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
 
@@ -359,7 +359,7 @@ public class MapBookmarkManager {
 
    private static void actionBookmark_Update(final IMapBookmarks mapBookmarks) {
 
-      if (_allRecentBookmarks.isEmpty() == false) {
+      if (_allRecentBookmarks.size() > 0) {
 
          final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
 
@@ -407,7 +407,7 @@ public class MapBookmarkManager {
       menuMgr.add(new ActionBookmark_Add(mapBookmarks));
 
       // update bookmark
-      if (_allRecentBookmarks.isEmpty() == false) {
+      if (_allRecentBookmarks.size() > 0) {
 
          final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
 
@@ -464,7 +464,7 @@ public class MapBookmarkManager {
       fillMenuItem(menu, new ActionBookmark_Add(mapBookmarks));
 
       // update bookmark
-      if (_allRecentBookmarks.isEmpty() == false) {
+      if (_allRecentBookmarks.size() > 0) {
 
          final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
 

@@ -817,7 +817,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-         if (structuredSelection.isEmpty() == false) {
+         if (structuredSelection.size() > 0) {
             final Object firstElement = structuredSelection.getFirstElement();
             if (firstElement instanceof TVICatalogComparedTour) {
 
@@ -835,7 +835,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          final SelectionRemovedComparedTours removedCompTours = (SelectionRemovedComparedTours) selection;
 
-         if (removedCompTours.removedComparedTours.isEmpty() == false) {
+         if (removedCompTours.removedComparedTours.size() > 0) {
             updateUI_YearChart(false);
          }
       }

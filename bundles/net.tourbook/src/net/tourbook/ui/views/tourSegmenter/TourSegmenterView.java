@@ -4744,7 +4744,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-               if (tourIds != null && tourIds.isEmpty() == false) {
+               if (tourIds != null && tourIds.size() > 0) {
 
                   if (tourIds.size() == 1) {
 

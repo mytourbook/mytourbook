@@ -666,7 +666,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-//					if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
+//					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 //
 //						_allTourData.clear();
 //						_allTourData.addAll(modifiedTours);
@@ -1014,8 +1014,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final TourLayer tourLayer = _mapApp.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
-      final boolean isTourAvailable = _allTourData.isEmpty() == false;
-      final boolean isAllPhotoAvailable = _allPhotos.isEmpty() == false;
+      final boolean isTourAvailable = _allTourData.size() > 0;
+      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 

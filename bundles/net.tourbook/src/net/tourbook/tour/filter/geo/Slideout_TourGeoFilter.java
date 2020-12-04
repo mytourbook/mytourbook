@@ -1065,7 +1065,7 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
       final boolean isGeoFilterSelected = _selectedFilter != null;
 
       _btnDeleteGeoFilter.setEnabled(isGeoFilterSelected);
-      _btnDeleteGeoFilterAllWithoutName.setEnabled(_allGeoFilter.isEmpty() == false);
+      _btnDeleteGeoFilterAllWithoutName.setEnabled(_allGeoFilter.size() > 0);
    }
 
    @Override

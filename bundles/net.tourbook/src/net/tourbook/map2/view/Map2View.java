@@ -1257,7 +1257,7 @@ public class Map2View extends ViewPart implements
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if ((modifiedTours != null) && (modifiedTours.isEmpty() == false)) {
+               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
                   _allTourData.clear();
                   _allTourData.addAll(modifiedTours);
@@ -1807,8 +1807,8 @@ public class Map2View extends ViewPart implements
          }
       }
 
-      final boolean isAllPhotoAvailable = _allPhotos.isEmpty() == false;
-      final boolean isFilteredPhotoAvailable = _filteredPhotos.isEmpty() == false;
+      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
+      final boolean isFilteredPhotoAvailable = _filteredPhotos.size() > 0;
       final boolean canShowFilteredPhoto = isFilteredPhotoAvailable && _isShowPhoto;
 
       /*
@@ -2491,7 +2491,7 @@ public class Map2View extends ViewPart implements
 
             final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
 
-            if (allPhotos.isEmpty() == false) {
+            if (allPhotos.size() > 0) {
 
 //               centerPhotos(allPhotos, false);
                showDefaultMap(true);
@@ -3894,7 +3894,7 @@ public class Map2View extends ViewPart implements
             /*
              * check if tour is set from a selection provider
              */
-            if (_allTourData.isEmpty() == false) {
+            if (_allTourData.size() > 0) {
                return;
             }
 

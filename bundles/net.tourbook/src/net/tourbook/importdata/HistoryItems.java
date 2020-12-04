@@ -206,7 +206,7 @@ class HistoryItems {
             isAdded = true;
          }
 
-         if (_deviceNameItems.isEmpty() == false) {
+         if (_deviceNameItems.size() > 0) {
 
             if (isAdded) {
                _combo.add(COMBO_SEPARATOR);
@@ -220,7 +220,7 @@ class HistoryItems {
          }
       }
 
-      if (_folderItems.isEmpty() == false) {
+      if (_folderItems.size() > 0) {
 
          if (isAdded) {
             _combo.add(COMBO_SEPARATOR);

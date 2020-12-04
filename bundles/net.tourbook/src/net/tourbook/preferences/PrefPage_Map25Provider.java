@@ -1452,7 +1452,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       if (lastMapProvider != null) {
          _mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
-      } else if (_allMapProvider.isEmpty() == false) {
+      } else if (_allMapProvider.size() > 0) {
          _mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
       } else {
          // nothing can be selected

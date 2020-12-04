@@ -455,7 +455,7 @@ public class PhotoImageLoader {
        * wait until exif data and small images are loaded
        */
       try {
-         while (thumbImageWaitingQueue.isEmpty() == false || exifWaitingQueue.isEmpty() == false) {
+         while (thumbImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
             Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
          }
       } catch (final InterruptedException e) {
@@ -1478,7 +1478,7 @@ public class PhotoImageLoader {
        * wait until original images are loaded
        */
       try {
-         while (waitingQueueOriginal.isEmpty() == false) {
+         while (waitingQueueOriginal.size() > 0) {
             Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
          }
       } catch (final InterruptedException e) {

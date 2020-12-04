@@ -812,7 +812,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
          final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-         if (tourIds != null && tourIds.isEmpty() == false) {
+         if (tourIds != null && tourIds.size() > 0) {
             updateChart_12(tourIds);
          }
 
@@ -903,7 +903,7 @@ public class HeartRateVariabilityView extends ViewPart {
             }
 
             final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.isEmpty() == false) {
+            if (selectedTours != null && selectedTours.size() > 0) {
                updateChart_22(selectedTours);
             }
          }

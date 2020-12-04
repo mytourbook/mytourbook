@@ -76,7 +76,7 @@ public class ActionRetrieveWeatherData extends Action {
                }
             }
 
-            if (modifiedTours.isEmpty() == false) {
+            if (modifiedTours.size() > 0) {
                TourManager.saveModifiedTours(modifiedTours);
             } else {
                MessageDialog.openInformation(

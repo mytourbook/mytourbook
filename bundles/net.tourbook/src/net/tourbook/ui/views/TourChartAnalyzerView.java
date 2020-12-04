@@ -826,7 +826,7 @@ public class TourChartAnalyzerView extends ViewPart {
 
                final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-               if (selectedTours != null && selectedTours.isEmpty() == false) {
+               if (selectedTours != null && selectedTours.size() > 0) {
 
                   final TourData selectedTour = selectedTours.get(0);
                   final SelectionTourId tourSelection = new SelectionTourId(selectedTour.getTourId());

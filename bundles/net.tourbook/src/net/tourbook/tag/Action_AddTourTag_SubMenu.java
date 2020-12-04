@@ -307,7 +307,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          // check the tag when it's set in the tour
          final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
 
-         final boolean isModifiedTags = _modifiedTags.isEmpty() == false;
+         final boolean isModifiedTags = _modifiedTags.size() > 0;
          final boolean isSelectedTags = _selectedTourTags != null;
 
          boolean isTagChecked = false;
@@ -424,7 +424,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          fillRecentTags(menu);
 
-         final boolean isModifiedTags = _modifiedTags.isEmpty() == false;
+         final boolean isModifiedTags = _modifiedTags.size() > 0;
 
          (new Separator()).fill(menu, -1);
          {
@@ -470,7 +470,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     */
    private void fillRecentTags(final Menu menu) {
 
-      if ((TourDatabase.getAllTourTags().isEmpty() == false)) {
+      if ((TourDatabase.getAllTourTags().size() > 0)) {
 
          // tags are available
 
@@ -566,7 +566,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
    private void saveTags() {
 
-      if (_modifiedTags.isEmpty() == false) {
+      if (_modifiedTags.size() > 0) {
          _tagMenuMgr.saveTourTags(_modifiedTags, true);
       }
    }
@@ -584,7 +584,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          // ensure tags are available
          final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
-         super.setEnabled(enabled && allTags.isEmpty() == false);
+         super.setEnabled(enabled && allTags.size() > 0);
 
       } else {
 
