@@ -36,6 +36,8 @@ Improvements
   - Show values with the selected measurement system
   - Show value labels with the selected language
 
+* Tour Photos View
+  - Select next/previous photo with the mousewheel
 
 Changes  
 =======
