@@ -15,17 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.data.TourData;
-
 public class HoveredValueData {
 
-   public TourData tourData;
+   public int hoveredValuePointIndex;
 
-   public int      hoveredValuePointIndex;
+   public HoveredValueData(final int hoveredValuePointIndex) {
 
-   public HoveredValueData(final TourData tourData, final int hoveredValuePointIndex) {
-
-      this.tourData = tourData;
       this.hoveredValuePointIndex = hoveredValuePointIndex;
    }
 
@@ -34,7 +29,6 @@ public class HoveredValueData {
 
       return "HoveredValueData\n" //$NON-NLS-1$
             + "[\n" //$NON-NLS-1$
-            + "tourData=" + tourData + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "hoveredValuePointIndex=" + hoveredValuePointIndex //$NON-NLS-1$
             + "\n]"; //$NON-NLS-1$
    }

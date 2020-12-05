@@ -477,15 +477,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private void fireHoveredValue(final int hoveredValuePointIndex) {
 
-//      TourData tourData;
-//      if (_tourData.isMultipleTours()) {
-//
-//      } else {
-//
-//         tourData = _tourChart.getTourData();
-//      }
-
-      final HoveredValueData hoveredValueData = new HoveredValueData(_tourData, hoveredValuePointIndex);
+      final HoveredValueData hoveredValueData = new HoveredValueData(hoveredValuePointIndex);
 
       TourManager.fireEventWithCustomData(
             TourEventId.HOVERED_VALUE_POSITION,

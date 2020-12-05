@@ -102,8 +102,8 @@ public class DirectMappingPainter implements IDirectPainter {
     */
    private boolean drawMarker(final DirectPainterContext painterContext,
                               final int sliderValueIndex,
-                                    final Image markerImage,
-                                    final boolean isYPosCenter) {
+                              final Image markerImage,
+                              final boolean isYPosCenter) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -122,14 +122,6 @@ public class DirectMappingPainter implements IDirectPainter {
 
       // convert awt to swt point
       final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
-
-      if (isYPosCenter) {
-
-         System.out.println((System.currentTimeMillis() + " drawMarker() - sliderValueIndex:" + sliderValueIndex));
-         System.out.println((System.currentTimeMillis() + " drawMarker() - serie size      :" + _tourData.latitudeSerie.length));
-         // TODO remove SYSTEM.OUT.PRINTLN
-
-      }
 
       // check if slider is visible
       final Rectangle viewport = painterContext.viewport;

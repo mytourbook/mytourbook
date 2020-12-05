@@ -2124,6 +2124,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourDataCopy;
    }
 
+   /**
+    * The default sorting for tours are by date/time
+    */
    @Override
    public int compareTo(final Object obj) {
 
