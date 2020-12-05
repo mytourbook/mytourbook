@@ -60,6 +60,9 @@ Fixes
   
 * Calendar View
   - The calendar week did not start always with the first day of week, it depended on the selected tour date 
+  
+* Tour Chart
+  - Multiple tours with default cadence of spm have displayed doubled cadence values  
 
 
 Translation    
