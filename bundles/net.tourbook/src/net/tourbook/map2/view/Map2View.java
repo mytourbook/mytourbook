@@ -36,6 +36,7 @@ import de.byteholder.gpx.PointOfInterest;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -1017,7 +1018,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowSlider() {
 
-      if ((_allTourData == null) || (_allTourData.isEmpty())) {
+      if (_allTourData == null || _allTourData.isEmpty()) {
          return;
       }
 
@@ -1048,9 +1049,9 @@ public class Map2View extends ViewPart implements
 
    public void actionShowValuePoint() {
 
-      if (_allTourData != null && !_allTourData.isEmpty()) {
+      if (_allTourData != null && _allTourData.size() > 0) {
 
-         updateUI_HoveredValuePoint(_allTourData.get(0), _currentValuePointIndex);
+         updateUI_HoveredValuePoint();
       }
    }
 
@@ -2611,7 +2612,7 @@ public class Map2View extends ViewPart implements
 
       _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
 
-      updateUI_HoveredValuePoint(hoveredValueData.tourData, hoveredValueData.hoveredValuePointIndex);
+      updateUI_HoveredValuePoint();
    }
 
    /**
@@ -3170,6 +3171,12 @@ public class Map2View extends ViewPart implements
          // tour data needs to be loaded
 
          newOverlayKey = TourManager.loadTourData(allTourIds, _allTourData, true);
+
+         /*
+          * Sort tours by date otherwise the chart value point, which is sorted by date, could show
+          * the wrong tour -> complicated
+          */
+         Collections.sort(_allTourData);
 
          _hash_AllTourIds = allTourIds.hashCode();
          _hash_AllTourData = _allTourData.hashCode();
@@ -4274,18 +4281,63 @@ public class Map2View extends ViewPart implements
       tbm.update(true);
    }
 
-   private void updateUI_HoveredValuePoint(final TourData tourData, final int hoveredValuePointIndex) {
+   private void updateUI_HoveredValuePoint() {
+
+      // find tour data for the index
+      TourData hoveredTourData = null;
+      int hoveredSerieIndex = 0;
+
+      if (_allTourData.size() == 1) {
+
+         // one simple tour or a multiple tour is displayed
+
+         hoveredSerieIndex = _currentValuePointIndex;
+         hoveredTourData = _allTourData.get(0);
+
+      } else {
+
+         /**
+          * Discovered issue:
+          * <p>
+          * When multiple tours are selected in the tourbook view, _allTourData contains multiple
+          * tours. However when tour chart is selected and it contains multiple tours, then one
+          * TourData with isMultipleTour is displayed in the map ->complicated
+          */
+
+         int adjustedValuePointIndex = _currentValuePointIndex;
+
+         for (final TourData tourData : _allTourData) {
+
+            final double[] latitudeSerie = tourData.latitudeSerie;
+            if (latitudeSerie != null) {
+
+               final int serieLength = latitudeSerie.length;
+
+               if (adjustedValuePointIndex < serieLength) {
+
+                  hoveredTourData = tourData;
+                  hoveredSerieIndex = adjustedValuePointIndex;
+
+                  break;
+
+               } else {
+
+                  adjustedValuePointIndex -= serieLength;
+               }
+            }
+         }
+      }
 
       // set the paint context  for the direct mapping painter
       _directMappingPainter.setPaintContext(
 
             _map,
             _isShowTour,
-            _allTourData.get(0),
+            hoveredTourData,
 
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
-            _currentValuePointIndex,
+            hoveredSerieIndex,
 
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
@@ -4296,7 +4348,7 @@ public class Map2View extends ViewPart implements
       _map.paint();
 
       if (_isMapSyncWith_ValuePoint) {
-         positionMapTo_ValueIndex(tourData, hoveredValuePointIndex);
+         positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
    }
 

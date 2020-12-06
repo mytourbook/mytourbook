@@ -218,8 +218,8 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                 * Label: Info
                 */
                final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
-               lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_Cadence_Tooltip);
-               GridDataFactory.fillDefaults()//
+               lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_CadenceValue_Tooltip);
+               GridDataFactory.fillDefaults()
                      .grab(true, false)
                      .indent(_checkboxIndent, 0)
                      .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)

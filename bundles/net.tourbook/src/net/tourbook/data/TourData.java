@@ -2124,6 +2124,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourDataCopy;
    }
 
+   /**
+    * The default sorting for tours are by date/time
+    */
    @Override
    public int compareTo(final Object obj) {
 
@@ -7093,20 +7096,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else {
 
-         if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
+         if (isMultipleTours) {
 
-            if (cadenceSerieWithMultiplier == null) {
+            /*
+             * Each tour of a multiple tour do already contain the cadence values with multiplier,
+             * so an additional multiplication would display the wrong value.
+             */
 
-               // create cadence with multiplier
+            return cadenceSerie;
 
-               cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+         } else {
 
-               for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
-                  cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+            if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
+
+               if (cadenceSerieWithMultiplier == null) {
+
+                  // create cadence with multiplier
+
+                  cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+
+                  for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+                     cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+                  }
                }
-            }
 
-            return cadenceSerieWithMultiplier;
+               return cadenceSerieWithMultiplier;
+            }
          }
 
          return cadenceSerie;
