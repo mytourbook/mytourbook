@@ -380,19 +380,19 @@ public class Map extends Canvas {
    private String                                     _overlayKey;
 
    /**
-    * this painter is called when the map is painted in the onPaint event
+    * This painter is called when the map is painted in the onPaint event
     */
    private IDirectPainter                             _directMapPainter;
 
    private final DirectPainterContext                 _directMapPainterContext  = new DirectPainterContext();
 
    /**
-    * when <code>true</code> the overlays are painted
+    * When <code>true</code> the overlays are painted
     */
    private boolean                                    _isDrawOverlays;
 
    /**
-    * contains a legend which is painted in the map
+    * Contains a legend which is painted in the map
     */
    private MapLegend                                  _mapLegend;
 
@@ -3131,8 +3131,8 @@ public class Map extends Canvas {
          if (_hoveredAreaContext != null) {
             final Image hoveredImage = _hoveredAreaContext.hoveredImage;
             if (hoveredImage != null) {
-               gc.drawImage( //
-                     hoveredImage,
+
+               gc.drawImage(hoveredImage,
                      _hoveredAreaContext.hoveredTopLeftX,
                      _hoveredAreaContext.hoveredTopLeftY);
             }
@@ -6365,7 +6365,7 @@ public class Map extends Canvas {
       final PoiToolTip poiTT = getPoi();
       final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
 
-      poiTT.show(//
+      poiTT.show(
             poiDisplayPosition.x,
             poiDisplayPosition.y,
             _poiImageBounds.width,

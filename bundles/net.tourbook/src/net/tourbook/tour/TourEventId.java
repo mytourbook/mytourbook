@@ -19,6 +19,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourEventId {
@@ -92,6 +93,12 @@ public enum TourEventId {
     * is closed which provided the tour
     */
    CLEAR_DISPLAYED_TOUR,
+
+   /**
+    * This event is fired when mouse is hovering a value point, event data contains
+    * {@link HoveredValueData}
+    */
+   HOVERED_VALUE_POSITION,
 
    /**
     * Event data contain the selected tours.

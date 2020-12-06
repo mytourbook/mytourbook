@@ -97,18 +97,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       };
    }
 
-   public final static int            LABEL_POS_VERTICAL_ABOVE_GRAPH            = 0;
-   public final static int            LABEL_POS_VERTICAL_BELOW_GRAPH            = 1;
-   public final static int            LABEL_POS_VERTICAL_TOP_CHART              = 2;
-   public final static int            LABEL_POS_VERTICAL_BOTTOM_CHART           = 3;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT     = 4;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED = 5;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT    = 6;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT     = 7;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED = 8;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT    = 9;
-   public final static int            LABEL_POS_HORIZONTAL_GRAPH_LEFT           = 10;
-   public final static int            LABEL_POS_HORIZONTAL_GRAPH_RIGHT          = 11;
+   public static final int            LABEL_POS_VERTICAL_ABOVE_GRAPH            = 0;
+   public static final int            LABEL_POS_VERTICAL_BELOW_GRAPH            = 1;
+   public static final int            LABEL_POS_VERTICAL_TOP_CHART              = 2;
+   public static final int            LABEL_POS_VERTICAL_BOTTOM_CHART           = 3;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT     = 4;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED = 5;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT    = 6;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT     = 7;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED = 8;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT    = 9;
+   public static final int            LABEL_POS_HORIZONTAL_GRAPH_LEFT           = 10;
+   public static final int            LABEL_POS_HORIZONTAL_GRAPH_RIGHT          = 11;
 
    /**
     *

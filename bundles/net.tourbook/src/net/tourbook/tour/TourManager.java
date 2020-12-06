@@ -1829,18 +1829,19 @@ public class TourManager {
          loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
          /*
-          * Check if this is a long duration -> run in progress monitor
+          * Check if this is a long duration -> run with progress monitor
           */
          final long runDuration = System.currentTimeMillis() - start;
          if (runDuration > 500) {
             isLongDuration = true;
+            ++tourIndex[0];
             break;
          }
 
          ++tourIndex[0];
       }
 
-      if (isLongDuration) {
+      if (isLongDuration && tourIndex[0] < numTourIds) {
 
          try {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,30 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package utils;
+package net.tourbook.ui.tourChart;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+public class HoveredValueData {
 
-import net.tourbook.common.UI;
+   public int hoveredValuePointIndex;
 
-import org.xml.sax.SAXException;
+   public HoveredValueData(final int hoveredValuePointIndex) {
 
-public class Initializer {
-
-   public static SAXParser initializeParser() {
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = null;
-      try {
-         parser = factory.newSAXParser();
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
-      } catch (final ParserConfigurationException | SAXException e) {
-         e.printStackTrace();
-      }
-
-      return parser;
+      this.hoveredValuePointIndex = hoveredValuePointIndex;
    }
+
+   @Override
+   public String toString() {
+
+      return "HoveredValueData\n" //$NON-NLS-1$
+            + "[\n" //$NON-NLS-1$
+            + "hoveredValuePointIndex=" + hoveredValuePointIndex //$NON-NLS-1$
+            + "\n]"; //$NON-NLS-1$
+   }
+
 }

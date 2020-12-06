@@ -220,7 +220,7 @@ public class TourContextMenu {
       _actionPrintTour.setEnabled(isTourSelected);
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.isEmpty() == false);
+      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
       Long tourTypeId = new Long(-1); // TODO -> NOTOUR
       if (null != firstSavedTour) {

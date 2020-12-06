@@ -1,43 +1,45 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+/**
+ * @author Wolfgang Schramm Created: 31.7.2012
+ */
+package net.tourbook.chart;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
+import net.tourbook.common.PointLong;
 
-import org.eclipse.jface.action.Action;
+public interface IHoveredValueTooltipListener {
 
-public class ActionSyncMapWithSlider extends Action {
+   /**
+    * Hide tooltip because chart has been modified (zoomed in/out)
+    */
+   void hideTooltip();
 
-	private Map2View _map2View;
-
-	public ActionSyncMapWithSlider(final Map2View map2View) {
-
-		super(null, AS_CHECK_BOX);
-
-		_map2View = map2View;
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled));
-	}
-
-	@Override
-	public void run() {
-		_map2View.action_SyncWith_ChartSlider();
-	}
+   /**
+    * Event is fired when mouse is moved over a line graph value point.
+    *
+    * @param eventTime
+    * @param devXMouseMove
+    * @param devYMouseMove
+    * @param hoveredValueIndex
+    * @param devHoveredValue
+    */
+   void hoveredValue(long eventTime,
+                     int devXMouseMove,
+                     int devYMouseMove,
+                     int hoveredValueIndex,
+                     PointLong devHoveredValue);
 
 }

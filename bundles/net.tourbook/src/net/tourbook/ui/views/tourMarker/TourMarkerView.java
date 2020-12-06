@@ -821,7 +821,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int previousMarkerIndex = getPreviousMarkerIndex(cell);
 
-            final int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            if (_tourData.isMultipleTours()) {
+               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
+            }
 
             final double averagePace = computeAverage(_tourData.getPaceSerieSeconds(), previousMarkerIndex, currentMarkerIndex);
 
@@ -842,7 +845,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int previousMarkerIndex = getPreviousMarkerIndex(cell);
 
-            final int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            int currentMarkerIndex = getCurrentMarkerIndex(cell);
+            if (_tourData.isMultipleTours()) {
+               currentMarkerIndex = getMultiTourSerieIndex(currentMarkerIndex);
+            }
 
             final double averageSpeed = computeAverage(_tourData.getSpeedSerie(), previousMarkerIndex, currentMarkerIndex);
 
@@ -959,16 +965,27 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
             int lastTime = 0;
+            TourData lastTourData = null;
             if (null != lastRow) {
                final Object element = lastRow.getElement();
                if (element instanceof TourMarker) {
                   lastTime = ((TourMarker) element).getTime();
+                  lastTourData = ((TourMarker) element).getTourData();
                }
             }
 
-            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+            final TourMarker currentTourMarker = ((TourMarker) cell.getElement());
+            final int currentTime = currentTourMarker.getTime();
+            final TourData currentTourData = currentTourMarker.getTourData();
 
-            final String text = ((TourMarker) cell.getElement()).getLabel();
+            int timeDifference = currentTime - lastTime;
+            if (lastTourData != null && !lastTourData.getTourId().equals(currentTourData.getTourId())) {
+               timeDifference = currentTime;
+            }
+
+            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(timeDifference));
+
+            final String text = currentTourMarker.getLabel();
 
             /*
              * Show text in red/bold when the text ends with a !, this hidden feature was introduced
@@ -1107,6 +1124,24 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    public Object getMarkerViewer() {
       return _markerViewer;
+   }
+
+   private int getMultiTourSerieIndex(final int currentMarkerIndex) {
+
+      if (_tourData == null || _tourData.multiTourMarkers == null) {
+         return 0;
+      }
+
+      final TourMarker result = _tourData.multiTourMarkers.stream()
+            .filter(t -> t.getSerieIndex() == currentMarkerIndex)
+            .findAny()
+            .orElse(null);
+
+      int multiTourSerieIndex = 0;
+      if (result != null) {
+         multiTourSerieIndex = result.getMultiTourSerieIndex();
+      }
+      return multiTourSerieIndex;
    }
 
    /**
@@ -1259,7 +1294,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       if (eventData instanceof SelectionTourMarker) {
 
          /*
-          * Select the tourmarker in the view
+          * Select the tour marker in the view
           */
          final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 

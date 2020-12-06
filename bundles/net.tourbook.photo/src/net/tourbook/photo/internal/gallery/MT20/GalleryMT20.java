@@ -74,8 +74,6 @@ public abstract class GalleryMT20 extends Canvas {
 
    private static final int                  GALLERY_ITEM_MIN_SIZE    = 10;
 
-   private IDialogSettings                   _state;
-
    private boolean                           _isVertical;
    private boolean                           _isHorizontal;
 
@@ -342,8 +340,6 @@ public abstract class GalleryMT20 extends Canvas {
       _isHorizontal = !_isVertical;
 
       _isMultiSelection = (style & SWT.MULTI) > 0;
-
-      _state = state;
 
       _clientArea = getClientArea();
 
@@ -1968,7 +1964,7 @@ public abstract class GalleryMT20 extends Canvas {
       }
    }
 
-   private void onMouseWheel(final MouseEvent event) {
+   private void onMouseWheel(final MouseEvent mouseEvent) {
 
       _isZoomed = false;
 
@@ -1984,19 +1980,29 @@ public abstract class GalleryMT20 extends Canvas {
       boolean isShiftKey;
 
       if (UI.IS_OSX) {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+         isCtrlKey = (mouseEvent.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD3) > 0;
       } else {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+         isCtrlKey = (mouseEvent.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (mouseEvent.stateMask & SWT.MOD2) > 0;
       }
 
       /*
        * ensure <ctrl> or <shift> is pressed, otherwise it is zoomed when the scrollbar is hidden
        */
       if (isCtrlKey || isShiftKey) {
-         zoomGallery(event.time, event.count > 0, isShiftKey, isCtrlKey);
+
+         zoomGallery(mouseEvent.time, mouseEvent.count > 0, isShiftKey, isCtrlKey);
          _isZoomed = true;
+
+      } else {
+
+         // select next/previous image
+         if (mouseEvent.count < 0) {
+            selectItem_Next(false);
+         } else {
+            selectItem_Previous(false);
+         }
       }
 
       // reset position when position is modified manually
