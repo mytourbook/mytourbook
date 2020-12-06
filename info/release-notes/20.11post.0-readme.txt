@@ -31,6 +31,7 @@ Improvements
 * 2D Map
   - Draw value point from the tour chart
   - Sync map location with value point in the tour chart
+    https://sourceforge.net/p/mytourbook/feature-requests/162/
 
 * Statistic Values View
   - Show values with the selected measurement system
