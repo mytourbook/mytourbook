@@ -1294,7 +1294,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       if (eventData instanceof SelectionTourMarker) {
 
          /*
-          * Select the tourmarker in the view
+          * Select the tour marker in the view
           */
          final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 
