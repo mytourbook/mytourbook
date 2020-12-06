@@ -3,8 +3,14 @@
 
 TODO's
 ======
+
+
   
-* At MT homepage, replace SQL Explorer with DBeaver https://sourceforge.net/p/mytourbook/discussion/622811/thread/9ae30efd93/?limit=25#57b3 
+MT website updates
+==================
+  
+* MT requires Java 11, recommend AdoptOpenJDK
+* Replace SQL Explorer with DBeaver https://sourceforge.net/p/mytourbook/discussion/622811/thread/9ae30efd93/?limit=25#57b3 
 
 
 Issues

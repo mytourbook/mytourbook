@@ -204,5 +204,5 @@ Export-Package: com.enterprisedt,
  org.joda.time.tz.data.Indian,
  org.joda.time.tz.data.Pacific,
  org.json
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: net.tourbook.ext.jars

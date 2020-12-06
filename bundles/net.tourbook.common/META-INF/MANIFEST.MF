@@ -38,7 +38,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.nebula.widgets.nattable.core,
  net.tourbook.ext.jars,
  net.tourbook.ext.worldwind
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
  javax.inject;version="1.0.0",
