@@ -64,6 +64,9 @@ Fixes
 * Tour Chart
   - Multiple tours with default cadence of spm have displayed doubled cadence values  
 
+* Tour Marker View (Frederic)
+  - Bugfix: The time difference, average pace and average speed between markers could be wrong in the case of multiple selected tours
+
 
 Translation    
 ===========
