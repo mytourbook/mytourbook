@@ -418,6 +418,8 @@ public class Messages extends NLS {
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;
 
+   public static String        Action_TourPhotos_RemovePhoto;
+
    public static String        Action_TourType_ModifyTourTypeFilter;
 
    public static String        Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -534,6 +536,7 @@ public class Messages extends NLS {
    public static String        App_Action_RefreshView;
    public static String        App_Action_Remove;
    public static String        App_Action_Remove_Immediate;
+   public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Rename;
    public static String        App_Action_RestartApp;
    public static String        App_Action_RestoreDefault;
@@ -1508,6 +1511,8 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Combo_Camera_Tooltip;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
+   public static String        Photos_AndTours_Dialog_RemovePhotos_Message;
+   public static String        Photos_AndTours_Dialog_RemovePhotos_Title;
    public static String        Photos_AndTours_Label_AdjustTime;
    public static String        Photos_AndTours_Label_AdjustTime_Tooltip;
    public static String        Photos_AndTours_Label_DurationLess1Hour;

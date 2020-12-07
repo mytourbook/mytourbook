@@ -439,7 +439,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
          if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
 
-            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(//
+            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
                   Display.getCurrent().getActiveShell(),
                   Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
                   Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
@@ -1825,13 +1825,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       if (_isFilterOneHistoryTour) {
 
-         _photoMgr.createTourPhotoLinks_01_OneHistoryTour(//
+         _photoMgr.createTourPhotoLinks_01_OneHistoryTour(
                _allPhotos,
                _visibleTourPhotoLinks,
                _allTourCameras);
       } else {
 
-         _photoMgr.createTourPhotoLinks(//
+         _photoMgr.createTourPhotoLinks(
                _allPhotos,
                _visibleTourPhotoLinks,
                _allTourCameras,

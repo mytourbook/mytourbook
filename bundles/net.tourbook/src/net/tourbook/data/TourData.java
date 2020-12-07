@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +95,7 @@ import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
@@ -112,7 +112,10 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
@@ -5164,7 +5167,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Create {@link Photo}'s from {@link TourPhoto}'s
+    * Create {@link Photo}'s from {@link TourPhoto}'s which are displayed in views, e.g. tour chart,
+    * map, ...
     */
    public void createGalleryPhotos() {
 
@@ -9291,6 +9295,92 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
    }
 
+   public void removePhotos(final Collection<GalleryMT20Item> allRemovedPhotoItems) {
+
+      final Collection<TourPhoto> allRemovedTourPhotos = new ArrayList<>();
+
+      // loop: all selected photos in the gallery
+      for (final GalleryMT20Item galleryPhotoItem : allRemovedPhotoItems) {
+
+         final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+         final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+         // loop: all tour references in a photo
+         for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+            final long removedTourId = tourPhotoReference.tourId;
+            final long removedPhotoId = tourPhotoReference.photoId;
+
+            if (removedTourId == tourId) {
+
+               // photo is from this tour
+
+               // loop: all current tour photos
+               for (final TourPhoto tourPhoto : tourPhotos) {
+
+                  if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                     // photo is in tour photo collection -> remove it
+
+                     allRemovedTourPhotos.add(tourPhoto);
+
+                     removedGalleryPhoto.removeTour(tourId);
+
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      if (allRemovedTourPhotos.size() > 0) {
+
+         // remove photos from this tour and save it
+
+         final MessageDialog dialog = new MessageDialog(
+
+               Display.getDefault().getActiveShell(),
+
+               Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
+               null, // no title image
+
+               NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
+                     allRemovedTourPhotos.size(),
+                     TourManager.getTourDateTimeShort(this)),
+
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_RemoveTourPhotos,
+               Messages.App_Action_Cancel);
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+
+            final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
+
+            currentTourPhotos.removeAll(allRemovedTourPhotos);
+
+            // force gallery photos to be recreated
+            _galleryPhotos.clear();
+
+            tourPhotos.clear();
+            tourPhotos.addAll(currentTourPhotos);
+
+            numberOfPhotos = tourPhotos.size();
+
+            computePhotoTimeAdjustment();
+
+            TourManager.saveModifiedTour(this, true);
+         }
+      }
+
+//      createGalleryPhotos();
+
+//      setTourPhotos(newTourPhotos, newGalleryPhotos);
+   }
+
    public boolean replaceAltitudeWithSRTM() {
 
       if (getSRTMSerie() == null) {
@@ -9966,7 +10056,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Set new photos into the tour, existing photos will be replaced.
     *
     * @param newTourPhotos
-    * @param linkPhotos
+    * @param newGalleryPhotos
     */
    public void setTourPhotos(final HashSet<TourPhoto> newTourPhotos, final ArrayList<Photo> newGalleryPhotos) {
 
@@ -9993,20 +10083,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (isPhotoUsed == false) {
 
                /*
-                * photo is not saved any more in this tour, remove tour reference
+                * Photo is not saved any more in this tour, remove tour reference
                 */
-
                oldGalleryPhoto.removeTour(tourId);
-
-               final HashMap<Long, TourPhotoReference> photoRefs = oldGalleryPhoto.getTourPhotoReferences();
-
-               if (photoRefs.isEmpty()) {
-
-                  oldGalleryPhoto.isSavedInTour = false;
-                  oldGalleryPhoto.ratingStars = 0;
-
-                  oldGalleryPhoto.resetTourExifState();
-               }
             }
          }
       }

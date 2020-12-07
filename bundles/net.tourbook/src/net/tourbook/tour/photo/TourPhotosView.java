@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -31,6 +32,7 @@ import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -42,6 +44,7 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -71,608 +74,666 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
-	public static final String					ID											= "net.tourbook.photo.TourPhotosView.ID";	//$NON-NLS-1$
+   public static final String             ID                              = "net.tourbook.photo.TourPhotosView.ID"; //$NON-NLS-1$
 
-	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";		//$NON-NLS-1$
+   private static final String            STATE_PHOTO_GALLERY_IS_VERTICAL = "STATE_PHOTO_GALLERY_IS_VERTICAL";      //$NON-NLS-1$
 
-	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
-	private final IPreferenceStore			_prefStore								= TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
 
-	private PostSelectionProvider				_postSelectionProvider;
+   private PostSelectionProvider          _postSelectionProvider;
 
-	private ISelectionListener					_postSelectionListener;
-	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener					_tourEventListener;
-	private IPartListener2						_partListener;
+   private ISelectionListener             _postSelectionListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private ITourEventListener             _tourEventListener;
+   private IPartListener2                 _partListener;
 
-	private boolean								_isPartVisible;
+   private boolean                        _isPartVisible;
 
-	private ActionToggleGalleryOrientation	_actionToggleGalleryOrientation;
+   private ActionRemovePhoto              _actionRemovePhoto;
+   private ActionToggleGalleryOrientation _actionToggleGalleryOrientation;
 
-	/**
-	 * contains selection which was set when the part is hidden
-	 */
-	private TourPhotoLinkSelection			_selectionWhenHidden;
+   /**
+    * Contains selection which was set when the part is hidden
+    */
+   private TourPhotoLinkSelection         _selectionWhenHidden;
 
-	private PhotoGallery							_photoGallery;
+   private TourPhotoGallery               _photoGallery;
 
-	private boolean								_isVerticalGallery;
-	public IToolBarManager						_galleryToolbarManager;
+   private boolean                        _isVerticalGallery;
+   public IToolBarManager                 _galleryToolbarManager;
 
-	private int										_galleryPositionKey;
+   private int                            _galleryPositionKey;
 
-	private long									_photoStartTime;
-	private long									_photoEndTime;
+   private long                           _photoStartTime;
+   private long                           _photoEndTime;
 
-	private boolean								_isLinkPhotoDisplayed;
+   private boolean                        _isLinkPhotoDisplayed;
 
-	/*
-	 * UI controls
-	 */
-	private ToolBar								_toolbarLeft;
-	private Label									_labelTitle;
+   /**
+    * Tour which is containing the displayed photos
+    */
+   private TourData                       _tourData;
 
-	private class ActionToggleGalleryOrientation extends Action {
+   /*
+    * UI controls
+    */
+   private ToolBar _toolbarLeft;
+   private Label   _labelTitle;
 
-		public ActionToggleGalleryOrientation() {
+   private class ActionRemovePhoto extends Action {
 
-			super(null, Action.AS_PUSH_BUTTON);
+      public ActionRemovePhoto() {
 
-			/**
-			 * VERY IMPORTANT
-			 * <p>
-			 * an image must be set in the constructor, otherwise the button is small when only ONE
-			 * action is in the toolbar
-			 */
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
-		}
+         super(Messages.Action_TourPhotos_RemovePhoto, Action.AS_PUSH_BUTTON);
 
-		@Override
-		public void run() {
-			actionToggleVH();
-		}
-	}
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      }
 
-	private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
+      @Override
+      public void run() {
+         actionRemovePhoto();
+      }
+   }
 
-		@Override
-		public IStatusLineManager getStatusLineManager() {
-			return getViewSite().getActionBars().getStatusLineManager();
-		}
+   private class ActionToggleGalleryOrientation extends Action {
 
-		@Override
-		public IToolBarManager getToolBarManager() {
-			return getViewSite().getActionBars().getToolBarManager();
-		}
+      public ActionToggleGalleryOrientation() {
 
-		@Override
-		public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
+         super(null, Action.AS_PUSH_BUTTON);
 
-		@Override
-		public void setSelection(final PhotoSelection photoSelection) {
-			_postSelectionProvider.setSelection(photoSelection);
-		}
-	}
+         /**
+          * VERY IMPORTANT
+          * <p>
+          * an image must be set in the constructor, otherwise the button is small when only ONE
+          * action is in the toolbar
+          */
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+      }
 
-	public TourPhotosView() {
-		super();
-	}
+      @Override
+      public void run() {
+         actionToggleVerticalHorizontal();
+      }
+   }
 
-	private void actionToggleVH() {
+   private final class PhotoGalleryProvider implements IPhotoGalleryProvider {
 
-		// keep state for current orientation
-		_photoGallery.saveState();
+      @Override
+      public IStatusLineManager getStatusLineManager() {
+         return getViewSite().getActionBars().getStatusLineManager();
+      }
 
-		// toggle gallery
-		_isVerticalGallery = !_isVerticalGallery;
+      @Override
+      public IToolBarManager getToolBarManager() {
+         return getViewSite().getActionBars().getToolBarManager();
+      }
 
-		updateUI_ToogleAction();
+      @Override
+      public void registerContextMenu(final String menuId, final MenuManager menuManager) {}
 
-		_photoGallery.setVertical(_isVerticalGallery);
-	}
+      @Override
+      public void setSelection(final PhotoSelection photoSelection) {
+         _postSelectionProvider.setSelection(photoSelection);
+      }
+   }
 
-	private void addPartListener() {
+   private class TourPhotoGallery extends PhotoGallery {
 
-		_partListener = new IPartListener2() {
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+      public TourPhotoGallery(final IDialogSettings state) {
+         super(state);
+      }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+      @Override
+      public void fillContextMenu(final IMenuManager menuMgr) {
+         TourPhotosView.this.fillContextMenu(menuMgr);
+      }
+   }
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+   public TourPhotosView() {
+      super();
+   }
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+   private void actionRemovePhoto() {
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {
+      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-				if (partRef.getPart(false) == TourPhotosView.this) {
-					_isPartVisible = false;
-				}
-			}
+      _tourData.removePhotos(selectedPhotos);
+   }
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+   private void actionToggleVerticalHorizontal() {
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+      // keep state for current orientation
+      _photoGallery.saveState();
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourPhotosView.this) {
+      // toggle gallery
+      _isVerticalGallery = !_isVerticalGallery;
 
-					_isPartVisible = true;
+      updateUI_ToogleAction();
 
-					if (_selectionWhenHidden != null) {
+      _photoGallery.setVertical(_isVerticalGallery);
+   }
 
-						onSelectionChanged(_selectionWhenHidden);
+   private void addPartListener() {
 
-						_selectionWhenHidden = null;
-					}
-				}
-			}
-		};
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+      _partListener = new IPartListener2() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-	private void addPrefListener() {
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-				final String property = event.getProperty();
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-				if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {
 
-					updateColors(false);
-				}
-			}
-		};
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+            if (partRef.getPart(false) == TourPhotosView.this) {
+               _isPartVisible = false;
+            }
+         }
 
-	/**
-	 * listen for events when a tour is selected
-	 */
-	private void addSelectionListener() {
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-		_postSelectionListener = new ISelectionListener() {
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-				if (part == TourPhotosView.this) {
-					return;
-				}
-				onSelectionChanged(selection);
-			}
-		};
-		getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-	private void addTourEventListener() {
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {
+            if (partRef.getPart(false) == TourPhotosView.this) {
 
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+               _isPartVisible = true;
 
-				if (part == TourPhotosView.this) {
-					return;
-				}
+               if (_selectionWhenHidden != null) {
 
-				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
+                  onSelectionChanged(_selectionWhenHidden);
 
-					// check if a tour must be updated
+                  _selectionWhenHidden = null;
+               }
+            }
+         }
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-				} else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+   private void addPrefListener() {
 
-					onSelectionChanged((SelectionTourMarker) eventData);
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				} else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+            final String property = event.getProperty();
 
-					onSelectionChanged((ISelection) eventData);
+            if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)) {
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+               updateColors(false);
+            }
+         }
+      };
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-					clearView();
-				}
-			}
-		};
+   /**
+    * listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
 
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            if (part == TourPhotosView.this) {
+               return;
+            }
+            onSelectionChanged(selection);
+         }
+      };
+      getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
 
-	private void clearView() {
+   private void addTourEventListener() {
 
-	}
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-	private void createActions() {
+            if (part == TourPhotosView.this) {
+               return;
+            }
 
-		_actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
-	}
+            if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 
-	@Override
-	public void createPartControl(final Composite parent) {
+               // ensure that not the wrong data are displayed
+               clearView();
+               showTourPhotos();
 
-		createUI(parent);
+            } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
-		createActions();
-		fillActionBar();
+               onSelectionChanged((SelectionTourMarker) eventData);
 
-		addSelectionListener();
-		addTourEventListener();
-		addPrefListener();
-		addPartListener();
-		PhotoManager.addPhotoEventListener(this);
+            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-		restoreState();
+               onSelectionChanged((ISelection) eventData);
 
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-		showTour();
-	}
+               clearView();
+            }
+         }
+      };
 
-	private void createUI(final Composite parent) {
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
 
-		createUI_10_Gallery(parent);
-		createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+   private void clearView() {
 
-		// must be called after the custom action bar is created
-		_photoGallery.createActionBar();
-	}
+      _tourData = null;
+   }
 
-	private void createUI_10_Gallery(final Composite parent) {
+   private void createActions() {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			_photoGallery = new PhotoGallery(_state);
+      _actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
+      _actionRemovePhoto = new ActionRemovePhoto();
+   }
 
-			_photoGallery.setShowCustomActionBar();
-			_photoGallery.setShowThumbnailSize();
+   @Override
+   public void createPartControl(final Composite parent) {
 
-			_photoGallery.createPhotoGallery(
-					container,
-					SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
-					new PhotoGalleryProvider());
+      createUI(parent);
 
-			_photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
-		}
-	}
+      createActions();
+      fillActionBar();
 
-	private void createUI_20_ActionBar(final Composite parent) {
+      addSelectionListener();
+      addTourEventListener();
+      addPrefListener();
+      addPartListener();
+      PhotoManager.addPhotoEventListener(this);
 
-		GridLayoutFactory.fillDefaults().applyTo(parent);
+      restoreState();
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      // this part is a selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+
+      showTourPhotos();
+   }
+
+   private void createUI(final Composite parent) {
+
+      createUI_10_Gallery(parent);
+      createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
+
+      // must be called after the custom action bar is created
+      _photoGallery.createActionBar();
+   }
+
+   private void createUI_10_Gallery(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         _photoGallery = new TourPhotoGallery(_state);
+
+         _photoGallery.setShowCustomActionBar();
+         _photoGallery.setShowThumbnailSize();
+
+         _photoGallery.createPhotoGallery(
+               container,
+               SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI,
+               new PhotoGalleryProvider());
+
+         _photoGallery.setDefaultStatusMessage(Messages.Photo_Gallery_Label_NoTourWithPhoto);
+      }
+   }
+
+   private void createUI_20_ActionBar(final Composite parent) {
+
+      GridLayoutFactory.fillDefaults().applyTo(parent);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, true)
+            .align(SWT.FILL, SWT.CENTER)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		{
-			/*
-			 * label: title
-			 */
-			_labelTitle = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.align(SWT.FILL, SWT.CENTER)
+      {
+         /*
+          * label: title
+          */
+         _labelTitle = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .align(SWT.FILL, SWT.CENTER)
 //					.hint(20, SWT.DEFAULT)
-					.applyTo(_labelTitle);
+               .applyTo(_labelTitle);
 //			_labelTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
-			/*
-			 * create toolbar for the buttons on the left side
-			 */
-			_toolbarLeft = new ToolBar(container, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
+         /*
+          * create toolbar for the buttons on the left side
+          */
+         _toolbarLeft = new ToolBar(container, SWT.FLAT);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.FILL, SWT.CENTER)
 //					.grab(false, true)
-					.applyTo(_toolbarLeft);
+               .applyTo(_toolbarLeft);
 //			_toolbarLeft.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		}
-	}
+      }
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		final IWorkbenchPage page = getViewSite().getPage();
+      final IWorkbenchPage page = getViewSite().getPage();
 
-		page.removePostSelectionListener(_postSelectionListener);
-		page.removePartListener(_partListener);
+      page.removePostSelectionListener(_postSelectionListener);
+      page.removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
-		PhotoManager.removePhotoEventListener(this);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      PhotoManager.removePhotoEventListener(this);
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	private void fillActionBar() {
+   private void enableActions() {
 
-		/*
-		 * fill gallery toolbar
-		 */
-		_galleryToolbarManager = new ToolBarManager(_toolbarLeft);
+      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-		_galleryToolbarManager.add(_actionToggleGalleryOrientation);
+      _actionRemovePhoto.setEnabled(selectedPhotos.size() > 0
 
-		_galleryToolbarManager.update(true);
-	}
+            // currently only ONE tour is supported
+            && _tourData != null
+            && _tourData.isMultipleTours() == false);
+   }
 
-	/**
-	 * Get photos from a tour.
-	 *
-	 * @param allPhotos
-	 * @param tourData
-	 */
-	private void getPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
+   private void fillActionBar() {
 
-		if (tourData == null) {
-			return;
-		}
+      /*
+       * fill gallery toolbar
+       */
+      _galleryToolbarManager = new ToolBarManager(_toolbarLeft);
 
-		final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+      _galleryToolbarManager.add(_actionToggleGalleryOrientation);
 
-		if (galleryPhotos == null) {
-			return;
-		}
+      _galleryToolbarManager.update(true);
+   }
 
-		allPhotos.addAll(galleryPhotos);
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
-		_galleryPositionKey += galleryPhotos.hashCode();
+      menuMgr.add(_actionRemovePhoto);
 
-		final int gallerySize = galleryPhotos.size();
-		if (gallerySize > 0) {
+      enableActions();
+   }
 
-			final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
-			final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
+   /**
+    * Get photos from a tour.
+    *
+    * @param allPhotos
+    * @param tourData
+    */
+   private void getTourPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
 
-			if (tourStartTime < _photoStartTime) {
-				_photoStartTime = tourStartTime;
-			}
-			if (tourEndTime > _photoEndTime) {
-				_photoEndTime = tourEndTime;
-			}
-		}
-	}
+      if (tourData == null) {
+         return;
+      }
 
-	private void onSelectionChanged(final ISelection selection) {
+      _tourData = tourData;
 
-//		System.out.println(net.tourbook.common.UI.timeStampNano() + " TourPhotosView\t" + selection);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
 
-		final ArrayList<Photo> allPhotos = new ArrayList<>();
+      if (galleryPhotos == null) {
+         return;
+      }
 
-		_galleryPositionKey = 0;
-		_photoStartTime = Long.MAX_VALUE;
-		_photoEndTime = Long.MIN_VALUE;
-		_isLinkPhotoDisplayed = false;
+      allPhotos.addAll(galleryPhotos);
 
-		if (selection instanceof TourPhotoLinkSelection) {
+      _galleryPositionKey += galleryPhotos.hashCode();
 
-			_isLinkPhotoDisplayed = true;
+      final int gallerySize = galleryPhotos.size();
+      if (gallerySize > 0) {
 
-			final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
+         final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
+         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
 
-			final ArrayList<TourPhotoLink> photoLinks = tourPhotoSelection.tourPhotoLinks;
+         if (tourStartTime < _photoStartTime) {
+            _photoStartTime = tourStartTime;
+         }
+         if (tourEndTime > _photoEndTime) {
+            _photoEndTime = tourEndTime;
+         }
+      }
+   }
 
-			for (final TourPhotoLink photoLink : photoLinks) {
+   private void onSelectionChanged(final ISelection selection) {
 
-				allPhotos.addAll(photoLink.linkPhotos);
+      final ArrayList<Photo> allPhotos = new ArrayList<>();
 
-				_galleryPositionKey += photoLink.linkId;
+      _galleryPositionKey = 0;
+      _photoStartTime = Long.MAX_VALUE;
+      _photoEndTime = Long.MIN_VALUE;
+      _isLinkPhotoDisplayed = false;
 
-				final long tourStartTime = photoLink.tourStartTime;
-				final long tourEndTime = photoLink.tourEndTime;
+      if (selection instanceof TourPhotoLinkSelection) {
 
-				if (tourStartTime < _photoStartTime) {
-					_photoStartTime = tourStartTime;
-				}
-				if (tourEndTime > _photoEndTime) {
-					_photoEndTime = tourEndTime;
-				}
-			}
+         _isLinkPhotoDisplayed = true;
 
-			updateUI(allPhotos);
+         final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
 
-		} else if (selection instanceof SelectionTourMarker) {
+         final ArrayList<TourPhotoLink> photoLinks = tourPhotoSelection.tourPhotoLinks;
 
-			final TourData tourData = ((SelectionTourMarker) selection).getTourData();
+         for (final TourPhotoLink photoLink : photoLinks) {
 
-			getPhotos(allPhotos, tourData);
-			updateUI(allPhotos);
+            allPhotos.addAll(photoLink.linkPhotos);
 
-		} else if (selection instanceof SelectionTourData) {
+            _galleryPositionKey += photoLink.linkId;
 
-			final TourData tourData = ((SelectionTourData) selection).getTourData();
+            final long tourStartTime = photoLink.tourStartTime;
+            final long tourEndTime = photoLink.tourEndTime;
 
-			getPhotos(allPhotos, tourData);
-			updateUI(allPhotos);
+            if (tourStartTime < _photoStartTime) {
+               _photoStartTime = tourStartTime;
+            }
+            if (tourEndTime > _photoEndTime) {
+               _photoEndTime = tourEndTime;
+            }
+         }
 
-		} else if (selection instanceof SelectionTourId) {
+         _tourData = null;
+         updateUI(allPhotos);
 
-			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+      } else if (selection instanceof SelectionTourMarker) {
 
-			getPhotos(allPhotos, tourData);
-			updateUI(allPhotos);
+         final TourData tourData = ((SelectionTourMarker) selection).getTourData();
 
-		} else if (selection instanceof SelectionTourIds) {
+         getTourPhotos(allPhotos, tourData);
+         updateUI(allPhotos);
 
-			// paint all selected tours
+      } else if (selection instanceof SelectionTourData) {
 
-			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final TourData tourData = ((SelectionTourData) selection).getTourData();
 
-			for (final Long tourId : tourIds) {
+         getTourPhotos(allPhotos, tourData);
+         updateUI(allPhotos);
 
-				final TourData tourData = TourManager.getInstance().getTourData(tourId);
+      } else if (selection instanceof SelectionTourId) {
 
-				getPhotos(allPhotos, tourData);
-			}
+         final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+         final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-			updateUI(allPhotos);
-		}
+         getTourPhotos(allPhotos, tourData);
+         updateUI(allPhotos);
 
-		/*
-		 * ensure the selection is set correctly and overwrite PhotogalleryProvider.setSelection()
-		 * which caused wrong behaviour
-		 */
-		_postSelectionProvider.setSelectionNoFireEvent(selection);
-	}
+      } else if (selection instanceof SelectionTourIds) {
 
-	@Override
-	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+         // paint all selected tours
 
-		if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
+         _tourData = null;
 
-			if (data instanceof TourPhotoLinkSelection) {
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-				final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
+         for (final Long tourId : tourIds) {
 
-				if (_isPartVisible == false) {
+            final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
-					_selectionWhenHidden = linkSelection;
+            getTourPhotos(allPhotos, tourData);
+         }
 
-				} else {
+         updateUI(allPhotos);
+      }
 
-					onSelectionChanged(linkSelection);
-				}
-			}
+      /*
+       * ensure the selection is set correctly and overwrite PhotogalleryProvider.setSelection()
+       * which caused wrong behaviour
+       */
+      _postSelectionProvider.setSelectionNoFireEvent(selection);
+   }
 
-		} else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
-			if (data instanceof ArrayList<?>) {
+      if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
-				final ArrayList<?> arrayList = (ArrayList<?>) data;
+         if (data instanceof TourPhotoLinkSelection) {
 
-				_photoGallery.updatePhotos(arrayList);
-			}
+            final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) data;
 
-		} else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
+            if (_isPartVisible == false) {
 
-			_photoGallery.refreshUI();
-		}
-	}
+               _selectionWhenHidden = linkSelection;
 
-	private void restoreState() {
+            } else {
 
-		updateColors(true);
+               onSelectionChanged(linkSelection);
+            }
+         }
 
-		_photoGallery.restoreState();
+      } else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
 
-		// set gallery orientation, default is horizontal
-		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, false);
-		_photoGallery.setVertical(_isVerticalGallery);
+         if (data instanceof ArrayList<?>) {
 
-		updateUI_ToogleAction();
-	}
+            final ArrayList<?> arrayList = (ArrayList<?>) data;
 
-	@PersistState
-	private void saveState() {
+            _photoGallery.updatePhotos(arrayList);
+         }
 
-		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
+      } else if (photoEventId == PhotoEventId.PHOTO_IMAGE_PATH_IS_MODIFIED) {
 
-		_photoGallery.saveState();
-	}
+         _photoGallery.refreshUI();
+      }
+   }
 
-	@Override
-	public void setFocus() {
+   private void restoreState() {
 
-	}
+      updateColors(true);
 
-	private void showTour() {
+      _photoGallery.restoreState();
 
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
+      // set gallery orientation, default is horizontal
+      _isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, false);
+      _photoGallery.setVertical(_isVerticalGallery);
 
-				// validate widget
-				if (_photoGallery.isDisposed()) {
-					return;
-				}
+      updateUI_ToogleAction();
+   }
 
-				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-				if (selectedTours != null && selectedTours.size() > 0) {
-					onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-				}
-			}
-		});
-	}
+   @PersistState
+   private void saveState() {
 
-	private void updateColors(final boolean isRestore) {
+      _state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      _photoGallery.saveState();
+   }
 
-		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-		final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
+   @Override
+   public void setFocus() {
 
-		final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
+   }
 
-		_photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
-	}
+   private void showTourPhotos() {
 
-	private void updateUI(final ArrayList<Photo> allPhotos) {
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-		/*
-		 * update photo gallery
-		 */
+            // validate widget
+            if (_photoGallery.isDisposed()) {
+               return;
+            }
 
-		_photoGallery.showImages(//
-				allPhotos,
-				Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
-				_isLinkPhotoDisplayed,
-				false);
+            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            if (selectedTours != null && selectedTours.size() > 0) {
+               onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
+            }
+         }
+      });
+   }
 
-		/*
-		 * set title
-		 */
-		final int size = allPhotos.size();
-		String labelText;
+   private void updateColors(final boolean isRestore) {
 
-		if (size == 1) {
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
+      final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+      final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+      final Color selectionFgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
 
-		} else if (size > 1) {
+      final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
-			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
-					+ UI.DASH_WITH_DOUBLE_SPACE
-					+ TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
+      _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
+   }
 
-		} else {
+   private void updateUI(final ArrayList<Photo> allPhotos) {
 
-			labelText = UI.EMPTY_STRING;
-		}
+      /*
+       * update photo gallery
+       */
 
-		_labelTitle.setText(labelText);
-		_labelTitle.setToolTipText(labelText);
-	}
+      _photoGallery.showImages(
+            allPhotos,
+            Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
+            _isLinkPhotoDisplayed,
+            false);
 
-	private void updateUI_ToogleAction() {
+      /*
+       * set title
+       */
+      final int size = allPhotos.size();
+      String labelText;
 
-		if (_isVerticalGallery) {
+      if (size == 1) {
 
-			_actionToggleGalleryOrientation.setToolTipText(//
-					Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
+         labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
 
-			_actionToggleGalleryOrientation.setImageDescriptor(//
-					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+      } else if (size > 1) {
 
-		} else {
+         labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
+               + UI.DASH_WITH_DOUBLE_SPACE
+               + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
 
-			_actionToggleGalleryOrientation.setToolTipText(//
-					Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
+      } else {
 
-			_actionToggleGalleryOrientation.setImageDescriptor(//
-					TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
-		}
-	}
+         labelText = UI.EMPTY_STRING;
+      }
+
+      _labelTitle.setText(labelText);
+      _labelTitle.setToolTipText(labelText);
+   }
+
+   private void updateUI_ToogleAction() {
+
+      if (_isVerticalGallery) {
+
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+
+      } else {
+
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+      }
+   }
 }
