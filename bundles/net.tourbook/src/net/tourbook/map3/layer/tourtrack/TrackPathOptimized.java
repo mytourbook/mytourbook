@@ -16,6 +16,7 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.GL2;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -37,8 +38,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.media.opengl.GL2;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map3.view.Map3View;

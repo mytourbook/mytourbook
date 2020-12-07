@@ -251,6 +251,7 @@ public class Map2View extends ViewPart implements
    //
    private static final String   STATE_MAP_DIM_LEVEL                                   = "STATE_MAP_DIM_LEVEL";                                 //$NON-NLS-1$
    private static final String   STATE_MAP_SYNC_MODE                                   = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
+   private static final String   STATE_MAP_SYNC_MODE_IS_ACTIVE                         = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
    //
    private static final String   STATE_ZOOM_LEVEL_ADJUSTMENT                           = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
    private static final String   STATE_SELECTED_MAP_PROVIDER_ID                        = "selected.map-provider-id";                            //$NON-NLS-1$
@@ -415,10 +416,10 @@ public class Map2View extends ViewPart implements
    private boolean                           _isInMapSync;
    private long                              _lastFiredSyncEventTime;
    //
-   private boolean                           _isMapSyncWith_ChartSlider_One;
-   private boolean                           _isMapSyncWith_ChartSlider_Centered;
    private boolean                           _isMapSyncWith_OtherMap;
    private boolean                           _isMapSyncWith_Photo;
+   private boolean                           _isMapSyncWith_Slider_Centered;
+   private boolean                           _isMapSyncWith_Slider_One;
    private boolean                           _isMapSyncWith_Tour;
    private boolean                           _isMapSyncWith_ValuePoint;
    //
@@ -686,15 +687,15 @@ public class Map2View extends ViewPart implements
       /*
        * Change state
        */
-      _isMapSyncWith_ChartSlider_One = isChecked_One || isChecked_Center;
-      _isMapSyncWith_ChartSlider_Centered = isActionCentered;
+      _isMapSyncWith_Slider_One = isChecked_One || isChecked_Center;
+      _isMapSyncWith_Slider_Centered = isActionCentered;
 
       // ensure data are available
       if (_allTourData.isEmpty()) {
          return;
       }
 
-      if (_isMapSyncWith_ChartSlider_One) {
+      if (_isMapSyncWith_Slider_One) {
 
          deactivateSyncWith_OtherMap();
          deactivateSyncWith_Photo();
@@ -716,7 +717,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ChartSlider_One);
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Slider_One);
    }
 
    public void action_SyncWith_OtherMap(final boolean isSelected) {
@@ -1900,7 +1901,7 @@ public class Map2View extends ViewPart implements
 
       // disable slider sync
 
-      _isMapSyncWith_ChartSlider_One = false;
+      _isMapSyncWith_Slider_One = false;
 
       _actionSyncMapWith_Slider_One.setChecked(false);
       _actionSyncMapWith_Slider_Centered.setChecked(false);
@@ -2019,13 +2020,7 @@ public class Map2View extends ViewPart implements
       _actionSyncMapWith_Tour.setEnabled(isTourAvailable);
       _actionSyncMapWith_ValuePoint.setEnabled(isTourAvailable);
 
-      final boolean isMapSynched = _isMapSyncWith_ValuePoint
-            || _isMapSyncWith_ChartSlider_One
-            || _isMapSyncWith_ChartSlider_Centered
-            || _isMapSyncWith_Tour
-            || _isMapSyncWith_OtherMap;
-
-      syncMap_ShowCurrentSyncModeImage(isMapSynched);
+      syncMap_ShowCurrentSyncModeImage(isMapSynched());
 
       if (numberOfTours == 0) {
 
@@ -2544,6 +2539,20 @@ public class Map2View extends ViewPart implements
       _map.showGeoGrid(null);
    }
 
+   private boolean isMapSynched() {
+
+      return false
+
+            || _isMapSyncWith_OtherMap
+            || _isMapSyncWith_Photo
+            || _isMapSyncWith_Slider_Centered
+            || _isMapSyncWith_Slider_One
+            || _isMapSyncWith_Tour
+            || _isMapSyncWith_ValuePoint
+
+      ;
+   }
+
    private void keepMapPosition(final TourData tourData) {
 
       final GeoPosition centerPosition = _map.getMapGeoCenter();
@@ -2992,7 +3001,7 @@ public class Map2View extends ViewPart implements
          }
       }
 
-      if (_isMapSyncWith_Tour || _isMapSyncWith_ChartSlider_One) {
+      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
 
          if (isDrawSlider) {
 
@@ -3486,7 +3495,7 @@ public class Map2View extends ViewPart implements
 
             _sliderPathPaintingData);
 
-      if (_isMapSyncWith_ChartSlider_One) {
+      if (_isMapSyncWith_Slider_One) {
 
          if (geoPositions != null) {
 
@@ -3496,7 +3505,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            if (_isMapSyncWith_ChartSlider_Centered) {
+            if (_isMapSyncWith_Slider_Centered) {
 
                // center to the left AND right slider
 
@@ -3613,7 +3622,8 @@ public class Map2View extends ViewPart implements
 
       // synch map with ...
       _currentMapSyncMode = (MapSyncMode) Util.getStateEnum(_state, STATE_MAP_SYNC_MODE, MapSyncMode.IsSyncWith_Tour);
-      syncMap_OnSelectSyncAction(true);
+      final boolean isSyncModeActive = _state.getBoolean(STATE_MAP_SYNC_MODE_IS_ACTIVE);
+      syncMap_OnSelectSyncAction(isSyncModeActive);
 
       // zoom level adjustment
       _actionZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, STATE_ZOOM_LEVEL_ADJUSTMENT, 0));
@@ -3890,6 +3900,7 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
+      _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
       Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
       _state.put(STATE_IS_ZOOM_CENTERED,                          _actionZoom_Centered.isChecked());
@@ -4167,9 +4178,9 @@ public class Map2View extends ViewPart implements
    /**
     * Set sync map action selected when one of it's subactions are selected.
     *
-    * @param isSelectSyncMapAction
+    * @param isSelectSyncMap
     */
-   private void syncMap_ShowCurrentSyncModeImage(final boolean isSelectSyncMapAction) {
+   private void syncMap_ShowCurrentSyncModeImage(final boolean isSelectSyncMap) {
 
       switch (_currentMapSyncMode) {
 
@@ -4203,9 +4214,7 @@ public class Map2View extends ViewPart implements
          break;
       }
 
-      if (isSelectSyncMapAction) {
-         _actionMap2_SyncMap.setSelection(isSelectSyncMapAction);
-      }
+      _actionMap2_SyncMap.setSelection(isSelectSyncMap);
    }
 
    @Override

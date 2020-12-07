@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,42 +47,42 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class ToolTip3 {
 
-   public static final int            SHELL_MARGIN                      = 5;
+   public static final int    SHELL_MARGIN                      = 5;
 
-   public static final String         SHELL_DATA_TOOL                   = "SHELL_DATA_TOOL";             //$NON-NLS-1$
+   public static final String SHELL_DATA_TOOL                   = "SHELL_DATA_TOOL"; //$NON-NLS-1$
 
-   public static final int            TOOLTIP_STYLE_RECREATE_CONTENT    = 0;
-   public static final int            TOOLTIP_STYLE_KEEP_CONTENT        = 1;
+   public static final int    TOOLTIP_STYLE_RECREATE_CONTENT    = 0;
+   public static final int    TOOLTIP_STYLE_KEEP_CONTENT        = 1;
 
-   public static final int            MOUSE_OVER_BEHAVIOUR_NO_IGNORE    = 0;
-   public static final int            MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER = 1;
+   public static final int    MOUSE_OVER_BEHAVIOUR_NO_IGNORE    = 0;
+   public static final int    MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER = 1;
 
    /**
     * how long each tick is when fading in/out (in ms)
     */
-   private static final int           FADE_TIME_INTERVAL                = UI.IS_OSX ? 10 : 10;
+   //private static final int				FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
 
    /**
     * Number of steps when fading in
     */
-   private static final int           FADE_IN_STEPS                     = 20;
+//   private static final int FADE_IN_STEPS = 20;
 
    /**
     * Number of steps when fading out
     */
-   private static final int           FADE_OUT_STEPS                    = 10;
+   //private static final int				FADE_OUT_STEPS						= 10;
 
    /**
     * Number of steps before fading out
     */
-   private static final int           FADE_OUT_DELAY_STEPS              = 20;
+   //private static final int				FADE_OUT_DELAY_STEPS				= 20;
 
-   private static final int           MOVE_STEPS                        = 20;
+   //private static final int				MOVE_STEPS							= 20;
 
-   private static final int           ALPHA_OPAQUE                      = 0xff;
+   //private static final int				ALPHA_OPAQUE						= 0xff;
 
-   private static final int           MOUSE_HOVER_DELAY                 = 10;
-   private static final int           AUTO_CLOSE_INTERVAL               = 700;
+   private static final int           MOUSE_HOVER_DELAY   = 10;
+   private static final int           AUTO_CLOSE_INTERVAL = 700;
 
    private OwnerControlListener       _ownerControlListener;
    private OwnerShellListener         _ownerShellListener;
@@ -105,17 +105,17 @@ public abstract class ToolTip3 {
     */
    private boolean                    _isShellFadingIn;
 
-   private Point                      _shellStartLocation;
-   private Point                      _shellEndLocation                 = new Point(0, 0);
+//	private Point							_shellStartLocation;
+//	private Point							_shellEndLocation					= new Point(0, 0);
+//
+//	private int								_fadeOutDelayCounter;
+//
+//	private final AnimationTimer			_animationTimer;
+//	private int								_animationMoveCounter;
+//
+//	private int								_fadeInSteps						= FADE_IN_STEPS;
 
-   private int                        _fadeOutDelayCounter;
-
-   private final AnimationTimer       _animationTimer;
-   private int                        _animationMoveCounter;
-
-   private int                        _fadeInSteps                      = FADE_IN_STEPS;
-
-   private int                        _mouseOverBehaviour               = MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
+   private int _mouseOverBehaviour = MOUSE_OVER_BEHAVIOUR_NO_IGNORE;
 
    /*
     * UI resources
@@ -141,21 +141,19 @@ public abstract class ToolTip3 {
     */
    private ToolTip3Tool                  _hoveredTool;
 
-   private final class AnimationTimer implements Runnable {
-      @Override
-      public void run() {
-         animation20_Runnable();
-      }
-   }
+//   private final class AnimationTimer implements Runnable {
+//      @Override
+//      public void run() {
+//         animation20_Runnable();
+//      }
+//   }
 
    private class DisplayFilterListener implements Listener {
       @Override
       public void handleEvent(final Event event) {
 
-         switch (event.type) {
-         case SWT.MouseMove:
+         if (event.type == SWT.MouseMove) {
             onDisplayMouseMove();
-            break;
          }
       }
    }
@@ -235,7 +233,7 @@ public abstract class ToolTip3 {
       _ownerControlListener = new OwnerControlListener();
       _ownerShellListener = new OwnerShellListener();
 
-      _animationTimer = new AnimationTimer();
+//		_animationTimer = new AnimationTimer();
       _ownerHoverTimer = new OwnerHoverTimer();
       _ttAutoCloseTimer = new ToolTipAutoCloseTimer();
 
@@ -375,7 +373,7 @@ public abstract class ToolTip3 {
       }
    }
 
-   private void animation20_Runnable() {
+//   private void animation20_Runnable() {
 
 //		final long start = System.nanoTime();
 
@@ -519,7 +517,7 @@ public abstract class ToolTip3 {
 ////			System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
 ////			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
-   }
+//   }
 
    /**
     * Is called before the tooltip shell is set to hidden.
@@ -667,7 +665,7 @@ public abstract class ToolTip3 {
     */
    private void closeWhenNothingIsHovered() {
 
-      if (_allTools.isEmpty()) {
+      if (_allTools.size() == 0) {
          return;
       }
 
@@ -1141,7 +1139,7 @@ public abstract class ToolTip3 {
       return isKeepOpened;
    }
 
-   private void onDispose(final Event event) {
+   private void onDispose() {
 
       // hide all tooltips
 
@@ -1165,7 +1163,7 @@ public abstract class ToolTip3 {
       switch (event.type) {
       case SWT.Dispose:
 
-         onDispose(event);
+         onDispose();
 
          removeOwnerControlsListener();
 
@@ -1497,9 +1495,9 @@ public abstract class ToolTip3 {
       _mouseOverBehaviour = mouseOverBehaviour;
    }
 
-   public void setFadeIsSteps(final int fadeInSteps) {
-      _fadeInSteps = fadeInSteps;
-   }
+//	public void setFadeIsSteps(final int fadeInSteps) {
+//		_fadeInSteps = fadeInSteps;
+//	}
 
    private void setShellVisible(final Shell shell, final boolean isVisible) {
 

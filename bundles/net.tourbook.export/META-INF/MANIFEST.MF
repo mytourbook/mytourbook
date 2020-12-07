@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.jars,
  net.tourbook.common,
  net.tourbook.ext.velocity
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: net.tourbook,
  net.tourbook.application,
