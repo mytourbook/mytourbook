@@ -15,15 +15,15 @@
  *******************************************************************************/
 package net.tourbook.opengl;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+
 import gov.nasa.worldwind.render.DrawContext;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.text.DecimalFormat;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
 
 import net.tourbook.common.UI;
 
