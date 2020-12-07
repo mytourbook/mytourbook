@@ -88,5 +88,6 @@ Translation
 System   
 ======
 
+* WorldWind 2.2.0 (https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.0)
 * FIT SDK 21.40
 * Eclipse 2020-09
