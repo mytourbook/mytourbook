@@ -9325,8 +9325,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      allRemovedTourPhotos.add(tourPhoto);
 
-                     removedGalleryPhoto.removeTour(tourId);
-
                      break;
                   }
                }
@@ -9358,6 +9356,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          if (dialog.open() == IDialogConstants.OK_ID) {
 
+            /*
+             * First remove tour reference from the photo, this MUST be done after the user has
+             * confirmed the removal otherwise the photo do not have a tour reference
+             */
+
+            // loop: all selected photos in the gallery
+            for (final GalleryMT20Item galleryPhotoItem : allRemovedPhotoItems) {
+
+               final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+               final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+               // loop: all tour references in a photo
+               for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+                  final long removedTourId = tourPhotoReference.tourId;
+                  final long removedPhotoId = tourPhotoReference.photoId;
+
+                  if (removedTourId == tourId) {
+
+                     // photo is from this tour
+
+                     // loop: all current tour photos
+                     for (final TourPhoto tourPhoto : tourPhotos) {
+
+                        if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                           // photo is in tour photo collection -> remove it
+
+                           removedGalleryPhoto.removeTour(tourId);
+
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+
+            /*
+             * Remove photo from database
+             */
             final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
 
             currentTourPhotos.removeAll(allRemovedTourPhotos);
@@ -9375,10 +9414,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             TourManager.saveModifiedTour(this, true);
          }
       }
-
-//      createGalleryPhotos();
-
-//      setTourPhotos(newTourPhotos, newGalleryPhotos);
    }
 
    public boolean replaceAltitudeWithSRTM() {

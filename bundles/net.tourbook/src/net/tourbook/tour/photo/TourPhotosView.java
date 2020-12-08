@@ -20,10 +20,12 @@ import java.util.Collection;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
@@ -32,6 +34,7 @@ import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -40,7 +43,6 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -196,9 +198,50 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private void actionRemovePhoto() {
 
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
       _tourData.removePhotos(selectedPhotos);
+
+      final Collection<TourPhoto> allRemovedTourPhotos = new ArrayList<>();
+
+      // loop: all selected photos in the gallery
+      for (final GalleryMT20Item galleryPhotoItem : selectedPhotos) {
+
+         final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+         final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+         // loop: all tour references in a photo
+         for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+            final long removedTourId = tourPhotoReference.tourId;
+            final long removedPhotoId = tourPhotoReference.photoId;
+
+            final TourData tourData = TourManager.getTour(removedTourId);
+
+            if (removedTourId == tourData.getTourId()) {
+
+               // photo is from this tour
+
+               // loop: all current tour photos
+               for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+
+                  if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                     // photo is in tour photo collection -> remove it
+
+WIP                     allRemovedTourPhotos.add(tourPhoto);
+
+                     break;
+                  }
+               }
+            }
+         }
+      }
    }
 
    private void actionToggleVerticalHorizontal() {
@@ -445,11 +488,24 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
       final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-      _actionRemovePhoto.setEnabled(selectedPhotos.size() > 0
+      final boolean isEnabled = selectedPhotos.size() > 0
 
             // currently only ONE tour is supported
-            && _tourData != null
-            && _tourData.isMultipleTours() == false);
+//            && _tourData != null
+//            && _tourData.isMultipleTours() == false
+            ;
+
+      _actionRemovePhoto.setEnabled(
+
+      /*
+       * This view can display photos from tours OR from tour photo links, only photos from
+       * tours can be removed !
+       */
+//            _isLinkPhotoDisplayed == false
+//
+//                  &&
+
+            isEnabled);
    }
 
    private void fillActionBar() {
@@ -689,9 +745,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
    private void updateUI(final ArrayList<Photo> allPhotos) {
 
       /*
-       * update photo gallery
+       * Update photo gallery
        */
-
       _photoGallery.showImages(
             allPhotos,
             Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
@@ -699,28 +754,42 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
             false);
 
       /*
-       * set title
+       * Set title
        */
       final int size = allPhotos.size();
-      String labelText;
 
-      if (size == 1) {
+      String labelText = UI.EMPTY_STRING;
+      String labelTooltip = UI.EMPTY_STRING;
 
-         labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
+      if (size > 0) {
 
-      } else if (size > 1) {
+         final String labelTextFormat = _isLinkPhotoDisplayed
+               ? Messages.Photos_AndTours_Label_Source_PhotoLink
+               : Messages.Photos_AndTours_Label_Source_Tour;
 
-         labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
-               + UI.DASH_WITH_DOUBLE_SPACE
-               + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
+         final String labelTooltipFormat = _isLinkPhotoDisplayed
+               ? Messages.Photos_AndTours_Label_Source_PhotoLink_Tooltip
+               : Messages.Photos_AndTours_Label_Source_Tour_Tooltip;
 
-      } else {
+         String photoDateTime = UI.EMPTY_STRING;
 
-         labelText = UI.EMPTY_STRING;
+         if (size == 1) {
+
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
+
+         } else if (size > 1) {
+
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
+                  + UI.ELLIPSIS_WITH_SPACE
+                  + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
+         }
+
+         labelText = String.format(labelTextFormat, size, photoDateTime);
+         labelTooltip = String.format(labelTooltipFormat, size, photoDateTime);
       }
 
       _labelTitle.setText(labelText);
-      _labelTitle.setToolTipText(labelText);
+      _labelTitle.setToolTipText(labelTooltip);
    }
 
    private void updateUI_ToogleAction() {

@@ -205,6 +205,9 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       _cursorResize = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_SIZEALL);
       _cursorHand = new Cursor(ownerControl.getDisplay(), SWT.CURSOR_HAND);
 
+      // prevent that the opened tooltip is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
+
       ownerControl.addDisposeListener(new DisposeListener() {
          @Override
          public void widgetDisposed(final DisposeEvent e) {

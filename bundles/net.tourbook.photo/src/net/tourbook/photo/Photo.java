@@ -71,7 +71,7 @@ public class Photo {
 
       setupTimeZone();
    }
-   
+
    /**
     * This is the image size which the user has selected to paint a photo image.
     */
@@ -146,7 +146,7 @@ public class Photo {
    public boolean                                  isSavedInTour;
 
    /**
-    * Key is tourId
+    * A photo can be linked to different tours, key is tourId
     */
    private final HashMap<Long, TourPhotoReference> _tourPhotoRef           = new HashMap<>();
 
@@ -155,7 +155,7 @@ public class Photo {
     * the file system and {@link #_tourPhotoRef} needs to be retrieved from the sql db.
     */
    private AtomicReference<PhotoSqlLoadingState>   _photoSqlLoadingState   = new AtomicReference<>(PhotoSqlLoadingState.NOT_LOADED);
-   
+
    /**
     * Rating stars are very complicated when a photo is saved in multiple tours. Currently
     * (8.1.2013) ratings stars can be set only for ALL tours.
@@ -163,7 +163,7 @@ public class Photo {
    public int                                      ratingStars;
 
    private PhotoImageMetadata                      _photoImageMetadata;
-   
+
    /**
     * <pre>
     * Orientation
@@ -217,7 +217,7 @@ public class Photo {
    private double                                  _altitude               = Double.MIN_VALUE;
 
    /**
-    * caches the world positions for the photo lat/long values for each zoom level
+    * Caches the world positions for the photo lat/long values for each zoom level
     * <p>
     * key: projection id + zoom level
     */
