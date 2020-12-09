@@ -2216,8 +2216,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final int serieLength = timeSerie.length;
 
-      final float dataSerieAltimeter[] = new float[serieLength];
-      final float dataSerieGradient[] = new float[serieLength];
+      final float[] dataSerieAltimeter = new float[serieLength];
+      final float[] dataSerieGradient = new float[serieLength];
 
       int adjustIndexLow;
       int adjustmentIndexHigh;
@@ -2316,8 +2316,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int serieLength = timeSerie.length;
       final int serieLengthLast = serieLength - 1;
 
-      final float dataSerieAltimeter[] = new float[serieLength];
-      final float dataSerieGradient[] = new float[serieLength];
+      final float[] dataSerieAltimeter = new float[serieLength];
+      final float[] dataSerieGradient = new float[serieLength];
 
       // get minimum time/distance differences
       final int minTimeDiff = _prefStore.getInt(ITourbookPreferences.APP_DATA_SPEED_MIN_TIMESLICE_VALUE);
@@ -2345,25 +2345,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final int sliceTimeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
 
          // check if a lat and long diff is available
-         if (checkPosition && (serieIndex > 0) && (serieIndex < serieLengthLast - 1)) {
+         if (checkPosition && (serieIndex > 0) && (serieIndex < serieLengthLast - 1) && (sliceTimeDiff > 10)) {
 
-            if (sliceTimeDiff > 10) {
-
-               if ((latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1])
-                     && (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1])) {
+            if ((latitudeSerie[serieIndex] == latitudeSerie[serieIndex - 1])
+                  && (longitudeSerie[serieIndex] == longitudeSerie[serieIndex - 1])) {
 //                  dataSerieAltimeter[serieIndex] = 100;
-                  continue;
-               }
+               continue;
+            }
 
-               if (distanceSerie[serieIndex] == distanceSerie[serieIndex - 1]) {
+            if (distanceSerie[serieIndex] == distanceSerie[serieIndex - 1]) {
 //                  dataSerieAltimeter[serieIndex] = 120;
-                  continue;
-               }
+               continue;
+            }
 
-               if (altitudeSerie[serieIndex] == altitudeSerie[serieIndex - 1]) {
+            if (altitudeSerie[serieIndex] == altitudeSerie[serieIndex - 1]) {
 //                  dataSerieAltimeter[serieIndex] = 130;
-                  continue;
-               }
+               continue;
             }
          }
          final int serieIndexPrev = serieIndex - 1;
@@ -3377,12 +3374,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Computes tour break time
     *
-    * @param startIndex
     * @param endIndex
     * @param btConfig
     * @return Returns break time for the whole tour.
     */
-   private int computeBreakTimeVariable(final int startIndex, final int endIndex, final BreakTimeTool btConfig) {
+   private int computeBreakTimeVariable(final BreakTimeTool btConfig) {
 
       /*
        * compute break time according to the selected method
@@ -3709,8 +3705,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final int size = timeSerie.length;
 
-      final double altitude[] = new double[size];
-      final double altitude_sc[] = new double[size];
+      final double[] altitude = new double[size];
+      final double[] altitude_sc = new double[size];
 
       final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
       final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
@@ -3780,13 +3776,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final double[] distance = new double[size];
       final double[] distance_sc = new double[size];
 
-      final double Vh_ini[] = new double[size];
-      final double Vh[] = new double[size];
-      final double Vh_sc[] = new double[size];
+      final double[] Vh_ini = new double[size];
+      final double[] Vh = new double[size];
+      final double[] Vh_sc = new double[size];
 
-      final double Vv_ini[] = new double[size];
-      final double Vv[] = new double[size];
-      final double Vv_sc[] = new double[size];
+      final double[] Vv_ini = new double[size];
+      final double[] Vv = new double[size];
+      final double[] Vv_sc = new double[size];
 
       /*
        * get distance
@@ -4974,18 +4970,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             if (isUseLatLon && (lowIndex > 0) && (highIndex < lastSerieIndex - 1)) {
 
                if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
-                     && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
-
-                  if (distDiff == 0) {
-                     continue;
-                  }
+                     && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])
+                     && (distDiff == 0)) {
+                  continue;
                }
 
                if ((longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])
-                     && (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])) {
-                  if (distDiff == 0) {
-                     continue;
-                  }
+                     && (latitudeSerie[highIndex] == latitudeSerie[highIndex + 1]) && (distDiff == 0)) {
+                  continue;
                }
             }
 
@@ -7016,7 +7008,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // variable time slices
 
-            computeBreakTimeVariable(startIndex, endIndex, breakTimeTool);
+            computeBreakTimeVariable(breakTimeTool);
 
          } else {
 
@@ -7978,19 +7970,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // use metric system
 
-         if (_runDyn_StepLength_UI == null) {
+         if (_runDyn_StepLength_UI == null && runDyn_StepLength != null) {
 
-            if (runDyn_StepLength != null) {
+            // create UI data serie
 
-               // create UI data serie
+            final int serieSize = runDyn_StepLength.length;
 
-               final int serieSize = runDyn_StepLength.length;
+            _runDyn_StepLength_UI = new float[serieSize];
 
-               _runDyn_StepLength_UI = new float[serieSize];
-
-               for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-                  _runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
-               }
+            for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+               _runDyn_StepLength_UI[serieIndex] = runDyn_StepLength[serieIndex];
             }
          }
 
@@ -8073,19 +8062,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getRunDyn_VerticalRatio() {
 
-      if (_runDyn_VerticalRatio_UI == null) {
+      if (_runDyn_VerticalRatio_UI == null && runDyn_VerticalRatio != null) {
 
-         if (runDyn_VerticalRatio != null) {
+         // create UI data serie
 
-            // create UI data serie
+         final int serieSize = runDyn_VerticalRatio.length;
 
-            final int serieSize = runDyn_VerticalRatio.length;
+         _runDyn_VerticalRatio_UI = new float[serieSize];
 
-            _runDyn_VerticalRatio_UI = new float[serieSize];
-
-            for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
-               _runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
-            }
+         for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+            _runDyn_VerticalRatio_UI[serieIndex] = runDyn_VerticalRatio[serieIndex] / RUN_DYN_DATA_MULTIPLIER;
          }
       }
 
