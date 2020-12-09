@@ -79,7 +79,7 @@ Translation
 ===========
 
  - Czech 20.8 (Lukas)
- - Dutch 20.8 (Maarten)
+ - Dutch 20.11 (Maarten)
  - French (Frederic)
  - German
  - Italian (Doriano)
