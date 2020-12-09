@@ -230,6 +230,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     *
     */
    private boolean _isFocusActive;
+
+   @SuppressWarnings("unused")
    private boolean _isLinkPhotoDisplayed;
 
    /*
@@ -569,7 +571,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
       if (photo.isSavedInTour) {
 
-         devXAnnotationOffset += _annotationImageWidth;
+         devXAnnotationOffset += _annotationImageWidth + 2;
 
          if (isItemHovered && galleryItem.isHovered_AnnotationTour) {
             annotationImage = _imageAnnotationSavedInTour_Hovered;

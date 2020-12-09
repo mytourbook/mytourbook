@@ -144,7 +144,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private HashMap<String, Camera>            _allTourCameras                 = new HashMap<>();
 
    /**
-    * All cameras sorted by camera name
+    * Contains all cameras sorted by camera name, they are displayed in the combobox
     */
    private Camera[]                           _allTourCamerasSorted;
 
@@ -1505,6 +1505,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final ArrayList<TourPhotoLink> selectedLinks = new ArrayList<>();
 
+      String firstLinkCamera = null;
+
       for (final Object linkElement : allSelectedLinks) {
 
          if (linkElement instanceof TourPhotoLink) {
@@ -1519,12 +1521,29 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                selectedTourIds.add(selectedLink.tourId);
             }
 
-            if (isRealTour && selectedLink.linkPhotos.size() > 0) {
+            if (selectedLink.linkPhotos.size() > 0) {
 
                final TourData tourData = TourManager.getInstance().getTourData(selectedLink.tourId);
 
                if (tourData != null && tourData.latitudeSerie != null) {
                   _selectedTourPhotoLinksWithGps.add(selectedLink);
+               }
+
+               // get camera which is used to preselect the camera in the view toolbar
+               if (firstLinkCamera == null) {
+
+                  final String[] tourCameras = selectedLink.tourCameras.split(UI.COMMA_SPACE);
+
+                  if (tourCameras != null
+
+                        /*
+                         * When a tour contains photos from multiple cameras -> do not set a camera
+                         * otherwise the adjusted time for a camera can switch to another camera
+                         */
+                        && tourCameras.length == 1) {
+
+                     firstLinkCamera = tourCameras[0];
+                  }
                }
             }
          }
@@ -1533,6 +1552,25 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       if (_selectedLinks.equals(selectedLinks)) {
          // currently selected tour is already selected and selection is fired
          return;
+      }
+
+      // select camera of the first tour in the combobox
+      if (firstLinkCamera != null) {
+
+         for (int cameraIndex = 0; cameraIndex < _allTourCamerasSorted.length; cameraIndex++) {
+
+            final Camera camera = _allTourCamerasSorted[cameraIndex];
+
+            if (firstLinkCamera.equals(camera.cameraName)) {
+
+               _comboCamera.select(cameraIndex);
+
+               // update UI
+               onSelectCamera();
+
+               break;
+            }
+         }
       }
 
       _selectedLinks.clear();

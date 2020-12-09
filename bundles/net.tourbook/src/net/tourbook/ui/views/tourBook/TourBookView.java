@@ -1276,7 +1276,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_Body_SelectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
       // use a RowSelectionModel that will perform row selections and is able to identify a row via unique ID
-      final IRowIdAccessor<TVITourBookTour> rowIdAccessor = new IRowIdAccessor<TVITourBookTour>() {
+      final IRowIdAccessor<TVITourBookTour> rowIdAccessor = new IRowIdAccessor<>() {
 
          @Override
          public Serializable getRowId(final TVITourBookTour rowObject) {
@@ -2394,7 +2394,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          } else {
 
-            _postSelectionProvider.setSelection(selection);
+            // fire selection and keep it in the provider that when this part is activated, it will fire the selection again
+            _postSelectionProvider.setSelection(selection, false);
          }
       }
       _isInFireSelection = false;

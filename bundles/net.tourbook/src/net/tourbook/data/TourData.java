@@ -94,8 +94,6 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
-import net.tourbook.photo.TourPhotoReference;
-import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.srtm.ElevationSRTM3;
 import net.tourbook.srtm.GeoLat;
@@ -112,10 +110,7 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
@@ -9295,124 +9290,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
    }
 
-   public void removePhotos(final Collection<GalleryMT20Item> allRemovedPhotoItems) {
-
-      final Collection<TourPhoto> allRemovedTourPhotos = new ArrayList<>();
-
-      // loop: all selected photos in the gallery
-      for (final GalleryMT20Item galleryPhotoItem : allRemovedPhotoItems) {
-
-         final Photo removedGalleryPhoto = galleryPhotoItem.photo;
-
-         final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
-
-         // loop: all tour references in a photo
-         for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
-
-            final long removedTourId = tourPhotoReference.tourId;
-            final long removedPhotoId = tourPhotoReference.photoId;
-
-            if (removedTourId == tourId) {
-
-               // photo is from this tour
-
-               // loop: all current tour photos
-               for (final TourPhoto tourPhoto : tourPhotos) {
-
-                  if (tourPhoto.getPhotoId() == removedPhotoId) {
-
-                     // photo is in tour photo collection -> remove it
-
-                     allRemovedTourPhotos.add(tourPhoto);
-
-                     break;
-                  }
-               }
-            }
-         }
-      }
+   public void removePhotos(final Collection<TourPhoto> allRemovedTourPhotos) {
 
       if (allRemovedTourPhotos.size() > 0) {
 
-         // remove photos from this tour and save it
+         /*
+          * Remove photo from database
+          */
+         final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
 
-         final MessageDialog dialog = new MessageDialog(
+         currentTourPhotos.removeAll(allRemovedTourPhotos);
 
-               Display.getDefault().getActiveShell(),
+         // force gallery photos to be recreated
+         _galleryPhotos.clear();
 
-               Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
-               null, // no title image
+         tourPhotos.clear();
+         tourPhotos.addAll(currentTourPhotos);
 
-               NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
-                     allRemovedTourPhotos.size(),
-                     TourManager.getTourDateTimeShort(this)),
+         numberOfPhotos = tourPhotos.size();
 
-               MessageDialog.CONFIRM,
+         computePhotoTimeAdjustment();
 
-               0, // default index
-
-               Messages.App_Action_RemoveTourPhotos,
-               Messages.App_Action_Cancel);
-
-         if (dialog.open() == IDialogConstants.OK_ID) {
-
-            /*
-             * First remove tour reference from the photo, this MUST be done after the user has
-             * confirmed the removal otherwise the photo do not have a tour reference
-             */
-
-            // loop: all selected photos in the gallery
-            for (final GalleryMT20Item galleryPhotoItem : allRemovedPhotoItems) {
-
-               final Photo removedGalleryPhoto = galleryPhotoItem.photo;
-
-               final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
-
-               // loop: all tour references in a photo
-               for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
-
-                  final long removedTourId = tourPhotoReference.tourId;
-                  final long removedPhotoId = tourPhotoReference.photoId;
-
-                  if (removedTourId == tourId) {
-
-                     // photo is from this tour
-
-                     // loop: all current tour photos
-                     for (final TourPhoto tourPhoto : tourPhotos) {
-
-                        if (tourPhoto.getPhotoId() == removedPhotoId) {
-
-                           // photo is in tour photo collection -> remove it
-
-                           removedGalleryPhoto.removeTour(tourId);
-
-                           break;
-                        }
-                     }
-                  }
-               }
-            }
-
-            /*
-             * Remove photo from database
-             */
-            final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
-
-            currentTourPhotos.removeAll(allRemovedTourPhotos);
-
-            // force gallery photos to be recreated
-            _galleryPhotos.clear();
-
-            tourPhotos.clear();
-            tourPhotos.addAll(currentTourPhotos);
-
-            numberOfPhotos = tourPhotos.size();
-
-            computePhotoTimeAdjustment();
-
-            TourManager.saveModifiedTour(this, true);
-         }
+         TourManager.saveModifiedTour(this, true);
       }
    }
 

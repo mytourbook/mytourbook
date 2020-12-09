@@ -17,6 +17,8 @@ package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -41,6 +43,7 @@ import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
@@ -51,7 +54,9 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,6 +65,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
@@ -112,15 +118,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private boolean                        _isLinkPhotoDisplayed;
 
-   /**
-    * Tour which is containing the displayed photos
-    */
-   private TourData                       _tourData;
-
    /*
     * UI controls
     */
-   private ToolBar _toolbarLeft;
+   private ToolBar _rightToolbar;
    private Label   _labelTitle;
 
    private class ActionRemovePhoto extends Action {
@@ -180,6 +181,19 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       }
    }
 
+//   private class TourAndPhotos {
+//
+//      private long                   tourId;
+//
+//      final HashMap<Long, TourPhoto> allTourPhotos = new HashMap<>();
+//
+//      public TourAndPhotos(final long tourId) {
+//
+//         this.tourId = tourId;
+//      }
+//
+//   }
+
    private class TourPhotoGallery extends PhotoGallery {
 
       public TourPhotoGallery(final IDialogSettings state) {
@@ -202,44 +216,130 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
          return;
       }
 
-      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
+      int numPhotos = 0;
 
-      _tourData.removePhotos(selectedPhotos);
-
-      final Collection<TourPhoto> allRemovedTourPhotos = new ArrayList<>();
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<Long, TourPhoto>> tourWithTourPhotos = new HashMap<>();
 
       // loop: all selected photos in the gallery
-      for (final GalleryMT20Item galleryPhotoItem : selectedPhotos) {
+      final Collection<GalleryMT20Item> tourPhotos2Remove = _photoGallery.getGallerySelection();
+      for (final GalleryMT20Item galleryItem : tourPhotos2Remove) {
 
-         final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+         final Photo removedPhoto = galleryItem.photo;
 
-         final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+         final Collection<TourPhotoReference> removedPhotoRefs = removedPhoto.getTourPhotoReferences().values();
 
          // loop: all tour references in a photo
-         for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+         for (final TourPhotoReference photoTourRef : removedPhotoRefs) {
 
-            final long removedTourId = tourPhotoReference.tourId;
-            final long removedPhotoId = tourPhotoReference.photoId;
+            final long removedTourId = photoTourRef.tourId;
+            final long removedPhotoId = photoTourRef.photoId;
 
             final TourData tourData = TourManager.getTour(removedTourId);
-
-            if (removedTourId == tourData.getTourId()) {
+            if (tourData != null) {
 
                // photo is from this tour
 
-               // loop: all current tour photos
+               // loop: all tour photos
                for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
 
                   if (tourPhoto.getPhotoId() == removedPhotoId) {
 
                      // photo is in tour photo collection -> remove it
 
-WIP                     allRemovedTourPhotos.add(tourPhoto);
+                     HashMap<Long, TourPhoto> allTourIdPhotos = tourWithTourPhotos.get(removedTourId);
+
+                     if (allTourIdPhotos == null) {
+                        allTourIdPhotos = new HashMap<>();
+                        tourWithTourPhotos.put(removedTourId, allTourIdPhotos);
+                     }
+
+                     final TourPhoto prevTourPhoto = allTourIdPhotos.put(removedPhotoId, tourPhoto);
+                     if (prevTourPhoto == null) {
+                        numPhotos++;
+                     }
 
                      break;
                   }
                }
             }
+         }
+      }
+
+      if (numPhotos == 0) {
+         return;
+      }
+
+      // remove photos from this tour and save it
+
+      final MessageDialog dialog = new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
+            null, // no title image
+
+            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
+                  numPhotos,
+                  tourWithTourPhotos.size()),
+
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_RemoveTourPhotos,
+            Messages.App_Action_Cancel);
+
+      if (dialog.open() == IDialogConstants.OK_ID) {
+
+         /*
+          * Remove tour reference from the photo, this MUST be done after the user has
+          * confirmed the removal otherwise the photo do not have a tour reference when the dialog
+          * is canceled
+          */
+
+         // loop: all selected photos in the gallery
+         for (final GalleryMT20Item galleryPhotoItem : tourPhotos2Remove) {
+
+            final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+            final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+            // loop: all tour references in a photo
+            for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+               final long removedTourId = tourPhotoReference.tourId;
+               final long removedPhotoId = tourPhotoReference.photoId;
+
+               final HashMap<Long, TourPhoto> allTourIdPhotos = tourWithTourPhotos.get(removedTourId);
+
+               if (allTourIdPhotos != null) {
+
+                  // loop: all current tour photos
+                  for (final TourPhoto tourIdPhoto : allTourIdPhotos.values()) {
+
+                     if (tourIdPhoto.getPhotoId() == removedPhotoId) {
+
+                        // photo is in tour photo collection -> remove it
+
+                        removedGalleryPhoto.removeTour(removedTourId);
+
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+
+         for (final Long tourId : tourWithTourPhotos.keySet()) {
+
+            final TourData tourData = TourManager.getTour(tourId);
+
+            final HashMap<Long, TourPhoto> tourWithPhotos = tourWithTourPhotos.get(tourId);
+
+            final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+            tourData.removePhotos(tourPhotos);
          }
       }
    }
@@ -348,11 +448,29 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
                return;
             }
 
-            if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
+            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+               clearView();
+
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+
+                  // show modified tour
+
+                  final ArrayList<Long> allTourIds = new ArrayList<>();
+
+                  for (final TourData tourData : modifiedTours) {
+                     allTourIds.add(tourData.getTourId());
+                  }
+
+                  onSelectionChanged(new SelectionTourIds(allTourIds));
+               }
+
+            } else if (eventId == TourEventId.UPDATE_UI) {
 
                // ensure that not the wrong data are displayed
                clearView();
-               showTourPhotos();
+//               showTourPhotos_FromDefaultSelection();
 
             } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
@@ -372,9 +490,50 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   /**
+    * Add photos from a tour.
+    *
+    * @param allPhotos
+    * @param tourData
+    * @return
+    */
+   private int addTourPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
+
+      if (tourData == null) {
+         return 0;
+      }
+
+      final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+      if (galleryPhotos == null) {
+         return 0;
+      }
+
+      allPhotos.addAll(galleryPhotos);
+
+      _galleryPositionKey += galleryPhotos.hashCode();
+
+      final int gallerySize = galleryPhotos.size();
+      if (gallerySize > 0) {
+
+         final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
+         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
+
+         if (tourStartTime < _photoStartTime) {
+            _photoStartTime = tourStartTime;
+         }
+         if (tourEndTime > _photoEndTime) {
+            _photoEndTime = tourEndTime;
+         }
+      }
+
+      return galleryPhotos.size();
+   }
+
    private void clearView() {
 
-      _tourData = null;
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
    }
 
    private void createActions() {
@@ -402,7 +561,7 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
       // this part is a selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-      showTourPhotos();
+      showTourPhotos_FromDefaultSelection();
    }
 
    private void createUI(final Composite parent) {
@@ -438,7 +597,7 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .align(SWT.FILL, SWT.CENTER)
             .applyTo(container);
@@ -449,22 +608,18 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
           * label: title
           */
          _labelTitle = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.CENTER)
-//					.hint(20, SWT.DEFAULT)
                .applyTo(_labelTitle);
-//			_labelTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
          /*
-          * create toolbar for the buttons on the left side
+          * Create toolbar for the buttons on the right side
           */
-         _toolbarLeft = new ToolBar(container, SWT.FLAT);
-         GridDataFactory.fillDefaults()//
+         _rightToolbar = new ToolBar(container, SWT.FLAT);
+         GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
-//					.grab(false, true)
-               .applyTo(_toolbarLeft);
-//			_toolbarLeft.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+               .applyTo(_rightToolbar);
       }
    }
 
@@ -488,32 +643,15 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
 
       final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-      final boolean isEnabled = selectedPhotos.size() > 0
-
-            // currently only ONE tour is supported
-//            && _tourData != null
-//            && _tourData.isMultipleTours() == false
-            ;
-
-      _actionRemovePhoto.setEnabled(
-
-      /*
-       * This view can display photos from tours OR from tour photo links, only photos from
-       * tours can be removed !
-       */
-//            _isLinkPhotoDisplayed == false
-//
-//                  &&
-
-            isEnabled);
+      _actionRemovePhoto.setEnabled(selectedPhotos.size() > 0);
    }
 
    private void fillActionBar() {
 
       /*
-       * fill gallery toolbar
+       * Fill gallery toolbar
        */
-      _galleryToolbarManager = new ToolBarManager(_toolbarLeft);
+      _galleryToolbarManager = new ToolBarManager(_rightToolbar);
 
       _galleryToolbarManager.add(_actionToggleGalleryOrientation);
 
@@ -525,45 +663,6 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
       menuMgr.add(_actionRemovePhoto);
 
       enableActions();
-   }
-
-   /**
-    * Get photos from a tour.
-    *
-    * @param allPhotos
-    * @param tourData
-    */
-   private void getTourPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
-
-      if (tourData == null) {
-         return;
-      }
-
-      _tourData = tourData;
-
-      final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
-
-      if (galleryPhotos == null) {
-         return;
-      }
-
-      allPhotos.addAll(galleryPhotos);
-
-      _galleryPositionKey += galleryPhotos.hashCode();
-
-      final int gallerySize = galleryPhotos.size();
-      if (gallerySize > 0) {
-
-         final long tourStartTime = galleryPhotos.get(0).adjustedTimeTour;
-         final long tourEndTime = galleryPhotos.get(gallerySize - 1).adjustedTimeTour;
-
-         if (tourStartTime < _photoStartTime) {
-            _photoStartTime = tourStartTime;
-         }
-         if (tourEndTime > _photoEndTime) {
-            _photoEndTime = tourEndTime;
-         }
-      }
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -582,12 +681,21 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
          final TourPhotoLinkSelection tourPhotoSelection = (TourPhotoLinkSelection) selection;
 
          final ArrayList<TourPhotoLink> photoLinks = tourPhotoSelection.tourPhotoLinks;
+         final HashSet<Long> allTourIds = new HashSet<>();
+         int numHistoryTour = 0;
 
          for (final TourPhotoLink photoLink : photoLinks) {
 
             allPhotos.addAll(photoLink.linkPhotos);
 
             _galleryPositionKey += photoLink.linkId;
+
+            final long tourId = photoLink.tourId;
+            if (tourId == Long.MIN_VALUE) {
+               numHistoryTour++;
+            } else {
+               allTourIds.add(tourId);
+            }
 
             final long tourStartTime = photoLink.tourStartTime;
             final long tourEndTime = photoLink.tourEndTime;
@@ -600,36 +708,36 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
             }
          }
 
-         _tourData = null;
-         updateUI(allPhotos);
+         showTourPhotos_FromCurrentSelection(allPhotos, allTourIds.size() + numHistoryTour);
 
       } else if (selection instanceof SelectionTourMarker) {
 
          final TourData tourData = ((SelectionTourMarker) selection).getTourData();
 
-         getTourPhotos(allPhotos, tourData);
-         updateUI(allPhotos);
+         addTourPhotos(allPhotos, tourData);
+
+         showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
       } else if (selection instanceof SelectionTourData) {
 
          final TourData tourData = ((SelectionTourData) selection).getTourData();
 
-         getTourPhotos(allPhotos, tourData);
-         updateUI(allPhotos);
+         addTourPhotos(allPhotos, tourData);
+
+         showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
       } else if (selection instanceof SelectionTourId) {
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-         getTourPhotos(allPhotos, tourData);
-         updateUI(allPhotos);
+         addTourPhotos(allPhotos, tourData);
+
+         showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
       } else if (selection instanceof SelectionTourIds) {
 
          // paint all selected tours
-
-         _tourData = null;
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
@@ -637,10 +745,10 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
 
             final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
-            getTourPhotos(allPhotos, tourData);
+            addTourPhotos(allPhotos, tourData);
          }
 
-         updateUI(allPhotos);
+         showTourPhotos_FromCurrentSelection(allPhotos, tourIds.size());
       }
 
       /*
@@ -710,7 +818,57 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
 
    }
 
-   private void showTourPhotos() {
+   private void showTourPhotos_FromCurrentSelection(final ArrayList<Photo> allPhotos, final int numTours) {
+
+      /*
+       * Update photo gallery
+       */
+      _photoGallery.showImages(
+            allPhotos,
+            Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
+            _isLinkPhotoDisplayed,
+            false);
+
+      /*
+       * Set title
+       */
+      final int numPhotos = allPhotos.size();
+
+      String labelText = UI.EMPTY_STRING;
+      String labelTooltip = UI.EMPTY_STRING;
+
+      if (numPhotos > 0) {
+
+         final String labelTextFormat = _isLinkPhotoDisplayed
+               ? Messages.Photos_AndTours_Label_Source_PhotoLink
+               : Messages.Photos_AndTours_Label_Source_Tour;
+
+         final String labelTooltipFormat = _isLinkPhotoDisplayed
+               ? Messages.Photos_AndTours_Label_Source_PhotoLink_Tooltip
+               : Messages.Photos_AndTours_Label_Source_Tour_Tooltip;
+
+         String photoDateTime = UI.EMPTY_STRING;
+
+         if (numPhotos == 1) {
+
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
+
+         } else if (numPhotos > 1) {
+
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
+                  + UI.ELLIPSIS_WITH_SPACE
+                  + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
+         }
+
+         labelText = String.format(labelTextFormat, numPhotos, numTours, photoDateTime);
+         labelTooltip = String.format(labelTooltipFormat, numPhotos, numTours, photoDateTime);
+      }
+
+      _labelTitle.setText(labelText);
+      _labelTitle.setToolTipText(labelTooltip);
+   }
+
+   private void showTourPhotos_FromDefaultSelection() {
 
       Display.getCurrent().asyncExec(new Runnable() {
          @Override
@@ -740,56 +898,6 @@ WIP                     allRemovedTourPhotos.add(tourPhoto);
       final Color noFocusSelectionFgColor = Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND);
 
       _photoGallery.updateColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor, isRestore);
-   }
-
-   private void updateUI(final ArrayList<Photo> allPhotos) {
-
-      /*
-       * Update photo gallery
-       */
-      _photoGallery.showImages(
-            allPhotos,
-            Long.toString(_galleryPositionKey) + "_TourPhotosView", //$NON-NLS-1$
-            _isLinkPhotoDisplayed,
-            false);
-
-      /*
-       * Set title
-       */
-      final int size = allPhotos.size();
-
-      String labelText = UI.EMPTY_STRING;
-      String labelTooltip = UI.EMPTY_STRING;
-
-      if (size > 0) {
-
-         final String labelTextFormat = _isLinkPhotoDisplayed
-               ? Messages.Photos_AndTours_Label_Source_PhotoLink
-               : Messages.Photos_AndTours_Label_Source_Tour;
-
-         final String labelTooltipFormat = _isLinkPhotoDisplayed
-               ? Messages.Photos_AndTours_Label_Source_PhotoLink_Tooltip
-               : Messages.Photos_AndTours_Label_Source_Tour_Tooltip;
-
-         String photoDateTime = UI.EMPTY_STRING;
-
-         if (size == 1) {
-
-            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
-
-         } else if (size > 1) {
-
-            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
-                  + UI.ELLIPSIS_WITH_SPACE
-                  + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
-         }
-
-         labelText = String.format(labelTextFormat, size, photoDateTime);
-         labelTooltip = String.format(labelTooltipFormat, size, photoDateTime);
-      }
-
-      _labelTitle.setText(labelText);
-      _labelTitle.setToolTipText(labelTooltip);
    }
 
    private void updateUI_ToogleAction() {
