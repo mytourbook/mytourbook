@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -28,288 +28,289 @@ import org.joda.time.PeriodType;
 
 public class TourPhotoLink {
 
-	private static final PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
-														// hide these components
-																.withMinutesRemoved()
-																.withSecondsRemoved()
-																.withMillisRemoved();
-
-	boolean							isHistoryTour;
+   private static final PeriodType _tourPeriodTemplate = PeriodType.yearMonthDayTime()
+
+         // hide these components
+         .withMinutesRemoved()
+         .withSecondsRemoved()
+         .withMillisRemoved();
 
-	/**
-	 * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
-	 */
-	public long						tourId				= Long.MIN_VALUE;
+   boolean                         isHistoryTour;
 
-	long							tourTypeId			= -1;
+   /**
+    * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
+    */
+   public long                     tourId              = Long.MIN_VALUE;
 
-	/**
-	 * Unique id for this link.
-	 */
-	long							linkId;
+   long                            tourTypeId          = -1;
 
-	/**
-	 * Tour start time in ms
-	 */
-	long							tourStartTime;
+   /**
+    * Unique id for this link.
+    */
+   long                            linkId;
 
-	/**
-	 * Tour end time in ms.
-	 */
-	long							tourEndTime			= Long.MIN_VALUE;
-
-	long							historyStartTime	= Long.MIN_VALUE;
-	long							historyEndTime		= Long.MIN_VALUE;
-
-	private ZonedDateTime			tourStartDateTime;
-	Period							tourPeriod;
-
-	int								numberOfGPSPhotos;
-	int								numberOfNoGPSPhotos;
-
-	/**
-	 * Number of photos which are saved in a real tour.
-	 */
-	int								numberOfTourPhotos;
-
-	/**
-	 * Adjusted time in seconds.
-	 */
-	int								photoTimeAdjustment;
-
-	/**
-	 * Contains all photos for this tour.
-	 */
-	public ArrayList<Photo>			linkPhotos			= new ArrayList<Photo>();
-
-	private TourData				_historyTourData;
-
-	/**
-	 * Contains names for all cameras which are used to take pictures for the current tour.
-	 */
-	String							tourCameras;
+   /**
+    * Tour start time in ms
+    */
+   long                            tourStartTime;
 
-	/**
-	 * Constructor for a history tour.
-	 * 
-	 * @param notUsed
-	 */
-	TourPhotoLink(final long tourStartTime) {
+   /**
+    * Tour end time in ms.
+    */
+   long                            tourEndTime         = Long.MIN_VALUE;
+
+   long                            historyStartTime    = Long.MIN_VALUE;
+   long                            historyEndTime      = Long.MIN_VALUE;
+
+   private ZonedDateTime           tourStartDateTime;
+   Period                          tourPeriod;
+
+   int                             numberOfGPSPhotos;
+   int                             numberOfNoGPSPhotos;
+
+   /**
+    * Number of photos which are saved in a real tour.
+    */
+   int                             numberOfTourPhotos;
+
+   /**
+    * Adjusted time in seconds.
+    */
+   int                             photoTimeAdjustment;
+
+   /**
+    * Contains all photos for this tour.
+    */
+   public ArrayList<Photo>         linkPhotos          = new ArrayList<>();
+
+   private TourData                _historyTourData;
 
-		isHistoryTour = true;
+   /**
+    * Contains names for all cameras which are used to take pictures for the current tour.
+    */
+   String                          tourCameras;
 
-		linkId = System.nanoTime();
+   /**
+    * Constructor for a history tour.
+    *
+    * @param notUsed
+    */
+   TourPhotoLink(final long tourStartTime) {
 
-		setTourStartTime(tourStartTime);
+      isHistoryTour = true;
 
-		_historyTourData = new TourData();
-		_historyTourData.setupHistoryTour();
-	}
+      linkId = System.nanoTime();
 
-	/**
-	 * Constructor for a real tour.
-	 * 
-	 * @param tourEndTime
-	 * @param tourStartTime
-	 * @param tourId
-	 * @param dbPhotoTimeAdjustment
-	 * @param dbNumberOfPhotos
-	 */
-	TourPhotoLink(	final long tourId,
-					final long tourStartTime,
-					final long tourEndTime,
-					final int numberOfPhotos,
-					final int dbPhotoTimeAdjustment) {
+      setTourStartTime(tourStartTime);
 
-		this.tourId = tourId;
+      _historyTourData = new TourData();
+      _historyTourData.setupHistoryTour();
+   }
 
-		linkId = tourId;
+   /**
+    * Constructor for a real tour.
+    *
+    * @param tourEndTime
+    * @param tourStartTime
+    * @param tourId
+    * @param dbPhotoTimeAdjustment
+    * @param dbNumberOfPhotos
+    */
+   TourPhotoLink(final long tourId,
+                 final long tourStartTime,
+                 final long tourEndTime,
+                 final int numberOfPhotos,
+                 final int dbPhotoTimeAdjustment) {
 
-		setTourStartTime(tourStartTime);
-		setTourEndTime(tourEndTime);
+      this.tourId = tourId;
 
-		numberOfTourPhotos = numberOfPhotos;
+      linkId = tourId;
 
-		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
+      setTourStartTime(tourStartTime);
+      setTourEndTime(tourEndTime);
 
-		photoTimeAdjustment = dbPhotoTimeAdjustment;
-	}
+      numberOfTourPhotos = numberOfPhotos;
 
-	private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {
+      tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 
-		final HistoryData historyData = new HistoryData();
+      photoTimeAdjustment = dbPhotoTimeAdjustment;
+   }
 
-		historyData.absoluteTime = timeSliceTime / 1000 * 1000;
+   private void addTimeSlice(final ArrayList<HistoryData> historyList, final long timeSliceTime) {
 
-		historyList.add(historyData);
-	}
+      final HistoryData historyData = new HistoryData();
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TourPhotoLink)) {
-			return false;
-		}
-		final TourPhotoLink other = (TourPhotoLink) obj;
-		if (linkId != other.linkId) {
-			return false;
-		}
-		return true;
-	}
+      historyData.absoluteTime = timeSliceTime / 1000 * 1000;
 
-	private void finalizeHistoryTour() {
+      historyList.add(historyData);
+   }
 
-		/*
-		 * create time data serie
-		 */
-		final int timeSerieLength = linkPhotos.size();
-		final long[] historyTimeSerie = new long[timeSerieLength];
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TourPhotoLink)) {
+         return false;
+      }
+      final TourPhotoLink other = (TourPhotoLink) obj;
+      if (linkId != other.linkId) {
+         return false;
+      }
+      return true;
+   }
 
-		for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
-			historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTimeLink;
-		}
+   private void finalizeHistoryTour() {
 
-		final long tourStart = historyTimeSerie[0];
-		final long tourEnd = historyTimeSerie[timeSerieLength - 1];
+      /*
+       * create time data serie
+       */
+      final int timeSerieLength = linkPhotos.size();
+      final long[] historyTimeSerie = new long[timeSerieLength];
 
-		historyStartTime = tourStart;
-		historyEndTime = tourEnd;
+      for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
+         historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTimeLink;
+      }
 
-		if (timeSerieLength == 1) {
+      final long tourStart = historyTimeSerie[0];
+      final long tourEnd = historyTimeSerie[timeSerieLength - 1];
 
-			// only 1 point is visible
+      historyStartTime = tourStart;
+      historyEndTime = tourEnd;
 
-			tourStartTime = tourStart - 1000;
-			tourEndTime = tourStart + 1000;
+      if (timeSerieLength == 1) {
 
-		} else {
+         // only 1 point is visible
 
-			// add additional 3% tour time that the tour do not start/end at the chart border
+         tourStartTime = tourStart - 1000;
+         tourEndTime = tourStart + 1000;
 
-			final double timeDiff = tourEnd - tourStart;
+      } else {
 
-			/**
-			 * very important: round to 0 ms
-			 */
-			long timeOffset = ((long) (timeDiff * 0.03) / 1000) * 1000;
+         // add additional 3% tour time that the tour do not start/end at the chart border
 
-			// ensure there is a time difference of 1 second
-			if (timeOffset == 0) {
-				timeOffset = 1000;
-			}
+         final double timeDiff = tourEnd - tourStart;
 
-			tourStartTime = tourStart - timeOffset;
-			tourEndTime = tourEnd + timeOffset;
-		}
+         /**
+          * very important: round to 0 ms
+          */
+         long timeOffset = ((long) (timeDiff * 0.03) / 1000) * 1000;
 
-		// update adjusted start
-		tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
+         // ensure there is a time difference of 1 second
+         if (timeOffset == 0) {
+            timeOffset = 1000;
+         }
 
-		/*
-		 * adjust start and end that the dummy tour do not start at the chart border
-		 */
+         tourStartTime = tourStart - timeOffset;
+         tourEndTime = tourEnd + timeOffset;
+      }
 
-		final ArrayList<HistoryData> historySlices = new ArrayList<HistoryData>();
+      // update adjusted start
+      tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
 
-		/*
-		 * set tour start time line before first time slice
-		 */
-		addTimeSlice(historySlices, tourStartTime);
+      /*
+       * adjust start and end that the dummy tour do not start at the chart border
+       */
 
-		/*
-		 * create time data list for all time slices which contains photos
-		 */
-		long prevTimeSliceTime = Long.MIN_VALUE;
-		for (final long timeSliceTime : historyTimeSerie) {
+      final ArrayList<HistoryData> historySlices = new ArrayList<>();
 
-			// skip duplicates
-			if (timeSliceTime == prevTimeSliceTime) {
-				continue;
-			}
+      /*
+       * set tour start time line before first time slice
+       */
+      addTimeSlice(historySlices, tourStartTime);
 
-			addTimeSlice(historySlices, timeSliceTime);
+      /*
+       * create time data list for all time slices which contains photos
+       */
+      long prevTimeSliceTime = Long.MIN_VALUE;
+      for (final long timeSliceTime : historyTimeSerie) {
 
-			prevTimeSliceTime = timeSliceTime;
-		}
+         // skip duplicates
+         if (timeSliceTime == prevTimeSliceTime) {
+            continue;
+         }
 
-		/*
-		 * set tour end time after the last time slice
-		 */
-		addTimeSlice(historySlices, tourEndTime);
+         addTimeSlice(historySlices, timeSliceTime);
 
-		_historyTourData.setTourStartTime(tourStartDateTime);
-		_historyTourData.createHistoryTimeSerie(historySlices);
-	}
+         prevTimeSliceTime = timeSliceTime;
+      }
 
-	public TourData getHistoryTourData() {
-		return _historyTourData;
-	}
+      /*
+       * set tour end time after the last time slice
+       */
+      addTimeSlice(historySlices, tourEndTime);
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (linkId ^ (linkId >>> 32));
-		return result;
-	}
+      _historyTourData.setTourStartTime(tourStartDateTime);
+      _historyTourData.createHistoryTimeSerie(historySlices);
+   }
 
-	public boolean isHistoryTour() {
-		return isHistoryTour;
-	}
+   public TourData getHistoryTourData() {
+      return _historyTourData;
+   }
 
-	void setTourEndTime(final long endTime) {
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (linkId ^ (linkId >>> 32));
+      return result;
+   }
 
-		if (isHistoryTour) {
+   public boolean isHistoryTour() {
+      return isHistoryTour;
+   }
 
-			final int photosSize = linkPhotos.size();
+   void setTourEndTime(final long endTime) {
 
-			if (photosSize == 0) {
-				// there are no photos in this history tour, THIS SHOULD NOT HAPPEN FOR A HISTORY TOUR
-				tourEndTime = tourStartTime;
-			} else {
-				// get time from last photo
-				tourEndTime = linkPhotos.get(photosSize - 1).adjustedTimeLink;
-			}
+      if (isHistoryTour) {
 
-			finalizeHistoryTour();
+         final int photosSize = linkPhotos.size();
 
-		} else {
+         if (photosSize == 0) {
+            // there are no photos in this history tour, THIS SHOULD NOT HAPPEN FOR A HISTORY TOUR
+            tourEndTime = tourStartTime;
+         } else {
+            // get time from last photo
+            tourEndTime = linkPhotos.get(photosSize - 1).adjustedTimeLink;
+         }
 
-			tourEndTime = endTime;
-		}
+         finalizeHistoryTour();
 
-		// set tour period AFTER history tour is finalized
-		tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
-	}
+      } else {
 
-	private void setTourStartTime(final long time) {
+         tourEndTime = endTime;
+      }
 
-		// remove milliseconds
-		tourStartTime = time / 1000 * 1000;
-		tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
-	}
+      // set tour period AFTER history tour is finalized
+      tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
+   }
 
-	@Override
-	public String toString() {
+   private void setTourStartTime(final long time) {
 
-//		private static final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
+      // remove milliseconds
+      tourStartTime = time / 1000 * 1000;
+      tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
+   }
 
-		return "TourPhotoLink " //$NON-NLS-1$
-//				+ ("\n\ttourStart=\t\t" + tourStartTime)
-				+ ("\n\ttourStart=\t\t" + TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_DateTime_M)) //$NON-NLS-1$
-//				+ ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
-				+ ("\n\thistoryStartTime=\t" + TimeTools.getZonedDateTime(historyStartTime).format(TimeTools.Formatter_DateTime_M)) //$NON-NLS-1$
-//				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
-				+ ("\n\tisHistory=" + isHistoryTour) //$NON-NLS-1$
-				+ ("\tlinkId=" + linkId) //$NON-NLS-1$
-				+ ("\n") //$NON-NLS-1$
-		//
-		;
-	}
+   @Override
+   public String toString() {
+
+//      private static final DateTimeFormatter   _dtFormatter      = DateTimeFormat.forStyle("SL");   //$NON-NLS-1$
+
+      return "TourPhotoLink " //$NON-NLS-1$
+//            + ("\n\ttourStart=\t\t" + tourStartTime)
+            + "\n\ttourStart=\t\t" + TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_DateTime_M) //$NON-NLS-1$
+//            + ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
+            + "\n\thistoryStartTime=\t" + TimeTools.getZonedDateTime(historyStartTime).format(TimeTools.Formatter_DateTime_M) //$NON-NLS-1$
+//            + ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
+            + "\n\tisHistory=" + isHistoryTour //$NON-NLS-1$
+            + "\tlinkId=" + linkId //$NON-NLS-1$
+            + "\n" //$NON-NLS-1$
+      //
+      ;
+   }
 
 }

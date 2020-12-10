@@ -1727,6 +1727,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public TourData() {}
 
    /**
+    * Add photos into this tour and save it.
+    *
+    * @param allNewTourPhotos
+    */
+   public void addPhotos(final Collection<TourPhoto> allNewTourPhotos) {
+
+      if (allNewTourPhotos.size() > 0) {
+
+         final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
+
+         currentTourPhotos.addAll(allNewTourPhotos);
+
+         saveTourPhotos(currentTourPhotos);
+      }
+   }
+
+   /**
     * Removed data series when the sum of all values is 0.
     */
    public void cleanupDataSeries() {
@@ -9290,28 +9307,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
    }
 
+   /**
+    * Remove photos from this tour and save it.
+    *
+    * @param allRemovedTourPhotos
+    */
    public void removePhotos(final Collection<TourPhoto> allRemovedTourPhotos) {
 
       if (allRemovedTourPhotos.size() > 0) {
 
-         /*
-          * Remove photo from database
-          */
          final HashSet<TourPhoto> currentTourPhotos = new HashSet<>(tourPhotos);
 
          currentTourPhotos.removeAll(allRemovedTourPhotos);
 
-         // force gallery photos to be recreated
-         _galleryPhotos.clear();
-
-         tourPhotos.clear();
-         tourPhotos.addAll(currentTourPhotos);
-
-         numberOfPhotos = tourPhotos.size();
-
-         computePhotoTimeAdjustment();
-
-         TourManager.saveModifiedTour(this, true);
+         saveTourPhotos(currentTourPhotos);
       }
    }
 
@@ -9353,6 +9362,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (serieData != null) {
          visibleDataPointSerie = serieData.visiblePoints_Surfing;
       }
+   }
+
+   /**
+    * Save photos in this tour.
+    *
+    * @param allTourPhotos
+    */
+   private void saveTourPhotos(final HashSet<TourPhoto> allTourPhotos) {
+
+      // force gallery photos to be recreated
+      _galleryPhotos.clear();
+
+      tourPhotos.clear();
+      tourPhotos.addAll(allTourPhotos);
+
+      numberOfPhotos = tourPhotos.size();
+
+      computePhotoTimeAdjustment();
+
+      TourManager.saveModifiedTour(this, true);
    }
 
    /**

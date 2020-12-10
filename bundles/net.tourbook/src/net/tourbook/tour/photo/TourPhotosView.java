@@ -17,7 +17,6 @@ package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import net.tourbook.Messages;
@@ -27,7 +26,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
@@ -36,7 +34,6 @@ import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
@@ -54,9 +51,7 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -65,7 +60,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
@@ -98,6 +92,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private boolean                        _isPartVisible;
 
+   private ActionAddPhoto                 _actionAddPhoto;
    private ActionRemovePhoto              _actionRemovePhoto;
    private ActionToggleGalleryOrientation _actionToggleGalleryOrientation;
 
@@ -123,21 +118,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
     */
    private ToolBar _rightToolbar;
    private Label   _labelTitle;
-
-   private class ActionRemovePhoto extends Action {
-
-      public ActionRemovePhoto() {
-
-         super(Messages.Action_TourPhotos_RemovePhoto, Action.AS_PUSH_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-      }
-
-      @Override
-      public void run() {
-         actionRemovePhoto();
-      }
-   }
 
    private class ActionToggleGalleryOrientation extends Action {
 
@@ -181,19 +161,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       }
    }
 
-//   private class TourAndPhotos {
-//
-//      private long                   tourId;
-//
-//      final HashMap<Long, TourPhoto> allTourPhotos = new HashMap<>();
-//
-//      public TourAndPhotos(final long tourId) {
-//
-//         this.tourId = tourId;
-//      }
-//
-//   }
-
    private class TourPhotoGallery extends PhotoGallery {
 
       public TourPhotoGallery(final IDialogSettings state) {
@@ -208,140 +175,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    public TourPhotosView() {
       super();
-   }
-
-   private void actionRemovePhoto() {
-
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
-
-      int numPhotos = 0;
-
-      // key: tour id, photo id
-      final HashMap<Long, HashMap<Long, TourPhoto>> tourWithTourPhotos = new HashMap<>();
-
-      // loop: all selected photos in the gallery
-      final Collection<GalleryMT20Item> tourPhotos2Remove = _photoGallery.getGallerySelection();
-      for (final GalleryMT20Item galleryItem : tourPhotos2Remove) {
-
-         final Photo removedPhoto = galleryItem.photo;
-
-         final Collection<TourPhotoReference> removedPhotoRefs = removedPhoto.getTourPhotoReferences().values();
-
-         // loop: all tour references in a photo
-         for (final TourPhotoReference photoTourRef : removedPhotoRefs) {
-
-            final long removedTourId = photoTourRef.tourId;
-            final long removedPhotoId = photoTourRef.photoId;
-
-            final TourData tourData = TourManager.getTour(removedTourId);
-            if (tourData != null) {
-
-               // photo is from this tour
-
-               // loop: all tour photos
-               for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
-
-                  if (tourPhoto.getPhotoId() == removedPhotoId) {
-
-                     // photo is in tour photo collection -> remove it
-
-                     HashMap<Long, TourPhoto> allTourIdPhotos = tourWithTourPhotos.get(removedTourId);
-
-                     if (allTourIdPhotos == null) {
-                        allTourIdPhotos = new HashMap<>();
-                        tourWithTourPhotos.put(removedTourId, allTourIdPhotos);
-                     }
-
-                     final TourPhoto prevTourPhoto = allTourIdPhotos.put(removedPhotoId, tourPhoto);
-                     if (prevTourPhoto == null) {
-                        numPhotos++;
-                     }
-
-                     break;
-                  }
-               }
-            }
-         }
-      }
-
-      if (numPhotos == 0) {
-         return;
-      }
-
-      // remove photos from this tour and save it
-
-      final MessageDialog dialog = new MessageDialog(
-
-            Display.getDefault().getActiveShell(),
-
-            Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
-            null, // no title image
-
-            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
-                  numPhotos,
-                  tourWithTourPhotos.size()),
-
-            MessageDialog.CONFIRM,
-
-            0, // default index
-
-            Messages.App_Action_RemoveTourPhotos,
-            Messages.App_Action_Cancel);
-
-      if (dialog.open() == IDialogConstants.OK_ID) {
-
-         /*
-          * Remove tour reference from the photo, this MUST be done after the user has
-          * confirmed the removal otherwise the photo do not have a tour reference when the dialog
-          * is canceled
-          */
-
-         // loop: all selected photos in the gallery
-         for (final GalleryMT20Item galleryPhotoItem : tourPhotos2Remove) {
-
-            final Photo removedGalleryPhoto = galleryPhotoItem.photo;
-
-            final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
-
-            // loop: all tour references in a photo
-            for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
-
-               final long removedTourId = tourPhotoReference.tourId;
-               final long removedPhotoId = tourPhotoReference.photoId;
-
-               final HashMap<Long, TourPhoto> allTourIdPhotos = tourWithTourPhotos.get(removedTourId);
-
-               if (allTourIdPhotos != null) {
-
-                  // loop: all current tour photos
-                  for (final TourPhoto tourIdPhoto : allTourIdPhotos.values()) {
-
-                     if (tourIdPhoto.getPhotoId() == removedPhotoId) {
-
-                        // photo is in tour photo collection -> remove it
-
-                        removedGalleryPhoto.removeTour(removedTourId);
-
-                        break;
-                     }
-                  }
-               }
-            }
-         }
-
-         for (final Long tourId : tourWithTourPhotos.keySet()) {
-
-            final TourData tourData = TourManager.getTour(tourId);
-
-            final HashMap<Long, TourPhoto> tourWithPhotos = tourWithTourPhotos.get(tourId);
-
-            final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
-
-            tourData.removePhotos(tourPhotos);
-         }
-      }
    }
 
    private void actionToggleVerticalHorizontal() {
@@ -539,7 +372,9 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
    private void createActions() {
 
       _actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
-      _actionRemovePhoto = new ActionRemovePhoto();
+
+      _actionAddPhoto = new ActionAddPhoto(_photoGallery);
+      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery);
    }
 
    @Override
@@ -643,7 +478,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
       final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-      _actionRemovePhoto.setEnabled(selectedPhotos.size() > 0);
+      final boolean isPhotoSelected = selectedPhotos.size() > 0;
+
+      _actionRemovePhoto.setEnabled(isPhotoSelected);
+      _actionAddPhoto.setEnabled(isPhotoSelected && _isLinkPhotoDisplayed);
    }
 
    private void fillActionBar() {
@@ -660,12 +498,23 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      menuMgr.add(_actionAddPhoto);
       menuMgr.add(_actionRemovePhoto);
 
       enableActions();
    }
 
    private void onSelectionChanged(final ISelection selection) {
+
+      if (_actionAddPhoto.isInModifyTour() || _actionRemovePhoto.isInModifyTour()) {
+
+         // prevent that the saved tour is displayed instead of the tour photo link
+
+         // update UI otherwise it is only updated e.g. when the mouse is hovering the photos
+         _photoGallery.refreshUI();
+
+         return;
+      }
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
 
@@ -686,7 +535,9 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
          for (final TourPhotoLink photoLink : photoLinks) {
 
-            allPhotos.addAll(photoLink.linkPhotos);
+            final ArrayList<Photo> linkPhotos = photoLink.linkPhotos;
+
+            allPhotos.addAll(linkPhotos);
 
             _galleryPositionKey += photoLink.linkId;
 
@@ -695,6 +546,11 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
                numHistoryTour++;
             } else {
                allTourIds.add(tourId);
+            }
+
+            // temporarily keep tour id in the photo, this is used when saving photo in tour
+            for (final Photo linkPhoto : linkPhotos) {
+               linkPhoto.setLinkTourId(tourId);
             }
 
             final long tourStartTime = photoLink.tourStartTime;
@@ -851,17 +707,17 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
          if (numPhotos == 1) {
 
-            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_S);
 
          } else if (numPhotos > 1) {
 
-            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
-                  + UI.ELLIPSIS_WITH_SPACE
-                  + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
+            photoDateTime = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_S)
+                  + UI.NEW_LINE + UI.TAB + UI.TAB + UI.TAB
+                  + TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_S);
          }
 
-         labelText = String.format(labelTextFormat, numPhotos, numTours, photoDateTime);
-         labelTooltip = String.format(labelTooltipFormat, numPhotos, numTours, photoDateTime);
+         labelText = String.format(labelTextFormat, numTours, numPhotos);
+         labelTooltip = String.format(labelTooltipFormat, numTours, numPhotos, photoDateTime);
       }
 
       _labelTitle.setText(labelText);

@@ -551,27 +551,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
       final boolean isPhotoWithGps = photo.isLinkPhotoWithGps || photo.isTourPhotoWithGps;
 
-      if (isPhotoWithGps) {
+      final boolean isSavedInTour = photo.isSavedInTour;
+
+      if (isSavedInTour) {
 
          devXAnnotationOffset = _annotationImageWidth;
-
-         annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
-
-         gc.drawImage(
-               annotationImage,
-               devXAnnotation - devXAnnotationOffset,
-               devYAnnotation);
-
-         galleryItem.paintedX_Annotation_Gps = devXAnnotation - _paintedDest_DevX;
-
-      } else {
-
-         galleryItem.paintedX_Annotation_Gps = Integer.MIN_VALUE;
-      }
-
-      if (photo.isSavedInTour) {
-
-         devXAnnotationOffset += _annotationImageWidth + 2;
 
          if (isItemHovered && galleryItem.isHovered_AnnotationTour) {
             annotationImage = _imageAnnotationSavedInTour_Hovered;
@@ -589,6 +573,24 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       } else {
 
          galleryItem.paintedX_Annotation_Tour = Integer.MIN_VALUE;
+      }
+
+      if (isPhotoWithGps) {
+
+         devXAnnotationOffset += _annotationImageWidth + (isSavedInTour ? 2 : 0);
+
+         annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
+
+         gc.drawImage(
+               annotationImage,
+               devXAnnotation - devXAnnotationOffset,
+               devYAnnotation);
+
+         galleryItem.paintedX_Annotation_Gps = devXAnnotation - _paintedDest_DevX;
+
+      } else {
+
+         galleryItem.paintedX_Annotation_Gps = Integer.MIN_VALUE;
       }
 
       galleryItem.paintedY_Annotation = devYAnnotation - galleryItem.paintedY_Photo;
@@ -616,7 +618,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          textFileName = photo.imageFileName;
          textFileNameWidth = gc.textExtent(textFileName).x;
 
-         textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+//         textFileNamePosCenterX = (photoWidth - (textFileNameWidth > photoWidth ? photoWidth : textFileNameWidth)) / 2;
+         textFileNamePosCenterX = 2;
       }
 
       if (_isShowDateInfo) {
@@ -640,7 +643,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
             textDateTimeWidth = gc.textExtent(textDateTime).x;
 
-            textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+//            textDateTimePosCenterX = (photoWidth - (textDateTimeWidth > photoWidth ? photoWidth : textDateTimeWidth)) / 2;
+            textDateTimePosCenterX = 2;
          }
       }
 
@@ -673,7 +677,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
             // center text
 
-            final int textX = (photoWidth - textWidth) / 2;
+//            final int textX = (photoWidth - textWidth) / 2;
+            final int textX = 2;
             posXFilename += textX;
             posXDate += textX + textFileNameWidth + textSpacing;
          }

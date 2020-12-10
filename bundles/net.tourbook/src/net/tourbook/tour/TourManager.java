@@ -22,9 +22,11 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +56,11 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.ITourProvider;
@@ -74,7 +81,9 @@ import net.tourbook.weather.WeatherData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -2533,6 +2542,9 @@ public class TourManager {
          tourEvent.tourDataEditorSavedTour = tourDataEditorSavedTour[0];
 
          fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+
+         // when tours are saved then the photo annotation can be changed -> update photo gallery
+         PhotoManager.updatePicDirGallery();
       }
 
       return savedTours;
@@ -2746,6 +2758,249 @@ public class TourManager {
          final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
 
          tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
+      }
+   }
+
+   /**
+    * Add/save selected photos in it's tours.
+    * 
+    * @param photoGallery
+    */
+   public static void tourPhoto_Add(final PhotoGallery photoGallery) {
+
+      if (isTourEditorModified()) {
+         return;
+      }
+
+      int numHistoryTourPhotos = 0;
+
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<String, TourPhoto>> allToursWithPhotos = new HashMap<>();
+
+      // loop: all selected photos in the gallery
+      final Collection<GalleryMT20Item> allGalleryItems = photoGallery.getGallerySelection();
+      for (final GalleryMT20Item galleryItem : allGalleryItems) {
+
+         final Photo selectedPhoto = galleryItem.photo;
+
+         final long linkTourId = selectedPhoto.getLinkTourId();
+
+         if (linkTourId == Long.MIN_VALUE) {
+
+            // this is a history tour -> photo cannot be saved
+
+            numHistoryTourPhotos++;
+
+            continue;
+         }
+
+         final TourData tourData = getTour(linkTourId);
+         if (tourData != null) {
+
+            // photo belongs to this tour
+
+            // check by image file name if the photo already exist in the tour
+            boolean isPhotoSavedInTour = false;
+            for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+               if (tourPhoto.getImageFilePathName().equals(selectedPhoto.imageFilePathName)) {
+                  isPhotoSavedInTour = true;
+                  break;
+               }
+            }
+
+            if (isPhotoSavedInTour) {
+               continue;
+            }
+
+            // create a new tour photo
+
+            final TourPhoto tourPhoto = new TourPhoto(tourData, selectedPhoto);
+
+            // set adjusted time / geo location
+            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTimeLink);
+            tourPhoto.setGeoLocation(
+                  selectedPhoto.getLinkLatitude(),
+                  selectedPhoto.getLinkLongitude());
+
+            HashMap<String, TourPhoto> tourWithPhotos = allToursWithPhotos.get(linkTourId);
+            if (tourWithPhotos == null) {
+               tourWithPhotos = new HashMap<>();
+               allToursWithPhotos.put(linkTourId, tourWithPhotos);
+            }
+
+            tourWithPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
+         }
+      }
+
+      // show message that photos can be saved only in real tours
+      if (numHistoryTourPhotos > 0) {
+
+         if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
+
+            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+                  Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
+                  Messages.App_ToggleState_DoNotShowAgain,
+                  false, // toggle default state
+                  null,
+                  null);
+
+            // save toggle state
+            _prefStore.setValue(
+                  ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING,
+                  dialog.getToggleState());
+         }
+      }
+
+      for (final Long tourId : allToursWithPhotos.keySet()) {
+
+         final TourData tourData = getTour(tourId);
+
+         final HashMap<String, TourPhoto> tourWithPhotos = allToursWithPhotos.get(tourId);
+
+         final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+         tourData.addPhotos(tourPhotos);
+      }
+   }
+
+   /**
+    * Remove selected photos from it's tours.
+    * 
+    * @param photoGallery
+    */
+   public static void tourPhoto_Remove(final PhotoGallery photoGallery) {
+
+      if (isTourEditorModified()) {
+         return;
+      }
+
+      int numPhotos = 0;
+
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<Long, TourPhoto>> allToursWithTourPhotos = new HashMap<>();
+
+      // loop: all selected photos in the gallery
+      final Collection<GalleryMT20Item> tourPhotos2Remove = photoGallery.getGallerySelection();
+      for (final GalleryMT20Item galleryItem : tourPhotos2Remove) {
+
+         final Photo removedPhoto = galleryItem.photo;
+
+         final Collection<TourPhotoReference> removedPhotoRefs = removedPhoto.getTourPhotoReferences().values();
+
+         // loop: all tour references in a photo
+         for (final TourPhotoReference photoTourRef : removedPhotoRefs) {
+
+            final long removedTourId = photoTourRef.tourId;
+            final long removedPhotoId = photoTourRef.photoId;
+
+            final TourData tourData = getTour(removedTourId);
+            if (tourData != null) {
+
+               // photo is from this tour
+
+               // loop: all tour photos
+               for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+
+                  if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                     // photo is in tour photo collection -> remove it
+
+                     HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+                     if (allTourIdPhotos == null) {
+                        allTourIdPhotos = new HashMap<>();
+                        allToursWithTourPhotos.put(removedTourId, allTourIdPhotos);
+                     }
+
+                     final TourPhoto prevTourPhoto = allTourIdPhotos.put(removedPhotoId, tourPhoto);
+                     if (prevTourPhoto == null) {
+                        numPhotos++;
+                     }
+
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      if (numPhotos == 0) {
+         return;
+      }
+
+      // remove photos from this tour and save it
+
+      final MessageDialog dialog = new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
+            null, // no title image
+
+            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
+                  numPhotos,
+                  allToursWithTourPhotos.size()),
+
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_RemoveTourPhotos,
+            Messages.App_Action_Cancel);
+
+      if (dialog.open() == IDialogConstants.OK_ID) {
+
+         /*
+          * Remove tour reference from the photo, this MUST be done after the user has
+          * confirmed the removal otherwise the photo do not have a tour reference when the dialog
+          * is canceled
+          */
+
+         // loop: all selected photos in the gallery
+         for (final GalleryMT20Item galleryPhotoItem : tourPhotos2Remove) {
+
+            final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+            final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+            // loop: all tour references in a photo
+            for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+               final long removedTourId = tourPhotoReference.tourId;
+               final long removedPhotoId = tourPhotoReference.photoId;
+
+               final HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+               if (allTourIdPhotos != null) {
+
+                  // loop: all current tour photos
+                  for (final TourPhoto tourIdPhoto : allTourIdPhotos.values()) {
+
+                     if (tourIdPhoto.getPhotoId() == removedPhotoId) {
+
+                        // photo is in tour photo collection -> remove it
+
+                        removedGalleryPhoto.removeTour(removedTourId);
+
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+
+         for (final Long tourId : allToursWithTourPhotos.keySet()) {
+
+            final TourData tourData = getTour(tourId);
+
+            final HashMap<Long, TourPhoto> tourWithPhotos = allToursWithTourPhotos.get(tourId);
+
+            final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+            tourData.removePhotos(tourPhotos);
+         }
       }
    }
 

@@ -146,7 +146,7 @@ public class Photo {
    public boolean                                  isSavedInTour;
 
    /**
-    * A photo can be linked to different tours, key is tourId
+    * A photo can be linked with different tours, key is tourId
     */
    private final HashMap<Long, TourPhotoReference> _tourPhotoRef           = new HashMap<>();
 
@@ -267,6 +267,11 @@ public class Photo {
    private org.eclipse.swt.graphics.Point          _mapImageSize           = MAP_IMAGE_DEFAULT_SIZE;
 
    private int                                     _paintedMapImageWidth;
+
+   /**
+    * Temporarily tour id from a {@link TourPhotoLink}
+    */
+   private long                                    _photoLinkTourId;
 
    /**
     */
@@ -854,6 +859,10 @@ public class Photo {
             : _exifLongitude;
    }
 
+   public long getLinkTourId() {
+      return _photoLinkTourId;
+   }
+
    /**
     * @return Returns the loading state for the given photo quality
     */
@@ -1165,6 +1174,10 @@ public class Photo {
       _linkLongitude = linkLongitude;
 
       isLinkPhotoWithGps = true;
+   }
+
+   public void setLinkTourId(final long photoLinkTourId) {
+      _photoLinkTourId = photoLinkTourId;
    }
 
    public void setLoadingState(final PhotoLoadingState photoLoadingState, final ImageQuality imageQuality) {

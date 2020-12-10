@@ -418,6 +418,7 @@ public class Messages extends NLS {
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;
 
+   public static String        Action_TourPhotos_AddPhoto;
    public static String        Action_TourPhotos_RemovePhoto;
 
    public static String        Action_TourType_ModifyTourTypeFilter;
@@ -1521,10 +1522,10 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Label_NoSelectedPhoto;
    public static String        Photos_AndTours_Label_Source_PhotoLink;
 
-   public static String Photos_AndTours_Label_Source_PhotoLink_Tooltip;
+   public static String        Photos_AndTours_Label_Source_PhotoLink_Tooltip;
    public static String        Photos_AndTours_Label_Source_Tour;
 
-   public static String Photos_AndTours_Label_Source_Tour_Tooltip;
+   public static String        Photos_AndTours_Label_Source_Tour_Tooltip;
    public static String        Photos_AndTours_Link_PhotoDirectory;
    public static String        Photos_AndTours_Spinner_AdjustHours_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustMinutes_Tooltip;

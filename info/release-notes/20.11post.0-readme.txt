@@ -45,7 +45,8 @@ Improvements
 
 * Tour Photos View
   - Select next/previous photo with the mousewheel when gallery is horizontal
-  - Remove photo from a tour -  https://sourceforge.net/p/mytourbook/feature-requests/116/
+  - Save/remove individual photos in/from a tour -  https://sourceforge.net/p/mytourbook/feature-requests/116/
+  - Time adjustment can now be done for each photo/camera in a tour
 
 Changes  
 =======

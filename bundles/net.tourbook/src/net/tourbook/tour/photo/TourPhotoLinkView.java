@@ -101,13 +101,9 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
@@ -1366,26 +1362,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       return _columnManager;
    }
 
-   private PicDirView getPicDirView(final IWorkbenchWindow wbWindow) {
-
-      final IWorkbenchPage wbPage = wbWindow.getActivePage();
-      if (wbPage != null) {
-
-         for (final IViewReference viewRef : wbPage.getViewReferences()) {
-
-            if (viewRef.getId().equals(PicDirView.ID)) {
-
-               final IViewPart viewPart = viewRef.getView(false);
-               if (viewPart instanceof PicDirView) {
-                  return (PicDirView) viewPart;
-               }
-            }
-         }
-      }
-
-      return null;
-   }
-
    private Camera getSelectedCamera() {
 
       final int cameraIndex = _comboCamera.getSelectionIndex();
@@ -1878,32 +1854,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       }
    }
 
-   /**
-    * Update GPS annotation in the image gallery.
-    */
-   private void updateAnnotationsInPicDirView() {
-
-      PicDirView picDirView = null;
-
-      final IWorkbench wb = PlatformUI.getWorkbench();
-
-      picDirView = getPicDirView(wb.getActiveWorkbenchWindow());
-
-      if (picDirView == null) {
-
-         for (final IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
-            picDirView = getPicDirView(wbWindow);
-            if (picDirView != null) {
-               break;
-            }
-         }
-      }
-
-      if (picDirView != null) {
-         picDirView.refreshUI();
-      }
-   }
-
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
@@ -1968,7 +1918,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             _tourViewer.setInput(new Object[0]);
             _pageBook.showPage(_pageViewer);
 
-            updateAnnotationsInPicDirView();
+            // update annotations in PicDirView
+            PhotoManager.updatePicDirGallery();
 
             if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
 
