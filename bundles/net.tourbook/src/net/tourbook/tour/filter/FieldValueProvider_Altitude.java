@@ -15,20 +15,20 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 public class FieldValueProvider_Altitude extends FieldValueConverter {
 
 	@Override
 	double convert_Model_To_UI(final double value) {
 
-		return value / UI.UNIT_VALUE_ALTITUDE;
+      return value / UI.UNIT_VALUE_ELEVATION;
 	}
 
 	@Override
 	double convert_UI_To_Model(final double value) {
 
-		return value * UI.UNIT_VALUE_ALTITUDE;
+      return value * UI.UNIT_VALUE_ELEVATION;
 	}
 
 }

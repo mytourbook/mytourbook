@@ -545,7 +545,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
    private void finalizeTour_20_CreateMarkers(final TourData tourData) {
 
-      if (_laps.size() == 0) {
+      if (_laps.isEmpty()) {
          return;
       }
 

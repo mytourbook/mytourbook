@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Unit tests suite for MyTourbook
+Bundle-SymbolicName: net.tourbook.tests;singleton:=true
+Bundle-Version: 20.11.1.qualifier
+Require-Bundle: org.junit.jupiter.api;resolution:=optional,
+ net.tourbook
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: MyTourbook
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: net.tourbook.common,
+ net.tourbook.common.util,
+ net.tourbook.data,
+ net.tourbook.device.garmin,
+ net.tourbook.device.garmin.fit,
+ net.tourbook.device.gpx,
+ net.tourbook.device.sporttracks,
+ net.tourbook.device.suunto,
+ org.json
+Automatic-Module-Name: net.tourbook.tests

@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -24,9 +23,11 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -119,6 +120,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    public static final String                 ID                         = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
    private final IPreferenceStore             _prefStore                 = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore             _prefStore_Common          = CommonActivator.getPrefStore();
    private final IDialogSettings              _state                     = TourbookPlugin.getState(ID);
 
    private TVICompareResultRootItem           _rootItem;
@@ -128,6 +130,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private ISelectionListener                 _postSelectionListener;
    private IPartListener2                     _partListener;
    private IPropertyChangeListener            _prefChangeListener;
+   private IPropertyChangeListener            _prefChangeListener_Common;
    private ITourEventListener                 _tourPropertyListener;
    private ITourEventListener                 _compareTourPropertyListener;
 
@@ -361,17 +364,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
-
-               recreateViewer(null);
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
                _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
@@ -388,7 +381,27 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
+
+               recreateViewer(null);
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -774,7 +787,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final float value = compareItem.compareDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+               final float value = compareItem.compareDistance / (1000 * UI.UNIT_VALUE_DISTANCE);
 
                colDef.printDetailValue(cell, value);
                setCellColor(cell, element);
@@ -809,7 +822,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             if (element instanceof TVICompareResultComparedTour) {
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
-               final double value = compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.compareSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -845,7 +858,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final double value = compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.movedSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -881,7 +894,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-               final double value = compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = compareItem.dbSpeed / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printDetailValue(cell, value);
 
@@ -971,7 +984,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
                final Set<TourTag> tourTags = ((TVICompareResultComparedTour) element).comparedTourData
                      .getTourTags();
-               if (tourTags.size() == 0) {
+               if (tourTags.isEmpty()) {
 
                   // the tags could have been removed, set empty field
 
@@ -1037,7 +1050,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       getSite().getPage().removePartListener(_partListener);
       TourManager.getInstance().removeTourEventListener(_compareTourPropertyListener);
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       _dbImage.dispose();
 
@@ -1060,9 +1075,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
        * count selected items
        */
       int selectedTours = 0;
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selection) {
 
          if (treeItem instanceof TVICompareResultComparedTour) {
             final TVICompareResultComparedTour comparedTourItem = (TVICompareResultComparedTour) treeItem;
@@ -1250,9 +1263,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private TVICompareResultComparedTour getSelectedComparedTour() {
 
       final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+      for (final Object treeItem : selection) {
 
-         final Object treeItem = iterator.next();
          if (treeItem instanceof TVICompareResultComparedTour) {
 
             return (TVICompareResultComparedTour) treeItem;
@@ -1265,9 +1277,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private TVICompareResultReferenceTour getSelectedRefTour() {
 
       final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+      for (final Object treeItem : selection) {
 
-         final Object treeItem = iterator.next();
          if (treeItem instanceof TVICompareResultReferenceTour) {
 
             return (TVICompareResultReferenceTour) treeItem;
@@ -1286,9 +1297,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selectedTours) {
 
          if (treeItem instanceof TVICompareResultComparedTour) {
 
@@ -1518,9 +1527,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       final SelectionRemovedComparedTours selectionRemovedCompareTours = new SelectionRemovedComparedTours();
       final ArrayList<Long> removedComparedTours = selectionRemovedCompareTours.removedComparedTours;
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-
-         final Object selectedElement = iterator.next();
+      for (final Object selectedElement : selection) {
 
          if (selectedElement instanceof TVICompareResultComparedTour) {
             final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) selectedElement;
@@ -1547,7 +1554,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       /*
        * return when there are no removed tours or when the selection has not changed
        */
-      if (removedTourCompareIds.size() == 0 || removedTourSelection == _oldRemoveSelection) {
+      if (removedTourCompareIds.isEmpty() || removedTourSelection == _oldRemoveSelection) {
          return;
       }
 
@@ -1582,7 +1589,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    /**
     * Persist the compared tours which are checked or selected
     */
-   @SuppressWarnings("unchecked")
    void saveCompareResults() {
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -1617,9 +1623,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
              * save selected items which are not checked
              */
             final TreeSelection selection = (TreeSelection) _tourViewer.getSelection();
-            for (final Iterator<Object> iterator = selection.iterator(); iterator.hasNext();) {
+            for (final Object treeItem : selection) {
 
-               final Object treeItem = iterator.next();
                if (treeItem instanceof TVICompareResultComparedTour) {
 
                   final TVICompareResultComparedTour selectedComparedItem = (TVICompareResultComparedTour) treeItem;

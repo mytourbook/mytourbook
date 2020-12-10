@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.SQL;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
@@ -60,17 +61,17 @@ public class ActionComputeCadenceZonesTimes extends Action {
       }
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
          // tours are not selected -> this can occur when loading tour data is canceled
          return;
       }
 
-      if (MessageDialog.openConfirm(
+      if (!MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.Tour_Action_ComputeCadenceZonesTimes_Title,
             NLS.bind(Messages.Tour_Action_ComputeCadenceZonesTimes_Message,
                   selectedTours.size(),
-                  _prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER))) == false) {
+                  _prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER)))) {
          return;
       }
 
@@ -99,10 +100,15 @@ public class ActionComputeCadenceZonesTimes extends Action {
                public void run() {
 
                   TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+                  // prevent re-importing in the import view
+                  RawDataManager.setIsReimportingActive(true);
+                  {
+                     // fire unique event for all changes
+                     TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+                  }
+                  RawDataManager.setIsReimportingActive(false);
                }
             });
-
          }
       }
    }

@@ -471,7 +471,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
             ALTITUDE_MIN,
             ALTITUDE_MAX);
 
-      _lblMinMax_Altitude_Unit = createUI_Label(parent, UI.UNIT_LABEL_ALTITUDE);
+      _lblMinMax_Altitude_Unit = createUI_Label(parent, UI.UNIT_LABEL_ELEVATION);
    }
 
    private void createUI_62_MinMax_Altimeter(final Composite parent) {
@@ -638,7 +638,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createUI_82_MinMax_RunDyn_StepLength(final Composite parent) {
 
-      final int maxStepLength = (int) (RUN_DYN_STEP_LENGTH_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
+      final int maxStepLength = (int) (RUN_DYN_STEP_LENGTH_MAX * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
 
       _iconRunDyn_StepLength = createUI_Icon(parent, _imageRunDyn_StepLength);
 
@@ -655,7 +655,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createUI_83_MinMax_RunDyn_VerticalOscillation(final Composite parent) {
 
-      final int maxVertOscillation = (int) (RUN_DYN_VERTICAL_OSCILLATION_MAX * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
+      final int maxVertOscillation = (int) (RUN_DYN_VERTICAL_OSCILLATION_MAX * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH);
 
       _iconRunDyn_VerticalOscillation = createUI_Icon(parent, _imageRunDyn_VerticalOscillation);
 
@@ -1109,7 +1109,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
 		prefRestoreDefault(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreDefault(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
@@ -1221,7 +1221,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
 		prefRestoreValue(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefRestoreValue(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
@@ -1329,7 +1329,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 		/*
 		 * Running dynamics
 		 */
-		final float measurementDistanceXS = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
 		prefSaveValue(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
 		prefSaveValue(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);

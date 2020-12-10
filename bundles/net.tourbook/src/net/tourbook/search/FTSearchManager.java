@@ -1050,7 +1050,7 @@ public class FTSearchManager {
                                            final int[] docids,
                                            final int docStartIndex) throws IOException {
 
-      if (highlights.size() == 0) {
+      if (highlights.isEmpty()) {
          return;
       }
 

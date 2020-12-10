@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -114,7 +116,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       _wbAdvisor = wbAdvisor;
 
-      _appTitle = Messages.App_Title + " - " //$NON-NLS-1$
+      _appTitle = Messages.App_Title + UI.DASH_WITH_SPACE
             + ApplicationVersion.getVersionSimple()
             + ApplicationVersion.getDevelopmentId();
    }
@@ -189,7 +191,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             label = currentPage.getLabel();
          }
 
-         if (!StringUtils.isNullOrEmpty(label)) {
+         if (StringUtils.hasContent(label)) {
             title = NLS.bind(shellTitle, label, title);
          }
       }
@@ -218,24 +220,20 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       new DialogSelectMeasurementSystem(activeShell).open();
 
       // tell the pref page to create a new default person
-      final Boolean isCreatePerson = new Boolean(true);
+      final Boolean isCreatePerson = Boolean.TRUE;
 
       // this dialog fires an event that the person list is modified
-      PreferencesUtil
-            .createPreferenceDialogOn(//
-                  activeShell,
-                  PrefPagePeople.ID,
-                  new String[] { PrefPagePeople.ID },
-                  isCreatePerson,
-                  PreferencesUtil.OPTION_FILTER_LOCKED //
-            )
-            .open();
+      PreferencesUtil.createPreferenceDialogOn(
+            activeShell,
+            PrefPagePeople.ID,
+            new String[] { PrefPagePeople.ID },
+            isCreatePerson,
+            PreferencesUtil.OPTION_FILTER_LOCKED).open();
 
       // set first person as active person
       final ArrayList<TourPerson> allPeople = PersonManager.getTourPeople();
       TourbookPlugin.setActivePerson(allPeople.get(0));
       _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-
 
       // tip to save tour
       MessageDialog.openInformation(
@@ -352,22 +350,32 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             }
          }
       };
-
    }
 
    private void loadPeopleData() {
 
-      final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
-
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          final ResultSet result = statement.executeQuery();
 
          if (result.next()) {
-            // people are available, nothing more to do
+
+            /**
+             * People are available.
+             * <p>
+             * Check if the user have selected a measurement system, after version
+             * 20.11 the default system would be metric.
+             */
+
+            MeasurementSystem_Manager.selectMeasurementSystem();
+
             return;
+
          } else {
+
             // no people are in the db -> this is the first startup of the application
             firstApplicationStart();
          }
@@ -511,6 +519,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public boolean preWindowShellClose() {
 
+      MeasurementSystem_Manager.saveState();
+      _applicationActionBarAdvisor._personContribItem.saveState();
+
       TagMenuManager.saveTagState();
       TourTagFilterManager.saveState();
 
@@ -526,8 +537,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       FTSearchManager.closeIndexReaderSuggester();
       WebContentServer.stop();
-
-      _applicationActionBarAdvisor._personContribItem.saveState();
 
       /**
        * Save map3 state only when map is initialized (displayed). When this state is not checked
@@ -555,9 +564,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public IStatus restoreState(final IMemento memento) {
 
-      // this is the first entry point - setup unit values otherwise views show "null"
-
-      net.tourbook.ui.UI.updateUnits();
       P2_Activator.setUpdateSites(memento);
 
       return super.restoreState(memento);

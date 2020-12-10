@@ -44,7 +44,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoLinkView;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -99,180 +98,86 @@ public class UI {
 //	long endTime = System.currentTimeMillis();
 //	System.out.println("Execution time : " + (endTime - startTime) + " ms");
 
-   public static final boolean IS_LINUX                       = "gtk".equals(SWT.getPlatform());                                         //$NON-NLS-1$
-   public static final boolean IS_OSX                         = "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform()); //$NON-NLS-1$ //$NON-NLS-2$
-   public static final boolean IS_WIN                         = "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());    //$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean       IS_LINUX                      = "gtk".equals(SWT.getPlatform());                                         //$NON-NLS-1$
+   public static final boolean       IS_OSX                        = "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform()); //$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean       IS_WIN                        = "win32".equals(SWT.getPlatform()) || "wpf".equals(SWT.getPlatform());    //$NON-NLS-1$ //$NON-NLS-2$
 
-   private static final String ICONS_PATH                     = "/icons/";                                                               //$NON-NLS-1$
+   private static final String       ICONS_PATH                    = "/icons/";                                                               //$NON-NLS-1$
 
-   public static final String  EMPTY_STRING                   = "";                                                                      //$NON-NLS-1$
-   public static final String  SPACE                          = " ";                                                                     //$NON-NLS-1$
-   public static final String  SPACE2                         = "  ";                                                                    //$NON-NLS-1$
-   public static final String  SPACE4                         = "    ";                                                                  //$NON-NLS-1$
-   public static final String  COLON_SPACE                    = ": ";                                                                    //$NON-NLS-1$
-   public static final String  COMMA_SPACE                    = ", ";                                                                    //$NON-NLS-1$
-   public static final String  UNDERSCORE                     = "_";                                                                     //$NON-NLS-1$
-   public static final String  DASH                           = "-";                                                                     //$NON-NLS-1$
-   public static final String  DASH_WITH_SPACE                = " - ";                                                                   //$NON-NLS-1$
-   public static final String  DASH_WITH_DOUBLE_SPACE         = "   -   ";                                                               //$NON-NLS-1$
-   public static final String  SLASH_WITH_SPACE               = " / ";                                                                   //$NON-NLS-1$
-   public static final String  EMPTY_STRING_FORMAT            = "%s";                                                                    //$NON-NLS-1$
-   public static final String  MNEMONIC                       = "&";                                                                     //$NON-NLS-1$
-   public static final String  BREAK_TIME_MARKER              = "x";                                                                     //$NON-NLS-1$
+   public static final String        EMPTY_STRING                  = "";                                                                      //$NON-NLS-1$
+   public static final String        SPACE                         = " ";                                                                     //$NON-NLS-1$
+   public static final String        SPACE2                        = "  ";                                                                    //$NON-NLS-1$
+   public static final String        SPACE4                        = "    ";                                                                  //$NON-NLS-1$
+   public static final String        COLON_SPACE                   = ": ";                                                                    //$NON-NLS-1$
+   public static final String        COMMA_SPACE                   = ", ";                                                                    //$NON-NLS-1$
+   public static final String        UNDERSCORE                    = "_";                                                                     //$NON-NLS-1$
+   public static final String        DASH                          = "-";                                                                     //$NON-NLS-1$
+   public static final String        DASH_WITH_SPACE               = " - ";                                                                   //$NON-NLS-1$
+   public static final String        DASH_WITH_DOUBLE_SPACE        = "   -   ";                                                               //$NON-NLS-1$
+   public static final String        SLASH_WITH_SPACE              = " / ";                                                                   //$NON-NLS-1$
+   public static final String        EMPTY_STRING_FORMAT           = "%s";                                                                    //$NON-NLS-1$
+   public static final String        MNEMONIC                      = "&";                                                                     //$NON-NLS-1$
+   public static final String        BREAK_TIME_MARKER             = "x";                                                                     //$NON-NLS-1$
 
    /**
     * contains a new line
     */
-   public static final String  NEW_LINE                       = "\n";                                                                    //$NON-NLS-1$
+   public static final String        NEW_LINE                      = "\n";                                                                    //$NON-NLS-1$
 
    /**
     * contains 2 new lines
     */
-   public static final String  NEW_LINE2                      = "\n\n";                                                                  //$NON-NLS-1$
+   public static final String        NEW_LINE2                     = "\n\n";                                                                  //$NON-NLS-1$
 
-   public static final String  SYSTEM_NEW_LINE                = System.getProperty("line.separator");                                    //$NON-NLS-1$
+   public static final String        SYSTEM_NEW_LINE               = System.getProperty("line.separator");                                    //$NON-NLS-1$
 
-   public static final String  IS_NOT_INITIALIZED             = "IS NOT INITIALIZED";                                                    //$NON-NLS-1$
+   public static final String        IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";                                                    //$NON-NLS-1$
 
-   public static final String  GRAPH_ALTIMETER                = "GRAPH_ALTIMETER";                                                       //$NON-NLS-1$
-   public static final String  GRAPH_ALTITUDE                 = "GRAPH_ALTITUDE";                                                        //$NON-NLS-1$
-   public static final String  GRAPH_CADENCE                  = "GRAPH_CADENCE";                                                         //$NON-NLS-1$
-   public static final String  GRAPH_GRADIENT                 = "GRAPH_GRADIENT";                                                        //$NON-NLS-1$
-   public static final String  GRAPH_PACE                     = "GRAPH_PACE";                                                            //$NON-NLS-1$
-   public static final String  GRAPH_POWER                    = "GRAPH_POWER";                                                           //$NON-NLS-1$
-   public static final String  GRAPH_PULSE                    = "GRAPH_PULSE";                                                           //$NON-NLS-1$
-   public static final String  GRAPH_SPEED                    = "GRAPH_SPEED";                                                           //$NON-NLS-1$
-   public static final String  GRAPH_TEMPERATURE              = "GRAPH_TEMPERATURE";                                                     //$NON-NLS-1$
+   public static final String        GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";                                                       //$NON-NLS-1$
+   public static final String        GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";                                                        //$NON-NLS-1$
+   public static final String        GRAPH_CADENCE                 = "GRAPH_CADENCE";                                                         //$NON-NLS-1$
+   public static final String        GRAPH_GRADIENT                = "GRAPH_GRADIENT";                                                        //$NON-NLS-1$
+   public static final String        GRAPH_PACE                    = "GRAPH_PACE";                                                            //$NON-NLS-1$
+   public static final String        GRAPH_POWER                   = "GRAPH_POWER";                                                           //$NON-NLS-1$
+   public static final String        GRAPH_PULSE                   = "GRAPH_PULSE";                                                           //$NON-NLS-1$
+   public static final String        GRAPH_SPEED                   = "GRAPH_SPEED";                                                           //$NON-NLS-1$
+   public static final String        GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";                                                     //$NON-NLS-1$
 
-   public static final String  VIEW_COLOR_CATEGORY            = "view.color.category";                                                   //$NON-NLS-1$
-   public static final String  VIEW_COLOR_TITLE               = "view.color.title";                                                      //$NON-NLS-1$
-   public static final String  VIEW_COLOR_SUB                 = "view.color.sub";                                                        //$NON-NLS-1$
-   public static final String  VIEW_COLOR_SUB_SUB             = "view.color.sub-sub";                                                    //$NON-NLS-1$
-   public static final String  VIEW_COLOR_TOUR                = "view.color.tour";                                                       //$NON-NLS-1$
-   public static final String  VIEW_COLOR_BG_HISTORY_TOUR     = "VIEW_COLOR_BG_HISTORY_TOUR";                                            //$NON-NLS-1$
+   public static final String        VIEW_COLOR_CATEGORY           = "view.color.category";                                                   //$NON-NLS-1$
+   public static final String        VIEW_COLOR_TITLE              = "view.color.title";                                                      //$NON-NLS-1$
+   public static final String        VIEW_COLOR_SUB                = "view.color.sub";                                                        //$NON-NLS-1$
+   public static final String        VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";                                                    //$NON-NLS-1$
+   public static final String        VIEW_COLOR_TOUR               = "view.color.tour";                                                       //$NON-NLS-1$
+   public static final String        VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR";                                            //$NON-NLS-1$
 
-   public static final String  SYMBOL_AVERAGE                 = "\u00f8";                                                                //$NON-NLS-1$
-   public static final String  SYMBOL_AVERAGE_WITH_SPACE      = "\u00f8 ";                                                               //$NON-NLS-1$
-   public static final String  SYMBOL_DASH                    = "-";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_DOUBLE_HORIZONTAL       = "\u2550";                                                                //$NON-NLS-1$
-   public static final String  SYMBOL_DOUBLE_VERTICAL         = "\u2551";                                                                //$NON-NLS-1$
-   public static final String  SYMBOL_DEGREE                  = "\u00B0";                                                                //$NON-NLS-1$
-   public static final String  SYMBOL_INFINITY                = "\u221E";                                                                //$NON-NLS-1$
-   public static final String  SYMBOL_SUM_WITH_SPACE          = "\u2211 ";                                                               //$NON-NLS-1$
-   public static final String  SYMBOL_TAU                     = "\u03c4";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_AVERAGE                = "\u00f8";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                                                               //$NON-NLS-1$
+   public static final String        SYMBOL_DASH                   = "-";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_DOUBLE_VERTICAL        = "\u2551";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_DEGREE                 = "\u00B0";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_INFINITY               = "\u221E";                                                                //$NON-NLS-1$
+   public static final String        SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                                                               //$NON-NLS-1$
+   public static final String        SYMBOL_TAU                    = "\u03c4";                                                                //$NON-NLS-1$
 
-   public static final String  SYMBOL_BRACKET_LEFT            = "(";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_BRACKET_RIGHT           = ")";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_COLON                   = ":";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_DOT                     = ".";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_EQUAL                   = "=";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_GREATER_THAN            = ">";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_LESS_THAN               = "<";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_PERCENTAGE              = "%";                                                                     //$NON-NLS-1$
-   public static final String  SYMBOL_WIND_WITH_SPACE         = "W ";                                                                    //$NON-NLS-1$
-   public static final String  SYMBOL_EXCLAMATION_POINT       = "!";                                                                     //$NON-NLS-1$
-
-   /**
-    * Convert Joule in Calorie
-    * <p>
-    * 1 cal = 4.1868 J<br>
-    * 1 J = 0.238846 cal
-    */
-   public static final float   UNIT_CALORIE_2_JOULE           = 4.1868f;
-
-   /**
-    * Convert Calorie to Joule
-    * <p>
-    * 1 cal = 4.1868 J<br>
-    * 1 J = 0.238846 cal
-    */
-   public static final float   UNIT_JOULE_2_CALORY            = 1.0f / 4.1868f;
-
-   /**
-    * Imperial system for distance
-    */
-   public static final float   UNIT_MILE                      = 1.609344f;
-
-   /**
-    * Nautical mile is exact 1852 meter
-    */
-   public static final float   UNIT_NAUTICAL_MILE             = 1.852f;
-
-   /**
-    * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
-    */
-   public static final float   UNIT_YARD                      = 0.9144f;
-
-   /**
-    * Imperial system for very small distance, 1 mm = 0.03937008 inches, 1 inch = 25.4 mm
-    */
-   public static final float   UNIT_INCH                      = 0.03937008f;
-
-   /**
-    * Imperial system for height
-    */
-   public static final float   UNIT_FOOT                      = 0.3048f;
-
-   /**
-    * Imperial system for weight
-    */
-   public static final float   UNIT_POUND                     = 2.204623f;
-
-   /**
-    * Contains the system of measurement value for distances relative to the metric system.
-    * <p>
-    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE}
-    */
-   public static float         UNIT_VALUE_DISTANCE            = 1;
-
-   /**
-    * contains the system of measurement value for small distances relative to the metric system.
-    * <p>
-    * The metric system is <code>1</code>, imperial system is {@link #UNIT_YARD}
-    */
-   public static float         UNIT_VALUE_DISTANCE_SMALL      = 1;
-
-   /**
-    * Contains the system of measurement value for very small distances relative to the metric
-    * system, the metric system is 1 mm, imperial is 0.03937008 inch.
-    */
-   public static float         UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
-
-   /**
-    * contains the system of measurement value for altitudes relative to the metric system, the
-    * metric system is <code>1</code>
-    */
-   public static float         UNIT_VALUE_ALTITUDE            = 1;
-
-   /**
-    * contains the system of measurement value for the temperature, is set to <code>1</code> for the
-    * metric system
-    */
-   public static float         UNIT_VALUE_TEMPERATURE         = 1;
-
-   /**
-    * Contains the system of measurement value for the power, is set to <code>1</code> for the
-    * metric system Watt/Kg.
-    */
-   public static float         UNIT_VALUE_POWER;
-
-   /**
-    * contains the system of measurement value for the weight, is set to <code>1</code> for the
-    * metric system
-    */
-   public static float         UNIT_VALUE_WEIGHT              = 1;
-
-   // (Celcius * 9/5) + 32 = Fahrenheit
-   public static final float         UNIT_FAHRENHEIT_MULTI         = 1.8f;
-   public static final float         UNIT_FAHRENHEIT_ADD           = 32;
+   public static final String        SYMBOL_BRACKET_LEFT           = "(";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_BRACKET_RIGHT          = ")";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_COLON                  = ":";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_DOT                    = ".";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_EQUAL                  = "=";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_GREATER_THAN           = ">";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_LESS_THAN              = "<";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_PERCENTAGE             = "%";                                                                     //$NON-NLS-1$
+   public static final String        SYMBOL_WIND_WITH_SPACE        = "W ";                                                                    //$NON-NLS-1$
+   public static final String        SYMBOL_EXCLAMATION_POINT      = "!";                                                                     //$NON-NLS-1$
 
    public final static ImageRegistry IMAGE_REGISTRY;
 
-   private static final String       PART_NAME_GRAPH_ID            = "graphId-";                 //$NON-NLS-1$
-   private static final String       PART_NAME_DISABLED            = "-disabled";                //$NON-NLS-1$
+   private static final String       PART_NAME_GRAPH_ID            = "graphId-";                                                              //$NON-NLS-1$
+   private static final String       PART_NAME_DISABLED            = "-disabled";                                                             //$NON-NLS-1$
 
-   public static final String        IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";          //$NON-NLS-1$
-   public static final String        IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";   //$NON-NLS-1$
+   public static final String        IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";                                                       //$NON-NLS-1$
+   public static final String        IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";                                                //$NON-NLS-1$
 
    private static StringBuilder      _formatterSB                  = new StringBuilder();
    private static Formatter          _formatter                    = new Formatter(_formatterSB);
@@ -284,12 +189,11 @@ public class UI {
    public static Styler              TAG_CATEGORY_STYLER;
    public static Styler              TAG_SUB_STYLER;
 
-   private static final String       DEFAULT_MONO_FONT             = "Courier";                  //$NON-NLS-1$
+   private static final String       DEFAULT_MONO_FONT             = "Courier";                                                               //$NON-NLS-1$
    private static Font               _fontForLogging;
 
    static {
 
-      updateUnits();
       setViewColorsFromPrefStore();
       setupFonts();
 
@@ -322,17 +226,17 @@ public class UI {
             Messages.Image__graph_gradient_disabled);
 
       createGraphImageInRegistry(
-            MapGraphId.HrZone, //
+            MapGraphId.HrZone,
             Messages.Image__PulseZones,
             Messages.Image__PulseZones_Disabled);
 
       createGraphImageInRegistry(
-            MapGraphId.Pace, //
+            MapGraphId.Pace,
             Messages.Image__graph_pace,
             Messages.Image__graph_pace_disabled);
 
       createGraphImageInRegistry(
-            MapGraphId.Power, //
+            MapGraphId.Power,
             Messages.Image__graph_power,
             Messages.Image__graph_power_disabled);
 
@@ -342,7 +246,7 @@ public class UI {
             Messages.Image__graph_heartbeat_disabled);
 
       createGraphImageInRegistry(
-            MapGraphId.Speed, //
+            MapGraphId.Speed,
             Messages.Image__graph_speed,
             Messages.Image__graph_speed_disabled);
 
@@ -1027,13 +931,6 @@ public class UI {
       control.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
    }
 
-   public static void setHorizontalSpacer(final Composite parent, final int columns) {
-      final Label label = new Label(parent, SWT.NONE);
-      final GridData gd = new GridData();
-      gd.horizontalSpan = columns;
-      label.setLayoutData(gd);
-   }
-
    /**
     * Set selection color which is displayed when table item is selected.
     * <p>
@@ -1283,7 +1180,7 @@ public class UI {
       // tour tags
       final Set<TourTag> tourTags = tourData.getTourTags();
 
-      if (tourTags == null || tourTags.size() == 0) {
+      if (tourTags == null || tourTags.isEmpty()) {
 
          tourTagLabel.setText(UI.EMPTY_STRING);
 
@@ -1321,128 +1218,4 @@ public class UI {
       lblTourType.pack(true);
       lblTourType.redraw(); // display changed tour image
    }
-
-   /**
-    * update units from the pref store into the application variables
-    */
-   public static void updateUnits() {
-
-      // pref store var cannot be set from a static field because it can be null !!!
-      final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-
-      /*
-       * Distance
-       */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-
-         // set imperial measure system
-
-         net.tourbook.common.UI.UNIT_IS_METRIC = false;
-
-         UNIT_VALUE_DISTANCE = UNIT_MILE;
-         UNIT_VALUE_DISTANCE_SMALL = UNIT_YARD;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH = UNIT_INCH;
-
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_MI;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
-
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
-
-         net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
-         net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
-
-      } else {
-
-         // default is the metric measure system
-
-         net.tourbook.common.UI.UNIT_IS_METRIC = true;
-
-         UNIT_VALUE_DISTANCE = 1;
-         UNIT_VALUE_DISTANCE_SMALL = 1;
-         UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
-
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_METER;
-         net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_MM;
-
-         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_MB;
-
-         net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
-         net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;
-      }
-
-      /*
-       * Elevation
-       */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT)) {
-
-         // set imperial measure system
-
-         UNIT_VALUE_ALTITUDE = UNIT_FOOT;
-
-         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_FT;
-         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_FT_H;
-
-      } else {
-
-         // default is the metric measure system
-
-         UNIT_VALUE_ALTITUDE = 1;
-
-         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE = net.tourbook.common.UI.UNIT_ALTITUDE_M;
-         net.tourbook.common.UI.UNIT_LABEL_ALTIMETER = net.tourbook.common.UI.UNIT_ALTIMETER_M_H;
-      }
-
-      /*
-       * Temperature
-       */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F)) {
-
-         // set imperial measure system
-
-         UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
-
-         net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = UNIT_VALUE_TEMPERATURE;
-         net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_F;
-
-      } else {
-
-         // default is the metric measure system
-
-         UNIT_VALUE_TEMPERATURE = 1;
-
-         net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = 1;
-         net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
-      }
-
-      /*
-       * Weight
-       */
-      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT)
-            .equals(ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS)) {
-
-         // set imperial measure system
-
-         UNIT_VALUE_WEIGHT = UNIT_POUND;
-
-         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
-         net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_LBS;
-
-      } else {
-
-         // default is the metric measure system
-
-         UNIT_VALUE_WEIGHT = 1;
-
-         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
-         net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_KG;
-      }
-
-      TourFilterManager.updateUnits();
-   }
-
 }

@@ -36,6 +36,7 @@ import de.byteholder.gpx.PointOfInterest;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,6 +47,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -53,6 +55,7 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -96,15 +99,18 @@ import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowTourPauses;
+import net.tourbook.map2.action.ActionShowValuePoint;
 import net.tourbook.map2.action.ActionShowWayPoints;
-import net.tourbook.map2.action.ActionSyncMapWithOtherMap;
-import net.tourbook.map2.action.ActionSyncMapWithPhoto;
-import net.tourbook.map2.action.ActionSyncMapWithSlider;
-import net.tourbook.map2.action.ActionSyncMapWithTour;
-import net.tourbook.map2.action.ActionSyncZoomLevelAdjustment;
+import net.tourbook.map2.action.ActionSyncMapWith_OtherMap;
+import net.tourbook.map2.action.ActionSyncMapWith_Photo;
+import net.tourbook.map2.action.ActionSyncMapWith_Slider_Centered;
+import net.tourbook.map2.action.ActionSyncMapWith_Slider_One;
+import net.tourbook.map2.action.ActionSyncMapWith_Tour;
+import net.tourbook.map2.action.ActionSyncMapWith_ValuePoint;
 import net.tourbook.map2.action.ActionTourColor;
 import net.tourbook.map2.action.ActionZoomCentered;
 import net.tourbook.map2.action.ActionZoomIn;
+import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
@@ -136,6 +142,7 @@ import net.tourbook.tour.photo.PhotoPropertiesEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
@@ -155,7 +162,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -199,7 +205,7 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-   public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                  //$NON-NLS-1$
+   public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
    private static final String   IMAGE_GRAPH                                           = net.tourbook.Messages.Image__Graph;
    private static final String   IMAGE_GRAPH_DISABLED                                  = net.tourbook.Messages.Image__Graph_Disabled;
@@ -218,55 +224,55 @@ public class Map2View extends ViewPart implements
    private static final String   IMAGE_SEARCH_TOURS_BY_LOCATION                        = net.tourbook.Messages.Image__SearchToursByLocation;
    private static final String   IMAGE_MAP_OPTIONS                                     = net.tourbook.Messages.Image__MapOptions;
    private static final String   IMAGE_MAP_OPTIONS_DISABLED                            = net.tourbook.Messages.Image__MapOptions_Disabled;
-
-   static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                  //$NON-NLS-1$
-   static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
-   private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                          //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                         //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                        //$NON-NLS-1$
-   public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                    = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT            = true;
-   private static final String   STATE_IS_SYNC_MAP2_WITH_OTHER_MAP                     = "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";                  //$NON-NLS-1$
-   private static final String   STATE_IS_SYNC_WITH_PHOTO                              = "STATE_IS_SYNC_WITH_PHOTO";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SYNC_WITH_TOURCHART_SLIDER                   = "STATE_IS_SYNC_WITH_TOURCHART_SLIDER";                //$NON-NLS-1$
-   private static final String   STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED       = "STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED";    //$NON-NLS-1$
-   static final String           STATE_IS_ZOOM_WITH_MOUSE_POSITION                     = "STATE_IS_ZOOM_WITH_MOUSE_POSITION";                  //$NON-NLS-1$
-   static final boolean          STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT             = true;
-
-   private static final String   MEMENTO_SHOW_START_END_IN_MAP                         = "action.show-start-end-in-map";                       //$NON-NLS-1$
-   private static final String   MEMENTO_SHOW_TOUR_MARKER                              = "action.show-tour-marker";                            //$NON-NLS-1$
-   private static final String   MEMENTO_SHOW_TOUR_PAUSES                              = "action.show-tour-pauses";                            //$NON-NLS-1$
-   static final String           MEMENTO_SHOW_SLIDER_IN_MAP                            = "action.show-slider-in-map";                          //$NON-NLS-1$
-   static final boolean          MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT                    = true;
-   private static final String   MEMENTO_SHOW_SLIDER_IN_LEGEND                         = "action.show-slider-in-legend";                       //$NON-NLS-1$
-   private static final String   MEMENTO_SHOW_SCALE_IN_MAP                             = "action.show-scale-in-map";                           //$NON-NLS-1$
-   private static final String   MEMENTO_SHOW_TOUR_INFO_IN_MAP                         = "action.show-tour-info-in-map";                       //$NON-NLS-1$
-   private static final String   MEMENTO_SHOW_WAY_POINTS                               = "action.show-way-points-in-map";                      //$NON-NLS-1$
-   private static final String   MEMENTO_SYNCH_WITH_SELECTED_TOUR                      = "action.synch-with-selected-tour";                    //$NON-NLS-1$
-   private static final String   MEMENTO_ZOOM_CENTERED                                 = "action.zoom-centered";                               //$NON-NLS-1$
-   private static final String   MEMENTO_MAP_DIM_LEVEL                                 = "action.map-dim-level";                               //$NON-NLS-1$
-
-   private static final String   MEMENTO_SYNCH_TOUR_ZOOM_LEVEL                         = "synch-tour-zoom-level";                              //$NON-NLS-1$
-   private static final String   MEMENTO_SELECTED_MAP_PROVIDER_ID                      = "selected.map-provider-id";                           //$NON-NLS-1$
-
-   private static final String   MEMENTO_DEFAULT_POSITION_ZOOM                         = "default.position.zoom-level";                        //$NON-NLS-1$
-   private static final String   MEMENTO_DEFAULT_POSITION_LATITUDE                     = "default.position.latitude";                          //$NON-NLS-1$
-   private static final String   MEMENTO_DEFAULT_POSITION_LONGITUDE                    = "default.position.longitude";                         //$NON-NLS-1$
-
-   private static final String   MEMENTO_TOUR_COLOR_ID                                 = "tour-color-id";                                      //$NON-NLS-1$
-
-   static final String           PREF_DEBUG_MAP_DIM_LEVEL                              = "MapDebug.MapDimLevel";                               //$NON-NLS-1$
-   static final String           PREF_DEBUG_MAP_SHOW_GEO_GRID                          = "PREF_DEBUG_MAP_SHOW_GEO_GRID";                       //$NON-NLS-1$
-   static final String           PREF_SHOW_TILE_INFO                                   = "MapDebug.ShowTileInfo";                              //$NON-NLS-1$
-   static final String           PREF_SHOW_TILE_BORDER                                 = "MapDebug.ShowTileBorder";                            //$NON-NLS-1$
+   private static final String   IMAGE_SYNC_MAP_WITH_OTHER_MAP                         = net.tourbook.Messages.Image__SyncMapWithOtherMap;
    //
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE                     = "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";                  //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_GRADIENT                     = "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT";                  //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_PACE                         = "STATE_IS_SHOW_IN_TOOLBAR_PACE";                      //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_PULSE                        = "STATE_IS_SHOW_IN_TOOLBAR_PULSE";                     //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_SPEED                        = "STATE_IS_SHOW_IN_TOOLBAR_SPEED";                     //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE                      = "STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE";                   //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH          = "STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH";       //$NON-NLS-1$
+   static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
+   static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
+   private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
+   public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                   = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT           = true;
+   static final String           STATE_IS_ZOOM_WITH_MOUSE_POSITION                     = "STATE_IS_ZOOM_WITH_MOUSE_POSITION";                   //$NON-NLS-1$
+   static final boolean          STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT             = true;
+   private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
+   private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
+   //
+   private static final String   STATE_IS_SHOW_SCALE_IN_MAP                            = "STATE_IS_SHOW_SCALE_IN_MAP";                          //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_SLIDER_IN_MAP                           = "STATE_IS_SHOW_SLIDER_IN_MAP";                         //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
+   private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
+   private static final String   STATE_IS_ZOOM_CENTERED                                = "STATE_IS_ZOOM_CENTERED";                              //$NON-NLS-1$
+   //
+   private static final String   STATE_MAP_DIM_LEVEL                                   = "STATE_MAP_DIM_LEVEL";                                 //$NON-NLS-1$
+   private static final String   STATE_MAP_SYNC_MODE                                   = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
+   private static final String   STATE_MAP_SYNC_MODE_IS_ACTIVE                         = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
+   //
+   private static final String   STATE_ZOOM_LEVEL_ADJUSTMENT                           = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
+   private static final String   STATE_SELECTED_MAP_PROVIDER_ID                        = "selected.map-provider-id";                            //$NON-NLS-1$
+   //
+   private static final String   STATE_DEFAULT_POSITION_ZOOM                           = "STATE_DEFAULT_POSITION_ZOOM";                         //$NON-NLS-1$
+   private static final String   STATE_DEFAULT_POSITION_LATITUDE                       = "STATE_DEFAULT_POSITION_LATITUDE";                     //$NON-NLS-1$
+   private static final String   STATE_DEFAULT_POSITION_LONGITUDE                      = "STATE_DEFAULT_POSITION_LONGITUDE";                    //$NON-NLS-1$
+   private static final String   STATE_TOUR_COLOR_ID                                   = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
+   //
+   static final String           PREF_DEBUG_MAP_DIM_LEVEL                              = "PREF_DEBUG_MAP_DIM_LEVEL";                            //$NON-NLS-1$
+   static final String           PREF_DEBUG_MAP_SHOW_GEO_GRID                          = "PREF_DEBUG_MAP_SHOW_GEO_GRID";                        //$NON-NLS-1$
+   static final String           PREF_SHOW_TILE_INFO                                   = "PREF_SHOW_TILE_INFO";                                 //$NON-NLS-1$
+   static final String           PREF_SHOW_TILE_BORDER                                 = "PREF_SHOW_TILE_BORDER";                               //$NON-NLS-1$
+   //
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE                     = "STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE";                   //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_GRADIENT                     = "STATE_IS_SHOW_IN_TOOLBAR_GRADIENT";                   //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_PACE                         = "STATE_IS_SHOW_IN_TOOLBAR_PACE";                       //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_PULSE                        = "STATE_IS_SHOW_IN_TOOLBAR_PULSE";                      //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_SPEED                        = "STATE_IS_SHOW_IN_TOOLBAR_SPEED";                      //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE                      = "STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE";                    //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH          = "STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH";        //$NON-NLS-1$
    //
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_ALTITUDE_DEFAULT             = true;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_GRADIENT_DEFAULT             = false;
@@ -276,11 +282,11 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_HR_ZONE_DEFAULT              = false;
    static final boolean          STATE_IS_SHOW_IN_TOOLBAR_RUN_DYN_STEP_LENGTH_DEFAULT  = true;
    //
-   static final String           STATE_IS_SHOW_SLIDER_PATH                             = "STATE_IS_SHOW_SLIDER_PATH";                          //$NON-NLS-1$
-   static final String           STATE_SLIDER_PATH_LINE_WIDTH                          = "STATE_SLIDER_PATH_LINE_WIDTH";                       //$NON-NLS-1$
-   static final String           STATE_SLIDER_PATH_OPACITY                             = "STATE_SLIDER_PATH_OPACITY";                          //$NON-NLS-1$
-   static final String           STATE_SLIDER_PATH_SEGMENTS                            = "STATE_SLIDER_PATH_SEGMENTS";                         //$NON-NLS-1$
-   static final String           STATE_SLIDER_PATH_COLOR                               = "STATE_SLIDER_PATH_COLOR";                            //$NON-NLS-1$
+   static final String           STATE_IS_SHOW_SLIDER_PATH                             = "STATE_IS_SHOW_SLIDER_PATH";                           //$NON-NLS-1$
+   static final String           STATE_SLIDER_PATH_LINE_WIDTH                          = "STATE_SLIDER_PATH_LINE_WIDTH";                        //$NON-NLS-1$
+   static final String           STATE_SLIDER_PATH_OPACITY                             = "STATE_SLIDER_PATH_OPACITY";                           //$NON-NLS-1$
+   static final String           STATE_SLIDER_PATH_SEGMENTS                            = "STATE_SLIDER_PATH_SEGMENTS";                          //$NON-NLS-1$
+   static final String           STATE_SLIDER_PATH_COLOR                               = "STATE_SLIDER_PATH_COLOR";                             //$NON-NLS-1$
    //
    static final boolean          STATE_IS_SHOW_SLIDER_PATH_DEFAULT                     = true;
    static final int              STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT                  = 30;
@@ -288,9 +294,9 @@ public class Map2View extends ViewPart implements
    static final int              STATE_SLIDER_PATH_SEGMENTS_DEFAULT                    = 200;
    static final RGB              STATE_SLIDER_PATH_COLOR_DEFAULT                       = new RGB(0xff, 0xff, 0x80);
    //
-   private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                     //$NON-NLS-1$
+   private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
    //
-   private static final MapGraphId[] _allGraphContribId                                   = {
+   private static final MapGraphId[]         _allGraphContribId       = {
 
          MapGraphId.Altitude,
          MapGraphId.Gradient,
@@ -303,176 +309,179 @@ public class Map2View extends ViewPart implements
          MapGraphId.HrZone,
    };
 
-
-
-   private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
-   private final IDialogSettings    _state                                 = TourbookPlugin.getState(ID);
-
-   private final ImageDescriptor    _imageSyncWithSlider                   = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider);
-   private final ImageDescriptor    _imageSyncWithSlider_Disabled          = TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled);
-   private final ImageDescriptor    _imageSyncWithSlider_Centered          = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered);
-   private final ImageDescriptor    _imageSyncWithSlider_Centered_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image_Action_SynchWithSlider_Centered_Disabled);
-
 // SET_FORMATTING_ON
-
+   //
+   private final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore            _prefStore_Common        = CommonActivator.getPrefStore();
+   private final IDialogSettings             _state                   = TourbookPlugin.getState(ID);
+   //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
-
    private final DirectMappingPainter        _directMappingPainter    = new DirectMappingPainter();
+   //
    private final MapInfoManager              _mapInfoManager          = MapInfoManager.getInstance();
-
    private final TourPainterConfiguration    _tourPainterConfig       = TourPainterConfiguration.getInstance();
-
+   //
    private boolean                           _isPartVisible;
-
+   //
    /**
-    * contains selection which was set when the part is hidden
+    * Contains selection which was set when the part is hidden
     */
    private ISelection                        _selectionWhenHidden;
    private IPartListener2                    _partListener;
    private ISelectionListener                _postSelectionListener;
    private IPropertyChangeListener           _prefChangeListener;
+   private IPropertyChangeListener           _prefChangeListener_Common;
    private ITourEventListener                _tourEventListener;
-
+   //
    /**
     * Contains all tours which are displayed in the map.
     */
    private final ArrayList<TourData>         _allTourData             = new ArrayList<>();
    private TourData                          _previousTourData;
-
+   //
    /**
     * contains photos which are displayed in the map
     */
    private final ArrayList<Photo>            _allPhotos               = new ArrayList<>();
-
    private final ArrayList<Photo>            _filteredPhotos          = new ArrayList<>();
-
+   //
    private boolean                           _isPhotoFilterActive;
    private int                               _photoFilterRatingStars;
    private int                               _photoFilterRatingStarOperator;
-
+   //
    private boolean                           _isShowTour;
    private boolean                           _isShowPhoto;
    private boolean                           _isShowLegend;
-
-   private boolean                           _isMapSynched_WithOtherMap;
-   private boolean                           _isMapSynched_WithPhoto;
-   private boolean                           _isMapSynched_WithChartSlider;
-   private boolean                           _isMapSynched_WithChartSlider_IsCentered;
-   private boolean                           _isMapSynched_WithTour;
    private boolean                           _isPositionCentered;
-
    private boolean                           _isInSelectBookmark;
    private boolean                           _isInZoom;
-
+   //
    private int                               _defaultZoom;
-
    private GeoPosition                       _defaultPosition;
-
+   //
    /**
-    * when <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
+    * When <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
     */
    private boolean                           _isTourOrWayPoint;
-
+   //
    /*
-    * tool tips
+    * Tool tips
     */
    private TourToolTip _tourToolTip;
+
    private String      _poiName;
    private GeoPosition _poiPosition;
    private int         _poiZoomLevel;
-
-   /*
-    * current position for the x-sliders
-    */
-   private int                            _currentLeftSliderValueIndex;
-   private int                            _currentRightSliderValueIndex;
-
-   private int                            _currentSelectedSliderValueIndex;
-
-   private MapLegend                      _mapLegend;
-
-   private long                           _previousOverlayKey;
-   private int                            _mapDimLevel         = -1;
-
-   private RGB                            _mapDimColor;
-
-   private int                            _selectedProfileKey  = 0;
-
-   private MapGraphId                     _tourColorId;
    //
-   private int                            _hash_AllTourIds;
-   private int                            _hash_AllTourData;
-   private long                           _hash_TourOverlayKey;
-   private int                            _hash_AllPhotos;
-
-   private final AtomicInteger            _asyncCounter        = new AtomicInteger();
+   /*
+    * Current position for the x-sliders and value point
+    */
+   private int                               _currentLeftSliderValueIndex;
+   private int                               _currentRightSliderValueIndex;
+   private int                               _currentSelectedSliderValueIndex;
+   private int                               _currentValuePointIndex;
+   //
+   private MapLegend                         _mapLegend;
+   //
+   private long                              _previousOverlayKey;
+   //
+   private int                               _mapDimLevel          = -1;
+   private RGB                               _mapDimColor;
+   //
+   private int                               _selectedProfileKey   = 0;
+   //
+   private MapGraphId                        _tourColorId;
+   //
+   private int                               _hash_AllTourIds;
+   private int                               _hash_AllTourData;
+   private long                              _hash_TourOverlayKey;
+   private int                               _hash_AllPhotos;
+   //
+   private final AtomicInteger               _asyncCounter         = new AtomicInteger();
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   private boolean                        _isLinkPhotoDisplayed;
-   private SliderPathPaintingData         _sliderPathPaintingData;
-   private OpenDialogManager              _openDlgMgr          = new OpenDialogManager();
-
-   private boolean                        _isInMapSync;
-   private long                           _lastFiredSyncEventTime;
-
-   private HashMap<MapGraphId, Action>    _allTourColorActions = new HashMap<>();
-   private ActionTourColor                _actionTourColor_Altitude;
-   private ActionTourColor                _actionTourColor_Gradient;
-   private ActionTourColor                _actionTourColor_Pulse;
-   private ActionTourColor                _actionTourColor_Speed;
-   private ActionTourColor                _actionTourColor_Pace;
-   private ActionTourColor                _actionTourColor_HrZone;
-   private ActionTourColor                _actionTourColor_RunDyn_StepLength;
-
-   private ActionCreateTourMarkerFromMap  _actionCreateTourMarkerFromMap;
-   private ActionDimMap                   _actionDimMap;
-   private ActionOpenPrefDialog           _actionEditMap2Preferences;
-   private ActionManageMapProviders       _actionManageProvider;
-   private ActionMapBookmarks             _actionMap2_Bookmarks;
-   private ActionMap2Color                _actionMap2_Color;
-   private ActionMap2_MapProvider         _actionMap2_MapProvider;
-   private ActionMap2_Options             _actionMap2_Options;
-   private ActionMap2_Graphs              _actionMap2_TourColors;
-   private ActionPhotoProperties          _actionPhotoFilter;
-   private ActionReloadFailedMapImages    _actionReloadFailedMapImages;
-   private ActionSaveDefaultPosition      _actionSaveDefaultPosition;
-   private ActionSearchTourByLocation     _actionSearchTourByLocation;
-   private ActionSetDefaultPosition       _actionSetDefaultPosition;
-   private ActionShowAllFilteredPhotos    _actionShowAllFilteredPhotos;
-   private ActionShowLegendInMap          _actionShowLegendInMap;
-   private ActionShowPhotos               _actionShowPhotos;
-   private ActionShowPOI                  _actionShowPOI;
-   private ActionShowScaleInMap           _actionShowScaleInMap;
-   private ActionShowSliderInMap          _actionShowSliderInMap;
-   private ActionShowSliderInLegend       _actionShowSliderInLegend;
-   private ActionShowStartEndInMap        _actionShowStartEndInMap;
-   private ActionShowTour                 _actionShowTour;
-   private ActionShowTourInfoInMap        _actionShowTourInfoInMap;
-   private ActionShowTourMarker           _actionShowTourMarker;
-   private ActionShowTourPauses           _actionShowTourPauses;
-   private ActionShowWayPoints            _actionShowWayPoints;
-   private ActionSyncZoomLevelAdjustment  _actionSyncZoomLevelAdjustment;
-   private ActionSyncMapWithOtherMap      _actionSyncMap_WithOtherMap;
-   private ActionSyncMapWithPhoto         _actionSyncMap_WithPhoto;
-   private ActionSyncMapWithSlider        _actionSyncMap_WithChartSlider;
-   private ActionSyncMapWithTour          _actionSyncMap_WithTour;
-
-   private ActionZoomIn                   _actionZoom_In;
-   private ActionZoomOut                  _actionZoom_Out;
-   private ActionZoomCentered             _actionZoom_Centered;
-   private ActionZoomShowEntireMap        _actionZoom_ShowEntireMap;
-
-   private ActionZoomShowEntireTour       _actionZoom_ShowEntireTour;
-
-   private org.eclipse.swt.graphics.Point _geoFilter_Loaded_TopLeft_E2;
-   private org.eclipse.swt.graphics.Point _geoFilter_Loaded_BottomRight_E2;
-   private GeoFilter_LoaderData           _geoFilter_PreviousGeoLoaderItem;
-   private AtomicInteger                  _geoFilter_RunningId = new AtomicInteger();
-
+   private boolean                           _isLinkPhotoDisplayed;
+   //
+   private SliderPathPaintingData            _sliderPathPaintingData;
+   private OpenDialogManager                 _openDlgMgr           = new OpenDialogManager();
+   //
+   /**
+    * Keep map sync mode when map sync action get's unchecked
+    */
+   private MapSyncMode                       _currentMapSyncMode   = MapSyncMode.IsSyncWith_NONE;
+   private boolean                           _isInMapSync;
+   private long                              _lastFiredSyncEventTime;
+   //
+   private boolean                           _isMapSyncWith_OtherMap;
+   private boolean                           _isMapSyncWith_Photo;
+   private boolean                           _isMapSyncWith_Slider_Centered;
+   private boolean                           _isMapSyncWith_Slider_One;
+   private boolean                           _isMapSyncWith_Tour;
+   private boolean                           _isMapSyncWith_ValuePoint;
+   //
+   private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
+   private ActionTourColor                   _actionTourColor_Altitude;
+   private ActionTourColor                   _actionTourColor_Gradient;
+   private ActionTourColor                   _actionTourColor_Pulse;
+   private ActionTourColor                   _actionTourColor_Speed;
+   private ActionTourColor                   _actionTourColor_Pace;
+   private ActionTourColor                   _actionTourColor_HrZone;
+   private ActionTourColor                   _actionTourColor_RunDyn_StepLength;
+   //
+   private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
+   private ActionDimMap                      _actionDimMap;
+   private ActionOpenPrefDialog              _actionEditMap2Preferences;
+   private ActionManageMapProviders          _actionManageMapProvider;
+   private ActionMapBookmarks                _actionMap2_Bookmarks;
+   private ActionMap2Color                   _actionMap2_Color;
+   private ActionMap2_MapProvider            _actionMap2_MapProvider;
+   private ActionMap2_Options                _actionMap2_Options;
+   private ActionMap2_Graphs                 _actionMap2_TourColors;
+   private ActionPhotoProperties             _actionPhotoFilter;
+   private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
+   private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
+   private ActionSearchTourByLocation        _actionSearchTourByLocation;
+   private ActionSetDefaultPosition          _actionSetDefaultPosition;
+   private ActionShowAllFilteredPhotos       _actionShowAllFilteredPhotos;
+   private ActionShowLegendInMap             _actionShowLegendInMap;
+   private ActionShowPhotos                  _actionShowPhotos;
+   private ActionShowPOI                     _actionShowPOI;
+   private ActionShowScaleInMap              _actionShowScaleInMap;
+   private ActionShowSliderInMap             _actionShowSliderInMap;
+   private ActionShowSliderInLegend          _actionShowSliderInLegend;
+   private ActionShowStartEndInMap           _actionShowStartEndInMap;
+   private ActionShowTour                    _actionShowTour;
+   private ActionShowTourInfoInMap           _actionShowTourInfoInMap;
+   private ActionShowTourMarker              _actionShowTourMarker;
+   private ActionShowTourPauses              _actionShowTourPauses;
+   private ActionShowValuePoint              _actionShowValuePoint;
+   private ActionShowWayPoints               _actionShowWayPoints;
+   private ActionZoomLevelAdjustment         _actionZoomLevelAdjustment;
+   //
+   private ActionSyncMap                     _actionMap2_SyncMap;
+   private HashMap<MapSyncId, Action>        _allSyncMap_Actions   = new HashMap<>();
+   private ActionSyncMapWith_Photo           _actionSyncMapWith_Photo;
+   private ActionSyncMapWith_Slider_One      _actionSyncMapWith_Slider_One;
+   private ActionSyncMapWith_Slider_Centered _actionSyncMapWith_Slider_Centered;
+   private ActionSyncMapWith_OtherMap        _actionSyncMapWith_OtherMap;
+   private ActionSyncMapWith_Tour            _actionSyncMapWith_Tour;
+   private ActionSyncMapWith_ValuePoint      _actionSyncMapWith_ValuePoint;
+   //
+   private ActionZoomIn                      _actionZoom_In;
+   private ActionZoomOut                     _actionZoom_Out;
+   private ActionZoomCentered                _actionZoom_Centered;
+   private ActionZoomShowEntireMap           _actionZoom_ShowEntireMap;
+   private ActionZoomShowEntireTour          _actionZoom_ShowEntireTour;
+   //
+   private org.eclipse.swt.graphics.Point    _geoFilter_Loaded_TopLeft_E2;
+   private org.eclipse.swt.graphics.Point    _geoFilter_Loaded_BottomRight_E2;
+   private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
+   private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
+   //
    /*
     * UI controls
     */
@@ -481,10 +490,10 @@ public class Map2View extends ViewPart implements
 
    private class ActionMap2_Graphs extends ActionToolbarSlideout {
 
-      public ActionMap2_Graphs(final ImageDescriptor imageDescriptor,
-                               final ImageDescriptor imageDescriptorDisabled) {
+      public ActionMap2_Graphs() {
 
-         super(imageDescriptor, imageDescriptorDisabled);
+         super(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
+               TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -521,7 +530,7 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public class ActionSearchTourByLocation extends Action {
+   private class ActionSearchTourByLocation extends Action {
 
       public ActionSearchTourByLocation() {
 
@@ -568,51 +577,133 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionSyncMap extends ActionToolbarSlideout {
+
+      public ActionSyncMap() {
+
+         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap),
+               TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap_Disabled));
+
+         isToggleAction = true;
+         isShowSlideoutAlways = true;
+
+         // image 0: tour
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
+
+         // image 1: value point
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint));
+
+         // image 2: one slider
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
+
+         // image 3: centered sliders
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_Slider_Centered));
+
+         // image 4: other map
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(IMAGE_SYNC_MAP_WITH_OTHER_MAP));
+
+         // image 5: photo
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_Map_SyncPhotoWithMap));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new Slideout_Map2_SyncMap(_parent, toolbar, Map2View.this);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         syncMap_OnSelectSyncAction(getSelection());
+      }
+   }
+
+   private enum MapSyncMode {
+
+      /**
+       * Image: 0
+       */
+      IsSyncWith_Tour,
+
+      /**
+       * Image: 1
+       */
+      IsSyncWith_ValuePoint,
+
+      /**
+       * Image: 2
+       */
+      IsSyncWith_Slider_One,
+
+      /**
+       * Image: 3
+       */
+      IsSyncWith_Slider_Center,
+
+      /**
+       * Image: 4
+       */
+      IsSyncWith_OtherMap,
+
+      /**
+       * Image: 5
+       */
+      IsSyncWith_Photo,
+
+      IsSyncWith_NONE,
+   }
+
    public Map2View() {}
 
-   public void action_SyncWith_ChartSlider() {
+   public void action_SyncWith_ChartSlider(final boolean isActionCentered) {
 
-      if (_allTourData.size() == 0) {
-         return;
+      // uncheck the other action
+      final boolean isChecked_Center = _actionSyncMapWith_Slider_Centered.isChecked();
+      final boolean isChecked_One = _actionSyncMapWith_Slider_One.isChecked();
+
+      if (isActionCentered) {
+
+         // sync with both centered sliders
+
+         _actionSyncMapWith_Slider_One.setChecked(false);
+         _currentMapSyncMode = MapSyncMode.IsSyncWith_Slider_Center;
+
+      } else {
+
+         // sync with one slider
+
+         _actionSyncMapWith_Slider_Centered.setChecked(false);
+         _currentMapSyncMode = MapSyncMode.IsSyncWith_Slider_One;
       }
 
       /*
        * Change state
        */
-      boolean isSync = _isMapSynched_WithChartSlider;
-      boolean isCentered = _isMapSynched_WithChartSlider_IsCentered;
+      _isMapSyncWith_Slider_One = isChecked_One || isChecked_Center;
+      _isMapSyncWith_Slider_Centered = isActionCentered;
 
-      if (isSync && isCentered) {
-
-         isSync = true;
-         isCentered = false;
-
-      } else if (isSync) {
-
-         isSync = false;
-         isCentered = false;
-
-      } else {
-
-         isSync = true;
-         isCentered = true;
+      // ensure data are available
+      if (_allTourData.isEmpty()) {
+         return;
       }
 
-      _isMapSynched_WithChartSlider = isSync;
-      _isMapSynched_WithChartSlider_IsCentered = isCentered;
+      if (_isMapSyncWith_Slider_One) {
 
-      updateChartSliderAction();
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Photo();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_ValuePoint();
 
-      if (_isMapSynched_WithChartSlider) {
-
-         deactivateMapSync();
-         deactivatePhotoSync();
-
-         _actionShowTour.setSelection(true);
-
-         // map must be synched with selected tour
-         _isMapSynched_WithTour = true;
-         _actionSyncMap_WithTour.setChecked(true);
+         // map must also be synched with selected tour
+         _isMapSyncWith_Tour = true;
 
          _map.setShowOverlays(true);
 
@@ -625,18 +716,24 @@ public class Map2View extends ViewPart implements
                _currentSelectedSliderValueIndex,
                null);
       }
+
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Slider_One);
    }
 
    public void action_SyncWith_OtherMap(final boolean isSelected) {
 
-      _isMapSynched_WithOtherMap = isSelected;
+      _isMapSyncWith_OtherMap = isSelected;
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_OtherMap;
 
-      if (_isMapSynched_WithOtherMap) {
+      if (_isMapSyncWith_OtherMap) {
 
-         deactivatePhotoSync();
-         deactivateTourSync();
-         deactivateSliderSync();
+         deactivateSyncWith_Photo();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_ValuePoint();
       }
+
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_OtherMap);
    }
 
    /**
@@ -644,34 +741,41 @@ public class Map2View extends ViewPart implements
     */
    public void action_SyncWith_Photo() {
 
-      _isMapSynched_WithPhoto = _actionSyncMap_WithPhoto.isChecked();
+      _isMapSyncWith_Photo = _actionSyncMapWith_Photo.isChecked();
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_Photo;
 
-      if (_isMapSynched_WithPhoto) {
+      if (_isMapSyncWith_Photo) {
 
-         deactivateMapSync();
-         deactivateTourSync();
-         deactivateSliderSync();
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_ValuePoint();
 
          centerPhotos(_filteredPhotos, false);
 
          _map.paint();
       }
 
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Photo);
+
       enableActions(true);
    }
 
    public void action_SyncWith_Tour() {
 
-      if (_allTourData.size() == 0) {
+      _isMapSyncWith_Tour = _actionSyncMapWith_Tour.isChecked();
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_Tour;
+
+      if (_allTourData.isEmpty()) {
          return;
       }
 
-      _isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
+      if (_isMapSyncWith_Tour) {
 
-      if (_isMapSynched_WithTour) {
-
-         deactivateMapSync();
-         deactivatePhotoSync();
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Photo();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_ValuePoint();
 
          // force tour to be repainted, that it is synched immediately
          _previousTourData = null;
@@ -680,11 +784,41 @@ public class Map2View extends ViewPart implements
          _map.setShowOverlays(true);
 
          paintTours_20_One(_allTourData.get(0), true);
-
-      } else {
-
-         deactivateSliderSync();
       }
+
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_Tour);
+   }
+
+   public void action_SyncWith_ValuePoint() {
+
+      _isMapSyncWith_ValuePoint = _actionSyncMapWith_ValuePoint.isChecked();
+      _currentMapSyncMode = MapSyncMode.IsSyncWith_ValuePoint;
+
+      if (_allTourData.isEmpty()) {
+         return;
+      }
+
+      if (_isMapSyncWith_ValuePoint) {
+
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Photo();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_Tour();
+
+         // map must also be synched with selected tour
+         _isMapSyncWith_Tour = true;
+
+         _map.setShowOverlays(true);
+
+         positionMapTo_0_TourSliders(
+               _allTourData.get(0), // sync with first tour
+               _currentLeftSliderValueIndex,
+               _currentRightSliderValueIndex,
+               _currentSelectedSliderValueIndex,
+               null);
+      }
+
+      syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ValuePoint);
    }
 
    public void actionDimMap(final int dimLevel) {
@@ -829,7 +963,7 @@ public class Map2View extends ViewPart implements
        */
       for (final MapGraphId graphId : _allGraphContribId) {
          if (graphId != colorId) {
-            getTourColorAction(graphId).setChecked(false);
+            getAction_TourColor(graphId).setChecked(false);
          }
       }
 
@@ -885,27 +1019,41 @@ public class Map2View extends ViewPart implements
 
    public void actionShowSlider() {
 
-      if ((_allTourData == null) || (_allTourData.size() == 0)) {
+      if (_allTourData == null || _allTourData.isEmpty()) {
          return;
       }
 
       final boolean isShowSliderInMap = _actionShowSliderInMap.isChecked();
 
       // keep state for the slideout
-      _state.put(Map2View.MEMENTO_SHOW_SLIDER_IN_MAP, isShowSliderInMap);
+      _state.put(Map2View.STATE_IS_SHOW_SLIDER_IN_MAP, isShowSliderInMap);
 
       // repaint map
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             _allTourData.get(0),
+
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
+            _currentValuePointIndex,
+
             isShowSliderInMap,
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
       _map.redraw();
+   }
+
+   public void actionShowValuePoint() {
+
+      if (_allTourData != null && _allTourData.size() > 0) {
+
+         updateUI_HoveredValuePoint();
+      }
    }
 
    public void actionZoomIn() {
@@ -955,7 +1103,6 @@ public class Map2View extends ViewPart implements
        */
       TourManager.getInstance().resetMapPositions();
 
-      _actionShowTour.setSelection(true);
       _map.setShowOverlays(true);
 
       paintEntireTour();
@@ -1156,17 +1303,6 @@ public class Map2View extends ViewPart implements
 
                actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               net.tourbook.ui.UI.updateUnits();
-               _map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
-
-               _map.paint();
-
             } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
                   || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
 
@@ -1209,7 +1345,27 @@ public class Map2View extends ViewPart implements
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+
+               createLegendImage(_tourPainterConfig.getMapColorProvider());
+
+               _map.paint();
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -1293,6 +1449,10 @@ public class Map2View extends ViewPart implements
 
                   hideGeoGrid();
                }
+
+            } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
+
+               onSelection_HoveredValue((HoveredValueData) eventData);
 
             } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
 
@@ -1394,10 +1554,6 @@ public class Map2View extends ViewPart implements
 
    private void createActions(final Composite parent) {
 
-      _actionMap2_TourColors = new ActionMap2_Graphs(
-            TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
-            TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
-
       _actionTourColor_Altitude = new ActionTourColor(
             this,
             MapGraphId.Altitude,
@@ -1447,57 +1603,71 @@ public class Map2View extends ViewPart implements
             Messages.Image__PulseZones,
             Messages.Image__PulseZones_Disabled);
 
-      _allTourColorActions.put(MapGraphId.Altitude, _actionTourColor_Altitude);
-      _allTourColorActions.put(MapGraphId.Gradient, _actionTourColor_Gradient);
-      _allTourColorActions.put(MapGraphId.Pulse, _actionTourColor_Pulse);
-      _allTourColorActions.put(MapGraphId.Speed, _actionTourColor_Speed);
-      _allTourColorActions.put(MapGraphId.Pace, _actionTourColor_Pace);
-      _allTourColorActions.put(MapGraphId.HrZone, _actionTourColor_HrZone);
-      _allTourColorActions.put(MapGraphId.RunDyn_StepLength, _actionTourColor_RunDyn_StepLength);
+// SET_FORMATTING_OFF
 
-      _actionZoom_In = new ActionZoomIn(this);
-      _actionZoom_Out = new ActionZoomOut(this);
-      _actionZoom_Centered = new ActionZoomCentered(this);
-      _actionZoom_ShowEntireMap = new ActionZoomShowEntireMap(this);
-      _actionZoom_ShowEntireTour = new ActionZoomShowEntireTour(this);
+      _allTourColor_Actions.put(MapGraphId.Altitude, _actionTourColor_Altitude);
+      _allTourColor_Actions.put(MapGraphId.Gradient, _actionTourColor_Gradient);
+      _allTourColor_Actions.put(MapGraphId.Pulse, _actionTourColor_Pulse);
+      _allTourColor_Actions.put(MapGraphId.Speed, _actionTourColor_Speed);
+      _allTourColor_Actions.put(MapGraphId.Pace, _actionTourColor_Pace);
+      _allTourColor_Actions.put(MapGraphId.HrZone, _actionTourColor_HrZone);
+      _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength, _actionTourColor_RunDyn_StepLength);
 
-      _actionSyncMap_WithOtherMap = new ActionSyncMapWithOtherMap(this);
-      _actionSyncMap_WithPhoto = new ActionSyncMapWithPhoto(this);
-      _actionSyncMap_WithTour = new ActionSyncMapWithTour(this);
-      _actionSyncMap_WithChartSlider = new ActionSyncMapWithSlider(this);
-      _actionSyncZoomLevelAdjustment = new ActionSyncZoomLevelAdjustment();
+      // map2 slideouts
+      _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
+      _actionMap2_Color                   = new ActionMap2Color();
+      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state);
+      _actionMap2_Options                 = new ActionMap2_Options();
+      _actionMap2_SyncMap                 = new ActionSyncMap();
+      _actionMap2_TourColors              = new ActionMap2_Graphs();
 
-      _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
+      _actionZoom_In                      = new ActionZoomIn(this);
+      _actionZoom_Out                     = new ActionZoomOut(this);
+      _actionZoom_Centered                = new ActionZoomCentered(this);
+      _actionZoom_ShowEntireMap           = new ActionZoomShowEntireMap(this);
+      _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
-      _actionCreateTourMarkerFromMap = new ActionCreateTourMarkerFromMap(this);
-      _actionMap2_Bookmarks = new ActionMapBookmarks(this._parent, this);
-      _actionMap2_Color = new ActionMap2Color();
-      _actionMap2_MapProvider = new ActionMap2_MapProvider(this, _state);
-      _actionMap2_Options = new ActionMap2_Options();
-      _actionSearchTourByLocation = new ActionSearchTourByLocation();
-      _actionSetDefaultPosition = new ActionSetDefaultPosition(this);
-      _actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
+      _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
+      _actionDimMap                       = new ActionDimMap(this);
+      _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
+      _actionPhotoFilter                  = new ActionPhotoProperties(this, parent, _state);
+      _actionManageMapProvider            = new ActionManageMapProviders(this);
+      _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
+      _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
+      _actionSearchTourByLocation         = new ActionSearchTourByLocation();
+      _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
+      _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
+      _actionShowLegendInMap              = new ActionShowLegendInMap(this);
+      _actionShowPhotos                   = new ActionShowPhotos(this);
+      _actionShowScaleInMap               = new ActionShowScaleInMap(this);
+      _actionShowSliderInMap              = new ActionShowSliderInMap(this);
+      _actionShowSliderInLegend           = new ActionShowSliderInLegend(this);
+      _actionShowStartEndInMap            = new ActionShowStartEndInMap(this);
+      _actionShowValuePoint               = new ActionShowValuePoint(this);
+      _actionShowPOI                      = new ActionShowPOI(this);
+      _actionShowTour                     = new ActionShowTour();
+      _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
+      _actionShowTourMarker               = new ActionShowTourMarker(this);
+      _actionShowTourPauses               = new ActionShowTourPauses(this);
+      _actionShowWayPoints                = new ActionShowWayPoints(this);
+      _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
-      _actionPhotoFilter = new ActionPhotoProperties(this, parent, _state);
-      _actionShowPhotos = new ActionShowPhotos(this);
-      _actionShowAllFilteredPhotos = new ActionShowAllFilteredPhotos(this);
-      _actionShowSliderInMap = new ActionShowSliderInMap(this);
-      _actionShowSliderInLegend = new ActionShowSliderInLegend(this);
-      _actionShowLegendInMap = new ActionShowLegendInMap(this);
-      _actionShowScaleInMap = new ActionShowScaleInMap(this);
-      _actionShowStartEndInMap = new ActionShowStartEndInMap(this);
+      // map sync actions
+      _actionSyncMapWith_Photo            = new ActionSyncMapWith_Photo(this);
+      _actionSyncMapWith_OtherMap         = new ActionSyncMapWith_OtherMap(this);
+      _actionSyncMapWith_Slider_One       = new ActionSyncMapWith_Slider_One(this);
+      _actionSyncMapWith_Slider_Centered  = new ActionSyncMapWith_Slider_Centered(this);
+      _actionSyncMapWith_Tour             = new ActionSyncMapWith_Tour(this);
+      _actionSyncMapWith_ValuePoint       = new ActionSyncMapWith_ValuePoint(this);
 
-      _actionShowPOI = new ActionShowPOI(this);
-      _actionShowTour = new ActionShowTour();
-      _actionShowTourInfoInMap = new ActionShowTourInfoInMap(this);
-      _actionShowTourMarker = new ActionShowTourMarker(this);
-      _actionShowTourPauses = new ActionShowTourPauses(this);
-      _actionShowWayPoints = new ActionShowWayPoints(this);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_OtherMap,           _actionSyncMapWith_OtherMap);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_Photo,              _actionSyncMapWith_Photo);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_Slider_One,         _actionSyncMapWith_Slider_One);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_Slider_Centered,    _actionSyncMapWith_Slider_Centered);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_Tour,               _actionSyncMapWith_Tour);
+      _allSyncMap_Actions.put(MapSyncId.SyncMapWith_ValuePoint,         _actionSyncMapWith_ValuePoint);
 
-      _actionReloadFailedMapImages = new ActionReloadFailedMapImages(this);
-      _actionDimMap = new ActionDimMap(this);
-      _actionManageProvider = new ActionManageMapProviders(this);
-
+// SET_FORMATTING_ON
    }
 
    /**
@@ -1527,7 +1697,7 @@ public class Map2View extends ViewPart implements
 
       final RGB rgbTransparent = new RGB(0xfe, 0xfe, 0xfe);
 
-      final ImageData overlayImageData = new ImageData(//
+      final ImageData overlayImageData = new ImageData(
             legendWidth,
             legendHeight,
             24,
@@ -1577,7 +1747,7 @@ public class Map2View extends ViewPart implements
    private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider,
                                                           final int legendHeight) {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return false;
       }
 
@@ -1621,7 +1791,7 @@ public class Map2View extends ViewPart implements
 
       _map.setLegend(_mapLegend);
       _map.setShowLegend(true);
-      _map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+      _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
       final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
@@ -1691,7 +1861,7 @@ public class Map2View extends ViewPart implements
             restoreState();
             enableActions();
 
-            if (_allTourData.size() == 0) {
+            if (_allTourData.isEmpty()) {
                // a tour is not displayed, find a tour provider which provides a tour
                showToursFromTourProvider();
             } else {
@@ -1711,36 +1881,44 @@ public class Map2View extends ViewPart implements
       });
    }
 
-   private void deactivateMapSync() {
+   private void deactivateSyncWith_OtherMap() {
 
       // disable map sync
 
-      _isMapSynched_WithOtherMap = false;
-      _actionSyncMap_WithOtherMap.setChecked(false);
+      _isMapSyncWith_OtherMap = false;
+      _actionSyncMapWith_OtherMap.setChecked(false);
    }
 
-   private void deactivatePhotoSync() {
+   private void deactivateSyncWith_Photo() {
 
       // disable photo sync
 
-      _isMapSynched_WithPhoto = false;
-      _actionSyncMap_WithPhoto.setChecked(false);
+      _isMapSyncWith_Photo = false;
+      _actionSyncMapWith_Photo.setChecked(false);
    }
 
-   private void deactivateSliderSync() {
+   private void deactivateSyncWith_Slider() {
 
       // disable slider sync
 
-      _isMapSynched_WithChartSlider = false;
-      _actionSyncMap_WithChartSlider.setChecked(false);
+      _isMapSyncWith_Slider_One = false;
+
+      _actionSyncMapWith_Slider_One.setChecked(false);
+      _actionSyncMapWith_Slider_Centered.setChecked(false);
    }
 
-   private void deactivateTourSync() {
+   private void deactivateSyncWith_Tour() {
 
       // disable tour sync
 
-      _isMapSynched_WithTour = false;
-      _actionSyncMap_WithTour.setChecked(false);
+      _isMapSyncWith_Tour = false;
+      _actionSyncMapWith_Tour.setChecked(false);
+   }
+
+   private void deactivateSyncWith_ValuePoint() {
+
+      _isMapSyncWith_ValuePoint = false;
+      _actionSyncMapWith_ValuePoint.setChecked(false);
    }
 
    @Override
@@ -1771,6 +1949,7 @@ public class Map2View extends ViewPart implements
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -1809,7 +1988,7 @@ public class Map2View extends ViewPart implements
       _actionPhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
       _actionShowPhotos.setEnabled(isAllPhotoAvailable);
-      _actionSyncMap_WithPhoto.setEnabled(canShowFilteredPhoto);
+      _actionSyncMapWith_Photo.setEnabled(canShowFilteredPhoto);
 
       /*
        * tour actions
@@ -1833,10 +2012,15 @@ public class Map2View extends ViewPart implements
       _actionShowWayPoints.setEnabled(_isTourOrWayPoint);
       _actionZoom_Centered.setEnabled(isTourAvailable);
       _actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
-      _actionSyncZoomLevelAdjustment.setEnabled(isTourAvailable);
-      _actionSyncMap_WithOtherMap.setEnabled(true);
-      _actionSyncMap_WithChartSlider.setEnabled(isTourAvailable);
-      _actionSyncMap_WithTour.setEnabled(isTourAvailable);
+      _actionZoomLevelAdjustment.setEnabled(isTourAvailable);
+
+      _actionSyncMapWith_Slider_One.setEnabled(isTourAvailable);
+      _actionSyncMapWith_Slider_Centered.setEnabled(isTourAvailable);
+      _actionSyncMapWith_OtherMap.setEnabled(true);
+      _actionSyncMapWith_Tour.setEnabled(isTourAvailable);
+      _actionSyncMapWith_ValuePoint.setEnabled(isTourAvailable);
+
+      syncMap_ShowCurrentSyncModeImage(isMapSynched());
 
       if (numberOfTours == 0) {
 
@@ -1901,7 +2085,6 @@ public class Map2View extends ViewPart implements
       tbm.add(_actionPhotoFilter);
       tbm.add(_actionShowPhotos);
       tbm.add(_actionShowAllFilteredPhotos);
-      tbm.add(_actionSyncMap_WithPhoto);
 
       tbm.add(new Separator());
 
@@ -1911,9 +2094,7 @@ public class Map2View extends ViewPart implements
 
       tbm.add(_actionShowTour);
       tbm.add(_actionZoom_ShowEntireTour);
-      tbm.add(_actionSyncMap_WithTour);
-      tbm.add(_actionSyncMap_WithChartSlider);
-      tbm.add(_actionSyncMap_WithOtherMap);
+      tbm.add(_actionMap2_SyncMap);
 
       tbm.add(new Separator());
 
@@ -1947,6 +2128,7 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionShowLegendInMap);
       menuMgr.add(_actionShowScaleInMap);
+      menuMgr.add(_actionShowValuePoint);
       menuMgr.add(_actionShowSliderInMap);
       menuMgr.add(_actionShowSliderInLegend);
 
@@ -1984,10 +2166,10 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionEditMap2Preferences);
       menuMgr.add(_actionDimMap);
-      menuMgr.add(_actionSyncZoomLevelAdjustment);
+      menuMgr.add(_actionZoomLevelAdjustment);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionManageProvider);
+      menuMgr.add(_actionManageMapProvider);
       menuMgr.add(_actionReloadFailedMapImages);
    }
 
@@ -2055,7 +2237,7 @@ public class Map2View extends ViewPart implements
 
          tbm.insertBefore(
                GRAPH_CONTRIBUTION_ID_SLIDEOUT,
-               _allTourColorActions.get(graphId));
+               _allTourColor_Actions.get(graphId));
       }
    }
 
@@ -2143,6 +2325,16 @@ public class Map2View extends ViewPart implements
 
          enableActions();
       });
+   }
+
+   IAction getAction_MapSync(final MapSyncId syncId) {
+
+      return _allSyncMap_Actions.get(syncId);
+   }
+
+   IAction getAction_TourColor(final MapGraphId graphId) {
+
+      return _allTourColor_Actions.get(graphId);
    }
 
    private IMapColorProvider getColorProvider(final MapGraphId colorId) {
@@ -2314,11 +2506,6 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   IAction getTourColorAction(final MapGraphId graphId) {
-
-      return _allTourColorActions.get(graphId);
-   }
-
    private Set<GeoPosition> getXSliderGeoPositions(final TourData tourData,
                                                    int valueIndex1,
                                                    int valueIndex2) {
@@ -2350,6 +2537,20 @@ public class Map2View extends ViewPart implements
    private void hideGeoGrid() {
 
       _map.showGeoGrid(null);
+   }
+
+   private boolean isMapSynched() {
+
+      return false
+
+            || _isMapSyncWith_OtherMap
+            || _isMapSyncWith_Photo
+            || _isMapSyncWith_Slider_Centered
+            || _isMapSyncWith_Slider_One
+            || _isMapSyncWith_Tour
+            || _isMapSyncWith_ValuePoint
+
+      ;
    }
 
    private void keepMapPosition(final TourData tourData) {
@@ -2416,6 +2617,13 @@ public class Map2View extends ViewPart implements
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
 
+   private void onSelection_HoveredValue(final HoveredValueData hoveredValueData) {
+
+      _currentValuePointIndex = hoveredValueData.hoveredValuePointIndex;
+
+      updateUI_HoveredValuePoint();
+   }
+
    /**
     * @param selection
     * @param isExternalEvent
@@ -2471,7 +2679,7 @@ public class Map2View extends ViewPart implements
          hideGeoGrid();
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
 
@@ -2592,7 +2800,7 @@ public class Map2View extends ViewPart implements
                               ? leftSliderValueIndex
                               : rightSliderValueIndex;
 
-                  positionMapTo_0_TourSliders(//
+                  positionMapTo_0_TourSliders(
                         tourData,
                         leftSliderValueIndex,
                         rightSliderValueIndex,
@@ -2621,7 +2829,7 @@ public class Map2View extends ViewPart implements
                ? valueIndex1
                : valueIndex2;
 
-         positionMapTo_0_TourSliders(//
+         positionMapTo_0_TourSliders(
                mapPositionSelection.getTourData(),
                valueIndex1,
                valueIndex2,
@@ -2697,7 +2905,7 @@ public class Map2View extends ViewPart implements
 
             paintTours_10_All();
 
-            positionMapTo_0_TourSliders(//
+            positionMapTo_0_TourSliders(
                   comparedTourData,
                   geoCompareItem.tourFirstIndex,
                   geoCompareItem.tourLastIndex,
@@ -2793,11 +3001,11 @@ public class Map2View extends ViewPart implements
          }
       }
 
-      if (_isMapSynched_WithTour || _isMapSynched_WithChartSlider) {
+      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
 
          if (isDrawSlider) {
 
-            positionMapTo_0_TourSliders(//
+            positionMapTo_0_TourSliders(
                   tourData,
                   leftSliderValueIndex,
                   rightSliderValueIndex,
@@ -2837,18 +3045,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
       _tourInfoToolTipProvider.setTourDataList(_allTourData);
-
-//      final TourData firstTourData = _allTourData.get(0);
-//
-//      // set slider position
-//      _directMappingPainter.setPaintContext(
-//            _map,
-//            _isShowTour,
-//            firstTourData,
-//            _currentLeftSliderValueIndex,
-//            _currentRightSliderValueIndex,
-//            _actionShowSliderInMap.isChecked(),
-//            _actionShowSliderInLegend.isChecked());
 
       final Set<GeoPosition> tourBounds = getTourBounds(_allTourData);
 
@@ -2892,7 +3088,13 @@ public class Map2View extends ViewPart implements
 
       runPhotoFilter();
 
-      if (_isShowPhoto && _isMapSynched_WithPhoto) {
+      /**
+       * It is possible that sync photo action is disabled but map can be synched with photos. This
+       * occure when show photos are deactivated but the photo sync is still selected.
+       * <p>
+       * To reactivate photo sync, first photos must be set visible.
+       */
+      if (_isMapSyncWith_Photo) {
          centerPhotos(_filteredPhotos, false);
       }
 
@@ -2979,6 +3181,12 @@ public class Map2View extends ViewPart implements
 
          newOverlayKey = TourManager.loadTourData(allTourIds, _allTourData, true);
 
+         /*
+          * Sort tours by date otherwise the chart value point, which is sorted by date, could show
+          * the wrong tour -> complicated
+          */
+         Collections.sort(_allTourData);
+
          _hash_AllTourIds = allTourIds.hashCode();
          _hash_AllTourData = _allTourData.hashCode();
          _hash_TourOverlayKey = newOverlayKey;
@@ -2999,7 +3207,7 @@ public class Map2View extends ViewPart implements
          _map.disposeOverlayImageCache();
       }
 
-      if (_isMapSynched_WithTour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
 
          // use default position for the tour
 
@@ -3018,7 +3226,7 @@ public class Map2View extends ViewPart implements
     */
    private void paintTours_10_All() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          _tourInfoToolTipProvider.setTourData(null);
          return;
       }
@@ -3094,13 +3302,19 @@ public class Map2View extends ViewPart implements
 
       // set the paint context (slider position) for the direct mapping painter
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             tourData,
+
             _currentLeftSliderValueIndex,
             _currentRightSliderValueIndex,
+            _currentValuePointIndex,
+
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
       // set the tour bounds
@@ -3119,7 +3333,7 @@ public class Map2View extends ViewPart implements
       /*
        * set position and zoom level for the tour
        */
-      if (_isMapSynched_WithTour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
 
          if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
@@ -3266,26 +3480,32 @@ public class Map2View extends ViewPart implements
       _currentSelectedSliderValueIndex = selectedSliderIndex;
 
       _directMappingPainter.setPaintContext(
+
             _map,
             _isShowTour,
             tourData,
+
             leftSliderValuesIndex,
             rightSliderValuesIndex,
+            _currentValuePointIndex,
+
             _actionShowSliderInMap.isChecked(),
             _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
             _sliderPathPaintingData);
 
-      if (_isMapSynched_WithChartSlider) {
+      if (_isMapSyncWith_Slider_One) {
 
          if (geoPositions != null) {
 
-            // center to the left AND right slider
+            // center to geo position
 
             positionMapTo_MapPosition(geoPositions, true);
 
          } else {
 
-            if (_isMapSynched_WithChartSlider_IsCentered) {
+            if (_isMapSyncWith_Slider_Centered) {
 
                // center to the left AND right slider
 
@@ -3326,7 +3546,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _map.setMapPosition(tourPositions, isAdjustZoomLevel, _tourPainterConfig.getSynchTourZoomLevel());
+      _map.setMapPosition(tourPositions, isAdjustZoomLevel, _tourPainterConfig.getZoomLevelAdjustment());
    }
 
    /**
@@ -3368,7 +3588,7 @@ public class Map2View extends ViewPart implements
 
    private void resetMap() {
 
-      if (_allTourData.size() == 0) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -3393,92 +3613,78 @@ public class Map2View extends ViewPart implements
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
       _actionShowLegendInMap.setChecked(_isShowLegend);
 
-      // checkbox: is tour centered
-      final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
+      _actionShowValuePoint.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_VALUE_POINT, STATE_IS_SHOW_VALUE_POINT_DEFAULT));
+
+      // is tour centered
+      final boolean isTourCentered = _state.getBoolean(STATE_IS_ZOOM_CENTERED);
       _actionZoom_Centered.setChecked(isTourCentered);
       _isPositionCentered = isTourCentered;
 
-      // sync map with photo
-      _isMapSynched_WithPhoto = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_PHOTO, false);
-      _actionSyncMap_WithPhoto.setChecked(_isMapSynched_WithPhoto);
+      // synch map with ...
+      _currentMapSyncMode = (MapSyncMode) Util.getStateEnum(_state, STATE_MAP_SYNC_MODE, MapSyncMode.IsSyncWith_Tour);
+      final boolean isSyncModeActive = _state.getBoolean(STATE_MAP_SYNC_MODE_IS_ACTIVE);
+      syncMap_OnSelectSyncAction(isSyncModeActive);
 
-      // synch map with tour
-      final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
-      _actionSyncMap_WithTour.setChecked(isSynchTour);
-      _isMapSynched_WithTour = isSynchTour;
+      // zoom level adjustment
+      _actionZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, STATE_ZOOM_LEVEL_ADJUSTMENT, 0));
+      _mapDimLevel = Util.getStateInt(_state, STATE_MAP_DIM_LEVEL, -1);
 
-      // synch map with chart slider
-      _isMapSynched_WithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_WITH_TOURCHART_SLIDER, true);
-      _isMapSynched_WithChartSlider_IsCentered = Util.getStateBoolean(
-            _state,
-            STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED,
-            true);
-      updateChartSliderAction();
-
-      // synch map with another map
-      _isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, false);
-      _actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
-
-      //
-      _actionSyncZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
-      _mapDimLevel = Util.getStateInt(_state, MEMENTO_MAP_DIM_LEVEL, -1);
-
-      // checkbox: show start/end in map
-      _actionShowStartEndInMap.setChecked(_state.getBoolean(MEMENTO_SHOW_START_END_IN_MAP));
+      // show start/end in map
+      _actionShowStartEndInMap.setChecked(_state.getBoolean(STATE_IS_SHOW_START_END_IN_MAP));
       _tourPainterConfig.isShowStartEndInMap = _actionShowStartEndInMap.isChecked();
 
       // show tour marker
-      final boolean isShowMarker = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_MARKER, true);
+      final boolean isShowMarker = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_MARKER, true);
       _actionShowTourMarker.setChecked(isShowMarker);
       _tourPainterConfig.isShowTourMarker = isShowMarker;
 
       // show tour pauses
-      final boolean isShowPauses = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_PAUSES, true);
+      final boolean isShowPauses = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_PAUSES, true);
       _actionShowTourPauses.setChecked(isShowPauses);
       _tourPainterConfig.isShowTourPauses = isShowPauses;
 
       // checkbox: show way points
-      final boolean isShowWayPoints = Util.getStateBoolean(_state, MEMENTO_SHOW_WAY_POINTS, true);
+      final boolean isShowWayPoints = Util.getStateBoolean(_state, STATE_IS_SHOW_WAY_POINTS, true);
       _actionShowWayPoints.setChecked(isShowWayPoints);
       _tourPainterConfig.isShowWayPoints = isShowWayPoints;
       if (isShowWayPoints) {
          _tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
       }
 
-      // checkbox: show tour info in map
-      final boolean isShowTourInfo = Util.getStateBoolean(_state, MEMENTO_SHOW_TOUR_INFO_IN_MAP, true);
+      // show tour info in map
+      final boolean isShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO_IN_MAP, true);
       _actionShowTourInfoInMap.setChecked(isShowTourInfo);
       if (isShowTourInfo) {
          _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
       }
 
-      // checkbox: show scale
-      final boolean isScaleVisible = Util.getStateBoolean(_state, MEMENTO_SHOW_SCALE_IN_MAP, true);
+      // show scale
+      final boolean isScaleVisible = Util.getStateBoolean(_state, STATE_IS_SHOW_SCALE_IN_MAP, true);
       _actionShowScaleInMap.setChecked(isScaleVisible);
       _map.setShowScale(isScaleVisible);
 
       // show slider
       _actionShowSliderInMap.setChecked(Util.getStateBoolean(_state,
-            MEMENTO_SHOW_SLIDER_IN_MAP,
-            MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT));
+            STATE_IS_SHOW_SLIDER_IN_MAP,
+            STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
 
-      _actionShowSliderInLegend.setChecked(_state.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
+      _actionShowSliderInLegend.setChecked(_state.getBoolean(STATE_IS_SHOW_SLIDER_IN_LEGEND));
 
       // restore map provider by selecting the last used map factory
-      _actionMap2_MapProvider.selectMapProvider(_state.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
+      _actionMap2_MapProvider.selectMapProvider(_state.get(STATE_SELECTED_MAP_PROVIDER_ID));
 
       _actionPhotoFilter.restoreState();
 
       // default position
-      _defaultZoom = Util.getStateInt(_state, MEMENTO_DEFAULT_POSITION_ZOOM, 10);
+      _defaultZoom = Util.getStateInt(_state, STATE_DEFAULT_POSITION_ZOOM, 10);
       _defaultPosition = new GeoPosition(//
-            Util.getStateDouble(_state, MEMENTO_DEFAULT_POSITION_LATITUDE, 46.303074),
-            Util.getStateDouble(_state, MEMENTO_DEFAULT_POSITION_LONGITUDE, 7.526386));
+            Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LATITUDE, 46.303074),
+            Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
       // tour color
       try {
 
-         final String stateColorId = Util.getStateString(_state, MEMENTO_TOUR_COLOR_ID, MapGraphId.Altitude.name());
+         final String stateColorId = Util.getStateString(_state, STATE_TOUR_COLOR_ID, MapGraphId.Altitude.name());
 
          MapGraphId colorId;
          try {
@@ -3585,8 +3791,8 @@ public class Map2View extends ViewPart implements
    void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {
 
       _actionShowSliderInMap.setChecked(Util.getStateBoolean(_state,
-            MEMENTO_SHOW_SLIDER_IN_MAP,
-            Map2View.MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT));
+            STATE_IS_SHOW_SLIDER_IN_MAP,
+            Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
 
       _sliderPathPaintingData = new SliderPathPaintingData();
 
@@ -3678,48 +3884,50 @@ public class Map2View extends ViewPart implements
    @PersistState
    private void saveState() {
 
-      // save checked actions
-      _state.put(STATE_IS_SHOW_TOUR_IN_MAP, _isShowTour);
-      _state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
-      _state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynched_WithOtherMap);
-      _state.put(STATE_IS_SYNC_WITH_PHOTO, _isMapSynched_WithPhoto);
-      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER, _isMapSynched_WithChartSlider);
-      _state.put(STATE_IS_SYNC_WITH_TOURCHART_SLIDER_IS_CENTERED, _isMapSynched_WithChartSlider_IsCentered);
+      _state.put(STATE_IS_SHOW_TOUR_IN_MAP,                       _isShowTour);
+      _state.put(STATE_IS_SHOW_PHOTO_IN_MAP,                      _isShowPhoto);
+      _state.put(STATE_IS_SHOW_LEGEND_IN_MAP,                     _isShowLegend);
 
-      _state.put(MEMENTO_ZOOM_CENTERED, _actionZoom_Centered.isChecked());
-      _state.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSyncMap_WithTour.isChecked());
-      _state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSyncZoomLevelAdjustment.getZoomLevel());
+      _state.put(STATE_IS_SHOW_VALUE_POINT,                       _actionShowValuePoint.isChecked());
+      _state.put(STATE_IS_SHOW_START_END_IN_MAP,                  _actionShowStartEndInMap.isChecked());
+      _state.put(STATE_IS_SHOW_SCALE_IN_MAP,                      _actionShowScaleInMap.isChecked());
+      _state.put(STATE_IS_SHOW_SLIDER_IN_MAP,                     _actionShowSliderInMap.isChecked());
+      _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_MARKER,                       _actionShowTourMarker.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
+      _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
+      _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
-      _state.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
+      _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
+      Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
-      _state.put(MEMENTO_SHOW_START_END_IN_MAP, _actionShowStartEndInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SCALE_IN_MAP, _actionShowScaleInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SLIDER_IN_MAP, _actionShowSliderInMap.isChecked());
-      _state.put(MEMENTO_SHOW_SLIDER_IN_LEGEND, _actionShowSliderInLegend.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_MARKER, _actionShowTourMarker.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_PAUSES, _actionShowTourPauses.isChecked());
-      _state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
-      _state.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
+      _state.put(STATE_IS_ZOOM_CENTERED,                          _actionZoom_Centered.isChecked());
+      _state.put(STATE_ZOOM_LEVEL_ADJUSTMENT,                     _actionZoomLevelAdjustment.getZoomLevel());
 
-      _state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionMap2_MapProvider.getSelectedMapProvider().getId());
+      _state.put(STATE_MAP_DIM_LEVEL,                             _mapDimLevel);
+
+      _state.put(STATE_SELECTED_MAP_PROVIDER_ID,                  _actionMap2_MapProvider.getSelectedMapProvider().getId());
 
       if (_defaultPosition == null) {
 
          final MP mapProvider = _map.getMapProvider();
+         final int defaultZoom = mapProvider == null ? _defaultZoom : mapProvider.getMinimumZoomLevel();
 
-         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM, mapProvider == null ? //
-               _defaultZoom
-               : mapProvider.getMinimumZoomLevel());
+         _state.put(STATE_DEFAULT_POSITION_ZOOM,         defaultZoom);
 
-         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, 0.0F);
-         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, 0.0F);
+         _state.put(STATE_DEFAULT_POSITION_LATITUDE,     0.0F);
+         _state.put(STATE_DEFAULT_POSITION_LONGITUDE,    0.0F);
+
       } else {
-         _state.put(MEMENTO_DEFAULT_POSITION_ZOOM, _defaultZoom);
-         _state.put(MEMENTO_DEFAULT_POSITION_LATITUDE, (float) _defaultPosition.latitude);
-         _state.put(MEMENTO_DEFAULT_POSITION_LONGITUDE, (float) _defaultPosition.longitude);
+
+         _state.put(STATE_DEFAULT_POSITION_ZOOM,         _defaultZoom);
+         _state.put(STATE_DEFAULT_POSITION_LATITUDE,     (float) _defaultPosition.latitude);
+         _state.put(STATE_DEFAULT_POSITION_LONGITUDE,    (float) _defaultPosition.longitude);
       }
+
+// SET_FORMATTING_ON
 
       // tour color
       MapGraphId colorId;
@@ -3746,14 +3954,14 @@ public class Map2View extends ViewPart implements
          // use altitude as default
          colorId = MapGraphId.Altitude;
       }
-      _state.put(MEMENTO_TOUR_COLOR_ID, colorId.name());
+      _state.put(STATE_TOUR_COLOR_ID, colorId.name());
 
       _actionPhotoFilter.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
 
-      if (_allTourData.size() < 1) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -3783,7 +3991,7 @@ public class Map2View extends ViewPart implements
          mapPositions.add(leftPosition);
          mapPositions.add(rightPosition);
 
-         positionMapTo_0_TourSliders(//
+         positionMapTo_0_TourSliders(
                mapTourData,
                leftSliderValueIndex,
                rightSliderValueIndex,
@@ -3823,7 +4031,21 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.resetTourData();
 
       // update direct painter to draw nothing
-      _directMappingPainter.setPaintContext(_map, false, null, 0, 0, false, false, _sliderPathPaintingData);
+      _directMappingPainter.setPaintContext(
+
+            _map,
+            false,
+            null,
+
+            0,
+            0,
+            0,
+
+            false,
+            false,
+            false, // show value point
+
+            _sliderPathPaintingData);
 
       _map.tourBreadcrumb().resetTours();
 
@@ -3897,12 +4119,110 @@ public class Map2View extends ViewPart implements
       });
    }
 
+   private void syncMap_OnSelectSyncAction(final boolean isActionSelected) {
+
+      if (isActionSelected) {
+
+         switch (_currentMapSyncMode) {
+
+         case IsSyncWith_Slider_Center:
+            _actionSyncMapWith_Slider_Centered.setChecked(true);
+            action_SyncWith_ChartSlider(true);
+            break;
+
+         case IsSyncWith_Slider_One:
+            _actionSyncMapWith_Slider_One.setChecked(true);
+            action_SyncWith_ChartSlider(false);
+            break;
+
+         case IsSyncWith_OtherMap:
+            _actionSyncMapWith_OtherMap.setChecked(true);
+            action_SyncWith_OtherMap(true);
+            break;
+
+         case IsSyncWith_Tour:
+            _actionSyncMapWith_Tour.setChecked(true);
+            action_SyncWith_Tour();
+            break;
+
+         case IsSyncWith_ValuePoint:
+            _actionSyncMapWith_ValuePoint.setChecked(true);
+            action_SyncWith_ValuePoint();
+            break;
+
+         case IsSyncWith_Photo:
+            _actionSyncMapWith_Photo.setChecked(true);
+            action_SyncWith_Photo();
+            break;
+
+         case IsSyncWith_NONE:
+         default:
+
+            // sync action is selected but no sync subaction -> uncheck map sync
+            _actionMap2_SyncMap.setSelection(false);
+            break;
+         }
+
+      } else {
+
+         // sync action is not selected
+
+         deactivateSyncWith_OtherMap();
+         deactivateSyncWith_Photo();
+         deactivateSyncWith_Slider();
+         deactivateSyncWith_Tour();
+         deactivateSyncWith_ValuePoint();
+      }
+   }
+
+   /**
+    * Set sync map action selected when one of it's subactions are selected.
+    *
+    * @param isSelectSyncMap
+    */
+   private void syncMap_ShowCurrentSyncModeImage(final boolean isSelectSyncMap) {
+
+      switch (_currentMapSyncMode) {
+
+      case IsSyncWith_Tour:
+         _actionMap2_SyncMap.showOtherEnabledImage(0);
+         break;
+
+      case IsSyncWith_ValuePoint:
+         _actionMap2_SyncMap.showOtherEnabledImage(1);
+         break;
+
+      case IsSyncWith_Slider_One:
+         _actionMap2_SyncMap.showOtherEnabledImage(2);
+         break;
+
+      case IsSyncWith_Slider_Center:
+         _actionMap2_SyncMap.showOtherEnabledImage(3);
+         break;
+
+      case IsSyncWith_OtherMap:
+         _actionMap2_SyncMap.showOtherEnabledImage(4);
+         break;
+
+      case IsSyncWith_Photo:
+         _actionMap2_SyncMap.showOtherEnabledImage(5);
+         break;
+
+      case IsSyncWith_NONE:
+      default:
+         _actionMap2_SyncMap.showDefaultEnabledImage();
+         break;
+      }
+
+      _actionMap2_SyncMap.setSelection(isSelectSyncMap);
+   }
+
    @Override
    public void syncMapWithOtherMap(final MapPosition mapPosition,
                                    final ViewPart viewPart,
                                    final int positionFlags) {
 
-      if (!_isMapSynched_WithOtherMap) {
+      if (!_isMapSyncWith_OtherMap) {
 
          // sync feature is disabled
 
@@ -3953,36 +4273,6 @@ public class Map2View extends ViewPart implements
       _parent.getDisplay().asyncExec(runnable);
    }
 
-   private void updateChartSliderAction() {
-
-      String toolTip;
-      ImageDescriptor imageDescriptor;
-      ImageDescriptor imageDescriptorDisabled;
-
-      final boolean isSync = _isMapSynched_WithChartSlider;
-      final boolean isCenter = _isMapSynched_WithChartSlider_IsCentered;
-
-      if (isSync && isCenter) {
-
-         toolTip = Messages.Map_Action_SynchWithSlider_Centered;
-
-         imageDescriptor = _imageSyncWithSlider_Centered;
-         imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
-
-      } else {
-
-         toolTip = Messages.map_action_synch_with_slider;
-
-         imageDescriptor = _imageSyncWithSlider;
-         imageDescriptorDisabled = _imageSyncWithSlider_Disabled;
-      }
-
-      _actionSyncMap_WithChartSlider.setToolTipText(toolTip);
-      _actionSyncMap_WithChartSlider.setImageDescriptor(imageDescriptor);
-      _actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
-      _actionSyncMap_WithChartSlider.setChecked(isSync);
-   }
-
    private void updateFilteredPhotos() {
 
       runPhotoFilter();
@@ -3998,6 +4288,77 @@ public class Map2View extends ViewPart implements
       fillToolbar_TourColors(tbm);
 
       tbm.update(true);
+   }
+
+   private void updateUI_HoveredValuePoint() {
+
+      // find tour data for the index
+      TourData hoveredTourData = null;
+      int hoveredSerieIndex = 0;
+
+      if (_allTourData.size() == 1) {
+
+         // one simple tour or a multiple tour is displayed
+
+         hoveredSerieIndex = _currentValuePointIndex;
+         hoveredTourData = _allTourData.get(0);
+
+      } else {
+
+         /**
+          * Discovered issue:
+          * <p>
+          * When multiple tours are selected in the tourbook view, _allTourData contains multiple
+          * tours. However when tour chart is selected and it contains multiple tours, then one
+          * TourData with isMultipleTour is displayed in the map ->complicated
+          */
+
+         int adjustedValuePointIndex = _currentValuePointIndex;
+
+         for (final TourData tourData : _allTourData) {
+
+            final double[] latitudeSerie = tourData.latitudeSerie;
+            if (latitudeSerie != null) {
+
+               final int serieLength = latitudeSerie.length;
+
+               if (adjustedValuePointIndex < serieLength) {
+
+                  hoveredTourData = tourData;
+                  hoveredSerieIndex = adjustedValuePointIndex;
+
+                  break;
+
+               } else {
+
+                  adjustedValuePointIndex -= serieLength;
+               }
+            }
+         }
+      }
+
+      // set the paint context  for the direct mapping painter
+      _directMappingPainter.setPaintContext(
+
+            _map,
+            _isShowTour,
+            hoveredTourData,
+
+            _currentLeftSliderValueIndex,
+            _currentRightSliderValueIndex,
+            hoveredSerieIndex,
+
+            _actionShowSliderInMap.isChecked(),
+            _actionShowSliderInLegend.isChecked(),
+            _actionShowValuePoint.isChecked(),
+
+            _sliderPathPaintingData);
+
+      _map.paint();
+
+      if (_isMapSyncWith_ValuePoint) {
+         positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
+      }
    }
 
    /**

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -25,89 +25,89 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class ValueOverlapChecker {
 
-	private Rectangle	INITIAL_HIDDEN_RECT	= new Rectangle(-1000, -1000, 0, 0);
+   private Rectangle   INITIAL_HIDDEN_RECT = new Rectangle(-1000, -1000, 0, 0);
 
-	/**
-	 * Contains all (previous) areas.
-	 */
-	private int			_numRects;
+   /**
+    * Contains all (previous) areas.
+    */
+   private int         _numRects;
 
-	/**
-	 * Contains areas which are checked and rearranged.
-	 */
-	private int			_numPreviousValues;
+   /**
+    * Contains areas which are checked and rearranged.
+    */
+   private int         _numPreviousValues;
 
-	private Rectangle[]	_prevValues;
+   private Rectangle[] _prevValues;
 
-	public ValueOverlapChecker(final int numStackedValues) {
+   public ValueOverlapChecker(final int numStackedValues) {
 
-		_numRects = numStackedValues + 20;
+      _numRects = numStackedValues + 20;
 
-		// +1 is necessary otherwise the segmenter values are not displayed
-		_numPreviousValues = numStackedValues + 1;
+      // +1 is necessary otherwise the segmenter values are not displayed
+      _numPreviousValues = numStackedValues + 1;
 
-		_prevValues = new Rectangle[_numRects];
+      _prevValues = new Rectangle[_numRects];
 
-		// setup checker with rectangles which are not visible
-		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
-			_prevValues[rectIndex] = INITIAL_HIDDEN_RECT;
-		}
-	}
+      // setup checker with rectangles which are not visible
+      for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
+         _prevValues[rectIndex] = INITIAL_HIDDEN_RECT;
+      }
+   }
 
-	Rectangle getValidRect(	final Rectangle textRect,
-							final boolean isValueUp,
-							final int textHeight,
-							final String valueText) {
+   public Rectangle getValidRect(final Rectangle textRect,
+                                 final boolean isValueUp,
+                                 final int textHeight,
+                                 final String valueText) {
 
-		Rectangle validRect = null;
+      Rectangle validRect = null;
 
-		int yDiff;
-		if (isValueUp) {
-			yDiff = -textHeight;
-		} else {
-			yDiff = textHeight;
-		}
+      int yDiff;
+      if (isValueUp) {
+         yDiff = -textHeight;
+      } else {
+         yDiff = textHeight;
+      }
 
-		/*
-		 * Debugging
-		 */
+      /*
+       * Debugging
+       */
 //		if (valueText.equals("13")) {
 //			int a = 0;
 //			a++;
 //		}
 
-		int rectCounter = 0;
-		for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
+      int rectCounter = 0;
+      for (int rectIndex = 0; rectIndex < _numRects; rectIndex++) {
 
-			final Rectangle prevRect = _prevValues[rectIndex];
+         final Rectangle prevRect = _prevValues[rectIndex];
 
-			if (prevRect.intersects(textRect)) {
+         if (prevRect.intersects(textRect)) {
 
-				textRect.y = prevRect.y + yDiff;
+            textRect.y = prevRect.y + yDiff;
 
-				validRect = null;
-				rectIndex = -1;
+            validRect = null;
+            rectIndex = -1;
 
-				rectCounter++;
-				if (rectCounter >= _numPreviousValues) {
-					return validRect;
-				}
+            rectCounter++;
+            if (rectCounter >= _numPreviousValues) {
+               return validRect;
+            }
 
-			} else {
+         } else {
 
-				validRect = textRect;
-			}
-		}
+            validRect = textRect;
+         }
+      }
 
-		return validRect;
-	}
+      return validRect;
+   }
 
-	void setupNext(final Rectangle textRect, final boolean isValueUp) {
+   public void setupNext(final Rectangle textRect, final boolean isValueUp) {
 
-		for (int rectIndex = _numRects - 1; rectIndex > 0; rectIndex--) {
-			_prevValues[rectIndex] = _prevValues[rectIndex - 1];
-		}
+      for (int rectIndex = _numRects - 1; rectIndex > 0; rectIndex--) {
+         _prevValues[rectIndex] = _prevValues[rectIndex - 1];
+      }
 
-		_prevValues[0] = textRect;
-	}
+      _prevValues[0] = textRect;
+   }
 }

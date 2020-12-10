@@ -23,158 +23,158 @@ import org.eclipse.swt.widgets.Menu;
 
 public class ActionPrint extends Action implements IMenuCreator {
 
-	private static ArrayList<PrintTourExtension>	fPrintExtensionPoints;
+   private static ArrayList<PrintTourExtension> fPrintExtensionPoints;
 
-	private Menu									fMenu;
-	private ArrayList<ActionPrintTour>				fPrintTourActions;
+   private Menu                                 fMenu;
+   private ArrayList<ActionPrintTour>           fPrintTourActions;
 
-	private ITourProvider							fTourProvider;
+   private ITourProvider                        fTourProvider;
 
-	private int										fTourStartIndex	= -1;
-	private int										fTourEndIndex	= -1;
+   private int                                  fTourStartIndex = -1;
+   private int                                  fTourEndIndex   = -1;
 
-	private class ActionPrintTour extends Action {
+   private class ActionPrintTour extends Action {
 
-		private PrintTourExtension	fPrintTourExtension;
+      private PrintTourExtension fPrintTourExtension;
 
-		public ActionPrintTour(final PrintTourExtension printTourExtension) {
+      public ActionPrintTour(final PrintTourExtension printTourExtension) {
 
-			super(printTourExtension.getVisibleName());
-			fPrintTourExtension = printTourExtension;
-		}
+         super(printTourExtension.getVisibleName());
+         fPrintTourExtension = printTourExtension;
+      }
 
       @SuppressWarnings("unused")
       ActionPrintTour(final String visibleName, final String fileExtension) {}
 
-		@Override
-		public void run() {
-			final ArrayList<TourData> selectedTours;
-			if (fTourProvider instanceof ITourProviderAll) {
-				selectedTours = ((ITourProviderAll) fTourProvider).getAllSelectedTours();
-			} else {
-				selectedTours = fTourProvider.getSelectedTours();
-			}
+      @Override
+      public void run() {
+         final ArrayList<TourData> selectedTours;
+         if (fTourProvider instanceof ITourProviderAll) {
+            selectedTours = ((ITourProviderAll) fTourProvider).getAllSelectedTours();
+         } else {
+            selectedTours = fTourProvider.getSelectedTours();
+         }
 
-			if (selectedTours == null || selectedTours.size() == 0) {
-				return;
-			}
+         if (selectedTours == null || selectedTours.isEmpty()) {
+            return;
+         }
 
-			fPrintTourExtension.printTours(selectedTours, fTourStartIndex, fTourEndIndex);
-		}
+         fPrintTourExtension.printTours(selectedTours, fTourStartIndex, fTourEndIndex);
+      }
 
-	}
+   }
 
-	/**
-	 * @param tourProvider
-	 * @param isAddMode
-	 * @param isSaveTour
-	 *            when <code>true</code> the tour will be saved and a
-	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
-	 *            from the tour provider is only updated
-	 */
-	public ActionPrint(final ITourProvider tourProvider) {
+   /**
+    * @param tourProvider
+    * @param isAddMode
+    * @param isSaveTour
+    *           when <code>true</code> the tour will be saved and a
+    *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
+    *           from the tour provider is only updated
+    */
+   public ActionPrint(final ITourProvider tourProvider) {
 
-		super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
+      super(UI.IS_NOT_INITIALIZED, AS_DROP_DOWN_MENU);
 
-		fTourProvider = tourProvider;
+      fTourProvider = tourProvider;
 
-		setText(Messages.action_print_tour);
-		setMenuCreator(this);
+      setText(Messages.action_print_tour);
+      setMenuCreator(this);
 
-		getExtensionPoints();
-		createActions();
-	}
+      getExtensionPoints();
+      createActions();
+   }
 
-	private void addActionToMenu(final Action action) {
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(fMenu, -1);
-	}
+   private void addActionToMenu(final Action action) {
+      final ActionContributionItem item = new ActionContributionItem(action);
+      item.fill(fMenu, -1);
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		if (fPrintTourActions != null) {
-			return;
-		}
+      if (fPrintTourActions != null) {
+         return;
+      }
 
-		fPrintTourActions = new ArrayList<>();
+      fPrintTourActions = new ArrayList<>();
 
-		// create action for each extension point
-		for (final PrintTourExtension printTourExtension : fPrintExtensionPoints) {
-			fPrintTourActions.add(new ActionPrintTour(printTourExtension));
-		}
-	}
+      // create action for each extension point
+      for (final PrintTourExtension printTourExtension : fPrintExtensionPoints) {
+         fPrintTourActions.add(new ActionPrintTour(printTourExtension));
+      }
+   }
 
-	@Override
+   @Override
    public void dispose() {
-		if (fMenu != null) {
-			fMenu.dispose();
-			fMenu = null;
-		}
-	}
+      if (fMenu != null) {
+         fMenu.dispose();
+         fMenu = null;
+      }
+   }
 
-	/**
-	 * read extension points {@link TourbookPlugin#EXT_POINT_PRINT_TOUR}
-	 */
-	private ArrayList<PrintTourExtension> getExtensionPoints() {
+   /**
+    * read extension points {@link TourbookPlugin#EXT_POINT_PRINT_TOUR}
+    */
+   private ArrayList<PrintTourExtension> getExtensionPoints() {
 
-		if (fPrintExtensionPoints != null) {
-			return fPrintExtensionPoints;
-		}
+      if (fPrintExtensionPoints != null) {
+         return fPrintExtensionPoints;
+      }
 
-		fPrintExtensionPoints = new ArrayList<>();
+      fPrintExtensionPoints = new ArrayList<>();
 
-		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
-				TourbookPlugin.EXT_POINT_PRINT_TOUR);
+      final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
+            TourbookPlugin.EXT_POINT_PRINT_TOUR);
 
-		if (extPoint != null) {
+      if (extPoint != null) {
 
-			for (final IExtension extension : extPoint.getExtensions()) {
-				for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+         for (final IExtension extension : extPoint.getExtensions()) {
+            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-					if (configElement.getName().equalsIgnoreCase("print")) { //$NON-NLS-1$
-						try {
-							final Object object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
-							if (object instanceof PrintTourExtension) {
+               if (configElement.getName().equalsIgnoreCase("print")) { //$NON-NLS-1$
+                  try {
+                     final Object object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+                     if (object instanceof PrintTourExtension) {
 
-								final PrintTourExtension printTourItem = (PrintTourExtension) object;
+                        final PrintTourExtension printTourItem = (PrintTourExtension) object;
 
-								printTourItem.setPrintId(configElement.getAttribute("id")); //$NON-NLS-1$
-								printTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
+                        printTourItem.setPrintId(configElement.getAttribute("id")); //$NON-NLS-1$
+                        printTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
 
-								fPrintExtensionPoints.add(printTourItem);
-							}
-						} catch (final CoreException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
+                        fPrintExtensionPoints.add(printTourItem);
+                     }
+                  } catch (final CoreException e) {
+                     e.printStackTrace();
+                  }
+               }
+            }
+         }
+      }
 
-		return fPrintExtensionPoints;
-	}
+      return fPrintExtensionPoints;
+   }
 
-	@Override
+   @Override
    public Menu getMenu(final Control parent) {
-		return null;
-	}
+      return null;
+   }
 
-	@Override
+   @Override
    public Menu getMenu(final Menu parent) {
 
-		dispose();
-		fMenu = new Menu(parent);
+      dispose();
+      fMenu = new Menu(parent);
 
-		for (final ActionPrintTour action : fPrintTourActions) {
-			addActionToMenu(action);
-		}
+      for (final ActionPrintTour action : fPrintTourActions) {
+         addActionToMenu(action);
+      }
 
-		return fMenu;
-	}
+      return fMenu;
+   }
 
-	public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
-		fTourStartIndex = tourStartIndex;
-		fTourEndIndex = tourEndIndex;
-	}
+   public void setTourRange(final int tourStartIndex, final int tourEndIndex) {
+      fTourStartIndex = tourStartIndex;
+      fTourEndIndex = tourEndIndex;
+   }
 
 }

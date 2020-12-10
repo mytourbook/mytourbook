@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -36,7 +35,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
@@ -106,7 +104,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private Spinner            _spinBodyWeight;
    private Spinner            _spinFTP;
-   private Spinner            _spinRestPuls;
+   private Spinner            _spinRestPulse;
    private Spinner            _spinCalories;
    private Spinner            _spinWeather_Temperature_Avg;
    private Spinner            _spinWeather_Wind_SpeedValue;
@@ -230,11 +228,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _pc = new PixelConverter(parent);
       _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
-      _unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-      _unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
-      _unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
-            ? IWeather.windSpeedKmh
-            : IWeather.windSpeedMph;
+      _unitValueDistance = UI.UNIT_VALUE_DISTANCE;
+      _unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
+      _unitValueWindSpeed = IWeather.getAllWindSpeeds();
 
       _tk = new FormToolkit(parent.getDisplay());
 
@@ -315,17 +311,15 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
             );
 
-            final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
-            int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-            descLines = descLines == 0 ? 5 : descLines;
+            // this is used as default, when the dialog is resized then the description field is also resized
+            final int descriptionHeight = _pc.convertHeightInCharsToPixels(5);
 
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   //
                   // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
                   //
-                  .hint(defaultTextWidth, _pc.convertHeightInCharsToPixels(descLines))
+                  .hint(defaultTextWidth, descriptionHeight)
                   .applyTo(_txtDescription);
          }
          {
@@ -439,16 +433,16 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _firstColumnControls.add(label);
 
             // spinner
-            _spinRestPuls = new Spinner(container, SWT.BORDER);
+            _spinRestPulse = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinRestPuls);
-            _spinRestPuls.setMinimum(0);
-            _spinRestPuls.setMaximum(200);
-            _spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+                  .applyTo(_spinRestPulse);
+            _spinRestPulse.setMinimum(0);
+            _spinRestPulse.setMaximum(200);
+            _spinRestPulse.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
 
-            _spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+            _spinRestPulse.addMouseWheelListener(_mouseWheelListener);
 
             // label: bpm
             _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -984,7 +978,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final float bodyWeight = UI.convertBodyWeightToMetric(_spinBodyWeight.getSelection());
       _tourData.setBodyWeight(bodyWeight / 10.0f);
       _tourData.setPower_FTP(_spinFTP.getSelection());
-      _tourData.setRestPulse(_spinRestPuls.getSelection());
+      _tourData.setRestPulse(_spinRestPulse.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
 
       _tourData.setWeatherWindDir((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
@@ -1007,12 +1001,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setWeather(_txtWeather.getText().trim());
 
       if (_isTemperatureManuallyModified) {
-         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
-         if (_unitValueTemperature != 1) {
 
-            temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
-                  / net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI);
+         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
+
+         if (_unitValueTemperature != 1) {
+            temperature = ((temperature - UI.UNIT_FAHRENHEIT_ADD) / UI.UNIT_FAHRENHEIT_MULTI);
          }
+
          _tourData.setAvgTemperature(temperature);
       }
 
@@ -1038,7 +1033,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
          _spinBodyWeight.setSelection(Math.round(bodyWeight * 10));
          _spinFTP.setSelection(_tourData.getPower_FTP());
-         _spinRestPuls.setSelection(_tourData.getRestPulse());
+         _spinRestPulse.setSelection(_tourData.getRestPulse());
          _spinCalories.setSelection(_tourData.getCalories());
 
          /*
@@ -1071,8 +1066,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
          if (_unitValueTemperature != 1) {
             final float metricTemperature = avgTemperature;
             avgTemperature = metricTemperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
 
          _spinWeather_Temperature_Avg.setDigits(1);

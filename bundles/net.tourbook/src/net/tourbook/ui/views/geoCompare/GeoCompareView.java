@@ -20,6 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -27,7 +29,9 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -114,94 +118,105 @@ import org.eclipse.ui.part.ViewPart;
 
 public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompareListener {
 
-   public static final String            ID                            = "net.tourbook.ui.views.geoCompare.GeoCompareView"; //$NON-NLS-1$
+   public static final String             ID                                         = "net.tourbook.ui.views.geoCompare.GeoCompareView"; //$NON-NLS-1$
 
-   private static final int              DELAY_BEFORE_STARTING_COMPARE = 500;
+   private static final int               DELAY_BEFORE_STARTING_COMPARE              = 500;
 
-   private static final int              UI_UPDATE_INTERVAL            = 1000;
+   private static final int               UI_UPDATE_INTERVAL                         = 1000;
 
-   private static final String           STATE_IS_USE_APP_FILTER       = "STATE_IS_USE_APP_FILTER";                         //$NON-NLS-1$
-   static final String                   STATE_DISTANCE_INTERVAL       = "STATE_DISTANCE_INTERVAL";                         //$NON-NLS-1$
-   static final String                   STATE_GEO_ACCURACY            = "STATE_GEO_ACCURACY";                              //$NON-NLS-1$
-   private static final String           STATE_SORT_COLUMN_DIRECTION   = "STATE_SORT_COLUMN_DIRECTION";                     //$NON-NLS-1$
-   private static final String           STATE_SORT_COLUMN_ID          = "STATE_SORT_COLUMN_ID";                            //$NON-NLS-1$
-   //
-   static final int                      DEFAULT_DISTANCE_INTERVAL     = 100;
-   static final int                      DEFAULT_GEO_ACCURACY          = 10_000;
-   //
-   private static final String           COLUMN_AVG_PULSE              = "avgPulse";                                        //$NON-NLS-1$
-   private static final String           COLUMN_AVG_SPEED              = "avgSpeed";                                        //$NON-NLS-1$
-   private static final String           COLUMN_GEO_DIFF               = "geoDiff";                                         //$NON-NLS-1$
-   private static final String           COLUMN_GEO_DIFF_RELATIVE      = "geoDiffRelative";                                 //$NON-NLS-1$
-   private static final String           COLUMN_SEQUENCE               = "sequence";                                        //$NON-NLS-1$
-   private static final String           COLUMN_TOUR_START_DATE        = "tourStartDate";                                   //$NON-NLS-1$
-   private static final String           COLUMN_TOUR_TITLE             = "tourTitle";                                       //$NON-NLS-1$
-   //
-   private static final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
-   private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+   static final String                    STATE_DISTANCE_INTERVAL                    = "STATE_DISTANCE_INTERVAL";                         //$NON-NLS-1$
+   static final String                    STATE_GEO_ACCURACY                         = "STATE_GEO_ACCURACY";                              //$NON-NLS-1$
+   static final String                    STATE_GEO_RELATIVE_DIFFERENCES_FILTER      = "STATE_GEO_RELATIVE_DIFFERENCES_FILTER";           //$NON-NLS-1$
+   static final String                    STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER   = "STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER";        //$NON-NLS-1$
+   private static final String            STATE_IS_USE_APP_FILTER                    = "STATE_IS_USE_APP_FILTER";                         //$NON-NLS-1$
 
-   //
+   private static final String            STATE_SORT_COLUMN_DIRECTION                = "STATE_SORT_COLUMN_DIRECTION";                     //$NON-NLS-1$
+   private static final String            STATE_SORT_COLUMN_ID                       = "STATE_SORT_COLUMN_ID";                            //$NON-NLS-1$
+
+   static final int                       DEFAULT_DISTANCE_INTERVAL                  = 100;
+   static final int                       DEFAULT_GEO_ACCURACY                       = 10_000;
+   static final int                       DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER    = 100;
+   static final boolean                   DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER = false;
+
+   private static final String            COLUMN_AVG_PACE                            = "avgPace";                                         //$NON-NLS-1$
+   private static final String            COLUMN_AVG_PULSE                           = "avgPulse";                                        //$NON-NLS-1$
+   private static final String            COLUMN_AVG_SPEED                           = "avgSpeed";                                        //$NON-NLS-1$
+   private static final String            COLUMN_GEO_DIFF                            = "geoDiff";                                         //$NON-NLS-1$
+   private static final String            COLUMN_GEO_DIFF_RELATIVE                   = "geoDiffRelative";                                 //$NON-NLS-1$
+   private static final String            COLUMN_SEQUENCE                            = "sequence";                                        //$NON-NLS-1$
+   private static final String            COLUMN_TOUR_START_DATE                     = "tourStartDate";                                   //$NON-NLS-1$
+   private static final String            COLUMN_TOUR_TITLE                          = "tourTitle";                                       //$NON-NLS-1$
+
+   private static final IDialogSettings   _state                                     = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore  _prefStore                                 = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common                          = CommonActivator.getPrefStore();
+
    private IPartListener2                 _partListener;
    private SelectionAdapter               _columnSortListener;
    private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
    private ISelectionListener             _postSelectionListener;
    private ITourEventListener             _tourEventListener;
    private PostSelectionProvider          _postSelectionProvider;
-   //
+
    private int                            _lastSelectionHash;
-   //
-   private AtomicInteger                  _workedTours             = new AtomicInteger();
-   private AtomicInteger                  _runningId               = new AtomicInteger();
-   //
+
+   private AtomicInteger                  _workedTours                               = new AtomicInteger();
+   private AtomicInteger                  _runningId                                 = new AtomicInteger();
+
    private long                           _workerExecutorId;
-   //
+
    private boolean                        _isInUpdate;
    private long                           _lastUIUpdate;
 
    /**
     * Comparer items from the last comparison
     */
-   private ArrayList<GeoPartComparerItem> _comparedTours           = new ArrayList<>();
-   //
+   private ArrayList<GeoPartComparerItem> _comparedTours                             = new ArrayList<>();
+
    private GeoPartComparerItem            _selectedComparerItem;
-   //
-   private int                            _compareData_NumGeoPartTours;
-   private TourData                       _compareData_TourData;
-   private long                           _compareData_TourId      = Long.MIN_VALUE;
+
    private int                            _compareData_FirstIndex;
-   private int                            _compareData_LastIndex;
    private int[]                          _compareData_GeoGrid;
+   private boolean                        _compareData_IsUseAppFilter;
+   private int                            _compareData_LastIndex;
+   private int                            _compareData_NumGeoPartTours;
    private GeoPartItem                    _compareData_PreviousGeoPartItem;
    private long                           _compareData_RefId;
+   private TourData                       _compareData_TourData;
+   private long                           _compareData_TourId                        = Long.MIN_VALUE;
    private String                         _compareData_TourTitle;
-   private boolean                        _compareData_IsUseAppFilter;
    //
-   private long                           _lastCompare_TourId;
+   private int                            _lastCompare_DistanceInterval;
    private int                            _lastCompare_FirstIndex;
    private int                            _lastCompare_LastIndex;
-   private int                            _lastCompare_DistanceInterval;
    private int                            _lastCompare_GeoAccuracy;
+   private int                            _lastCompare_GeoDifferencesFilter;
+   private boolean                        _lastCompare_IsGeoRelativeDifferencesFilter;
    private boolean                        _lastCompare_IsUseAppFilter;
-   //
+   private long                           _lastCompare_TourId;
+
    private TableViewer                    _geoPartViewer;
    private ColumnManager                  _columnManager;
-   private CompareResultComparator        _geoPartComparator       = new CompareResultComparator();
-   //
+   private CompareResultComparator        _geoPartComparator                         = new CompareResultComparator();
+
+   private boolean                        _isGeoRelativeDifferencesFilter;
    private int                            _distanceInterval;
    private int                            _geoAccuracy;
+   private int                            _geoRelativeDifferencesFilter;
    private long                           _maxMinDiff;
-   //
-   private OpenDialogManager              _openDlgMgr              = new OpenDialogManager();
+
+   private OpenDialogManager              _openDlgMgr                                = new OpenDialogManager();
    private SlideoutGeoCompareOptions      _slideoutGeoCompareOptions;
-   private GeoCompareState                _slideoutGeoCompareState = new GeoCompareState();
-   //
+   private GeoCompareState                _slideoutGeoCompareState                   = new GeoCompareState();
+
    private PixelConverter                 _pc;
-   //
+
    private ActionAppTourFilter            _actionAppTourFilter;
    private ActionOnOff                    _actionOnOff;
    private ActionGeoCompareOptions        _actionGeoCompareOptions;
 
-   private final NumberFormat             _nf1                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf1                                       = NumberFormat.getInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -210,19 +225,27 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    /*
     * UI controls
     */
-   private Composite _parent;
-   private Composite _viewerContainer;
-   //
-   private PageBook  _pageBook;
-   private Composite _pageContent;
-   private Composite _pageMultipleTours;
-   private Composite _pageNoData;
-   private Label     _lblCompareStatus;
-   //
-   private Label     _lblNumTours;
-   private Label     _lblNumGeoGrids;
-   private Label     _lblNumSlices;
-   private Label     _lblTitle;
+   private Composite                   _parent;
+   private Composite                   _viewerContainer;
+
+   private PageBook                    _pageBook;
+   private Composite                   _pageContent;
+   private Composite                   _pageMultipleTours;
+   private Composite                   _pageNoData;
+
+   private Label                       _lblCompareStatus;
+   private Label                       _lblNumTours;
+   private Label                       _lblNumGeoGrids;
+   private Label                       _lblNumSlices;
+   private Label                       _lblTitle;
+
+   private final Function<Long, Float> _minDiffValueToRelative =
+
+         minDiffValue -> {
+                                                                        final float relative = (float) minDiffValue / _maxMinDiff * 100;
+
+                                                                        return relative;
+                                                                     };
 
    private class ActionAppTourFilter extends Action {
 
@@ -339,6 +362,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.avgPulse - item2.avgPulse;
             break;
 
+         case COLUMN_AVG_PACE:
+            rc = item1.avgPace - item2.avgPace;
+            break;
+
          case COLUMN_AVG_SPEED:
             rc = item1.avgSpeed - item2.avgSpeed;
             break;
@@ -357,6 +384,10 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          case TableColumnFactory.TIME__COMPUTED_MOVING_TIME_ID:
             rc = item1.movingTime - item2.movingTime;
+            break;
+
+         case TableColumnFactory.TIME__DEVICE_RECORDED_TIME_ID:
+            rc = item1.recordedTime - item2.recordedTime;
             break;
 
          case TableColumnFactory.TIME__DEVICE_ELAPSED_TIME_ID:
@@ -487,8 +518,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                // map options can have be changed
                _slideoutGeoCompareOptions.restoreState();
+            }
+         }
+      };
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
 //					updateUI_GeoAccuracy();
             }
@@ -497,6 +537,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -717,6 +758,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             && _lastCompare_FirstIndex == _compareData_FirstIndex
             && _lastCompare_LastIndex == _compareData_LastIndex
             && _lastCompare_GeoAccuracy == _geoAccuracy
+            && _lastCompare_GeoDifferencesFilter == _geoRelativeDifferencesFilter
+            && _lastCompare_IsGeoRelativeDifferencesFilter == _isGeoRelativeDifferencesFilter
             && _lastCompare_DistanceInterval == _distanceInterval) {
 
          // comparing is finished for the requested data
@@ -913,8 +956,11 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _lastCompare_TourId = _compareData_TourId;
       _lastCompare_FirstIndex = _compareData_FirstIndex;
       _lastCompare_LastIndex = _compareData_LastIndex;
-      _lastCompare_GeoAccuracy = _geoAccuracy;
+
       _lastCompare_DistanceInterval = _distanceInterval;
+      _lastCompare_GeoAccuracy = _geoAccuracy;
+      _lastCompare_GeoDifferencesFilter = _geoRelativeDifferencesFilter;
+      _lastCompare_IsGeoRelativeDifferencesFilter = _isGeoRelativeDifferencesFilter;
       _lastCompare_IsUseAppFilter = _compareData_IsUseAppFilter;
 
       /*
@@ -928,12 +974,20 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          }
       }
 
+      // overwrite compared tours when filter is active
+      if (_isGeoRelativeDifferencesFilter) {
+
+         // this code may be compact and fast but I don't understand it
+
+         final ArrayList<GeoPartComparerItem> filteredComparedTours = new ArrayList<>(geoPartItem.comparedTours.stream()
+               .filter(c -> isMinDiffValueWithinFilter(c.minDiffValue))
+               .collect(Collectors.toList()));
+
+         _comparedTours = filteredComparedTours;
+      }
+
       // make sure the selection is visible
-//		if (_selectedComparerItem != null) {
-//
-////			_geoPartViewer.setSelection(new StructuredSelection(_selectedComparerItem), true);
       _geoPartViewer.getTable().showSelection();
-//		}
 
       updateUI_HideFalsePositive();
    }
@@ -1142,63 +1196,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       }
    }
 
-//	private void createUI_50_HideFalsePositive(final Composite parent) {
-//
-//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//				onChange_HideFalsePositive();
-//			}
-//		};
-//
-//		/*
-//		 * Hide false positive tours
-//		 */
-//		{
-//			/*
-//			 * Checkbox: live update
-//			 */
-//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
-//			_chkHideFalsePositive.setText("&Hide false positive");
-//			_chkHideFalsePositive.setToolTipText(
-//					"Hide tours which are found but do not contain the requested tour part");
-//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
-//		}
-//
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory
-//				.fillDefaults()
-//				.grab(true, false)
-//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
-//				.applyTo(container);
-//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		{
-//			{
-//				/*
-//				 * Scale: False positive in %
-//				 */
-//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
-//				_scaleHideFalsePositive.setIncrement(1);
-//				_scaleHideFalsePositive.setPageIncrement(10);
-//				_scaleHideFalsePositive.setMinimum(1);
-//				_scaleHideFalsePositive.setMaximum(100);
-//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
-//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
-//			}
-//			{
-//				/*
-//				 * Label: %
-//				 */
-//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
-//				GridDataFactory
-//						.fillDefaults()
-//						.align(SWT.FILL, SWT.CENTER)
-//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-//						.applyTo(_lblHideFalsePositiveValue);
-//			}
-//		}
-//	}
-
    private void createUI_80_TableViewer(final Composite parent) {
 
       /*
@@ -1279,6 +1276,63 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       createUI_82_ContextMenu();
    }
 
+//	private void createUI_50_HideFalsePositive(final Composite parent) {
+//
+//		final SelectionAdapter falsePositiveListener = new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(final SelectionEvent e) {
+//				onChange_HideFalsePositive();
+//			}
+//		};
+//
+//		/*
+//		 * Hide false positive tours
+//		 */
+//		{
+//			/*
+//			 * Checkbox: live update
+//			 */
+//			_chkHideFalsePositive = new Button(parent, SWT.CHECK);
+//			_chkHideFalsePositive.setText("&Hide false positive");
+//			_chkHideFalsePositive.setToolTipText(
+//					"Hide tours which are found but do not contain the requested tour part");
+//			_chkHideFalsePositive.addSelectionListener(falsePositiveListener);
+//		}
+//
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory
+//				.fillDefaults()
+//				.grab(true, false)
+//				.indent(_pc.convertHorizontalDLUsToPixels(6), SWT.DEFAULT)
+//				.applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		{
+//			{
+//				/*
+//				 * Scale: False positive in %
+//				 */
+//				_scaleHideFalsePositive = new Scale(container, SWT.NONE);
+//				_scaleHideFalsePositive.setIncrement(1);
+//				_scaleHideFalsePositive.setPageIncrement(10);
+//				_scaleHideFalsePositive.setMinimum(1);
+//				_scaleHideFalsePositive.setMaximum(100);
+//				_scaleHideFalsePositive.addSelectionListener(falsePositiveListener);
+//				GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHideFalsePositive);
+//			}
+//			{
+//				/*
+//				 * Label: %
+//				 */
+//				_lblHideFalsePositiveValue = new Label(container, SWT.NONE);
+//				GridDataFactory
+//						.fillDefaults()
+//						.align(SWT.FILL, SWT.CENTER)
+//						.hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+//						.applyTo(_lblHideFalsePositiveValue);
+//			}
+//		}
+//	}
+
    /**
     * Create the view context menus
     */
@@ -1295,14 +1349,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       defineColumn_GeoDiff();
       defineColumn_GeoDiff_Relative();
       defineColumn_Time_TourStartDate();
+      defineColumn_Motion_AvgPace();
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_Altimeter();
       defineColumn_Motion_Distance();
 
       defineColumn_Body_AvgPulse();
 
-      defineColumn_Time_MovingTime();
       defineColumn_Time_ElapsedTime();
+      defineColumn_Time_RecordedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Tour_Type();
       defineColumn_Tour_Title();
@@ -1454,7 +1510,37 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * column: Tour start date
+    * Column: Motion - Avg pace min/km - min/mi
+    */
+   private void defineColumn_Motion_AvgPace() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_AVG_PACE);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final float avgpace = item.avgPace * UI.UNIT_VALUE_DISTANCE;
+
+            if (avgpace == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.format_mm_ss((long) avgpace));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Motion - Avg speed km/h - mph
     */
    private void defineColumn_Motion_AvgSpeed() {
 
@@ -1472,7 +1558,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
-            final double speed = item.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double speed = item.avgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, speed);
          }
@@ -1496,7 +1582,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             final double value = item.distance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, value);
          }
@@ -1543,6 +1629,29 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
 
             final long value = item.movingTime;
+
+            colDef.printLongValue(cell, value, true);
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Recorded time (h)
+    */
+   private void defineColumn_Time_RecordedTime() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final GeoPartComparerItem item = (GeoPartComparerItem) cell.getElement();
+
+            final long value = item.recordedTime;
 
             colDef.printLongValue(cell, value, true);
          }
@@ -1627,6 +1736,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       });
    }
 
+   @Override
+   public void dispose() {
+
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getSite().getPage().removePartListener(_partListener);
+
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      GeoCompareManager.removeGeoCompareListener(this);
+
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
+
+      super.dispose();
+   }
+
 //	/**
 //	 * Column: Start index
 //	 */
@@ -1696,20 +1820,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		});
 //	}
 
-   @Override
-   public void dispose() {
-
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getSite().getPage().removePartListener(_partListener);
-
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
-      GeoCompareManager.removeGeoCompareListener(this);
-
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
-
-      super.dispose();
-   }
-
    private void enableControls() {
 
       final boolean isCompareEnabled = GeoCompareManager.isGeoComparing();
@@ -1717,6 +1827,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _actionAppTourFilter.setEnabled(isCompareEnabled);
 
 //		_geoPartViewer.getTable().setEnabled(_isCompareEnabled);
+   }
+
+   private void fillToolbar() {
+
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionOnOff);
+      tbm.add(_actionAppTourFilter);
+      tbm.add(_actionGeoCompareOptions);
+
+      tbm.update(true);
    }
 
 //	private void enableControls_HideFalsePositive() {
@@ -1729,17 +1850,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		_lblHideFalsePositiveValue.setEnabled(isShowHideFalsePositive);
 //		_scaleHideFalsePositive.setEnabled(isShowHideFalsePositive);
 //	}
-
-   private void fillToolbar() {
-
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionOnOff);
-      tbm.add(_actionAppTourFilter);
-      tbm.add(_actionGeoCompareOptions);
-
-      tbm.update(true);
-   }
 
    private void fireSelection(final ISelection selection) {
 
@@ -1834,6 +1944,21 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       return false;
    }
 
+   /**
+    * Evaluates whether a given minDiffValue is between 0 and the current geo
+    * relative difference filter value, false otherwise.
+    *
+    * @param minDiffValue
+    *           A given value
+    * @return true if the minDiffValue is between 0 and the current geo
+    *         relative difference filter value, false otherwise.
+    */
+   private boolean isMinDiffValueWithinFilter(final long minDiffValue) {
+
+      return _minDiffValueToRelative.apply(minDiffValue) >= 0 &&
+            _minDiffValueToRelative.apply(minDiffValue) < _geoRelativeDifferencesFilter;
+   }
+
    private void onAction_AppFilter(final boolean isSelected) {
 
       _compareData_IsUseAppFilter = isSelected;
@@ -1881,7 +2006,18 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             GeoCompareView.STATE_DISTANCE_INTERVAL,
             GeoCompareView.DEFAULT_DISTANCE_INTERVAL);
 
-      if (_lastCompare_GeoAccuracy != _geoAccuracy || _lastCompare_DistanceInterval != _distanceInterval) {
+      _isGeoRelativeDifferencesFilter = Util.getStateBoolean(_state,
+            GeoCompareView.STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER,
+            GeoCompareView.DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
+
+      _geoRelativeDifferencesFilter = Util.getStateInt(_state,
+            GeoCompareView.STATE_GEO_RELATIVE_DIFFERENCES_FILTER,
+            GeoCompareView.DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
+
+      if (_lastCompare_GeoAccuracy != _geoAccuracy ||
+            _lastCompare_DistanceInterval != _distanceInterval ||
+            _lastCompare_GeoDifferencesFilter != _geoRelativeDifferencesFilter ||
+            _lastCompare_IsGeoRelativeDifferencesFilter != _isGeoRelativeDifferencesFilter) {
 
          // accuracy is modified
 
@@ -1938,7 +2074,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       if (_lastSelectionHash == selectionHash) {
 
          /*
-          * Last selection has not changed, this can occure when the app lost the focus and got the
+          * Last selection has not changed, this can occur when the app lost the focus and got the
           * focus again.
           */
          return;
@@ -2199,6 +2335,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _geoAccuracy = Util.getStateInt(_state, STATE_GEO_ACCURACY, DEFAULT_GEO_ACCURACY);
       _distanceInterval = Util.getStateInt(_state, STATE_DISTANCE_INTERVAL, DEFAULT_DISTANCE_INTERVAL);
+
+      _isGeoRelativeDifferencesFilter = Util.getStateBoolean(_state,
+            STATE_IS_GEO_RELATIVE_DIFFERENCES_FILTER,
+            DEFAULT_IS_GEO_RELATIVE_DIFFERENCES_FILTER);
+      _geoRelativeDifferencesFilter = Util.getStateInt(_state,
+            STATE_GEO_RELATIVE_DIFFERENCES_FILTER,
+            DEFAULT_GEO_RELATIVE_DIFFERENCES_FILTER);
 
       enableControls();
    }

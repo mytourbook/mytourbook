@@ -3207,7 +3207,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _offlineJobMapProviders.add(updateMapProvider);
       }
 
-      if (_offlineJobMapProviders.size() == 0) {
+      if (_offlineJobMapProviders.isEmpty()) {
          // nothing to do
          return;
       }

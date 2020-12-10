@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -191,7 +191,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_TOUR_CALORIES            = "mt:calories";             //$NON-NLS-1$
    private static final String TAG_MT_TOUR_REST_PULSE          = "mt:restPulse";            //$NON-NLS-1$
 
-   private static final String TAG_MT_TOUR_BIKER_WEIGHT        = "mt:bikerWeight";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_WEIGHT        = "mt:BodyWeight";          //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_BODY_FAT        = "mt:BodyFat";          //$NON-NLS-1$
    private static final String TAG_MT_TOUR_CONCONI_DEFLECTION  = "mt:conconiDeflection";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_DP_TOLERANCE        = "mt:dpTolerance";          //$NON-NLS-1$
 
@@ -283,8 +284,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private final TourbookDevice          _device;
    private final String                  _importFilePath;
-   private HashMap<Long, TourData>       _alreadyImportedTours;
-   private HashMap<Long, TourData>       _newlyImportedTours;
+   private Map<Long, TourData>           _alreadyImportedTours;
+   private Map<Long, TourData>           _newlyImportedTours;
    private int                           _trackCounter;
 
    private final Set<TourMarker>         _allTourMarker       = new HashSet<>();
@@ -336,8 +337,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    public GPX_SAX_Handler(final TourbookDevice deviceDataReader,
                           final String importFileName,
                           final DeviceData deviceData,
-                          final HashMap<Long, TourData> alreadyImportedTours,
-                          final HashMap<Long, TourData> newlyImportedTours) {
+                          final Map<Long, TourData> alreadyImportedTours,
+                          final Map<Long, TourData> newlyImportedTours) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -655,9 +656,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setRestPulse(getIntValue(charData));
          _isInMT_Tour = false;
 
-      } else if (name.equals(TAG_MT_TOUR_BIKER_WEIGHT)) {
+      } else if (name.equals(TAG_MT_TOUR_BODY_WEIGHT)) {
 
          _tourData.setBodyWeight(getFloatValue(charData));
+         _isInMT_Tour = false;
+
+      } else if (name.equals(TAG_MT_TOUR_BODY_FAT)) {
+
+         _tourData.setBodyFat(getFloatValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)) {
@@ -1035,7 +1041,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private void finalizeTour() {
 
-      if (_timeDataList.size() == 0) {
+      if (_timeDataList.isEmpty()) {
          // there is not data
 // disabled to imports tour without tracks
 //			return;
@@ -1057,7 +1063,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _tourData.setTourDescription(_trkDesc);
       }
 
-      if (_timeDataList.size() > 0) {
+      if (!_timeDataList.isEmpty()) {
 
          // set tour start date/time
 
@@ -1142,7 +1148,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private void finalizeTour_Tags() {
 
-      if (_allImportedTagNames.size() == 0) {
+      if (_allImportedTagNames.isEmpty()) {
          return;
       }
 
@@ -1519,7 +1525,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
                if (value.contains(NAME_SPACE_GPX_1_0)
 
                      // tolerate 'version="1.0"' without namespace
-                     || (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))
+                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))
 
                ) {
 
@@ -1532,7 +1538,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
                } else if (value.contains(NAME_SPACE_GPX_1_1)
 
                      // tolerate 'version="1.1"' without namespace
-                     || (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_1))
+                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_1))
 
                ) {
 
@@ -1636,7 +1642,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
             || name.equals(TAG_MT_TOUR_CALORIES)
             || name.equals(TAG_MT_TOUR_REST_PULSE)
 
-            || name.equals(TAG_MT_TOUR_BIKER_WEIGHT)
+            || name.equals(TAG_MT_TOUR_BODY_WEIGHT)
+            || name.equals(TAG_MT_TOUR_BODY_FAT)
             || name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)
             || name.equals(TAG_MT_TOUR_DP_TOLERANCE)
 

@@ -23,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -88,7 +87,7 @@ import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
+import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
@@ -222,7 +221,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 //
    private final static IPreferenceStore   _prefStore                                      = TourbookPlugin.getPrefStore();
-   private final static IPreferenceStore   _prefStoreCommon                                = CommonActivator.getPrefStore();
+   private final static IPreferenceStore   _prefStore_Common                               = CommonActivator.getPrefStore();
    //
    private static final IDialogSettings    _state                                          = TourbookPlugin.getState(ID);
    private static final IDialogSettings    _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
@@ -267,7 +266,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IPartListener2                  _partListener;
    private ITourEventListener              _tourPropertyListener;
    private IPropertyChangeListener         _prefChangeListener;
-   private IPropertyChangeListener         _prefChangeListenerCommon;
+   private IPropertyChangeListener         _prefChangeListener_Common;
    //
    private TreeViewer                      _tourViewer_Tree;
    //
@@ -317,7 +316,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IContextMenuProvider            _viewerContextMenuProvider_Tree                 = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues        _subMenu_AdjustTourValues;
-   private Action_Reimport_SubMenu         _subMenu_Reimport;
    //
    private ActionCollapseAll               _actionCollapseAll;
    private ActionCollapseOthers            _actionCollapseOthers;
@@ -337,6 +335,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
    private ActionPrint                     _actionPrintTour;
    private ActionRefreshView               _actionRefreshView;
+   private ActionReimportTours             _actionReimport_Tours;
    private ActionSelectAllTours            _actionSelectAllTours;
    private ActionSetTourTypeMenu           _actionSetTourType;
    private ActionSetPerson                 _actionSetOtherPerson;
@@ -787,7 +786,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // get selected items
       final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
 
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -960,7 +959,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               reloadViewer();
+               /*
+                * Flat view do not preserve column reordering when reloaded -> recreate it
+                */
+               if (_isLayoutNatTable) {
+
+                  // save column ordering
+                  saveState();
+
+                  recreateViewer_NatTable();
+
+               } else {
+
+                  reloadViewer();
+               }
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
@@ -976,7 +988,35 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                _columnFactory.updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+               _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+               _tourViewer_Tree.refresh();
+
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _tourViewer_Tree.getTree().redraw();
+            }
+         }
+      };
+
+      /*
+       * Common preferences
+       */
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+
+               recreateViewer_NatTable();
+               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
+
+            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                // measurement system has changed
 
@@ -993,43 +1033,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                recreateViewer_NatTable();
                _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _tourViewer_Tree.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer_Tree.getTree().redraw();
             }
          }
       };
 
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-
-      /*
-       * Common preferences
-       */
-      _prefChangeListenerCommon = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            final String property = event.getProperty();
-
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
-
-               recreateViewer_NatTable();
-               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
-            }
-         }
-      };
-
-      // register the listener
-      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -1098,7 +1108,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void createActions() {
 
       _subMenu_AdjustTourValues = new SubMenu_AdjustTourValues(this, this);
-      _subMenu_Reimport = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
 
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
@@ -1573,7 +1583,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       if (_natTable_DataLoader != null) {
          _natTable_DataLoader.resetTourItems();
@@ -1669,9 +1679,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
           * count number of selected items
           */
 
-         for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+         for (final Object treeItem : selection) {
 
-            final Object treeItem = iter.next();
             if (treeItem instanceof TVITourBookTour) {
                if (numTourItems == 0) {
                   firstTourItem = (TVITourBookTour) treeItem;
@@ -1742,7 +1751,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
       _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
 
-      _subMenu_Reimport.setEnabled(isTourSelected);
+      // re-import can be run on all/selected/between dates tours
+      _actionReimport_Tours.setEnabled(true);
 
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionEditQuick.setEnabled(isOneTour);
@@ -1845,7 +1855,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       menuMgr.add(new Separator());
       menuMgr.add(_subMenu_AdjustTourValues);
-      menuMgr.add(_subMenu_Reimport);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTour);
 
@@ -1972,7 +1982,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             tourIds.add(tviTourBookTour.tourId);
          }
 
-//         if (tourIds.size() == 0 && _hoveredTourId != -1) {
+//         if (tourIds.isEmpty() && _hoveredTourId != -1) {
 //
 //            // when nothing is selected but mouse is hovering a tour, return this tour id
 //
@@ -1986,9 +1996,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectedTours = _tourViewer_Tree.getStructuredSelection();
       }
 
-      for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-
-         final Object viewItem = tourIterator.next();
+      for (final Object viewItem : selectedTours) {
 
          if (viewItem instanceof TVITourBookYear) {
 
@@ -2355,7 +2363,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void onSelect_CreateTourSelection(final HashSet<Long> tourIds) {
 
       ISelection selection;
-      if (tourIds.size() == 0) {
+      if (tourIds.isEmpty()) {
 
          // fire selection that nothing is selected
 
@@ -2481,9 +2489,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 
       // loop: all selected items
-      for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
-
-         final Object treeItem = itemIterator.next();
+      for (final Object treeItem : selectedTours) {
 
          if (isSelectAllChildren) {
 
@@ -3303,7 +3309,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // set tooltip text
 
-      final String timeZone = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+      final String timeZone = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
       final String timeZoneTooltip = NLS.bind(COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
 
       _columnFactory.getColDef_TimeZoneOffset_Tree().setColumnHeaderToolTipText(timeZoneTooltip);

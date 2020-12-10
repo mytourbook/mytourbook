@@ -3478,7 +3478,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
     */
    private double getMarkerDistanceValue(final ImportLauncher importLauncher) {
 
-      return importLauncher.lastMarkerDistance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      return importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
    }
 
    public EasyConfig getModifiedConfig() {
@@ -3491,7 +3491,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private int getSelectedLastMarkerDistance() {
 
       final float lastMarkerDistance = _spinnerIL_LastMarkerDistance.getSelection()
-            * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE
+            * UI.UNIT_VALUE_DISTANCE
             * 100;
 
       return (int) lastMarkerDistance;
@@ -4511,7 +4511,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final SpeedTourType speedTourType = new SpeedTourType();
 
-               speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * UI.UNIT_VALUE_DISTANCE;
                speedTourType.cadenceMultiplier = comboCadence.getSelectedCadence();
 
                final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
@@ -4702,7 +4702,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   final ComboViewerCadence comboCadence = _comboTT_Cadence[speedTTIndex];
 
                   // update UI
-                  final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+                  final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
                   spinnerAvgSpeed.setSelection((int) avgSpeed);
 
                   if (tourTypeId == TourDatabase.ENTITY_IS_NOT_SAVED) {

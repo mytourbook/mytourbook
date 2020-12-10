@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchYearScale extends Action {
 
-	private final YearStatisticView	_yearStatisticView;
+	private final RefTour_YearStatistic_View	_yearStatisticView;
 
-	public ActionSynchYearScale(final YearStatisticView yearStatisticView) {
+	public ActionSynchYearScale(final RefTour_YearStatistic_View yearStatisticView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 

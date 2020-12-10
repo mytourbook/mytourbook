@@ -213,12 +213,12 @@ public class PrintTourPDF extends PrintTourExtension {
 
       _transformer.setParameter("startDate", formatStartDate(_tourData)); //$NON-NLS-1$
 
-      _transformer.setParameter("unitAltitude", new Double(net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)); //$NON-NLS-1$
-      _transformer.setParameter("unitDistance", new Double(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)); //$NON-NLS-1$
-      _transformer.setParameter("unitTemperature", net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE); //$NON-NLS-1$
+      _transformer.setParameter("unitAltitude", Double.valueOf(UI.UNIT_VALUE_ELEVATION)); //$NON-NLS-1$
+      _transformer.setParameter("unitDistance", Double.valueOf(UI.UNIT_VALUE_DISTANCE)); //$NON-NLS-1$
+      _transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE); //$NON-NLS-1$
       _transformer.setParameter("unitLabelDistance", UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
       _transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ALTITUDE); //$NON-NLS-1$
+      _transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ELEVATION); //$NON-NLS-1$
       _transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
       _transformer.setParameter("unitLabelHeartBeat", net.tourbook.ui.Messages.Value_Unit_Pulse); //$NON-NLS-1$
       _transformer.setParameter("unitLabelCadence", net.tourbook.ui.Messages.Value_Unit_Cadence); //$NON-NLS-1$

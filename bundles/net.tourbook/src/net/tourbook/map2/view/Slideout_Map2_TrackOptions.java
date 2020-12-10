@@ -642,7 +642,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 // SET_FORMATTING_OFF
 
       // slider location
-      _chkShowSlider_Location.setSelection(     Map2View.MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT);
+      _chkShowSlider_Location.setSelection(     Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT);
 
       // slider path
       _chkShowSlider_Path.setSelection(         Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
@@ -685,7 +685,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 // SET_FORMATTING_OFF
 
       // slider location
-      _chkShowSlider_Location.setSelection(     Util.getStateBoolean(_state,  Map2View.MEMENTO_SHOW_SLIDER_IN_MAP,   Map2View.MEMENTO_SHOW_SLIDER_IN_MAP_DEFAULT));
+      _chkShowSlider_Location.setSelection(     Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_IN_MAP,   Map2View.STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
 
       // slider path
       _chkShowSlider_Path.setSelection(         Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_SLIDER_PATH,    Map2View.STATE_IS_SHOW_SLIDER_PATH_DEFAULT));
@@ -726,7 +726,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 // SET_FORMATTING_OFF
 
       // slider location
-      _state.put(Map2View.MEMENTO_SHOW_SLIDER_IN_MAP,          _chkShowSlider_Location.getSelection());
+      _state.put(Map2View.STATE_IS_SHOW_SLIDER_IN_MAP,          _chkShowSlider_Location.getSelection());
 
       // slider path
       _state.put(Map2View.STATE_IS_SHOW_SLIDER_PATH,           _chkShowSlider_Path.getSelection());

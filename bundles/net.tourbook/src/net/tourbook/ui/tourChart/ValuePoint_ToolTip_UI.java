@@ -635,7 +635,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-            lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+            lblAltitudeUnit.setText(UI.UNIT_LABEL_ELEVATION);
          }
          _firstColumnControls.add(_lblAltitude);
          _firstColumnContainerControls.add(container);
@@ -1615,7 +1615,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Distance) {
 
-         final float distance = _tourData.distanceSerie[valueIndex] / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final float distance = _tourData.distanceSerie[valueIndex] / 1000 / UI.UNIT_VALUE_DISTANCE;
 
          _lblDistance.setText(_nf3NoGroup.format(distance));
       }
@@ -1670,13 +1670,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          float temperature = _tourData.temperatureSerie[valueIndex];
 
-         if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+         if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
             // get imperial temperature
 
             temperature = temperature
-                  * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                  + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+                  * UI.UNIT_FAHRENHEIT_MULTI
+                  + UI.UNIT_FAHRENHEIT_ADD;
          }
 
          _lblTemperature.setText(_nf1.format(temperature));

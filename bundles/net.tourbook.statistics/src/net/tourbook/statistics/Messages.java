@@ -22,6 +22,8 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.statistics.messages"; //$NON-NLS-1$
 
    public static String        LABEL_GRAPH_ALTITUDE;
+   public static String        LABEL_GRAPH_BODY_FAT;
+   public static String        LABEL_GRAPH_BODY_WEIGHT;
    public static String        LABEL_GRAPH_DAYTIME;
    public static String        LABEL_GRAPH_DISTANCE;
    public static String        LABEL_GRAPH_NUMBER_OF_TOURS;
@@ -33,19 +35,6 @@ public class Messages extends NLS {
    public static String        LABEL_GRAPH_TRAINING_EFFECT_ANAEROBIC;
    public static String        LABEL_GRAPH_TRAINING_PERFORMANCE;
 
-   public static String        numbers_info_altitude_between;
-   public static String        numbers_info_altitude_down;
-   public static String        numbers_info_altitude_total;
-   public static String        numbers_info_altitude_up;
-   public static String        numbers_info_distance_between;
-   public static String        numbers_info_distance_down;
-   public static String        numbers_info_distance_total;
-   public static String        numbers_info_distance_up;
-   public static String        numbers_info_time_between;
-   public static String        numbers_info_time_down;
-   public static String        numbers_info_time_total;
-   public static String        numbers_info_time_up;
-
    public static String        NUMBERS_UNIT;
 
    public static String        Statistic_HrZone_Error_NoHrZoneInPerson;
@@ -53,36 +42,43 @@ public class Messages extends NLS {
 
    public static String        Statistic_Label_Invers;
 
-   public static String        tourtime_info_altitude;
-   public static String        tourtime_info_avg_pace;
-   public static String        tourtime_info_avg_speed;
-   public static String        tourtime_info_break_time;
-   public static String        tourtime_info_break_time_tour;
-   public static String        tourtime_info_date_month;
-   public static String        tourtime_info_date_week;
-   public static String        tourtime_info_date_year;
-   public static String        tourtime_info_description;
-   public static String        tourtime_info_description_text;
-   public static String        tourtime_info_distance;
-   public static String        tourtime_info_distance_tour;
-   public static String        tourtime_info_moving_time;
-   public static String        tourtime_info_moving_time_tour;
-   public static String        tourtime_info_elapsed_time;
-   public static String        tourtime_info_elapsed_time_tour;
-   public static String        tourtime_info_recorded_time;
-   public static String        tourtime_info_recorded_time_tour;
-   public static String        tourtime_info_paused_time;
-   public static String        tourtime_info_paused_time_tour;
-   public static String        tourtime_info_tags;
-   public static String        tourtime_info_time;
-   public static String        TourTime_Info_NumberOfTours;
-   public static String        Tourtime_Info_TimeZone;
-   public static String        Tourtime_Info_TimeZoneDifference;
-   public static String        Tourtime_Info_Training_Effect_Aerob;
-   public static String        Tourtime_Info_Training_Effect_Anaerob;
-   public static String        Tourtime_Info_Training_Performance;
-   public static String        tourtime_info_tour_type;
-   public static String        tourtime_info_week;
+   public static String        Statistic_Value_Date_Day_Header1;
+   public static String        Statistic_Value_Date_DOY_Header1;
+   public static String        Statistic_Value_Date_FirstDay_Header1;
+   public static String        Statistic_Value_Date_FirstDay_Header2;
+   public static String        Statistic_Value_Date_Month_Header1;
+   public static String        Statistic_Value_Date_Week_Header1;
+   public static String        Statistic_Value_Date_Year_Header1;
+   public static String        Statistic_Value_Elevation_ElevationUp_Header1;
+   public static String        Statistic_Value_HR_Summary_Header1;
+   public static String        Statistic_Value_HR_Zone_1_Header1;
+   public static String        Statistic_Value_HR_Zone_10_Header1;
+   public static String        Statistic_Value_HR_Zone_2_Header1;
+   public static String        Statistic_Value_HR_Zone_3_Header1;
+   public static String        Statistic_Value_HR_Zone_4_Header1;
+   public static String        Statistic_Value_HR_Zone_5_Header1;
+   public static String        Statistic_Value_HR_Zone_6_Header1;
+   public static String        Statistic_Value_HR_Zone_7_Header1;
+   public static String        Statistic_Value_HR_Zone_8_Header1;
+   public static String        Statistic_Value_HR_Zone_9_Header1;
+   public static String        Statistic_Value_Motion_Distance_Header1;
+   public static String        Statistic_Value_Motion_Pace_Header1;
+   public static String        Statistic_Value_Motion_Speed_Header1;
+   public static String        Statistic_Value_Time_Computed_Break_Header1;
+   public static String        Statistic_Value_Time_Computed_Moving_Header1;
+   public static String        Statistic_Value_Time_Device_Elapsed_Header1;
+   public static String        Statistic_Value_Time_Device_Paused_Header1;
+   public static String        Statistic_Value_Time_Device_Recorded_Header1;
+   public static String        Statistic_Value_Tour_NumberOfTours_Header1;
+   public static String        Statistic_Value_Tour_Title_Header1;
+   public static String        Statistic_Value_Tour_TourType_Header1;
+   public static String        Statistic_Value_Training_Aerob_Header1;
+   public static String        Statistic_Value_Training_Anaerob_Header1;
+   public static String        Statistic_Value_Training_Header1;
+   public static String        Statistic_Value_Training_Performance_Header1;
+
+   public static String        Statistic_Week_Tooltip_ColumnHeaderTitle;
+   public static String        Statistic_Week_Tooltip_Title;
 
    static {
       // initialize resource bundle

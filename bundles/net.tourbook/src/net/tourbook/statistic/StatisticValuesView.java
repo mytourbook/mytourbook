@@ -20,6 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearance;
@@ -38,6 +39,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -59,9 +61,12 @@ public class StatisticValuesView extends ViewPart {
    private static final String                STATE_IS_SHOW_SEQUENCE_NUMBERS = "STATE_IS_SHOW_SEQUENCE_NUMBERS";                        //$NON-NLS-1$
 
    private static final IPreferenceStore      _prefStore                     = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore      _prefStore_Common              = CommonActivator.getPrefStore();
    private static final IDialogSettings       _state                         = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener            _prefChangeListener;
+   private IPropertyChangeListener            _prefChangeListener_Common;
+
    private ITourEventListener                 _tourEventListener;
 
    private Action_CopyStatValuesIntoClipboard _action_CopyIntoClipboard;
@@ -205,15 +210,16 @@ public class StatisticValuesView extends ViewPart {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-            } else if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED)) {
 
                // update font
 
-               _txtStatValues.setFont(net.tourbook.ui.UI.getLogFont());
+               final Font logFont = net.tourbook.ui.UI.getLogFont();
+
+               // ensure the font is valid, this case occurred in Ubuntu
+               if (logFont != null) {
+                  _txtStatValues.setFont(logFont);
+               }
 
             } else if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
@@ -221,7 +227,22 @@ public class StatisticValuesView extends ViewPart {
             }
          }
       };
+
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+            }
+         }
+      };
+
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addTourEventListener() {
@@ -324,6 +345,7 @@ public class StatisticValuesView extends ViewPart {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }

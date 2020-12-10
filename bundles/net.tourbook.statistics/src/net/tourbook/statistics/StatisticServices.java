@@ -44,6 +44,28 @@ public class StatisticServices {
 
    /**
     * @param serieIndex
+    * @param activeTourTypeFilter
+    * @return Returns the tour type id or -1 when type id is not set
+    */
+   public static long getTourTypeId(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
+
+      int colorOffset = 0;
+      if (activeTourTypeFilter.showUndefinedTourTypes()) {
+         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
+
+      if (serieIndex - colorOffset < 0) {
+         return -1;
+      }
+
+      final ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
+      final long typeId = allTourTypes.get(serieIndex - colorOffset).getTypeId();
+
+      return typeId;
+   }
+
+   /**
+    * @param serieIndex
     * @param valueIndex
     * @param resortedTypeIds
     * @param activeTourTypeFilter
@@ -126,7 +148,7 @@ public class StatisticServices {
 
       } else {
 
-         if (allTourTypes == null || allTourTypes.size() == 0 || numUsedTypes == 0) {
+         if (allTourTypes == null || allTourTypes.isEmpty() || numUsedTypes == 0) {
 
             statContext.outIsUpdateBarNames = true;
             statContext.outBarNames = null;

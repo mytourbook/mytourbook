@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.action;
-
-import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -89,7 +87,7 @@ public class ActionExpandSelection extends Action {
 
       final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
 
          if (_isExpandAllWhenNoSelection) {
 
@@ -100,8 +98,8 @@ public class ActionExpandSelection extends Action {
 
          tree.setRedraw(false);
          {
-            for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-               treeViewer.expandToLevel(iterator.next(), _expandLevels);
+            for (final Object name : selection) {
+               treeViewer.expandToLevel(name, _expandLevels);
             }
          }
          tree.setRedraw(true);

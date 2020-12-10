@@ -254,61 +254,61 @@ public class CalendarProfileManager {
    /*
     * min / MAX values
     */
-   static final int                     CALENDAR_COLUMNS_SPACE_MIN = 0;
-   static final int                     CALENDAR_COLUMNS_SPACE_MAX = 300;
-   static final int                     DATE_COLUMN_WIDTH_MIN      = 1;
-   static final int                     DATE_COLUMN_WIDTH_MAX      = 200;
-   static final int                     TOUR_BACKGROUND_WIDTH_MIN  = 0;
-   static final int                     TOUR_BACKGROUND_WIDTH_MAX  = 100;
-   static final int                     TOUR_BORDER_WIDTH_MIN      = 0;
-   static final int                     TOUR_BORDER_WIDTH_MAX      = 100;
-   static final int                     TOUR_TRUNCATED_LINES_MIN   = 1;
-   static final int                     TOUR_TRUNCATED_LINES_MAX   = 10;
-   static final int                     TOUR_VALUE_COLUMNS_MIN     = 1;
-   static final int                     TOUR_VALUE_COLUMNS_MAX     = 5;
-   static final int                     WEEK_COLUMN_WIDTH_MIN      = 1;
-   static final int                     WEEK_COLUMN_WIDTH_MAX      = 200;
-   static final int                     WEEK_HEIGHT_MIN            = 2;
-   static final int                     WEEK_HEIGHT_MAX            = 1000;
-   static final int                     WEEK_ROWS_MIN              = 1;
-   static final int                     WEEK_ROWS_MAX              = 1000;
-   static final int                     YEAR_COLUMNS_MIN           = 1;
-   static final int                     YEAR_COLUMNS_MAX           = 100;
-   static final int                     YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
-   static final int                     YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
-   private static final DataFormatter   _tourFormatter_Distance;
+   static final int                   CALENDAR_COLUMNS_SPACE_MIN = 0;
+   static final int                   CALENDAR_COLUMNS_SPACE_MAX = 300;
+   static final int                   DATE_COLUMN_WIDTH_MIN      = 1;
+   static final int                   DATE_COLUMN_WIDTH_MAX      = 200;
+   static final int                   TOUR_BACKGROUND_WIDTH_MIN  = 0;
+   static final int                   TOUR_BACKGROUND_WIDTH_MAX  = 100;
+   static final int                   TOUR_BORDER_WIDTH_MIN      = 0;
+   static final int                   TOUR_BORDER_WIDTH_MAX      = 100;
+   static final int                   TOUR_TRUNCATED_LINES_MIN   = 1;
+   static final int                   TOUR_TRUNCATED_LINES_MAX   = 10;
+   static final int                   TOUR_VALUE_COLUMNS_MIN     = 1;
+   static final int                   TOUR_VALUE_COLUMNS_MAX     = 5;
+   static final int                   WEEK_COLUMN_WIDTH_MIN      = 1;
+   static final int                   WEEK_COLUMN_WIDTH_MAX      = 200;
+   static final int                   WEEK_HEIGHT_MIN            = 2;
+   static final int                   WEEK_HEIGHT_MAX            = 1000;
+   static final int                   WEEK_ROWS_MIN              = 1;
+   static final int                   WEEK_ROWS_MAX              = 1000;
+   static final int                   YEAR_COLUMNS_MIN           = 1;
+   static final int                   YEAR_COLUMNS_MAX           = 100;
+   static final int                   YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
+   static final int                   YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
+   private static final DataFormatter _tourFormatter_Distance;
 
-   private static final DataFormatter   _tourFormatter_Elevation;
-   private static final DataFormatter   _tourFormatter_Elevation_Change;
-   private static final DataFormatter   _tourFormatter_Energy_kcal;
-   private static final DataFormatter   _tourFormatter_Energy_MJ;
-   private static final DataFormatter   _tourFormatter_Pace;
-   private static final DataFormatter   _tourFormatter_Power_Avg;
-   private static final DataFormatter   _tourFormatter_Pulse_Avg;
-   private static final DataFormatter   _tourFormatter_Speed;
-   private static final DataFormatter   _tourFormatter_Time_Elapsed;
-   private static final DataFormatter   _tourFormatter_Time_Recorded;
-   private static final DataFormatter   _tourFormatter_Time_Paused;
-   private static final DataFormatter   _tourFormatter_Time_Moving;
-   private static final DataFormatter   _tourFormatter_Time_Break;
-   private static final DataFormatter   _tourFormatter_TourDescription;
-   private static final DataFormatter   _tourFormatter_TourTitle;
-   private static final DataFormatter   _weekFormatter_CadenceZones_TimePercentages;
+   private static final DataFormatter _tourFormatter_Elevation;
+   private static final DataFormatter _tourFormatter_Elevation_Change;
+   private static final DataFormatter _tourFormatter_Energy_kcal;
+   private static final DataFormatter _tourFormatter_Energy_MJ;
+   private static final DataFormatter _tourFormatter_Pace;
+   private static final DataFormatter _tourFormatter_Power_Avg;
+   private static final DataFormatter _tourFormatter_Pulse_Avg;
+   private static final DataFormatter _tourFormatter_Speed;
+   private static final DataFormatter _tourFormatter_Time_Elapsed;
+   private static final DataFormatter _tourFormatter_Time_Recorded;
+   private static final DataFormatter _tourFormatter_Time_Paused;
+   private static final DataFormatter _tourFormatter_Time_Moving;
+   private static final DataFormatter _tourFormatter_Time_Break;
+   private static final DataFormatter _tourFormatter_TourDescription;
+   private static final DataFormatter _tourFormatter_TourTitle;
+   private static final DataFormatter _weekFormatter_CadenceZones_TimePercentages;
 
-   private static final DataFormatter   _weekFormatter_Distance;
-   private static final DataFormatter   _weekFormatter_Elevation;
-   private static final DataFormatter   _weekFormatter_Elevation_Change;
-   private static final DataFormatter   _weekFormatter_Energy_kcal;
-   private static final DataFormatter   _weekFormatter_Energy_MJ;
-   private static final DataFormatter   _weekFormatter_Pace;
-   private static final DataFormatter   _weekFormatter_Speed;
-   private static final DataFormatter   _weekFormatter_Time_Elapsed;
-   private static final DataFormatter   _weekFormatter_Time_Recorded;
-   private static final DataFormatter   _weekFormatter_Time_Paused;
-   private static final DataFormatter   _weekFormatter_Time_Moving;
-   private static final DataFormatter   _weekFormatter_Time_Break;
-   static final DataFormatter[]         allTourContentFormatter;
-   static final DataFormatter[]         allWeekFormatter;
+   private static final DataFormatter _weekFormatter_Distance;
+   private static final DataFormatter _weekFormatter_Elevation;
+   private static final DataFormatter _weekFormatter_Elevation_Change;
+   private static final DataFormatter _weekFormatter_Energy_kcal;
+   private static final DataFormatter _weekFormatter_Energy_MJ;
+   private static final DataFormatter _weekFormatter_Pace;
+   private static final DataFormatter _weekFormatter_Speed;
+   private static final DataFormatter _weekFormatter_Time_Elapsed;
+   private static final DataFormatter _weekFormatter_Time_Recorded;
+   private static final DataFormatter _weekFormatter_Time_Paused;
+   private static final DataFormatter _weekFormatter_Time_Moving;
+   private static final DataFormatter _weekFormatter_Time_Break;
+   static final DataFormatter[]       allTourContentFormatter;
+   static final DataFormatter[]       allWeekFormatter;
 
 // SET_FORMATTING_OFF
 
@@ -866,7 +866,7 @@ public class CalendarProfileManager {
 
             if (data.distance > 0) {
 
-               final double distance = data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double distance = data.distance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = valueFormatter.printDouble(distance);
 
@@ -925,11 +925,11 @@ public class CalendarProfileManager {
 
             if (data.elevationGain > 0) {
 
-               final float elevation = data.elevationGain / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               final float elevation = data.elevationGain / UI.UNIT_VALUE_ELEVATION;
                final String valueText = valueFormatter.printDouble(elevation);
 
                return isShowValueUnit
-                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE
                      : valueText + UI.SPACE;
 
             } else {
@@ -980,13 +980,13 @@ public class CalendarProfileManager {
 
             if (data.elevationGain > 0 && data.distance > 0) {
 
-               final float totalDistance = data.distance / 1000f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-               final float totalElevationChange = (data.elevationGain + data.elevationLoss) / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               final float totalDistance = data.distance / 1000f / UI.UNIT_VALUE_DISTANCE;
+               final float totalElevationChange = (data.elevationGain + data.elevationLoss) / UI.UNIT_VALUE_ELEVATION;
                final float elevationChangePerDistanceUnit = totalElevationChange / totalDistance;
                final String valueText = valueFormatter.printDouble(elevationChangePerDistanceUnit);
 
                return isShowValueUnit
-                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
                      : valueText + UI.SPACE;
 
             } else {
@@ -1138,7 +1138,7 @@ public class CalendarProfileManager {
 
             if (calories > 0) {
 
-               final double joule = calories * net.tourbook.ui.UI.UNIT_CALORIE_2_JOULE;
+               final double joule = calories * UI.UNIT_CALORIE_2_JOULE;
                final double megaJoule = joule / 1_000_000;
 
                final String valueText = valueFormatter.printDouble(megaJoule);
@@ -1204,7 +1204,7 @@ public class CalendarProfileManager {
 
                final float pace = data.distance == 0
                      ? 0
-                     : 1000 * time / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     : 1000 * time / data.distance * UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = UI.format_mm_ss((long) pace);
 
@@ -1364,7 +1364,7 @@ public class CalendarProfileManager {
                      : data.distance / (time / 3.6f);
 
                //convert to the current measurement system
-               speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speed /= UI.UNIT_VALUE_DISTANCE;
                final String valueText = valueFormatter.printDouble(speed);
 
                return isShowValueUnit
@@ -3213,7 +3213,7 @@ public class CalendarProfileManager {
          _allCalendarProfiles.addAll(missingDefaultDefaultProfiles);
 
          // ensure profiles are created
-         if (_allCalendarProfiles.size() == 0) {
+         if (_allCalendarProfiles.isEmpty()) {
             createProfile_0_AllDefaultDefaultProfiles(_allCalendarProfiles);
          }
 

@@ -46,7 +46,7 @@ public class MapUtils {
                                                 final ColorProviderConfig config,
                                                 final int legendHeight) {
 
-      if (allTourData.size() == 0) {
+      if (allTourData.isEmpty()) {
          return false;
       }
 
@@ -119,7 +119,7 @@ public class MapUtils {
                legendHeight,
                minValue,
                maxValue,
-               UI.UNIT_LABEL_ALTITUDE,
+               UI.UNIT_LABEL_ELEVATION,
                LegendUnitFormat.Number);
 
          break;
@@ -228,7 +228,7 @@ public class MapUtils {
          if (colorProvider instanceof Map3GradientColorProvider) {
 
             // the colorProvider already contains the active color profile
-            
+
             //Converting the values from seconds to minutes
             minValue /= 60;
             maxValue /= 60;

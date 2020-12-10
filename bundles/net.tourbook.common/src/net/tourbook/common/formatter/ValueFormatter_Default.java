@@ -28,11 +28,16 @@ public class ValueFormatter_Default implements IValueFormatter {
 	}
 
 	@Override
-	public String toString() {
-		return "ValueFormatter_Default [" // //$NON-NLS-1$
-				+ "printDouble()" //$NON-NLS-1$
-				+ "+ printLong()" //$NON-NLS-1$
-				+ "]"; //$NON-NLS-1$
-	}
+   public String printLong(final long value, final boolean isHide0Value, final boolean isShowBiggerThan0) {
+      return printLong(value);
+   }
+
+   @Override
+   public String toString() {
+      return "ValueFormatter_Default [" // //$NON-NLS-1$
+            + "printDouble()" //$NON-NLS-1$
+            + "+ printLong()" //$NON-NLS-1$
+            + "]"; //$NON-NLS-1$
+   }
 
 }

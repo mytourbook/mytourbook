@@ -61,17 +61,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.TOUR_DATABASE_IS_DERBY_EMBEDDED, true);
 
       /*
-       * regional settings
+       * Regional settings
        */
-
-      // disabled since version 11.7
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI, false);
-
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,      ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,      ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,   ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
-      store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY,        ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY_JOULE);
-
       store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
       store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, UI.SYMBOL_DOT);
       store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
@@ -106,6 +97,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
@@ -114,6 +107,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
       store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
@@ -122,6 +117,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
+
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_DURATION_TIME, DurationTime.MOVING.name());
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES, true);
+      store.setDefault(ITourbookPreferences.STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES, true);
 
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);
@@ -374,11 +375,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH,                          15);
       PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB,            new RGB(0xff, 0xff, 0xff));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB,  new RGB(0xff, 0x00, 0x80));
-
-      /*
-       * tour data editor
-       */
-      store.setDefault(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT, 3);
 
       /*
        * general appearance

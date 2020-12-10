@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,18 +15,18 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import net.tourbook.common.util.Util;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-
-import net.tourbook.common.util.Util;
 
 public class ActionHandler_OpenView_TourInfo extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(TourInfoView.ID, true);
+      Util.showView(TourInfo_View.ID, true);
 
 		return null;
 	}

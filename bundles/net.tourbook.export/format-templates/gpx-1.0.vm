@@ -42,7 +42,8 @@
          <mt:calories>$tourData.Calories</mt:calories>
          <mt:restPulse>$tourData.restPulse</mt:restPulse>
 ## other
-         <mt:bikerWeight>$tourData.getBodyWeight()</mt:bikerWeight>
+         <mt:bodyWeight>$tourData.getBodyWeight()</mt:bodyWeight>
+         <mt:bodyFat>$tourData.getBodyFat()</mt:bodyFat>
          <mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
          <mt:dpTolerance>$tourData.DpTolerance</mt:dpTolerance>
 ## weather
