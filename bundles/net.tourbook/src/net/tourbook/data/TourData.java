@@ -2386,20 +2386,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             }
 
             // check if lat and long diff is available
-            if (checkPosition && (lowIndex > 0) && (highIndex < serieLengthLast - 1)) {
+            if (checkPosition && (lowIndex > 0) && (highIndex < serieLengthLast - 1) && (sliceTimeDiff > 10)) {
 
-               if (sliceTimeDiff > 10) {
-
-                  if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
-                        && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
+               if ((latitudeSerie[lowIndex] == latitudeSerie[lowIndex - 1])
+                     && (longitudeSerie[lowIndex] == longitudeSerie[lowIndex - 1])) {
 //                     dataSerieAltimeter[serieIndex] = 210;
-                     continue;
-                  }
-                  if ((latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])
-                        && (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])) {
+                  continue;
+               }
+               if ((latitudeSerie[highIndex] == latitudeSerie[highIndex + 1])
+                     && (longitudeSerie[highIndex] == longitudeSerie[highIndex + 1])) {
 //                     dataSerieAltimeter[serieIndex] = 220;
-                     continue;
-                  }
+                  continue;
                }
             }
 
@@ -2569,7 +2566,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       // convert data series into DP points
-      final DPPoint dpPoints[] = new DPPoint[endIndex - startIndex];
+      final DPPoint[] dpPoints = new DPPoint[endIndex - startIndex];
       int dpPointsIndex = 0;
       for (int serieIndex = startIndex; serieIndex < endIndex; serieIndex++) {
          dpPoints[dpPointsIndex] = new DPPoint(distanceSerie[serieIndex], elevationSerie[serieIndex], serieIndex);
@@ -2812,7 +2809,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int serieLength = Math.abs(valueIndexRight - valueIndexLeft);
 
       // convert data series into DP points
-      final DPPoint dpPoints[] = new DPPoint[serieLength];
+      final DPPoint[] dpPoints = new DPPoint[serieLength];
       for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
 
          dpPoints[serieIndex] = new DPPoint(
@@ -3174,7 +3171,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (breakTimeSerie[serieIndex] == true) {
 
-               // break has occured in this time slice
+               // break has occurred in this time slice
 
                if (serieIndex < lastIndex) {
 
@@ -3563,8 +3560,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
       if (isAltitudeAvailable) {
 
-         final float dataSerieAltimeter[] = new float[serieLength];
-         final float dataSerieGradient[] = new float[serieLength];
+         final float[] dataSerieAltimeter = new float[serieLength];
+         final float[] dataSerieGradient = new float[serieLength];
 
          for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
