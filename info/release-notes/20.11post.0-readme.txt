@@ -76,6 +76,9 @@ Fixes
 * Tour Marker View (Frederic)
   - Bugfix: The time difference, average pace and average speed between markers could be wrong in the case of multiple selected tours
 
+* Printing Tour to PDF (Frederic)
+  - Bugfix: Printing a tour to a PDF file when using Java11 was resulting in exceptions
+
 
 Translation    
 ===========
