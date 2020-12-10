@@ -730,8 +730,8 @@ public class TourMapPainter extends MapPainter {
    }
 
    public static List<TourLegendLabel> getMapLegendLabels(final int legendHeight,
-                                                               final IGradientColorProvider colorProvider,
-                                                               final ColorProviderConfig config) {
+                                                          final IGradientColorProvider colorProvider,
+                                                          final ColorProviderConfig config) {
 
       final ArrayList<TourLegendLabel> legendLabels = new ArrayList<>();
 
@@ -1781,25 +1781,22 @@ public class TourMapPainter extends MapPainter {
 
                // current position is outside the tile
 
-               if (isVisibleDataPoint) {
+               if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
 
-                  if (serieIndex == lastInsideIndex + 1) {
+                  /*
+                   * this position is the first which is outside of the tile, draw a line from
+                   * the last inside to the first outside position
+                   */
 
-                     /*
-                      * this position is the first which is outside of the tile, draw a line from
-                      * the last inside to the first outside position
-                      */
-
-                     drawTour_20_Line(
-                           gcTile,
-                           devFrom_WithOffsetX,
-                           devFrom_WithOffsetY,
-                           devTo_WithOffsetX,
-                           devTo_WithOffsetY,
-                           color,
-                           tile,
-                           tourId);
-                  }
+                  drawTour_20_Line(
+                        gcTile,
+                        devFrom_WithOffsetX,
+                        devFrom_WithOffsetY,
+                        devTo_WithOffsetX,
+                        devTo_WithOffsetY,
+                        color,
+                        tile,
+                        tourId);
                }
 
                // keep positions
@@ -2583,34 +2580,29 @@ public class TourMapPainter extends MapPainter {
       final int tileWorldPixelTop = tile.getY() * tileSize;
       final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0) {
+      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0 && isPaintingNeeded_Tours(
+            tourDataList,
+            mp,
+            mapZoomLevel,
+            projectionId,
+            tileWorldPixelLeft,
+            tileWorldPixelRight,
+            tileWorldPixelTop,
+            tileWorldPixelBottom)) {
 
-         if (isPaintingNeeded_Tours(
-               tourDataList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelRight,
-               tileWorldPixelTop,
-               tileWorldPixelBottom)) {
-
-            return true;
-         }
+         return true;
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
+      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0 &&
+            isPaintingNeeded_Photos(
+                  photoList,
+                  mp,
+                  mapZoomLevel,
+                  projectionId,
+                  tileWorldPixelLeft,
+                  tileWorldPixelTop)) {
 
-         if (isPaintingNeeded_Photos(
-               photoList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelTop)) {
-
-            return true;
-         }
+         return true;
       }
 
       return false;

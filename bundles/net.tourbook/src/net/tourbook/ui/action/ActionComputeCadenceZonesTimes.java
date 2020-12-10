@@ -17,7 +17,7 @@ package net.tourbook.ui.action;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -60,7 +60,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
          return;
       }
 
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
       if (selectedTours == null || selectedTours.isEmpty()) {
          // tours are not selected -> this can occur when loading tour data is canceled
          return;

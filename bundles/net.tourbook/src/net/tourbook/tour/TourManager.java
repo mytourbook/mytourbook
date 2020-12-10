@@ -47,6 +47,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.common.util.Util;
@@ -254,7 +255,7 @@ public class TourManager {
    //
    private static TourData                               _joined_TourData;
    private static int                                    _joined_TourIds_Hash;
-   private static ArrayList<TourData>                    _allLoaded_TourData;
+   private static List<TourData>                         _allLoaded_TourData;
    private static int                                    _allLoaded_TourData_Hash;
    private static long                                   _allLoaded_TourData_Key;
    private static int                                    _allLoaded_TourIds_Hash;
@@ -537,42 +538,45 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeCadenceZonesTimes(final Connection conn,
-                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+                                                  final List<TourData> selectedTours) throws SQLException {
       boolean isUpdated = false;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate);
+      try (PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate)) {
 
-      int numComputedTour = 0;
-      int numNotComputedTour = 0;
+         int numComputedTour = 0;
+         int numNotComputedTour = 0;
 
-      // loop over all tours and compute each cadence zone time
-      for (final TourData tourData : selectedTours) {
+         // loop over all tours and compute each cadence zone time
+         for (final TourData tourData : selectedTours) {
 
-         final boolean timeComputed = tourData.computeCadenceZonesTimes();
-         if (!timeComputed) {
+            final boolean timeComputed = tourData.computeCadenceZonesTimes();
+            if (!timeComputed) {
 
-            numNotComputedTour++;
+               numNotComputedTour++;
 
-         } else {
+            } else {
 
-            // update cadence zones times in the database
-            stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
-            stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
-            stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
-            stmtUpdate.setLong(4, tourData.getTourId());
+               // update cadence zones times in the database
+               stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
+               stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
+               stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
+               stmtUpdate.setLong(4, tourData.getTourId());
 
-            stmtUpdate.executeUpdate();
+               stmtUpdate.executeUpdate();
 
-            isUpdated = true;
-            numComputedTour++;
+               isUpdated = true;
+               numComputedTour++;
+            }
          }
-      }
 
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+         TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
 
-      if (numNotComputedTour >= 0) {
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+         if (numNotComputedTour >= 0) {
+            TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+                  NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+         }
+      } catch (final SQLException e) {
+         SQL.showException(e);
       }
 
       return isUpdated;
@@ -1803,8 +1807,8 @@ public class TourManager {
     *           will be returned.
     * @return Returns a unique key for all {@link TourData}.
     */
-   public static long loadTourData(final ArrayList<Long> allTourIds,
-                                   final ArrayList<TourData> allTourData,
+   public static long loadTourData(final List<Long> allTourIds,
+                                   final List<TourData> allTourData,
                                    final boolean isCheckLatLon) {
 
       // check if the requested data are already available
@@ -1901,7 +1905,7 @@ public class TourManager {
    }
 
    private static void loadTourData_OneTour(final Long tourId,
-                                            final ArrayList<TourData> allTourData,
+                                            final List<TourData> allTourData,
                                             final boolean isCheckLatLon,
                                             final long[] newOverlayKey) {
 
@@ -2833,24 +2837,21 @@ public class TourManager {
       }
 
       // show message that photos can be saved only in real tours
-      if (numHistoryTourPhotos > 0) {
+      if (numHistoryTourPhotos > 0 && _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
 
-         if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
+         final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+               Display.getCurrent().getActiveShell(),
+               Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+               Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
+               Messages.App_ToggleState_DoNotShowAgain,
+               false, // toggle default state
+               null,
+               null);
 
-            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
-                  Display.getCurrent().getActiveShell(),
-                  Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
-                  Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
-                  Messages.App_ToggleState_DoNotShowAgain,
-                  false, // toggle default state
-                  null,
-                  null);
-
-            // save toggle state
-            _prefStore.setValue(
-                  ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING,
-                  dialog.getToggleState());
-         }
+         // save toggle state
+         _prefStore.setValue(
+               ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING,
+               dialog.getToggleState());
       }
 
       for (final Long tourId : allToursWithPhotos.keySet()) {
@@ -3518,7 +3519,7 @@ public class TourManager {
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
       xDataTime.setDefaultRGB(new RGB(0, 0, 0));
-      xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
+      xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
        * show the distance on the x-axis when a distance is available, otherwise the time is
