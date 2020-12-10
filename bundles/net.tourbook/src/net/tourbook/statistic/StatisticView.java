@@ -30,6 +30,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -97,6 +98,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
    private final IPreferenceStore       _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings        _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
+
 
    private IPartListener2               _partListener;
    private IPropertyChangeListener      _prefChangeListener;
@@ -381,6 +383,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
       addPrefListener();
       addSelectionListener();
       addTourEventListener();
+
+      // this part is a selection provider which can be used in a statistic, e.g. StatisticDay
+      getSite().setSelectionProvider(new PostSelectionProvider(ID));
 
       /*
        * Start async that the workspace is fully initialized with all data filters

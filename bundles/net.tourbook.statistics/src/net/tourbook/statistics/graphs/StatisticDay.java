@@ -33,6 +33,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -60,6 +61,7 @@ import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -221,11 +223,19 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   return;
                }
 
+               final SelectionTourId selection = new SelectionTourId(_selectedTourId);
+
                // this view can be inactive -> selection is not fired with the SelectionProvider interface
                TourManager.fireEventWithCustomData(
                      TourEventId.TOUR_SELECTION,
-                     new SelectionTourId(_selectedTourId),
+                     selection,
                      viewSite.getPart());
+
+               // set selection also into the view that when the view is activated, then a tour selection is fired
+               final ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
+               if (selectionProvider instanceof PostSelectionProvider) {
+                  ((PostSelectionProvider) selectionProvider).setSelectionNoFireEvent(selection);
+               }
             }
          }
       });

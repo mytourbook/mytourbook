@@ -44,7 +44,9 @@ Improvements
   - Show value labels with the selected language
 
 * Tour Photos View
-  - Select next/previous photo with the mousewheel
+  - Select next/previous photo with the mousewheel when gallery is horizontal
+  - Save/remove individual photos in/from a tour -  https://sourceforge.net/p/mytourbook/feature-requests/116/
+  - Time adjustment can now be done for each photo/camera in a tour
 
 Changes  
 =======
@@ -79,7 +81,7 @@ Translation
 ===========
 
  - Czech 20.8 (Lukas)
- - Dutch 20.8 (Maarten)
+ - Dutch 20.11 (Maarten)
  - French (Frederic)
  - German
  - Italian (Doriano)

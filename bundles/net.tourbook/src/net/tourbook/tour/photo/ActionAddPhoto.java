@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,16 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
-public class TourPhotoReference {
+import net.tourbook.Messages;
+import net.tourbook.photo.PhotoGallery;
+import net.tourbook.tour.TourManager;
 
-   public long tourId;
-   public long photoId;
+import org.eclipse.jface.action.Action;
 
-   public TourPhotoReference(final long tourId, final long photoId) {
+class ActionAddPhoto extends Action {
 
-      this.photoId = photoId;
-      this.tourId = tourId;
+   private PhotoGallery _photoGallery;
+   private boolean      _isInModifyTour;
+
+   public ActionAddPhoto(final PhotoGallery photoGallery) {
+
+      super(Messages.Action_TourPhotos_AddPhoto, Action.AS_PUSH_BUTTON);
+
+      _photoGallery = photoGallery;
+   }
+
+   public boolean isInModifyTour() {
+      return _isInModifyTour;
+   }
+
+   @Override
+   public void run() {
+
+      _isInModifyTour = true;
+      {
+         TourManager.tourPhoto_Add(_photoGallery);
+      }
+      _isInModifyTour = false;
    }
 }
