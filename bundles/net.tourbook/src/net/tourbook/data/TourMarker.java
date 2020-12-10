@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import net.tourbook.Messages;
@@ -137,6 +138,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
+   @XmlTransient
    private TourData tourData;
 
    /**
@@ -521,6 +523,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return time;
    }
 
+   @XmlTransient
    public TourData getTourData() {
       return tourData;
    }

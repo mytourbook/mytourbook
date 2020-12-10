@@ -176,7 +176,7 @@ public class TourManager {
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
    //
-   private final static String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
+   private static final String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
    public static final String  GEAR_TEETH_FORMAT                               = "%2d:%2d";                                                          //$NON-NLS-1$
    public static final String  GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - %1.2f";                                     //$NON-NLS-1$
    //
@@ -236,12 +236,12 @@ public class TourManager {
          GRAPH_TOUR_COMPARE
    };
 
-   private final static IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
 
    private static TourManager                            _instance;
 
-   private final static StringBuilder                    _sbFormatter                      = new StringBuilder();
-   private final static Formatter                        _formatter                        = new Formatter(_sbFormatter);
+   private static final StringBuilder                    _sbFormatter                      = new StringBuilder();
+   private static final Formatter                        _formatter                        = new Formatter(_sbFormatter);
 
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
@@ -846,7 +846,7 @@ public class TourManager {
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
       final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
       final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
-      final ArrayList<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
+      final List<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
       final int[] allTourPausesNumbers = joinedTourData.multipleNumberOfPauses = new int[numTours];
       final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
 
@@ -1827,12 +1827,12 @@ public class TourManager {
       boolean isLongDuration = false;
 
       // create a unique key for all tours
-      final long newOverlayKey[] = { 0 };
-      final int tourIndex[] = { 0 };
-      final int loadCounter[] = { 0 };
+      final long[] newOverlayKey = { 0 };
+      final int[] tourIndex = { 0 };
+      final int[] loadCounter = { 0 };
       final int numTourIds = allTourIds.size();
 
-      for (; tourIndex[0] < numTourIds;) {
+      while (tourIndex[0] < numTourIds) {
 
          final Long tourId = allTourIds.get(tourIndex[0]);
          loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
@@ -1861,7 +1861,7 @@ public class TourManager {
 
                   monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
-                  for (; tourIndex[0] < numTourIds;) {
+                  while (tourIndex[0] < numTourIds) {
 
                      monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
                            ++loadCounter[0],
@@ -1923,7 +1923,7 @@ public class TourManager {
     */
    public static TourDataEditorView openTourEditor(final boolean isActive) {
 
-      final TourDataEditorView tourDataEditorView[] = { null };
+      final TourDataEditorView[] tourDataEditorView = { null };
 
       /*
        * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -2443,7 +2443,7 @@ public class TourManager {
 
       final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification);
 
-      if (savedTourData == null || savedTourData.isEmpty()) {
+      if (savedTourData.isEmpty()) {
          return null;
       } else {
          return savedTourData.get(0);
@@ -2763,7 +2763,7 @@ public class TourManager {
 
    /**
     * Add/save selected photos in it's tours.
-    * 
+    *
     * @param photoGallery
     */
    public static void tourPhoto_Add(final PhotoGallery photoGallery) {
@@ -2867,7 +2867,7 @@ public class TourManager {
 
    /**
     * Remove selected photos from it's tours.
-    * 
+    *
     * @param photoGallery
     */
    public static void tourPhoto_Remove(final PhotoGallery photoGallery) {
