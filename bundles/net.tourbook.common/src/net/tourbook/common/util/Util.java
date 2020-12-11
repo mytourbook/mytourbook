@@ -1787,7 +1787,7 @@ public class Util {
    public static void logSimpleMessage(final Class<?> clazz,
                                        final String message) {
 
-      System.out.println(String.format("%s [%s] %s",
+      System.out.println(String.format("%s [%s] %s", //$NON-NLS-1$
             UI.timeStampNano(),
             clazz.getSimpleName(),
             message));
