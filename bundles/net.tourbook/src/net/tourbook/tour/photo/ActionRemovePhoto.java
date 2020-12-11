@@ -29,7 +29,7 @@ class ActionRemovePhoto extends Action {
 
    public ActionRemovePhoto(final PhotoGallery photoGallery) {
 
-      super(Messages.Action_TourPhotos_RemovePhoto, Action.AS_PUSH_BUTTON);
+      super(Messages.Action_PhotosAndTours_RemovePhoto, Action.AS_PUSH_BUTTON);
 
       _photoGallery = photoGallery;
 

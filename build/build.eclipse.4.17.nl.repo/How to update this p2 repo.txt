@@ -15,4 +15,4 @@
          BabelLanguagePack-eclipse-it_4.14.0.v20200113020001.zip
          BabelLanguagePack-eclipse-nl_4.14.0.v20200113020001.zip
 
-   - Export "feature.net.tourbook.ext.eclipse.nl" as deployable feature into this folder "build\build.eclipse.4.14.nl.repo"
+   - Export "feature.net.tourbook.ext.eclipse.nl" as deployable feature into this folder "build\build.eclipse.4.17.nl.repo"

@@ -35,10 +35,12 @@ public class Messages extends NLS {
    public static String        Action_MarkerFilter_WithGPS_Tooltip;
    public static String        Action_MarkerFilter_WithoutGPS_Tooltip;
 
+   public static String        Action_PhotosAndTours_AddPhoto;
    public static String        Action_PhotosAndTours_FilterNoTours_Tooltip;
    public static String        Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
    public static String        Action_PhotosAndTours_FilterPhotos_Tooltip;
-   public static String        Action_PhotosAndTours_SaveAllPhotosInTour;
+   public static String        Action_PhotosAndTours_RemovePhoto;
+   public static String        Action_PhotosAndTours_SaveAllPhotos;
 
    public static String        Action_ToolTip_Hide;
    public static String        Action_ToolTip_SetDefaults;
@@ -417,9 +419,6 @@ public class Messages extends NLS {
    public static String        Action_TagCategory_Edit;
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;
-
-   public static String        Action_TourPhotos_AddPhoto;
-   public static String        Action_TourPhotos_RemovePhoto;
 
    public static String        Action_TourType_ModifyTourTypeFilter;
 

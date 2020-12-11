@@ -25,7 +25,7 @@ public class ActionSavePhotosInTour extends Action {
 
    public ActionSavePhotosInTour(final TourPhotoLinkView photosAndToursView) {
 
-      super(Messages.Action_PhotosAndTours_SaveAllPhotosInTour, AS_PUSH_BUTTON);
+      super(Messages.Action_PhotosAndTours_SaveAllPhotos, AS_PUSH_BUTTON);
 
       _photosAndToursView = photosAndToursView;
    }
