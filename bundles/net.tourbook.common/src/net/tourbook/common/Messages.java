@@ -269,8 +269,6 @@ public class Messages extends NLS {
    public static String        Pref_System_Label_Weight_Info;
    public static String        Pref_System_Option_BodyWeight_Kilogram;
    public static String        Pref_System_Option_BodyWeight_Pound;
-   public static String        Pref_System_Option_DayTime_24_Hours;
-   public static String        Pref_System_Option_DayTime_AM_PM;
    public static String        Pref_System_Option_Distance_Kilometer;
    public static String        Pref_System_Option_Distance_Mile;
    public static String        Pref_System_Option_Distance_NauticMile;
