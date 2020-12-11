@@ -28,7 +28,7 @@ class ActionAddPhoto extends Action {
 
    public ActionAddPhoto(final PhotoGallery photoGallery) {
 
-      super(Messages.Action_TourPhotos_AddPhoto, Action.AS_PUSH_BUTTON);
+      super(Messages.Action_PhotosAndTours_AddPhoto, Action.AS_PUSH_BUTTON);
 
       _photoGallery = photoGallery;
    }
