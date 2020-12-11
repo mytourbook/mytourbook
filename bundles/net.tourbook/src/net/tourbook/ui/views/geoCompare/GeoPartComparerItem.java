@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 
 /**
- * Contains data for one comapred tour
+ * Contains data for one compared tour
  */
 public class GeoPartComparerItem {
 
@@ -47,14 +47,16 @@ public class GeoPartComparerItem {
    long           minDiffValue = -2;
 
    float          avgPulse;
+   float          avgPace;
    float          avgSpeed;
    double         avgAltimeter;
 
    ZonedDateTime  tourStartTime;
    long           tourStartTimeMS;
 
+   int            elapsedTime;
+   long           recordedTime;
    long           movingTime;
-   int            recordingTime;
    float          distance;
 
    /**

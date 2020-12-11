@@ -111,18 +111,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-   public static final String     ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
+   public static final String  ID                         = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
-   /**
-    * On Linux an async selection event is fired since e4
-    */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";           //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";          //$NON-NLS-1$
 
    public static final int        HEART_BEAT_MIN                      = 10;
    public static final int        HEART_BEAT_MAX                      = 300;
@@ -131,14 +126,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";              //$NON-NLS-1$
 
    /**
     * Id to indicate that the person's information should be displayed for the active person when
     * the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";    //$NON-NLS-1$
 
    private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
    private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
@@ -160,9 +155,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
    }
-
-   private final boolean             _isOSX                     = net.tourbook.common.UI.IS_OSX;
-   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
 
    private SelectionListener         _defaultSelectionListener;
    private MouseWheelListener        _defaultMouseWheelListener;
@@ -280,7 +272,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       if (data instanceof Boolean) {
 
          final Boolean isCreatePerson = (Boolean) data;
-         if (isCreatePerson && _people.size() == 0) {
+         if (isCreatePerson && _people.isEmpty()) {
 
             // this is a request, to create a new person
 
@@ -778,13 +770,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                  return;
-               }
-
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+               if (UI.isLinuxAsyncEvent(e.widget)) {
                   return;
                }
 
@@ -904,7 +890,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          _spinnerHeightInches = new Spinner(containerHeight, SWT.BORDER);
 
-         if (UI.UNIT_IS_METRIC) { // Metric units
+         if (UI.UNIT_IS_ELEVATION_METER) {
+
+            // Metric units
+
             _spinnerHeight.setDigits(2);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(300); // 3.00 m
@@ -912,7 +901,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _spinnerHeightInches.setVisible(false);
 
             label.setText(UI.UNIT_METER);
-         } else { // Imperial units
+
+         } else {
+
+            // Imperial units
+
             _spinnerHeight.setDigits(0);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(10);
@@ -1143,7 +1136,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
       label.dispose();
 
-      final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
+      final int comboWidth = (int) (UI.IS_OSX || UI.IS_LINUX ? comboSize.x * 1.3 : comboSize.x);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -1240,7 +1233,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       {
          final ArrayList<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
 
-         if (hrZones.size() == 0) {
+         if (hrZones.isEmpty()) {
             // hr zones are not available, show info
             createUI_81_HrZone_Info(innerContainer);
          } else {
@@ -1604,7 +1597,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
       tc = tvc.getColumn();
 
-      if (UI.UNIT_IS_METRIC) {
+      if (UI.UNIT_IS_ELEVATION_METER) {
          tc.setText(Messages.Pref_People_Column_height);
       } else {
          tc.setText(UI.UNIT_HEIGHT_FT + UI.DASH + UI.UNIT_HEIGHT_IN);
@@ -1614,7 +1607,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          @Override
          public void update(final ViewerCell cell) {
 
-            if (UI.UNIT_IS_METRIC) {
+            if (UI.UNIT_IS_ELEVATION_METER) {
                final float height = ((TourPerson) cell.getElement()).getHeight();
                cell.setText(_nf2.format(height));
             } else {
@@ -2228,7 +2221,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       setErrorMessage(null);
 
-      if (_peopleWithModifiedHrZones.size() == 0) {
+      if (_peopleWithModifiedHrZones.isEmpty()) {
          return true;
       }
 
@@ -2282,8 +2275,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          _txtFirstName.setText(person.getFirstName());
          _txtLastName.setText(person.getLastName());
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+         _dtBirthday.setData(UI.FIX_LINUX_ASYNC_EVENT_2, true);
          _dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
 
          final float bodyWeight = UI.convertBodyWeightFromMetric(person.getWeight());
@@ -2291,7 +2284,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final float bodyHeight = UI.convertBodyHeightFromMetric(person.getHeight());
 
-         if (UI.UNIT_IS_METRIC) {
+         if (UI.UNIT_IS_ELEVATION_METER) {
             _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
          } else {
             _spinnerHeight.setSelection((int) Math.floor(bodyHeight / 12));

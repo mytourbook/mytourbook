@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
@@ -86,6 +87,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    static final int                DEFAULT_TOUR_TOOLTIP_DELAY      = 100;                                                       // ms
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView");               //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
@@ -96,6 +98,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private ISelectionListener      _selectionListener;
    private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
 
    private ActionCalendarOptions   _actionCalendarOptions;
@@ -195,12 +198,25 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
                refreshCalendar();
             }
          }
+      };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               refreshCalendar();
+            }
+         }
       };
 
       // add prop listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    // create and register our selection listener
@@ -322,7 +338,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       }
 
       /*
-       * Today
+       * Go to today
        */
       {
          _actionGotoToday = new Action() {
@@ -332,7 +348,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
+         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Today));
       }
    }
 
@@ -350,7 +366,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
       createUI(parent);
 
       createActions();
-      fillActions();
+      fillActionBars();
 
       addSelectionListener();
 
@@ -439,12 +455,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       getSite().getPage().removePostSelectionListener(_selectionListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
 
-   private void fillActions() {
+   private void fillActionBars() {
 
       final IActionBars bars = getViewSite().getActionBars();
 
@@ -458,6 +476,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       toolbarMrg.add(yearMonthItem);
 
+      toolbarMrg.add(_actionGotoToday);
       toolbarMrg.add(_actionSetLinked);
       toolbarMrg.add(_actionTourInfo);
       toolbarMrg.add(_actionCalendarOptions);
@@ -643,7 +662,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          _calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
       }
 
-      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
+      final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, Long.valueOf(-1));
       _calendarGraph.setSelectionTourId(selectedTourId);
 
       // tooltip

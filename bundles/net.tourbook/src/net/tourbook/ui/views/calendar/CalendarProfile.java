@@ -21,6 +21,7 @@ import java.util.Locale;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
@@ -29,8 +30,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class CalendarProfile implements Cloneable {
 
-   private static int                _cloneCounter;
-   private static final boolean      _isLogCalendarProfile = System.getProperty("logCalendarProfile") != null; //$NON-NLS-1$
+   private static int           _cloneCounter;
+
+   private static final String  SYS_PROP__LOG_CALENDAR_PROFILE = "logCalendarProfile";                                      //$NON-NLS-1$
+   private static final boolean _isLogCalendarProfile          = System.getProperty(SYS_PROP__LOG_CALENDAR_PROFILE) != null;
+
+   static {
+
+      if (_isLogCalendarProfile) {
+
+         Util.logSystemProperty_IsEnabled(CalendarProfile.class,
+               SYS_PROP__LOG_CALENDAR_PROFILE,
+               "Calendar profiles are logged"); //$NON-NLS-1$
+      }
+   }
 
    /**
     * <b>VERY IMPORTANT</b>
@@ -39,7 +52,7 @@ public class CalendarProfile implements Cloneable {
     * <p>
     * -> this is not a float !!!
     */
-   private final static NumberFormat _nf1                  = NumberFormat.getNumberInstance(Locale.US);
+   private final static NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
 
    static {
 
@@ -464,16 +477,24 @@ public class CalendarProfile implements Cloneable {
             formatterID = FormatterID.SPEED.name();
             break;
 
-         case TIME_MOVING:
-            formatterID = FormatterID.TIME_MOVING.name();
+         case TIME_ELAPSED:
+            formatterID = FormatterID.TIME_ELAPSED.name();
+            break;
+
+         case TIME_RECORDED:
+            formatterID = FormatterID.TIME_RECORDED.name();
             break;
 
          case TIME_PAUSED:
             formatterID = FormatterID.TIME_PAUSED.name();
             break;
 
-         case TIME_RECORDING:
-            formatterID = FormatterID.TIME_RECORDING.name();
+         case TIME_MOVING:
+            formatterID = FormatterID.TIME_MOVING.name();
+            break;
+
+         case TIME_BREAK:
+            formatterID = FormatterID.TIME_BREAK.name();
             break;
 
          case TOUR_DESCRIPTION:
@@ -515,7 +536,7 @@ public class CalendarProfile implements Cloneable {
 
    private String dump_RGB(final RGB rgb) {
 
-      return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
    @Override

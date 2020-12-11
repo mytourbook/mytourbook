@@ -1395,7 +1395,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             if (markerDistance == -1) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(_nf3.format(markerDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+               cell.setText(_nf3.format(markerDistance / (1000 * UI.UNIT_VALUE_DISTANCE)));
             }
 
             if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {

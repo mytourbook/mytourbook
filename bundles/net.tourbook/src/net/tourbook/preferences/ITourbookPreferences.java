@@ -24,35 +24,35 @@ import net.tourbook.ui.UI;
 public interface ITourbookPreferences {
 
    /*
-    * dummy field used by field editors so they don't assert
+    * Dummy field used by field editors so they don't assert
     */
    public static final String DUMMY_FIELD   = UI.EMPTY_STRING;
 
    public static final String GENERAL_NOTES = "GENERAL_NOTES"; //$NON-NLS-1$
 
    /*
-    * system
+    * System
     */
    public static final String TOUR_CACHE_SIZE      = "TourCacheSize";        //$NON-NLS-1$
    public static final String CLEAR_TOURDATA_CACHE = "CLEAR_TOURDATA_CACHE"; //$NON-NLS-1$
 
    /*
-    * tour database
+    * Tour database
     */
    public static final String TOUR_DATABASE_IS_DERBY_EMBEDDED = "TOUR_DATABASE_IS_DERBY_EMBEDDED"; //$NON-NLS-1$
 
    /*
-    * notifications
+    * Notifications
     */
    public static final String HR_ZONES_ARE_MODIFIED = "HrZonesAreModified"; //$NON-NLS-1$
 
    /*
-    * statistic provider
+    * Statistic provider
     */
    public static final String STATISTICS_STATISTIC_PROVIDER_IDS = "statistics.provider.ids"; //$NON-NLS-1$
 
    /*
-    * statistic: number frequency - where the units can be set in the preferences
+    * Statistic: Number frequency - where the units can be set in the preferences
     */
    public static final String STAT_DISTANCE_NUMBERS   = "statistic.distance.numbers";  //$NON-NLS-1$
    public static final String STAT_DISTANCE_LOW_VALUE = "statistic.distance.lowvalue"; //$NON-NLS-1$
@@ -69,37 +69,47 @@ public interface ITourbookPreferences {
    /*
     * Statistic summary
     */
-   public static final String STAT_DAY_DURATION_TIME             = "STAT_DAY_DURATION_TIME";             //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_ALTITUDE          = "STAT_DAY_IS_SHOW_ALTITUDE";          //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_AVG_PACE          = "STAT_DAY_IS_SHOW_AVG_PACE";          //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_AVG_SPEED         = "STAT_DAY_IS_SHOW_AVG_SPEED";         //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_DISTANCE          = "STAT_DAY_IS_SHOW_DISTANCE";          //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_DURATION          = "STAT_DAY_IS_SHOW_DURATION";          //$NON-NLS-1$
-   public static final String STAT_DAY_IS_SHOW_YEAR_SEPARATOR    = "STAT_DAY_IS_SHOW_YEAR_SEPARATOR";    //$NON-NLS-1$
+   public static final String STAT_DAY_DURATION_TIME                           = "STAT_DAY_DURATION_TIME";                           //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_ALTITUDE                        = "STAT_DAY_IS_SHOW_ALTITUDE";                        //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_AVG_PACE                        = "STAT_DAY_IS_SHOW_AVG_PACE";                        //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_AVG_SPEED                       = "STAT_DAY_IS_SHOW_AVG_SPEED";                       //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_DISTANCE                        = "STAT_DAY_IS_SHOW_DISTANCE";                        //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_DURATION                        = "STAT_DAY_IS_SHOW_DURATION";                        //$NON-NLS-1$
+   public static final String STAT_DAY_IS_SHOW_YEAR_SEPARATOR                  = "STAT_DAY_IS_SHOW_YEAR_SEPARATOR";                  //$NON-NLS-1$
 
-   public static final String STAT_WEEK_DURATION_TIME            = "STAT_WEEK_DURATION_TIME";            //$NON-NLS-1$
-   public static final String STAT_WEEK_CHART_TYPE               = "STAT_WEEK_CHART_TYPE";               //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_ALTITUDE         = "STAT_WEEK_IS_SHOW_ALTITUDE";         //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_DISTANCE         = "STAT_WEEK_IS_SHOW_DISTANCE";         //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_DURATION         = "STAT_WEEK_IS_SHOW_DURATION";         //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS  = "STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS";  //$NON-NLS-1$
-   public static final String STAT_WEEK_IS_SHOW_YEAR_SEPARATOR   = "STAT_WEEK_IS_SHOW_YEAR_SEPARATOR";   //$NON-NLS-1$
+   public static final String STAT_WEEK_DURATION_TIME                          = "STAT_WEEK_DURATION_TIME";                          //$NON-NLS-1$
+   public static final String STAT_WEEK_CHART_TYPE                             = "STAT_WEEK_CHART_TYPE";                             //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_ALTITUDE                       = "STAT_WEEK_IS_SHOW_ALTITUDE";                       //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_DISTANCE                       = "STAT_WEEK_IS_SHOW_DISTANCE";                       //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_DURATION                       = "STAT_WEEK_IS_SHOW_DURATION";                       //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS                = "STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS";                //$NON-NLS-1$
+   public static final String STAT_WEEK_IS_SHOW_YEAR_SEPARATOR                 = "STAT_WEEK_IS_SHOW_YEAR_SEPARATOR";                 //$NON-NLS-1$
+   public static final String STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES      = "STAT_WEEK_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";      //$NON-NLS-1$
+   public static final String STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES         = "STAT_WEEK_TOOLTIP_IS_SHOW_SUMMARY_VALUES";         //$NON-NLS-1$
 
-   public static final String STAT_MONTH_DURATION_TIME           = "STAT_MONTH_DURATION_TIME";           //$NON-NLS-1$
-   public static final String STAT_MONTH_CHART_TYPE              = "STAT_MONTH_CHART_TYPE";              //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_ALTITUDE        = "STAT_MONTH_IS_SHOW_ALTITUDE";        //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_DISTANCE        = "STAT_MONTH_IS_SHOW_DISTANCE";        //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_DURATION        = "STAT_MONTH_IS_SHOW_DURATION";        //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS = "STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS"; //$NON-NLS-1$
-   public static final String STAT_MONTH_IS_SHOW_YEAR_SEPARATOR  = "STAT_MONTH_IS_SHOW_YEAR_SEPARATOR";  //$NON-NLS-1$
+   public static final String STAT_MONTH_DURATION_TIME                         = "STAT_MONTH_DURATION_TIME";                         //$NON-NLS-1$
+   public static final String STAT_MONTH_CHART_TYPE                            = "STAT_MONTH_CHART_TYPE";                            //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_ALTITUDE                      = "STAT_MONTH_IS_SHOW_ALTITUDE";                      //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_DISTANCE                      = "STAT_MONTH_IS_SHOW_DISTANCE";                      //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_DURATION                      = "STAT_MONTH_IS_SHOW_DURATION";                      //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS               = "STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS";               //$NON-NLS-1$
+   public static final String STAT_MONTH_IS_SHOW_YEAR_SEPARATOR                = "STAT_MONTH_IS_SHOW_YEAR_SEPARATOR";                //$NON-NLS-1$
+   public static final String STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES     = "STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";     //$NON-NLS-1$
+   public static final String STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES        = "STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES";        //$NON-NLS-1$
 
-   public static final String STAT_YEAR_DURATION_TIME            = "STAT_YEAR_DURATION_TIME";            //$NON-NLS-1$
-   public static final String STAT_YEAR_CHART_TYPE               = "STAT_YEAR_CHART_TYPE";               //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_ALTITUDE         = "STAT_YEAR_IS_SHOW_ALTITUDE";         //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_DISTANCE         = "STAT_YEAR_IS_SHOW_DISTANCE";         //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_DURATION         = "STAT_YEAR_IS_SHOW_DURATION";         //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS  = "STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS";  //$NON-NLS-1$
-   public static final String STAT_YEAR_IS_SHOW_YEAR_SEPARATOR   = "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";   //$NON-NLS-1$
+   public static final String STAT_YEAR_DURATION_TIME                          = "STAT_YEAR_DURATION_TIME";                          //$NON-NLS-1$
+   public static final String STAT_YEAR_CHART_TYPE                             = "STAT_YEAR_CHART_TYPE";                             //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_ALTITUDE                       = "STAT_YEAR_IS_SHOW_ALTITUDE";                       //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_DISTANCE                       = "STAT_YEAR_IS_SHOW_DISTANCE";                       //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_DURATION                       = "STAT_YEAR_IS_SHOW_DURATION";                       //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS                = "STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS";                //$NON-NLS-1$
+   public static final String STAT_YEAR_IS_SHOW_YEAR_SEPARATOR                 = "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";                 //$NON-NLS-1$
+   public static final String STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES      = "STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES";      //$NON-NLS-1$
+   public static final String STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES         = "STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES";         //$NON-NLS-1$
+
+   public static final String STAT_FREQUENCY_DURATION_TIME                     = "STAT_FREQUENCY_DURATION_TIME";                     //$NON-NLS-1$
+   public static final String STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES = "STAT_FREQUENCY_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES"; //$NON-NLS-1$
+   public static final String STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES    = "STAT_FREQUENCY_TOOLTIP_IS_SHOW_SUMMARY_VALUES";    //$NON-NLS-1$
 
    /*
     * Statistic: Training
@@ -131,6 +141,7 @@ public interface ITourbookPreferences {
     */
    public static final String GRAPH_ALL                                  = "graphs.all";                                 //$NON-NLS-1$
    public static final String GRAPH_ANTIALIASING                         = "Graph_Antialiasing";                         //$NON-NLS-1$
+   public static final String GRAPH_ARE_PAUSES_VISIBLE                   = "GRAPH_ARE_PAUSES_VISIBLE";                   //$NON-NLS-1$
    public static final String GRAPH_BACKGROUND_SOURCE                    = "GRAPH_BACKGROUND_SOURCE";                    //$NON-NLS-1$
    public static final String GRAPH_BACKGROUND_STYLE                     = "GRAPH_BACKGROUND_STYLE";                     //$NON-NLS-1$
    public static final String GRAPH_IS_BREAKTIME_VALUES_VISIBLE          = "Graph_IsBreaktimeVisible";                   //$NON-NLS-1$
@@ -355,32 +366,6 @@ public interface ITourbookPreferences {
    public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
 
    /*
-    * measurement system
-    */
-   public static final String MEASUREMENT_SYSTEM                = "system.of.measurement";             //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_SHOW_IN_UI     = "system.of.measurement.show.in.ui";  //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_DISTANCE       = "system.of.measurement.distance";    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_DISTANCE_KM    = "metric.km";                         //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_DISTANCE_MI    = "imperial.mi";                       //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE       = "system.of.measurement.altitude";    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE_M     = "metric.m";                          //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ALTITUDE_FOOT  = "imperial.foot";                     //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_TEMPERATURE    = "system.of.measurement.temperature"; //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_TEMPERATURE_C  = "metric.celcius";                    //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_TEMPTERATURE_F = "metric.fahrenheit";                 //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_ENERGY         = "system.of.energy";                  //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ENERGY_JOULE   = "energy.joule";                      //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_ENERGY_CALORIE = "energy.calorie";                    //$NON-NLS-1$
-
-   public static final String MEASUREMENT_SYSTEM_WEIGHT         = "system.of.weight";                  //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_WEIGHT_KG      = "weight.kilogram";                   //$NON-NLS-1$
-   public static final String MEASUREMENT_SYSTEM_WEIGHT_LBS     = "weight.pound";                      //$NON-NLS-1$
-
-   /*
     * map settings
     */
    public static final String MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING = "map.view.confirmation.show-dim-warning"; //$NON-NLS-1$
@@ -440,19 +425,19 @@ public interface ITourbookPreferences {
     * tour data editor
     */
    public static final String TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR = "tourdata.editor.confirmation.revert-tour"; //$NON-NLS-1$
-   public static final String TOUR_EDITOR_DESCRIPTION_HEIGHT           = "tourdata.editor.description-height";       //$NON-NLS-1$
 
    /*
     * common appearance
     */
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
-   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS       = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
-   public static final String APPEARANCE_SHOW_MEMORY_MONITOR         = "appearance.show-memory-monitor";                    //$NON-NLS-1$
-   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES        = "appearance.NumberOfRecentTourTypes";                //$NON-NLS-1$
+   public static final String APPEARANCE_NUMBER_OF_RECENT_TAGS              = "appearance.number-of-recent-tags";                  //$NON-NLS-1$
+   public static final String APPEARANCE_SHOW_MEMORY_MONITOR                = "appearance.show-memory-monitor";                    //$NON-NLS-1$
+   public static final String APPEARANCE_SHOW_TOUR_TYPE_CONTEXT_MENU        = "appearance.ShowTourTypeContextMenuOnMouseHovering"; //$NON-NLS-1$
 
-   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN        = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
-   public static final String APPEARANCE_IS_TAGGING_ANIMATION        = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
-   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY     = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
+   public static final String APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME = "Appearance.IsPaceAndSpeedFromRecordedTime";         //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_AUTO_OPEN               = "Appearance.IsAutoOpenTagging";                      //$NON-NLS-1$
+   public static final String APPEARANCE_IS_TAGGING_ANIMATION               = "Appearance.IsTaggingAnimation";                     //$NON-NLS-1$
+   public static final String APPEARANCE_TAGGING_AUTO_OPEN_DELAY            = "Appearance.AutoOpenTaggingDelay";                   //$NON-NLS-1$
 
    /*
     * merge tour dialog
@@ -523,19 +508,7 @@ public interface ITourbookPreferences {
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$
 
-   public static final String TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES           = "TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES";          //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TOUR                      = "TOGGLE_STATE_REIMPORT_TOUR";                     //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TOUR_MARKER               = "TOGGLE_STATE_REIMPORT_TOUR_MARKER";              //$NON-NLS-1$
-
-   public static final String TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES           = "TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES";          //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_CADENCE_VALUES            = "TOGGLE_STATE_REIMPORT_CADENCE_VALUES";           //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_GEAR_VALUES               = "TOGGLE_STATE_REIMPORT_GEAR_VALUES";              //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES    = "TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES";   //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES    = "TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES";   //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES   = "TOGGLE_STATE_REIMPORT_RUNNING_DYNAMICS_VALUES";  //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_SWIMMING_VALUES           = "TOGGLE_STATE_REIMPORT_SWIMMING_VALUES";          //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES        = "TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES";       //$NON-NLS-1$
-   public static final String TOGGLE_STATE_REIMPORT_TRAINING_VALUES           = "TOGGLE_STATE_REIMPORT_TRAINING_VALUES";          //$NON-NLS-1$
+   public static final String TOGGLE_STATE_REIMPORT_TOUR_VALUES               = "TOGGLE_STATE_REIMPORT_TOUR_VALUES";              //$NON-NLS-1$
 
    public static final String TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING     = "TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING";    //$NON-NLS-1$
    public static final String TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING      = "TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING";     //$NON-NLS-1$
@@ -611,4 +584,5 @@ public interface ITourbookPreferences {
     */
    public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
    public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
+
 }

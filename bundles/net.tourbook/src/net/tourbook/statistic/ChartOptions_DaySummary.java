@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistic;
+
+import de.byteholder.geoclipse.map.UI;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -46,9 +48,11 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
    private Button _chkShowAvgSpeed;
    private Button _chkShowAvgPace;
 
-   private Button _rdoDuration_BreakTime;
+   private Button _rdoDuration_ElapsedTime;
+   private Button _rdoDuration_RecordedTime;
+   private Button _rdoDuration_PausedTime;
    private Button _rdoDuration_MovingTime;
-   private Button _rdoDuration_RecordingTime;
+   private Button _rdoDuration_BreakTime;
 
    @Override
    public void createUI(final Composite parent) {
@@ -62,25 +66,14 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             .grab(true, false)
             .span(2, 1)
             .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-      {
-         createUI_10_Left(group);
-         createUI_20_Right(group);
-      }
-   }
-
-   private void createUI_10_Left(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          {
             /*
              * Show distance
              */
-            _chkShowDistance = new Button(container, SWT.CHECK);
+            _chkShowDistance = new Button(group, SWT.CHECK);
             _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
             _chkShowDistance.addSelectionListener(_defaultSelectionListener);
          }
@@ -88,7 +81,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show altitude
              */
-            _chkShowAltitude = new Button(container, SWT.CHECK);
+            _chkShowAltitude = new Button(group, SWT.CHECK);
             _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
             _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
          }
@@ -96,14 +89,14 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show time
              */
-            _chkShowDuration = new Button(container, SWT.CHECK);
+            _chkShowDuration = new Button(group, SWT.CHECK);
             _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
-             * Moving, recording + break time
+             * Moving, elapsed + break time
              */
-            final Composite timeContainer = new Composite(container, SWT.NONE);
+            final Composite timeContainer = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(16, 0)
@@ -112,11 +105,27 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             {
                {
                   /*
-                   * Recording time
+                   * Elapsed time
                    */
-                  _rdoDuration_RecordingTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_RecordingTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordingTime);
-                  _rdoDuration_RecordingTime.addSelectionListener(_defaultSelectionListener);
+                  _rdoDuration_ElapsedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_ElapsedTime.setText(Messages.Pref_Statistic_Radio_Duration_ElapsedTime);
+                  _rdoDuration_ElapsedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Recorded time
+                   */
+                  _rdoDuration_RecordedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_RecordedTime.setText(Messages.Pref_Statistic_Radio_Duration_RecordedTime);
+                  _rdoDuration_RecordedTime.addSelectionListener(_defaultSelectionListener);
+               }
+               {
+                  /*
+                   * Paused time
+                   */
+                  _rdoDuration_PausedTime = new Button(timeContainer, SWT.RADIO);
+                  _rdoDuration_PausedTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_PausedTime.addSelectionListener(_defaultSelectionListener);
                }
                {
                   /*
@@ -131,25 +140,16 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                    * Break time
                    */
                   _rdoDuration_BreakTime = new Button(timeContainer, SWT.RADIO);
-                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_PausedTime);
+                  _rdoDuration_BreakTime.setText(Messages.Pref_Statistic_Radio_Duration_BreakTime);
                   _rdoDuration_BreakTime.addSelectionListener(_defaultSelectionListener);
                }
             }
          }
-      }
-   }
-
-   private void createUI_20_Right(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
          {
             /*
              * Show avg speed
              */
-            _chkShowAvgSpeed = new Button(container, SWT.CHECK);
+            _chkShowAvgSpeed = new Button(group, SWT.CHECK);
             _chkShowAvgSpeed.setText(Messages.Pref_Statistic_Checkbox_AvgSpeed);
             _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
          }
@@ -157,7 +157,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show avg pace
              */
-            _chkShowAvgPace = new Button(container, SWT.CHECK);
+            _chkShowAvgPace = new Button(group, SWT.CHECK);
             _chkShowAvgPace.setText(Messages.Pref_Statistic_Checkbox_AvgPace);
             _chkShowAvgPace.addSelectionListener(_defaultSelectionListener);
          }
@@ -170,7 +170,9 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
 
       _rdoDuration_MovingTime.setEnabled(isShowDuration);
       _rdoDuration_BreakTime.setEnabled(isShowDuration);
-      _rdoDuration_RecordingTime.setEnabled(isShowDuration);
+      _rdoDuration_ElapsedTime.setEnabled(isShowDuration);
+      _rdoDuration_RecordedTime.setEnabled(isShowDuration);
+      _rdoDuration_PausedTime.setEnabled(isShowDuration);
    }
 
    private void initUI(final Composite parent) {
@@ -212,7 +214,9 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -231,7 +235,9 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             DurationTime.MOVING);
       _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
       _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
+      _rdoDuration_ElapsedTime.setSelection(durationTime.equals(DurationTime.ELAPSED));
+      _rdoDuration_RecordedTime.setSelection(durationTime.equals(DurationTime.RECORDED));
+      _rdoDuration_PausedTime.setSelection(durationTime.equals(DurationTime.PAUSED));
 
       enableControls();
    }
@@ -245,14 +251,20 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
       _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
       _prefStore.setValue(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, _chkShowDuration.getSelection());
 
-      _prefStore.setValue(ITourbookPreferences.STAT_DAY_DURATION_TIME,
+      String selectedDurationType = UI.EMPTY_STRING;
 
-            _rdoDuration_BreakTime.getSelection()
-                  ? DurationTime.BREAK.name()
+      if (_rdoDuration_BreakTime.getSelection()) {
+         selectedDurationType = DurationTime.BREAK.name();
+      } else if (_rdoDuration_MovingTime.getSelection()) {
+         selectedDurationType = DurationTime.MOVING.name();
+      } else if (_rdoDuration_RecordedTime.getSelection()) {
+         selectedDurationType = DurationTime.RECORDED.name();
+      } else if (_rdoDuration_PausedTime.getSelection()) {
+         selectedDurationType = DurationTime.PAUSED.name();
+      } else if (_rdoDuration_ElapsedTime.getSelection()) {
+         selectedDurationType = DurationTime.ELAPSED.name();
+      }
 
-                  : _rdoDuration_MovingTime.getSelection()
-                        ? DurationTime.MOVING.name()
-
-                        : DurationTime.RECORDING.name());
+      _prefStore.setValue(ITourbookPreferences.STAT_DAY_DURATION_TIME, selectedDurationType);
    }
 }

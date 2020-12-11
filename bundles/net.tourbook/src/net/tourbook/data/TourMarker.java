@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,15 +37,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.swt.graphics.Rectangle;
-
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * A tour marker has a position within a tour.
@@ -64,6 +67,7 @@ import net.tourbook.ui.tourChart.ChartLabel;
 @XmlType(name = "TourMarker")
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
 
    public static final int      DB_LENGTH_URL_TEXT    = 1024;
@@ -93,18 +97,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       };
    }
 
-   public final static int            LABEL_POS_VERTICAL_ABOVE_GRAPH            = 0;
-   public final static int            LABEL_POS_VERTICAL_BELOW_GRAPH            = 1;
-   public final static int            LABEL_POS_VERTICAL_TOP_CHART              = 2;
-   public final static int            LABEL_POS_VERTICAL_BOTTOM_CHART           = 3;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT     = 4;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED = 5;
-   public final static int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT    = 6;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT     = 7;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED = 8;
-   public final static int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT    = 9;
-   public final static int            LABEL_POS_HORIZONTAL_GRAPH_LEFT           = 10;
-   public final static int            LABEL_POS_HORIZONTAL_GRAPH_RIGHT          = 11;
+   public static final int            LABEL_POS_VERTICAL_ABOVE_GRAPH            = 0;
+   public static final int            LABEL_POS_VERTICAL_BELOW_GRAPH            = 1;
+   public static final int            LABEL_POS_VERTICAL_TOP_CHART              = 2;
+   public static final int            LABEL_POS_VERTICAL_BOTTOM_CHART           = 3;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT     = 4;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED = 5;
+   public static final int            LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT    = 6;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT     = 7;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED = 8;
+   public static final int            LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT    = 9;
+   public static final int            LABEL_POS_HORIZONTAL_GRAPH_LEFT           = 10;
+   public static final int            LABEL_POS_HORIZONTAL_GRAPH_RIGHT          = 11;
 
    /**
     *

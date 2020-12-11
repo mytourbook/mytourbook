@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,12 +38,13 @@ public class TourPainterConfiguration {
     */
    private Set<GeoPosition>                _tourBounds;
 
-   private int                             _synchTourZoomLevel;
+   private int                             _zoomLevelAdjustment;
 
    private IMapColorProvider               _mapColorProvider;
 
    boolean                                 isShowStartEndInMap;
    boolean                                 isShowTourMarker;
+   boolean                                 isShowTourPauses;
    boolean                                 isShowWayPoints;
    boolean                                 isPhotoVisible;
    boolean                                 isTourVisible;
@@ -73,10 +74,6 @@ public class TourPainterConfiguration {
       return _photos;
    }
 
-   public int getSynchTourZoomLevel() {
-      return _synchTourZoomLevel;
-   }
-
    /**
     * @return Returns the tour bounds or <code>null</code> when a tour is not set
     */
@@ -89,6 +86,10 @@ public class TourPainterConfiguration {
     */
    public ArrayList<TourData> getTourData() {
       return _tourDataList;
+   }
+
+   public int getZoomLevelAdjustment() {
+      return _zoomLevelAdjustment;
    }
 
    /**
@@ -126,8 +127,8 @@ public class TourPainterConfiguration {
       isLinkPhotoDisplayed = isLinkPhoto;
    }
 
-   public void setSynchZoomLevelAdjustment(final int zoomLevel) {
-      _synchTourZoomLevel = zoomLevel;
+   public void setZoomLevelAdjustment(final int zoomLevel) {
+      _zoomLevelAdjustment = zoomLevel;
    }
 
    public void setTourBounds(final Set<GeoPosition> mapPositions) {

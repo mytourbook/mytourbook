@@ -63,9 +63,6 @@ ${button}.addSelectionListener(new SelectionAdapter() {
 ${imp:import(org.eclipse.swt.SWT, org.eclipse.swt.events.SelectionAdapter, org.eclipse.swt.events.SelectionEvent)}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="new Button" enabled="true" name="Button2">${buttonType:newType(org.eclipse.swt.widgets.Button)} ${button:newName(org.eclipse.swt.widgets.Button)}= new ${buttonType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.PUSH, SWT.TOGGLE, SWT.RADIO, SWT.CHECK, SWT.FLAT)});&#13;
 GridDataFactory.fillDefaults().applyTo(${button});&#13;
 ${button}.setText(${word_selection}${});&#13;
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="new Button" enabled="true" name="Button2">${buttonType:newType(org.eclipse.swt.widgets.Button)} ${button:newName(org.eclipse.swt.widgets.Button)}= new ${buttonType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.PUSH, SWT.TOGGLE, SWT.RADIO, SWT.CHECK, SWT.FLAT)});&#13;
-GridDataFactory.fillDefaults().applyTo(${button});&#13;
-${button}.setText(${word_selection}${});&#13;
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="e4-members" deleted="false" description="Creates CanExecute method" enabled="true" id="org.eclipse.e4.tools.jdt.templates.canexecute" name="CanExecute">@CanExecute
 public boolean canExecute() {
 	return true;
@@ -84,14 +81,9 @@ GridDataFactory.fillDefaults().grab(true, false).applyTo(container);&#13;
 GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);&#13;
 {&#13;
 	${cursor}		&#13;
-}</template><template autoinsert="true" context="java-statements" deleted="false" description="creates a composite container" enabled="true" name="container">Composite container = new Composite(parent, SWT.NONE);&#13;
-GridDataFactory.fillDefaults().grab(true, false).applyTo(container);&#13;
-GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);&#13;
-{&#13;
-	${cursor}		&#13;
 }</template><template autoinsert="false" context="swt-statements" deleted="false" description="new DateTime" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.datetime" name="DateTime">${dateType:newType(org.eclipse.swt.widgets.DateTime)} ${dateTime:newName(org.eclipse.swt.widgets.DateTime)}= new ${dateType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link('SWT.CALENDAR | SWT.SHORT', 'SWT.CALENDAR | SWT.MEDIUM', 'SWT.CALENDAR | SWT.LONG', 'SWT.TIME | SWT.SHORT', 'SWT.TIME | SWT.MEDIUM', 'SWT.TIME | SWT.LONG', 'SWT.DATE | SWT.SHORT', 'SWT.DATE | SWT.MEDIUM', 'SWT.DATE | SWT.LONG')});
 ${dateTime}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="SWT.DEFAULT" enabled="true" name="default">SWT.DEFAULT</template><template autoinsert="true" context="java" deleted="false" description="SWT.DEFAULT" enabled="true" name="default">SWT.DEFAULT</template><template autoinsert="false" context="java-statements" deleted="false" description="do while statement" enabled="true" id="org.eclipse.jdt.ui.templates.do" name="do">do {
+${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="SWT.DEFAULT" enabled="true" name="default">SWT.DEFAULT</template><template autoinsert="false" context="java-statements" deleted="false" description="do while statement" enabled="true" id="org.eclipse.jdt.ui.templates.do" name="do">do {
 	${line_selection}${cursor}
 } while (${condition:var(boolean)});</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a do-while loop" enabled="true" id="org.eclipse.jdt.postfixcompletion.dowhile" name="dowhile">do {&#13;
 	${cursor}&#13;
@@ -141,7 +133,6 @@ ${imp:import(org.eclipse.e4.ui.di.Focus)}
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an indexed for statement which uses the given integer as upper bound" enabled="true" id="org.eclipse.jdt.postfixcompletion.foriub" name="foriub">for (int ${index} = 0; i &lt; ${i:inner_expression(int)}; ${index}++) {&#13;
 	${cursor}&#13;
 }</template><template autoinsert="true" context="java" deleted="false" description="Set formatting ON/OFF" enabled="true" name="formatting">// SET_FORMATTING_OFF&#13;
-// SET_FORMATTING_ON</template><template autoinsert="true" context="java" deleted="false" description="Set formatting ON/OFF" enabled="true" name="formatting">// SET_FORMATTING_OFF&#13;
 // SET_FORMATTING_ON</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a for statement which iterates over an array in reverse order" enabled="true" id="org.eclipse.jdt.postfixcompletion.forr" name="forr">for (int ${index} = ${i:inner_expression(array)}.length - 1; i &gt;= 0; ${index}--) {&#13;
 	${cursor}&#13;
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an indexed for statement which uses the given integer - 1 as starting value (counting backwards)" enabled="true" id="org.eclipse.jdt.postfixcompletion.forrlb" name="forrlb">for (int ${index} = ${i:inner_expression(int)} - 1; i &gt;= 0 ; ${index}--) {&#13;
@@ -169,12 +160,8 @@ ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="fals
 	
 }</template><template autoinsert="true" context="java-statements" deleted="false" description="if not null" enabled="true" name="ifnn">if (${var} != null) {&#13;
 	${cursor}&#13;
-}</template><template autoinsert="true" context="java-statements" deleted="false" description="if not null" enabled="true" name="ifnn">if (${var} != null) {&#13;
-	${cursor}&#13;
 }</template><template autoinsert="false" context="java-statements" deleted="false" description="if statement checking for not null" enabled="true" id="org.eclipse.jdt.ui.templates.ifnotnull" name="ifNotNull">if (${name:var} != null) {
 	${cursor}
-}</template><template autoinsert="true" context="java-statements" deleted="false" description="if null" enabled="true" name="ifnull">if (${var} == null) {&#13;
-	${cursor}&#13;
 }</template><template autoinsert="true" context="java-statements" deleted="false" description="if null" enabled="true" name="ifnull">if (${var} == null) {&#13;
 	${cursor}&#13;
 }</template><template autoinsert="false" context="java-statements" deleted="false" description="if statement checking for null" enabled="true" id="org.eclipse.jdt.ui.templates.ifnull" name="ifNull">if (${name:var} == null) {
@@ -209,15 +196,6 @@ ${label}.setLayoutData(new ${type:newType(org.eclipse.swt.layout.GridData)}(SWT.
 ${label}.setText(${word_selection}${});
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 center">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
 GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(${label});&#13;
-${label}.setText(${word_selection}${});&#13;
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 center">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
-GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(${label});&#13;
-${label}.setText(${word_selection}${});&#13;
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 fill">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
-GridDataFactory.fillDefaults().applyTo(${label});&#13;
-${label}.setText(${word_selection}${});&#13;
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 fill">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
-GridDataFactory.fillDefaults().applyTo(${label});&#13;
 ${label}.setText(${word_selection}${});&#13;
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 fill">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
 GridDataFactory.fillDefaults().applyTo(${label});&#13;
@@ -262,24 +240,6 @@ LOCK.lock();&#13;
 		_LOCK.unlock();&#13;
 	}&#13;
 }&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="lock">private static final ReentrantLock LOCK = new ReentrantLock();&#13;
-&#13;
-LOCK.lock();&#13;
-{&#13;
-	try {&#13;
-&#13;
-		// check again, field must be volatile to work correctly&#13;
-		if (${field} != null) {&#13;
-			return ${field};&#13;
-		}&#13;
-&#13;
-&#13;
-	} finally {&#13;
-		_LOCK.unlock();&#13;
-	}&#13;
-}&#13;
-</template><template autoinsert="true" context="java-statements" deleted="false" description="log to system out" enabled="true" name="log">Util.log(${word_selection}${});${cursor}&#13;
-// ${todo} remove Util.log()&#13;
 </template><template autoinsert="true" context="java-statements" deleted="false" description="log to system out" enabled="true" name="log">Util.log(${word_selection}${});${cursor}&#13;
 // ${todo} remove Util.log()&#13;
 </template><template autoinsert="false" context="java-members" deleted="false" description="main method" enabled="true" id="org.eclipse.jdt.ui.templates.main" name="main">public static void main(String[] args) {
@@ -296,13 +256,13 @@ while (!${shell}.isDisposed()) {
 	if (!${display}.readAndDispatch ()) 
 		${display}.sleep();
 }
-${display}.dispose();</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nano">System.nanoTime()</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nano">System.nanoTime()</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nanom in ms">((float) System.nanoTime() / 1000000)</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nanom in ms">((float) System.nanoTime() / 1000000)</template><template autoinsert="true" context="java" deleted="false" description="measure time in ns, display in ms" enabled="true" name="nano sys out">long start = System.nanoTime();&#13;
+${display}.dispose();</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nano">System.nanoTime()</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="nanom in ms">((float) System.nanoTime() / 1000000)</template><template autoinsert="true" context="java" deleted="false" description="measure time in ns, display in ms" enabled="true" name="nano sys out">long start = System.nanoTime();&#13;
+&#13;
+&#13;
+long end = System.nanoTime();&#13;
+&#13;
 System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")&#13;
-				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));&#13;
-// TODO remove SYSTEM.OUT.PRINTLN&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="measure time in ns, display in ms" enabled="true" name="nano sys out">long start = System.nanoTime();&#13;
-System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")&#13;
-				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));&#13;
+				+ (((float) (end - start) / 1000000) + " ms"));&#13;
 // TODO remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="false" context="java" deleted="false" description="create new object" enabled="true" id="org.eclipse.jdt.ui.templates.new" name="new">${type} ${name} = new ${type}(${});</template><template autoinsert="false" context="java-empty" deleted="false" description="create new class" enabled="true" id="org.eclipse.jdt.ui.templates.new_class" name="new_class">${package_declaration}
 
@@ -324,7 +284,7 @@ public record ${class_name}(${cursor})${line_selection} {
 
 }</template><template autoinsert="false" context="java" deleted="false" description="non-externalized string marker" enabled="true" id="org.eclipse.jdt.ui.templates.non-nls" name="nls">//$$NON-NLS-${1}$$</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an if statement and checks if the expression does not resolve to null" enabled="true" id="org.eclipse.jdt.postfixcompletion.nnull" name="nnull">if (${i:inner_expression(java.lang.Object,array)} != null) {&#13;
 	${cursor}&#13;
-}</template><template autoinsert="true" context="java" deleted="false" description="SWT.NONE" enabled="true" name="none">SWT.NONE</template><template autoinsert="true" context="java" deleted="false" description="SWT.NONE" enabled="true" name="none">SWT.NONE</template><template autoinsert="true" context="javadoc" deleted="false" description="&lt;code&gt;null&lt;/code&gt;" enabled="true" id="org.eclipse.jdt.ui.templates.code_tag_null" name="null">&lt;code&gt;null&lt;/code&gt;</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an if statement which checks if expression resolves to null" enabled="true" id="org.eclipse.jdt.postfixcompletion.null" name="null">if (${i:inner_expression(java.lang.Object,array)} == null) {&#13;
+}</template><template autoinsert="true" context="java" deleted="false" description="SWT.NONE" enabled="true" name="none">SWT.NONE</template><template autoinsert="true" context="javadoc" deleted="false" description="&lt;code&gt;null&lt;/code&gt;" enabled="true" id="org.eclipse.jdt.ui.templates.code_tag_null" name="null">&lt;code&gt;null&lt;/code&gt;</template><template autoinsert="true" context="postfix" deleted="false" description="Creates an if statement which checks if expression resolves to null" enabled="true" id="org.eclipse.jdt.postfixcompletion.null" name="null">if (${i:inner_expression(java.lang.Object,array)} == null) {&#13;
 	${cursor}&#13;
 }</template><template autoinsert="false" context="e4-members" deleted="false" description="Creates @PostConstruct method" enabled="true" id="org.eclipse.e4.tools.jdt.templates.init" name="PostConstruct">@PostConstruct
 public void postConstruct(${type:newType(org.eclipse.swt.widgets.Composite)} parent) { 
@@ -346,16 +306,17 @@ ${imp:import(javax.annotation.PreDestroy)}
 	${cursor}
 }</template><template autoinsert="false" context="java-members" deleted="false" description="public static method" enabled="true" id="org.eclipse.jdt.ui.templates.public_static_method" name="public_static_method">public static ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java" deleted="false" description="runnable" enabled="true" id="org.eclipse.jdt.ui.templates.runnable" name="runnable">new Runnable() {
+}</template><template autoinsert="false" context="java" deleted="false" description="runnable BEFORE lambda" enabled="true" id="org.eclipse.jdt.ui.templates.runnable" name="runnable">new Runnable() {
 	public void run() {
 		${line_selection}
 	}
+}</template><template autoinsert="true" context="java" deleted="false" description="runnable WITH lambda" enabled="true" name="runnable">() -&gt; {&#13;
+   ${cursor}&#13;
 }</template><template autoinsert="false" context="swt-statements" deleted="false" description="new SashForm" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.sashform" name="SashForm">${type:newType(org.eclipse.swt.custom.SashForm)} ${sash:newName(org.eclipse.swt.custom.SashForm)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.HORIZONTAL, SWT.VERTICAL)});
 ${sash}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));
 ${imp:import(org.eclipse.swt.SWT)}${cursor}
 
 ${sash}.setWeights(new int[] {1, 1});</template><template autoinsert="true" context="java" deleted="false" description="StringBuilder" enabled="true" name="sb">StringBuilder sb = new StringBuilder();&#13;
-sb.append(${cursor});</template><template autoinsert="true" context="java" deleted="false" description="StringBuilder" enabled="true" name="sb">StringBuilder sb = new StringBuilder();&#13;
 sb.append(${cursor});</template><template autoinsert="false" context="swt-statements" deleted="false" description="new Scale" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.scale" name="Scale">${scaleType:newType(org.eclipse.swt.widgets.Scale)} ${scale:newName(org.eclipse.swt.widgets.Scale)}= new ${scaleType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.HORIZONTAL, SWT.VERTICAL)});
 ${scale}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(BEGINNING, FILL, CENTER, END)}, SWT.${vertical:link(CENTER, TOP, BOTTOM, FILL)}, ${hex:link(false, true)}, ${vex:link(false, true)}));
 ${scale}.setMaximum(${max:link(100)});
@@ -423,14 +384,9 @@ ${imp:import(org.eclipse.swt.SWT, org.eclipse.swt.widgets.Display)}${cursor}</te
 		${cursor}&#13;
 	}&#13;
 });&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="create Display syncExec " enabled="true" name="syncExec">Display.getDefault().syncExec(new Runnable() {&#13;
-	public void run() {&#13;
-		${cursor}&#13;
-	}&#13;
-});&#13;
 </template><template autoinsert="false" context="java-statements" deleted="false" description="synchronized block" enabled="true" id="org.eclipse.jdt.ui.templates.synchronized" name="synchronized">synchronized (${mutex:var}) {
 	${line_selection}
-}</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java-statements" deleted="false" description="print to standard error" enabled="true" id="org.eclipse.jdt.ui.templates.syserr" name="syserr">System.err.println(${word_selection}${});${cursor}</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with system time" enabled="true" name="sysn">System.out.println((System.currentTimeMillis() + " ${cursor}"));&#13;
+}</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java-statements" deleted="false" description="print to standard error" enabled="true" id="org.eclipse.jdt.ui.templates.syserr" name="syserr">System.err.println(${word_selection}${});${cursor}</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with system time" enabled="true" name="sysn">System.out.println((System.currentTimeMillis() + " ${cursor}"));&#13;
 // ${todo} remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="true" context="java-statements" deleted="false" description="system out with nano system time" enabled="true" id="org.eclipse.jdt.ui.templates.sysout" name="sysout">System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ${cursor}()"&#13;
 	+ "\t: " + &#13;
@@ -473,9 +429,6 @@ ${text}.setText(${word_selection}${});
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="postfix" deleted="false" description="Throws the given Exception" enabled="true" id="org.eclipse.jdt.postfixcompletion.throw" name="throw">throw ${true:inner_expression(java.lang.Throwable)};</template><template autoinsert="true" context="java" deleted="false" description="measure runtime" enabled="true" name="time">long start = System.currentTimeMillis();&#13;
 System.out.println("time\t" + (System.currentTimeMillis() - start) + " ms");&#13;
 // TODO remove SYSTEM.OUT.PRINTLN&#13;
-</template><template autoinsert="true" context="java" deleted="false" description="measure runtime" enabled="true" name="time">long start = System.currentTimeMillis();&#13;
-System.out.println("time\t" + (System.currentTimeMillis() - start) + " ms");&#13;
-// TODO remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="false" context="java" deleted="false" description="convert collection to array" enabled="true" id="org.eclipse.jdt.ui.templates.toarray" name="toarray">(${type:elemType(collection)}[]) ${collection}.toArray(new ${type}[${collection}.size()])</template><template autoinsert="false" context="swt-statements" deleted="false" description="new ToolBar" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.toolbar" name="ToolBar">${type:newType(org.eclipse.swt.widgets.ToolBar)} ${bar:newName(org.eclipse.swt.widgets.ToolBar)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.FLAT, SWT.WRAP, SWT.RIGHT, SWT.HORIZONTAL, SWT.VERTICAL, SWT.SHADOW_OUT)});
 ${bar}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="swt-statements" deleted="false" description="new ToolItem for a ToolBar" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.toolitem" name="ToolItem">${type:newType(org.eclipse.swt.widgets.ToolItem)} ${item:newName(org.eclipse.swt.widgets.ToolItem)}= new ${type}(${parent:var(org.eclipse.swt.widgets.ToolBar)}, ${style:link(SWT.PUSH, SWT.CHECK, SWT.RADIO, SWT.SEPARATOR, SWT.DROP_DOWN)});
@@ -493,10 +446,6 @@ ${column}.setText(${word_selection}${});
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="swt-statements" deleted="false" description="new TreeItem for a Tree" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.treeitem" name="TreeItem">${type:newType(org.eclipse.swt.widgets.TreeItem)} ${item:newName(org.eclipse.swt.widgets.TreeItem)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Tree, org.eclipse.swt.widgets.TreeItem)}, SWT.NONE);
 ${item}.setText(${count:link(0, 1, 2, 3, 4, 5)}, ${word_selection}${});
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="javadoc" deleted="false" description="&lt;code&gt;true&lt;/code&gt;" enabled="true" id="org.eclipse.jdt.ui.templates.code_tag_true" name="true">&lt;code&gt;true&lt;/code&gt;</template><template autoinsert="true" context="java-statements" deleted="false" description="try finally unlock" enabled="true" name="try">try {&#13;
-	${cursor}&#13;
-} finally {&#13;
-	.unlock();&#13;
-}</template><template autoinsert="true" context="java-statements" deleted="false" description="try finally unlock" enabled="true" name="try">try {&#13;
 	${cursor}&#13;
 } finally {&#13;
 	.unlock();&#13;

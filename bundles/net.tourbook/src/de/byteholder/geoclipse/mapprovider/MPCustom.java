@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,10 @@
 package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
 
 import java.util.ArrayList;
+
+import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -73,7 +74,7 @@ public class MPCustom extends MP {
    @Override
    public String getTileUrl(final Tile tile) {
 
-      if (_urlParts.size() == 0) {
+      if (_urlParts.isEmpty()) {
 
          // url parts are not set yet, display openstreetmap
 

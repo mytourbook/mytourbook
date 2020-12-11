@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,9 +45,9 @@ public class WeatherData {
    /**
     * Atmospheric pressure in millibars (mb)
     */
-   private int averagePressure;
+   private int    averagePressure;
 
-   private int windChill;
+   private int    windChill;
 
    public int getAverageHumidity() {
       return averageHumidity;
@@ -161,6 +161,9 @@ public class WeatherData {
          break;
       case "353": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+         break;
+      default:
+         WeatherType = IWeather.cloudIsNotDefined;
          break;
       }
    }

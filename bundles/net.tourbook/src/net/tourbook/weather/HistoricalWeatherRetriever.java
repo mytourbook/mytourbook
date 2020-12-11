@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,6 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,11 +33,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.Messages;
+import net.tourbook.ui.views.calendar.CalendarProfile;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -48,10 +49,21 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private static final boolean   _isLogWeatherData = System.getProperty("logWeatherData") != null;                     //$NON-NLS-1$
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData"; //$NON-NLS-1$
+   private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
-   private final static String    baseApiUrl        = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private final static String    keyParameter      = "?key=";                                                          //$NON-NLS-1$
+   static {
+
+      if (_isLogWeatherData) {
+
+         Util.logSystemProperty_IsEnabled(CalendarProfile.class,
+               SYS_PROP__LOG_WEATHER_DATA,
+               "Weather data are logged"); //$NON-NLS-1$
+      }
+   }
+
+   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    keyParameter = "?key=";                                                          //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
@@ -61,7 +73,7 @@ public class HistoricalWeatherRetriever {
 
    private WeatherData            historicalWeatherData;
 
-   private final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
    public HistoricalWeatherRetriever() {}
 
@@ -139,9 +151,9 @@ public class HistoricalWeatherRetriever {
 
       if (_isLogWeatherData) {
 
-         final long recordingTime = tour.getTourRecordingTime();
+         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
          final ZonedDateTime zdtTourStart = tour.getTourStartTime();
-         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
          final String tourTitle = tour.getTourTitle();
 
          System.out.println();

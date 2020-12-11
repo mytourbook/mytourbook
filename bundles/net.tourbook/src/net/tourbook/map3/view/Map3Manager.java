@@ -408,7 +408,7 @@ public class Map3Manager {
    private static void createLayer_MT_TourLegend() {
 
       // create WW layer
-      _wwLayer_TourLegend = new TourLegendLayer(_state);
+      _wwLayer_TourLegend = new TourLegendLayer();
 
       /*
        * create UI model layer

@@ -22,10 +22,13 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -44,6 +47,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.common.util.Util;
@@ -53,6 +57,11 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.ui.ITourProvider;
@@ -73,7 +82,9 @@ import net.tourbook.weather.WeatherData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -166,7 +177,7 @@ public class TourManager {
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
    //
-   private final static String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
+   private static final String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
    public static final String  GEAR_TEETH_FORMAT                               = "%2d:%2d";                                                          //$NON-NLS-1$
    public static final String  GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - %1.2f";                                     //$NON-NLS-1$
    //
@@ -226,12 +237,12 @@ public class TourManager {
          GRAPH_TOUR_COMPARE
    };
 
-   private final static IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
 
    private static TourManager                            _instance;
 
-   private final static StringBuilder                    _sbFormatter                      = new StringBuilder();
-   private final static Formatter                        _formatter                        = new Formatter(_sbFormatter);
+   private static final StringBuilder                    _sbFormatter                      = new StringBuilder();
+   private static final Formatter                        _formatter                        = new Formatter(_sbFormatter);
 
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
@@ -244,7 +255,7 @@ public class TourManager {
    //
    private static TourData                               _joined_TourData;
    private static int                                    _joined_TourIds_Hash;
-   private static ArrayList<TourData>                    _allLoaded_TourData;
+   private static List<TourData>                         _allLoaded_TourData;
    private static int                                    _allLoaded_TourData_Hash;
    private static long                                   _allLoaded_TourData_Key;
    private static int                                    _allLoaded_TourIds_Hash;
@@ -476,36 +487,36 @@ public class TourManager {
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
 
-         final StringBuilder sb = new StringBuilder()//
-               .append("ERROR: ") //$NON-NLS-1$
-               .append("The internal structure of the application is out of synch.") //$NON-NLS-1$
-               .append(UI.NEW_LINE2)
-               .append("You can solve the problem by:") //$NON-NLS-1$
-               .append(UI.NEW_LINE2)
-               .append("- restarting the application") //$NON-NLS-1$
-               .append(UI.NEW_LINE)
-               .append("- close the tour editor in all perspectives") //$NON-NLS-1$
-               .append(UI.NEW_LINE)
-               .append("- save/revert tour and select another tour") //$NON-NLS-1$
-               .append(UI.NEW_LINE2)
-               .append(UI.NEW_LINE)
-               .append("The tour editor contains the selected tour, but the data are different.") //$NON-NLS-1$
-               .append(UI.NEW_LINE2)
-               .append("Tour in Editor:") //$NON-NLS-1$
-               .append(tourData2.toStringWithHash())
-               .append(UI.NEW_LINE)
-               .append("Selected Tour:") //$NON-NLS-1$
-               .append(tourData1.toStringWithHash())
-               .append(UI.NEW_LINE2)
-               .append(UI.NEW_LINE)
-               .append("You should also inform the author of the application how this error occured. ") //$NON-NLS-1$
-               .append("However it isn't very easy to find out, what actions are exactly done, before this error occured. ") //$NON-NLS-1$
-               .append(UI.NEW_LINE2)
-               .append("These actions must be reproducable otherwise the bug cannot be identified."); //$NON-NLS-1$
+         final String message = UI.EMPTY_STRING
+               + "ERROR: " //                                                                                              //$NON-NLS-1$
+               + "The internal structure of the application is out of synch." //                                           //$NON-NLS-1$
+               + UI.NEW_LINE2
+               + "You can solve the problem by:" //                                                                        //$NON-NLS-1$
+               + UI.NEW_LINE2
+               + "- restarting the application" //                                                                         //$NON-NLS-1$
+               + UI.NEW_LINE
+               + "- close the tour editor in all perspectives" //                                                          //$NON-NLS-1$
+               + UI.NEW_LINE
+               + "- save/revert tour and select another tour" //                                                           //$NON-NLS-1$
+               + UI.NEW_LINE2
+               + UI.NEW_LINE
+               + "The tour editor contains the selected tour, but the data are different." //                              //$NON-NLS-1$
+               + UI.NEW_LINE2
+               + "Tour in Editor:" //                                                                                      //$NON-NLS-1$
+               + tourData2.toStringWithHash()
+               + UI.NEW_LINE
+               + "Selected Tour:" //                                                                                       //$NON-NLS-1$
+               + tourData1.toStringWithHash()
+               + UI.NEW_LINE2
+               + UI.NEW_LINE
+               + "You should also inform the author of the application how this error occured. " //                        //$NON-NLS-1$
+               + "However it isn't very easy to find out, what actions are exactly done, before this error occured. " //   //$NON-NLS-1$
+               + UI.NEW_LINE2
+               + "These actions must be reproducable otherwise the bug cannot be identified."; //                          //$NON-NLS-1$
 
-         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error: Out of Synch", sb.toString()); //$NON-NLS-1$
+         MessageDialog.openError(Display.getDefault().getActiveShell(), "Error: Out of Synch", message); //                //$NON-NLS-1$
 
-         throw new MyTourbookException(sb.toString());
+         throw new MyTourbookException(message);
       }
 
       return true;
@@ -527,42 +538,45 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeCadenceZonesTimes(final Connection conn,
-                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+                                                  final List<TourData> selectedTours) throws SQLException {
       boolean isUpdated = false;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate);
+      try (PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate)) {
 
-      int numComputedTour = 0;
-      int numNotComputedTour = 0;
+         int numComputedTour = 0;
+         int numNotComputedTour = 0;
 
-      // loop over all tours and compute each cadence zone time
-      for (final TourData tourData : selectedTours) {
+         // loop over all tours and compute each cadence zone time
+         for (final TourData tourData : selectedTours) {
 
-         final boolean timeComputed = tourData.computeCadenceZonesTimes();
-         if (!timeComputed) {
+            final boolean timeComputed = tourData.computeCadenceZonesTimes();
+            if (!timeComputed) {
 
-            numNotComputedTour++;
+               numNotComputedTour++;
 
-         } else {
+            } else {
 
-            // update cadence zones times in the database
-            stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
-            stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
-            stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
-            stmtUpdate.setLong(4, tourData.getTourId());
+               // update cadence zones times in the database
+               stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
+               stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
+               stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
+               stmtUpdate.setLong(4, tourData.getTourId());
 
-            stmtUpdate.executeUpdate();
+               stmtUpdate.executeUpdate();
 
-            isUpdated = true;
-            numComputedTour++;
+               isUpdated = true;
+               numComputedTour++;
+            }
          }
-      }
 
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+         TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
 
-      if (numNotComputedTour >= 0) {
-         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+         if (numNotComputedTour >= 0) {
+            TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+                  NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+         }
+      } catch (final SQLException e) {
+         SQL.showException(e);
       }
 
       return isUpdated;
@@ -577,7 +591,7 @@ public class TourManager {
     */
    public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
 
-      if (tourDataList == null || tourDataList.size() == 0) {
+      if (tourDataList == null || tourDataList.isEmpty()) {
          return false;
       }
 
@@ -664,9 +678,9 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the recording time
+    * @return Returns the elapsed time
     */
-   public static int computeTourRecordingTime(final TourData tourData, final int startIndex, final int endIndex) {
+   public static int computeTourDeviceTime_Elapsed(final TourData tourData, final int startIndex, final int endIndex) {
 
       final float[] distanceSerie = tourData.getMetricDistanceSerie();
       final int[] timeSerie = tourData.timeSerie;
@@ -836,6 +850,8 @@ public class TourManager {
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
       final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
       final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
+      final List<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
+      final int[] allTourPausesNumbers = joinedTourData.multipleNumberOfPauses = new int[numTours];
       final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
 
       final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
@@ -847,7 +863,9 @@ public class TourManager {
 
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
-      int tourRecordingTime = 0;
+      int tourDeviceTime_Elapsed = 0;
+      int tourDeviceTime_Recorded = 0;
+      int tourDeviceTime_Paused = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
       float tourAltDown = 0;
@@ -937,12 +955,12 @@ public class TourManager {
 
             // adjust relative time series
             for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
-               toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
+               toTimeSerie[toStartIndex + serieIndex] = tourDeviceTime_Elapsed + fromTimeSerie[serieIndex];
             }
             if (fromSwim_Time != null) {
                isSwim_Time = true;
                for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
-                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
+                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourDeviceTime_Elapsed + fromSwim_Time[swimSerieIndex];
                }
             }
 
@@ -1059,6 +1077,23 @@ public class TourManager {
          allTourMarker.addAll(fromTourMarker);
          allTourMarkerNumbers[tourIndex] = fromTourMarker.size();
 
+         // tour pauses
+         final long[] pausedTime_Start = fromTourData.getPausedTime_Start();
+
+         if (pausedTime_Start != null) {
+            final long[] pausedTime_End = fromTourData.getPausedTime_End();
+            for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+               final List<Long> fromTourPausesList = new ArrayList<>();
+
+               fromTourPausesList.add(pausedTime_Start[index]);
+               fromTourPausesList.add(pausedTime_End[index]);
+
+               allTourPauses.add(fromTourPausesList);
+            }
+            allTourPausesNumbers[tourIndex] = pausedTime_Start.length;
+         }
+
          // photos
          final Set<TourPhoto> fromTourPhotos = fromTourData.getTourPhotos();
          allTourPhoto.addAll(fromTourPhotos);
@@ -1077,9 +1112,9 @@ public class TourManager {
             tourDistance += fromDistanceSerie[fromSerieLength - 1];
          }
 
-         // summarize recording time
+         // summarize elapsed time
          final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
-         tourRecordingTime += fromTourEnd;
+         tourDeviceTime_Elapsed += fromTourEnd;
 
          // summarize altitude up/down
          tourAltUp += fromTourData.getTourAltUp();
@@ -1097,7 +1132,10 @@ public class TourManager {
           * Add 1 otherwise the next tour has the same start time as the previous tour end time,
           * this is because it starts with 0.
           */
-         tourRecordingTime++;
+         tourDeviceTime_Elapsed++;
+
+         tourDeviceTime_Recorded += fromTourData.getTourDeviceTime_Recorded();
+         tourDeviceTime_Paused += fromTourData.getTourDeviceTime_Paused();
       }
 
       /*
@@ -1174,14 +1212,16 @@ public class TourManager {
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
       joinedTourData.setTourStartTime(tourStartTime);
-      joinedTourData.setTourRecordingTime(tourRecordingTime);
+      joinedTourData.setTourDeviceTime_Elapsed(tourDeviceTime_Elapsed);
+      joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
+      joinedTourData.setTourDeviceTime_Paused(tourDeviceTime_Paused);
       joinedTourData.setTourDistance(tourDistance);
 
-      // computing these values is VERY cpu intensive because of the DP algorithm
+      // computing these values is VERY CPU intensive because of the DP algorithm
       joinedTourData.setTourAltUp(tourAltUp);
       joinedTourData.setTourAltDown(tourAltDown);
 
-      joinedTourData.computeTourDrivingTime();
+      joinedTourData.computeTourMovingTime();
       joinedTourData.computeComputedValues();
 
       joinedTourData.multipleTour_IsCadenceRpm = isCadenceRpm;
@@ -1767,8 +1807,8 @@ public class TourManager {
     *           will be returned.
     * @return Returns a unique key for all {@link TourData}.
     */
-   public static long loadTourData(final ArrayList<Long> allTourIds,
-                                   final ArrayList<TourData> allTourData,
+   public static long loadTourData(final List<Long> allTourIds,
+                                   final List<TourData> allTourData,
                                    final boolean isCheckLatLon) {
 
       // check if the requested data are already available
@@ -1791,29 +1831,30 @@ public class TourManager {
       boolean isLongDuration = false;
 
       // create a unique key for all tours
-      final long newOverlayKey[] = { 0 };
-      final int tourIndex[] = { 0 };
-      final int loadCounter[] = { 0 };
+      final long[] newOverlayKey = { 0 };
+      final int[] tourIndex = { 0 };
+      final int[] loadCounter = { 0 };
       final int numTourIds = allTourIds.size();
 
-      for (; tourIndex[0] < numTourIds;) {
+      while (tourIndex[0] < numTourIds) {
 
          final Long tourId = allTourIds.get(tourIndex[0]);
          loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
          /*
-          * Check if this is a long duration -> run in progress monitor
+          * Check if this is a long duration -> run with progress monitor
           */
          final long runDuration = System.currentTimeMillis() - start;
          if (runDuration > 500) {
             isLongDuration = true;
+            ++tourIndex[0];
             break;
          }
 
          ++tourIndex[0];
       }
 
-      if (isLongDuration) {
+      if (isLongDuration && tourIndex[0] < numTourIds) {
 
          try {
 
@@ -1824,7 +1865,7 @@ public class TourManager {
 
                   monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
-                  for (; tourIndex[0] < numTourIds;) {
+                  while (tourIndex[0] < numTourIds) {
 
                      monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
                            ++loadCounter[0],
@@ -1864,7 +1905,7 @@ public class TourManager {
    }
 
    private static void loadTourData_OneTour(final Long tourId,
-                                            final ArrayList<TourData> allTourData,
+                                            final List<TourData> allTourData,
                                             final boolean isCheckLatLon,
                                             final long[] newOverlayKey) {
 
@@ -1886,7 +1927,7 @@ public class TourManager {
     */
    public static TourDataEditorView openTourEditor(final boolean isActive) {
 
-      final TourDataEditorView tourDataEditorView[] = { null };
+      final TourDataEditorView[] tourDataEditorView = { null };
 
       /*
        * must be run in the UI thread because PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -2276,7 +2317,7 @@ public class TourManager {
 
       // check if markers are available
       final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
-      if (allTourMarkers.size() == 0) {
+      if (allTourMarkers.isEmpty()) {
          return;
       }
 
@@ -2406,7 +2447,7 @@ public class TourManager {
 
       final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification);
 
-      if (savedTourData == null || savedTourData.size() == 0) {
+      if (savedTourData.isEmpty()) {
          return null;
       } else {
          return savedTourData.get(0);
@@ -2449,7 +2490,7 @@ public class TourManager {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
-      if (modifiedTours.size() == 0) {
+      if (modifiedTours.isEmpty()) {
          // there is nothing modified
          return savedTours;
       }
@@ -2505,6 +2546,9 @@ public class TourManager {
          tourEvent.tourDataEditorSavedTour = tourDataEditorSavedTour[0];
 
          fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+
+         // when tours are saved then the photo annotation can be changed -> update photo gallery
+         PhotoManager.updatePicDirGallery();
       }
 
       return savedTours;
@@ -2601,7 +2645,7 @@ public class TourManager {
 
    public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
 
-      if (tourDataList == null || tourDataList.size() == 0) {
+      if (tourDataList == null || tourDataList.isEmpty()) {
          return false;
       }
 
@@ -2718,6 +2762,246 @@ public class TourManager {
          final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
 
          tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
+      }
+   }
+
+   /**
+    * Add/save selected photos in it's tours.
+    *
+    * @param photoGallery
+    */
+   public static void tourPhoto_Add(final PhotoGallery photoGallery) {
+
+      if (isTourEditorModified()) {
+         return;
+      }
+
+      int numHistoryTourPhotos = 0;
+
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<String, TourPhoto>> allToursWithPhotos = new HashMap<>();
+
+      // loop: all selected photos in the gallery
+      final Collection<GalleryMT20Item> allGalleryItems = photoGallery.getGallerySelection();
+      for (final GalleryMT20Item galleryItem : allGalleryItems) {
+
+         final Photo selectedPhoto = galleryItem.photo;
+
+         final long linkTourId = selectedPhoto.getLinkTourId();
+
+         if (linkTourId == Long.MIN_VALUE) {
+
+            // this is a history tour -> photo cannot be saved
+
+            numHistoryTourPhotos++;
+
+            continue;
+         }
+
+         final TourData tourData = getTour(linkTourId);
+         if (tourData != null) {
+
+            // photo belongs to this tour
+
+            // check by image file name if the photo already exist in the tour
+            boolean isPhotoSavedInTour = false;
+            for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+               if (tourPhoto.getImageFilePathName().equals(selectedPhoto.imageFilePathName)) {
+                  isPhotoSavedInTour = true;
+                  break;
+               }
+            }
+
+            if (isPhotoSavedInTour) {
+               continue;
+            }
+
+            // create a new tour photo
+
+            final TourPhoto tourPhoto = new TourPhoto(tourData, selectedPhoto);
+
+            // set adjusted time / geo location
+            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTimeLink);
+            tourPhoto.setGeoLocation(
+                  selectedPhoto.getLinkLatitude(),
+                  selectedPhoto.getLinkLongitude());
+
+            HashMap<String, TourPhoto> tourWithPhotos = allToursWithPhotos.get(linkTourId);
+            if (tourWithPhotos == null) {
+               tourWithPhotos = new HashMap<>();
+               allToursWithPhotos.put(linkTourId, tourWithPhotos);
+            }
+
+            tourWithPhotos.put(tourPhoto.getImageFilePathName(), tourPhoto);
+         }
+      }
+
+      // show message that photos can be saved only in real tours
+      if (numHistoryTourPhotos > 0 && _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
+
+         final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+               Display.getCurrent().getActiveShell(),
+               Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Title,
+               Messages.Photos_AndTours_Dialog_CannotSaveHistoryTour_Message,
+               Messages.App_ToggleState_DoNotShowAgain,
+               false, // toggle default state
+               null,
+               null);
+
+         // save toggle state
+         _prefStore.setValue(
+               ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING,
+               dialog.getToggleState());
+      }
+
+      for (final Long tourId : allToursWithPhotos.keySet()) {
+
+         final TourData tourData = getTour(tourId);
+
+         final HashMap<String, TourPhoto> tourWithPhotos = allToursWithPhotos.get(tourId);
+
+         final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+         tourData.addPhotos(tourPhotos);
+      }
+   }
+
+   /**
+    * Remove selected photos from it's tours.
+    *
+    * @param photoGallery
+    */
+   public static void tourPhoto_Remove(final PhotoGallery photoGallery) {
+
+      if (isTourEditorModified()) {
+         return;
+      }
+
+      int numPhotos = 0;
+
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<Long, TourPhoto>> allToursWithTourPhotos = new HashMap<>();
+
+      // loop: all selected photos in the gallery
+      final Collection<GalleryMT20Item> tourPhotos2Remove = photoGallery.getGallerySelection();
+      for (final GalleryMT20Item galleryItem : tourPhotos2Remove) {
+
+         final Photo removedPhoto = galleryItem.photo;
+
+         final Collection<TourPhotoReference> removedPhotoRefs = removedPhoto.getTourPhotoReferences().values();
+
+         // loop: all tour references in a photo
+         for (final TourPhotoReference photoTourRef : removedPhotoRefs) {
+
+            final long removedTourId = photoTourRef.tourId;
+            final long removedPhotoId = photoTourRef.photoId;
+
+            final TourData tourData = getTour(removedTourId);
+            if (tourData != null) {
+
+               // photo is from this tour
+
+               // loop: all tour photos
+               for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+
+                  if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                     // photo is in tour photo collection -> remove it
+
+                     HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+                     if (allTourIdPhotos == null) {
+                        allTourIdPhotos = new HashMap<>();
+                        allToursWithTourPhotos.put(removedTourId, allTourIdPhotos);
+                     }
+
+                     final TourPhoto prevTourPhoto = allTourIdPhotos.put(removedPhotoId, tourPhoto);
+                     if (prevTourPhoto == null) {
+                        numPhotos++;
+                     }
+
+                     break;
+                  }
+               }
+            }
+         }
+      }
+
+      if (numPhotos == 0) {
+         return;
+      }
+
+      // remove photos from this tour and save it
+
+      final MessageDialog dialog = new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
+            null, // no title image
+
+            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
+                  numPhotos,
+                  allToursWithTourPhotos.size()),
+
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_RemoveTourPhotos,
+            Messages.App_Action_Cancel);
+
+      if (dialog.open() == IDialogConstants.OK_ID) {
+
+         /*
+          * Remove tour reference from the photo, this MUST be done after the user has
+          * confirmed the removal otherwise the photo do not have a tour reference when the dialog
+          * is canceled
+          */
+
+         // loop: all selected photos in the gallery
+         for (final GalleryMT20Item galleryPhotoItem : tourPhotos2Remove) {
+
+            final Photo removedGalleryPhoto = galleryPhotoItem.photo;
+
+            final Collection<TourPhotoReference> removedPhotoRefs = removedGalleryPhoto.getTourPhotoReferences().values();
+
+            // loop: all tour references in a photo
+            for (final TourPhotoReference tourPhotoReference : removedPhotoRefs) {
+
+               final long removedTourId = tourPhotoReference.tourId;
+               final long removedPhotoId = tourPhotoReference.photoId;
+
+               final HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+               if (allTourIdPhotos != null) {
+
+                  // loop: all current tour photos
+                  for (final TourPhoto tourIdPhoto : allTourIdPhotos.values()) {
+
+                     if (tourIdPhoto.getPhotoId() == removedPhotoId) {
+
+                        // photo is in tour photo collection -> remove it
+
+                        removedGalleryPhoto.removeTour(removedTourId);
+
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+
+         for (final Long tourId : allToursWithTourPhotos.keySet()) {
+
+            final TourData tourData = getTour(tourId);
+
+            final HashMap<Long, TourPhoto> tourWithPhotos = allToursWithTourPhotos.get(tourId);
+
+            final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+            tourData.removePhotos(tourPhotos);
+         }
       }
    }
 
@@ -3130,7 +3414,7 @@ public class TourManager {
                   valueIndexLeft,
                   valueIndexRight);
 
-            return metricValue * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+            return metricValue * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
          }
       };
 
@@ -3145,7 +3429,7 @@ public class TourManager {
                   valueIndexLeft,
                   valueIndexRight);
 
-            return metricValue * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH / TourData.RUN_DYN_DATA_MULTIPLIER;
+            return metricValue * UI.UNIT_VALUE_DISTANCE_MM_OR_INCH / TourData.RUN_DYN_DATA_MULTIPLIER;
          }
       };
 
@@ -3235,7 +3519,7 @@ public class TourManager {
       xDataTime.setLabel(Messages.tour_editor_label_time);
       xDataTime.setUnitLabel(Messages.tour_editor_label_time_unit);
       xDataTime.setDefaultRGB(new RGB(0, 0, 0));
-      xDataTime.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
+      xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
        * show the distance on the x-axis when a distance is available, otherwise the time is
@@ -3681,7 +3965,7 @@ public class TourManager {
          }
 
          yDataAltitude.setYTitle(GRAPH_LABEL_ALTITUDE);
-         yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+         yDataAltitude.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
          yDataAltitude.setShowYSlider(true);
          yDataAltitude.setDisplayedFractionalDigits(2);
          yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
@@ -4103,7 +4387,7 @@ public class TourManager {
          // adjust min/max values when it's defined in the pref store
          setVisibleForcedValues(
                yDataSerie,
-               net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
+               UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
                0.1,
                0.1,
                ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
@@ -4149,7 +4433,7 @@ public class TourManager {
          // adjust min/max values when it's defined in the pref store
          setVisibleForcedValues(
                yDataSerie,
-               net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
+               UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
                0.1,
                0.1,
                ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
@@ -4431,7 +4715,7 @@ public class TourManager {
          }
       }
 
-      return tourDataList.size() == 0 ? null : tourDataList;
+      return tourDataList.isEmpty() ? null : tourDataList;
    }
 
    /**
@@ -4810,13 +5094,13 @@ public class TourManager {
                                      final TourDoubleClickState tourDoubleClickState) {
 
       ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-      if (selectedTours.size() == 0) {
+      if (selectedTours.isEmpty()) {
 
          if (tourProvider instanceof ITourProviderAll) {
             final ITourProviderAll allTourProvider = (ITourProviderAll) tourProvider;
             selectedTours = allTourProvider.getAllSelectedTours();
 
-            if (selectedTours.size() == 0) {
+            if (selectedTours.isEmpty()) {
                return;
             }
          } else {

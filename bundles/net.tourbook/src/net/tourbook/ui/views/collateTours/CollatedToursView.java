@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,13 +19,14 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -79,7 +80,7 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
+import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -138,17 +139,19 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
    }
 
-   private final IPreferenceStore  _prefStore  = TourbookPlugin.getPrefStore();
-   private final IDialogSettings   _state      = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
    //
    private ColumnManager           _columnManager;
-   private OpenDialogManager       _openDlgMgr = new OpenDialogManager();
+   private OpenDialogManager       _openDlgMgr       = new OpenDialogManager();
    //
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
    private IPartListener2          _partListener;
    private ITourEventListener      _tourPropertyListener;
    private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
    //
    private TVICollatedTour_Root    _rootItem;
    //
@@ -207,7 +210,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private ActionModifyColumns                        _actionModifyColumns;
    private ActionPrint                                _actionPrintTour;
    private ActionRefreshView                          _actionRefreshView;
-   private Action_Reimport_SubMenu                    _actionReimportSubMenu;
+   private ActionReimportTours                        _actionReimport_Tours;
    private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetPerson                            _actionSetOtherPerson;
@@ -377,18 +380,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
                updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-//               UI.updateUnits();
-
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
-
-               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
-
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 //               updateDisplayFormats();
@@ -405,8 +396,28 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          }
       };
 
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
+
+               _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
+            }
+         }
+      };
+
       // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -478,7 +489,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
       _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -664,12 +675,13 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_1stColumn_CollateEvent();
       defineColumn_Time_WeekDay();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_MovingTime();
       defineColumn_Time_WeekNo();
       defineColumn_Time_WeekYear();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
-      defineColumn_Time_PausedTime_Relative();
+      defineColumn_Time_BreakTime_Relative();
 
       defineColumn_Tour_Type();
       defineColumn_Tour_TypeText();
@@ -818,7 +830,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final double dbAltitudeDown = ((TVICollatedTour) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbAltitudeDown / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -841,7 +853,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbMaxAltitude = ((TVICollatedTour) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbMaxAltitude / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -865,7 +877,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             final long dbAltitudeUp = ((TVICollatedTour) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbAltitudeUp / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
 
@@ -1031,7 +1043,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: timeinterval
+    * column: time interval
     */
 
    private void defineColumn_Data_TimeInterval() {
@@ -1073,7 +1085,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             if (element instanceof TVICollatedTour_Tour) {
 
                final long dbStartDistance = ((TVICollatedTour_Tour) element).getColumnStartDistance();
-               final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printValue_0(cell, value);
 
@@ -1095,7 +1107,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float pace = ((TVICollatedTour) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float pace = ((TVICollatedTour) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1120,7 +1132,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final float value = ((TVICollatedTour) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final float value = ((TVICollatedTour) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1144,7 +1156,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             final double value = ((TVICollatedTour) element).colDistance
                   / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1165,7 +1177,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVICollatedTour) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = ((TVICollatedTour) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1242,11 +1254,66 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: driving time (h)
+    * column: relative break time %
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_BreakTime_Relative() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_BREAK_TIME_RELATIVE.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            /*
+             * display paused time relative to the elapsed time
+             */
+
+            final Object element = cell.getElement();
+            final TVICollatedTour item = (TVICollatedTour) element;
+
+            final long dbBreakTime = item.colBreakTime;
+            final long dbElapsedTime = item.colElapsedTime;
+
+            final float relativePausedTime = dbElapsedTime == 0 ? 0 : (float) dbBreakTime
+                  / dbElapsedTime
+                  * 100;
+
+            cell.setText(_nf1.format(relativePausedTime));
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: elapsed time (h)
+    */
+   private void defineColumn_Time_ElapsedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVICollatedTour) element).colElapsedTime;
+
+            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: moving time (h)
+    */
+   private void defineColumn_Time_MovingTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1254,7 +1321,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colDrivingTime;
+            final long value = ((TVICollatedTour) element).colMovingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1268,15 +1335,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
     */
    private void defineColumn_Time_PausedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_PAUSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-
-            /*
-             * display paused time relative to the recording time
-             */
 
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
@@ -1291,52 +1354,24 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: relative paused time %
+    * column: recorded time (h)
     */
-   private void defineColumn_Time_PausedTime_Relative() {
+   private void defineColumn_Time_RecordedTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME_RELATIVE.createColumn(
-            _columnManager,
-            _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME__DEVICE_RECORDED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             /*
-             * display paused time relative to the recording time
+             * display paused time relative to the elapsed time
              */
 
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
 
-            final long dbPausedTime = item.colPausedTime;
-            final long dbRecordingTime = item.colRecordingTime;
-
-            final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-                  / dbRecordingTime
-                  * 100;
-
-            cell.setText(_nf1.format(relativePausedTime));
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: recording time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colRecordingTime;
+            final long value = item.colRecordedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1647,11 +1682,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             float value = ((TVICollatedTour) element).colAvgTemperature;
 
-            if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
+            if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
-               value = value //
-                     * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                     + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
+               value = value
+                     * UI.UNIT_FAHRENHEIT_MULTI
+                     + UI.UNIT_FAHRENHEIT_ADD;
             }
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
@@ -1730,7 +1765,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
             final Object element = cell.getElement();
             final int windSpeed = (int) (((TVICollatedTour) element).colWindSpd
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+                  / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -1751,6 +1786,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -1766,9 +1802,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       TVICollatedTour firstTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+      for (final Object treeItem : selection) {
 
-         final Object treeItem = iter.next();
          if (treeItem instanceof TVICollatedTour) {
 
             boolean isDummyTour = false;
@@ -1824,7 +1859,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
-      _actionReimportSubMenu.setEnabled(isTourSelected);
+      _actionReimport_Tours.setEnabled(isTourSelected);
       _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
@@ -1899,7 +1934,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimportSubMenu);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
@@ -1955,9 +1990,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
 
-      for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-
-         final Object viewItem = tourIterator.next();
+      for (final Object viewItem : selectedTours) {
 
          if (viewItem instanceof TVICollatedTour) {
             tourIds.add(((TVICollatedTour) viewItem).getTourId());
@@ -2018,7 +2051,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
        * This ensures that the unit's are set otherwise they can be null
        */
       @SuppressWarnings("unused")
-      final boolean is = net.tourbook.ui.UI.IS_WIN;
+      final boolean is = UI.IS_WIN;
    }
 
    boolean isInUIUpdate() {
@@ -2035,9 +2068,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
       // loop: all selected items
-      for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
-
-         final Object treeItem = itemIterator.next();
+      for (final Object treeItem : selectedTours) {
 
          final TVICollatedTour tourItem = (TVICollatedTour) treeItem;
 
@@ -2045,7 +2076,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       }
 
       ISelection selection;
-      if (tourIds.size() == 0) {
+      if (tourIds.isEmpty()) {
 
          // fire selection that nothing is selected
 

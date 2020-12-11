@@ -57,7 +57,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
     * and <code>yy</code> the year.
     * <p>
     * As a default, todays date is returned.
-    * 
+    *
     * @param file
     *           The file from which the name should be derived.
     * @return A Date object that has its calendar information set correctly, but not its time
@@ -116,7 +116,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
    /**
     * Computes the equivalent of the time section of the parameter in seconds. The date section is
     * ignored.
-    * 
+    *
     * @param cal
     *           A Calendar object
     * @return The equivalent of the time in seconds
@@ -165,7 +165,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
       StringTokenizer tokenizer = null;
       String tokenLine;
 
-      final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+      final ArrayList<TimeData> timeDataList = new ArrayList<>();
       TimeData timeData;
 
       int previousTime = 0;
@@ -192,7 +192,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
                continue;
             }
 
-            // file format is Tabbed Seperated Values
+            // file format is Tabbed Separated Values
             tokenizer = new StringTokenizer(tokenLine, "\t"); //$NON-NLS-1$
 
             final String recTime = tokenizer.nextToken();
@@ -263,7 +263,8 @@ public class CiclotourTextDataReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.computeTourDrivingTime();
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+            tourData.computeTourMovingTime();
             tourData.computeComputedValues();
          }
 
@@ -278,7 +279,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
    /**
     * Checks the presence of the header information written by the CicloTour text export function.
-    * 
+    *
     * @see net.tourbook.importdata.IRawDataReader#validateRawData(java.lang.String)
     * @return <code>true</code> if the file appears to be a valid CicloTour Text file, otherwise
     *         <code>false</code>.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +44,7 @@ import org.eclipse.swt.graphics.Image;
  * has it's own lat/lon position.
  */
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "wayPointId")
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
    private static final String        IMAGE_MAP_WAY_POINT_HOVERED = net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;

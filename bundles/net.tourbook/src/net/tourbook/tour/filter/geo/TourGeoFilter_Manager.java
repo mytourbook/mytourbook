@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -34,7 +35,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.filter.SQLFilterData;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -256,7 +256,7 @@ public class TourGeoFilter_Manager {
          sqlWhere = sb.toString();
       }
 
-      if (allLatLonParts.size() == 0) {
+      if (allLatLonParts.isEmpty()) {
 
          // prevent invalid sql
          return null;
@@ -292,7 +292,7 @@ public class TourGeoFilter_Manager {
             // skip all events which has not yet been executed
             if (__runnableCounter != _fireEventCounter[0]) {
 
-               // a new event occured
+               // a new event occurred
                return;
             }
 
@@ -336,7 +336,7 @@ public class TourGeoFilter_Manager {
     * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
     *         available.
     */
-   public static SQLFilterData getSQL() {
+   public static SQLData getSQL() {
 
       if (_isGeoFilterEnabled == false) {
 
@@ -369,7 +369,7 @@ public class TourGeoFilter_Manager {
 
       if (sqlSelect_WithAllTourIds_FromGeoParts == null) {
 
-         // this can occure when there are no geo parts, this would cause a sql exception
+         // this can occur when there are no geo parts, this would cause a sql exception
 
          return null;
       }
@@ -384,7 +384,7 @@ public class TourGeoFilter_Manager {
             + " AND HasGeoData" + NL //$NON-NLS-1$
             + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + sqlSelect_WithAllTourIds_FromGeoParts + ") "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere, sqlParameters);
+      final SQLData tourFilterSQLData = new SQLData(sqlWhere, sqlParameters);
 
       return tourFilterSQLData;
    }

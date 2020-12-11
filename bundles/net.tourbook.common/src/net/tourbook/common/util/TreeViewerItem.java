@@ -149,7 +149,7 @@ public abstract class TreeViewerItem {
          fetchChildrenInternal();
       }
 
-      if (_children.size() == 0) {
+      if (_children.isEmpty()) {
          return new Object[0];
       }
 

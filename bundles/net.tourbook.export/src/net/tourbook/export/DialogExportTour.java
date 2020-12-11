@@ -600,10 +600,10 @@ public class DialogExportTour extends TitleAreaDialog {
 
                         _nf3.format(distanceSerie[_tourStartIndex]
                               / 1000
-                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+                              / UI.UNIT_VALUE_DISTANCE),
                         _nf3.format(distanceSerie[_tourEndIndex]
                               / 1000
-                              / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE),
+                              / UI.UNIT_VALUE_DISTANCE),
 
                         UI.UNIT_LABEL_DISTANCE,
 
@@ -1010,7 +1010,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void doExport() throws IOException {
 
-      // disable button's
+      // disable buttons
       getButton(IDialogConstants.OK_ID).setEnabled(false);
       getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
@@ -1018,7 +1018,7 @@ public class DialogExportTour extends TitleAreaDialog {
       _exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
 
       _exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
-      _exportState_CamouflageSpeed *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE / 3.6f;
+      _exportState_CamouflageSpeed *= UI.UNIT_VALUE_DISTANCE / 3.6f;
       _exportState_FileCollisionBehaviour = new FileCollisionBehavior();
 
       if (_isSetup_TourRange) {
@@ -1171,7 +1171,7 @@ public class DialogExportTour extends TitleAreaDialog {
          }
 
          /*
-          * There is currently no listener to stop the velocity evalute method
+          * There is currently no listener to stop the velocity evaluate method
           */
          monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
 
@@ -1191,6 +1191,9 @@ public class DialogExportTour extends TitleAreaDialog {
             if (monitor.isCanceled()) {
                break;
             }
+
+            // merge distance is also used as total distance for not merged tours
+            _mergedDistance = 0;
 
             // create file path name
             final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
@@ -1288,20 +1291,15 @@ public class DialogExportTour extends TitleAreaDialog {
 
       doExport_20_TourValues(vc);
 
-      final Writer exportWriter = new BufferedWriter(new OutputStreamWriter(
-            new FileOutputStream(exportFile),
-            UI.UTF_8));
-
-      final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate));
-
-      try {
+      try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            final Writer exportWriter = new BufferedWriter(outputStreamWriter);
+            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate))) {
 
          Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 
       } catch (final Exception e) {
          StatusUtil.showStatus(e);
-      } finally {
-         exportWriter.close();
       }
    }
 
@@ -1464,9 +1462,9 @@ public class DialogExportTour extends TitleAreaDialog {
       for (final Object name : tracks) {
 
          final GPSTrack track = (GPSTrack) name;
-         for (final Iterator<?> wpIter = track.getWaypoints().iterator(); wpIter.hasNext();) {
+         for (final Object waypoint : track.getWaypoints()) {
 
-            final GPSTrackpoint wp = (GPSTrackpoint) wpIter.next();
+            final GPSTrackpoint wp = (GPSTrackpoint) waypoint;
 
             // starttime, totaltime
             if (wp.getDate() != null) {
@@ -2393,7 +2391,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          String fileName = getExportFileName();
 
-         // remove extentions
+         // remove extensions
          final int extPos = fileName.indexOf('.');
          if (extPos != -1) {
             fileName = fileName.substring(0, extPos);

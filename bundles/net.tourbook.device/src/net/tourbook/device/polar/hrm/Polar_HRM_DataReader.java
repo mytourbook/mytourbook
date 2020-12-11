@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -34,7 +35,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -497,7 +497,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.computeTourDrivingTime();
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
          tourData.computeAltitudeUpDown();
 
@@ -567,7 +568,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    private void createTourData_20_SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
 
-      if (_sectionLapData.size() == 0) {
+      if (_sectionLapData.isEmpty()) {
          return;
       }
 
@@ -608,7 +609,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     */
    private void createTourData_30_CreateMarkers(final TourData tourData) {
 
-      if (_sectionLapData.size() == 0) {
+      if (_sectionLapData.isEmpty()) {
          return;
       }
 

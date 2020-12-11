@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -557,7 +557,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       }
 
       // ensure that one mp is available
-      if (_allMapProvider.size() == 0) {
+      if (_allMapProvider.isEmpty()) {
          _allMapProvider.add(MapProviderManager.getDefaultMapProvider());
       }
    }

@@ -266,7 +266,7 @@ public class NmeaDataReader extends TourbookDevice {
 
    private boolean setTourData() {
 
-      if (_timeDataList == null || _timeDataList.size() == 0) {
+      if (_timeDataList == null || _timeDataList.isEmpty()) {
          return false;
       }
 
@@ -305,7 +305,8 @@ public class NmeaDataReader extends TourbookDevice {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.computeTourDrivingTime();
+         tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
          tourData.computeAltitudeUpDown();
       }

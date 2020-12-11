@@ -53,7 +53,7 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
       sb.append(" startDay,"); //				4 //$NON-NLS-1$
       sb.append(" tourType_typeId,"); //		5	 //$NON-NLS-1$
       sb.append(" tourDistance,"); //			6 //$NON-NLS-1$
-      sb.append(" tourRecordingTime,"); //	7		 //$NON-NLS-1$
+      sb.append(" tourDeviceTime_Elapsed,"); //	7		 //$NON-NLS-1$
       sb.append(" tourAltUp"); //				8 //$NON-NLS-1$
 
       sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
@@ -93,7 +93,7 @@ public class TVIWizardCompareMonth extends TVIWizardCompareItem {
                   : (Long) tourTypeId);
 
             tourItem.colDistance = result.getLong(6);
-            tourItem.colRecordingTime = result.getLong(7);
+            tourItem.colElapsedTime = result.getLong(7);
             tourItem.colAltitudeUp = result.getLong(8);
 
          }

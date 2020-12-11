@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourEventId {
@@ -94,6 +95,12 @@ public enum TourEventId {
    CLEAR_DISPLAYED_TOUR,
 
    /**
+    * This event is fired when mouse is hovering a value point, event data contains
+    * {@link HoveredValueData}
+    */
+   HOVERED_VALUE_POSITION,
+
+   /**
     * Event data contain the selected tours.
     */
    TOUR_SELECTION,
@@ -108,4 +115,9 @@ public enum TourEventId {
     */
    MAP_SHOW_GEO_GRID,
 
+   /**
+    * This event is fired when a statistic is updated, the event data contains the
+    * {@link Selection_StatisticValues}.
+    */
+   STATISTIC_VALUES,
 }

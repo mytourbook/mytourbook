@@ -22,6 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.FormatManager;
@@ -93,7 +94,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -3599,25 +3599,33 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
        * Confirm deletion
        */
       setIsKeepOpenInternally(true);
-      int confirmDialogResult;
+      boolean isDeleteProfile = false;
       {
-         confirmDialogResult = new MessageDialog(
-               Display.getCurrent().getActiveShell(),
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
+
+               getToolTipShell(),
+
                Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Title,
-               null,
-               NLS.bind(
-                     Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Message,
-                     selectedProfile.profileName),
-               MessageDialog.QUESTION,
-               new String[] {
-                     Messages.App_Action_DeleteProfile,
-                     IDialogConstants.CANCEL_LABEL
-               },
-               0).open();
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Message, selectedProfile.profileName),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
+
       }
       setIsKeepOpenInternally(false);
 
-      if (confirmDialogResult != 0) {
+      if (isDeleteProfile == false) {
          return;
       }
 

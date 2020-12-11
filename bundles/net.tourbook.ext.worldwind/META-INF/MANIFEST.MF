@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: World Wind Resources
 Bundle-SymbolicName: net.tourbook.ext.worldwind;singleton:=true
-Bundle-Version: 2.1.20170207.3938883
+Bundle-Version: 2.2.20200812.5250a29
 Bundle-Vendor: NASA World Wind
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  gdal.jar,
@@ -30,7 +30,6 @@ Export-Package: com.jogamp.common,
  com.jogamp.graph.curve.tess,
  com.jogamp.graph.font,
  com.jogamp.graph.geom,
- com.jogamp.graph.geom.opengl,
  com.jogamp.nativewindow,
  com.jogamp.nativewindow.awt,
  com.jogamp.nativewindow.egl,
@@ -48,6 +47,9 @@ Export-Package: com.jogamp.common,
  com.jogamp.newt.util,
  com.jogamp.newt.util.applet,
  com.jogamp.opengl,
+ com.jogamp.opengl.awt,
+ com.jogamp.opengl.fixedfunc,
+ com.jogamp.opengl.glu,
  com.jogamp.opengl.math,
  com.jogamp.opengl.math.geom,
  com.jogamp.opengl.swt,
@@ -173,13 +175,5 @@ Export-Package: com.jogamp.common,
  gov.nasa.worldwindx.examples.util,
  gov.nasa.worldwindx.examples.util.cachecleaner,
  gov.nasa.worldwindx.examples.view,
- gov.nasa.worldwindx.performance,
- javax.media.nativewindow,
- javax.media.nativewindow.util,
- javax.media.opengl,
- javax.media.opengl.awt,
- javax.media.opengl.fixedfunc,
- javax.media.opengl.glu,
- javax.media.opengl.glu.gl2,
- javax.media.opengl.glu.gl2es1
+ gov.nasa.worldwindx.performance
 Automatic-Module-Name: net.tourbook.ext.worldwind

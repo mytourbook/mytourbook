@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>20.8.0-SNAPSHOT</version>
+                                             <version>20.12.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -95,8 +95,8 @@
       -->
       
       <repository>
-         <id>eclipse.4.14.nl</id>                                       <layout>p2</layout>
-         <url>file:build/build.eclipse.4.14.nl.repo</url>
+         <id>eclipse.4.17.nl</id>                                       <layout>p2</layout>
+         <url>file:build/build.eclipse.4.17.nl.repo</url>
       </repository>
 
 
@@ -166,7 +166,7 @@
 
                   <environment>   <os>linux</os>      <ws>gtk</ws>      <arch>x86_64</arch>      </environment>
                   <environment>   <os>win32</os>      <ws>win32</ws>    <arch>x86_64</arch>      </environment>
-                  <environment>   <os>macosx</os>   <ws>cocoa</ws>      <arch>x86_64</arch>      </environment>
+                  <environment>   <os>macosx</os>     <ws>cocoa</ws>    <arch>x86_64</arch>      </environment>
 
                </environments>
             </configuration>

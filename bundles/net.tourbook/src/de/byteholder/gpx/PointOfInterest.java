@@ -8,7 +8,7 @@ import org.eclipse.jface.viewers.ISelection;
  * A Point of interest is essentially a {@link Waypoint} that has additional information like a
  * type, category and information, what's near it. It can also contain a value, which zoom level is
  * recommended to show it in the map.
- * 
+ *
  * @author Michael Kanis
  */
 public class PointOfInterest extends Waypoint implements ISelection {
@@ -17,33 +17,33 @@ public class PointOfInterest extends Waypoint implements ISelection {
 
 //	private Type type;
 
-	private String						category;
+   private String category;
 
-	private String						info;
+   private String info;
 
 //	private int							recommendedZoom	= -1;
 
-	private List<? extends Waypoint>	nearestPlaces;
+   private List<? extends Waypoint> nearestPlaces;
 
-	private String						_boundingBox;
+   private String                   _boundingBox;
 
-	/**
-	 * @return Returns bounding box of this POI or <code>null</code>, when not available.
-	 *         <p>
-	 *         e.g.
-	 *         boundingbox="48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
-	 */
-	public String getBoundingBox() {
-		return _boundingBox;
-	}
+   /**
+    * @return Returns bounding box of this POI or <code>null</code>, when not available.
+    *         <p>
+    *         e.g.
+    *         boundingbox="48.4838981628418,48.5500030517578,9.02030849456787,9.09173774719238"
+    */
+   public String getBoundingBox() {
+      return _boundingBox;
+   }
 
-	public String getCategory() {
-		return category;
-	}
+   public String getCategory() {
+      return category;
+   }
 
-	public String getInfo() {
-		return info;
-	}
+   public String getInfo() {
+      return info;
+   }
 
 //	/**
 //	 * @return Return the recommended zoom level or -1 when the zoom level should not be changed
@@ -52,13 +52,14 @@ public class PointOfInterest extends Waypoint implements ISelection {
 //		return recommendedZoom;
 //	}
 
-	public List<? extends Waypoint> getNearestPlaces() {
-		return nearestPlaces;
-	}
+   public List<? extends Waypoint> getNearestPlaces() {
+      return nearestPlaces;
+   }
 
-	public boolean isEmpty() {
-		return false;
-	}
+   @Override
+   public boolean isEmpty() {
+      return false;
+   }
 
 //	public void setType(Type type) {
 //		this.type = type;
@@ -77,36 +78,36 @@ public class PointOfInterest extends Waypoint implements ISelection {
 //		}
 //	}
 
-	public void setBoundingBox(final String boundingBox) {
-		_boundingBox = boundingBox;
-	}
+   public void setBoundingBox(final String boundingBox) {
+      _boundingBox = boundingBox;
+   }
 
-	public void setCategory(final String category) {
-		this.category = category;
-	}
+   public void setCategory(final String category) {
+      this.category = category;
+   }
 
-	public void setInfo(final String info) {
-		this.info = info;
-	}
+   public void setInfo(final String info) {
+      this.info = info;
+   }
 
 //	public void setRecommendedZoom(final int recommendedZoom) {
 //		this.recommendedZoom = recommendedZoom;
 //	}
 
-	public void setNearestPlaces(final List<? extends Waypoint> nearestPlaces) {
-		this.nearestPlaces = nearestPlaces;
-	}
+   public void setNearestPlaces(final List<? extends Waypoint> nearestPlaces) {
+      this.nearestPlaces = nearestPlaces;
+   }
 
-	@Override
-	public String toString() {
+   @Override
+   public String toString() {
 
-		final StringBuilder buf = new StringBuilder();
-		buf.append(this.getName()).append(" (").append(this.getCategory()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+      final StringBuilder buf = new StringBuilder();
+      buf.append(this.getName()).append(" (").append(this.getCategory()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		if ((nearestPlaces != null) && (nearestPlaces.size() > 0)) {
-			buf.append(" near ").append(nearestPlaces.get(0).toString()); //$NON-NLS-1$
-		}
+      if ((nearestPlaces != null) && (nearestPlaces.size() > 0)) {
+         buf.append(" near ").append(nearestPlaces.get(0).toString()); //$NON-NLS-1$
+      }
 
-		return buf.toString();
-	}
+      return buf.toString();
+   }
 }

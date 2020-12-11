@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,7 +51,7 @@ public class ActionRetrieveWeatherData extends Action {
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       final Shell shell = Display.getCurrent().getActiveShell();
-      if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
          MessageDialog.openInformation(
@@ -84,7 +84,7 @@ public class ActionRetrieveWeatherData extends Action {
                      Messages.Dialog_RetrieveWeather_Dialog_Title,
                      Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
             }
-         };
+         }
       });
    }
 }

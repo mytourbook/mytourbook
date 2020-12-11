@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.font;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -42,9 +45,6 @@ import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
 
 /**
  * This is a copy of {@link orgFontFieldEditor} with an open & close listener which is fired when
@@ -606,6 +606,15 @@ public class FontFieldEditorExtended extends FieldEditor {
       gd = (GridData) _containerFontSize.getLayoutData();
       gd.horizontalIndent = horizontalIndent;
       gd.verticalIndent = verticalIndent;
+   }
+
+   @Override
+   public void setFocus() {
+
+// this is not working      
+//    _btnChangeFont.setFocus();
+
+      _spinFontSize.setFocus();
    }
 
    /**

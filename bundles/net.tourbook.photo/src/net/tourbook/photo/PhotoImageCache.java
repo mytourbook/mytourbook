@@ -131,7 +131,14 @@ public class PhotoImageCache {
             final Image image = cacheWrapper.image;
 
             if (image != null) {
-               image.dispose();
+
+               // sometimes the device of the image is null which causes an exception
+
+               try {
+                  image.dispose();
+               } catch (final Exception e) {
+                  // ignore
+               }
             }
          }
       }

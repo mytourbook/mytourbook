@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -34,7 +35,6 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -190,7 +190,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          /*
           * set time serie from the imported trackpoints
           */
-         final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+         final ArrayList<TimeData> timeDataList = new ArrayList<>();
          TimeData timeData;
 
          int time;
@@ -262,7 +262,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             previousDistance = distance;
          }
 
-         if (timeDataList.size() == 0) {
+         if (timeDataList.isEmpty()) {
             /*
              * data are valid but have no data points
              */
@@ -299,7 +299,8 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.computeTourDrivingTime();
+            tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+            tourData.computeTourMovingTime();
             tourData.computeComputedValues();
          }
 

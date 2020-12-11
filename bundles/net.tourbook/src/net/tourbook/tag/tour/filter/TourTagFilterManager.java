@@ -24,10 +24,10 @@ import net.tourbook.application.ActionTourTagFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.filter.SQLFilterData;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -40,38 +40,43 @@ import org.osgi.framework.Version;
 
 public class TourTagFilterManager {
 
-   private static final String                    TOUR_FILTER_FILE_NAME    = "tour-tag-filter.xml";                  //$NON-NLS-1$
-   private static final int                       TOUR_FILTER_VERSION      = 1;
+   private static final char                      NL                          = UI.NEW_LINE;
 
-   private static final String                    TAG_PROFILE              = "Profile";                              //$NON-NLS-1$
-   private static final String                    TAG_ROOT                 = "TourTagFilterProfiles";                //$NON-NLS-1$
+   private static final String                    TOUR_FILTER_FILE_NAME       = "tour-tag-filter.xml";                  //$NON-NLS-1$
+   private static final int                       TOUR_FILTER_VERSION         = 1;
 
-   private static final String                    ATTR_TOUR_FILTER_VERSION = "tourTagFilterVersion";                 //$NON-NLS-1$
-   private static final String                    ATTR_IS_SELECTED         = "isSelected";                           //$NON-NLS-1$
-   private static final String                    ATTR_NAME                = "name";                                 //$NON-NLS-1$
-   private static final String                    ATTR_TAG_ID              = "tagIds";                               //$NON-NLS-1$
+   private static final String                    TAG_PROFILE                 = "Profile";                              //$NON-NLS-1$
+   private static final String                    TAG_ROOT                    = "TourTagFilterProfiles";                //$NON-NLS-1$
 
-   private static final String                    PARAMETER_FIRST          = " ?";                                   //$NON-NLS-1$
-   private static final String                    PARAMETER_FOLLOWING      = ", ?";                                  //$NON-NLS-1$
+   private static final String                    ATTR_TOUR_FILTER_VERSION    = "tourTagFilterVersion";                 //$NON-NLS-1$
+   private static final String                    ATTR_IS_OR_OPERATOR         = "isOrOperator";                         //$NON-NLS-1$
+   static final boolean                           ATTR_IS_OR_OPERATOR_DEFAULT = true;
+   private static final String                    ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
+   private static final String                    ATTR_NAME                   = "name";                                 //$NON-NLS-1$
+   private static final String                    ATTR_TAG_ID                 = "tagIds";                               //$NON-NLS-1$
+   private static final String                    ATTR_TAG_ID_UNCHECKED       = "tagIdsUnchecked";                      //$NON-NLS-1$
 
-   private static final Bundle                    _bundle                  = TourbookPlugin.getDefault().getBundle();
+   private static final String                    PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
+   private static final String                    PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
 
-   private static final IPath                     _stateLocation           = Platform.getStateLocation(_bundle);
-   private static final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
+   private static final Bundle                    _bundle                     = TourbookPlugin.getDefault().getBundle();
+
+   private static final IPath                     _stateLocation              = Platform.getStateLocation(_bundle);
+   private static final IPreferenceStore          _prefStore                  = TourbookPlugin.getPrefStore();
 
    private static boolean                         _isTourTagFilterEnabled;
 
    /**
     * Contains all available profiles.
     */
-   private static ArrayList<TourTagFilterProfile> _filterProfiles          = new ArrayList<>();
+   private static ArrayList<TourTagFilterProfile> _filterProfiles             = new ArrayList<>();
 
    /**
     * Contains the selected profile or <code>null</code> when a profile is not selected.
     */
    private static TourTagFilterProfile            _selectedProfile;
 
-   private static int[]                           _fireEventCounter        = new int[1];
+   private static int[]                           _fireEventCounter           = new int[1];
 
    private static ActionTourTagFilter             _actionTourTagFilter;
 
@@ -114,10 +119,10 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns SQL where part for the tag filter or <code>null</code> when tag filter is
-    *         disabled.
+    * @return Returns the SQL <code>WHERE</code> part for the tag filter when a tag filter is
+    *         enabled and tag's are OR'ed, otherwise <code>null</code>.
     */
-   public static SQLFilterData getSQL() {
+   public static SQLData getSQL_WherePart() {
 
       if (_selectedProfile == null) {
          return null;
@@ -132,31 +137,79 @@ public class TourTagFilterManager {
          return null;
       }
 
-      final ArrayList<Object> sqlParameters = new ArrayList<>();
+      if (_selectedProfile.isOrOperator == false) {
 
-      boolean isFirst = true;
+         /**
+          * Tags are combined with AND
+          * <p>
+          * This cannot simply be done by using an AND operator between tag's, it is done with an
+          * inner join -> complicated
+          */
+
+         return null;
+      }
+
+      /*
+       * Combine tags with OR
+       */
+
+      final ArrayList<Object> sqlParameters = new ArrayList<>();
       final StringBuilder parameterTagIds = new StringBuilder();
 
-      for (final long tagId : tagIds) {
-
-         if (isFirst) {
-            isFirst = false;
+      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
+         if (tagIndex == 0) {
             parameterTagIds.append(PARAMETER_FIRST);
          } else {
             parameterTagIds.append(PARAMETER_FOLLOWING);
          }
 
-         sqlParameters.add(tagId);
+         sqlParameters.add(tagIds[tagIndex]);
       }
 
-      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
-      return new SQLFilterData(sqlWhere, sqlParameters);
+      return new SQLData(sqlWhere, sqlParameters);
    }
 
    private static File getXmlFile() {
 
       return _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
+   }
+
+   /**
+    * @return Returns <code>true</code> when the filter tags are OR'ed or the tour tag filter is not
+    *         enabled, otherwise tags's are AND'ed
+    */
+   public static boolean isNoTagsFilter_Or_CombineTagsWithOr() {
+
+      boolean isNoTagFilter_Or_CombineTagsWithOr = true;
+      final boolean isTourTagFilterEnabled = isTourTagFilterEnabled();
+
+      if (isTourTagFilterEnabled && getSelectedProfile().isOrOperator == false) {
+         isNoTagFilter_Or_CombineTagsWithOr = false;
+      }
+
+      return isNoTagFilter_Or_CombineTagsWithOr;
+   }
+
+   /**
+    * @return Returns <code>true</code> when a tour tag filter is enabled in the current tour tag
+    *         filter profile.
+    */
+   public static boolean isTourTagFilterEnabled() {
+
+      if (_selectedProfile == null) {
+         return false;
+      }
+
+      if (_isTourTagFilterEnabled == false || _selectedProfile.tagFilterIds.isEmpty()) {
+
+         // tour tag filter is not enabled
+
+         return false;
+      }
+
+      return true;
    }
 
    /**
@@ -181,6 +234,7 @@ public class TourTagFilterManager {
                   final TourTagFilterProfile tagFilterProfile = new TourTagFilterProfile();
 
                   tagFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+                  tagFilterProfile.isOrOperator = Util.getXmlBoolean(xmlProfile, ATTR_IS_OR_OPERATOR, true);
 
                   _filterProfiles.add(tagFilterProfile);
 
@@ -190,8 +244,10 @@ public class TourTagFilterManager {
                   }
 
                   final long[] tagIds = Util.getXmlLongArray(xmlProfile, ATTR_TAG_ID);
+                  final long[] tagIdsUnchecked = Util.getXmlLongArray(xmlProfile, ATTR_TAG_ID_UNCHECKED);
 
                   tagFilterProfile.tagFilterIds.addAll(tagIds);
+                  tagFilterProfile.tagFilterIds_Unchecked.addAll(tagIdsUnchecked);
                }
             }
 
@@ -259,6 +315,7 @@ public class TourTagFilterManager {
             final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
 
             xmlProfile.putString(ATTR_NAME, tagFilterProfile.name);
+            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR, tagFilterProfile.isOrOperator);
 
             // set flag for active profile
             if (tagFilterProfile == _selectedProfile) {
@@ -266,6 +323,7 @@ public class TourTagFilterManager {
             }
 
             Util.setXmlLongArray(xmlProfile, ATTR_TAG_ID, tagFilterProfile.tagFilterIds.toArray());
+            Util.setXmlLongArray(xmlProfile, ATTR_TAG_ID_UNCHECKED, tagFilterProfile.tagFilterIds_Unchecked.toArray());
          }
 
       } catch (final Exception e) {

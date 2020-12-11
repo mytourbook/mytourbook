@@ -39,7 +39,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,6 +90,7 @@ import net.tourbook.preferences.PrefPageImport;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -106,6 +106,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProviderAll;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
@@ -193,98 +194,103 @@ import org.joda.time.PeriodType;
 /**
  *
  */
-public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
+public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3, ITourProviderByID {
 
-   public static final String  ID                                         = "net.tourbook.views.rawData.RawDataView";                         //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-   private static final String COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+
+// SET_FORMATTING_ON
+
+   public static final String ID = "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+
    // db state
-   private static final String IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";                                       //$NON-NLS-1$
-   private static final String IMAGE_DATABASE                             = "IMAGE_DATABASE";                                                 //$NON-NLS-1$
-   private static final String IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";                                    //$NON-NLS-1$
-   private static final String IMAGE_DELETE                               = "IMAGE_DELETE";                                                   //$NON-NLS-1$
-   private static final String IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                                         //$NON-NLS-1$
-   // import state
-   private static final String IMAGE_STATE_DELETE                         = "IMAGE_STATE_DELETE";                                             //$NON-NLS-1$
-   private static final String IMAGE_STATE_MOVED                          = "IMAGE_STATE_MOVED";                                              //$NON-NLS-1$
-   // OLD UI
-   private static final String IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                                            //$NON-NLS-1$
-   private static final String IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";                                     //$NON-NLS-1$
-   private static final String IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                                        //$NON-NLS-1$
-   private static final String IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                                                   //$NON-NLS-1$
-   //
-   private static final String HTML_TD                                    = "<td>";                                                           //$NON-NLS-1$
-   private static final String HTML_TD_SPACE                              = "<td ";                                                           //$NON-NLS-1$
-   private static final String HTML_TD_END                                = "</td>";                                                          //$NON-NLS-1$
-   private static final String HTML_TR                                    = "<tr>";                                                           //$NON-NLS-1$
-   private static final String HTML_TR_END                                = "</tr>";                                                          //$NON-NLS-1$
-   //
-   private static final String JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                                           //$NON-NLS-1$
-   //
-   private static final String WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                                                //$NON-NLS-1$
-//   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                                            //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                                                //$NON-NLS-1$
-   private static final String WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                                           //$NON-NLS-1$
-   //
-   private static final String CSS_IMPORT_BACKGROUND                      = "div.import-background";                                          //$NON-NLS-1$
-   private static final String CSS_IMPORT_TILE                            = "a.import-tile";                                                  //$NON-NLS-1$
-   //
-   private static final String STATE_IMPORTED_FILENAMES                   = "importedFilenames";                                              //$NON-NLS-1$
-   private static final String STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                                            //$NON-NLS-1$
-   //
-   public static final String  STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                                           //$NON-NLS-1$
-   public static final boolean STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
-   public static final String  STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";                                     //$NON-NLS-1$
-   public static final boolean STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
-   public static final String  STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                                         //$NON-NLS-1$
-   public static final boolean STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
-   public static final String  STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";                             //$NON-NLS-1$
-   public static final boolean STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
-   private static final String STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";                         //$NON-NLS-1$
-   public static final String  STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                                                  //$NON-NLS-1$
-   public static final boolean STATE_IS_MERGE_TRACKS_DEFAULT              = false;
-   public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
-   public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
-   public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
-   public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
-   //
-   private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
+   private static final String           IMAGE_ASSIGN_MERGED_TOUR                   = "IMAGE_ASSIGN_MERGED_TOUR";               //$NON-NLS-1$
+   private static final String           IMAGE_DATABASE                             = "IMAGE_DATABASE";                         //$NON-NLS-1$
 
+   private static final String           IMAGE_DATABASE_OTHER_PERSON                = "IMAGE_DATABASE_OTHER_PERSON";            //$NON-NLS-1$
+   private static final String           IMAGE_DELETE                               = "IMAGE_DELETE";                           //$NON-NLS-1$
+   private static final String           IMAGE_ICON_PLACEHOLDER                     = "IMAGE_ICON_PLACEHOLDER";                 //$NON-NLS-1$
+   // import state
+   private static final String           IMAGE_STATE_DELETE                         = "IMAGE_STATE_DELETE";                     //$NON-NLS-1$
+   private static final String           IMAGE_STATE_MOVED                          = "IMAGE_STATE_MOVED";                      //$NON-NLS-1$
+   // OLD UI
+   private static final String           IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                    //$NON-NLS-1$
+   private static final String           IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";             //$NON-NLS-1$
+   private static final String           IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                //$NON-NLS-1$
+   private static final String           IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                           //$NON-NLS-1$
+   //
+   private static final String           HTML_TD                                    = "<td>";                                   //$NON-NLS-1$
+   private static final String           HTML_TD_SPACE                              = "<td ";                                   //$NON-NLS-1$
+   private static final String           HTML_TD_END                                = "</td>";                                  //$NON-NLS-1$
+   private static final String           HTML_TR                                    = "<tr>";                                   //$NON-NLS-1$
+   private static final String           HTML_TR_END                                = "</tr>";                                  //$NON-NLS-1$
+   //
+   private static final String           JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                   //$NON-NLS-1$
+   //
+   private static final String           WEB_RESOURCE_TITLE_FONT                    = "Nunito-Bold.ttf";                        //$NON-NLS-1$
+   //   private static final String   WEB_RESOURCE_TITLE_FONT                        = "NothingYouCouldDo.ttf";               //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE          = "mytourbook-icon.svg";                    //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS               = "tour-import.css";                        //$NON-NLS-1$
+   private static final String           WEB_RESOURCE_TOUR_IMPORT_CSS3              = "tour-import-css3.css";                   //$NON-NLS-1$
+   //
+   private static final String           CSS_IMPORT_BACKGROUND                      = "div.import-background";                  //$NON-NLS-1$
+   private static final String           CSS_IMPORT_TILE                            = "a.import-tile";                          //$NON-NLS-1$
+   //
+   private static final String           STATE_IMPORTED_FILENAMES                   = "importedFilenames";                      //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                    //$NON-NLS-1$
+   //
+   public static final String            STATE_IS_CHECKSUM_VALIDATION               = "isChecksumValidation";                   //$NON-NLS-1$
+   public static final boolean           STATE_IS_CHECKSUM_VALIDATION_DEFAULT       = true;
+   public static final String            STATE_IS_CONVERT_WAYPOINTS                 = "STATE_IS_CONVERT_WAYPOINTS";             //$NON-NLS-1$
+   public static final boolean           STATE_IS_CONVERT_WAYPOINTS_DEFAULT         = true;
+   public static final String            STATE_IS_CREATE_TOUR_ID_WITH_TIME          = "isCreateTourIdWithTime";                 //$NON-NLS-1$
+   public static final boolean           STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT  = false;
+   public static final String            STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW         = "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";     //$NON-NLS-1$
+   public static final boolean           STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT = true;
+   private static final String           STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED     = "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
+   public static final String            STATE_IS_MERGE_TRACKS                      = "isMergeTracks";                          //$NON-NLS-1$
+   public static final boolean           STATE_IS_MERGE_TRACKS_DEFAULT              = false;
+   public static final String            STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                    //$NON-NLS-1$
+   public static final boolean           STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String            STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                        //$NON-NLS-1$
+   public static final boolean           STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
+   public static final String            STATE_DEFAULT_CADENCE_MULTIPLIER           = "STATE_DEFAULT_CADENCE_MULTIPLIER";       //$NON-NLS-1$
+   public static final CadenceMultiplier STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT   = CadenceMultiplier.RPM;
+   //
+   private static final String           HREF_TOKEN                                 = "#";                                      //$NON-NLS-1$
+   private static final String           PAGE_ABOUT_BLANK                           = "about:blank";                            //$NON-NLS-1$
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                                 = "http://dummy";                                                   //$NON-NLS-1$
-
-   private static final String HTML_STYLE_TITLE_VERTICAL_PADDING          = "style='padding-top:10px;'";                                      //$NON-NLS-1$
-
-   private static String       ACTION_DEVICE_IMPORT                       = "DeviceImport";                                                   //$NON-NLS-1$
-   private static String       ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                                                    //$NON-NLS-1$
-   private static final String ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                                                //$NON-NLS-1$
-   private static final String ACTION_OLD_UI                              = "OldUI";                                                          //$NON-NLS-1$
-   private static final String ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                                           //$NON-NLS-1$
-   private static final String ACTION_SERIAL_PORT_DIRECTLY                = "SerialPortDirectly";                                             //$NON-NLS-1$
-   private static final String ACTION_SETUP_EASY_IMPORT                   = "SetupEasyImport";                                                //$NON-NLS-1$
+   private static final String           HTTP_DUMMY                                 = "http://dummy";                           //$NON-NLS-1$
+   private static final String           HTML_STYLE_TITLE_VERTICAL_PADDING          = "style='padding-top:10px;'";              //$NON-NLS-1$
+   private static String                 ACTION_DEVICE_IMPORT                       = "DeviceImport";                           //$NON-NLS-1$
+   private static String                 ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                            //$NON-NLS-1$
+   private static final String           ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                        //$NON-NLS-1$
+   private static final String           ACTION_OLD_UI                              = "OldUI";                                  //$NON-NLS-1$
+   private static final String           ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                   //$NON-NLS-1$
+   private static final String           ACTION_SERIAL_PORT_DIRECTLY                = "SerialPortDirectly";                     //$NON-NLS-1$
+   private static final String           ACTION_SETUP_EASY_IMPORT                   = "SetupEasyImport";                        //$NON-NLS-1$
    //
-   private static final String DOM_CLASS_DEVICE_ON                        = "deviceOn";                                                       //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_OFF                       = "deviceOff";                                                      //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_ON_ANIMATED               = "deviceOnAnimated";                                               //$NON-NLS-1$
-   private static final String DOM_CLASS_DEVICE_OFF_ANIMATED              = "deviceOffAnimated";                                              //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_ON                        = "deviceOn";                               //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_OFF                       = "deviceOff";                              //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_ON_ANIMATED               = "deviceOnAnimated";                       //$NON-NLS-1$
+   private static final String           DOM_CLASS_DEVICE_OFF_ANIMATED              = "deviceOffAnimated";                      //$NON-NLS-1$
    //
-   private static final String DOM_ID_DEVICE_ON_OFF                       = "deviceOnOff";                                                    //$NON-NLS-1$
-   private static final String DOM_ID_DEVICE_STATE                        = "deviceState";                                                    //$NON-NLS-1$
-   private static final String DOM_ID_IMPORT_CONFIG                       = "importConfig";                                                   //$NON-NLS-1$
-   private static final String DOM_ID_IMPORT_TILES                        = "importTiles";                                                    //$NON-NLS-1$
+   private static final String           DOM_ID_DEVICE_ON_OFF                       = "deviceOnOff";                            //$NON-NLS-1$
+   private static final String           DOM_ID_DEVICE_STATE                        = "deviceState";                            //$NON-NLS-1$
+   private static final String           DOM_ID_IMPORT_CONFIG                       = "importConfig";                           //$NON-NLS-1$
+   private static final String           DOM_ID_IMPORT_TILES                        = "importTiles";                            //$NON-NLS-1$
    //
-   private static String       HREF_ACTION_DEVICE_IMPORT;
-   private static String       HREF_ACTION_DEVICE_WATCHING_ON_OFF;
-   private static String       HREF_ACTION_IMPORT_FROM_FILES;
-   private static String       HREF_ACTION_OLD_UI;
-   private static String       HREF_ACTION_SERIAL_PORT_CONFIGURED;
-   private static String       HREF_ACTION_SERIAL_PORT_DIRECTLY;
-   private static String       HREF_ACTION_SETUP_EASY_IMPORT;
+   private static String                 HREF_ACTION_DEVICE_IMPORT;
+   private static String                 HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+   private static String                 HREF_ACTION_IMPORT_FROM_FILES;
+   private static String                 HREF_ACTION_OLD_UI;
+   private static String                 HREF_ACTION_SERIAL_PORT_CONFIGURED;
+   private static String                 HREF_ACTION_SERIAL_PORT_DIRECTLY;
 
+   private static String                 HREF_ACTION_SETUP_EASY_IMPORT;
    static {
 
       HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
@@ -295,15 +301,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
       HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
    }
-
-   private static boolean                 _isStopWatchingStoresThread;
-   public static volatile ReentrantLock   THREAD_WATCHER_LOCK             = new ReentrantLock();
+   private static boolean               _isStopWatchingStoresThread;
+   public static volatile ReentrantLock THREAD_WATCHER_LOCK = new ReentrantLock();
+   //
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
+   private final IPreferenceStore         _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    //
    private RawDataManager                 _rawDataMgr                     = RawDataManager.getInstance();
+
    private TableViewer                    _tourViewer;
    private TableViewerTourInfoToolTip     _tourInfoToolTip;
    private ColumnManager                  _columnManager;
@@ -321,7 +328,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private IPartListener2                 _partListener;
    private ISelectionListener             _postSelectionListener;
    private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListenerCommon;
+   private IPropertyChangeListener        _prefChangeListener_Common;
    private ITourEventListener             _tourEventListener;
    //
    private TagMenuManager                 _tagMenuManager;
@@ -342,7 +349,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
    private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private Action_Reimport_SubMenu        _actionReimportSubMenu;
+   private ActionReimportTours            _actionReimport_Tours;
    private ActionRemoveTour               _actionRemoveTour;
    private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
    private ActionSaveTourInDatabase       _actionSaveTour;
@@ -778,7 +785,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    void actionRemoveTour() {
 
       final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -898,12 +905,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               recreateViewer();
-
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
                _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -923,7 +924,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * Common preferences
        */
-      _prefChangeListenerCommon = new IPropertyChangeListener() {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
 
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
@@ -933,12 +934,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
                recreateViewer();
+
+            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               recreateViewer();
             }
          }
       };
 
       // register the listener
-      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -992,7 +999,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
                _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
-               reimportAllImportFiles(false);
+               if (RawDataManager.isReimportingActive() == false) {
+
+                  /*
+                   * Re-import files because computed values could be changed, e.g. elevation gain
+                   */
+
+                  reimportAllImportFiles(false);
+               }
 
             } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
@@ -1022,7 +1036,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionOpenTourLogView = new ActionOpenTourLogView();
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
-      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
+      _actionReimport_Tours = new ActionReimportTours(this);
       _actionRemoveTour = new ActionRemoveTour(this);
       _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
       _actionSaveTour = new ActionSaveTourInDatabase(this, false);
@@ -1210,7 +1224,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * Get Tours
              */
             sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append("   " + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
             sb.append("</div>\n"); //$NON-NLS-1$
 
             createHTML_90_SimpleImport(sb);
@@ -1723,7 +1737,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
       final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
 
-      if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
+      if (allImportLauncher.isEmpty() || allImportConfigs.isEmpty()) {
 
          // this case should not happen
          TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
@@ -1850,7 +1864,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             }
 
             final long tourTypeId = speedTT.tourTypeId;
-            final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+            final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
 
             ttText.append((int) avgSpeed);
             ttText.append(UI.SPACE);
@@ -1867,10 +1881,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          if (oneTourType != null) {
 
             final String ttName = oneTourType.getName();
+            final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
 
             // show this text only when the name is different
             if (!tileName.equals(ttName)) {
-               ttText.append(ttName);
+               ttText.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
             }
          }
       }
@@ -1908,7 +1923,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // last marker
       {
-         final double distance = importLauncher.lastMarkerDistance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+         final double distance = importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
 
@@ -2257,7 +2272,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * Eclipse 3.8 with Linux has only a limited css3 support -> DISABLED
           */
          if (UI.IS_WIN) {
-
             webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS3);
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
@@ -2707,8 +2721,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       defineColumn_Time_TourDate();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_RecordingTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_ElapsedTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Time_TimeZone();
       defineColumn_Time_TimeZoneDifference();
@@ -2755,7 +2769,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void update(final ViewerCell cell) {
 
             final double dbValue = ((TourData) cell.getElement()).getTourAltDown();
-            final double value = -dbValue / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = -dbValue / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
          }
@@ -2777,7 +2791,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void update(final ViewerCell cell) {
 
             final double dbValue = ((TourData) cell.getElement()).getTourAltUp();
-            final double value = dbValue / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final double value = dbValue / UI.UNIT_VALUE_ELEVATION;
 
             colDef.printValue_0(cell, value);
          }
@@ -2921,11 +2935,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+            final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
-                  : drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : time * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2951,12 +2966,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+
+            final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
+            final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
-            if (drivingTime != 0) {
-               value = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            if (time != 0) {
+               value = tourDistance / time * 3.6 / UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
@@ -2977,7 +2994,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void update(final ViewerCell cell) {
 
             final double tourDistance = ((TourData) cell.getElement()).getTourDistance();
-            final double value = tourDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            final double value = tourDistance / 1000 / UI.UNIT_VALUE_DISTANCE;
 
             colDef.printDetailValue(cell, value);
          }
@@ -3028,17 +3045,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: driving time
+    * column: elapsed time
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_ElapsedTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__DEVICE_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
+      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourDrivingTime();
+            final long value = ((TourData) cell.getElement()).getTourDeviceTime_Elapsed();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3046,18 +3064,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * column: recording time
+    * column: moving time
     */
-   private void defineColumn_Time_RecordingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME__COMPUTED_MOVING_TIME.createColumn(_columnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourRecordingTime();
+            final long value = ((TourData) cell.getElement()).getTourComputedTime_Moving();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3242,7 +3259,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final Set<TourTag> tourTags = tourData.getTourTags();
 
-            if (tourTags.size() == 0) {
+            if (tourTags.isEmpty()) {
 
                // the tags could have been removed, set empty field
 
@@ -3422,7 +3439,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       disposeConfigImages();
 
@@ -3518,7 +3535,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void doSaveTour_PostActions(final ArrayList<TourData> savedTours) {
 
       // update viewer, fire selection event
-      if (savedTours.size() == 0) {
+      if (savedTours.isEmpty()) {
          return;
       }
 
@@ -3569,8 +3586,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourData firstSavedTour = null;
       TourData firstValidTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-         final Object treeItem = iter.next();
+      for (final Object treeItem : selection) {
          if (treeItem instanceof TourData) {
 
             selectedTours++;
@@ -3646,7 +3662,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionMergeIntoTour.setEnabled(isOneSelectedNotDeleteTour);
 
       _actionMergeTour.setEnabled(isOneSavedAndNotDeleteTour && (firstSavedTour.getMergeSourceTourId() != null));
-      _actionReimportSubMenu.setEnabled(selectedTours > 0);
+      _actionReimport_Tours.setEnabled(selectedTours > 0);
       _actionRemoveTour.setEnabled(selectedTours > 0);
       _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
       _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
@@ -3722,7 +3738,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimportSubMenu);
+      menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionEditImportPreferences);
       menuMgr.add(_actionRemoveTour);
       menuMgr.add(_actionDeleteTourFile);
@@ -3803,9 +3819,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 
@@ -3847,8 +3861,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // get selected tours, this must be outside of the runnable !!!
       final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
 
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-         selectedTours.add((TourData) iterator.next());
+      for (final Object name : selection) {
+         selectedTours.add((TourData) name);
       }
 
       return selectedTours;
@@ -3993,6 +4007,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    @Override
+   public Set<Long> getSelectedTourIDs() {
+      final Set<Long> tourIds = new HashSet<>();
+
+      final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
+      for (final Object viewItem : selectedTours) {
+
+         if (viewItem instanceof TourData) {
+            tourIds.add(((TourData) viewItem).getTourId());
+         }
+      }
+
+      return tourIds;
+   }
+
+   @Override
    public ArrayList<TourData> getSelectedTours() {
 
       final TourManager tourManager = TourManager.getInstance();
@@ -4003,9 +4032,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
       // loop: all selected tours
-      for (final Iterator<?> iter = selectedTours.iterator(); iter.hasNext();) {
-
-         final Object tourItem = iter.next();
+      for (final Object tourItem : selectedTours) {
 
          if (tourItem instanceof TourData) {
 
@@ -4290,7 +4317,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
       setWatcher_Off();
-
       easyConfig.setActiveImportConfig(selectedConfig);
       _isDeviceStateValid = false;
       updateUI_2_Dashboard();
@@ -4309,7 +4335,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final SelectionDeletedTours tourSelection = (SelectionDeletedTours) selection;
          final ArrayList<ITourItem> removedTours = tourSelection.removedTours;
 
-         if (removedTours.size() == 0) {
+         if (removedTours.isEmpty()) {
             return;
          }
 
@@ -4393,7 +4419,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          return;
       }
 
-      // Log reimport
+      // Log re-import
       TourLogManager.addLog(
             TourLogState.DEFAULT,
             RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
@@ -4433,7 +4459,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * reimport previous imported tours
+    * re-import previous imported tours
     *
     * @param monitor
     * @param importedFiles
@@ -4610,6 +4636,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // restore: set body weight status before the tours are imported
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+
+      final CadenceMultiplier defaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_state,
+            STATE_DEFAULT_CADENCE_MULTIPLIER,
+            STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
+      _rawDataMgr.setState_DefaultCadenceMultiplier(defaultCadenceMultiplier);
 
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
@@ -5288,6 +5319,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // activate store watching
       _isWatchingStores.set(true);
+
+      // activate folder watching
+      thread_WatchFolders(true);
    }
 
    private void thread_FolderWatcher_Deactivate() {
@@ -5374,7 +5408,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
             }
          } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
+            // TourLogManager.logEx(e); // This is expected condition, don't need to log.
          } finally {
             _folderWatcher = null;
             _watchingFolderThread = null;
@@ -5391,7 +5425,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Runnable thread_WatchFolders_Runnable() {
 
       return new Runnable() {
-         @SuppressWarnings("resource")
          @Override
          public void run() {
 
@@ -5828,7 +5861,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private void updateUI_TourViewerColumns() {
 
       // set tooltip text
-      final String timeZone = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+      final String timeZone = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
 
       final String timeZoneTooltip = NLS.bind(COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
 

@@ -535,7 +535,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
          e.printStackTrace();
       } finally {
 
-         if (_profileList.size() == 0) {
+         if (_profileList.isEmpty()) {
 
             // !!! this message is confusing the user !!!
 //				MessageDialog.openError(Display.getCurrent().getActiveShell(), //

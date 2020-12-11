@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,14 @@
 package net.tourbook.photo;
 
 import java.io.File;
+
+import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.photo.internal.Activator;
+import net.tourbook.photo.internal.PicDirFolder;
+import net.tourbook.photo.internal.PicDirImages;
+import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
@@ -37,14 +45,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-
-import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.Activator;
-import net.tourbook.photo.internal.PicDirFolder;
-import net.tourbook.photo.internal.PicDirImages;
-import net.tourbook.photo.internal.manager.ThumbnailStore;
 
 public class PicDirView extends ViewPart implements IPhotoEventListener {
 
@@ -182,6 +182,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 				if (partRef.getPart(false) == PicDirView.this) {
 
+               PhotoManager.setPicDirView(null);
+
 					_picDirImages.stopLoadingImages();
 
 					ThumbnailStore.cleanupStoreFiles(false, false);
@@ -235,6 +237,8 @@ public class PicDirView extends ViewPart implements IPhotoEventListener {
 
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+
+      PhotoManager.setPicDirView(this);
 
 		/*
 		 * restore async because a previous folder can contain many files and it can take a long time

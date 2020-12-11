@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,9 +23,22 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.measurement_system.MeasurementSystem;
+import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
+import net.tourbook.common.measurement_system.Unit_Distance;
+import net.tourbook.common.measurement_system.Unit_Elevation;
+import net.tourbook.common.measurement_system.Unit_Length;
+import net.tourbook.common.measurement_system.Unit_Length_Small;
+import net.tourbook.common.measurement_system.Unit_Pace;
+import net.tourbook.common.measurement_system.Unit_Pressure_Atmosphere;
+import net.tourbook.common.measurement_system.Unit_Temperature;
+import net.tourbook.common.measurement_system.Unit_Weight;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -83,7 +96,12 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -158,14 +176,14 @@ public class UI {
 
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
+   public static final String       SYMBOL_COMMA                  = ",";        //$NON-NLS-1$
    public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
-   // this looks ugly "\u2551";
-   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$
+   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$   // this looks ugly "\u2551";
    public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
    public static final String       SYMBOL_EXCLAMATION_POINT      = "!";        //$NON-NLS-1$
    public static final String       SYMBOL_GREATER_THAN           = ">";        //$NON-NLS-1$
    public static final String       SYMBOL_LESS_THAN              = "<";        //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
    public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
    public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
    public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
@@ -212,40 +230,231 @@ public class UI {
          '|', };
 
 // SET_FORMATTING_OFF
-	public static final boolean			IS_LINUX		= "gtk".equals(SWT.getPlatform());																						//$NON-NLS-1$
-	public static final boolean			IS_OSX		= "carbon".equals(SWT.getPlatform())	|| "cocoa".equals(SWT.getPlatform());								//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean			IS_WIN		= "win32".equals(SWT.getPlatform())		|| "wpf".equals(SWT.getPlatform());									//$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean   IS_LINUX    = "gtk".equals(SWT.getPlatform());                                                                  //$NON-NLS-1$
+   public static final boolean   IS_OSX      = "carbon".equals(SWT.getPlatform())   || "cocoa".equals(SWT.getPlatform());                        //$NON-NLS-1$ //$NON-NLS-2$
+   public static final boolean   IS_WIN      = "win32".equals(SWT.getPlatform())    || "wpf".equals(SWT.getPlatform());                           //$NON-NLS-1$ //$NON-NLS-2$
 // SET_FORMATTING_ON
 
-   public static final String  BROWSER_TYPE_MOZILLA      = "mozilla";             //$NON-NLS-1$
+   /**
+    * On Linux an async selection event is fired since e4
+    */
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1"; //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2"; //$NON-NLS-1$
 
-   public static final String  UTF_8                     = "UTF-8";               //$NON-NLS-1$
-   public static final String  UTF_16                    = "UTF-16";              //$NON-NLS-1$
-   public static final String  ISO_8859_1                = "ISO-8859-1";          //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                 //$NON-NLS-1$
 
-   public static final Charset UTF8_CHARSET              = Charset.forName(UTF_8);
+   public static final String  UTF_8                          = "UTF-8";                   //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                  //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";              //$NON-NLS-1$
 
-   public static final String  MENU_SEPARATOR_ADDITIONS  = "additions";           //$NON-NLS-1$
+   public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
+
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";               //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
     */
-   public static final int     DEFAULT_DESCRIPTION_WIDTH = 350;
-   public static final int     DEFAULT_FIELD_WIDTH       = 40;
+   public static final int     DEFAULT_DESCRIPTION_WIDTH      = 350;
+   public static final int     DEFAULT_FIELD_WIDTH            = 40;
 
    /**
-    * Is <code>true</code> when the measurement system is metric, otherwise it is imperial.
+    * Convert Joule in Calorie
+    * <p>
+    * 1 cal = 4.1868 J<br>
+    * 1 J = 0.238846 cal
     */
-   public static boolean       UNIT_IS_METRIC;
+   public static final float   UNIT_CALORIE_2_JOULE           = 4.1868f;
+
+   /**
+    * Convert Calorie to Joule
+    * <p>
+    * 1 cal = 4.1868 J<br>
+    * 1 J = 0.238846 cal
+    */
+   public static final float   UNIT_JOULE_2_CALORY            = 1.0f / 4.1868f;
+
+   /**
+    * Convert Mile into Nautical mile.
+    * <p>
+    * Multiply miles with this value to get nautical miles
+    */
+   public static final float   UNIT_MILE_2_NAUTICAL_MILE      = 0.868976f;
+
+   /**
+    * Imperial system for distance
+    */
+   public static final float   UNIT_MILE                      = 1.609344f;
+
+   /**
+    * Nautical mile is exact 1852 meter
+    */
+   public static final float   UNIT_NAUTICAL_MILE             = 1.852f;
+
+   /**
+    * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
+    */
+   public static final float   UNIT_YARD                      = 0.9144f;
+
+   /**
+    * Imperial system for very small distance, 1 mm = 0.03937008 inches, 1 inch = 25.4 mm
+    */
+   public static final float   UNIT_INCH                      = 0.03937008f;
+
+   /**
+    * Imperial system for height
+    */
+   public static final float   UNIT_FOOT                      = 0.3048f;
+
+   /**
+    * Imperial system for weight
+    */
+   public static final float   UNIT_POUND                     = 2.204623f;
+
+   /**
+    * Imperial system for temperature
+    * <p>
+    * (Celcius * 9/5) + 32 = Fahrenheit
+    */
+   public static final float   UNIT_FAHRENHEIT_MULTI          = 1.8f;
+   public static final float   UNIT_FAHRENHEIT_ADD            = 32;
+
+   public static final float   UNIT_METER_TO_INCHES           = 39.37007874f;
+
+   public static final float   UNIT_KILOGRAM_TO_POUND         = 2.204623f;
+
+   /**
+    * Hash code including all system measurement data. This can be used to easily find out if the
+    * system has changed.
+    */
+   public static int           UNIT_HASH_CODE;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_KILOMETER;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_MILE;
+
+   /**
+    * Distance could be km (metric), mile or nautical mile
+    */
+   public static boolean       UNIT_IS_DISTANCE_NAUTICAL_MILE;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_FOOT;
+
+   /**
+    * Elevation could be meter (metric) or foot
+    */
+   public static boolean       UNIT_IS_ELEVATION_METER;
+
+   /**
+    * Length could be meter (metric) or yard
+    */
+   public static boolean       UNIT_IS_LENGTH_METER;
+
+   /**
+    * Length could be meter (metric) or yard
+    */
+   public static boolean       UNIT_IS_LENGTH_YARD;
+
+   /**
+    * Small length could be mm (metric) or inch
+    */
+   public static boolean       UNIT_IS_LENGTH_SMALL_MILLIMETER;
+
+   /**
+    * Small length could be mm (metric) or inch
+    */
+   public static boolean       UNIT_IS_LENGTH_SMALL_INCH;
+
+   /**
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is millibar
+    * (mb), otherwise it is inch of mercury (inHg)
+    */
+   public static boolean       UNIT_IS_PRESSURE_MILLIBAR;
+
+   /**
+    * Is <code>true</code> when the measurement system for the atmospheric pressure is inch of
+    * mercury (inHg), otherwise it is millibar (mb)
+    */
+   public static boolean       UNIT_IS_PRESSURE_MERCURY;
+
+   /**
+    * Temperature could be celcius (metric) or fahrenheit
+    */
+   public static boolean       UNIT_IS_TEMPERATURE_CELCIUS;
+
+   /**
+    * Temperature could be celcius (metric) or fahrenheit
+    */
+   public static boolean       UNIT_IS_TEMPERATURE_FAHRENHEIT;
+
+   /**
+    * Weight could be kilogramm (metric) or pound
+    */
+   public static boolean       UNIT_IS_WEIGHT_KILOGRAMM;
+
+   /**
+    * Weight could be kilogramm (metric) or pound
+    */
+   public static boolean       UNIT_IS_WEIGHT_POUND;
+
+   public static boolean       UNIT_IS_PACE_MIN_PER_KILOMETER;
+   public static boolean       UNIT_IS_PACE_MIN_PER_MILE;
+
+   /**
+    * Contains the system of measurement value for distances relative to the metric system.
+    * <p>
+    * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE} or
+    * {@link #UNIT_NAUTICAL_MILE}
+    */
+   public static float         UNIT_VALUE_DISTANCE            = 1;
+
+   /**
+    * contains the system of measurement value for small distances relative to the metric system.
+    * <p>
+    * The metric system is <code>1</code>, imperial system is {@link #UNIT_YARD}
+    */
+   public static float         UNIT_VALUE_DISTANCE_SMALL      = 1;
+
+   /**
+    * Contains the system of measurement value for very small distances relative to the metric
+    * system, the metric system is 1 mm, imperial is 0.03937008 inch.
+    */
+   public static float         UNIT_VALUE_DISTANCE_MM_OR_INCH = 1;
+
+   /**
+    * Contains the system of measurement value for altitudes relative to the metric system, the
+    * metric system is <code>1</code>
+    */
+   public static float         UNIT_VALUE_ELEVATION           = 1;
+
+   /**
+    * contains the system of measurement value for the temperature, is set to <code>1</code> for the
+    * metric system
+    */
+   public static float         UNIT_VALUE_TEMPERATURE         = 1;
+
+   /**
+    * contains the system of measurement value for the weight, is set to <code>1</code> for the
+    * metric system
+    */
+   public static float         UNIT_VALUE_WEIGHT              = 1;
 
    /*
     * Contains the unit label in the current measurement system for the distance values
     */
+   public static String       UNIT_LABEL_ALTIMETER;
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
-   public static String       UNIT_LABEL_ALTITUDE;
-   public static String       UNIT_LABEL_ALTIMETER;
+   public static String       UNIT_LABEL_ELEVATION;
    public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
@@ -255,38 +464,20 @@ public class UI {
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
 
-   public static float        UNIT_VALUE_TEMPERATURE;
-
-   // (Celcius * 9/5) + 32 = Fahrenheit
-   public static final float UNIT_FAHRENHEIT_MULTI  = 1.8f;
-   public static final float UNIT_FAHRENHEIT_ADD    = 32;
-
-   public static final float UNIT_METER_TO_INCHES   = 39.37007874f;
-
-   public static float       UNIT_VALUE_WEIGHT;
-
-   public static final float UNIT_KILOGRAM_TO_POUND = 2.204623f;
-
    /*
     * Labels for the different measurement systems
     */
    public static final String          UNIT_ALTIMETER_M_H         = "m/h";                      //$NON-NLS-1$
    public static final String          UNIT_ALTIMETER_FT_H        = "ft/h";                     //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_M            = "m";                        //$NON-NLS-1$
-   public static final String          UNIT_ALTITUDE_FT           = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_KM           = "km";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_MI           = "mi";                       //$NON-NLS-1$
+   public static final String          UNIT_DISTANCE_NMI          = "nmi";                      //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_YARD         = "yd";                       //$NON-NLS-1$
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
-   public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
-   public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
-   public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
-
+   public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
+   public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
    public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
@@ -295,13 +486,20 @@ public class UI {
    public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
    public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
    public static final String          UNIT_PERCENT               = "%";                        //$NON-NLS-1$
-   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
    public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
    public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
+   public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
+   public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
+   public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
+   public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
+   public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
+   public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
+   public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
+   public static final String          UNIT_TEMPERATURE_F         = "\u00B0F";                  //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
-   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -311,14 +509,12 @@ public class UI {
 
    private static FontMetrics          _fontMetrics;
 
-   /*
-	 * SET_FORMATTING_OFF
-	 */
-	public	static final long beforeCET		= ZonedDateTime.of(1893, 4, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant().toEpochMilli();
-	public	static final long afterCETBegin	= ZonedDateTime.of(1893, 4, 1, 0, 6, 32, 0,ZoneOffset.UTC).toInstant().toEpochMilli();
-	/*
-	 * SET_FORMATTING_ON
-	 */
+// SET_FORMATTING_OFF
+
+   public   static final long beforeCET      = ZonedDateTime.of(1893, 4, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant().toEpochMilli();
+   public   static final long afterCETBegin  = ZonedDateTime.of(1893, 4, 1, 0, 6, 32, 0,ZoneOffset.UTC).toInstant().toEpochMilli();
+
+// SET_FORMATTING_ON
 
    public static final int     BERLIN_HISTORY_ADJUSTMENT = 6 * 60 + 32;
 
@@ -373,19 +569,19 @@ public class UI {
 
 // SET_FORMATTING_OFF
 
-	private static final Random 		RANDOM_GENERATOR						= new Random();
-	private static final String			ALL_SCRAMBLED_CHARS_LOWER				= "abcdefghklmnoprsu";						//$NON-NLS-1$
-	private static final String			ALL_SCRAMBLED_CHARS_UPPER				= "ABCDEFGHKLMNOPRSU";						//$NON-NLS-1$
+   private static final Random   RANDOM_GENERATOR                       = new Random();
+   private static final String   ALL_SCRAMBLED_CHARS_LOWER              = "abcdefghklmnoprsu";                       //$NON-NLS-1$
+   private static final String   ALL_SCRAMBLED_CHARS_UPPER              = "ABCDEFGHKLMNOPRSU";                       //$NON-NLS-1$
 
-	/*
-	 * image keys for images which are stored in the image registry
-	 */
-	public static final String			IMAGE_ACTION_PHOTO_FILTER				= "IMAGE_ACTION_PHOTO_FILTER";						//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS		= "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";			//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS	= "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";																				//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED		= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";				//$NON-NLS-1$
-	public static final String			IMAGE_CONFIGURE_COLUMNS					= "IMAGE_CONFIGURE_COLUMNS";						//$NON-NLS-1$
-	public static final String			IMAGE_EMPTY_16							= "_empty16";										//$NON-NLS-1$
+   /*
+    * image keys for images which are stored in the image registry
+    */
+   public static final String    IMAGE_ACTION_PHOTO_FILTER              = "IMAGE_ACTION_PHOTO_FILTER";               //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS    = "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";     //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS  = "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";   //$NON-NLS-1$
+   public static final String    IMAGE_ACTION_PHOTO_FILTER_DISABLED     = "IMAGE_ACTION_PHOTO_FILTER_DISABLED";      //$NON-NLS-1$
+   public static final String    IMAGE_CONFIGURE_COLUMNS                = "IMAGE_CONFIGURE_COLUMNS";                 //$NON-NLS-1$
+   public static final String    IMAGE_EMPTY_16                         = "_empty16";                                //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -403,6 +599,8 @@ public class UI {
        * https://en.it1352.com/article/fb82e2d4ec294636ba29f786e3335066.html
        */
       PlatformUI.createDisplay();
+
+      updateUnits();
 
       setupUI_FontMetrics();
 
@@ -512,12 +710,14 @@ public class UI {
    /**
     * Number of horizontal dialog units per character, value <code>4</code>.
     */
-   private static final int HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
+   private static final int    HORIZONTAL_DIALOG_UNIT_PER_CHAR = 4;
 
    /**
     * Number of vertical dialog units per character, value <code>8</code>.
     */
-//	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+//   private static final int   VERTICAL_DIALOG_UNITS_PER_CHAR   = 8;
+
+   private static final String SYS_PROP__SCRAMBLE_DATA         = "scrambleData";                                     //$NON-NLS-1$
 
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
@@ -525,7 +725,17 @@ public class UI {
     * <p>
     * Commandline parameter: <code>-DscrambleData</code>
     */
-   public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
+   public static boolean       IS_SCRAMBLE_DATA                = System.getProperty(SYS_PROP__SCRAMBLE_DATA) != null;
+
+   static {
+
+      if (IS_SCRAMBLE_DATA) {
+
+         Util.logSystemProperty_IsEnabled(UI.class,
+               SYS_PROP__SCRAMBLE_DATA,
+               "Visible data are scrambled"); //$NON-NLS-1$
+      }
+   }
 
    /**
     * @param sash
@@ -571,11 +781,11 @@ public class UI {
       if (IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -598,11 +808,11 @@ public class UI {
       if (IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -617,7 +827,7 @@ public class UI {
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_ELEVATION_METER) {
          return height;
       }
 
@@ -626,7 +836,7 @@ public class UI {
 
    public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
 
-      if (UNIT_IS_METRIC) {
+      if (UNIT_IS_ELEVATION_METER) {
          return primaryHeight;
       }
 
@@ -639,7 +849,7 @@ public class UI {
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
 
-      if (UNIT_VALUE_WEIGHT == 1) {
+      if (UNIT_IS_WEIGHT_KILOGRAMM) {
          return bodyWeight;
       }
 
@@ -653,7 +863,7 @@ public class UI {
     */
    public static float convertBodyWeightToMetric(final float weight) {
 
-      if (UNIT_VALUE_WEIGHT == 1) {
+      if (UNIT_IS_WEIGHT_KILOGRAMM) {
          return weight;
       }
 
@@ -664,10 +874,10 @@ public class UI {
     * Returns the number of pixels corresponding to the given number of horizontal dialog units.
     * <p>
     * The required <code>FontMetrics</code> parameter may be created in the following way: <code>
-    * 	GC gc = new GC(control);
-    *	gc.setFont(control.getFont());
-    *	fontMetrics = gc.getFontMetrics();
-    *	gc.dispose();
+    *    GC gc = new GC(control);
+    *   gc.setFont(control.getFont());
+    *   fontMetrics = gc.getFontMetrics();
+    *   gc.dispose();
     * </code>
     * </p>
     *
@@ -715,7 +925,7 @@ public class UI {
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return precipitation;
       }
 
@@ -728,7 +938,7 @@ public class UI {
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_LENGTH_SMALL_MILLIMETER) {
          return precipitation;
       }
 
@@ -741,7 +951,7 @@ public class UI {
     */
    public static float convertPressure_FromMetric(final float weatherPressure) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return weatherPressure;
       }
 
@@ -754,7 +964,7 @@ public class UI {
     */
    public static float convertPressure_ToMetric(final float weatherPressure) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return weatherPressure;
       }
 
@@ -767,7 +977,7 @@ public class UI {
     */
    public static float convertTemperatureFromMetric(final float temperature) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return temperature;
       }
 
@@ -781,7 +991,7 @@ public class UI {
     */
    public static float convertTemperatureToMetric(final float temperature) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_IS_TEMPERATURE_CELCIUS) {
          return temperature;
       }
 
@@ -825,6 +1035,23 @@ public class UI {
       sourceData.transparentPixel = 0;
 
       return new Cursor(display, sourceData, 0, 0);
+   }
+
+   public static void createSpacer_Horizontal(final Composite parent, final int columns) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults().span(columns, 1).applyTo(label);
+   }
+
+   public static void createSpacer_Vertical(final Composite parent, final int height, final int spanHorizontal) {
+
+      final Label label = new Label(parent, SWT.NONE);
+
+      GridDataFactory.fillDefaults()
+            .hint(SWT.DEFAULT, height)
+            .span(spanHorizontal, 1)
+            .applyTo(label);
    }
 
    /**
@@ -899,6 +1126,8 @@ public class UI {
    public static Composite createUI_PageNoData(final Composite parent, final String message) {
 
       final Composite pageNoData = new Composite(parent, SWT.NONE);
+      // use a dimmed color, default is white
+      pageNoData.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
       GridDataFactory.fillDefaults().grab(true, true).applyTo(pageNoData);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(pageNoData);
       {
@@ -966,20 +1195,30 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hh, (time / 3600)).toString();
+      return _formatter.format(Messages.Format_hh,
+
+            time / 3600
+
+      ).toString();
    }
 
    public static String format_hh_mm(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            time / 3600,
+            time % 3600 / 60
+
+      ).toString();
    }
 
    /**
     * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
     *
     * @param time
+    *           ini seconds
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -994,24 +1233,24 @@ public class UI {
 
          // display hours
 
-         return _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         return _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         return _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
       }
    }
 
@@ -1019,18 +1258,17 @@ public class UI {
     * force hours to be displayed
     *
     * @param time
+    *           in seconds
     * @return
     */
    public static String format_hhh_mm_ss(final long time) {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(
-                  Messages.Format_hhmmss,
-                  (time / 3600),
-                  ((time % 3600) / 60),
-                  ((time % 3600) % 60))
+      return _formatter.format(Messages.Format_hhmmss,
+            time / 3600,
+            (time % 3600) / 60,
+            (time % 3600) % 60)
             .toString();
    }
 
@@ -1044,7 +1282,12 @@ public class UI {
 
       final long timeAbs = time < 0 ? 0 - time : time;
 
-      return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
+      return _formatter.format(Messages.Format_hhmm,
+
+            timeAbs / 60,
+            timeAbs % 60
+
+      ).toString();
    }
 
    public static String format_yyyymmdd_hhmmss(final int year,
@@ -1056,16 +1299,16 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  year,
-                  month,
-                  day,
-                  hour,
-                  minute,
-                  second)//
-            .toString();
+      return _formatter.format(Messages.Format_yyyymmdd_hhmmss,
+
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second
+
+      ).toString();
    }
 
    public static String FormatDoubleMinMax(final double value) {
@@ -1117,24 +1360,24 @@ public class UI {
 
          // display hours
 
-         timeText = _formatter
-               .format(//
-                     Messages.Format_hhmmss,
-                     (time / 3600),
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmmss,
+
+               time / 3600,
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       } else {
 
          // ignore hours
 
-         timeText = _formatter
-               .format(
-                     Messages.Format_hhmm,
-                     ((time % 3600) / 60),
-                     ((time % 3600) % 60))
-               .toString();
+         timeText = _formatter.format(Messages.Format_hhmm,
+
+               time % 3600 / 60,
+               time % 3600 % 60
+
+         ).toString();
 
       }
 
@@ -1286,6 +1529,37 @@ public class UI {
       return LINK_TAG_START + url + LINK_TAG_END;
    }
 
+   /**
+    * @return Returns the {@link StatusLineManager} of the current active part or <code>null</code>
+    *         when not available.
+    */
+   public static IStatusLineManager getStatusLineManager() {
+
+      final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+      final IWorkbenchPart activePart = activePage.getActivePart();
+      if (activePart instanceof IViewPart) {
+
+         final IViewPart viewPart = (IViewPart) activePart;
+
+         return viewPart.getViewSite().getActionBars().getStatusLineManager();
+      }
+
+      final IWorkbenchPart activeEditor = activePage.getActiveEditor();
+      if (activeEditor instanceof IEditorSite) {
+
+         final IEditorSite editorSite = (IEditorSite) activeEditor;
+
+         return editorSite.getActionBars().getStatusLineManager();
+      }
+
+      return null;
+   }
+
+   /**
+    * @param event
+    * @return Returns <code>true</code> when <Ctrl> key is pressed.
+    */
    public static boolean isCtrlKey(final Event event) {
 
       boolean isCtrlKey;
@@ -1310,6 +1584,24 @@ public class UI {
       }
 
       return isCtrlKey;
+   }
+
+   public static boolean isLinuxAsyncEvent(final Widget widget) {
+
+      if (IS_LINUX) {
+
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+            return true;
+         }
+
+         if (widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+            widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public static boolean isShiftKey(final MouseEvent event) {
@@ -1763,26 +2055,26 @@ public class UI {
           * FOREGROUND CANNOT BE SET
           */
 
-//			final ToolBar tb = (ToolBar) child;
+//         final ToolBar tb = (ToolBar) child;
 //
-//			for (final ToolItem toolItem : tb.getItems()) {
+//         for (final ToolItem toolItem : tb.getItems()) {
 //
-//				final Object data = toolItem.getData();
+//            final Object data = toolItem.getData();
 //
-//				if (data instanceof ActionContributionItem) {
+//            if (data instanceof ActionContributionItem) {
 //
-//					final ActionContributionItem action = (ActionContributionItem) data;
+//               final ActionContributionItem action = (ActionContributionItem) data;
 //
-//					final Widget widget = action.getWidget();
+//               final Widget widget = action.getWidget();
 //
-//					if (widget instanceof Button) {
+//               if (widget instanceof Button) {
 //
-//						final Button button = (Button) widget;
+//                  final Button button = (Button) widget;
 //
-//						button.setForeground(fgColor);
-//					}
-//				}
-//			}
+//                  button.setForeground(fgColor);
+//               }
+//            }
+//         }
       }
 
       child.setForeground(fgColor);
@@ -2145,6 +2437,228 @@ public class UI {
       }
    }
 
+   /**
+    * Update units from the pref store into the application variables
+    */
+   public static void updateUnits() {
+
+      final MeasurementSystem activeSystem = MeasurementSystem_Manager.getActiveMeasurementSystem();
+
+      UNIT_HASH_CODE = activeSystem.getSystemDataHash();
+
+// SET_FORMATTING_OFF
+
+      /*
+       * Atmospheric pressure
+       */
+      UNIT_IS_PRESSURE_MERCURY            = false;
+      UNIT_IS_PRESSURE_MILLIBAR           = false;
+
+      if (activeSystem.getPressure_Atmosphere() == Unit_Pressure_Atmosphere.INCH_OF_MERCURY) {
+
+         // set imperial measure system
+
+         UNIT_IS_PRESSURE_MERCURY         = true;
+
+         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_INHG;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_PRESSURE_MILLIBAR        = true;
+         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_MB;
+      }
+
+      /*
+       * Distance
+       */
+      UNIT_IS_DISTANCE_KILOMETER          = false;
+      UNIT_IS_DISTANCE_MILE               = false;
+      UNIT_IS_DISTANCE_NAUTICAL_MILE      = false;
+
+      final Unit_Distance distance = activeSystem.getDistance();
+      if (distance == Unit_Distance.MILE) {
+
+         // set imperial measure system
+
+         UNIT_IS_DISTANCE_MILE            = true;
+
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_MI;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_MPH;
+
+         UNIT_VALUE_DISTANCE              = UNIT_MILE;
+
+      } else if (distance == Unit_Distance.NAUTIC_MILE) {
+
+         UNIT_IS_DISTANCE_NAUTICAL_MILE   = true;
+
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_NMI;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_KNOT;
+
+         UNIT_VALUE_DISTANCE              = UNIT_NAUTICAL_MILE;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_DISTANCE_KILOMETER       = true;
+
+         UNIT_LABEL_DISTANCE              = UNIT_DISTANCE_KM;
+         UNIT_LABEL_SPEED                 = UNIT_SPEED_KM_H;
+
+         UNIT_VALUE_DISTANCE              = 1;
+      }
+
+      /*
+       * Pace
+       */
+      UNIT_IS_PACE_MIN_PER_KILOMETER      = false;
+      UNIT_IS_PACE_MIN_PER_MILE           = false;
+
+      if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
+
+         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
+
+         UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
+
+      } else {
+
+         UNIT_IS_PACE_MIN_PER_MILE        = true;
+
+         UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
+      }
+
+      /*
+       * Length
+       */
+      UNIT_IS_LENGTH_METER                = false;
+      UNIT_IS_LENGTH_YARD                 = false;
+
+      if (activeSystem.getLength() == Unit_Length.YARD) {
+
+         UNIT_IS_LENGTH_YARD              = true;
+
+         UNIT_LABEL_DISTANCE_M_OR_YD      = UNIT_DISTANCE_YARD;
+         UNIT_VALUE_DISTANCE_SMALL        = UNIT_YARD;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_LENGTH_METER             = true;
+
+         UNIT_LABEL_DISTANCE_M_OR_YD      = UNIT_METER;
+         UNIT_VALUE_DISTANCE_SMALL        = 1;
+      }
+
+      /*
+       * Small length
+       */
+      UNIT_IS_LENGTH_SMALL_MILLIMETER     = false;
+      UNIT_IS_LENGTH_SMALL_INCH           = false;
+
+      if (activeSystem.getLengthSmall() == Unit_Length_Small.INCH) {
+
+         UNIT_IS_LENGTH_SMALL_INCH        = true;
+
+         UNIT_LABEL_DISTANCE_MM_OR_INCH   = UNIT_DISTANCE_INCH;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = UNIT_INCH;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_LENGTH_SMALL_MILLIMETER  = true;
+
+         UNIT_LABEL_DISTANCE_MM_OR_INCH   = UNIT_MM;
+         UNIT_VALUE_DISTANCE_MM_OR_INCH   = 1;
+      }
+
+      /*
+       * Elevation
+       */
+      UNIT_IS_ELEVATION_FOOT              = false;
+      UNIT_IS_ELEVATION_METER             = false;
+
+      if (activeSystem.getElevation() == Unit_Elevation.FOOT) {
+
+         // set imperial measure system
+
+         UNIT_IS_ELEVATION_FOOT           = true;
+
+         UNIT_LABEL_ELEVATION             = UNIT_ELEVATION_FT;
+         UNIT_LABEL_ALTIMETER             = UNIT_ALTIMETER_FT_H;
+
+         UNIT_VALUE_ELEVATION             = UNIT_FOOT;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_ELEVATION_METER          = true;
+
+         UNIT_LABEL_ELEVATION             = UNIT_ELEVATION_M;
+         UNIT_LABEL_ALTIMETER             = UNIT_ALTIMETER_M_H;
+
+         UNIT_VALUE_ELEVATION             = 1;
+      }
+
+      /*
+       * Temperature
+       */
+      UNIT_IS_TEMPERATURE_CELCIUS         = false;
+      UNIT_IS_TEMPERATURE_FAHRENHEIT      = false;
+
+      if (activeSystem.getTemperature() == Unit_Temperature.FAHRENHEIT) {
+
+         // set imperial measure system
+
+         UNIT_IS_TEMPERATURE_FAHRENHEIT   = true;
+
+         UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_F;
+         UNIT_VALUE_TEMPERATURE           = UNIT_FAHRENHEIT_ADD;
+
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_TEMPERATURE_CELCIUS      = true;
+
+         UNIT_LABEL_TEMPERATURE           = UNIT_TEMPERATURE_C;
+         UNIT_VALUE_TEMPERATURE           = 1;
+      }
+
+      /*
+       * Weight
+       */
+      UNIT_IS_WEIGHT_KILOGRAMM            = false;
+      UNIT_IS_WEIGHT_POUND                = false;
+
+      if (activeSystem.getWeight() == Unit_Weight.POUND) {
+
+         // set imperial measure system
+
+         UNIT_IS_WEIGHT_POUND             = true;
+
+         UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_LBS;
+         UNIT_VALUE_WEIGHT                = UNIT_POUND;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_IS_WEIGHT_KILOGRAMM         = true;
+
+         UNIT_LABEL_WEIGHT                = UNIT_WEIGHT_KG;
+         UNIT_VALUE_WEIGHT                = 1;
+      }
+
+// SET_FORMATTING_ON
+
+   }
+
    public static VerifyListener verifyFilenameInput() {
 
       return new VerifyListener() {
@@ -2257,108 +2771,108 @@ public class UI {
 
 //this conversion is not working for all png images, found SWT2Dutil.java
 //
-//	/**
-//	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
-//	 *
-//	 * @param bufferedImage
-//	 *            the image to be converted
-//	 * @param originalImagePathName
-//	 * @return An ImageData that represents the same image as bufferedImage
-//	 */
-//	public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
+//   /**
+//    * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
+//    *
+//    * @param bufferedImage
+//    *            the image to be converted
+//    * @param originalImagePathName
+//    * @return An ImageData that represents the same image as bufferedImage
+//    */
+//   public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
 //
-//		try {
+//      try {
 //
-//			if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-//				final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
-//				final PaletteData palette = new PaletteData(
-//						colorModel.getRedMask(),
-//						colorModel.getGreenMask(),
-//						colorModel.getBlueMask());
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[3];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
+//         if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+//            final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
+//            final PaletteData palette = new PaletteData(
+//                  colorModel.getRedMask(),
+//                  colorModel.getGreenMask(),
+//                  colorModel.getBlueMask());
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
+//            final WritableRaster raster = bufferedImage.getRaster();
+//            final int[] pixelArray = new int[3];
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//                  data.setPixel(x, y, pixel);
+//               }
+//            }
+//            return data;
 //
-//			} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+//         } else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
 //
-//				final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
-//				final int size = colorModel.getMapSize();
-//				final byte[] reds = new byte[size];
-//				final byte[] greens = new byte[size];
-//				final byte[] blues = new byte[size];
-//				colorModel.getReds(reds);
-//				colorModel.getGreens(greens);
-//				colorModel.getBlues(blues);
-//				final RGB[] rgbs = new RGB[size];
-//				for (int i = 0; i < rgbs.length; i++) {
-//					rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
-//				}
-//				final PaletteData palette = new PaletteData(rgbs);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				data.transparentPixel = colorModel.getTransparentPixel();
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[1];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						data.setPixel(x, y, pixelArray[0]);
-//					}
-//				}
-//				return data;
+//            final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
+//            final int size = colorModel.getMapSize();
+//            final byte[] reds = new byte[size];
+//            final byte[] greens = new byte[size];
+//            final byte[] blues = new byte[size];
+//            colorModel.getReds(reds);
+//            colorModel.getGreens(greens);
+//            colorModel.getBlues(blues);
+//            final RGB[] rgbs = new RGB[size];
+//            for (int i = 0; i < rgbs.length; i++) {
+//               rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
+//            }
+//            final PaletteData palette = new PaletteData(rgbs);
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
+//            data.transparentPixel = colorModel.getTransparentPixel();
+//            final WritableRaster raster = bufferedImage.getRaster();
+//            final int[] pixelArray = new int[1];
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  data.setPixel(x, y, pixelArray[0]);
+//               }
+//            }
+//            return data;
 //
-//			} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
+//         } else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
 //
-//				final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
+//            final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
 //
-//				//ASSUMES: 3 BYTE BGR IMAGE TYPE
+//            //ASSUMES: 3 BYTE BGR IMAGE TYPE
 //
-//				final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
+//            final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
+//            final ImageData data = new ImageData(
+//                  bufferedImage.getWidth(),
+//                  bufferedImage.getHeight(),
+//                  colorModel.getPixelSize(),
+//                  palette);
 //
-//				//This is valid because we are using a 3-byte Data model with no transparent pixels
-//				data.transparentPixel = -1;
+//            //This is valid because we are using a 3-byte Data model with no transparent pixels
+//            data.transparentPixel = -1;
 //
-//				final WritableRaster raster = bufferedImage.getRaster();
+//            final WritableRaster raster = bufferedImage.getRaster();
 //
-////				final int[] pixelArray = new int[3];
-//				final int[] pixelArray = colorModel.getComponentSize();
+////            final int[] pixelArray = new int[3];
+//            final int[] pixelArray = colorModel.getComponentSize();
 //
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
-//			}
+//            for (int y = 0; y < data.height; y++) {
+//               for (int x = 0; x < data.width; x++) {
+//                  raster.getPixel(x, y, pixelArray);
+//                  final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//                  data.setPixel(x, y, pixel);
+//               }
+//            }
+//            return data;
+//         }
 //
-//		} catch (final Exception e) {
+//      } catch (final Exception e) {
 //
-//			System.out.println(NLS.bind(//
-//					UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
-//					imagePathName));
-//		}
+//         System.out.println(NLS.bind(//
+//               UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
+//               imagePathName));
+//      }
 //
-//		return null;
-//	}
+//      return null;
+//   }
