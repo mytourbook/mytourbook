@@ -218,6 +218,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
     */
    public Comparator<Photo>        SORT_BY_IMAGE_DATE;
    public Comparator<Photo>        SORT_BY_FILE_NAME;
+
    /**
     * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
     * {@link PicDirView#GALLERY_SORTING_BY_NAME}
@@ -322,15 +323,14 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private Composite        _uiContainer;
 
    private GalleryMT20      _galleryMT20;
-
    private GalleryActionBar _galleryActionBar;
-   private PageBook         _pageBook;
 
+   private PageBook         _pageBook;
    private Composite        _pageDefault;
    private Composite        _pageGalleryInfo;
    private Composite        _pageDetails;
-   private Label            _lblDefaultPage;
 
+   private Label            _lblDefaultPage;
    private Label            _lblGalleryInfo;
 
    private Menu             _tableContextMenu;
@@ -375,7 +375,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
          }
       };
 
-      SORT_BY_IMAGE_DATE = new Comparator<Photo>() {
+      SORT_BY_IMAGE_DATE = new Comparator<>() {
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
 
@@ -390,7 +390,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
          }
       };
 
-      SORT_BY_FILE_NAME = new Comparator<Photo>() {
+      SORT_BY_FILE_NAME = new Comparator<>() {
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
 

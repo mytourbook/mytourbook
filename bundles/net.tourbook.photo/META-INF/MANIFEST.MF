@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.di
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
-Export-Package: net.tourbook.photo
+Export-Package: net.tourbook.photo,
+ net.tourbook.photo.internal.gallery.MT20
 Import-Package: net.tourbook.common,
  net.tourbook.common.action,
  net.tourbook.common.form,

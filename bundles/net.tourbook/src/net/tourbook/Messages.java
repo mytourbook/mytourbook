@@ -38,7 +38,7 @@ public class Messages extends NLS {
    public static String        Action_PhotosAndTours_FilterNoTours_Tooltip;
    public static String        Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip;
    public static String        Action_PhotosAndTours_FilterPhotos_Tooltip;
-   public static String        Action_PhotosAndTours_SavePhotoInTour;
+   public static String        Action_PhotosAndTours_SaveAllPhotosInTour;
 
    public static String        Action_ToolTip_Hide;
    public static String        Action_ToolTip_SetDefaults;
@@ -418,6 +418,9 @@ public class Messages extends NLS {
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;
 
+   public static String        Action_TourPhotos_AddPhoto;
+   public static String        Action_TourPhotos_RemovePhoto;
+
    public static String        Action_TourType_ModifyTourTypeFilter;
 
    public static String        Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -534,6 +537,7 @@ public class Messages extends NLS {
    public static String        App_Action_RefreshView;
    public static String        App_Action_Remove;
    public static String        App_Action_Remove_Immediate;
+   public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Rename;
    public static String        App_Action_RestartApp;
    public static String        App_Action_RestoreDefault;
@@ -1508,12 +1512,20 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Combo_Camera_Tooltip;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Message;
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
+   public static String        Photos_AndTours_Dialog_RemovePhotos_Message;
+   public static String        Photos_AndTours_Dialog_RemovePhotos_Title;
    public static String        Photos_AndTours_Label_AdjustTime;
    public static String        Photos_AndTours_Label_AdjustTime_Tooltip;
    public static String        Photos_AndTours_Label_DurationLess1Hour;
    public static String        Photos_AndTours_Label_HistoryTour;
    public static String        Photos_AndTours_Label_NoCamera;
    public static String        Photos_AndTours_Label_NoSelectedPhoto;
+   public static String        Photos_AndTours_Label_Source_PhotoLink;
+
+   public static String        Photos_AndTours_Label_Source_PhotoLink_Tooltip;
+   public static String        Photos_AndTours_Label_Source_Tour;
+
+   public static String        Photos_AndTours_Label_Source_Tour_Tooltip;
    public static String        Photos_AndTours_Link_PhotoDirectory;
    public static String        Photos_AndTours_Spinner_AdjustHours_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
