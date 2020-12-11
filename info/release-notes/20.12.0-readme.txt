@@ -1,4 +1,4 @@
-20.?.0                                                 ?. Month 2020
+20.12.0                                                 ?. December 2020
 
 
 TODO's
@@ -93,6 +93,5 @@ Translation
 System   
 ======
 
+* Eclipse 2020-12
 * WorldWind 2.2.0 (https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.0)
-* FIT SDK 21.40
-* Eclipse 2020-09

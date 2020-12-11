@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="feature_export" name="build">
 	<target name="feature_export">
-		<pde.exportFeatures destination="C:\DAT\MT\mytourbook\build\build.eclipse.4.14.nl.repo" exportSource="false" exportType="directory" features="feature.net.tourbook.ext.eclipse.nl" useJARFormat="true"/>
+		<pde.exportFeatures destination="C:\DAT\MT\mytourbook\build\build.eclipse.4.17.nl.repo" exportSource="false" exportType="directory" features="feature.net.tourbook.ext.eclipse.nl" useJARFormat="true"/>
 	</target>
 </project>
