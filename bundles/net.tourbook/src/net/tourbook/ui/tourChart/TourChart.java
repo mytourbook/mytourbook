@@ -1957,7 +1957,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final ArrayList<List<Long>> allTourPauses = _tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = _tourData.multiTourPauses;
          String pauseDurationText;
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {

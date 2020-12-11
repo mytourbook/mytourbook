@@ -93,7 +93,7 @@ public class TourMapPainter extends MapPainter {
    private static final int                MARKER_MARGIN     = 2;
    private static final int                MARKER_POLE       = 16;
 
-   final static IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
+   static final IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
 
    private static IPropertyChangeListener  _prefChangeListener;
 
@@ -124,7 +124,7 @@ public class TourMapPainter extends MapPainter {
    private static Rectangle                _twpImageBounds;
    private static TourPainterConfiguration _tourPaintConfig;
 
-   private final static NumberFormat       _nf1              = NumberFormat.getNumberInstance();
+   private static final NumberFormat       _nf1              = NumberFormat.getNumberInstance();
 
    /*
     * UI resources
@@ -136,7 +136,7 @@ public class TourMapPainter extends MapPainter {
     */
    private static Image               _twpImage;
 
-   private final static ColorCacheSWT _colorCache = new ColorCacheSWT();
+   private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
 
    private float[]                    _dataSerie;
    private IMapColorProvider          _legendProvider;
@@ -729,10 +729,9 @@ public class TourMapPainter extends MapPainter {
       _colorCache.dispose();
    }
 
-   public static ArrayList<TourLegendLabel> getMapLegendLabels(final int legendWidth,
-                                                               final int legendHeight,
-                                                               final IGradientColorProvider colorProvider,
-                                                               final ColorProviderConfig config) {
+   public static List<TourLegendLabel> getMapLegendLabels(final int legendHeight,
+                                                          final IGradientColorProvider colorProvider,
+                                                          final ColorProviderConfig config) {
 
       final ArrayList<TourLegendLabel> legendLabels = new ArrayList<>();
 
@@ -1355,7 +1354,7 @@ public class TourMapPainter extends MapPainter {
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final ArrayList<List<Long>> allTourPauses = tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = tourData.multiTourPauses;
          int currentTourPauseIndex = 0;
          int pauseCounter = 0;
          final int[] timeSerie = tourData.timeSerie;
@@ -1374,7 +1373,7 @@ public class TourMapPainter extends MapPainter {
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
-                  previousTourElapsedTime = timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+                  previousTourElapsedTime = timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
                for (; tourSerieIndex < timeSerie.length; ++tourSerieIndex) {
@@ -1615,7 +1614,7 @@ public class TourMapPainter extends MapPainter {
        * world positions are cached to optimize performance when multiple tours are selected
        */
       final String projectionId = mp.getProjection().getId();
-      Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+      Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
 
       if ((tourWorldPixelPosAll == null)) {
 
@@ -1782,25 +1781,22 @@ public class TourMapPainter extends MapPainter {
 
                // current position is outside the tile
 
-               if (isVisibleDataPoint) {
+               if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
 
-                  if (serieIndex == lastInsideIndex + 1) {
+                  /*
+                   * this position is the first which is outside of the tile, draw a line from
+                   * the last inside to the first outside position
+                   */
 
-                     /*
-                      * this position is the first which is outside of the tile, draw a line from
-                      * the last inside to the first outside position
-                      */
-
-                     drawTour_20_Line(
-                           gcTile,
-                           devFrom_WithOffsetX,
-                           devFrom_WithOffsetY,
-                           devTo_WithOffsetX,
-                           devTo_WithOffsetY,
-                           color,
-                           tile,
-                           tourId);
-                  }
+                  drawTour_20_Line(
+                        gcTile,
+                        devFrom_WithOffsetX,
+                        devFrom_WithOffsetY,
+                        devTo_WithOffsetX,
+                        devTo_WithOffsetY,
+                        color,
+                        tile,
+                        tourId);
                }
 
                // keep positions
@@ -2584,36 +2580,29 @@ public class TourMapPainter extends MapPainter {
       final int tileWorldPixelTop = tile.getY() * tileSize;
       final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0) {
+      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0 && isPaintingNeeded_Tours(
+            tourDataList,
+            mp,
+            mapZoomLevel,
+            projectionId,
+            tileWorldPixelLeft,
+            tileWorldPixelRight,
+            tileWorldPixelTop,
+            tileWorldPixelBottom)) {
 
-         if (isPaintingNeeded_Tours(
-               tourDataList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelRight,
-               tileWorldPixelTop,
-               tileWorldPixelBottom)) {
-
-            return true;
-         }
+         return true;
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
+      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0 &&
+            isPaintingNeeded_Photos(
+                  photoList,
+                  mp,
+                  mapZoomLevel,
+                  projectionId,
+                  tileWorldPixelLeft,
+                  tileWorldPixelTop)) {
 
-         if (isPaintingNeeded_Photos(
-               photoList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelRight,
-               tileWorldPixelTop,
-               tileWorldPixelBottom)) {
-
-            return true;
-         }
+         return true;
       }
 
       return false;
@@ -2624,9 +2613,7 @@ public class TourMapPainter extends MapPainter {
                                            final int mapZoomLevel,
                                            final String projectionId,
                                            final int tileWorldPixelLeft,
-                                           final int tileWorldPixelRight,
-                                           final int tileWorldPixelTop,
-                                           final int tileWorldPixelBottom) {
+                                           final int tileWorldPixelTop) {
       /*
        * check photos
        */
@@ -2685,7 +2672,7 @@ public class TourMapPainter extends MapPainter {
             /*
              * world positions are cached to optimize performance when multiple tours are selected
              */
-            Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+            Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
             if ((tourWorldPixelPosAll == null)) {
 
                // world pixels are not yet cached, create them now

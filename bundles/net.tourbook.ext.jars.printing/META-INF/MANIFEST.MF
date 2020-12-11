@@ -7,12 +7,16 @@ Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: 
  batik-all-1.12.jar,
- commons-io-2.6.jar,
+ commons-io-2.8.0.jar,
  commons-logging-1.2.jar,
- fop-2.4.jar,
+ fop-2.5.jar,
  jaxb-api-2.4.0-b180830.0359.jar,
- xmlgraphics-commons-2.4.jar
+ xmlgraphics-commons-2.4.jar,
+ jaxb-runtime-2.4.0-b180830.0438.jar,
+ istack-commons-runtime-4.0.0.jar,
+ activation-1.1.1.jar
 Export-Package: 
+ javax.xml.bind,
  javax.xml.bind.annotation,
  org.apache.commons.io,
  org.apache.commons.logging,
