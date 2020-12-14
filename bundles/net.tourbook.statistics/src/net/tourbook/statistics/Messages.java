@@ -43,7 +43,6 @@ public class Messages extends NLS {
    public static String        Statistic_Label_Invers;
 
    public static String        Statistic_Value_Date_Day_Header1;
-   public static String        Statistic_Value_Date_DOY_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header1;
    public static String        Statistic_Value_Date_FirstDay_Header2;
    public static String        Statistic_Value_Date_Month_Header1;
@@ -72,10 +71,10 @@ public class Messages extends NLS {
    public static String        Statistic_Value_Tour_NumberOfTours_Header1;
    public static String        Statistic_Value_Tour_Title_Header1;
    public static String        Statistic_Value_Tour_TourType_Header1;
-   public static String        Statistic_Value_Training_Aerob_Header1;
-   public static String        Statistic_Value_Training_Anaerob_Header1;
+   public static String        Statistic_Value_Training_Aerob_Header2;
+   public static String        Statistic_Value_Training_Anaerob_Header2;
    public static String        Statistic_Value_Training_Header1;
-   public static String        Statistic_Value_Training_Performance_Header1;
+   public static String        Statistic_Value_Training_Performance_Header2;
 
    public static String        Statistic_Week_Tooltip_ColumnHeaderTitle;
    public static String        Statistic_Week_Tooltip_Title;

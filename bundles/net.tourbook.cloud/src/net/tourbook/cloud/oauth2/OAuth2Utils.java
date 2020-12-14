@@ -38,10 +38,12 @@ public class OAuth2Utils {
    public static String getAuthorizeUrl(final OAuth2Client client) {
 
       final List<NameValuePair> params = new ArrayList<>();
-      params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_REDIRECT_URI,
-            client.getRedirectUri()));
+
+      params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_REDIRECT_URI, client.getRedirectUri()));
+
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CLIENT_ID,
-            client.getId().toString()));
+            client.getId()));
+
       params.add(new BasicNameValuePair(
             IOAuth2Constants.RESPONSE_TYPE,
             IOAuth2Constants.PARAM_TOKEN));

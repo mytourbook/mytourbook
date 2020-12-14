@@ -22,11 +22,12 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -52,6 +53,8 @@ public class HistoricalWeatherRetriever {
    private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData"; //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
+   private static HttpClient    httpClient                 = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+
    static {
 
       if (_isLogWeatherData) {
@@ -62,8 +65,8 @@ public class HistoricalWeatherRetriever {
       }
    }
 
-   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private final static String    keyParameter = "?key=";                                                          //$NON-NLS-1$
+   private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
@@ -82,9 +85,10 @@ public class HistoricalWeatherRetriever {
     * The tour for which we need to retrieve the weather data.
     */
    public HistoricalWeatherRetriever(final TourData tour) {
+
       this.tour = tour;
 
-      searchAreaCenter = determineWeatherSearchArea();
+      determineWeatherSearchArea();
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
 
       final double roundedStartTime = tour.getTourStartTime().getHour();
@@ -111,7 +115,7 @@ public class HistoricalWeatherRetriever {
     * encompass most of the track to search a weather station as close as possible
     * to the overall course and not just to a specific point.
     */
-   private LatLng determineWeatherSearchArea() {
+   private void determineWeatherSearchArea() {
       // Looking for the farthest point of the track
       double maxDistance = Double.MIN_VALUE;
       LatLng furthestPoint = null;
@@ -131,9 +135,7 @@ public class HistoricalWeatherRetriever {
       final double bearingBetweenPoint = LatLngTool.initialBearing(startPoint, furthestPoint);
 
       // We find the center of the circle formed by the starting point and the farthest point
-      final LatLng searchAreaCenter = LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
-
-      return searchAreaCenter;
+      searchAreaCenter = LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
    }
 
    public WeatherData getHistoricalWeatherData() {
@@ -253,29 +255,20 @@ public class HistoricalWeatherRetriever {
    }
 
    /**
-    * This method retrieves, if found, the weather data.
-    */
-   public HistoricalWeatherRetriever retrieve() {
-      historicalWeatherData = retrieveHistoricalWeatherData();
-
-      return this;
-   }
-
-   /**
     * Retrieves the historical weather data
     *
     * @return The weather data, if found.
     */
-   private WeatherData retrieveHistoricalWeatherData() {
+   public HistoricalWeatherRetriever retrieveHistoricalWeatherData() {
 
       final String rawWeatherData = sendWeatherApiRequest();
       if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
          return null;
       }
 
-      final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
+      historicalWeatherData = parseWeatherData(rawWeatherData);
 
-      return historicalWeatherData;
+      return this;
    }
 
    /**
@@ -300,47 +293,27 @@ public class HistoricalWeatherRetriever {
 
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
-      BufferedReader rd = null;
-      InputStreamReader isr = null;
-      final StringBuffer weatherHistory = new StringBuffer();
+      String weatherHistory = UI.EMPTY_STRING;
       try {
          // NOTE :
          // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
          // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
 
-         final URL url = new URL(weatherRequestWithParameters);
-         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-         connection.setRequestMethod("GET"); //$NON-NLS-1$
-         connection.connect();
+         final HttpRequest request = HttpRequest.newBuilder(URI.create(weatherRequestWithParameters)).GET().build();
 
-         isr = new InputStreamReader(connection.getInputStream());
-         rd = new BufferedReader(isr);
+         final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 
-         String line = UI.EMPTY_STRING;
-         while ((line = rd.readLine()) != null) {
-            weatherHistory.append(line);
-         }
+         weatherHistory = response.body();
+
       } catch (final Exception ex) {
          StatusUtil.log(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
          return UI.EMPTY_STRING;
-      } finally {
-         try {
-            // close resources
-            if (rd != null) {
-               rd.close();
-            }
-            if (isr != null) {
-               isr.close();
-            }
-         } catch (final IOException e) {
-            e.printStackTrace();
-         }
       }
 
-      return weatherHistory.toString();
+      return weatherHistory;
    }
 
 }

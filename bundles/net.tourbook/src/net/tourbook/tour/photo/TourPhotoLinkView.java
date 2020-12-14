@@ -631,6 +631,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void clearView() {
 
+      if (_pageBook.isDisposed()) {
+         return;
+      }
+
       _visibleTourPhotoLinks.clear();
       _allPhotos.clear();
       _selectedLinks.clear();

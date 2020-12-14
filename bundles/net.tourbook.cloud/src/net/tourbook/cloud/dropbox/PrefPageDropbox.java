@@ -46,7 +46,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    /*
     * UI controls
     */
-   private Button             _btnAuthorizeConnection;
    private Text               _textAccessToken;
 
    @Override
@@ -70,17 +69,17 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             /*
              * Authorize button
              */
-            _btnAuthorizeConnection = new Button(container, SWT.NONE);
-            setButtonLayoutData(_btnAuthorizeConnection);
-            _btnAuthorizeConnection.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_Authorize);
-            _btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
+            final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
+            setButtonLayoutData(btnAuthorizeConnection);
+            btnAuthorizeConnection.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_Authorize);
+            btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onClickAuthorize();
                }
             });
-            
+
             /*
              * Access Token
              */
