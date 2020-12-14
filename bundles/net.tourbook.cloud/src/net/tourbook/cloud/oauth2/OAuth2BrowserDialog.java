@@ -40,15 +40,15 @@ import org.eclipse.ui.PlatformUI;
  */
 public class OAuth2BrowserDialog extends Dialog {
 
-   private final String url;
+   private static final String paramAccessToken = IOAuth2Constants.PARAM_ACCESS_TOKEN;
 
-   private final String redirectUri;
+   private final String        url;
 
-   private final String paramName;
+   private final String        redirectUri;
 
-   private String       token;
+   private String              token;
 
-   private String       response;
+   private String              response;
 
    /**
     * @param shell
@@ -59,7 +59,7 @@ public class OAuth2BrowserDialog extends Dialog {
 
       this(PlatformUI.getWorkbench()
             .getDisplay()
-            .getActiveShell(), OAuth2Utils.getAuthorizeUrl(client), IOAuth2Constants.PARAM_ACCESS_TOKEN, client.getRedirectUri());
+            .getActiveShell(), OAuth2Utils.getAuthorizeUrl(client), client.getRedirectUri());
    }
 
    /**
@@ -70,11 +70,9 @@ public class OAuth2BrowserDialog extends Dialog {
     */
    public OAuth2BrowserDialog(final Shell shell,
                               final String url,
-                              final String parameterName,
                               final String redirectUri) {
       super(shell);
       this.url = url;
-      paramName = parameterName;
       this.redirectUri = redirectUri;
    }
 
@@ -93,8 +91,7 @@ public class OAuth2BrowserDialog extends Dialog {
       final Composite displayArea = new Composite(control, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(displayArea);
       GridDataFactory.fillDefaults()
-            .hint(600,
-                  600)
+            .hint(600, 600)
             .grab(true, true)
             .applyTo(displayArea);
 
@@ -114,18 +111,12 @@ public class OAuth2BrowserDialog extends Dialog {
             } catch (final URISyntaxException ignored) {
                return;
             }
-            final char[] separators = { '#', '&' };
-            response = uri.toString();
-            final List<NameValuePair> params = URLEncodedUtils.parse(response, StandardCharsets.UTF_8, separators);
-            for (final NameValuePair param : params) {
-               if (paramName.equals(param.getName())) {
-                  token = param.getValue();
-                  break;
-               }
-            }
+            retrieveTokenFromResponse(uri);
+
             event.doit = false;
             close();
          }
+
       });
       getShell().setText(Messages.OAuth2BrowserDialog_Title);
       return control;
@@ -147,12 +138,27 @@ public class OAuth2BrowserDialog extends Dialog {
       return response;
    }
 
+   public String getToken() {
+      return token;
+   }
+
    @Override
    protected boolean isResizable() {
       return true;
    }
 
-   public String getToken() {
-      return token;
+   private void retrieveTokenFromResponse(final URI uri) {
+
+      final char[] separators = { '#', '&' };
+
+      response = uri.toString();
+
+      final List<NameValuePair> params = URLEncodedUtils.parse(response, StandardCharsets.UTF_8, separators);
+      for (final NameValuePair param : params) {
+         if (paramAccessToken.equals(param.getName())) {
+            token = param.getValue();
+            break;
+         }
+      }
    }
 }
