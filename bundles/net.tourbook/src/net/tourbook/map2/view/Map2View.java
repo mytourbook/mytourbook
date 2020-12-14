@@ -91,7 +91,6 @@ import net.tourbook.map2.action.ActionSetDefaultPosition;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
-import net.tourbook.map2.action.ActionShowPhotos;
 import net.tourbook.map2.action.ActionShowScaleInMap;
 import net.tourbook.map2.action.ActionShowSliderInLegend;
 import net.tourbook.map2.action.ActionShowSliderInMap;
@@ -545,6 +544,36 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionShowPhotos extends ActionToolbarSlideout {
+
+      public ActionShowPhotos() {
+
+         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap),
+               TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap_Disabled));
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new Slideout_Map2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         actionShowPhotos(getSelection());
+      }
+   }
+
    private class ActionShowTour extends ActionToolbarSlideout {
 
       public ActionShowTour() {
@@ -586,6 +615,10 @@ public class Map2View extends ViewPart implements
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
+
+         /*
+          * Register other action images
+          */
 
          // image 0: tour
          addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
@@ -1003,9 +1036,9 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionShowPhotos() {
+   public void actionShowPhotos(final boolean isSelected) {
 
-      _isShowPhoto = _actionShowPhotos.isChecked();
+      _isShowPhoto = isSelected;
 
       enableActions();
 
@@ -1638,7 +1671,7 @@ public class Map2View extends ViewPart implements
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap              = new ActionShowLegendInMap(this);
-      _actionShowPhotos                   = new ActionShowPhotos(this);
+      _actionShowPhotos                   = new ActionShowPhotos();
       _actionShowScaleInMap               = new ActionShowScaleInMap(this);
       _actionShowSliderInMap              = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend           = new ActionShowSliderInLegend(this);
@@ -3607,7 +3640,7 @@ public class Map2View extends ViewPart implements
 
       // is show photo
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
-      _actionShowPhotos.setChecked(_isShowPhoto);
+      _actionShowPhotos.setSelection(_isShowPhoto);
 
       // is show legend
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
@@ -4359,6 +4392,13 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
+   }
+
+   public void updateUI_Photos() {
+
+      _map.disposeOverlayImageCache();
+
+      _map.paint();
    }
 
    /**

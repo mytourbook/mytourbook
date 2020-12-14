@@ -23,7 +23,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.MapFilterData;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.RatingStars;
@@ -37,7 +36,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -48,7 +46,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 
@@ -59,38 +56,30 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 
    private static final int      SHELL_MARGIN                            = 5;
 
-   private static final int      MIN_IMAGE_WIDTH                         = 10;
-
-   /**
-    * This value is small because a map do not yet load large images !!!
-    */
-   private static final int      MAX_IMAGE_WIDTH                         = 200;
-
    private static final String   STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";         //$NON-NLS-1$
    private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR"; //$NON-NLS-1$
-   private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE       = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
 
    public static final int       OPERATOR_IS_LESS_OR_EQUAL               = 0;
-
    public static final int       OPERATOR_IS_EQUAL                       = 1;
-
    public static final int       OPERATOR_IS_MORE_OR_EQUAL               = 2;
 
    private static final String[] _ratingStarOperatorsText                = {
+
          Messages.Photo_Filter_Operator_IsLess,
          Messages.Photo_Filter_Operator_IsEqual,
          Messages.Photo_Filter_Operator_IsMore,
-         //
+
    };
 
    /**
     * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
     */
    private static final int[]    _ratingStarOperatorsValues              = {
+
          OPERATOR_IS_LESS_OR_EQUAL,
          OPERATOR_IS_EQUAL,
          OPERATOR_IS_MORE_OR_EQUAL,
-         //
+
    };
 
    private IDialogSettings       _state;
@@ -101,13 +90,11 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    private final WaitTimer                              _waitTimer           = new WaitTimer();
 
    private boolean                                      _canOpenToolTip;
-
    private boolean                                      _isWaitTimerStarted;
+
    private int                                          _filterRatingStars   = RatingStars.MAX_RATING_STARS;
 
    private final ListenerList<IPhotoPropertiesListener> _propertiesListeners = new ListenerList<>(ListenerList.IDENTITY);
-
-   private int                                          _imageSize;
 
    /*
     * filter operator
@@ -132,8 +119,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    private Combo         _comboRatingStarOperators;
 
    private RatingStars   _ratingStars;
-
-   private Spinner       _spinnerImageSize;
 
    private final class WaitTimer implements Runnable {
       @Override
@@ -204,18 +189,12 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    private Composite createUI(final Composite parent) {
 
       _shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .margins(SHELL_MARGIN, SHELL_MARGIN)
             .numColumns(3)
             .applyTo(_shellContainer);
       {
          createUI_10_Filter(_shellContainer);
-
-         // spacer
-         final Label label = new Label(_shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().hint(20, 0).applyTo(label);
-
-         createUI_20_ImageSize(_shellContainer);
       }
 
       return _shellContainer;
@@ -239,16 +218,14 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
          createUI_12_FilterHeader(container);
 
          /*
-          * combo: > = <
+          * Combo: > = <
           */
-//			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
          _comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .align(SWT.END, SWT.FILL)
 //					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
                .applyTo(_comboRatingStarOperators);
          _comboRatingStarOperators.setVisibleItemCount(10);
-//			_comboRatingStarOperators.setToolTipText(Messages.Photos_PhotoFilter_Combo_RatingStarOperands_Tooltip);
          _comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -257,7 +234,7 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
          });
 
          /*
-          * rating stars
+          * Rating stars
           */
          _ratingStars = new RatingStars(container);
          _ratingStars.addSelectionListener(new SelectionAdapter() {
@@ -272,18 +249,16 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    private void createUI_12_FilterHeader(final Composite parent) {
 
       _containerFilterHeader = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .applyTo(_containerFilterHeader);
-      GridLayoutFactory.fillDefaults()//
-            .applyTo(_containerFilterHeader);
+      GridDataFactory.fillDefaults().applyTo(_containerFilterHeader);
+      GridLayoutFactory.fillDefaults().applyTo(_containerFilterHeader);
 //		_containerFilterHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          /*
           * inner container is used to center horizontally
           */
          final Composite innerContainer = new Composite(_containerFilterHeader, SWT.NONE);
-         GridDataFactory.fillDefaults().//
-               grab(true, false)
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
                .align(SWT.CENTER, SWT.FILL)
                .applyTo(innerContainer);
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
@@ -309,51 +284,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
             _lblFilteredPhotos.setText(UI.EMPTY_STRING);
             _lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
          }
-      }
-   }
-
-   private void createUI_20_ImageSize(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         /*
-          * label: displayed photos
-          */
-         final Label label = new Label(container, SWT.NO_FOCUS);
-         GridDataFactory.fillDefaults()//
-//					.align(SWT.CENTER, SWT.BEGINNING)
-               .applyTo(label);
-
-         label.setText(Messages.Photo_Properties_Label_Size);
-         label.setToolTipText(Messages.Photo_Properties_Label_ThumbnailSize_Tooltip);
-
-         /*
-          * spinner: size
-          */
-         _spinnerImageSize = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
-               .applyTo(_spinnerImageSize);
-         _spinnerImageSize.setMinimum(MIN_IMAGE_WIDTH);
-         _spinnerImageSize.setMaximum(MAX_IMAGE_WIDTH);
-         _spinnerImageSize.setIncrement(1);
-         _spinnerImageSize.setPageIncrement(10);
-         _spinnerImageSize.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectImageSize();
-            }
-         });
-         _spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               onSelectImageSize();
-            }
-         });
-
       }
    }
 
@@ -403,21 +333,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    protected void onDispose() {
 
       PhotoManager.removePhotoEventListener(this);
-   }
-
-   private void onSelectImageSize() {
-
-      final int oldImageSize = _imageSize;
-
-      _imageSize = _spinnerImageSize.getSelection();
-
-      // optimize fire event
-      if (oldImageSize != _imageSize) {
-
-         Photo.setPaintedMapImageWidth(_imageSize);
-
-         firePropertiesEvent();
-      }
    }
 
    private void onSelectRatingStarOperands() {
@@ -471,15 +386,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
          _itemBounds = itemBounds;
          _canOpenToolTip = true;
 
-//		System.out.println(UI.timeStampNano()
-//				+ " open\t2\t_isWaitTimerStarted="
-//				+ _isWaitTimerStarted
-//				+ ("\t_canOpenToolTip=" + _canOpenToolTip)
-//				+ ("\t__itemBounds=" + _itemBounds)
-//		//
-//				);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
          if (_isWaitTimerStarted == false) {
 
             _isWaitTimerStarted = true;
@@ -513,20 +419,7 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
    public void restoreState() {
 
       _filterRatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
-      _filterRatingStarOperatorIndex = Util.getStateInt(
-            _state,
-            STATE_PHOTO_FILTER_RATING_STAR_OPERATOR,
-            OPERATOR_IS_EQUAL);
-
-      _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
-
-      // ensure that an image is displayed, it happend that image size was 0
-      if (_imageSize < 10) {
-         _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
-      }
-
-      // set image size for the map photos
-      Photo.setPaintedMapImageWidth(_imageSize);
+      _filterRatingStarOperatorIndex = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, OPERATOR_IS_EQUAL);
 
       // set photo filter into the map
       firePropertiesEvent();
@@ -536,8 +429,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 
       _state.put(STATE_PHOTO_FILTER_RATING_STARS, _filterRatingStars);
       _state.put(STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _filterRatingStarOperatorIndex);
-
-      _state.put(STATE_PHOTO_PROPERTIES_IMAGE_SIZE, _imageSize);
    }
 
    /**
@@ -585,9 +476,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 
       // select operator
       _comboRatingStarOperators.select(_filterRatingStarOperatorIndex);
-
-      // image size
-      _spinnerImageSize.setSelection(_imageSize);
    }
 
 }
