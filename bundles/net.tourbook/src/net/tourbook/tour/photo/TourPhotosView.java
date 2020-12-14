@@ -498,7 +498,10 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionAddPhoto);
+      if (_isLinkPhotoDisplayed) {
+         menuMgr.add(_actionAddPhoto);
+      }
+
       menuMgr.add(_actionRemovePhoto);
 
       enableActions();
