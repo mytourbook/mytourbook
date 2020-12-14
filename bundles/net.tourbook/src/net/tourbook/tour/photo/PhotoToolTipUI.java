@@ -526,7 +526,10 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionAddPhoto);
+      if (_isLinkPhotoDisplayed) {
+         menuMgr.add(_actionAddPhoto);
+      }
+
       menuMgr.add(_actionRemovePhoto);
 
       enableActions();
