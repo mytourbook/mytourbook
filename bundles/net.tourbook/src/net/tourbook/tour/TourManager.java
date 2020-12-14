@@ -2385,9 +2385,7 @@ public class TourManager {
          return false;
       }
 
-      final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tourData);
-
-      final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
+      final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
          TourLogManager.subLog_Error(
                NLS.bind(
@@ -3330,7 +3328,7 @@ public class TourManager {
                // left and right slider are at the same position
                return 0;
             } else {
-               return (float) (((rightAltitude - leftAltitude)) / (rightDistance - leftDistance) * 100);
+               return (float) ((rightAltitude - leftAltitude) / (rightDistance - leftDistance) * 100);
             }
          }
       };
@@ -3626,13 +3624,10 @@ public class TourManager {
             graphBgSource = GraphBackgroundSource.DEFAULT;
          }
 
-      } else if (prefShow_SwimStyle) {
-
-         if (canShowBackground_SwimStyle == false) {
+      } else if (prefShow_SwimStyle && canShowBackground_SwimStyle == false) {
 
             // swimming style cannot be displayed -> show default
             graphBgSource = GraphBackgroundSource.DEFAULT;
-         }
       }
 
       tcc.graphBackground_Source = graphBgSource;
@@ -4389,7 +4384,6 @@ public class TourManager {
                yDataSerie,
                UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
                0.1,
-               0.1,
                ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED,
                ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED,
                ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,
@@ -4434,7 +4428,6 @@ public class TourManager {
          setVisibleForcedValues(
                yDataSerie,
                UI.UNIT_VALUE_DISTANCE_MM_OR_INCH,
-               0.1,
                0.1,
                ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED,
                ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED,
@@ -4700,11 +4693,24 @@ public class TourManager {
    }
 
    /**
+    * Fills a list with {@link TourData} from it's id's.
+    *
+    * @param allTourData
+    * @param tourIds
+    */
+   public void getTourData(final ArrayList<TourData> allTourData, final ArrayList<Long> tourIds) {
+
+      for (final Long tourId : tourIds) {
+         allTourData.add(getTourData(tourId));
+      }
+   }
+
+   /**
     * @param tourIds
     * @return Returns a list with {@link TourData} for all tour ids. <code>Null</code> is returned
     *         when {@link TourData} are not available.
     */
-   public ArrayList<TourData> getTourData(final ArrayList<Long> tourIds) {
+   public List<TourData> getTourData(final List<Long> tourIds) {
 
       final ArrayList<TourData> tourDataList = new ArrayList<>();
 
@@ -4716,19 +4722,6 @@ public class TourManager {
       }
 
       return tourDataList.isEmpty() ? null : tourDataList;
-   }
-
-   /**
-    * Fills a list with {@link TourData} from it's id's.
-    *
-    * @param allTourData
-    * @param tourIds
-    */
-   public void getTourData(final ArrayList<TourData> allTourData, final ArrayList<Long> tourIds) {
-
-      for (final Long tourId : tourIds) {
-         allTourData.add(getTourData(tourId));
-      }
    }
 
    /**
@@ -4992,7 +4985,6 @@ public class TourManager {
     */
    private void setVisibleForcedValues(final ChartDataYSerie yData,
                                        final float valueMultiplier,
-                                       final double minValueAdjustment,
                                        final double maxValueAdjustment,
                                        final String prefName_IsMinEnabled,
                                        final String prefName_IsMaxEnabled,
