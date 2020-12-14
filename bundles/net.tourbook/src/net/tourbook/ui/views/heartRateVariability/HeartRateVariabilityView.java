@@ -17,6 +17,7 @@ package net.tourbook.ui.views.heartRateVariability;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -121,7 +122,7 @@ public class HeartRateVariabilityView extends ViewPart {
    private IPropertyChangeListener  _prefChangeListener;
    private ITourEventListener       _tourEventListener;
 
-   private ArrayList<TourData>      _hrvTours;
+   private List<TourData>           _hrvTours;
 
    private ActionToolbarSlideout    _actionHrvOptions;
    private ActionSynchChartScale    _actionSynchChartScaling;
@@ -368,7 +369,7 @@ public class HeartRateVariabilityView extends ViewPart {
     *           contains all tours which are displayed in the chart, they can be valid or invalid
     * @return
     */
-   private ChartDataModel createChartDataModel(final ArrayList<TourData> hrvTours) {
+   private ChartDataModel createChartDataModel(final List<TourData> hrvTours) {
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.XY_SCATTER);
 
@@ -935,7 +936,7 @@ public class HeartRateVariabilityView extends ViewPart {
       updateChart_22(tourDataList);
    }
 
-   private void updateChart_22(final ArrayList<TourData> tourDataList) {
+   private void updateChart_22(final List<TourData> tourDataList) {
 
       /*
        * tour editor is not opened because it can cause a recursive attempt to active a part in the
@@ -955,8 +956,6 @@ public class HeartRateVariabilityView extends ViewPart {
       _hrvTours = tourDataList;
 
       updateChart_50_CurrentTours(true);
-
-      return;
    }
 
    /**
