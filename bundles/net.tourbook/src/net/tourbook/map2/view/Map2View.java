@@ -135,7 +135,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.DialogPhotoProperties;
+import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
 import net.tourbook.tour.photo.IPhotoPropertiesListener;
 import net.tourbook.tour.photo.PhotoPropertiesEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -3866,9 +3866,9 @@ public class Map2View extends ViewPart implements
       if (_isPhotoFilterActive) {
 
          final boolean isNoStar = _photoFilterRatingStars == 0;
-         final boolean isEqual = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_EQUAL;
-         final boolean isMore = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_LESS_OR_EQUAL;
+         final boolean isEqual = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_EQUAL;
+         final boolean isMore = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_MORE_OR_EQUAL;
+         final boolean isLess = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_LESS_OR_EQUAL;
 
          for (final Photo photo : _allPhotos) {
 

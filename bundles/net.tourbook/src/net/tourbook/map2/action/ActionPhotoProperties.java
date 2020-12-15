@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.tour.photo.DialogPhotoProperties;
+import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -40,20 +40,20 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionPhotoProperties extends ContributionItem {
 
-   private static final String   ID                           = "ACTION_PHOTO_FILTER_ID";       //$NON-NLS-1$
+   private static final String       ID                           = "ACTION_PHOTO_FILTER_ID";       //$NON-NLS-1$
 
-   private static final String   STATE_IS_PHOTO_FILTER_ACTIVE = "STATE_IS_PHOTO_FILTER_ACTIVE"; //$NON-NLS-1$
+   private static final String       STATE_IS_PHOTO_FILTER_ACTIVE = "STATE_IS_PHOTO_FILTER_ACTIVE"; //$NON-NLS-1$
 
-   private Map2View              _mapView;
+   private Map2View                  _mapView;
 
-   private DialogPhotoProperties _photoProperties;
+   private Slideout_Map2_PhotoFilter _slideoutPhotoFilter;
 
-   private ToolBar               _toolBar;
+   private ToolBar                   _toolBar;
 
-   private ToolItem              _actionToolItem;
+   private ToolItem                  _actionToolItem;
 
-   private IDialogSettings       _state;
-   private boolean               _stateIsFilterActive;
+   private IDialogSettings           _state;
+   private boolean                   _stateIsFilterActive;
 
    /*
     * UI controls
@@ -65,7 +65,7 @@ public class ActionPhotoProperties extends ContributionItem {
    private Image   _imageEnabledWithPhotos;
    private Image   _imageDisabled;
 
-   public class PhotoPropertiesUI extends DialogPhotoProperties {
+   private class PhotoPropertiesUI extends Slideout_Map2_PhotoFilter {
 
       public PhotoPropertiesUI(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
          super(parent, toolBar, state);
@@ -132,10 +132,10 @@ public class ActionPhotoProperties extends ContributionItem {
             }
          });
 
-         _photoProperties = new PhotoPropertiesUI(_parent, _toolBar, _state);
+         _slideoutPhotoFilter = new PhotoPropertiesUI(_parent, _toolBar, _state);
 
          // send notifications to the map to update displayed photos
-         _photoProperties.addPropertiesListener(_mapView);
+         _slideoutPhotoFilter.addPropertiesListener(_mapView);
 
          // this is also listening to update filter numbers in the photo properties shell
          // this MUST be called after the map
@@ -158,11 +158,11 @@ public class ActionPhotoProperties extends ContributionItem {
          itemBounds.x = itemDisplayPosition.x;
          itemBounds.y = itemDisplayPosition.y;
 
-         _photoProperties.open(itemBounds, false);
+         _slideoutPhotoFilter.open(itemBounds, false);
 
       } else {
 
-         _photoProperties.close();
+         _slideoutPhotoFilter.close();
       }
 
       _mapView.actionPhotoProperties(_stateIsFilterActive);
@@ -191,7 +191,7 @@ public class ActionPhotoProperties extends ContributionItem {
          itemBounds.y = itemDisplayPosition.y;
       }
 
-      _photoProperties.open(itemBounds, true);
+      _slideoutPhotoFilter.open(itemBounds, true);
    }
 
    private void onUpdateFilter(final MapFilterData data) {
@@ -209,7 +209,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
       _actionToolItem.setSelection(_stateIsFilterActive);
 
-      _photoProperties.restoreState();
+      _slideoutPhotoFilter.restoreState();
 
       updateUI();
 
@@ -223,7 +223,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
       _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _stateIsFilterActive);
 
-      _photoProperties.saveState();
+      _slideoutPhotoFilter.saveState();
    }
 
    public void setEnabled(final boolean isEnabled) {
