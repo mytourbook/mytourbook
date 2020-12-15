@@ -70,7 +70,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -95,6 +94,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private static final String PREF_SYSTEM_LABEL_PACE_INFO                = net.tourbook.common.Messages.Pref_System_Label_Pace_Info;
    private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE      = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
    private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere_Info;
+   private static final String PREF_SYSTEM_LABEL_SYSTEM                   = net.tourbook.common.Messages.Pref_System_Label_System;
    private static final String PREF_SYSTEM_LABEL_TEMPERATURE              = net.tourbook.common.Messages.Pref_System_Label_Temperature;
    private static final String PREF_SYSTEM_LABEL_USING_INFO               = net.tourbook.common.Messages.Pref_System_Label_UsingInfo;
    private static final String PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP       = net.tourbook.common.Messages.Pref_System_Label_UsingInfo_Tooltip;
@@ -260,7 +260,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             });
             GridDataFactory.fillDefaults()
                   .span(2, 1)
-                  .indent(0, _pc.convertVerticalDLUsToPixels(8))
+                  .indent(0, _pc.convertVerticalDLUsToPixels(20))
                   .applyTo(_chkSystem_ShowMeasurementInAppToolbar);
          }
       }
@@ -294,234 +294,221 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          }
       };
 
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText(net.tourbook.common.Messages.Pref_System_Group_MeasurementSystem);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .indent(0, 5)
-            .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
-//      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
-         final Composite container = new Composite(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         // vertical spacer
+         UI.createSpacer_Vertical(container, 2, 3);
+
          {
-            // vertical spacer
-            UI.createSpacer_Vertical(container, 2, 3);
+            /*
+             * Measurement system
+             */
 
-            {
-               /*
-                * Measurement system
-                */
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_SYSTEM);
+            gridData_Label.applyTo(label);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(net.tourbook.common.Messages.Pref_System_Label_System);
-               gridData_Label.applyTo(label);
+            // combo
+            _comboSystem_Profile = new Combo(container, SWT.DROP_DOWN);
+            _comboSystem_Profile.addSelectionListener(profileListener);
+            _comboSystem_Profile.addModifyListener(modifyListener);
+            gridData_Combo.applyTo(_comboSystem_Profile);
 
-               // combo
-               _comboSystem_Profile = new Combo(container, SWT.DROP_DOWN);
-               _comboSystem_Profile.addSelectionListener(profileListener);
-               _comboSystem_Profile.addModifyListener(modifyListener);
-               gridData_Combo.applyTo(_comboSystem_Profile);
+            new Label(container, SWT.NONE);
+         }
+         {
+            /*
+             * Info
+             */
 
-               new Label(container, SWT.NONE);
-            }
-            {
-               /*
-                * Info
-                */
+            new Label(container, SWT.NONE);
+            new Label(container, SWT.NONE);
 
-               // vertical spacer
-               UI.createSpacer_Vertical(container, 5, 3);
+            // label
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_USING_INFO);
+            labelInfo.setToolTipText(PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Distance
+             */
 
-               new Label(container, SWT.NONE);
-               new Label(container, SWT.NONE);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_DISTANCE);
+            gridData_Label.applyTo(label);
 
-               // label
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_USING_INFO);
-               labelInfo.setToolTipText(PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Distance
-                */
+            // combo
+            _comboSystemOptiop_Distance = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Distance.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Distance);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_DISTANCE);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_DISTANCE_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Length
+             */
 
-               // combo
-               _comboSystemOptiop_Distance = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Distance.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Distance);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_LENGTH);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_DISTANCE_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Length
-                */
+            // combo
+            _comboSystemOptiop_Length = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Length.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Length);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_LENGTH);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Small length
+             */
 
-               // combo
-               _comboSystemOptiop_Length = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Length.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Length);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Small length
-                */
+            // combo
+            _comboSystemOptiop_Length_Small = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Length_Small.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Length_Small);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Elevation
+             */
 
-               // combo
-               _comboSystemOptiop_Length_Small = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Length_Small.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Length_Small);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_ELEVATION);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Elevation
-                */
+            // combo
+            _comboSystemOptiop_Elevation = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Elevation.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Elevation);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_ELEVATION);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_ELEVATION_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Height
+             */
 
-               // combo
-               _comboSystemOptiop_Elevation = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Elevation.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Elevation);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_HEIGHT);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_ELEVATION_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Height
-                */
+            // combo
+            _comboSystemOptiop_Height_Body = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Height_Body.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Height_Body);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_HEIGHT);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_HEIGHT_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Pace
+             */
 
-               // combo
-               _comboSystemOptiop_Height_Body = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Height_Body.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Height_Body);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_PACE);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_HEIGHT_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Pace
-                */
+            // combo
+            _comboSystemOptiop_Pace = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Pace.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Pace);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_PACE);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_PACE_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Weight
+             */
 
-               // combo
-               _comboSystemOptiop_Pace = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Pace.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Pace);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_WEIGHT);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_PACE_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Weight
-                */
+            // combo
+            _comboSystemOptiop_Weight = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Weight.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Weight);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_WEIGHT);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_WEIGHT_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Atmospheric pressure
+             */
 
-               // combo
-               _comboSystemOptiop_Weight = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Weight.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Weight);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_WEIGHT_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Atmospheric pressure
-                */
+            // combo
+            _comboSystemOptiop_Pressure_Atmosphere = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Pressure_Atmosphere.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Pressure_Atmosphere);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE);
-               gridData_Label.applyTo(label);
+            // label: info
+            final Label labelInfo = new Label(container, SWT.NONE);
+            labelInfo.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO);
+            gridData_Label.applyTo(labelInfo);
+         }
+         {
+            /*
+             * Temperature
+             */
 
-               // combo
-               _comboSystemOptiop_Pressure_Atmosphere = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Pressure_Atmosphere.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Pressure_Atmosphere);
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(PREF_SYSTEM_LABEL_TEMPERATURE);
+            gridData_Label.applyTo(label);
 
-               // label: info
-               final Label labelInfo = new Label(container, SWT.NONE);
-               labelInfo.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO);
-               gridData_Label.applyTo(labelInfo);
-            }
-            {
-               /*
-                * Temperature
-                */
+            // combo
+            _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
+            _comboSystemOptiop_Temperature.addSelectionListener(itemListener);
+            gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
 
-               // label
-               final Label label = new Label(container, SWT.NONE);
-               label.setText(PREF_SYSTEM_LABEL_TEMPERATURE);
-               gridData_Label.applyTo(label);
-
-               // combo
-               _comboSystemOptiop_Temperature = new Combo(container, SWT.READ_ONLY);
-               _comboSystemOptiop_Temperature.addSelectionListener(itemListener);
-               gridData_Combo.applyTo(_comboSystemOptiop_Temperature);
-
-               new Label(container, SWT.NONE);
-            }
+            new Label(container, SWT.NONE);
          }
       }
    }

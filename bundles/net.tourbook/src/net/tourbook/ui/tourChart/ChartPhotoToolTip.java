@@ -116,7 +116,7 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
                                      final int devXMouseMove,
                                      final int devYMouseMove) {
 
-      final ArrayList<ChartPhoto> hoveredPhotos = photoLayer.getHoveredPhotos(//
+      final ArrayList<ChartPhoto> hoveredPhotos = photoLayer.getHoveredPhotos(
             eventTime,
             devXMouseMove,
             devYMouseMove);

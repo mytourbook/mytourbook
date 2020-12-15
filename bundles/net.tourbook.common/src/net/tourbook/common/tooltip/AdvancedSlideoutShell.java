@@ -845,7 +845,7 @@ public abstract class AdvancedSlideoutShell {
 
    private Shell getRootShell(final Shell shell) {
 
-      if (shell == null) {
+      if (shell == null || shell.isDisposed()) {
          return shell;
       }
 

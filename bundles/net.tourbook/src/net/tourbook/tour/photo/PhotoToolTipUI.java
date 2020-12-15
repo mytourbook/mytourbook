@@ -16,6 +16,7 @@
 package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -27,9 +28,11 @@ import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.ui.tourChart.ChartPhoto;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -75,14 +78,18 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    private final ArrayList<Photo>         _allPhotos                      = new ArrayList<>();
 
+   private ActionAddPhoto                 _actionAddPhoto;
    private ActionCloseToolTip             _actionCloseToolTip;
    private ActionPinToolTip               _actionPinToolTip;
+   private ActionRemovePhoto              _actionRemovePhoto;
    private ActionToggleGalleryOrientation _actionToggleGalleryOrientation;
    private ActionToolTipLocationUpDown    _actionToolTipLocation;
 
    private ToolBarManager                 _galleryToolbarManager;
    private boolean                        _isVerticalGallery;
    private boolean                        _isShellDragged;
+
+   private boolean                        _isLinkPhotoDisplayed;
 
    /**
     * <pre>
@@ -98,17 +105,17 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    /*
     * UI controls
     */
-   private Composite    _galleryContainer;
+   private Composite        _galleryContainer;
 
-   private PhotoGallery _photoGallery;
+   private TourPhotoGallery _photoGallery;
 
-   private ToolBar      _ttToolbarControlExit;
-   private ToolBar      _galleryToolbarControl;
+   private ToolBar          _ttToolbarControlExit;
+   private ToolBar          _galleryToolbarControl;
 
-   private Label        _labelDragToolTip;
+   private Label            _labelDragToolTip;
 
-   private Cursor       _cursorResize;
-   private Cursor       _cursorHand;
+   private Cursor           _cursorResize;
+   private Cursor           _cursorHand;
 
    private class ActionCloseToolTip extends Action {
 
@@ -193,6 +200,18 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       @Override
       public void setSelection(final PhotoSelection photoSelection) {
          onSelectPhoto(photoSelection);
+      }
+   }
+
+   private class TourPhotoGallery extends PhotoGallery {
+
+      public TourPhotoGallery(final IDialogSettings state) {
+         super(state);
+      }
+
+      @Override
+      public void fillContextMenu(final IMenuManager menuMgr) {
+         PhotoToolTipUI.this.fillContextMenu(menuMgr);
       }
    }
 
@@ -327,10 +346,16 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
    private void createActions() {
 
+      _actionCloseToolTip = new ActionCloseToolTip();
       _actionPinToolTip = new ActionPinToolTip();
       _actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
-      _actionCloseToolTip = new ActionCloseToolTip();
       _actionToolTipLocation = new ActionToolTipLocationUpDown();
+   }
+
+   private void createActions_WithUI() {
+
+      _actionAddPhoto = new ActionAddPhoto(_photoGallery);
+      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery);
    }
 
    @Override
@@ -354,6 +379,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       createUI_20_ActionBar(_photoGallery.getCustomActionBarContainer());
 
+      createActions_WithUI();
       fillActionBar();
 
       // must be called after the custom action bar is created
@@ -377,7 +403,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
             .applyTo(_galleryContainer);
       _galleryContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         _photoGallery = new PhotoGallery(_state);
+         _photoGallery = new TourPhotoGallery(_state);
 
          _photoGallery.setShowCustomActionBar();
          _photoGallery.setShowThumbnailSize();
@@ -461,6 +487,16 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       }
    }
 
+   private void enableActions() {
+
+      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
+
+      final boolean isPhotoSelected = selectedPhotos.size() > 0;
+
+      _actionAddPhoto.setEnabled(isPhotoSelected && _isLinkPhotoDisplayed);
+      _actionRemovePhoto.setEnabled(isPhotoSelected);
+   }
+
    protected void enableControls() {
 
       _actionToolTipLocation.setEnabled(isToolTipPinned() == false);
@@ -486,6 +522,21 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       _galleryToolbarManager.add(_actionToggleGalleryOrientation);
       _galleryToolbarManager.add(new Separator());
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      if (_isLinkPhotoDisplayed) {
+         menuMgr.add(_actionAddPhoto);
+      }
+
+      menuMgr.add(_actionRemovePhoto);
+
+      enableActions();
+   }
+
+   public PhotoGallery getPhotoGallery() {
+      return _photoGallery;
    }
 
    @Override
@@ -604,6 +655,8 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    }
 
    protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos, final boolean isLinkPhotoDisplayed) {
+
+      _isLinkPhotoDisplayed = isLinkPhotoDisplayed;
 
       final boolean isPhotoHovered = hoveredPhotos != null && hoveredPhotos.size() > 0;
 

@@ -2068,7 +2068,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final ArrayList<PhotoCategory> chartPhotoGroups = new ArrayList<>();
 
          /*
-          * get saved photos
+          * Get saved photos
           */
          final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
          if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
@@ -2081,7 +2081,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          /*
-          * get link photos, they are painted below saved photos that the mouse hit area is larger
+          * Get link photos, they are painted below saved photos that the mouse hit area is larger
           */
          final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
          if (tourPhotoLink != null) {
@@ -2104,7 +2104,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          /*
-          * at least 1 photo is available
+          * At least 1 photo is available
           */
 
          /*
@@ -5710,6 +5710,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourInfoIconTooltipProvider.setTourData(_tourData);
       _valuePointTooltip.setTourData(_tourData);
       _tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours() == false);
+
+      // when a tour is saved after a photo was removed, update the photo gallery to see the removed photo
+      if (_photoTooltip != null && _photoTooltip.getPhotoGallery() != null) {
+         _photoTooltip.getPhotoGallery().refreshUI();
+      }
    }
 
    /**
