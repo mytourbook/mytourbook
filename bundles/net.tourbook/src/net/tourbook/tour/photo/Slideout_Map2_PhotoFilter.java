@@ -17,7 +17,7 @@ package net.tourbook.tour.photo;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.MapFilterData;
@@ -31,19 +31,15 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
@@ -53,16 +49,16 @@ import org.eclipse.ui.IViewPart;
  */
 public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhotoEventListener {
 
-   private static final int      SHELL_MARGIN                            = 5;
+   private static final int                         SHELL_MARGIN                            = 5;
 
-   private static final String   STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";         //$NON-NLS-1$
-   private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR"; //$NON-NLS-1$
+   private static final String                      STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";         //$NON-NLS-1$
+   private static final String                      STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR"; //$NON-NLS-1$
 
-   public static final int       OPERATOR_IS_LESS_OR_EQUAL               = 0;
-   public static final int       OPERATOR_IS_EQUAL                       = 1;
-   public static final int       OPERATOR_IS_MORE_OR_EQUAL               = 2;
+   public static final int                          OPERATOR_IS_LESS_OR_EQUAL               = 0;
+   public static final int                          OPERATOR_IS_EQUAL                       = 1;
+   public static final int                          OPERATOR_IS_MORE_OR_EQUAL               = 2;
 
-   private static final String[] _ratingStarOperatorsText                = {
+   private static final String[]                    _ratingStarOperatorsText                = {
 
          Messages.Photo_Filter_Operator_IsLess,
          Messages.Photo_Filter_Operator_IsEqual,
@@ -73,7 +69,7 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
    /**
     * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
     */
-   private static final int[]    _ratingStarOperatorsValues              = {
+   private static final int[]                       _ratingStarOperatorsValues              = {
 
          OPERATOR_IS_LESS_OR_EQUAL,
          OPERATOR_IS_EQUAL,
@@ -81,45 +77,32 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
    };
 
-   private IDialogSettings       _state;
+   private IDialogSettings                          _state;
 
-   // initialize with default values which are (should) never be used
-   private Rectangle                                    _itemBounds          = new Rectangle(0, 0, 50, 50);
+   private int                                      _filterRatingStars                      = RatingStars.MAX_RATING_STARS;
 
-   private final WaitTimer                              _waitTimer           = new WaitTimer();
+   private final ListenerList<IPhotoFilterListener> _propertiesListeners                    = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                                      _canOpenToolTip;
-   private boolean                                      _isWaitTimerStarted;
-
-   private int                                          _filterRatingStars   = RatingStars.MAX_RATING_STARS;
-
-   private final ListenerList<IPhotoPropertiesListener> _propertiesListeners = new ListenerList<>(ListenerList.IDENTITY);
-
-   /*
-    * filter operator
+   /**
+    * Filter operator
     */
-   private int           _filterRatingStarOperatorIndex;
+   private int                                      _filterRatingStarOperatorIndex;
 
-   private MapFilterData _oldMapFilterData;
+   private MapFilterData                            _oldMapFilterData;
+
+   private PixelConverter                           _pc;
+
    /*
     * UI controls
     */
-   private Composite     _shellContainer;
+   private Composite   _shellContainer;
+   private Composite   _containerFilterHeader;
 
-   private Composite     _containerFilterHeader;
+   private Label       _lblAllPhotos;
+   private Label       _lblFilteredPhotos;
+   private Combo       _comboRatingStarOperators;
 
-   private Label         _lblAllPhotos;
-   private Label         _lblFilteredPhotos;
-   private Combo         _comboRatingStarOperators;
-
-   private RatingStars   _ratingStars;
-
-   private final class WaitTimer implements Runnable {
-      @Override
-      public void run() {
-         open_Runnable();
-      }
-   }
+   private RatingStars _ratingStars;
 
    public Slideout_Map2_PhotoFilter(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
 
@@ -127,22 +110,10 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
       _state = state;
 
-      toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-         @Override
-         public void mouseExit(final MouseEvent e) {
-
-            // prevent to open the tooltip
-            _canOpenToolTip = false;
-         }
-      });
-
-      setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-      setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-      setIsKeepShellOpenWhenMoved(false);
-      setFadeInSteps(1);
+      PhotoManager.addPhotoEventListener(this);
    }
 
-   public void addPropertiesListener(final IPhotoPropertiesListener listener) {
+   public void addPropertiesListener(final IPhotoFilterListener listener) {
       _propertiesListeners.add(listener);
    }
 
@@ -153,6 +124,8 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
+
+      initUI(parent);
 
       final Composite container = createUI(parent);
 
@@ -187,17 +160,24 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 //            .numColumns(3)
             .applyTo(_shellContainer);
       {
-         createUI_10_Filter(_shellContainer);
+         createUI_10_Title(_shellContainer);
+         createUI_20_Filter(_shellContainer);
       }
 
       return _shellContainer;
    }
 
-   private void createUI_10_Filter(final Composite parent) {
+   private void createUI_10_Title(final Composite parent) {
+
+      final GridDataFactory gridData_NumPhotos = GridDataFactory.fillDefaults()
+            .align(SWT.CENTER, SWT.END)
+//            .hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT)
+
+      ;
 
       final Composite container = new Composite(parent, SWT.NO_FOCUS);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             /*
@@ -206,25 +186,27 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
             final Label label = new Label(container, SWT.NO_FOCUS);
             GridDataFactory.fillDefaults().applyTo(label);
 
-            label.setText(Messages.Photo_Filter_Label_RatingStars);
+            label.setText(Messages.Photo_Filter_Label_PhotoFilter);
             label.setToolTipText(Messages.Photo_Filter_Label_RatingStars_Tooltip);
+            MTFont.setBannerFont(label);
          }
          {
             _containerFilterHeader = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(_containerFilterHeader);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+//                  .indent(5, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+                  .applyTo(_containerFilterHeader);
             GridLayoutFactory.fillDefaults().applyTo(_containerFilterHeader);
-            //		_containerFilterHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//            _containerFilterHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
             {
-               /*
-                * Inner container is used to center horizontally
-                */
                final Composite innerContainer = new Composite(_containerFilterHeader, SWT.NONE);
                GridDataFactory.fillDefaults()
-//                     .grab(true, false)
-//                     .align(SWT.CENTER, SWT.FILL)
+                     .grab(true, true)
+                     .align(SWT.CENTER, SWT.END)
                      .applyTo(innerContainer);
                GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
-               innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//               innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
                {
                   /*
                    * value: number of all photos
@@ -232,12 +214,14 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
                   _lblAllPhotos = new Label(innerContainer, SWT.NO_FOCUS);
                   _lblAllPhotos.setText(UI.EMPTY_STRING);
                   _lblAllPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfAllPhotos_Tooltip);
+                  gridData_NumPhotos.applyTo(_lblAllPhotos);
 
                   /*
                    * label: number of filtered photos
                    */
                   final Label label = new Label(innerContainer, SWT.NO_FOCUS);
-                  label.setText(UI.DASH_WITH_SPACE);
+                  label.setText(UI.DASH);
+                  GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.END).applyTo(label);
 
                   /*
                    * value: number of filtered photos
@@ -245,9 +229,19 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
                   _lblFilteredPhotos = new Label(innerContainer, SWT.NO_FOCUS);
                   _lblFilteredPhotos.setText(UI.EMPTY_STRING);
                   _lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
+                  gridData_NumPhotos.applyTo(_lblFilteredPhotos);
                }
             }
          }
+      }
+   }
+
+   private void createUI_20_Filter(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NO_FOCUS);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
          {
             /*
              * Combo: > = <
@@ -281,44 +275,25 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
    private void enableActions() {
 
-//		final boolean isRatingStars = _filterRatingStars > 0;
-//
-//		_comboRatingStarOperators.setEnabled(isRatingStars);
    }
 
-   private void firePropertiesEvent() {
+   private void fireFilterEvent() {
 
-      final PhotoPropertiesEvent propertyEvent = new PhotoPropertiesEvent();
+      final PhotoFilterEvent filterEvent = new PhotoFilterEvent();
 
-      propertyEvent.filterRatingStars = _filterRatingStars;
-      propertyEvent.fiterRatingStarOperator = _ratingStarOperatorsValues[_filterRatingStarOperatorIndex];
+      filterEvent.filterRatingStars = _filterRatingStars;
+      filterEvent.fiterRatingStarOperator = _ratingStarOperatorsValues[_filterRatingStarOperatorIndex];
 
       final Object[] listeners = _propertiesListeners.getListeners();
       for (final Object listener : listeners) {
-         ((IPhotoPropertiesListener) listener).photoPropertyEvent(propertyEvent);
+         ((IPhotoFilterListener) listener).photoFilterEvent(filterEvent);
       }
    }
 
-   @Override
-   public Point getToolTipLocation(final Point tipSize) {
+   private void initUI(final Composite parent) {
+      // TODO Auto-generated method stub
 
-      final int tipWidth = tipSize.x;
-
-      final int itemWidth = _itemBounds.width;
-      final int itemHeight = _itemBounds.height;
-
-      final int itemWidth2 = itemWidth / 2;
-      final int tipWidth2 = tipWidth / 2;
-
-      final int devX = _itemBounds.x + itemWidth2 - tipWidth2;
-      final int devY = _itemBounds.y + itemHeight + 0;
-
-      return new Point(devX, devY);
-   }
-
-   @Override
-   protected Rectangle noHideOnMouseMove() {
-      return _itemBounds;
+      _pc = new PixelConverter(parent);
    }
 
    @Override
@@ -331,7 +306,7 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
       _filterRatingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
 
-      firePropertiesEvent();
+      fireFilterEvent();
    }
 
    private void onSelectRatingStars() {
@@ -342,59 +317,7 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
 
       enableActions();
 
-      firePropertiesEvent();
-   }
-
-   /**
-    * @param itemBounds
-    * @param isOpenDelayed
-    */
-   @Override
-   public void open(final Rectangle itemBounds, final boolean isOpenDelayed) {
-
-      if (isToolTipVisible()) {
-         return;
-      }
-
-      if (isOpenDelayed == false) {
-
-         if (itemBounds != null) {
-
-            _itemBounds = itemBounds;
-
-            showToolTip();
-         }
-
-      } else {
-
-         if (itemBounds == null) {
-
-            // item is not hovered any more
-
-            _canOpenToolTip = false;
-
-            return;
-         }
-
-         _itemBounds = itemBounds;
-         _canOpenToolTip = true;
-
-         if (_isWaitTimerStarted == false) {
-
-            _isWaitTimerStarted = true;
-
-            Display.getCurrent().timerExec(50, _waitTimer);
-         }
-      }
-   }
-
-   private void open_Runnable() {
-
-      _isWaitTimerStarted = false;
-
-      if (_canOpenToolTip) {
-         showToolTip();
-      }
+      fireFilterEvent();
    }
 
    @Override
@@ -415,7 +338,7 @@ public class Slideout_Map2_PhotoFilter extends ToolbarSlideout implements IPhoto
       _filterRatingStarOperatorIndex = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, OPERATOR_IS_EQUAL);
 
       // set photo filter into the map
-      firePropertiesEvent();
+      fireFilterEvent();
    }
 
    public void saveState() {

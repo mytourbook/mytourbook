@@ -84,7 +84,7 @@ import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
-import net.tourbook.map2.action.ActionPhotoProperties;
+import net.tourbook.map2.action.ActionPhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
@@ -136,8 +136,8 @@ import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
-import net.tourbook.tour.photo.IPhotoPropertiesListener;
-import net.tourbook.tour.photo.PhotoPropertiesEvent;
+import net.tourbook.tour.photo.IPhotoFilterListener;
+import net.tourbook.tour.photo.PhotoFilterEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
@@ -195,7 +195,7 @@ public class Map2View extends ViewPart implements
 
       IMapContextProvider,
       IPhotoEventListener,
-      IPhotoPropertiesListener,
+      IPhotoFilterListener,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapPositionListener,
@@ -440,7 +440,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_MapProvider            _actionMap2_MapProvider;
    private ActionMap2_Options                _actionMap2_Options;
    private ActionMap2_Graphs                 _actionMap2_TourColors;
-   private ActionPhotoProperties             _actionPhotoFilter;
+   private ActionPhotoFilter             _actionPhotoFilter;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -1663,7 +1663,7 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
-      _actionPhotoFilter                  = new ActionPhotoProperties(this, parent, _state);
+      _actionPhotoFilter                  = new ActionPhotoFilter(this, parent, _state);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -3480,7 +3480,7 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void photoPropertyEvent(final PhotoPropertiesEvent event) {
+   public void photoFilterEvent(final PhotoFilterEvent event) {
 
       _photoFilterRatingStars = event.filterRatingStars;
       _photoFilterRatingStarOperator = event.fiterRatingStarOperator;

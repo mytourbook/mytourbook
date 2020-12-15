@@ -1480,6 +1480,7 @@ public class Messages extends NLS {
 
    public static String        Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
    public static String        Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
+   public static String        Photo_Filter_Label_PhotoFilter;
    public static String        Photo_Filter_Label_RatingStars;
    public static String        Photo_Filter_Label_RatingStars_Tooltip;
    public static String        Photo_Filter_Operator_IsEqual;

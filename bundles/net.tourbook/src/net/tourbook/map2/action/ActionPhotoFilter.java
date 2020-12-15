@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionPhotoProperties extends ContributionItem {
+public class ActionPhotoFilter extends ContributionItem {
 
    private static final String       ID                           = "ACTION_PHOTO_FILTER_ID";       //$NON-NLS-1$
 
@@ -49,11 +49,10 @@ public class ActionPhotoProperties extends ContributionItem {
    private Slideout_Map2_PhotoFilter _slideoutPhotoFilter;
 
    private ToolBar                   _toolBar;
-
    private ToolItem                  _actionToolItem;
 
    private IDialogSettings           _state;
-   private boolean                   _stateIsFilterActive;
+   private boolean                   _isFilterActive;
 
    /*
     * UI controls
@@ -65,9 +64,9 @@ public class ActionPhotoProperties extends ContributionItem {
    private Image   _imageEnabledWithPhotos;
    private Image   _imageDisabled;
 
-   private class PhotoPropertiesUI extends Slideout_Map2_PhotoFilter {
+   private class SlideoutPhotoFilter extends Slideout_Map2_PhotoFilter {
 
-      public PhotoPropertiesUI(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
+      public SlideoutPhotoFilter(final Control parent, final ToolBar toolBar, final IDialogSettings state) {
          super(parent, toolBar, state);
       }
 
@@ -77,7 +76,7 @@ public class ActionPhotoProperties extends ContributionItem {
       }
    }
 
-   public ActionPhotoProperties(final Map2View mapView, final Control parent, final IDialogSettings state) {
+   public ActionPhotoFilter(final Map2View mapView, final Control parent, final IDialogSettings state) {
 
       super(ID);
 
@@ -132,24 +131,20 @@ public class ActionPhotoProperties extends ContributionItem {
             }
          });
 
-         _slideoutPhotoFilter = new PhotoPropertiesUI(_parent, _toolBar, _state);
+         _slideoutPhotoFilter = new SlideoutPhotoFilter(_parent, _toolBar, _state);
 
          // send notifications to the map to update displayed photos
          _slideoutPhotoFilter.addPropertiesListener(_mapView);
-
-         // this is also listening to update filter numbers in the photo properties shell
-         // this MUST be called after the map
-//         _photoProperties.addPropertiesListener(this);
       }
    }
 
    private void onAction() {
 
-      updateUI();
+      _isFilterActive = _actionToolItem.getSelection();
 
-      _stateIsFilterActive = _actionToolItem.getSelection();
+      updateUI_ActionTooltip();
 
-      if (_stateIsFilterActive) {
+      if (_isFilterActive) {
 
          final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -165,12 +160,12 @@ public class ActionPhotoProperties extends ContributionItem {
          _slideoutPhotoFilter.close();
       }
 
-      _mapView.actionPhotoProperties(_stateIsFilterActive);
+      _mapView.actionPhotoProperties(_isFilterActive);
    }
 
    private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
-      if (_stateIsFilterActive == false || _actionToolItem.isEnabled() == false) {
+      if (_isFilterActive == false || _actionToolItem.isEnabled() == false) {
 
          // filter is not active
 
@@ -196,32 +191,29 @@ public class ActionPhotoProperties extends ContributionItem {
 
    private void onUpdateFilter(final MapFilterData data) {
 
-      _actionToolItem.setImage(data.allPhotos == 0 ? //
-            _imageEnabled
-            : data.filteredPhotos == 0 ? //
-                  _imageEnabledNoPhotos
+      _actionToolItem.setImage(data.allPhotos == 0
+            ? _imageEnabled
+            : data.filteredPhotos == 0
+                  ? _imageEnabledNoPhotos
                   : _imageEnabledWithPhotos);
    }
 
    public void restoreState() {
 
-      _stateIsFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+      _isFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
 
-      _actionToolItem.setSelection(_stateIsFilterActive);
+      _actionToolItem.setSelection(_isFilterActive);
 
       _slideoutPhotoFilter.restoreState();
 
-      updateUI();
+      updateUI_ActionTooltip();
 
-      _mapView.actionPhotoProperties(_stateIsFilterActive);
-
-      // update AFTER photo filter is activated
-//      updateUI_FotoFilterStats();
+      _mapView.actionPhotoProperties(_isFilterActive);
    }
 
    public void saveState() {
 
-      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _stateIsFilterActive);
+      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _isFilterActive);
 
       _slideoutPhotoFilter.saveState();
    }
@@ -237,16 +229,16 @@ public class ActionPhotoProperties extends ContributionItem {
 
       _actionToolItem.setEnabled(isEnabled);
 
-      if (isEnabled && _stateIsFilterActive == false) {
+      if (isEnabled && _isFilterActive == false) {
 
          // show default icon
          _actionToolItem.setImage(_imageEnabled);
       }
    }
 
-   private void updateUI() {
+   private void updateUI_ActionTooltip() {
 
-      if (_stateIsFilterActive) {
+      if (_isFilterActive) {
 
          // hide tooltip because the photo filter is displayed
 
@@ -254,7 +246,7 @@ public class ActionPhotoProperties extends ContributionItem {
 
       } else {
 
-         _actionToolItem.setToolTipText(Messages.Map_Action_PhotoFilter_Tooltip);
+         _actionToolItem.setToolTipText(Messages.Map_Action_PhotoFilter2_Tooltip);
       }
    }
 
