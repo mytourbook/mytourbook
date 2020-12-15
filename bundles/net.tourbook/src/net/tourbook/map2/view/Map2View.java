@@ -84,14 +84,13 @@ import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
-import net.tourbook.map2.action.ActionPhotoProperties;
+import net.tourbook.map2.action.ActionPhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
-import net.tourbook.map2.action.ActionShowPhotos;
 import net.tourbook.map2.action.ActionShowScaleInMap;
 import net.tourbook.map2.action.ActionShowSliderInLegend;
 import net.tourbook.map2.action.ActionShowSliderInMap;
@@ -136,9 +135,9 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.DialogPhotoProperties;
-import net.tourbook.tour.photo.IPhotoPropertiesListener;
-import net.tourbook.tour.photo.PhotoPropertiesEvent;
+import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
+import net.tourbook.tour.photo.IPhotoFilterListener;
+import net.tourbook.tour.photo.PhotoFilterEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
@@ -196,7 +195,7 @@ public class Map2View extends ViewPart implements
 
       IMapContextProvider,
       IPhotoEventListener,
-      IPhotoPropertiesListener,
+      IPhotoFilterListener,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapPositionListener,
@@ -441,7 +440,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_MapProvider            _actionMap2_MapProvider;
    private ActionMap2_Options                _actionMap2_Options;
    private ActionMap2_Graphs                 _actionMap2_TourColors;
-   private ActionPhotoProperties             _actionPhotoFilter;
+   private ActionPhotoFilter             _actionPhotoFilter;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -545,6 +544,36 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionShowPhotos extends ActionToolbarSlideout {
+
+      public ActionShowPhotos() {
+
+         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap),
+               TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap_Disabled));
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new Slideout_Map2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         actionShowPhotos(getSelection());
+      }
+   }
+
    private class ActionShowTour extends ActionToolbarSlideout {
 
       public ActionShowTour() {
@@ -586,6 +615,10 @@ public class Map2View extends ViewPart implements
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
+
+         /*
+          * Register other action images
+          */
 
          // image 0: tour
          addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
@@ -1003,9 +1036,9 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionShowPhotos() {
+   public void actionShowPhotos(final boolean isSelected) {
 
-      _isShowPhoto = _actionShowPhotos.isChecked();
+      _isShowPhoto = isSelected;
 
       enableActions();
 
@@ -1630,7 +1663,7 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
-      _actionPhotoFilter                  = new ActionPhotoProperties(this, parent, _state);
+      _actionPhotoFilter                  = new ActionPhotoFilter(this, parent, _state);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -1638,7 +1671,7 @@ public class Map2View extends ViewPart implements
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap              = new ActionShowLegendInMap(this);
-      _actionShowPhotos                   = new ActionShowPhotos(this);
+      _actionShowPhotos                   = new ActionShowPhotos();
       _actionShowScaleInMap               = new ActionShowScaleInMap(this);
       _actionShowSliderInMap              = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend           = new ActionShowSliderInLegend(this);
@@ -3447,7 +3480,7 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void photoPropertyEvent(final PhotoPropertiesEvent event) {
+   public void photoFilterEvent(final PhotoFilterEvent event) {
 
       _photoFilterRatingStars = event.filterRatingStars;
       _photoFilterRatingStarOperator = event.fiterRatingStarOperator;
@@ -3607,7 +3640,7 @@ public class Map2View extends ViewPart implements
 
       // is show photo
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
-      _actionShowPhotos.setChecked(_isShowPhoto);
+      _actionShowPhotos.setSelection(_isShowPhoto);
 
       // is show legend
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
@@ -3833,9 +3866,9 @@ public class Map2View extends ViewPart implements
       if (_isPhotoFilterActive) {
 
          final boolean isNoStar = _photoFilterRatingStars == 0;
-         final boolean isEqual = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_EQUAL;
-         final boolean isMore = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_LESS_OR_EQUAL;
+         final boolean isEqual = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_EQUAL;
+         final boolean isMore = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_MORE_OR_EQUAL;
+         final boolean isLess = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_LESS_OR_EQUAL;
 
          for (final Photo photo : _allPhotos) {
 
@@ -4359,6 +4392,13 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
+   }
+
+   public void updateUI_Photos() {
+
+      _map.disposeOverlayImageCache();
+
+      _map.paint();
    }
 
    /**

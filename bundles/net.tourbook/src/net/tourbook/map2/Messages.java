@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.map2.messages";     //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.map2.messages";    //$NON-NLS-1$
 
    public static String        App_Action_Apply;
 
@@ -38,6 +38,7 @@ public class Messages extends NLS {
    public static String        Image_Action_ShowAllPhotosInMap;
    public static String        Image_Action_ShowAllPhotosInMap_Disabled;
    public static String        Image_Action_ShowPhotosInMap;
+   public static String        Image_Action_ShowPhotosInMap_Disabled;
    public static String        Image_Action_ShowSliderInMap;
    public static String        Image_Action_ShowSliderInMap_Left;
    public static String        Image_Action_ShowStartEndInMap;
@@ -107,6 +108,7 @@ public class Messages extends NLS {
 
    public static String        Map_Action_ManageMapProviders;
    public static String        Map_Action_PhotoFilter_Tooltip;
+   public static String        Map_Action_PhotoFilter2_Tooltip;
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;
    public static String        Map_Action_SearchTourByLocation;
