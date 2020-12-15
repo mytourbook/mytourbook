@@ -35,252 +35,252 @@ import org.eclipse.ui.part.PageBook;
  */
 public abstract class AbstractRRShell {
 
-	private boolean		_isResizeable;
+   private boolean      _isResizeable;
 
-	private int			_shellTrimWidth;
-	private int			_shellTrimHeight;
+   private int       _shellTrimWidth;
+   private int       _shellTrimHeight;
 
-	/*
-	 * UI resources
-	 */
-	private Display		_display;
+   /*
+    * UI resources
+    */
+   private Display      _display;
 
-	private Shell		_shell;
+   private Shell     _shell;
 
-	private PageBook	_shellBook;
-	private Composite	_pageShell;
-	private Composite	_pageReparentableImage;
+   private PageBook  _shellBook;
+   private Composite _pageShell;
+   private Composite _pageReparentableImage;
 
-	private Image		_otherShellImage;
+   private Image     _otherShellImage;
 
-	public AbstractRRShell(final Shell parentShell, final int style, final String shellTitle, final boolean isResizeable) {
+   public AbstractRRShell(final Shell parentShell, final int style, final String shellTitle, final boolean isResizeable) {
 
-		_display = parentShell.getDisplay();
+      _display = parentShell.getDisplay();
 
-		_isResizeable = isResizeable;
+      _isResizeable = isResizeable;
 
-		_shell = new Shell(parentShell, style);
-		_shell.setLayout(new FillLayout());
+      _shell = new Shell(parentShell, style);
+      _shell.setLayout(new FillLayout());
 
-		_shell.setText(shellTitle);
+      _shell.setText(shellTitle);
 
-		setTrimSize();
+      setTrimSize();
 
-		setContentSize(getContentSize());
+      setContentSize(getContentSize());
 
-//		_shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//    _shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		_shellBook = new PageBook(_shell, SWT.NONE);
-		{
-			_pageShell = createUI_10_PageShellContent(_shellBook);
-			_pageReparentableImage = createUI_20_PageShellImage(_shellBook);
-		}
+      _shellBook = new PageBook(_shell, SWT.NONE);
+      {
+         _pageShell = createUI_10_PageShellContent(_shellBook);
+         _pageReparentableImage = createUI_20_PageShellImage(_shellBook);
+      }
 
-		_shellBook.showPage(_pageShell);
-	}
+      _shellBook.showPage(_pageShell);
+   }
 
-	private Composite createUI_10_PageShellContent(final Composite parent) {
+   private Composite createUI_10_PageShellContent(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new FillLayout());
+      final Composite container = new Composite(parent, SWT.NONE);
+      container.setLayout(new FillLayout());
 
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		return container;
-	}
+      return container;
+   }
 
-	private Composite createUI_20_PageShellImage(final Composite parent) {
+   private Composite createUI_20_PageShellImage(final Composite parent) {
 
-		final Canvas resizeCanvas = new Canvas(//
-				parent,
-//				SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE//
-				SWT.NONE //
-		);
+      final Canvas resizeCanvas = new Canvas(//
+            parent,
+//          SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE//
+            SWT.NONE //
+      );
 
-		resizeCanvas.setLayout(new FillLayout());
+      resizeCanvas.setLayout(new FillLayout());
 
-//		resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//    resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 
-		resizeCanvas.addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(final PaintEvent e) {
-				onPaintShellImage(e);
-			}
-		});
+      resizeCanvas.addPaintListener(new PaintListener() {
+         @Override
+         public void paintControl(final PaintEvent e) {
+            onPaintShellImage(e);
+         }
+      });
 
-		return resizeCanvas;
-	}
+      return resizeCanvas;
+   }
 
-	public void dispose() {
+   public void dispose() {
 
-		_shell.dispose();
-		_shell = null;
-	}
+      _shell.dispose();
+      _shell = null;
+   }
 
-	public abstract Point getContentSize();
+   public abstract Point getContentSize();
 
-	public Shell getShell() {
-		return _shell;
-	}
+   public Shell getShell() {
+      return _shell;
+   }
 
-	public Point getShellContentLocation() {
+   public Point getShellContentLocation() {
 
-		final Point shellLocation = _shell.getLocation();
+      final Point shellLocation = _shell.getLocation();
 
-		final int shellX = shellLocation.x + _shellTrimWidth;
-		final int shellY = shellLocation.y + _shellTrimHeight;
+      final int shellX = shellLocation.x + _shellTrimWidth;
+      final int shellY = shellLocation.y + _shellTrimHeight;
 
-		return new Point(shellX, shellY);
-	}
+      return new Point(shellX, shellY);
+   }
 
-	public Point getShellLocation(final Point contentLocation) {
+   public Point getShellLocation(final Point contentLocation) {
 
-		final int shellX = contentLocation.x - _shellTrimWidth;
-		final int shellY = contentLocation.y - _shellTrimHeight;
+      final int shellX = contentLocation.x - _shellTrimWidth;
+      final int shellY = contentLocation.y - _shellTrimHeight;
 
-		return new Point(shellX, shellY);
-	}
+      return new Point(shellX, shellY);
+   }
 
-	public Composite getShellPage() {
-		return _pageShell;
-	}
+   public Composite getShellPage() {
+      return _pageShell;
+   }
 
-	public Point getShellSize(final Point contentSize) {
+   public Point getShellSize(final Point contentSize) {
 
-		final int shellWidth = contentSize.x + _shellTrimWidth * 2;
-		final int shellHeight = contentSize.y + _shellTrimHeight * 2;
+      final int shellWidth = contentSize.x + _shellTrimWidth * 2;
+      final int shellHeight = contentSize.y + _shellTrimHeight * 2;
 
-		return new Point(shellWidth, shellHeight);
-	}
+      return new Point(shellWidth, shellHeight);
+   }
 
-	public int getShellTrimHeight() {
-		return _shellTrimHeight;
-	}
+   public int getShellTrimHeight() {
+      return _shellTrimHeight;
+   }
 
-	public int getShellTrimWidth() {
-		return _shellTrimWidth;
-	}
+   public int getShellTrimWidth() {
+      return _shellTrimWidth;
+   }
 
-	private void onPaintShellImage(final PaintEvent event) {
+   private void onPaintShellImage(final PaintEvent event) {
 
-		if (_otherShellImage == null || _otherShellImage.isDisposed()) {
-			return;
-		}
+      if (_otherShellImage == null || _otherShellImage.isDisposed()) {
+         return;
+      }
 
-		final GC gc = event.gc;
+      final GC gc = event.gc;
 
-//		final Rectangle bounds = gc.getClipping();
-//		gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-//		gc.fillRectangle(bounds);
+//    final Rectangle bounds = gc.getClipping();
+//    gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//    gc.fillRectangle(bounds);
 
-		gc.drawImage(_otherShellImage, 0, 0);
-	}
+      gc.drawImage(_otherShellImage, 0, 0);
+   }
 
-	public void reparentFromOtherShell(final AbstractRRShell otherRRShell, final Composite reparentContainer) {
+   public void reparentFromOtherShell(final AbstractRRShell otherRRShell, final Composite reparentContainer) {
 
-		final Shell otherShell = otherRRShell.getShell();
+      final Shell otherShell = otherRRShell.getShell();
 
-		final Rectangle otherShellBounds = otherShell.getBounds();
-		final Rectangle otherClientAreaBounds = otherShell.getClientArea();
+      final Rectangle otherShellBounds = otherShell.getBounds();
+      final Rectangle otherClientAreaBounds = otherShell.getClientArea();
 
-		/*
-		 * copy NoResize shell image into the resize shell, to prevent flickering
-		 */
-		_otherShellImage = new Image(_display, otherClientAreaBounds);
+      /*
+       * copy NoResize shell image into the resize shell, to prevent flickering
+       */
+      _otherShellImage = new Image(_display, otherClientAreaBounds);
 
-		final GC gc = new GC(otherShell);
-		gc.copyArea(_otherShellImage, 0, 0);
-		gc.dispose();
+      final GC gc = new GC(otherShell);
+      gc.copyArea(_otherShellImage, 0, 0);
+      gc.dispose();
 
-		_shellBook.showPage(_pageReparentableImage);
+      _shellBook.showPage(_pageReparentableImage);
 
-		/*
-		 * set shell position with new trim size so that the shell content is not moving
-		 */
-		final int trimDiffX = _shellTrimWidth - otherRRShell._shellTrimWidth;
-		final int trimDiffY = _shellTrimHeight - otherRRShell._shellTrimHeight;
+      /*
+       * set shell position with new trim size so that the shell content is not moving
+       */
+      final int trimDiffX = _shellTrimWidth - otherRRShell._shellTrimWidth;
+      final int trimDiffY = _shellTrimHeight - otherRRShell._shellTrimHeight;
 
-		final int shellX = otherShellBounds.x - trimDiffX;
-		final int shellY = otherShellBounds.y - trimDiffY;
+      final int shellX = otherShellBounds.x - trimDiffX;
+      final int shellY = otherShellBounds.y - trimDiffY;
 
-		_shell.setLocation(shellX, shellY);
+      _shell.setLocation(shellX, shellY);
 
-		if (_isResizeable == false) {
+      if (_isResizeable == false) {
 
-			/*
-			 * set size ONLY for the shell without resize, size for shell with resize is set by the
-			 * user by resizing the window, when size is not set, the shell is empty and default
-			 * size is 2x2
-			 */
-			setContentSize(getContentSize());
-		}
+         /*
+          * set size ONLY for the shell without resize, size for shell with resize is set by the
+          * user by resizing the window, when size is not set, the shell is empty and default
+          * size is 2x2
+          */
+         setContentSize(getContentSize());
+      }
 
-		_shell.setAlpha(0x0);
+      _shell.setAlpha(0x0);
 
-		/*
-		 * this will paint the shell image before reparenting takes place
-		 */
-		_shell.setVisible(true);
+      /*
+       * this will paint the shell image before reparenting takes place
+       */
+      _shell.setVisible(true);
 
-		_shell.setAlpha(0xff);
+      _shell.setAlpha(0xff);
 
-		otherRRShell.setAlpha(0);
+      otherRRShell.setAlpha(0);
 
-		// reparent UI container
-		reparentContainer.setParent(_pageShell);
+      // reparent UI container
+      reparentContainer.setParent(_pageShell);
 
-		_shellBook.showPage(_pageShell);
+      _shellBook.showPage(_pageShell);
 
-		_otherShellImage.dispose();
-	}
+      _otherShellImage.dispose();
+   }
 
-	public void setAlpha(final int alpha) {
-		_shell.setAlpha(alpha);
-	}
+   public void setAlpha(final int alpha) {
+      _shell.setAlpha(alpha);
+   }
 
-	public void setContentSize(final int width, final int height) {
+   public void setContentSize(final int width, final int height) {
 
-		final int shellWidth = width + _shellTrimWidth * 2;
-		final int shellHeight = height + _shellTrimHeight * 2;
+      final int shellWidth = width + _shellTrimWidth * 2;
+      final int shellHeight = height + _shellTrimHeight * 2;
 
-		_shell.setSize(shellWidth, shellHeight);
-	}
+      _shell.setSize(shellWidth, shellHeight);
+   }
 
-	private void setContentSize(final Point size) {
-		setContentSize(size.x, size.y);
-	}
+   private void setContentSize(final Point size) {
+      setContentSize(size.x, size.y);
+   }
 
-	public void setShellLocation(final int x, final int y, final int flag) {
-		_shell.setLocation(x, y);
-	}
+   public void setShellLocation(final int x, final int y, final int flag) {
+      _shell.setLocation(x, y);
+   }
 
-	private void setTrimSize() {
+   private void setTrimSize() {
 
-		final Point contentSize = getContentSize();
+      final Point contentSize = getContentSize();
 
-		final int contentWidth = contentSize.x;
-		final int contentHeight = contentSize.y;
+      final int contentWidth = contentSize.x;
+      final int contentHeight = contentSize.y;
 
-		final Rectangle contentWithTrim = _shell.computeTrim(0, 0, contentWidth, contentHeight);
+      final Rectangle contentWithTrim = _shell.computeTrim(0, 0, contentWidth, contentHeight);
 
-		final int shellTrimWidth = contentWithTrim.width - contentWidth;
-		final int shellTrimHeight = contentWithTrim.height - contentHeight;
+      final int shellTrimWidth = contentWithTrim.width - contentWidth;
+      final int shellTrimHeight = contentWithTrim.height - contentHeight;
 
-		_shellTrimWidth = shellTrimWidth / 2;
-		_shellTrimHeight = shellTrimHeight / 2;
-	}
+      _shellTrimWidth = shellTrimWidth / 2;
+      _shellTrimHeight = shellTrimHeight / 2;
+   }
 
-	@Override
-	public String toString() {
-		return ("_isResizeable=" + _isResizeable) //$NON-NLS-1$
-				+ ("\tTrimWidth=" + _shellTrimWidth) //$NON-NLS-1$
-				+ ("\tTrimHeight=" + _shellTrimHeight) //$NON-NLS-1$
-				+ ("\t_shell=" + _shell.getText()); //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+      return ("_isResizeable=" + _isResizeable) //$NON-NLS-1$
+            + ("\tTrimWidth=" + _shellTrimWidth) //$NON-NLS-1$
+            + ("\tTrimHeight=" + _shellTrimHeight) //$NON-NLS-1$
+            + ("\t_shell=" + _shell.getText()); //$NON-NLS-1$
+   }
 
-	public void updateColors(final Color fgColor, final Color bgColor) {
+   public void updateColors(final Color fgColor, final Color bgColor) {
 
-		_shell.setBackground(bgColor);
-	}
+      _shell.setBackground(bgColor);
+   }
 
 }

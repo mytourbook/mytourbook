@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,7 +149,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
     * </code>
     *           </pre>
     */
-   public AdvancedSlideout(final Control ownerControl, //
+   public AdvancedSlideout(final Control ownerControl,
                            final IDialogSettings state,
                            final int[] slideoutDefaultSize) {
 
@@ -222,8 +222,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    private Composite createUI(final Composite parent) {
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory
-            .swtDefaults() //
+      GridLayoutFactory.swtDefaults()
             .spacing(0, 0)
             .applyTo(shellContainer);
 //		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -241,8 +240,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .extendedMargins(0, 0, 0, 5)
             .spacing(0, 0)
@@ -260,11 +258,9 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _labelDragSlideout = new Label(container, SWT.NONE);
       _labelDragSlideout.setText(_titleText);
       _labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.CENTER)
-            //				.indent(3, 0)
             .applyTo(_labelDragSlideout);
       MTFont.setBannerFont(_labelDragSlideout);
 

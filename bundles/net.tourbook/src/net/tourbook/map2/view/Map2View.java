@@ -84,7 +84,7 @@ import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
-import net.tourbook.map2.action.ActionPhotoFilter;
+import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
@@ -135,9 +135,9 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
 import net.tourbook.tour.photo.IPhotoFilterListener;
 import net.tourbook.tour.photo.PhotoFilterEvent;
+import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
@@ -313,6 +313,8 @@ public class Map2View extends ViewPart implements
    private final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
    private final IPreferenceStore            _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings             _state                   = TourbookPlugin.getState(ID);
+   private final IDialogSettings             _state_MapProvider       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider");
+   private final IDialogSettings             _state_PhotoFilter       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter");
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
@@ -439,8 +441,8 @@ public class Map2View extends ViewPart implements
    private ActionMap2Color                   _actionMap2_Color;
    private ActionMap2_MapProvider            _actionMap2_MapProvider;
    private ActionMap2_Options                _actionMap2_Options;
+   private ActionMap2_PhotoFilter            _actionMap2_PhotoFilter;
    private ActionMap2_Graphs                 _actionMap2_TourColors;
-   private ActionPhotoFilter             _actionPhotoFilter;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -1649,7 +1651,8 @@ public class Map2View extends ViewPart implements
       // map2 slideouts
       _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
       _actionMap2_Color                   = new ActionMap2Color();
-      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state);
+      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2_PhotoFilter             = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
       _actionMap2_Options                 = new ActionMap2_Options();
       _actionMap2_SyncMap                 = new ActionSyncMap();
       _actionMap2_TourColors              = new ActionMap2_Graphs();
@@ -1663,7 +1666,6 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
-      _actionPhotoFilter                  = new ActionPhotoFilter(this, parent, _state);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -2018,7 +2020,7 @@ public class Map2View extends ViewPart implements
       /*
        * photo actions
        */
-      _actionPhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
+      _actionMap2_PhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
       _actionShowPhotos.setEnabled(isAllPhotoAvailable);
       _actionSyncMapWith_Photo.setEnabled(canShowFilteredPhoto);
@@ -2115,7 +2117,7 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionPhotoFilter);
+      tbm.add(_actionMap2_PhotoFilter);
       tbm.add(_actionShowPhotos);
       tbm.add(_actionShowAllFilteredPhotos);
 
@@ -3706,7 +3708,7 @@ public class Map2View extends ViewPart implements
       // restore map provider by selecting the last used map factory
       _actionMap2_MapProvider.selectMapProvider(_state.get(STATE_SELECTED_MAP_PROVIDER_ID));
 
-      _actionPhotoFilter.restoreState();
+      _actionMap2_PhotoFilter.restoreState();
 
       // default position
       _defaultZoom = Util.getStateInt(_state, STATE_DEFAULT_POSITION_ZOOM, 10);
@@ -3989,7 +3991,7 @@ public class Map2View extends ViewPart implements
       }
       _state.put(STATE_TOUR_COLOR_ID, colorId.name());
 
-      _actionPhotoFilter.saveState();
+      _actionMap2_PhotoFilter.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
