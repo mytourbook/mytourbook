@@ -17,11 +17,12 @@ package net.tourbook.map2.view;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 
@@ -31,6 +32,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -45,7 +48,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
 
    private static final String   MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -92,11 +95,6 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
       _state = map2State;
    }
 
-   @Override
-   public void colorDialogOpened(final boolean isAnotherDialogOpened) {
-      setIsAnotherDialogOpened(isAnotherDialogOpened);
-   }
-
    private void createActions() {
 
       _actionRestoreDefaults = new Action() {
@@ -106,12 +104,13 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault_Dark));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
-      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID);
-      _actionPrefDialog.closeThisTooltip(this);
-      _actionPrefDialog.setShell(_parent.getShell());
+      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID)
+            .setDarkMode(true)
+            .closeThisTooltip(this)
+            .setShell(_parent.getShell());
    }
 
    @Override
@@ -127,6 +126,11 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
       enableControls();
 
       updateUI();
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      UI.setChildColors(parent,
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 
       return ui;
    }
@@ -148,7 +152,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             /*
@@ -184,8 +188,9 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
    private void createUI_20_ImageSize(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//    GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -195,7 +200,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout implements IColo
             label.setText(Messages.Photo_Properties_Label_Size);
             label.setToolTipText(Messages.Photo_Properties_Label_ThumbnailSize_Tooltip);
             GridDataFactory.fillDefaults()
-//             .align(SWT.CENTER, SWT.BEGINNING)
+                  .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
          }
          {

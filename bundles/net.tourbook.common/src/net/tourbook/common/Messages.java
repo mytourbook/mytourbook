@@ -181,6 +181,7 @@ public class Messages extends NLS {
    public static String        Image__MapProvider_Transparent;
    public static String        Image__MapProvider_Transparent_Hill;
    public static String        Image__options;
+   public static String        Image__Options_Dark;
    public static String        Image__Pin_Themed;
    public static String        Image__TourOptions;
    public static String        Image__TourOptions_Disabled;

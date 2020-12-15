@@ -962,6 +962,7 @@ public class Messages extends NLS {
    public static String        Image__App_Filter_Disabled;
    public static String        Image__App_OK;
    public static String        Image__App_RestoreDefault;
+   public static String        Image__App_RestoreDefault_Dark;
    public static String        Image__App_SequenceNumber;
    public static String        Image__App_SequenceNumber_Disabled;
    public static String        Image__App_Sort;
