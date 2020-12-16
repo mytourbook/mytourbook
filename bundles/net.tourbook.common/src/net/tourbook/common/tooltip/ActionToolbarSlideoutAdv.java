@@ -126,7 +126,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
          _toolbarSlideout = createSlideout(_actionToolItem);
 
-         updateUI_Tooltip();
+         updateUI_ToolItem_Tooltip();
       }
    }
 
@@ -212,8 +212,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
          return;
       }
 
-      updateUI_Image();
-      updateUI_Tooltip();
+      updateUI_ToolItem_Image();
+      updateUI_ToolItem_Tooltip();
 
       if (_toolbarSlideout.isVisible() == false) {
 
@@ -268,8 +268,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
       _actionToolItem.setSelection(isSelected);
 
-      updateUI_Image();
-      updateUI_Tooltip();
+      updateUI_ToolItem_Image();
+      updateUI_ToolItem_Tooltip();
    }
 
    @Override
@@ -282,8 +282,10 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
    /**
     * Show other image when selected
+    *
+    * @param _actionToolItem2
     */
-   private void updateUI_Image() {
+   protected void updateUI_ToolItem_Image() {
 
       if (_image_Selected != null) {
 
@@ -297,7 +299,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       }
    }
 
-   private void updateUI_Tooltip() {
+   private void updateUI_ToolItem_Tooltip() {
 
       if (_actionToolItem.getSelection()) {
 
@@ -309,5 +311,9 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
          _actionToolItem.setToolTipText(notSelectedTooltip);
       }
+   }
+
+   public ToolItem getActionToolItem() {
+      return _actionToolItem;
    }
 }

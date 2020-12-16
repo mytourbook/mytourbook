@@ -20,7 +20,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
-import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
@@ -33,22 +32,19 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
 
-   private static final String          STATE_IS_PHOTO_FILTER_ACTIVE = "STATE_IS_PHOTO_FILTER_ACTIVE";                                              //$NON-NLS-1$
-
-   private static final ImageDescriptor _actionImageDescriptor       = TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory);
 
    private IDialogSettings              _state;
 
-   private Slideout_Map2_PhotoFilter    _slideoutPhotoFilter;
-
    private Map2View                     _map2View;
+   private Slideout_Map2_PhotoFilter    _slideoutPhotoFilter;
 
    /*
     * UI resources
     */
    private Image _imageEnabled;
-   private Image _imageEnabledNoPhotos;
-   private Image _imageEnabledWithPhotos;
+   private Image _imageEnabled_NoPhotos;
+   private Image _imageEnabled_WithPhotos;
    private Image _imageDisabled;
 
    public ActionMap2_PhotoFilter(final Map2View map2View, final IDialogSettings state) {
@@ -61,18 +57,26 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
       isToggleAction = true;
       notSelectedTooltip = Messages.Map_Action_PhotoFilter2_Tooltip;
 
-      _imageEnabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
-      _imageEnabledNoPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
-      _imageEnabledWithPhotos = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
-      _imageDisabled = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
+// SET_FORMATTING_OFF
+
+      _imageEnabled              = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
+      _imageEnabled_NoPhotos     = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
+      _imageEnabled_WithPhotos   = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
+      _imageDisabled             = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
+
+// SET_FORMATTING_ON
    }
 
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutPhotoFilter = new Slideout_Map2_PhotoFilter(toolItem, _map2View, _state);
+      _slideoutPhotoFilter = new Slideout_Map2_PhotoFilter(this, toolItem, _map2View, _state);
       _slideoutPhotoFilter.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
+      return _slideoutPhotoFilter;
+   }
+
+   public Slideout_Map2_PhotoFilter getPhotoFilterSlideout() {
       return _slideoutPhotoFilter;
    }
 
@@ -85,25 +89,30 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected void onSelect(final SelectionEvent selectionEvent) {
 
+      // show/hide slideout
       super.onSelect(selectionEvent);
 
+      _map2View.photoFilter_UpdateFromAction(getSelection());
    }
 
-   public void restoreState() {
+   public void updateUI() {
 
-      setSelection(Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false));
+      final boolean isSelected = getActionToolItem().getSelection();
 
-      _slideoutPhotoFilter.restoreState();
+      final int numAllPhotos = _map2View.getPhotos().size();
+      final int numFilteredPhotos = _map2View.getFilteredPhotos().size();
 
-//      updateUI_ActionTooltip();
-//
-//      _mapView.actionPhotoProperties(_isFilterActive);
+      getActionToolItem().setImage(
+
+            numAllPhotos == 0 ? _imageEnabled
+                  : numFilteredPhotos == 0 ? _imageEnabled_NoPhotos
+                        : _imageEnabled_WithPhotos);
    }
 
-   public void saveState() {
+   @Override
+   protected void updateUI_ToolItem_Image() {
 
-      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, getSelection());
-
-      _slideoutPhotoFilter.saveState();
+      updateUI();
    }
+
 }

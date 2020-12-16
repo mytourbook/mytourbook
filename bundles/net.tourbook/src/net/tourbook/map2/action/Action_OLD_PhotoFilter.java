@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionPhotoFilter extends ContributionItem {
+public class Action_OLD_PhotoFilter extends ContributionItem {
 
    private static final String       ID                           = "ACTION_PHOTO_FILTER_ID";       //$NON-NLS-1$
 
@@ -71,12 +71,12 @@ public class ActionPhotoFilter extends ContributionItem {
       }
 
       @Override
-      protected void updateFilterActionUI(final MapFilterData data) {
+      protected void updatePhotoFilter(final MapFilterData data) {
          onUpdateFilter(data);
       }
    }
 
-   public ActionPhotoFilter(final Map2View mapView, final Control parent, final IDialogSettings state) {
+   public Action_OLD_PhotoFilter(final Map2View mapView, final Control parent, final IDialogSettings state) {
 
       super(ID);
 
@@ -160,7 +160,7 @@ public class ActionPhotoFilter extends ContributionItem {
          _slideoutPhotoFilter.close();
       }
 
-      _mapView.actionPhotoProperties(_isFilterActive);
+      _mapView.photoFilter_UpdateFromAction(_isFilterActive);
    }
 
    private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
@@ -208,7 +208,7 @@ public class ActionPhotoFilter extends ContributionItem {
 
       updateUI_ActionTooltip();
 
-      _mapView.actionPhotoProperties(_isFilterActive);
+      _mapView.photoFilter_UpdateFromAction(_isFilterActive);
    }
 
    public void saveState() {

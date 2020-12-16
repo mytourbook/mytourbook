@@ -18,16 +18,12 @@ package net.tourbook.tour.photo;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.util.Util;
+import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.PhotoEventId;
-import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.RatingStars;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -43,21 +39,17 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IViewPart;
 
 /**
  * Photo properties dialog.
  */
-public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhotoEventListener {
+public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
-   private static final String                      STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";         //$NON-NLS-1$
-   private static final String                      STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR"; //$NON-NLS-1$
+   public static final int                        OPERATOR_IS_LESS_OR_EQUAL  = 0;
+   public static final int                        OPERATOR_IS_EQUAL          = 1;
+   public static final int                        OPERATOR_IS_MORE_OR_EQUAL  = 2;
 
-   public static final int                          OPERATOR_IS_LESS_OR_EQUAL               = 0;
-   public static final int                          OPERATOR_IS_EQUAL                       = 1;
-   public static final int                          OPERATOR_IS_MORE_OR_EQUAL               = 2;
-
-   private static final String[]                    _ratingStarOperatorsText                = {
+   private static final String[]                  _ratingStarOperatorsText   = {
 
          Messages.Photo_Filter_Operator_IsLess,
          Messages.Photo_Filter_Operator_IsEqual,
@@ -66,31 +58,29 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
    };
 
    /**
-    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
+    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_ratingStarOperatorsText}
     */
-   private static final int[]                       _ratingStarOperatorsValues              = {
+   private static final PhotoRatingStarOperator[] _ratingStarOperatorsValues = {
 
-         OPERATOR_IS_LESS_OR_EQUAL,
-         OPERATOR_IS_EQUAL,
-         OPERATOR_IS_MORE_OR_EQUAL,
+         PhotoRatingStarOperator.IS_LESS_OR_EQUAL,
+         PhotoRatingStarOperator.IS_EQUAL,
+         PhotoRatingStarOperator.IS_MORE_OR_EQUAL,
 
    };
 
-   private IDialogSettings                          _state;
-
-   private final ListenerList<IPhotoFilterListener> _photoFilterListeners                   = new ListenerList<>(ListenerList.IDENTITY);
+   private IDialogSettings                        _state;
 
    /**
     * Filter operator
     */
-   private int                                      _filterRatingStarOperatorIndex;
-   private int                                      _filterRatingStars                      = RatingStars.MAX_RATING_STARS;
+   private int                                    _filterRatingStarOperatorIndex;
+   private int                                    _filterRatingStars         = RatingStars.MAX_RATING_STARS;
 
-   private MapFilterData                            _oldMapFilterData;
+   private PixelConverter                         _pc;
 
-   private PixelConverter                           _pc;
-
-   private ToolItem                                 _toolItem;
+   private ActionMap2_PhotoFilter                 _actionMap2_PhotoFilter;
+   private Map2View                               _map2View;
+   private ToolItem                               _toolItem;
 
    /*
     * UI controls
@@ -104,23 +94,22 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
 
    private RatingStars _ratingStars;
 
-   public Slideout_Map2_PhotoFilter(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state) {
+   public Slideout_Map2_PhotoFilter(final ActionMap2_PhotoFilter actionMap2_PhotoFilter,
+                                    final ToolItem toolItem,
+                                    final Map2View map2View,
+                                    final IDialogSettings state) {
 
       super(toolItem.getParent(), state, new int[] { 220, 100, 220, 100 });
 
+      _actionMap2_PhotoFilter = actionMap2_PhotoFilter;
       _toolItem = toolItem;
+      _map2View = map2View;
       _state = state;
 
       setTitleText(Messages.Photo_Filter_Label_PhotoFilter);
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
-
-      PhotoManager.addPhotoEventListener(this);
-   }
-
-   public void addPropertiesListener(final IPhotoFilterListener listener) {
-      _photoFilterListeners.add(listener);
    }
 
    @Override
@@ -137,18 +126,7 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
 
       updateUI();
 
-      if (_oldMapFilterData != null) {
-
-         /*
-          * _oldMapFilterData can be set before the UI is created
-          */
-
-         updateFilterUI(_oldMapFilterData);
-      }
-
       enableActions();
-
-      PhotoManager.addPhotoEventListener(this);
    }
 
    private Composite createUI(final Composite parent) {
@@ -179,7 +157,7 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
             _comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectRatingStarOperands();
+                  onSelect_RatingStarOperands();
                }
             });
             GridDataFactory.fillDefaults()
@@ -194,7 +172,7 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
             _ratingStars.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectRatingStars();
+                  onSelect_RatingStars();
                }
             });
          }
@@ -206,7 +184,6 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .hint(_pc.convertWidthInCharsToPixels(12), SWT.DEFAULT)
-//                  .indent(10, 0)
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_containerNumbers);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerNumbers);
@@ -242,19 +219,6 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
 
    }
 
-   private void fireFilterEvent() {
-
-      final PhotoFilterEvent filterEvent = new PhotoFilterEvent();
-
-      filterEvent.filterRatingStars = _filterRatingStars;
-      filterEvent.fiterRatingStarOperator = _ratingStarOperatorsValues[_filterRatingStarOperatorIndex];
-
-      final Object[] listeners = _photoFilterListeners.getListeners();
-      for (final Object listener : listeners) {
-         ((IPhotoFilterListener) listener).photoFilterEvent(filterEvent);
-      }
-   }
-
    @Override
    protected Rectangle getParentBounds() {
 
@@ -275,7 +239,6 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
    @Override
    protected void onDispose() {
 
-      PhotoManager.removePhotoEventListener(this);
    }
 
    @Override
@@ -284,14 +247,14 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
       _comboRatingStarOperators.setFocus();
    }
 
-   private void onSelectRatingStarOperands() {
+   private void onSelect_RatingStarOperands() {
 
       _filterRatingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
 
-      fireFilterEvent();
+      updateMapPhotoFilter();
    }
 
-   private void onSelectRatingStars() {
+   private void onSelect_RatingStars() {
 
       final int selectedStars = _ratingStars.getSelection();
 
@@ -299,66 +262,25 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
 
       enableActions();
 
-      fireFilterEvent();
-   }
-
-   @Override
-   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
-
-      if (photoEventId == PhotoEventId.PHOTO_FILTER) {
-
-         if (data instanceof MapFilterData) {
-
-            updateFilterUI((MapFilterData) data);
-         }
-      }
+      updateMapPhotoFilter();
    }
 
    public void restoreState() {
 
-      _filterRatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
-      _filterRatingStarOperatorIndex = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, OPERATOR_IS_EQUAL);
-
       // set photo filter into the map
-      fireFilterEvent();
+//      updateMapPhotoFilter();
    }
 
    @Override
    public void saveState() {
 
-      _state.put(STATE_PHOTO_FILTER_RATING_STARS, _filterRatingStars);
-      _state.put(STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _filterRatingStarOperatorIndex);
-
+      // save slideout position/size
       super.saveState();
    }
 
-   /**
-    * This is called when the filter is run and filter statistics are available.
-    *
-    * @param data
-    */
-   protected void updateFilterActionUI(final MapFilterData data) {
-      // do nothing
-   }
+   private void updateMapPhotoFilter() {
 
-   private void updateFilterUI(final MapFilterData data) {
-
-      if (_lblAllPhotos == null || _lblAllPhotos.isDisposed()) {
-
-         // UI is not initialized
-
-         _oldMapFilterData = data;
-
-         return;
-      }
-
-      _lblAllPhotos.setText(Integer.toString(data.allPhotos));
-      _lblFilteredPhotos.setText(Integer.toString(data.filteredPhotos));
-
-      _containerNumbers.layout();
-
-      // update action button
-      updateFilterActionUI(data);
+      _map2View.photoFilter_UpdateFromSlideout(_filterRatingStars, _ratingStarOperatorsValues[_filterRatingStarOperatorIndex]);
    }
 
    private void updateUI() {
@@ -377,6 +299,29 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout implements IPhot
 
       // select operator
       _comboRatingStarOperators.select(_filterRatingStarOperatorIndex);
+   }
+
+   /**
+    * This is called after the filter is run to update depending UI controls, e.g. number of
+    * filtered photos
+    *
+    * @param numFilteredPhotos
+    * @param numAllPhotos
+    * @param data
+    */
+   public void updateUI_NumberOfPhotos() {
+
+      if (_lblAllPhotos == null || _lblAllPhotos.isDisposed()) {
+
+         // UI is not initialized
+
+         return;
+      }
+
+      _lblAllPhotos.setText(Integer.toString(_map2View.getPhotos().size()));
+      _lblFilteredPhotos.setText(Integer.toString(_map2View.getFilteredPhotos().size()));
+
+      _containerNumbers.layout();
    }
 
 }
