@@ -84,7 +84,7 @@ import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
-import net.tourbook.map2.action.ActionPhotoFilter;
+import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
@@ -117,6 +117,7 @@ import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
@@ -135,9 +136,6 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.Slideout_Map2_PhotoFilter;
-import net.tourbook.tour.photo.IPhotoFilterListener;
-import net.tourbook.tour.photo.PhotoFilterEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
@@ -195,7 +193,6 @@ public class Map2View extends ViewPart implements
 
       IMapContextProvider,
       IPhotoEventListener,
-      IPhotoFilterListener,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapPositionListener,
@@ -293,6 +290,10 @@ public class Map2View extends ViewPart implements
    static final int              STATE_SLIDER_PATH_SEGMENTS_DEFAULT                    = 200;
    static final RGB              STATE_SLIDER_PATH_COLOR_DEFAULT                       = new RGB(0xff, 0xff, 0x80);
    //
+   private static final String   STATE_IS_PHOTO_FILTER_ACTIVE                          = "STATE_IS_PHOTO_FILTER_ACTIVE";                        //$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STARS                       = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
+   //
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
    //
    private static final MapGraphId[]         _allGraphContribId       = {
@@ -313,6 +314,8 @@ public class Map2View extends ViewPart implements
    private final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
    private final IPreferenceStore            _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings             _state                   = TourbookPlugin.getState(ID);
+   private final IDialogSettings             _state_MapProvider       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider");
+   private final IDialogSettings             _state_PhotoFilter       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter");
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
@@ -346,8 +349,8 @@ public class Map2View extends ViewPart implements
    private final ArrayList<Photo>            _filteredPhotos          = new ArrayList<>();
    //
    private boolean                           _isPhotoFilterActive;
-   private int                               _photoFilterRatingStars;
-   private int                               _photoFilterRatingStarOperator;
+   private int                               _photoFilter_RatingStars;
+   private Enum<PhotoRatingStarOperator>     _photoFilter_RatingStar_Operator;
    //
    private boolean                           _isShowTour;
    private boolean                           _isShowPhoto;
@@ -439,8 +442,8 @@ public class Map2View extends ViewPart implements
    private ActionMap2Color                   _actionMap2_Color;
    private ActionMap2_MapProvider            _actionMap2_MapProvider;
    private ActionMap2_Options                _actionMap2_Options;
+   private ActionMap2_PhotoFilter            _actionMap2_PhotoFilter;
    private ActionMap2_Graphs                 _actionMap2_TourColors;
-   private ActionPhotoFilter             _actionPhotoFilter;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -880,13 +883,6 @@ public class Map2View extends ViewPart implements
 
          _map.dimMap(_mapDimLevel, dimColor);
       }
-   }
-
-   public void actionPhotoProperties(final boolean isFilterActive) {
-
-      _isPhotoFilterActive = isFilterActive;
-
-      updateFilteredPhotos();
    }
 
    public void actionPOI() {
@@ -1649,7 +1645,8 @@ public class Map2View extends ViewPart implements
       // map2 slideouts
       _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
       _actionMap2_Color                   = new ActionMap2Color();
-      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state);
+      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2_PhotoFilter             = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
       _actionMap2_Options                 = new ActionMap2_Options();
       _actionMap2_SyncMap                 = new ActionSyncMap();
       _actionMap2_TourColors              = new ActionMap2_Graphs();
@@ -1663,7 +1660,6 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
-      _actionPhotoFilter                  = new ActionPhotoFilter(this, parent, _state);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -2018,7 +2014,7 @@ public class Map2View extends ViewPart implements
       /*
        * photo actions
        */
-      _actionPhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
+      _actionMap2_PhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
       _actionShowPhotos.setEnabled(isAllPhotoAvailable);
       _actionSyncMapWith_Photo.setEnabled(canShowFilteredPhoto);
@@ -2115,7 +2111,7 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionPhotoFilter);
+      tbm.add(_actionMap2_PhotoFilter);
       tbm.add(_actionShowPhotos);
       tbm.add(_actionShowAllFilteredPhotos);
 
@@ -2381,6 +2377,13 @@ public class Map2View extends ViewPart implements
       return MapColorProvider.getActiveMap2ColorProvider(colorId);
    }
 
+   /**
+    * @return Returns a list with all filtered photos
+    */
+   public ArrayList<Photo> getFilteredPhotos() {
+      return _filteredPhotos;
+   }
+
    public Map getMap() {
       return _map;
    }
@@ -2470,6 +2473,13 @@ public class Map2View extends ViewPart implements
       mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
       return mapPositions;
+   }
+
+   /**
+    * @return Returns a list with all available photos.
+    */
+   public ArrayList<Photo> getPhotos() {
+      return _allPhotos;
    }
 
    private Set<GeoPosition> getTourBounds(final ArrayList<TourData> tourDataList) {
@@ -3479,11 +3489,17 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   @Override
-   public void photoFilterEvent(final PhotoFilterEvent event) {
+   public void photoFilter_UpdateFromAction(final boolean isFilterActive) {
 
-      _photoFilterRatingStars = event.filterRatingStars;
-      _photoFilterRatingStarOperator = event.fiterRatingStarOperator;
+      _isPhotoFilterActive = isFilterActive;
+
+      updateFilteredPhotos();
+   }
+
+   public void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
+
+      _photoFilter_RatingStars = filterRatingStars;
+      _photoFilter_RatingStar_Operator = ratingstaroperatorsvalues;
 
       updateFilteredPhotos();
    }
@@ -3638,9 +3654,16 @@ public class Map2View extends ViewPart implements
       _isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
       _actionShowTour.setSelection(_isShowTour);
 
-      // is show photo
+      // photo states
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
       _actionShowPhotos.setSelection(_isShowPhoto);
+
+      _isPhotoFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+      _actionMap2_PhotoFilter.setSelection(_isPhotoFilterActive);
+
+      _photoFilter_RatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
+      _photoFilter_RatingStar_Operator = Util.getStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, PhotoRatingStarOperator.HAS_ANY);
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
 
       // is show legend
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
@@ -3705,8 +3728,6 @@ public class Map2View extends ViewPart implements
 
       // restore map provider by selecting the last used map factory
       _actionMap2_MapProvider.selectMapProvider(_state.get(STATE_SELECTED_MAP_PROVIDER_ID));
-
-      _actionPhotoFilter.restoreState();
 
       // default position
       _defaultZoom = Util.getStateInt(_state, STATE_DEFAULT_POSITION_ZOOM, 10);
@@ -3863,12 +3884,14 @@ public class Map2View extends ViewPart implements
 
       _filteredPhotos.clear();
 
-      if (_isPhotoFilterActive) {
+      final boolean hasAnyStars = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.HAS_ANY;
 
-         final boolean isNoStar = _photoFilterRatingStars == 0;
-         final boolean isEqual = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_EQUAL;
-         final boolean isMore = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilterRatingStarOperator == Slideout_Map2_PhotoFilter.OPERATOR_IS_LESS_OR_EQUAL;
+      if (_isPhotoFilterActive && !hasAnyStars) {
+
+         final boolean isNoStar = _photoFilter_RatingStars == 0;
+         final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isLess = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
 
          for (final Photo photo : _allPhotos) {
 
@@ -3880,15 +3903,15 @@ public class Map2View extends ViewPart implements
 
                _filteredPhotos.add(photo);
 
-            } else if (isEqual && ratingStars == _photoFilterRatingStars) {
+            } else if (isEqual && ratingStars == _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
 
-            } else if (isMore && ratingStars >= _photoFilterRatingStars) {
+            } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
 
-            } else if (isLess && ratingStars <= _photoFilterRatingStars) {
+            } else if (isLess && ratingStars <= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
             }
@@ -3896,7 +3919,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         // photo filter is not active
+         // photo filter is not active or any stars can be selected -> show all photos
 
          _filteredPhotos.addAll(_allPhotos);
       }
@@ -3905,13 +3928,9 @@ public class Map2View extends ViewPart implements
 
       enableActions(true);
 
-      PhotoManager.firePhotoEvent(
-            this,
-            PhotoEventId.PHOTO_FILTER,
-            new MapFilterData(
-                  _allPhotos.size(),
-                  _filteredPhotos.size()));
-
+      // update UI: photo filter slideout
+      _actionMap2_PhotoFilter.updateUI();
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().updateUI_NumberOfPhotos();
    }
 
    @PersistState
@@ -3962,6 +3981,12 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
+      // photo filter
+      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _actionMap2_PhotoFilter.getSelection());
+      _state.put(STATE_PHOTO_FILTER_RATING_STARS, _photoFilter_RatingStars);
+      Util.setStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _photoFilter_RatingStar_Operator);
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().saveState();
+
       // tour color
       MapGraphId colorId;
 
@@ -3988,8 +4013,6 @@ public class Map2View extends ViewPart implements
          colorId = MapGraphId.Altitude;
       }
       _state.put(STATE_TOUR_COLOR_ID, colorId.name());
-
-      _actionPhotoFilter.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {

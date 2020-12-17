@@ -93,6 +93,8 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
 
       _map2View = map2View;
       _state = map2State;
+
+      restoreState_BeforeUI();
    }
 
    private void createActions() {
@@ -122,7 +124,6 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
 
       final Composite ui = createUI(parent);
 
-      restoreState();
       enableControls();
 
       updateUI();
@@ -265,7 +266,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
       updateUI_Map();
    }
 
-   private void restoreState() {
+   private void restoreState_BeforeUI() {
 
       _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
@@ -273,6 +274,8 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
       if (_imageSize < 10) {
          _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
       }
+
+      Photo.setPaintedMapImageWidth(_imageSize);
    }
 
    private void saveState() {

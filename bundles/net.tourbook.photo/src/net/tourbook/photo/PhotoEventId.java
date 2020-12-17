@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,24 +19,19 @@ import java.util.ArrayList;
 
 public enum PhotoEventId {
 
-	/**
-	 * Photo attributes, e.g star rating has been modified. Event data contain an {@link ArrayList}
-	 * with the modified {@link Photo}'s.
-	 */
-	PHOTO_ATTRIBUTES_ARE_MODIFIED,
+   /**
+    * Photo attributes, e.g star rating has been modified. Event data contain an {@link ArrayList}
+    * with the modified {@link Photo}'s.
+    */
+   PHOTO_ATTRIBUTES_ARE_MODIFIED,
 
-	/**
-	 * Photo filter is run, event data contains MapFilterData.
-	 */
-	PHOTO_FILTER,
+   /**
+    * File image path has been modified.
+    */
+   PHOTO_IMAGE_PATH_IS_MODIFIED,
 
-	/**
-	 * File image path has been modified.
-	 */
-	PHOTO_IMAGE_PATH_IS_MODIFIED,
-
-	/**
-	 * Event data contains a selection with photos.
-	 */
-	PHOTO_SELECTION,
+   /**
+    * Event data contains a selection with photos.
+    */
+   PHOTO_SELECTION,
 }
