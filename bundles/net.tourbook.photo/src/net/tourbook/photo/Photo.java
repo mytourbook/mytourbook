@@ -76,6 +76,7 @@ public class Photo {
     * This is the image size which the user has selected to paint a photo image.
     */
    private static int                              PAINTED_MAP_IMAGE_WIDTH = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+
    private String                                  _uniqueId;
 
    /**

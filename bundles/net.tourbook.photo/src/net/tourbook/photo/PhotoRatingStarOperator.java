@@ -17,9 +17,12 @@ package net.tourbook.photo;
 
 public enum PhotoRatingStarOperator {
 
+   HAS_ANY, //
+
    IS_EQUAL, //
 
    IS_LESS_OR_EQUAL, //
 
    IS_MORE_OR_EQUAL, //
+
 }

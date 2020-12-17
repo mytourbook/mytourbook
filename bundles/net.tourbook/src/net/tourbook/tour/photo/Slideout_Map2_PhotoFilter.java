@@ -18,7 +18,6 @@ package net.tourbook.tour.photo;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoRatingStarOperator;
@@ -30,6 +29,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -41,44 +41,55 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- * Photo properties dialog.
+ * Photo filter slideout
  */
 public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
-   public static final int                        OPERATOR_IS_LESS_OR_EQUAL  = 0;
-   public static final int                        OPERATOR_IS_EQUAL          = 1;
-   public static final int                        OPERATOR_IS_MORE_OR_EQUAL  = 2;
+   /**
+    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_allRatingStar_Labels} and
+    * {@link #_allRatingStar_Tooltip}
+    */
+   private static final PhotoRatingStarOperator[] _allRatingStar_Operators    = {
 
-   private static final String[]                  _ratingStarOperatorsText   = {
-
-         Messages.Photo_Filter_Operator_IsLess,
-         Messages.Photo_Filter_Operator_IsEqual,
-         Messages.Photo_Filter_Operator_IsMore,
+         PhotoRatingStarOperator.HAS_ANY,
+         PhotoRatingStarOperator.IS_EQUAL,
+         PhotoRatingStarOperator.IS_MORE_OR_EQUAL,
+         PhotoRatingStarOperator.IS_LESS_OR_EQUAL,
 
    };
 
    /**
-    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_ratingStarOperatorsText}
+    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_allRatingStar_Operators}
     */
-   private static final PhotoRatingStarOperator[] _ratingStarOperatorsValues = {
+   private static final String[]                  _allRatingStar_Labels       = {
 
-         PhotoRatingStarOperator.IS_LESS_OR_EQUAL,
-         PhotoRatingStarOperator.IS_EQUAL,
-         PhotoRatingStarOperator.IS_MORE_OR_EQUAL,
+         Messages.Photo_Filter_Operator_HasAny,
+         Messages.Photo_Filter_Operator_IsEqual,
+         Messages.Photo_Filter_Operator_IsMore,
+         Messages.Photo_Filter_Operator_IsLess,
 
    };
 
-   private IDialogSettings                        _state;
+   /**
+    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_allRatingStar_Operators}
+    */
+   private static final String[]                  _allRatingStar_Tooltip      = {
+
+         Messages.Photo_Filter_Operator_HasAny_Tooltip,
+         Messages.Photo_Filter_Operator_IsEqual_Tooltip,
+         Messages.Photo_Filter_Operator_IsMore_Tooltip,
+         Messages.Photo_Filter_Operator_IsLess_Tooltip,
+
+   };
 
    /**
     * Filter operator
     */
-   private int                                    _filterRatingStarOperatorIndex;
-   private int                                    _filterRatingStars         = RatingStars.MAX_RATING_STARS;
+   private int                                    _selectedRatingStars        = 0;
+   private PhotoRatingStarOperator                _selectedRatingStarOperator = PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
 
    private PixelConverter                         _pc;
 
-   private ActionMap2_PhotoFilter                 _actionMap2_PhotoFilter;
    private Map2View                               _map2View;
    private ToolItem                               _toolItem;
 
@@ -94,19 +105,16 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private RatingStars _ratingStars;
 
-   public Slideout_Map2_PhotoFilter(final ActionMap2_PhotoFilter actionMap2_PhotoFilter,
-                                    final ToolItem toolItem,
+   public Slideout_Map2_PhotoFilter(final ToolItem toolItem,
                                     final Map2View map2View,
                                     final IDialogSettings state) {
 
       super(toolItem.getParent(), state, new int[] { 220, 100, 220, 100 });
 
-      _actionMap2_PhotoFilter = actionMap2_PhotoFilter;
       _toolItem = toolItem;
       _map2View = map2View;
-      _state = state;
 
-      setTitleText(Messages.Photo_Filter_Label_PhotoFilter);
+      setTitleText(Messages.Photo_Filter_Title_Map2PhotoFilter);
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
@@ -249,7 +257,10 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private void onSelect_RatingStarOperands() {
 
-      _filterRatingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
+      final int ratingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
+
+      _selectedRatingStarOperator = _allRatingStar_Operators[ratingStarOperatorIndex];
+      updateUI_OperatorTooltip(ratingStarOperatorIndex);
 
       updateMapPhotoFilter();
    }
@@ -258,17 +269,21 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
       final int selectedStars = _ratingStars.getSelection();
 
-      _filterRatingStars = selectedStars;
+      _selectedRatingStars = selectedStars;
+
+      final int ratingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
+      updateUI_OperatorTooltip(ratingStarOperatorIndex);
 
       enableActions();
 
       updateMapPhotoFilter();
    }
 
-   public void restoreState() {
+   public void restoreState(final int photoFilter_RatingStars, final Enum<PhotoRatingStarOperator> photoFilter_RatingStar_Operator) {
 
-      // set photo filter into the map
-//      updateMapPhotoFilter();
+      // keep values, when this method is called, then the slideout UI was not yet created
+      _selectedRatingStars = photoFilter_RatingStars;
+      _selectedRatingStarOperator = (PhotoRatingStarOperator) photoFilter_RatingStar_Operator;
    }
 
    @Override
@@ -280,25 +295,33 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
 
    private void updateMapPhotoFilter() {
 
-      _map2View.photoFilter_UpdateFromSlideout(_filterRatingStars, _ratingStarOperatorsValues[_filterRatingStarOperatorIndex]);
+      _map2View.photoFilter_UpdateFromSlideout(_selectedRatingStars, _selectedRatingStarOperator);
    }
 
    private void updateUI() {
 
       // select rating star
-      _ratingStars.setSelection(_filterRatingStars);
+      _ratingStars.setSelection(_selectedRatingStars);
 
-      for (final String operator : _ratingStarOperatorsText) {
-         _comboRatingStarOperators.add(operator);
-      }
-
-      // ensure array bounds
-      if (_filterRatingStarOperatorIndex >= _ratingStarOperatorsText.length) {
-         _filterRatingStarOperatorIndex = 0;
+      for (final String operatorLabel : _allRatingStar_Labels) {
+         _comboRatingStarOperators.add(operatorLabel);
       }
 
       // select operator
-      _comboRatingStarOperators.select(_filterRatingStarOperatorIndex);
+      int ratingStarOperatorIndex = 0;
+      for (int operatorIndex = 0; operatorIndex < _allRatingStar_Operators.length; operatorIndex++) {
+         final PhotoRatingStarOperator photoRatingStarOperator = _allRatingStar_Operators[operatorIndex];
+
+         if (photoRatingStarOperator.equals(_selectedRatingStarOperator)) {
+            ratingStarOperatorIndex = operatorIndex;
+            break;
+         }
+      }
+
+      _comboRatingStarOperators.select(ratingStarOperatorIndex);
+      updateUI_OperatorTooltip(ratingStarOperatorIndex);
+
+      updateUI_NumberOfPhotos();
    }
 
    /**
@@ -322,6 +345,20 @@ public class Slideout_Map2_PhotoFilter extends AdvancedSlideout {
       _lblFilteredPhotos.setText(Integer.toString(_map2View.getFilteredPhotos().size()));
 
       _containerNumbers.layout();
+   }
+
+   private void updateUI_OperatorTooltip(final int ratingStarOperatorIndex) {
+
+      if (_selectedRatingStarOperator == PhotoRatingStarOperator.HAS_ANY) {
+
+         // there is no number of rating stars
+
+         _comboRatingStarOperators.setToolTipText(_allRatingStar_Tooltip[ratingStarOperatorIndex]);
+
+      } else {
+
+         _comboRatingStarOperators.setToolTipText(NLS.bind(_allRatingStar_Tooltip[ratingStarOperatorIndex], _selectedRatingStars));
+      }
    }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,6 +69,12 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
       _image_Disabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
    }
 
+   public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {
+
+      _image_Enabled = actionImage;
+      _image_Disabled = actionImageDisabled;
+   }
+
    public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
 
       _image_Enabled = actionImage.createImage();
@@ -128,6 +134,10 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
          updateUI_ToolItem_Tooltip();
       }
+   }
+
+   public ToolItem getActionToolItem() {
+      return _actionToolItem;
    }
 
    @Override
@@ -311,9 +321,5 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
          _actionToolItem.setToolTipText(notSelectedTooltip);
       }
-   }
-
-   public ToolItem getActionToolItem() {
-      return _actionToolItem;
    }
 }

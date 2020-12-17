@@ -119,7 +119,6 @@ import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.RatingStars;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 import net.tourbook.srtm.IPreferences;
@@ -3658,10 +3657,13 @@ public class Map2View extends ViewPart implements
       // photo states
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
       _actionShowPhotos.setSelection(_isShowPhoto);
-      _photoFilter_RatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
-      _photoFilter_RatingStar_Operator = Util.getStateEnum(_state,
-            STATE_PHOTO_FILTER_RATING_STAR_OPERATOR,
-            PhotoRatingStarOperator.IS_LESS_OR_EQUAL);
+
+      _isPhotoFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+      _actionMap2_PhotoFilter.setSelection(_isPhotoFilterActive);
+
+      _photoFilter_RatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
+      _photoFilter_RatingStar_Operator = Util.getStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, PhotoRatingStarOperator.HAS_ANY);
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
 
       // is show legend
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
@@ -3726,10 +3728,6 @@ public class Map2View extends ViewPart implements
 
       // restore map provider by selecting the last used map factory
       _actionMap2_MapProvider.selectMapProvider(_state.get(STATE_SELECTED_MAP_PROVIDER_ID));
-
-      _isPhotoFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
-      _actionMap2_PhotoFilter.setSelection(_isPhotoFilterActive);
-      _actionMap2_PhotoFilter.getPhotoFilterSlideout().restoreState();
 
       // default position
       _defaultZoom = Util.getStateInt(_state, STATE_DEFAULT_POSITION_ZOOM, 10);
@@ -3886,7 +3884,9 @@ public class Map2View extends ViewPart implements
 
       _filteredPhotos.clear();
 
-      if (_isPhotoFilterActive) {
+      final boolean hasAnyStars = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.HAS_ANY;
+
+      if (_isPhotoFilterActive && !hasAnyStars) {
 
          final boolean isNoStar = _photoFilter_RatingStars == 0;
          final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
@@ -3919,7 +3919,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         // photo filter is not active -> show all photos
+         // photo filter is not active or any stars can be selected -> show all photos
 
          _filteredPhotos.addAll(_allPhotos);
       }
