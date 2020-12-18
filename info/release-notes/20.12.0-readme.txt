@@ -48,6 +48,7 @@ Improvements
   - When the measurement unit is changed, the values are now immediately updated
 
  
+ Changes  
 =======
 
 * 2D Map
