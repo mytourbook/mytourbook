@@ -322,7 +322,6 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          final GeoPartComparerItem item1 = (GeoPartComparerItem) e1;
          final GeoPartComparerItem item2 = (GeoPartComparerItem) e2;
 
-         boolean _isSortByTime = true;
          double rc = 0;
 
          // Determine which column and do the appropriate sort
@@ -394,11 +393,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             rc = item1.elapsedTime - item2.elapsedTime;
             break;
 
-         default:
-            _isSortByTime = true;
          }
 
-         if (rc == 0 && _isSortByTime) {
+         if (rc == 0) {
             rc = item1.tourStartTimeMS - item2.tourStartTimeMS;
          }
 
@@ -530,7 +527,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-//					updateUI_GeoAccuracy();
+               // measurement system has changed
+
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns();
+
+               _geoPartViewer = (TableViewer) recreateViewer(_geoPartViewer);
             }
          }
       };
@@ -831,7 +834,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          return;
       }
 
-      final long workerExecutorId[] = { 0 };
+      final long[] workerExecutorId = { 0 };
 
       _workedTours.set(0);
 
@@ -992,16 +995,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       updateUI_HideFalsePositive();
    }
 
-   /**
-    * @param tourData
-    * @return Returns <code>true</code> when tour comparing could be started, otherwise
-    *         <code>false</code>
-    */
-   private boolean compareWholeTour(final TourData tourData) {
-
-      // is currently disabled because it is slowing down
-      return false;
-
+//   /**
+//    * @param tourData
+//    * @return Returns <code>true</code> when tour comparing could be started, otherwise
+//    *         <code>false</code>
+//    */
+//   private boolean compareWholeTour() {//final TourData tourData) {
+//
+//      // is currently disabled because it is slowing down
+//      return false;
+//
 //		if (tourData == null) {
 //			return false;
 //		}
@@ -1034,7 +1037,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //				geoCompareRefId);
 //
 //		return true;
-   }
+//   }
 
    private void createActions() {
 
@@ -1215,7 +1218,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          @Override
          public void handleEvent(final Event event) {
-            onGeoPart_Select(event);
+            onGeoPart_Select();
          }
       });
       /*
@@ -2031,7 +2034,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //		updateUI_HideFalsePositive();
 //	}
 
-   private void onGeoPart_Select(final Event event) {
+   private void onGeoPart_Select() {
 
       if (_isInUpdate) {
          return;
@@ -2200,35 +2203,35 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       } else if (selection instanceof SelectionTourData) {
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
-
-         final TourData selectionTourData = tourDataSelection.getTourData();
-
-         compareWholeTour(selectionTourData);
+//         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+//
+//         final TourData selectionTourData = tourDataSelection.getTourData();
+//
+//         compareWholeTour(selectionTourData);
 
       } else if (selection instanceof SelectionTourId) {
 
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
-         final Long tourId = selectionTourId.getTourId();
-
-         compareWholeTour(TourManager.getInstance().getTourData(tourId));
+//         final SelectionTourId selectionTourId = (SelectionTourId) selection;
+//         final Long tourId = selectionTourId.getTourId();
+//
+//         compareWholeTour(TourManager.getInstance().getTourData(tourId));
 
       } else if (selection instanceof SelectionTourIds) {
 
          // only 1 tour can be compared
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-
-         if (tourIds != null) {
-
-            for (final Long tourId : tourIds) {
-
-               final TourData tourData = TourManager.getInstance().getTourData(tourId);
-               if (compareWholeTour(tourData)) {
-                  break;
-               }
-            }
-         }
+//         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+//
+//         if (tourIds != null) {
+//
+//            for (final Long tourId : tourIds) {
+//
+//               final TourData tourData = TourManager.getInstance().getTourData(tourId);
+//               if (compareWholeTour(tourData)) {
+//                  break;
+//               }
+//            }
+//         }
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -2308,16 +2311,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                   return;
                }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.size() > 0) {
-
-                  for (final TourData tourData : selectedTours) {
-
-                     if (compareWholeTour(tourData)) {
-                        break;
-                     }
-                  }
-               }
+//               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+//               if (selectedTours != null && selectedTours.size() > 0) {
+//
+//                  for (final TourData tourData : selectedTours) {
+//
+//                     if (compareWholeTour(tourData)) {
+//                        break;
+//                     }
+//                  }
+//               }
             }
          });
       }
