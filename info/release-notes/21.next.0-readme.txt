@@ -1,0 +1,53 @@
+21.next.0                                                 ?. Month 2021
+
+
+TODO's
+======
+
+*
+
+
+Issues
+======
+
+*
+
+  
+New
+===
+
+* 
+
+
+Improvements
+============
+
+* 
+
+
+Changes  
+=======
+
+* 
+
+
+Bugfix
+======
+
+* 
+
+
+Translation    
+===========
+
+- Czech 20.11 (Lukas)
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Eclipse 2020-12 (maybe)

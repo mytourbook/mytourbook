@@ -62,7 +62,7 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
       _slideoutPhotoFilter = new Slideout_Map2_PhotoFilter(toolItem, _map2View, _state);
-      _slideoutPhotoFilter.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+      _slideoutPhotoFilter.setSlideoutLocation(SlideoutLocation.BELOW_CENTER);
 
       return _slideoutPhotoFilter;
    }
