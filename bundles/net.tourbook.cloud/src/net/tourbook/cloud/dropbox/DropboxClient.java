@@ -42,7 +42,7 @@ public class DropboxClient {
 
    private static DbxClientV2      _dropboxClient;
    private static DbxRequestConfig _requestConfig;
-   final static IPreferenceStore   _prefStore = Activator.getDefault().getPreferenceStore();
+   static final IPreferenceStore   _prefStore = Activator.getDefault().getPreferenceStore();
    private static String           _accessToken;
 
    static {

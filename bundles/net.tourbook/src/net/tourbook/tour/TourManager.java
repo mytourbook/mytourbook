@@ -2866,7 +2866,7 @@ public class TourManager {
 
    /**
     * Remove selected photos from it's tours.
-    * 
+    *
     * @param photoGallery
     */
    public static void tourPhoto_Remove(final PhotoGallery photoGallery) {

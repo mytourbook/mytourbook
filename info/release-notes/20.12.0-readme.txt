@@ -48,6 +48,9 @@ Improvements
   - Save/remove individual photos in/from a tour -  https://sourceforge.net/p/mytourbook/feature-requests/116/
   - Time adjustment can now be done for each photo/camera in a tour
 
+* Geo Compare View (Frederic)
+  - When the measurement unit is changed, the values are now immediately updated
+
 Changes  
 =======
 

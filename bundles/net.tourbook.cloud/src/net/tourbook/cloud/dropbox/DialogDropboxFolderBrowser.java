@@ -106,8 +106,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      String title = UI.EMPTY_STRING;
-      title = Messages.Dialog_DropboxFolderChooser_Area_Title;
+      final String title = Messages.Dialog_DropboxFolderChooser_Area_Title;
 
       shell.setText(title);
    }
@@ -117,8 +116,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       super.create();
 
-      String text = UI.EMPTY_STRING;
-      text = Messages.Dialog_DropboxFolderChooser_Area_Text;
+      final String text = Messages.Dialog_DropboxFolderChooser_Area_Text;
 
       setTitle(text);
    }
@@ -289,7 +287,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       return _state;
    }
 
-   public ArrayList<String> getSelectedFiles() {
+   public List<String> getSelectedFiles() {
       return _selectedFiles;
    }
 

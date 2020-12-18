@@ -65,31 +65,29 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         {
-            /*
-             * Authorize button
-             */
-            final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
-            setButtonLayoutData(btnAuthorizeConnection);
-            btnAuthorizeConnection.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_Authorize);
-            btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
+         /*
+          * Authorize button
+          */
+         final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
+         setButtonLayoutData(btnAuthorizeConnection);
+         btnAuthorizeConnection.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_Authorize);
+         btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
 
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onClickAuthorize();
-               }
-            });
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onClickAuthorize();
+            }
+         });
 
-            /*
-             * Access Token
-             */
-            _textAccessToken = new Text(container, SWT.BORDER);
-            _textAccessToken.setEditable(false);
-            _textAccessToken.setToolTipText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(_textAccessToken);
-         }
+         /*
+          * Access Token
+          */
+         _textAccessToken = new Text(container, SWT.BORDER);
+         _textAccessToken.setEditable(false);
+         _textAccessToken.setToolTipText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .applyTo(_textAccessToken);
       }
    }
 

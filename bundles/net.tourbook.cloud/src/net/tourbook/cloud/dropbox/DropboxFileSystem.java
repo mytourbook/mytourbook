@@ -203,8 +203,8 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    public String selectFileSystemFolder(final Shell shell, final String workingDirectory) {
 
-      final DialogDropboxFolderBrowser dropboxFolderChooser[] = new DialogDropboxFolderBrowser[1];
-      final int folderChooserResult[] = new int[1];
+      final DialogDropboxFolderBrowser[] dropboxFolderChooser = new DialogDropboxFolderBrowser[1];
+      final int[] folderChooserResult = new int[1];
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
