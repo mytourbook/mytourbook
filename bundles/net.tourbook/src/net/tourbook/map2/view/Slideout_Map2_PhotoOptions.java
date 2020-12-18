@@ -243,6 +243,11 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
       _parent = parent;
    }
 
+   @Override
+   protected boolean isCenterHorizontal() {
+      return true;
+   }
+
    private void onChangeUI() {
 
       final int oldImageSize = _imageSize;
