@@ -2111,8 +2111,8 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionMap2_PhotoFilter);
       tbm.add(_actionShowPhotos);
+      tbm.add(_actionMap2_PhotoFilter);
       tbm.add(_actionShowAllFilteredPhotos);
 
       tbm.add(new Separator());

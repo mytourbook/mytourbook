@@ -2336,7 +2336,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final ColumnDefinition colDef = allSortedColumns.get(colIndex);
 
-         body_DataLayer.setColumnWidthByPosition(colIndex, colDef.getColumnWidth(), false);
+         int columnWidth = colDef.getColumnWidth();
+
+         if (columnWidth < 0) {
+
+            // this case happened in https://sourceforge.net/p/mytourbook/discussion/622811/thread/31aa349fc5/?limit=25
+
+            // java.lang.IllegalArgumentException: size < 0
+            // at org.eclipse.nebula.widgets.nattable.layer.SizeConfig.setSize(SizeConfig.java:292)
+            // at org.eclipse.nebula.widgets.nattable.layer.DataLayer.setColumnWidthByPosition(DataLayer.java:272)
+            // at net.tourbook.ui.views.tourBook.TourBookView.natTable_SetColumnWidths(TourBookView.java:2331)
+            // at net.tourbook.ui.views.tourBook.TourBookView.createUI_20_NatTable_TourViewer(TourBookView.java:1344)
+            // at net.tourbook.ui.views.tourBook.TourBookView.createUI(TourBookView.java:1223)
+            // at net.tourbook.ui.views.tourBook.TourBookView.createPartControl(TourBookView.java:1182)
+
+            // set default column width
+            columnWidth = 50;
+         }
+
+         body_DataLayer.setColumnWidthByPosition(colIndex, columnWidth, false);
       }
    }
 

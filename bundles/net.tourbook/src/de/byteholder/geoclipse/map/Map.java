@@ -5776,6 +5776,10 @@ public class Map extends Canvas {
                               final boolean isAdjustZoomLevel,
                               final int requestedZoomLevelAdjustment) {
 
+      if (_mp == null) {
+         return;
+      }
+
       Rectangle wpTourRect;
       Rectangle wpMapRect;
 
