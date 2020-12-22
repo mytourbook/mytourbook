@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>20.12.0-SNAPSHOT</version>
+                                             <version>20.12.1-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -63,8 +63,13 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.16</id>                                 <layout>p2</layout>
-         <url>https://download.eclipse.org/releases/2020-06</url>
+         <id>eclipse.platform.4.17</id>                                 <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2020-09</url>
+      </repository>   
+
+      <repository>
+         <id>com.make.chromium.cef</id>                                 <layout>p2</layout>
+         <url>http://dl.maketechnology.io/chromium-cef/rls/repository</url>
       </repository>   
    
       <!-- 
