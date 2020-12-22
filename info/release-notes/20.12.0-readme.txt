@@ -99,7 +99,7 @@ Translation
 System   
 ======
 
-- Eclipse 2020-09
+- Eclipse 2020-06
 - WorldWind 2.2.0
 
  
