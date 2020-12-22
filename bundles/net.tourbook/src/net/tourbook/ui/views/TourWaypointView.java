@@ -17,6 +17,7 @@ package net.tourbook.ui.views;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -284,7 +285,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
                _columnManager.saveState(_state);
                _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
+               defineAllColumns();
 
                _wpViewer = (TableViewer) recreateViewer(_wpViewer);
             }
@@ -399,7 +400,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
       _columnManager = new ColumnManager(this, _state);
       _columnManager.setIsCategoryAvailable(true);
-      defineAllColumns(parent);
+      defineAllColumns();
 
       createUI(parent);
 
@@ -522,7 +523,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
       _columnManager.createHeaderContextMenu(table, null);
    }
 
-   private void defineAllColumns(final Composite parent) {
+   private void defineAllColumns() {
 
       defineColumn_Name();
       defineColumn_Description();
@@ -895,7 +896,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             tourId = tourIds.get(0);
          }

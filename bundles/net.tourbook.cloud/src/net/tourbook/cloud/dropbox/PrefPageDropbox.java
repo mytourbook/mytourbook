@@ -115,13 +115,13 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$
 
-      final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client);
+      final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client, "Dropbox"); //$NON-NLS-1$
       //Opens the dialog
       if (oAuth2Browser.open() != Window.OK) {
          return;
       }
 
-      final String token = oAuth2Browser.getToken();
+      final String token = oAuth2Browser.getAccessToken();
       final String dialogMessage = StringUtils.isNullOrEmpty(token) ? NLS.bind(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved,
             oAuth2Browser.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
 

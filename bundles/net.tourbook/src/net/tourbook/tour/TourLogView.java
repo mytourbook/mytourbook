@@ -126,7 +126,7 @@ public class TourLogView extends ViewPart {
 
       if (isBrowserAvailable && _isBrowserCompleted == false) {
 
-         // this occures when the view is opening but not yet ready
+         // this occurs when the view is opening but not yet ready
          return;
       }
 
@@ -145,8 +145,8 @@ public class TourLogView extends ViewPart {
                ? CSS_LOG_ITEM
                : tourLog.css;
 
-         final String stateWithBrowser[] = { UI.EMPTY_STRING };
-         final String stateNoBrowser[] = { UI.EMPTY_STRING };
+         final String[] stateWithBrowser = { UI.EMPTY_STRING };
+         final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
          setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
 
@@ -364,7 +364,7 @@ public class TourLogView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -427,7 +427,7 @@ public class TourLogView extends ViewPart {
                @Override
                public void completed(final ProgressEvent event) {
 
-                  onBrowser_Completed(event);
+                  onBrowser_Completed();
                }
             });
          }
@@ -469,7 +469,7 @@ public class TourLogView extends ViewPart {
       tbm.add(_actionReset);
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
       /*
        * Webpage css
@@ -500,7 +500,7 @@ public class TourLogView extends ViewPart {
       return "td.style.backgroundImage=\"url('" + imageUrl + "')\";" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private void onBrowser_Completed(final ProgressEvent event) {
+   private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
 
@@ -612,8 +612,8 @@ public class TourLogView extends ViewPart {
           */
          for (final TourLog tourLog : TourLogManager.getLogs()) {
 
-            final String stateWithBrowser[] = { UI.EMPTY_STRING };
-            final String stateNoBrowser[] = { UI.EMPTY_STRING };
+            final String[] stateWithBrowser = { UI.EMPTY_STRING };
+            final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
             setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);

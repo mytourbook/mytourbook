@@ -40,6 +40,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -571,18 +572,15 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == Map3View.this) {
+            if (partRef.getPart(false) == Map3View.this && _isPartVisible == false) {
 
-               if (_isPartVisible == false) {
+               _isPartVisible = true;
 
-                  _isPartVisible = true;
+               if (_lastHiddenSelection != null) {
 
-                  if (_lastHiddenSelection != null) {
+                  onSelectionChanged(_lastHiddenSelection);
 
-                     onSelectionChanged(_lastHiddenSelection);
-
-                     _lastHiddenSelection = null;
-                  }
+                  _lastHiddenSelection = null;
                }
             }
          }
@@ -1716,7 +1714,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          // paint all selected tours
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if (tourIds.isEmpty()) {
 
             clearView();
@@ -2287,7 +2285,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       showAllTours_NewTours(allTours);
    }
 
-   private void showTours(final ArrayList<Long> allTourIds) {
+   private void showTours(final List<Long> allTourIds) {
 
       if (allTourIds.hashCode() != _allTourIdHash || _allTours.hashCode() != _allTourDataHash) {
 

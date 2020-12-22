@@ -767,7 +767,7 @@ public class TourManager {
     * @param tourIds
     * @return
     */
-   public static TourData createJoinedTourData(final ArrayList<Long> tourIds) {
+   public static TourData createJoinedTourData(final List<Long> tourIds) {
 
       // check if the requested data are already available
       final int tourIds_Hash = tourIds.hashCode();

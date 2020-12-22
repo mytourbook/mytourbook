@@ -892,7 +892,7 @@ public class ConconiView extends ViewPart {
       } else if (selection instanceof SelectionTourIds) {
 
          final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
-         final ArrayList<Long> tourIds = selectionTourId.getTourIds();
+         final List<Long> tourIds = selectionTourId.getTourIds();
          if (tourIds != null && tourIds.size() > 0) {
             updateChart_12(tourIds);
          }
@@ -1025,7 +1025,7 @@ public class ConconiView extends ViewPart {
       updateChart_12(tourIds);
    }
 
-   private void updateChart_12(final ArrayList<Long> tourIds) {
+   private void updateChart_12(final List<Long> tourIds) {
       updateChart_22(TourManager.getInstance().getTourData(tourIds));
    }
 
