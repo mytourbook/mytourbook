@@ -95,7 +95,7 @@ public class OAuth2BrowserDialog extends Dialog {
             .grab(true, true)
             .applyTo(displayArea);
 
-      final Browser browser = new Browser(displayArea, SWT.NONE);
+      final Browser browser = new Browser(displayArea, SWT.CHROMIUM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(browser);
       browser.setUrl(url);
       browser.addLocationListener(new LocationAdapter() {
