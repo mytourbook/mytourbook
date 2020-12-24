@@ -410,14 +410,7 @@ public class TourLogView extends ViewPart {
             // initial setup
             _browser.setRedraw(false);
 
-         } catch (final Exception e) {
-
-//            /*
-//             * Use mozilla browser, this is necessary for Linux when default browser fails
-//             * however the XULrunner needs to be installed.
-//             */
-//            _browser = new Browser(parent, SWT.MOZILLA);
-         }
+         } catch (final Exception e) {}
 
          if (_browser != null) {
 
@@ -557,6 +550,7 @@ public class TourLogView extends ViewPart {
          break;
 
       case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
@@ -564,11 +558,6 @@ public class TourLogView extends ViewPart {
       case EASY_IMPORT_DELETE_DEVICE:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-         break;
-
-      case TOUR_DELETED:
-         stateNoBrowser[0] = STATE_DELETE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
 
       case TOUR_SAVED:

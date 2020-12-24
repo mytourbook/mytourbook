@@ -2541,12 +2541,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             _browser.setRedraw(false);
 
          } catch (final Exception e) {
-
-//            /*
-//             * Use mozilla browser, this is necessary for Linux when default browser fails
-//             * however the XULrunner needs to be installed.
-//             */
-//            _browser = new Browser(parent, SWT.MOZILLA);
          }
 
          if (_browser != null) {
