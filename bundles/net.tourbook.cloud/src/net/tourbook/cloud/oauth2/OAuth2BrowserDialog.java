@@ -104,10 +104,7 @@ public class OAuth2BrowserDialog extends Dialog {
             .grab(true, true)
             .applyTo(displayArea);
 
-      //TODO FB Dropbox says it's deprecated :-(
-      final Browser browser = new Browser(displayArea, SWT.CHROMIUM);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(browser);
-//      browser.setUrl(_url, null, new String[] { "user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0" });
+      final Browser browser = new Browser(displayArea, SWT.NONE);
       browser.setUrl(_url);
       browser.addLocationListener(new LocationAdapter() {
 
