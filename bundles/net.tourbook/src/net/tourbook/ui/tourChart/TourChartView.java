@@ -291,7 +291,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                }
 
                // get modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   final long chartTourId = _tourData.getTourId();
@@ -883,7 +883,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                   return;
                }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               final List<TourData> selectedTours = TourManager.getSelectedTours();
                if (selectedTours != null && selectedTours.size() > 0) {
                   updateChart(selectedTours.get(0));
                }

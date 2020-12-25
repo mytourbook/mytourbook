@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -434,7 +435,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
             if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
                   updateTourViewer(_rootItem, modifiedTours);
                }
@@ -1705,7 +1706,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
     * @param rootItem
     * @param modifiedTours
     */
-   private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+   private void updateTourViewer(final TreeViewerItem parentItem, final List<TourData> modifiedTours) {
 
       final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 

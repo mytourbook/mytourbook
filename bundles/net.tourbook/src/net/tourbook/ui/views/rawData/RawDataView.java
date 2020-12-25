@@ -980,7 +980,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                // update modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   // update model

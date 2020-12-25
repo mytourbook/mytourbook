@@ -1722,7 +1722,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                return;
             }
 
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
+            final List<TourData> tourDataList = TourManager.getSelectedTours(true);
             if (tourDataList != null) {
 
                _allTourData.clear();

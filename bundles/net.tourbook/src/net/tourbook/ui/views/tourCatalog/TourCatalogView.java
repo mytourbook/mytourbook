@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -501,7 +502,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
                // get a clone of the modified tours because the tours are removed from the list
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
                   updateTourViewer(_rootItem, modifiedTours);
                }
@@ -1470,7 +1471,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     * @param rootItem
     * @param modifiedTours
     */
-   private void updateTourViewer(final TreeViewerItem parentItem, final ArrayList<TourData> modifiedTours) {
+   private void updateTourViewer(final TreeViewerItem parentItem, final List<TourData> modifiedTours) {
 
       final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 

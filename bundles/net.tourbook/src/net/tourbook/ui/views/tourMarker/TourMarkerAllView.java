@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -626,7 +627,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
             if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour

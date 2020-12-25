@@ -1652,7 +1652,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    }
 
    @Override
-   public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+   public void toursAreModified(final List<TourData> modifiedTours) {
 
       // check if it's not the correct tour
       if (modifiedTours == null || modifiedTours.isEmpty() || _joinedTourData != modifiedTours.get(0)) {

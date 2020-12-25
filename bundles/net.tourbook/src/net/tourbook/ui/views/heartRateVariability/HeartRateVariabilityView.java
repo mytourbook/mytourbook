@@ -903,7 +903,7 @@ public class HeartRateVariabilityView extends ViewPart {
                return;
             }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            final List<TourData> selectedTours = TourManager.getSelectedTours();
             if (selectedTours != null && selectedTours.size() > 0) {
                updateChart_22(selectedTours);
             }

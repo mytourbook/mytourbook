@@ -2567,7 +2567,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                   final TourEvent tourEvent = (TourEvent) eventData;
-                  final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+                  final List<TourData> modifiedTours = tourEvent.getModifiedTours();
 
                   if (modifiedTours == null) {
                      return;
@@ -5858,7 +5858,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   return;
                }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               final List<TourData> selectedTours = TourManager.getSelectedTours();
                if ((selectedTours != null) && (selectedTours.size() > 0)) {
 
                   // get first tour, this view shows only one tour
@@ -8273,7 +8273,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    @Override
-   public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+   public void toursAreModified(final List<TourData> modifiedTours) {
 
       if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 

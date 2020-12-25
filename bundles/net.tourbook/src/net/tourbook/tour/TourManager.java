@@ -589,7 +589,7 @@ public class TourManager {
     * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
     *         updated but not yet saved.
     */
-   public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
+   public static boolean computeDistanceValuesFromGeoPosition(final List<TourData> tourDataList) {
 
       if (tourDataList == null || tourDataList.isEmpty()) {
          return false;
@@ -1499,7 +1499,7 @@ public class TourManager {
     *
     * @return Returns tour id's or <code>null</code> when tours are not found
     */
-   public static ArrayList<TourData> getSelectedTours() {
+   public static List<TourData> getSelectedTours() {
 
       return getSelectedTours(false);
    }
@@ -1510,7 +1510,7 @@ public class TourManager {
     *           otherwise all tours will be returned.
     * @return
     */
-   public static ArrayList<TourData> getSelectedTours(final boolean isOnlyGeoTour) {
+   public static List<TourData> getSelectedTours(final boolean isOnlyGeoTour) {
 
       final IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 
@@ -1575,7 +1575,7 @@ public class TourManager {
 
       ISelection selection = null;
 
-      final ArrayList<TourData> selectedTours = getSelectedTours();
+      final List<TourData> selectedTours = getSelectedTours();
 
       if (selectedTours != null && selectedTours.size() > 0) {
 
@@ -2443,7 +2443,7 @@ public class TourManager {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
       modifiedTours.add(tourData);
 
-      final ArrayList<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification);
+      final List<TourData> savedTourData = saveModifiedTours(modifiedTours, isFireNotification);
 
       if (savedTourData.isEmpty()) {
          return null;
@@ -2463,7 +2463,7 @@ public class TourManager {
     *           modified tours
     * @return Returns a list with all persisted {@link TourData}
     */
-   public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+   public static List<TourData> saveModifiedTours(final List<TourData> modifiedTours) {
       return saveModifiedTours(modifiedTours, true);
    }
 
@@ -2480,8 +2480,8 @@ public class TourManager {
     *           when <code>true</code>, a notification is fired when the data are saved
     * @return a list with all persisted {@link TourData}
     */
-   private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
-                                                        final boolean canFireNotification) {
+   private static List<TourData> saveModifiedTours(final List<TourData> modifiedTours,
+                                                   final boolean canFireNotification) {
 
       // reset multiple tour data cache
       _joined_TourData = null;
@@ -2641,7 +2641,7 @@ public class TourManager {
       }
    }
 
-   public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
+   public static boolean setAltitudeValuesFromSRTM(final List<TourData> tourDataList) {
 
       if (tourDataList == null || tourDataList.isEmpty()) {
          return false;
@@ -3626,8 +3626,8 @@ public class TourManager {
 
       } else if (prefShow_SwimStyle && canShowBackground_SwimStyle == false) {
 
-            // swimming style cannot be displayed -> show default
-            graphBgSource = GraphBackgroundSource.DEFAULT;
+         // swimming style cannot be displayed -> show default
+         graphBgSource = GraphBackgroundSource.DEFAULT;
       }
 
       tcc.graphBackground_Source = graphBgSource;
@@ -4693,19 +4693,6 @@ public class TourManager {
    }
 
    /**
-    * Fills a list with {@link TourData} from it's id's.
-    *
-    * @param allTourData
-    * @param tourIds
-    */
-   public void getTourData(final ArrayList<TourData> allTourData, final ArrayList<Long> tourIds) {
-
-      for (final Long tourId : tourIds) {
-         allTourData.add(getTourData(tourId));
-      }
-   }
-
-   /**
     * @param tourIds
     * @return Returns a list with {@link TourData} for all tour ids. <code>Null</code> is returned
     *         when {@link TourData} are not available.
@@ -4722,6 +4709,19 @@ public class TourManager {
       }
 
       return tourDataList.isEmpty() ? null : tourDataList;
+   }
+
+   /**
+    * Fills a list with {@link TourData} from it's id's.
+    *
+    * @param allTourData
+    * @param tourIds
+    */
+   public void getTourData(final List<TourData> allTourData, final ArrayList<Long> tourIds) {
+
+      for (final Long tourId : tourIds) {
+         allTourData.add(getTourData(tourId));
+      }
    }
 
    /**

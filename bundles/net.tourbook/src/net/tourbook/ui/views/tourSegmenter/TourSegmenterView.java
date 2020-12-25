@@ -928,7 +928,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
                   final TourEvent tourEvent = (TourEvent) eventData;
-                  final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+                  final List<TourData> modifiedTours = tourEvent.getModifiedTours();
 
                   if (modifiedTours == null || modifiedTours.isEmpty()) {
                      return;

@@ -694,7 +694,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
                   updateModifiedTours(modifiedTours);
                }
@@ -1436,7 +1436,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * @param allTours
     * @return Returns only tours which can be displayed in the map (which contains geo coordinates).
     */
-   private ArrayList<TourData> getMapTours(final ArrayList<TourData> allTours) {
+   private List<TourData> getMapTours(final List<TourData> allTours) {
 
       final ArrayList<TourData> mapTours = new ArrayList<>(allTours.size());
 
@@ -2232,7 +2232,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       showAllTours(_isMapSynched_WithTour);
    }
 
-   private void showAllTours_NewTours(final ArrayList<TourData> newTours) {
+   private void showAllTours_NewTours(final List<TourData> newTours) {
 
       // check if new tours are already displayed
       if (newTours.hashCode() == _allTours.hashCode()) {
@@ -2322,7 +2322,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
                return;
             }
 
-            final ArrayList<TourData> allTours = TourManager.getSelectedTours();
+            final List<TourData> allTours = TourManager.getSelectedTours();
             if (allTours != null) {
                showAllTours_NewTours(allTours);
             }
@@ -2506,7 +2506,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       moveToMapLocation(mapPosition, positionFlags);
    }
 
-   private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
+   private void updateModifiedTours(final List<TourData> modifiedTours) {
 
       // cleanup old tours, this method cannot be used: cleanupOldTours();
 //		_postSelectionProvider.clearSelection();

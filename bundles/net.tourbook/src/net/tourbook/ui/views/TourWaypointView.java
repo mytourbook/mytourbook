@@ -1003,7 +1003,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
                return;
             }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            final List<TourData> selectedTours = TourManager.getSelectedTours();
             if ((selectedTours != null) && (selectedTours.size() > 0)) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
             }

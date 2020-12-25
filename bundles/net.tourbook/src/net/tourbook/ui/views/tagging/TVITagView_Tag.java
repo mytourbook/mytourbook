@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -105,7 +106,7 @@ public class TVITagView_Tag extends TVITagViewItem {
     * @param modifiedTours
     * @return Returns an expression to select tour id's in the WHERE clause
     */
-   private String getTourIdWhereClause(final ArrayList<TourData> modifiedTours) {
+   private String getTourIdWhereClause(final List<TourData> modifiedTours) {
 
       if (modifiedTours.isEmpty()) {
          return UI.EMPTY_STRING;
@@ -279,7 +280,7 @@ public class TVITagView_Tag extends TVITagViewItem {
     * @param modifiedTours
     * @param isAddMode
     */
-   public void refresh(final TreeViewer tagViewer, final ArrayList<TourData> modifiedTours, final boolean isAddMode) {
+   public void refresh(final TreeViewer tagViewer, final List<TourData> modifiedTours, final boolean isAddMode) {
 
       switch (_expandType) {
       case TourTag.EXPAND_TYPE_FLAT:
@@ -300,7 +301,7 @@ public class TVITagView_Tag extends TVITagViewItem {
    }
 
    private void refreshFlatTours(final TreeViewer tagViewer,
-                                 final ArrayList<TourData> modifiedTours,
+                                 final List<TourData> modifiedTours,
                                  final boolean isAddMode) {
 
       final ArrayList<TreeViewerItem> unfetchedChildren = getUnfetchedChildren();

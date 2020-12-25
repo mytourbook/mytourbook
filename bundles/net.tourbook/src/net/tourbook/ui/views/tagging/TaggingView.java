@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -647,7 +648,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
                   updateViewerAfterTourIsModified(_rootItem, modifiedTours);
                }
@@ -2551,7 +2552,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             final TVITagView_Tag tagItem = (TVITagView_Tag) object;
             final long viewerTagId = tagItem.getTagId();
 
-            final HashMap<Long, TourTag> modifiedTags = changedTags.getModifiedTags();
+            final Map<Long, TourTag> modifiedTags = changedTags.getModifiedTags();
             final ArrayList<Long> removedIds = new ArrayList<>();
 
             for (final Long modifiedTagId : modifiedTags.keySet()) {
@@ -2658,7 +2659,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * @param modifiedTours
     */
    private void updateViewerAfterTourIsModified(final TreeViewerItem parentItem,
-                                                final ArrayList<TourData> modifiedTours) {
+                                                final List<TourData> modifiedTours) {
 
       final ArrayList<TreeViewerItem> children = parentItem.getUnfetchedChildren();
 

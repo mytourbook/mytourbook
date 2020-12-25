@@ -19,6 +19,7 @@ package net.tourbook.tour;
 // created:	6. July 2007
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -175,7 +176,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
                final TourEvent tourEvent = (TourEvent) eventData;
 
                // get modified tours
-               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+               final List<TourData> modifiedTours = tourEvent.getModifiedTours();
                final long tourId = _tourData.getTourId();
 
                // check if the tour in the editor was modified

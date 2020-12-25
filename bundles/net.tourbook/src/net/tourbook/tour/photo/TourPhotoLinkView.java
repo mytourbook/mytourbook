@@ -456,7 +456,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       }
 
-      final ArrayList<TourData> savedTours = TourManager.saveModifiedTours(modifiedTours);
+      final List<TourData> savedTours = TourManager.saveModifiedTours(modifiedTours);
 
       /*
        * after saving tour + photos, update the photos and put them into the photo cache
@@ -613,7 +613,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
                // get modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   onTourChanged(modifiedTours);
@@ -1564,7 +1564,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       PhotoManager.firePhotoEvent(this, PhotoEventId.PHOTO_SELECTION, _tourPhotoLinkSelection);
    }
 
-   private void onTourChanged(final ArrayList<TourData> modifiedTours) {
+   private void onTourChanged(final List<TourData> modifiedTours) {
 
       final TourManager tourManager = TourManager.getInstance();
 

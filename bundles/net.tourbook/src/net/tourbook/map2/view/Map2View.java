@@ -1426,7 +1426,7 @@ public class Map2View extends ViewPart implements
 
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
                   _allTourData.clear();
@@ -4157,7 +4157,7 @@ public class Map2View extends ViewPart implements
                return;
             }
 
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+            final List<TourData> tourDataList = TourManager.getSelectedTours();
             if (tourDataList != null) {
 
                _allTourData.clear();

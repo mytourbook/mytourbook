@@ -631,7 +631,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour
@@ -1775,7 +1775,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                   return;
                }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               final List<TourData> selectedTours = TourManager.getSelectedTours();
                if (selectedTours != null && selectedTours.size() > 0) {
                   setSelectedTours(selectedTours);
                   updateUI_Tags();

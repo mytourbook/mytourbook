@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -128,7 +127,7 @@ public class TourInfo_View extends ViewPart {
 
             if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
                if (!modifiedTours.isEmpty()) {
 
@@ -373,7 +372,7 @@ public class TourInfo_View extends ViewPart {
                return;
             }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            final List<TourData> selectedTours = TourManager.getSelectedTours();
 
             if ((selectedTours != null) && (selectedTours.size() > 0)) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));

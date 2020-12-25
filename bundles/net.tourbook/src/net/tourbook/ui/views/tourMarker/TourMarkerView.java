@@ -360,7 +360,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-                  final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+                  final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                   if (modifiedTours != null) {
 
                      // update modified tour

@@ -18,6 +18,7 @@ package net.tourbook.ui.views.rawData;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -1845,7 +1846,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 	}
 
 	@Override
-	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+   public void toursAreModified(final List<TourData> modifiedTours) {
 
 		// tour type was modified
 		_isMergeSourceTourModified = true;

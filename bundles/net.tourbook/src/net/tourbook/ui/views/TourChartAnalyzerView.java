@@ -16,6 +16,7 @@
 package net.tourbook.ui.views;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -824,7 +825,7 @@ public class TourChartAnalyzerView extends ViewPart {
                   return;
                }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               final List<TourData> selectedTours = TourManager.getSelectedTours();
 
                if (selectedTours != null && selectedTours.size() > 0) {
 

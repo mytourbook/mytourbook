@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -1355,7 +1356,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    }
 
    @Override
-   public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+   public void toursAreModified(final List<TourData> modifiedTours) {
 
       if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 

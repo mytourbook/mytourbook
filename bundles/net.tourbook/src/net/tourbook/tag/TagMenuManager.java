@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -697,7 +698,7 @@ public class TagMenuManager {
    private void runnableRemoveAllTags() {
 
       // get tours which tour type should be changed
-      final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
+      final List<TourData> modifiedTours = _tourProvider.getSelectedTours();
 
       if (modifiedTours == null || modifiedTours.isEmpty()) {
          return;
@@ -728,7 +729,7 @@ public class TagMenuManager {
     * @param modifiedTags
     * @param modifiedTours
     */
-   private void saveAndNotify(final HashMap<Long, TourTag> modifiedTags, ArrayList<TourData> modifiedTours) {
+   private void saveAndNotify(final HashMap<Long, TourTag> modifiedTags, List<TourData> modifiedTours) {
 
       if (_isSaveTour) {
 

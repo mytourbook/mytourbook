@@ -360,7 +360,7 @@ public class TrainingView extends ViewPart {
 
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 
                if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
                   updateUI_20(modifiedTours.get(0));
@@ -1098,7 +1098,7 @@ public class TrainingView extends ViewPart {
                return;
             }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            final List<TourData> selectedTours = TourManager.getSelectedTours();
             if (selectedTours != null && selectedTours.size() > 0) {
                updateUI_20(selectedTours.get(0));
             }

@@ -16,6 +16,7 @@
 package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -112,7 +113,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
                // check if a tour was modified
-               final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
                if (modifiedTours != null) {
 
                   for (final TourData modifiedTourData : modifiedTours) {

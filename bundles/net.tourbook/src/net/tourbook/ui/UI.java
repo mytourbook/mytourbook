@@ -24,8 +24,8 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -445,7 +445,7 @@ public class UI {
       } else if (propertyData instanceof TourEvent) {
 
          final TourEvent tourEvent = (TourEvent) propertyData;
-         final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+         final List<TourData> modifiedTours = tourEvent.getModifiedTours();
 
          if (modifiedTours != null) {
             for (final TourData tourData : modifiedTours) {
@@ -813,7 +813,7 @@ public class UI {
     */
    public static TourData getTourPropertyTourData(final TourEvent propertyData, final TourData oldTourData) {
 
-      final ArrayList<TourData> modifiedTours = propertyData.getModifiedTours();
+      final List<TourData> modifiedTours = propertyData.getModifiedTours();
       if (modifiedTours == null) {
          return null;
       }

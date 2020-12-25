@@ -286,7 +286,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
                clearView();
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
                if (modifiedTours != null) {
 
                   // show modified tour
@@ -739,7 +739,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
                return;
             }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            final List<TourData> selectedTours = TourManager.getSelectedTours();
             if (selectedTours != null && selectedTours.size() > 0) {
                onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
             }
