@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -297,15 +296,18 @@ public class TourBlogView extends ViewPart {
 
                onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+            } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+               if (eventData instanceof SelectionTourMarker) {
 
-               if (tourData != _tourData) {
+                  final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
 
-                  _tourData = tourData;
+                  if (tourData != _tourData) {
 
-                  updateUI();
+                     _tourData = tourData;
+
+                     updateUI();
+                  }
                }
             }
          }
@@ -680,7 +682,7 @@ public class TourBlogView extends ViewPart {
          _browser.addProgressListener(new ProgressAdapter() {
             @Override
             public void completed(final ProgressEvent event) {
-               onBrowserCompleted();
+               onBrowserCompleted(event);
             }
          });
 
@@ -843,7 +845,7 @@ public class TourBlogView extends ViewPart {
 
    }
 
-   private void onBrowserCompleted() {
+   private void onBrowserCompleted(final ProgressEvent event) {
 
       if (_reloadedTourMarkerId == null) {
          return;
@@ -988,7 +990,7 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);

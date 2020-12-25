@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -1238,15 +1237,18 @@ public class Map2View extends ViewPart implements
 
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == Map2View.this && _isPartVisible == false) {
+            if (partRef.getPart(false) == Map2View.this) {
 
-               _isPartVisible = true;
+               if (_isPartVisible == false) {
 
-               if (_selectionWhenHidden != null) {
+                  _isPartVisible = true;
 
-                  onSelectionChanged(_selectionWhenHidden, true);
+                  if (_selectionWhenHidden != null) {
 
-                  _selectionWhenHidden = null;
+                     onSelectionChanged(_selectionWhenHidden, true);
+
+                     _selectionWhenHidden = null;
+                  }
                }
             }
          }
@@ -2719,12 +2721,12 @@ public class Map2View extends ViewPart implements
 
          hideGeoGrid();
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
 
-            final List<Photo> allPhotos = paintPhotoSelection(selection);
+            final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
 
             if (allPhotos.size() > 0) {
 
@@ -3151,7 +3153,7 @@ public class Map2View extends ViewPart implements
     * @param selection
     * @return Returns a list which contains all photos.
     */
-   private List<Photo> paintPhotoSelection(final ISelection selection) {
+   private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
 
       _isLinkPhotoDisplayed = false;
 
@@ -3186,7 +3188,7 @@ public class Map2View extends ViewPart implements
       return allPhotos;
    }
 
-   private void paintTours(final List<Long> allTourIds) {
+   private void paintTours(final ArrayList<Long> allTourIds) {
 
       /*
        * TESTING if a map redraw can be avoided, 15.6.2015
@@ -3308,8 +3310,11 @@ public class Map2View extends ViewPart implements
       }
 
       // prevent loading the same tour
-      if (forceRedraw == false && _allTourData.size() == 1 && _allTourData.get(0) == tourData) {
-         return;
+      if (forceRedraw == false) {
+
+         if ((_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
+            return;
+         }
       }
 
       // force multiple tours to be repainted

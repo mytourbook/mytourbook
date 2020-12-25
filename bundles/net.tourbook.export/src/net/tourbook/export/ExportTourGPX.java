@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 import net.tourbook.extension.export.ExportTourExtension;
@@ -35,7 +35,7 @@ public class ExportTourGPX extends ExportTourExtension {
    public ExportTourGPX() {}
 
    @Override
-   public void exportTours(final List<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
+   public void exportTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
       new DialogExportTour(
             Display.getCurrent().getActiveShell(),

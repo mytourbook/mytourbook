@@ -16,7 +16,6 @@
 package net.tourbook.ui.views;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -172,15 +171,18 @@ public class TourInfo_View extends ViewPart {
 
                onSelectionChanged((ISelection) eventData);
 
-            } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+            } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+               if (eventData instanceof SelectionTourMarker) {
 
-               if (tourData != _tourData) {
+                  final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
 
-                  _tourData = tourData;
+                  if (tourData != _tourData) {
 
-                  updateUI();
+                     _tourData = tourData;
+
+                     updateUI();
+                  }
                }
             }
          }
@@ -302,7 +304,7 @@ public class TourInfo_View extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             tourId = tourIds.get(0);
          }

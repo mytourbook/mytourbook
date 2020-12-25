@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
@@ -1237,7 +1236,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
          if (tourIds != null && tourIds.size() > 0) {
 
