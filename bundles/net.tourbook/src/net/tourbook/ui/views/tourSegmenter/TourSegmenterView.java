@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
@@ -692,11 +693,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
                return true;
             }
 
-         } else if (_selectedSurfingFilter == 2) {
-
-            if (segment.filter == 2) {
-               return true;
-            }
+         } else if (_selectedSurfingFilter == 2 && segment.filter == 2) {
+            return true;
          }
 
          return false;
@@ -704,7 +702,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    }
 
-   public static enum SegmenterType {
+   public enum SegmenterType {
 
       ByAltitudeWithDP, //
       ByAltitudeWithDPMerged, //
@@ -1005,10 +1003,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
                   // check if a tour must be updated
 
-                  if (_tourData == null) {
-                     return;
-                  }
-
                   final Long tourId = _tourData.getTourId();
 
                   // update ui
@@ -1297,7 +1291,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
 
       // convert data series into dp points
-      final DPPoint graphPoints[] = new DPPoint[distanceSerie.length];
+      final DPPoint[] graphPoints = new DPPoint[distanceSerie.length];
       for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
          graphPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
       }
@@ -1333,7 +1327,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final int serieSize = distanceSerie.length;
 
       // convert data series into dp points
-      final DPPoint graphPoints[] = new DPPoint[serieSize];
+      final DPPoint[] graphPoints = new DPPoint[serieSize];
       for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
 
          graphPoints[serieIndex] = new DPPoint(//
@@ -1534,7 +1528,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       segmentSerieIndex.add(0);
 
       boolean prevIsBreak = false;
-      boolean isBreak = breakTimeSerie[0];
+      boolean isBreak = false;
 
       for (int serieIndex = 1; serieIndex < breakTimeSerie.length; serieIndex++) {
 
@@ -1742,7 +1736,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       // convert data series into points
-      final DPPoint graphPoints[] = new DPPoint[timeSerie.length];
+      final DPPoint[] graphPoints = new DPPoint[timeSerie.length];
       for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
          graphPoints[serieIndex] = new DPPoint(timeSerie[serieIndex], powerSerie[serieIndex], serieIndex);
       }
@@ -1777,7 +1771,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       // convert data series into points
-      final DPPoint graphPoints[] = new DPPoint[timeSerie.length];
+      final DPPoint[] graphPoints = new DPPoint[timeSerie.length];
       for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
          graphPoints[serieIndex] = new DPPoint(timeSerie[serieIndex], pulseSerie[serieIndex], serieIndex);
       }
@@ -4293,7 +4287,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return forcedIndices;
    }
 
-   public ArrayList<TourSegment> getTourSegments() {
+   public List<TourSegment> getTourSegments() {
       return _allTourSegments;
    }
 
@@ -4389,11 +4383,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     */
    private boolean isTourDisplayed(final Long tourId) {
 
-      if (_tourData != null) {
-         if (_tourData.getTourId().equals(tourId)) {
-            // don't reload the same tour
-            return true;
-         }
+      if (_tourData != null && _tourData.getTourId().equals(tourId)) {
+         // don't reload the same tour
+         return true;
       }
 
       return false;
@@ -4742,7 +4734,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             } else if (selection instanceof SelectionTourIds) {
 
-               final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+               final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
                if (tourIds != null && tourIds.size() > 0) {
 

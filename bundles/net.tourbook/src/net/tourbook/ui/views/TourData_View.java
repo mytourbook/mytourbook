@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeSet;
 
 import net.tourbook.Messages;
@@ -710,7 +711,7 @@ public class TourData_View extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             tourId = tourIds.get(0);
          }

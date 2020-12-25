@@ -18,6 +18,7 @@ package net.tourbook.tour.photo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -598,7 +599,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
          // paint all selected tours
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
          for (final Long tourId : tourIds) {
 

@@ -7,7 +7,8 @@ Bundle-Activator: net.tourbook.cloud.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  net.tourbook.common,
- net.tourbook.ext.jars
+ net.tourbook.ext.jars,
+ net.tourbook.ext.velocity
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
@@ -18,13 +19,22 @@ Bundle-ClassPath: .,
  httpcore-4.4.14.jar,
  httpclient-4.5.13.jar
 Import-Package: com.fasterxml.jackson.core,
+ net.tourbook,
  net.tourbook.application,
+ net.tourbook.data,
+ net.tourbook.export,
+ net.tourbook.ext.velocity,
+ net.tourbook.extension.upload,
+ net.tourbook.tour,
+ net.tourbook.web,
  org.apache.commons.io,
  org.apache.http,
  org.apache.http.client.entity,
  org.apache.http.client.methods,
  org.apache.http.client.utils,
  org.apache.http.entity,
+ org.apache.http.entity.mime,
+ org.apache.http.entity.mime.content,
  org.apache.http.impl.client,
  org.apache.http.message,
  org.apache.http.util,

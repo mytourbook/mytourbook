@@ -1197,7 +1197,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          // paint all selected tours
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
@@ -1430,7 +1430,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       paintTours_AndUpdateMap();
    }
 
-   private void paintTours(final ArrayList<Long> tourIdList) {
+   private void paintTours(final List<Long> tourIdList) {
 
       /*
        * TESTING if a map redraw can be avoided, 15.6.2015

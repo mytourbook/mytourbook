@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -121,7 +122,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveAndRestorePart {
 
-   static public final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
+   public static final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
    private static final String        STATE_IS_HIERARCHICAL_LAYOUT              = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
    private static final String        STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS    = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";      //$NON-NLS-1$
@@ -1404,7 +1405,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> allTourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> allTourIds = ((SelectionTourIds) selection).getTourIds();
          if (allTourIds != null) {
 
             final ArrayList<TourData> allTourData = new ArrayList<>();
@@ -1655,7 +1656,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             /*
              * expand and select selected folder
              */
-            _tagViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
+            _tagViewer.setExpandedTreePaths(selectedTreePath);
             _tagViewer.setSelection(treeSelection, true);
 
             if (_isBehaviourAutoExpandCollapse && isExpanded) {

@@ -2480,35 +2480,33 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   path1.moveTo(graphXPrev, graphYPrev);
                   path1.lineTo(graphX1, graphY1);
 
-               } else if (pointIndex > 4) {
+               } else if (pointIndex > 4 && (graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB)) {
 
                   // draw following segments
 
                   // optimize, draw only when changed
-                  if (graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB) {
 
-                     if (segmentRGB == prevRGB) {
+                  if (segmentRGB == prevRGB) {
 
-                        // use the same color as the previous
+                     // use the same color as the previous
 
-                        if (segmentRGB == rgb1) {
-                           path1.lineTo(graphX1, graphY1);
-
-                        } else {
-                           path2.lineTo(graphX1, graphY1);
-                        }
+                     if (segmentRGB == rgb1) {
+                        path1.lineTo(graphX1, graphY1);
 
                      } else {
+                        path2.lineTo(graphX1, graphY1);
+                     }
 
-                        // color has changed, paint into other path
+                  } else {
 
-                        if (segmentRGB == rgb1) {
-                           path1.moveTo(graphXPrev, graphYPrev);
-                           path1.lineTo(graphX1, graphY1);
-                        } else {
-                           path2.moveTo(graphXPrev, graphYPrev);
-                           path2.lineTo(graphX1, graphY1);
-                        }
+                     // color has changed, paint into other path
+
+                     if (segmentRGB == rgb1) {
+                        path1.moveTo(graphXPrev, graphYPrev);
+                        path1.lineTo(graphX1, graphY1);
+                     } else {
+                        path2.moveTo(graphXPrev, graphYPrev);
+                        path2.lineTo(graphX1, graphY1);
                      }
                   }
                }
@@ -2983,10 +2981,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartLabel hoveredMarkerLabel = getHoveredMarkerLabel();
 
-      if (hoveredMarkerLabel != null) {
-         if (hoveredMarkerLabel.data instanceof TourMarker) {
-            tourMarker = (TourMarker) hoveredMarkerLabel.data;
-         }
+      if (hoveredMarkerLabel != null && hoveredMarkerLabel.data instanceof TourMarker) {
+         tourMarker = (TourMarker) hoveredMarkerLabel.data;
       }
 
       _lastHoveredTourMarker = tourMarker;
@@ -3074,7 +3070,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return _tourData;
    }
 
-   public ArrayList<TourSegment> getTourSegments() {
+   public List<TourSegment> getTourSegments() {
 
       final IViewPart viewPart = Util.getView(TourSegmenterView.ID);
 
