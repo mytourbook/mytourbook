@@ -3868,19 +3868,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
-         final double speedMetric = Vh[serieIndex] * 3.6;
-         final double speed_Mile = speedMetric / UI.UNIT_MILE;
-         final double speed_NauticalMile = speedMetric / UI.UNIT_NAUTICAL_MILE;
+         final double speed_Metric = Vh[serieIndex] * 3.6;
+         final double speed_Mile = speed_Metric / UI.UNIT_MILE;
+         final double speed_NauticalMile = speed_Metric / UI.UNIT_NAUTICAL_MILE;
 
-         speedSerie[serieIndex] = (float) speedMetric;
+         speedSerie[serieIndex] = (float) speed_Metric;
          speedSerie_Mile[serieIndex] = (float) speed_Mile;
          speedSerie_NauticalMile[serieIndex] = (float) speed_NauticalMile;
 
-         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
+         final float paceMetricSeconds = speed_Metric < 1.0 ? 0 : (float) (3600.0 / speed_Metric);
+         final float paceImperialSeconds = speed_Metric < 0.6 ? 0 : (float) (3600.0 / speed_Mile);
 
-         if (speedMetric > maxSpeed) {
-            maxSpeed = (float) speedMetric;
+         if (speed_Metric > maxSpeed) {
+            maxSpeed = (float) speed_Metric;
             maxPace = paceMetricSeconds;
          }
 
