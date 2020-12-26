@@ -171,6 +171,9 @@ public class TimeData implements Serializable {
     */
    public short              runDyn_VerticalRatio       = Short.MIN_VALUE;
 
+   //CUSTOM TRACKS
+   public CustomTrackValue[] customTracks;
+
    public TimeData() {
       super();
    }
