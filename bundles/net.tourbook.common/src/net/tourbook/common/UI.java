@@ -2518,14 +2518,14 @@ public class UI {
 
       if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
 
-         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
-
+         UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
 
       } else {
 
-         UNIT_IS_PACE_MIN_PER_MILE        = true;
+         // default is the metric measure system
 
+         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
       }
 

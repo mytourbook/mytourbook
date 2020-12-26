@@ -34,7 +34,7 @@ Changes
 Bugfix
 ======
 
-* 
+* A few measurement system values were wrong
 
 
 Translation    
