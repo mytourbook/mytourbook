@@ -4382,7 +4382,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_PressureValue);
 
          // label: mb, inHg
-         _lblWeather_PressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
+         _lblWeather_PressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.FILL, SWT.CENTER)
@@ -8987,7 +8987,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblPerson_BodyWeightUnit.setText(UI.UNIT_LABEL_WEIGHT);
       _lblPerson_BodyFatUnit.setText(UI.UNIT_PERCENT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
-      _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
+      _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
       _lblWeather_TemperatureUnit_Avg.setText(UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
       _lblWeather_TemperatureUnit_Max.setText(UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
