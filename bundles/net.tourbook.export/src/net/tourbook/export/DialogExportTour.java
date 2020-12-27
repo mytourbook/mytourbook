@@ -15,28 +15,16 @@
  *******************************************************************************/
 package net.tourbook.export;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -48,22 +36,12 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.tools.generic.MathTool;
-import org.dinopolis.gpstool.gpsinput.GPSRoute;
-import org.dinopolis.gpstool.gpsinput.GPSTrack;
-import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
-import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
-import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -101,9 +79,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
@@ -132,77 +107,36 @@ public class DialogExportTour extends TitleAreaDialog {
    private static final String STATE_EXPORT_PATH_NAME            = "exportPathName";                    //$NON-NLS-1$
    private static final String STATE_EXPORT_FILE_NAME            = "exportFileName";                    //$NON-NLS-1$
 
-   /**
-    * This is a special parameter to force elevation values from the device and not from the lat/lon
-    * + srtm data
-    * <a href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
-    *
-    * @since 15.6
-    */
-   private static final String STRAVA_WITH_BAROMETER             = " with barometer";                   //$NON-NLS-1$
+   //$NON-NLS-1$
 
-   /*
-    * Velocity (VC) context values
-    */
-   private static final String            VC_HAS_TOUR_MARKERS        = "hasTourMarkers";                                   //$NON-NLS-1$
-   private static final String            VC_HAS_TRACKS              = "hasTracks";                                        //$NON-NLS-1$
-   private static final String            VC_HAS_WAY_POINTS          = "hasWayPoints";                                     //$NON-NLS-1$
-   private static final String            VC_IS_EXPORT_ALL_TOUR_DATA = "isExportAllTourData";                              //$NON-NLS-1$
+   private static final int           VERTICAL_SECTION_MARGIN = 10;
+   private static final int           SIZING_TEXT_FIELD_WIDTH = 250;
+   private static final int           COMBO_HISTORY_LENGTH    = 20;
 
-   private static final String            VC_LAP                     = "lap";                                              //$NON-NLS-1$
-   private static final String            VC_TOUR_DATA               = "tourData";                                         //$NON-NLS-1$
-   private static final String            VC_TOUR_MARKERS            = "tourMarkers";                                      //$NON-NLS-1$
-   private static final String            VC_TRACKS                  = "tracks";                                           //$NON-NLS-1$
-   private static final String            VC_WAY_POINTS              = "wayPoints";                                        //$NON-NLS-1$
-
-   private static final String            ZERO                       = "0";                                                //$NON-NLS-1$
-
-   private static final int               VERTICAL_SECTION_MARGIN    = 10;
-   private static final int               SIZING_TEXT_FIELD_WIDTH    = 250;
-   private static final int               COMBO_HISTORY_LENGTH       = 20;
-
-   private static String                  _dlgDefaultMessage;
+   private static String              _dlgDefaultMessage;
    //
-   private static final DecimalFormat     _nf1                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-   private static final DecimalFormat     _nf3                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-   private static final DecimalFormat     _nf8                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-
-   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
-   private static final SimpleDateFormat  _dateFormat                = new SimpleDateFormat();
+   private static final DecimalFormat _nf3                    = (DecimalFormat) NumberFormat.getInstance(Locale.US);
 
    static {
-
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-      _nf1.setGroupingUsed(false);
 
       _nf3.setMinimumFractionDigits(1);
       _nf3.setMaximumFractionDigits(3);
       _nf3.setGroupingUsed(false);
-
-      _nf8.setMinimumFractionDigits(1);
-      _nf8.setMaximumFractionDigits(8);
-      _nf8.setGroupingUsed(false);
-
-      _dtIso.withZoneUTC();
-      _dateFormat.applyPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
-      _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
-   private final static String[]     StravaActivityTypes = new String[] {
+   private static final String[]     StravaActivityTypes = new String[] {
          "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                                    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
    };
-
-   private final String              _formatTemplate;
 
    private final IDialogSettings     _state              = TourbookPlugin
          .getState("DialogExportTour");                                                                                                                   //$NON-NLS-1$
 
    private final ExportTourExtension _exportExtensionPoint;
 
-   private final ArrayList<TourData> _tourDataList;
+   private final List<TourData>      _tourDataList;
    private final int                 _tourStartIndex;
    private final int                 _tourEndIndex;
+   private TourExporter              _tourExporter;
 
    /**
     * Is <code>true</code> when multiple tours are selected and NOT merged into 1 file.
@@ -231,8 +165,8 @@ public class DialogExportTour extends TitleAreaDialog {
     */
    private boolean                   _isSetup_MultipleTours;
 
-   private int                       _mergedDistance;
-   private ZonedDateTime             _mergedTime;
+   private int[]                     _mergedDistance     = new int[1];
+   private ZonedDateTime[]           _mergedTime         = new ZonedDateTime[1];
 
    private Point                     _shellDefaultSize;
 
@@ -256,6 +190,7 @@ public class DialogExportTour extends TitleAreaDialog {
    private boolean                   _exportState_TCX_IsActivities;
 
    private PixelConverter            _pc;
+   private final String              _formatTemplate;
 
    /*
     * UI controls
@@ -310,7 +245,7 @@ public class DialogExportTour extends TitleAreaDialog {
     */
    public DialogExportTour(final Shell parentShell,
                            final ExportTourExtension exportExtensionPoint,
-                           final ArrayList<TourData> tourDataList,
+                           final List<TourData> tourDataList,
                            final int tourStartIndex,
                            final int tourEndIndex,
                            final String formatTemplate) {
@@ -325,8 +260,7 @@ public class DialogExportTour extends TitleAreaDialog {
                   | SWT.CLOSE
                   | SWT.MIN
 //				| SWT.MAX
-                  | SWT.RESIZE
-                  | SWT.NONE;
+                  | SWT.RESIZE;
 
       // make dialog resizable
       setShellStyle(shellStyle);
@@ -350,6 +284,35 @@ public class DialogExportTour extends TitleAreaDialog {
 
       // initialize velocity
       VelocityService.init();
+   }
+
+   private String appendSurfingParameters(final TourData minTourData) {
+
+      String postFilename = UI.EMPTY_STRING;
+
+      if (!_isSetup_GPX || !_chkGPX_SurfingWaves.getSelection()) {
+         return postFilename;
+      }
+
+      postFilename = String.format(
+
+            "__%d-%d-%d-%d", //$NON-NLS-1$
+
+            // min start/stop speed
+            minTourData.getSurfing_MinSpeed_StartStop(),
+
+            // min surfing speed
+            minTourData.getSurfing_MinSpeed_Surfing(),
+
+            // min time duration
+            minTourData.getSurfing_MinTimeDuration(),
+
+            // min distance
+            minTourData.isSurfing_IsMinDistance() ? minTourData.getSurfing_MinDistance() : 0
+
+      );
+
+      return postFilename;
    }
 
    @Override
@@ -1008,7 +971,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
    }
 
-   private void doExport() throws IOException {
+   private void doExport() {
 
       // disable buttons
       getButton(IDialogConstants.OK_ID).setEnabled(false);
@@ -1041,9 +1004,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
       } else if (_isSetup_TCX) {
 
-         // .tcx files do always contain absolute distances
-         _exportState_isAbsoluteDistance = true;
-
          _exportState_IsDescription = _chkTCX_Description.getSelection();
 
          _exportState_TCX_IsActivities = _rdoTCX_Activities.getSelection();
@@ -1055,27 +1015,45 @@ public class DialogExportTour extends TitleAreaDialog {
 
       final String exportFileName = _txtFilePath.getText();
 
+      boolean isOverwrite = true;
+      final File exportFile = new File(exportFileName);
+      if (exportFile.exists()) {
+         if (_exportState_IsOverwriteFiles) {
+            // overwrite is enabled in the UI
+         } else {
+            isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehaviour, exportFile);
+         }
+      }
+
+      if (isOverwrite == false) {
+         return;
+      }
+
+      _tourExporter = new TourExporter(
+            _formatTemplate,
+            _exportState_IsCamouflageSpeed,
+            _exportState_CamouflageSpeed,
+            _exportState_IsRange,
+            _tourStartIndex,
+            _tourEndIndex,
+            _exportState_GPX_IsExportWithBarometer,
+            _exportState_TCX_IsActivities,
+            _exportState_TCX_ActivityType,
+            _exportState_IsDescription,
+            _exportState_GPX_IsExportSurfingWaves,
+            _exportState_GPX_IsExportAllTourData,
+            _exportState_TCX_IsCourses,
+            _exportState_TCX_CourseName);
+
+      if (_exportState_isAbsoluteDistance) {
+         _tourExporter.setUseAbsoluteDistance(true);
+      }
+
       if (_tourDataList.size() == 1) {
 
          // export one tour
 
-         final ArrayList<GarminTrack> tracks = new ArrayList<>();
-         final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-         final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-         final TourData tourData = _tourDataList.get(0);
-         final ZonedDateTime trackStartTime = tourData.getTourStartTime();
-
-         final GarminLap tourLap = doExport_50_Lap(tourData);
-
-         final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
-         if (track != null) {
-            tracks.add(track);
-         }
-
-         doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
-
-         doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+         _tourExporter.useTourData(_tourDataList.get(0)).export(exportFileName);
 
       } else {
 
@@ -1113,7 +1091,6 @@ public class DialogExportTour extends TitleAreaDialog {
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
-
       }
    }
 
@@ -1130,8 +1107,8 @@ public class DialogExportTour extends TitleAreaDialog {
           * merge all tours into one
           */
 
-         _mergedTime = _tourDataList.get(0).getTourStartTime();
-         _mergedDistance = 0;
+         _mergedTime[0] = _tourDataList.get(0).getTourStartTime();
+         _mergedDistance[0] = 0;
 
          final ArrayList<GarminTrack> tracks = new ArrayList<>();
          final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
@@ -1157,17 +1134,22 @@ public class DialogExportTour extends TitleAreaDialog {
 
             ZonedDateTime trackStartTime;
             if (_exportState_IsCamouflageSpeed) {
-               trackStartTime = _mergedTime;
+               trackStartTime = _mergedTime[0];
             } else {
                trackStartTime = tourData.getTourStartTime();
             }
 
-            final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
+            final GarminTrack track = _tourExporter.useTourData(tourData).doExport_60_TrackPoints(trackStartTime, _mergedTime, _mergedDistance);
             if (track != null) {
                tracks.add(track);
             }
 
-            doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
+            // get markers when this option is checked
+            if (!_exportState_GPX_IsExportMarkers) {
+               return;
+            }
+
+            _tourExporter.doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
          }
 
          /*
@@ -1175,7 +1157,7 @@ public class DialogExportTour extends TitleAreaDialog {
           */
          monitor.subTask(NLS.bind(Messages.Dialog_Export_SubTask_CreatingExportFile, exportFileName));
 
-         doExport_10_Tour(null, tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+         _tourExporter.doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
 
       } else {
 
@@ -1186,14 +1168,12 @@ public class DialogExportTour extends TitleAreaDialog {
          final IPath exportFilePath = new Path(exportFileName).addTrailingSeparator();
          final String fileExtension = _exportExtensionPoint.getFileExtension();
 
-         for (final TourData tourData : _tourDataList) {
+         for (int index = 0; index < _tourDataList.size() && !monitor.isCanceled(); ++index) {
 
-            if (monitor.isCanceled()) {
-               break;
-            }
+            final TourData tourData = _tourDataList.get(index);
 
             // merge distance is also used as total distance for not merged tours
-            _mergedDistance = 0;
+            _mergedDistance[0] = 0;
 
             // create file path name
             final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
@@ -1210,23 +1190,8 @@ public class DialogExportTour extends TitleAreaDialog {
                         tourSize,
                         exportFilePathName }));
 
-            final ArrayList<GarminTrack> tracks = new ArrayList<>();
-            final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
-            final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
-
-            final ZonedDateTime trackStartTime = tourData.getTourStartTime();
-
-            final GarminLap tourLap = doExport_50_Lap(tourData);
-
-            final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
-
-            if (track != null) {
-               tracks.add(track);
-            }
-
-            doExport_70_WayPoints(wayPoints, tourMarkers, tourData, trackStartTime);
-
-            doExport_10_Tour(tourData, tracks, wayPoints, tourMarkers, tourLap, exportFilePathName);
+            _tourExporter.useTourData(tourData);
+            _tourExporter.export(exportFilePathName);
 
             // check if overwrite dialog was canceled
             if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
@@ -1234,324 +1199,6 @@ public class DialogExportTour extends TitleAreaDialog {
             }
          }
       }
-   }
-
-   private void doExport_10_Tour(final TourData tourData,
-                                 final ArrayList<GarminTrack> tracks,
-                                 final ArrayList<TourWayPoint> wayPoints,
-                                 final ArrayList<TourMarker> tourMarkers,
-                                 final GarminLap lap,
-                                 final String exportFileName) throws IOException {
-
-      boolean isOverwrite = true;
-
-      final File exportFile = new File(exportFileName);
-      if (exportFile.exists()) {
-         if (_exportState_IsOverwriteFiles) {
-            // overwrite is enabled in the UI
-         } else {
-            isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehaviour, exportFile);
-         }
-      }
-
-      if (isOverwrite == false) {
-         return;
-      }
-
-      final VelocityContext vc = new VelocityContext();
-
-      // math tool to convert float into double
-      vc.put("math", new MathTool());//$NON-NLS-1$
-
-      if (_isSetup_GPX) {
-
-         vc.put(VC_IS_EXPORT_ALL_TOUR_DATA, _exportState_GPX_IsExportAllTourData && tourData != null);
-
-      } else if (_isSetup_TCX) {
-
-         vc.put("iscourses", _exportState_TCX_IsCourses); //$NON-NLS-1$
-         vc.put("coursename", _exportState_TCX_CourseName); //$NON-NLS-1$
-      }
-
-      vc.put(VC_LAP, lap);
-      vc.put(VC_TRACKS, tracks);
-      vc.put(VC_WAY_POINTS, wayPoints);
-      vc.put(VC_TOUR_MARKERS, tourMarkers);
-      vc.put(VC_TOUR_DATA, tourData);
-
-      vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.size() > 0));
-      vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.size() > 0));
-      vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.size() > 0));
-
-      vc.put("dateformat", _dateFormat); //$NON-NLS-1$
-      vc.put("dtIso", _dtIso); //$NON-NLS-1$
-      vc.put("nf1", _nf1); //$NON-NLS-1$
-      vc.put("nf3", _nf3); //$NON-NLS-1$
-      vc.put("nf8", _nf8); //$NON-NLS-1$
-
-      doExport_20_TourValues(vc);
-
-      try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
-            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
-            final Writer exportWriter = new BufferedWriter(outputStreamWriter);
-            final Reader templateReader = new InputStreamReader(this.getClass().getResourceAsStream(_formatTemplate))) {
-
-         Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
-
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      }
-   }
-
-   /**
-    * Adds some values to the velocity context (e.g. date, ...).
-    *
-    * @param vcContext
-    *           the velocity context holding all the data
-    */
-   private void doExport_20_TourValues(final VelocityContext vcContext) {
-
-      /*
-       * Current time, date
-       */
-      final Calendar now = Calendar.getInstance();
-      final Date creationDate = now.getTime();
-      vcContext.put("creation_date", creationDate); //$NON-NLS-1$
-
-      doExport_21_Creator(vcContext);
-      doExport_22_MinMax_LatLon(vcContext);
-      doExport_24_MinMax_Other(vcContext, creationDate);
-   }
-
-   private void doExport_21_Creator(final VelocityContext vcContext) {
-
-      final Version version = Activator.getDefault().getVersion();
-
-      /*
-       * Version
-       */
-      String pluginMajorVersion = ZERO;
-      String pluginMinorVersion = ZERO;
-      String pluginMicroVersion = ZERO;
-      String pluginQualifierVersion = ZERO;
-
-      if (version != null) {
-         pluginMajorVersion = Integer.toString(version.getMajor());
-         pluginMinorVersion = Integer.toString(version.getMinor());
-         pluginMicroVersion = Integer.toString(version.getMicro());
-         final String versionQualifier = version.getQualifier();
-         if (StringUtils.isNumeric(versionQualifier)) {
-            pluginQualifierVersion = versionQualifier;
-         }
-      }
-
-      vcContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
-      vcContext.put("pluginMinorVersion", pluginMinorVersion); //$NON-NLS-1$
-      vcContext.put("pluginMicroVersion", pluginMicroVersion); //$NON-NLS-1$
-      vcContext.put("pluginQualifierVersion", pluginQualifierVersion); //$NON-NLS-1$
-
-      /*
-       * Creator
-       */
-      String creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net", //$NON-NLS-1$
-            version.getMajor(),
-            version.getMinor(),
-            version.getMicro(),
-            version.getQualifier());
-
-      if (_exportState_GPX_IsExportWithBarometer) {
-         creatorText += STRAVA_WITH_BAROMETER;
-      }
-
-      vcContext.put("creator", creatorText); //$NON-NLS-1$
-   }
-
-   /**
-    * Calculate min/max values for latitude/longitude.
-    */
-   private void doExport_22_MinMax_LatLon(final VelocityContext vcContext) {
-
-      /*
-       * Extent of waypoint, routes and tracks:
-       */
-      double min_latitude = 90.0;
-      double min_longitude = 180.0;
-      double max_latitude = -90.0;
-      double max_longitude = -180.0;
-
-      final List<?> routes = (List<?>) vcContext.get("routes"); //$NON-NLS-1$
-      if (routes != null) {
-         final Iterator<?> route_iterator = routes.iterator();
-         while (route_iterator.hasNext()) {
-            final GPSRoute route = (GPSRoute) route_iterator.next();
-            min_longitude = route.getMinLongitude();
-            max_longitude = route.getMaxLongitude();
-            min_latitude = route.getMinLatitude();
-            max_latitude = route.getMaxLatitude();
-         }
-      }
-
-      final List<?> wayPoints = (List<?>) vcContext.get(VC_WAY_POINTS);
-      if (wayPoints != null) {
-         final Iterator<?> waypoint_iterator = wayPoints.iterator();
-         while (waypoint_iterator.hasNext()) {
-            final TourWayPoint waypoint = (TourWayPoint) waypoint_iterator.next();
-            min_longitude = Math.min(min_longitude, waypoint.getLongitude());
-            max_longitude = Math.max(max_longitude, waypoint.getLongitude());
-            min_latitude = Math.min(min_latitude, waypoint.getLatitude());
-            max_latitude = Math.max(max_latitude, waypoint.getLatitude());
-         }
-      }
-
-      final List<?> tourMarkers = (List<?>) vcContext.get(VC_TOUR_MARKERS);
-      if (tourMarkers != null) {
-
-         for (final Object element : tourMarkers) {
-            if (element instanceof TourMarker) {
-
-               final TourMarker tourMarker = (TourMarker) element;
-
-               final double longitude = tourMarker.getLongitude();
-               final double latitude = tourMarker.getLatitude();
-
-               if (longitude != TourDatabase.DEFAULT_DOUBLE) {
-
-                  min_longitude = Math.min(min_longitude, longitude);
-                  max_longitude = Math.max(max_longitude, longitude);
-                  min_latitude = Math.min(min_latitude, latitude);
-                  max_latitude = Math.max(max_latitude, latitude);
-               }
-            }
-         }
-      }
-
-      final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-      if (tracks != null) {
-         final Iterator<?> track_iterator = tracks.iterator();
-         while (track_iterator.hasNext()) {
-            final GPSTrack track = (GPSTrack) track_iterator.next();
-            min_longitude = Math.min(min_longitude, track.getMinLongitude());
-            max_longitude = Math.max(max_longitude, track.getMaxLongitude());
-            min_latitude = Math.min(min_latitude, track.getMinLatitude());
-            max_latitude = Math.max(max_latitude, track.getMaxLatitude());
-         }
-      }
-
-      vcContext.put("min_latitude", Double.valueOf(min_latitude)); //$NON-NLS-1$
-      vcContext.put("min_longitude", Double.valueOf(min_longitude)); //$NON-NLS-1$
-      vcContext.put("max_latitude", Double.valueOf(max_latitude)); //$NON-NLS-1$
-      vcContext.put("max_longitude", Double.valueOf(max_longitude)); //$NON-NLS-1$
-   }
-
-   /**
-    * Min/max time, heart, cadence and other values.
-    */
-   private void doExport_24_MinMax_Other(final VelocityContext vcContext, final Date creationDate) {
-
-      Date starttime = null;
-      Date endtime = null;
-      int heartNum = 0;
-      long heartSum = 0;
-      int cadNum = 0;
-      long cadSum = 0;
-      short maximumheartrate = 0;
-      double totaldistance = 0;
-
-      final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-
-      for (final Object name : tracks) {
-
-         final GPSTrack track = (GPSTrack) name;
-         for (final Object waypoint : track.getWaypoints()) {
-
-            final GPSTrackpoint wp = (GPSTrackpoint) waypoint;
-
-            // starttime, totaltime
-            if (wp.getDate() != null) {
-               if (starttime == null) {
-                  starttime = wp.getDate();
-               }
-               endtime = wp.getDate();
-            }
-
-            if (wp instanceof GarminTrackpointAdapter) {
-
-               final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
-
-               // average heartrate, maximum heartrate
-               if (gta.hasValidHeartrate()) {
-                  heartSum += gta.getHeartrate();
-                  heartNum++;
-                  if (gta.getHeartrate() > maximumheartrate) {
-                     maximumheartrate = gta.getHeartrate();
-                  }
-               }
-
-               // average cadence
-               if (gta.hasValidCadence()) {
-                  cadSum += gta.getCadence();
-                  cadNum++;
-               }
-
-               // totaldistance
-               if (gta.hasValidDistance()) {
-                  totaldistance = gta.getDistance();
-               }
-            }
-         }
-      }
-
-      if (_exportState_TCX_IsActivities) {
-         vcContext.put("activityType", _exportState_TCX_ActivityType); //$NON-NLS-1$
-      }
-
-      if (starttime != null) {
-         vcContext.put("starttime", starttime); //$NON-NLS-1$
-      } else {
-         vcContext.put("starttime", creationDate); //$NON-NLS-1$
-      }
-
-      if ((starttime != null) && (endtime != null)) {
-         vcContext.put("totaltime", ((double) endtime.getTime() - starttime.getTime()) / 1000); //$NON-NLS-1$
-      } else {
-         vcContext.put("totaltime", (double) 0); //$NON-NLS-1$
-      }
-
-      vcContext.put("totaldistance", totaldistance); //$NON-NLS-1$
-
-      if (maximumheartrate != 0) {
-         vcContext.put("maximumheartrate", maximumheartrate); //$NON-NLS-1$
-      }
-
-      if (heartNum != 0) {
-         vcContext.put("averageheartrate", heartSum / heartNum); //$NON-NLS-1$
-      }
-
-      if (cadNum != 0) {
-         vcContext.put("averagecadence", cadSum / cadNum); //$NON-NLS-1$
-      }
-   }
-
-   private GarminLap doExport_50_Lap(final TourData tourData) {
-
-      final GarminLap lap = new GarminLap();
-
-      /*
-       * Calories
-       */
-      lap.setCalories(tourData.getCalories());
-
-      /*
-       * Description
-       */
-      if (_exportState_IsDescription) {
-         final String notes = tourData.getTourDescription();
-         if ((notes != null) && (notes.length() > 0)) {
-            lap.setNotes(notes);
-         }
-      }
-
-      return lap;
    }
 
    private void doExport_52_Laps(final TourData tourData, final GarminLap tourLap) {
@@ -1582,381 +1229,6 @@ public class DialogExportTour extends TitleAreaDialog {
          }
       }
 
-   }
-
-   /**
-    * @param tourData
-    * @param trackDateTime
-    * @return Returns a track or <code>null</code> when tour data cannot be exported.
-    */
-   private GarminTrack doExport_60_TrackPoints(final TourData tourData, final ZonedDateTime trackDateTime) {
-
-      final int[] timeSerie = tourData.timeSerie;
-
-      // check if all dataseries are available
-      if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
-         return null;
-      }
-
-      final float[] altitudeSerie = tourData.altitudeSerie;
-      final float[] cadenceSerie = tourData.getCadenceSerie();
-      final float[] distanceSerie = tourData.distanceSerie;
-      final long[] gearSerie = tourData.gearSerie;
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
-      final float[] pulseSerie = tourData.pulseSerie;
-      final float[] temperatureSerie = tourData.temperatureSerie;
-
-      final boolean isAltitude = (altitudeSerie != null) && (altitudeSerie.length > 0);
-      final boolean isCadence = (cadenceSerie != null) && (cadenceSerie.length > 0);
-      final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
-      final boolean isGear = (gearSerie != null) && (gearSerie.length > 0);
-      final boolean isPulse = (pulseSerie != null) && (pulseSerie.length > 0);
-      final boolean isTemperature = (temperatureSerie != null) && (temperatureSerie.length > 0);
-
-      int prevTime = -1;
-      ZonedDateTime lastTrackDateTime = null;
-
-      // default is to use all trackpoints
-      int startIndex = 0;
-      int endIndex = timeSerie.length - 1;
-
-      // adjust start/end when a part is exported
-      if (_exportState_IsRange) {
-         startIndex = _tourStartIndex;
-         endIndex = _tourEndIndex;
-      }
-
-      /*
-       * Manage surfing waves
-       */
-      boolean[] visibleDataPointSerie = null;
-      boolean isPrevDataPointVisible = false;
-      if (_exportState_GPX_IsExportSurfingWaves && tourData.isVisiblePointsSaved_ForSurfing()) {
-
-         visibleDataPointSerie = tourData.visibleDataPointSerie;
-         isPrevDataPointVisible = visibleDataPointSerie[0];
-      }
-      final boolean isExportSurfingWaves = visibleDataPointSerie != null;
-
-      final GarminTrack track = new GarminTrack();
-
-      /*
-       * Track title/description
-       */
-      if (_exportState_IsDescription) {
-
-         final String tourTitle = tourData.getTourTitle();
-         if (tourTitle.length() > 0) {
-            track.setIdentification(tourTitle);
-         }
-
-         final StringBuilder sbTourDescription = new StringBuilder();
-
-         // add description from the tour
-         sbTourDescription.append(tourData.getTourDescription());
-
-         // append surfing parameters to the description
-         if (isExportSurfingWaves) {
-
-            if (sbTourDescription.length() > 0) {
-               sbTourDescription.append(UI.NEW_LINE2);
-            }
-
-            sbTourDescription.append(String.format(
-
-                  Messages.Dialog_Export_Description_SurfingWaves,
-
-                  // min start/stop speed
-                  tourData.getSurfing_MinSpeed_StartStop(),
-                  UI.UNIT_LABEL_SPEED,
-
-                  // min surfing speed
-                  tourData.getSurfing_MinSpeed_Surfing(),
-                  UI.UNIT_LABEL_SPEED,
-
-                  // min time duration
-                  tourData.getSurfing_MinTimeDuration(),
-                  Messages.App_Unit_Seconds_Small,
-
-                  // min distance
-                  tourData.isSurfing_IsMinDistance() ? tourData.getSurfing_MinDistance() : 0,
-                  UI.UNIT_LABEL_DISTANCE_M_OR_YD));
-         }
-
-         if (sbTourDescription.length() > 0) {
-            track.setComment(sbTourDescription.toString());
-         }
-      }
-
-      /*
-       * loop: trackpoints
-       */
-      for (int serieIndex = startIndex; serieIndex <= endIndex; serieIndex++) {
-
-         final GarminTrackpointD304 tp304 = new GarminTrackpointD304();
-         final GarminTrackpointAdapterExtended tpExt = new GarminTrackpointAdapterExtended(tp304);
-
-         /*
-          * Manage surfing
-          */
-         boolean isCreateTrackSegment = false;
-         if (isExportSurfingWaves) {
-
-            // export only surfing events
-
-            final boolean isDataPointVisible = visibleDataPointSerie[serieIndex];
-
-            if (isDataPointVisible && isDataPointVisible != isPrevDataPointVisible) {
-
-               // visibility has changed -> show track
-
-               isCreateTrackSegment = true;
-
-            } else if (isDataPointVisible == false) {
-
-               // hide time slices until they are visible again
-
-               isPrevDataPointVisible = false;
-
-               continue;
-            }
-
-            isPrevDataPointVisible = isDataPointVisible;
-         }
-
-         // mark as a new track to create the <trkseg>...</trkseg> tags
-         if (serieIndex == startIndex || isCreateTrackSegment) {
-            tpExt.setNewTrack(true);
-         }
-
-         if (isAltitude) {
-            tpExt.setAltitude(altitudeSerie[serieIndex]);
-         }
-
-         // I don't know if this is according to the rules to have a gpx/tcx without lat/lon
-         if (latitudeSerie != null && longitudeSerie != null) {
-            tpExt.setLatitude(latitudeSerie[serieIndex]);
-            tpExt.setLongitude(longitudeSerie[serieIndex]);
-         }
-
-         float distance = 0;
-         if (isDistance) {
-
-            if (_exportState_isAbsoluteDistance) {
-
-               distance = distanceSerie[serieIndex];
-
-            } else if (distanceSerie != null) {
-
-               // skip first distance difference
-               if (serieIndex > startIndex) {
-                  distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
-               }
-            }
-         }
-
-         int relativeTime;
-         if (_exportState_IsCamouflageSpeed && isDistance) {
-
-            // camouflage speed
-
-            relativeTime = (int) (distance / _exportState_CamouflageSpeed);
-
-         } else {
-
-            // keep recorded speed
-
-            relativeTime = timeSerie[serieIndex];
-         }
-
-         if (isDistance) {
-            tpExt.setDistance(distance + _mergedDistance);
-         }
-
-         if (isCadence) {
-            tp304.setCadence((short) cadenceSerie[serieIndex]);
-         }
-
-         if (isPulse) {
-            tp304.setHeartrate((short) pulseSerie[serieIndex]);
-         }
-
-         if (isTemperature) {
-            tpExt.setTemperature(temperatureSerie[serieIndex]);
-         }
-
-         if (isGear) {
-            tpExt.setGear(gearSerie[serieIndex]);
-         }
-
-         // ignore trackpoints which have the same time
-         if (relativeTime != prevTime) {
-
-            lastTrackDateTime = trackDateTime.plusSeconds(relativeTime);
-
-            tpExt.setDate(Date.from(lastTrackDateTime.toInstant()));
-
-            track.addWaypoint(tpExt);
-         }
-
-         prevTime = relativeTime;
-      }
-
-      /*
-       * Keep values for the next merged tour
-       */
-      if (isDistance && _exportState_isAbsoluteDistance) {
-
-         final float distanceDiff = distanceSerie[endIndex] - distanceSerie[startIndex];
-         _mergedDistance += distanceDiff;
-      }
-
-      _mergedTime = lastTrackDateTime;
-
-      return track;
-   }
-
-   private void doExport_70_WayPoints(final ArrayList<TourWayPoint> exportedWayPoints,
-                                      final ArrayList<TourMarker> exportedTourMarkers,
-                                      final TourData tourData,
-                                      final ZonedDateTime tourStartTime) {
-
-      // get markers when this option is checked
-      if (_exportState_GPX_IsExportMarkers == false) {
-         return;
-      }
-
-      final int[] timeSerie = tourData.timeSerie;
-      final float[] altitudeSerie = tourData.altitudeSerie;
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
-      final float[] distanceSerie = tourData.distanceSerie;
-
-      final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-      final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
-
-      // ensure required dataseries are available
-      if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
-         return;
-      }
-
-      final boolean isAltitude = altitudeSerie != null;
-      final boolean isDistance = (distanceSerie != null) && (distanceSerie.length > 0);
-
-      // default is to use all trackpoints
-      int startIndex = 0;
-      int endIndex = timeSerie.length - 1;
-      boolean isRange = false;
-
-      // adjust start/end when a part is exported
-      if (_exportState_IsRange) {
-         startIndex = _tourStartIndex;
-         endIndex = _tourEndIndex;
-         isRange = true;
-      }
-
-      /*
-       * Create exported tour marker
-       */
-      for (final TourMarker tourMarker : tourMarkers) {
-
-         final int serieIndex = tourMarker.getSerieIndex();
-
-         // skip markers when they are not in the defined range
-         if (isRange) {
-            if ((serieIndex < startIndex) || (serieIndex > endIndex)) {
-               continue;
-            }
-         }
-
-         /*
-          * get distance
-          */
-         float distance = 0;
-         if (isDistance) {
-
-            if (_exportState_isAbsoluteDistance) {
-
-               distance = distanceSerie[serieIndex];
-
-            } else if (distanceSerie != null) {
-
-               // skip first distance difference
-               if (serieIndex > startIndex) {
-                  distance = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
-               }
-            }
-         }
-
-         /*
-          * get time
-          */
-         int relativeTime;
-         if (_exportState_IsCamouflageSpeed && isDistance) {
-
-            // camouflage speed
-
-            relativeTime = (int) (distance / _exportState_CamouflageSpeed);
-
-         } else {
-
-            // keep recorded speed
-
-            relativeTime = timeSerie[serieIndex];
-         }
-
-         final ZonedDateTime zonedMarkerTime = tourStartTime.plusSeconds(relativeTime);
-         final long absoluteMarkerTime = zonedMarkerTime.toInstant().toEpochMilli();
-
-         /*
-          * Setup exported tour marker
-          */
-         final TourMarker exportedTourMarker = tourMarker.clone();
-
-         exportedTourMarker.setTime(relativeTime, absoluteMarkerTime);
-         exportedTourMarker.setLatitude(latitudeSerie[serieIndex]);
-         exportedTourMarker.setLongitude(longitudeSerie[serieIndex]);
-
-         if (isAltitude) {
-            exportedTourMarker.setAltitude(altitudeSerie[serieIndex]);
-         }
-
-         if (isDistance) {
-            exportedTourMarker.setDistance(distance);
-         }
-
-         exportedTourMarkers.add(exportedTourMarker);
-      }
-
-      for (final TourWayPoint twp : tourWayPoints) {
-
-         final TourWayPoint wayPoint = new TourWayPoint();
-
-         wayPoint.setTime(twp.getTime());
-         wayPoint.setLatitude(twp.getLatitude());
-         wayPoint.setLongitude(twp.getLongitude());
-
-         wayPoint.setName(twp.getName());
-
-         // <desc>...</desc>
-         final String comment = twp.getComment();
-         final String description = twp.getDescription();
-         final String descText = description != null ? description : comment;
-         if (descText != null) {
-            wayPoint.setComment(descText);
-         }
-
-         wayPoint.setAltitude(twp.getAltitude());
-
-         wayPoint.setUrlAddress(twp.getUrlAddress());
-         wayPoint.setUrlText(twp.getUrlText());
-//
-//			// <sym>...</sym>
-//			wayPoint.setSymbolName(twp.getSymbol());
-
-         exportedWayPoints.add(wayPoint);
-      }
    }
 
    private void enableExportButton(final boolean isEnabled) {
@@ -2050,11 +1322,7 @@ public class DialogExportTour extends TitleAreaDialog {
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
-            try {
-               doExport();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
+            doExport();
          }
       });
 
@@ -2280,30 +1548,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          // display the tour date/time
 
-         String postFilename = UI.EMPTY_STRING;
-
-         if (_isSetup_GPX && _chkGPX_SurfingWaves.getSelection()) {
-
-            // append surfing parameters
-
-            postFilename = String.format(
-
-                  "__%d-%d-%d-%d", //$NON-NLS-1$
-
-                  // min start/stop speed
-                  minTourData.getSurfing_MinSpeed_StartStop(),
-
-                  // min surfing speed
-                  minTourData.getSurfing_MinSpeed_Surfing(),
-
-                  // min time duration
-                  minTourData.getSurfing_MinTimeDuration(),
-
-                  // min distance
-                  minTourData.isSurfing_IsMinDistance() ? minTourData.getSurfing_MinDistance() : 0
-
-            );
-         }
+         final String postFilename = appendSurfingParameters(minTourData);
 
          _comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData) + postFilename);
       }
@@ -2344,12 +1589,10 @@ public class DialogExportTour extends TitleAreaDialog {
        * validate fields
        */
 
-      if (_isSetup_TCX) {
-         if (_rdoTCX_Courses.getSelection() && getCourseName().length() == 0) {
-            setError(Messages.Dialog_Export_Error_CourseNameIsInvalid);
-            _comboTcxCourseName.setFocus();
-            return;
-         }
+      if (_isSetup_TCX && _rdoTCX_Courses.getSelection() && getCourseName().length() == 0) {
+         setError(Messages.Dialog_Export_Error_CourseNameIsInvalid);
+         _comboTcxCourseName.setFocus();
+         return;
       }
 
       if (validateFilePath() == false) {

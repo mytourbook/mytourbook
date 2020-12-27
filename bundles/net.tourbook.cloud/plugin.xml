@@ -3,13 +3,19 @@
 <plugin>
 	
    <extension   point="net.tourbook.fileSystem">
-   
       <fileSystem
          id             ="net.tourbook.cloud.DropboxFileSystem"
          name           ="Dropbox File System"
          class          ="net.tourbook.cloud.dropbox.DropboxFileSystem"
       />
+   </extension>
       
+   <extension   point="net.tourbook.cloudUploader">
+      <cloudUploader
+         id             ="net.tourbook.cloud.StravaUploader"
+         name           ="Strava Uploader"
+         class          ="net.tourbook.cloud.strava.StravaUploader"
+      />
    </extension>
 
    <!-- Dropbox -->
@@ -19,6 +25,16 @@
             class="net.tourbook.cloud.dropbox.PrefPageDropbox"
             id="net.tourbook.cloud.PrefPageDropbox"
             name="Dropbox">
+      </page>
+   </extension>
+   
+   <!-- Strava -->
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageCloudConnectivity"
+            class="net.tourbook.cloud.strava.PrefPageStrava"
+            id="net.tourbook.strava.PrefPageStrava"
+            name="Strava">
       </page>
    </extension>
    
