@@ -70,8 +70,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static HttpClient       httpClient     = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-   private static final String     _stravaBaseUrl = "https://www.strava.com/api/v3/";                                      //$NON-NLS-1$
+   private static HttpClient       _httpClient     = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   private static final String     StravaBaseUrl = "https://www.strava.com/api/v3/";                                      //$NON-NLS-1$
 
    public static final String      HerokuAppUrl   = "https://passeur-mytourbook-strava.herokuapp.com";                     //$NON-NLS-1$
 
@@ -110,7 +110,7 @@ public class StravaUploader extends TourbookCloudUploader {
             .build();
 
       try {
-         final java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+         final java.net.http.HttpResponse<String> response = _httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
             final Tokens token = new ObjectMapper().readValue(response.body(), Tokens.class);
@@ -299,7 +299,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       try (final CloseableHttpClient apacheHttpClient = HttpClients.createDefault()) {
 
-         final HttpPost httpPost = new HttpPost(_stravaBaseUrl + "/uploads");//$NON-NLS-1$
+         final HttpPost httpPost = new HttpPost(StravaBaseUrl + "/uploads");//$NON-NLS-1$
          httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()); //$NON-NLS-1$
          httpPost.setEntity(entity);
          final HttpResponse response = apacheHttpClient.execute(httpPost);

@@ -103,7 +103,7 @@ public class ActionUpload extends Action implements IMenuCreator {
 
       _tourProvider = tourProvider;
 
-      setText(Messages.action_upload_tour);
+      setText(Messages.App_Action_Upload_Tour);
       setMenuCreator(this);
 
       getCloudUploaders();
