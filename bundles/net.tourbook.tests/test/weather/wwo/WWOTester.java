@@ -8,7 +8,6 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import utils.Initializer;
 
@@ -26,7 +25,7 @@ public class WWOTester {
    /**
     * Regression test for the weather retrieval from World Weather Online.
     */
-   @Test
+//   @Test
    void testWeatherRetrieval() {
 
       final TourData tour = Initializer.importTour();

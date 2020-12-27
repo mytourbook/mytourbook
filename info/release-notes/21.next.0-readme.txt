@@ -16,7 +16,7 @@ Issues
 New
 ===
 
-* Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/266
+* Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/273
   - Ability to upload tours to a Strava account.
 
 
