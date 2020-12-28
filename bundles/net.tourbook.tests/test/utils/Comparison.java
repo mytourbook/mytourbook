@@ -84,7 +84,10 @@ public class Comparison {
       Assertions.assertTrue(result.passed(), result.getMessage());
    }
 
-   public static void compareXmlAgainstControl(final String controlTourFilePath, final String testTourFilePath, final List<String> nodesToFilter) {
+   public static void compareXmlAgainstControl(final String controlTourFilePath,
+                                               final String testTourFilePath,
+                                               final List<String> nodesToFilter,
+                                               final List<String> attributesToFilter) {
 
       final String controlTour = Comparison.readFileContent(controlTourFilePath);
       final String testTour = Comparison.readFileContent(testTourFilePath);
@@ -94,6 +97,7 @@ public class Comparison {
             .withTest(testTour)
             .ignoreWhitespace()
             .withNodeFilter(node -> !nodesToFilter.contains(node.getNodeName()))
+            .withAttributeFilter(attribute -> !attributesToFilter.contains(attribute.getName()))
             .build();
 
       if (documentDiff.hasDifferences()) {

@@ -76,7 +76,8 @@ public class ExportGpxTester {
       _tourExporter.export(_testTourFilePath);
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "mt:tourType", "mt:tourDistance"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter);
+      final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
+      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter, attributesToFilter);
    }
 
    @Test
