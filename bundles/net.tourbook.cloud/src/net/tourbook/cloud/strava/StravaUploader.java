@@ -71,7 +71,7 @@ import org.eclipse.swt.widgets.Display;
 public class StravaUploader extends TourbookCloudUploader {
 
    private static HttpClient       _httpClient   = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-   private static final String     StravaBaseUrl = "https://www.strava.com/api/v3/";                                      //$NON-NLS-1$
+   private static final String     StravaBaseUrl = "https://www.strava.com/api/v3";                                       //$NON-NLS-1$
 
    public static final String      HerokuAppUrl  = "https://passeur-mytourbook-strava.herokuapp.com";                     //$NON-NLS-1$
 
@@ -191,7 +191,7 @@ public class StravaUploader extends TourbookCloudUploader {
 //      final HttpRequest request = HttpRequest.newBuilder()
 //            .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
 //            .GET()
-//            .uri(URI.create(_stravaBaseUrl + "uploads/" + uploadId))//$NON-NLS-1$
+//            .uri(URI.create(_stravaBaseUrl + "/uploads/" + uploadId))//$NON-NLS-1$
 //            .build();
 //
 //      try {
