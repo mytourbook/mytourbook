@@ -16,6 +16,7 @@ Import-Package: net.tourbook.common,
  net.tourbook.device.gpx,
  net.tourbook.device.sporttracks,
  net.tourbook.device.suunto,
+ net.tourbook.export,
  org.eclipse.jface.preference,
  org.json
 Automatic-Module-Name: net.tourbook.tests
