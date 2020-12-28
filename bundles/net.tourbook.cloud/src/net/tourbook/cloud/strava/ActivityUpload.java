@@ -25,6 +25,8 @@ public class ActivityUpload {
    private String status;
    private String activityId;
 
+   private String tourDate;
+
    ActivityUpload() {}
 
    @JsonProperty("activity_id")
@@ -45,7 +47,15 @@ public class ActivityUpload {
       return status;
    }
 
+   public String getTourDate() {
+      return tourDate;
+   }
+
    public void setError(final String error) {
       this.error = error;
+   }
+
+   public void setTourDate(final String tourDate) {
+      this.tourDate = tourDate;
    }
 }
