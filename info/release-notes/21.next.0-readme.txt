@@ -6,6 +6,11 @@ TODO's
 
 * Website: Document cloud connections
 
+  @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
+  "All apps must display the “Powered by Strava” logo or “Compatible with Strava” logo on all websites, apps and any distributable media such as images, videos or prints. No variations or modifications are acceptable."
+
+  I am thinking you could display the logo "Compatible With Strava" on the website in the next release and that would comply with their requirements ?
+
 
 Issues
 ======
