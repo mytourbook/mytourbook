@@ -65,11 +65,10 @@ import org.eclipse.swt.widgets.Display;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static HttpClient       _httpClient   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static final String     StravaBaseUrl = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
-
    public static final String      HerokuAppUrl  = "https://passeur-mytourbook-strava.herokuapp.com";                    //$NON-NLS-1$
 
+   private static HttpClient       _httpClient   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static IPreferenceStore _prefStore    = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
    private static int[]            _numberOfUploadedTours;
