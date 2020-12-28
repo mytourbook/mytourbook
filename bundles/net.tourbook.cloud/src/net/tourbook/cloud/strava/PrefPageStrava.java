@@ -143,47 +143,53 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       group.setText(Messages.PrefPage_Account_Information_Group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
-         _labelAthleteName = new Label(group, SWT.NONE);
-         _labelAthleteName.setText(Messages.PrefPage_Account_Information_AthleteName_Label);
-         GridDataFactory.fillDefaults().applyTo(_labelAthleteName);
+         {
+            _labelAthleteName = new Label(group, SWT.NONE);
+            _labelAthleteName.setText(Messages.PrefPage_Account_Information_AthleteName_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelAthleteName);
 
-         _labelAthleteName_Value = new Label(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelAthleteName_Value);
+            _labelAthleteName_Value = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelAthleteName_Value);
+         }
+         {
+            _labelAthleteWebPage = new Label(group, SWT.NONE);
+            _labelAthleteWebPage.setText(Messages.PrefPage_Account_Information_AthleteWebPage_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelAthleteWebPage);
 
-         _labelAthleteWebPage = new Label(group, SWT.NONE);
-         _labelAthleteWebPage.setText(Messages.PrefPage_Account_Information_AthleteWebPage_Label);
-         GridDataFactory.fillDefaults().applyTo(_labelAthleteWebPage);
+            _linkAthleteWebPage = new Link(group, SWT.NONE);
+            _linkAthleteWebPage.setEnabled(true);
+            _linkAthleteWebPage.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  WEB.openUrl(constructAthleteWebPageLink(_athleteId));
+               }
+            });
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkAthleteWebPage);
+         }
+         {
+            _labelAccessToken = new Label(group, SWT.NONE);
+            _labelAccessToken.setText(Messages.PrefPage_Account_Information_AccessToken_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-         _linkAthleteWebPage = new Link(group, SWT.NONE);
-         _linkAthleteWebPage.setEnabled(true);
-         _linkAthleteWebPage.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(constructAthleteWebPageLink(_athleteId));
-            }
-         });
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkAthleteWebPage);
+            _labelAccessToken_Value = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelAccessToken_Value);
+         }
+         {
+            _labelRefreshToken = new Label(group, SWT.NONE);
+            _labelRefreshToken.setText(Messages.PrefPage_Account_Information_RefreshToken_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-         _labelAccessToken = new Label(group, SWT.NONE);
-         _labelAccessToken.setText(Messages.PrefPage_Account_Information_AccessToken_Label);
-         GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
+            _labelRefreshToken_Value = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelRefreshToken_Value);
+         }
+         {
+            _labelExpiresAt = new Label(group, SWT.NONE);
+            _labelExpiresAt.setText(Messages.PrefPage_Account_Information_ExpiresAt_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
-         _labelAccessToken_Value = new Label(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelAccessToken_Value);
-
-         _labelRefreshToken = new Label(group, SWT.NONE);
-         _labelRefreshToken.setText(Messages.PrefPage_Account_Information_RefreshToken_Label);
-         GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
-
-         _labelRefreshToken_Value = new Label(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelRefreshToken_Value);
-
-         _labelExpiresAt = new Label(group, SWT.NONE);
-         _labelExpiresAt.setText(Messages.PrefPage_Account_Information_ExpiresAt_Label);
-         GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
-
-         _labelExpiresAt_Value = new Label(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+            _labelExpiresAt_Value = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
+         }
       }
    }
 
