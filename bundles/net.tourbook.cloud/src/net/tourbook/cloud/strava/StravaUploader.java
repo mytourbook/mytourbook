@@ -70,13 +70,13 @@ import org.eclipse.swt.widgets.Display;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static HttpClient       httpClient     = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-   private static final String     _stravaBaseUrl = "https://www.strava.com/api/v3/";                                      //$NON-NLS-1$
+   private static HttpClient       _httpClient   = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   private static final String     StravaBaseUrl = "https://www.strava.com/api/v3";                                       //$NON-NLS-1$
 
-   public static final String      HerokuAppUrl   = "https://passeur-mytourbook-strava.herokuapp.com";                     //$NON-NLS-1$
+   public static final String      HerokuAppUrl  = "https://passeur-mytourbook-strava.herokuapp.com";                     //$NON-NLS-1$
 
-   private static IPreferenceStore _prefStore     = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter  = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static IPreferenceStore _prefStore    = Activator.getDefault().getPreferenceStore();
+   private static TourExporter     _tourExporter = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
    public StravaUploader() {
       super("STRAVA", Messages.VendorName_Strava); //$NON-NLS-1$
@@ -110,7 +110,7 @@ public class StravaUploader extends TourbookCloudUploader {
             .build();
 
       try {
-         final java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+         final java.net.http.HttpResponse<String> response = _httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
             final Tokens token = new ObjectMapper().readValue(response.body(), Tokens.class);
@@ -191,7 +191,7 @@ public class StravaUploader extends TourbookCloudUploader {
 //      final HttpRequest request = HttpRequest.newBuilder()
 //            .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
 //            .GET()
-//            .uri(URI.create(_stravaBaseUrl + "uploads/" + uploadId))//$NON-NLS-1$
+//            .uri(URI.create(_stravaBaseUrl + "/uploads/" + uploadId))//$NON-NLS-1$
 //            .build();
 //
 //      try {
@@ -299,7 +299,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       try (final CloseableHttpClient apacheHttpClient = HttpClients.createDefault()) {
 
-         final HttpPost httpPost = new HttpPost(_stravaBaseUrl + "/uploads");//$NON-NLS-1$
+         final HttpPost httpPost = new HttpPost(StravaBaseUrl + "/uploads");//$NON-NLS-1$
          httpPost.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()); //$NON-NLS-1$
          httpPost.setEntity(entity);
          final HttpResponse response = apacheHttpClient.execute(httpPost);
@@ -377,15 +377,11 @@ public class StravaUploader extends TourbookCloudUploader {
                final TourData tourData = tourToUpload.getValue();
                final String tourDate = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
 
-               // Send TCX.gz file
                final ActivityUpload activityUpload = uploadFile(compressedTourAbsoluteFilePath, tourData);
-//TODO FB async
-               //   https: //hc.apache.org/httpcomponents-asyncclient-dev/quickstart.html
                if (monitor.isCanceled()) {
                   break;
                }
 
-               //TODO disable cancel button ? is it possible?
                deleteTemporaryFile(compressedTourAbsoluteFilePath);
 
                if (StringUtils.hasContent(activityUpload.getError())) {
@@ -416,6 +412,7 @@ public class StravaUploader extends TourbookCloudUploader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
 
+         //TODO disable cancel button ? true, false
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          TourLogManager.logTitle(String.format(Messages.Log_UploadToursToStrava_005_End, (System.currentTimeMillis() - start) / 1000.0));

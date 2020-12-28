@@ -105,6 +105,8 @@ public class OAuth2BrowserDialog extends Dialog {
             .applyTo(displayArea);
 
       final Browser browser = new Browser(displayArea, SWT.NONE);
+      Browser.clearSessions();
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(browser);
       browser.setUrl(_url);
       browser.addLocationListener(new LocationAdapter() {
 

@@ -445,7 +445,7 @@ public class Messages extends NLS {
    public static String        action_tourbook_select_year_month_tours;
    public static String        action_tourCatalog_open_compare_wizard;
    public static String        action_tourType_modify_tourTypes;
-   public static String        action_upload_tour;
+   public static String        App_Action_Upload_Tour;
 
    public static String        adjust_altitude_action_create_spline_point;
    public static String        adjust_altitude_btn_reset_altitude;
