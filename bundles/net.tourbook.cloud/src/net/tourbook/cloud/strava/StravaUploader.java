@@ -378,7 +378,8 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(Messages.UploadToursToStrava_Task, numberOfTours * 2);
+            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, _prefStore.getString(IPreferences.STRAVA_ATHLETEFULLNAME)),
+                  numberOfTours * 2);
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
                   Messages.UploadToursToStrava_Icon_Hourglass,
@@ -392,7 +393,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
                //Check that a tour has a non empty time serie to avoid this Strava error
                //"error": "Time information is missing from file.
-               //TODO ? V2: Create activities without timeseries using this API endpoint :
+               //V2?: Create activities without timeseries using this API endpoint :
                //https://developers.strava.com/playground/#/Activities/createActivity
                if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 
