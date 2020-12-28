@@ -18,6 +18,7 @@ package exportdata.garmin.tcx;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class ExportTcxTester {
       _tourExporter.export(_testTourFilePath);
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "Author", "Creator"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
+      final List<String> attributesToFilter = new ArrayList<>();
       Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter, attributesToFilter);
    }
 
