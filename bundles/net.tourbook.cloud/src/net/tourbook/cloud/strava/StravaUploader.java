@@ -243,7 +243,7 @@ public class StravaUploader extends TourbookCloudUploader {
       return _prefStore.getString(IPreferences.STRAVA_ACCESSTOKEN);
    }
 
-   private long getAcessTokenExpirationDate() {
+   private long getAccessTokenExpirationDate() {
       return _prefStore.getLong(IPreferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
    }
 
@@ -259,7 +259,7 @@ public class StravaUploader extends TourbookCloudUploader {
     */
    private boolean isAccessTokenExpired() {
 
-      return getAcessTokenExpirationDate() - System.currentTimeMillis() - 300000 < 0;
+      return getAccessTokenExpirationDate() - System.currentTimeMillis() - 300000 < 0;
    }
 
    @Override
