@@ -59,7 +59,7 @@ public class GarminTcxTester {
     * @throws SAXException
     */
    @Test
-   void testFitImportConeyLake() throws SAXException, IOException {
+   void testTcxImportConeyLake() throws SAXException, IOException {
 
       final String filePathWithoutExtension = IMPORT_PATH +
             "Move_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$

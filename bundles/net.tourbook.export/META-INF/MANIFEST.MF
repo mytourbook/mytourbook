@@ -31,3 +31,4 @@ Import-Package: net.tourbook,
  org.dinopolis.gpstool.gpsinput.garmin,
  org.dinopolis.util.text
 Automatic-Module-Name: net.tourbook.export
+Export-Package: net.tourbook.export

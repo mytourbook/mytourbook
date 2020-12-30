@@ -456,7 +456,7 @@ public class UI {
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
    public static String       UNIT_LABEL_ELEVATION;
-   public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
+   public static String       UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
@@ -492,7 +492,7 @@ public class UI {
    public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
@@ -952,7 +952,7 @@ public class UI {
     */
    public static float convertPressure_FromMetric(final float weatherPressure) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_PRESSURE_MILLIBAR) {
          return weatherPressure;
       }
 
@@ -965,7 +965,7 @@ public class UI {
     */
    public static float convertPressure_ToMetric(final float weatherPressure) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_PRESSURE_MILLIBAR) {
          return weatherPressure;
       }
 
@@ -2460,15 +2460,14 @@ public class UI {
          // set imperial measure system
 
          UNIT_IS_PRESSURE_MERCURY         = true;
-
-         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_INHG;
+         UNIT_LABEL_PRESSURE_MBAR_OR_INHG = UNIT_PRESSURE_INHG;
 
       } else {
 
          // default is the metric measure system
 
          UNIT_IS_PRESSURE_MILLIBAR        = true;
-         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_MB;
+         UNIT_LABEL_PRESSURE_MBAR_OR_INHG = UNIT_PRESSURE_MBAR;
       }
 
       /*
@@ -2519,14 +2518,14 @@ public class UI {
 
       if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
 
-         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
-
+         UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
 
       } else {
 
-         UNIT_IS_PACE_MIN_PER_MILE        = true;
+         // default is the metric measure system
 
+         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
       }
 

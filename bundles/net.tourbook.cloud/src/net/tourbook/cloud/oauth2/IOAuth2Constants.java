@@ -19,43 +19,25 @@ package net.tourbook.cloud.oauth2;
  */
 public interface IOAuth2Constants {
 
-   /**
-    * PARAM_ACCESS_TOKEN
-    */
-   String PARAM_ACCESS_TOKEN  = "access_token";  //$NON-NLS-1$
+   String PARAM_AUTHORIZATION_CODE = "authorization_code"; //$NON-NLS-1$
 
-   /**
-    * PARAM_CLIENT_ID
-    */
-   String PARAM_CLIENT_ID     = "client_id";     //$NON-NLS-1$
+   String PARAM_ACCESS_TOKEN       = "access_token";       //$NON-NLS-1$
 
-   /**
-    * PARAM_CLIENT_SECRET
-    */
-   String PARAM_CLIENT_SECRET = "client_secret"; //$NON-NLS-1$
+   String PARAM_REFRESH_TOKEN      = "refresh_token";      //$NON-NLS-1$
 
-   /**
-    * PARAM_TOKEN
-    */
-   String PARAM_TOKEN         = "token";         //$NON-NLS-1$
+   String PARAM_CLIENT_ID          = "client_id";          //$NON-NLS-1$
 
-   /**
-    * PARAM_GRANT_TYPE
-    */
-   String PARAM_GRANT_TYPE    = "grant_type";    //$NON-NLS-1$
+   String PARAM_CLIENT_SECRET      = "client_secret";      //$NON-NLS-1$
 
-   /**
-    * PARAM_REDIRECT_URI
-    */
-   String PARAM_REDIRECT_URI  = "redirect_uri";  //$NON-NLS-1$
+   String PARAM_CODE               = "code";               //$NON-NLS-1$
 
-   /**
-    * PARAM_SCOPE
-    */
-   String PARAM_SCOPE         = "scope";         //$NON-NLS-1$
+   String PARAM_TOKEN              = "token";              //$NON-NLS-1$
 
-   /**
-    * RESPONSE_TYPE
-    */
-   String RESPONSE_TYPE       = "response_type"; //$NON-NLS-1$
+   String PARAM_GRANT_TYPE         = "grant_type";         //$NON-NLS-1$
+
+   String PARAM_REDIRECT_URI       = "redirect_uri";       //$NON-NLS-1$
+
+   String PARAM_SCOPE              = "scope";              //$NON-NLS-1$
+
+   String RESPONSE_TYPE            = "response_type";      //$NON-NLS-1$
 }
