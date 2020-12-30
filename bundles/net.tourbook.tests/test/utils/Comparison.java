@@ -84,17 +84,28 @@ public class Comparison {
       Assertions.assertTrue(result.passed(), result.getMessage());
    }
 
-   public static void compareXmlAgainstControl(final String controlTourFilePath, final String testTourFilePath, final List<String> nodesToFilter) {
+   public static void compareXmlAgainstControl(final String controlTourFilePath,
+                                               final String testTourFilePath,
+                                               final List<String> nodesToFilter,
+                                               final List<String> attributesToFilter) {
 
       final String controlTour = Comparison.readFileContent(controlTourFilePath);
       final String testTour = Comparison.readFileContent(testTourFilePath);
 
-      final Diff documentDiff = DiffBuilder
+      final DiffBuilder documentDiffBuilder = DiffBuilder
             .compare(controlTour)
             .withTest(testTour)
-            .ignoreWhitespace()
-            .withNodeFilter(node -> !nodesToFilter.contains(node.getNodeName()))
-            .build();
+            .ignoreWhitespace();
+
+      if (!nodesToFilter.isEmpty()) {
+         documentDiffBuilder.withNodeFilter(node -> !nodesToFilter.contains(node.getNodeName()));
+      }
+
+      if (!attributesToFilter.isEmpty()) {
+         documentDiffBuilder.withAttributeFilter(attribute -> !attributesToFilter.contains(attribute.getName()));
+      }
+
+      final Diff documentDiff = documentDiffBuilder.build();
 
       if (documentDiff.hasDifferences()) {
          writeErroneousFiles(controlTourFilePath, testTour);

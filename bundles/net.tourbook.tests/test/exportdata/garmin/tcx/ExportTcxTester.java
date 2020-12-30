@@ -18,6 +18,7 @@ package exportdata.garmin.tcx;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,17 +77,18 @@ public class ExportTcxTester {
 
       _tourExporter.export(_testTourFilePath);
 
-      final List<String> nodesToFilter = Arrays.asList("Cadence");
-      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter);
+      final List<String> nodesToFilter = Arrays.asList("Cadence", "Author", "Creator"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final List<String> attributesToFilter = new ArrayList<>();
+      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName, _testTourFilePath, nodesToFilter, attributesToFilter);
    }
 
    @Test
    void testTcxExportCamouflage15KmHBikingActivity() {
 
-      final String controlTourFileName = "LongsPeak-CamouflageSpeed-15kmh-BikingActivity.tcx";
+      final String controlTourFileName = "LongsPeak-CamouflageSpeed-15kmh-BikingActivity.tcx"; //$NON-NLS-1$
 
       _tourExporter.setUseActivityType(true);
-      _tourExporter.setActivityType("Biking");
+      _tourExporter.setActivityType("Biking"); //$NON-NLS-1$
       _tourExporter.setIsCamouflageSpeed(true);
       _tourExporter.setCamouflageSpeed(15 / 3.6f);
 
@@ -96,10 +98,10 @@ public class ExportTcxTester {
    @Test
    void testTcxExportCourse() {
 
-      final String controlTourFileName = "LongsPeak-Course.tcx";
+      final String controlTourFileName = "LongsPeak-Course.tcx"; //$NON-NLS-1$
 
       _tourExporter.setIsCourse(true);
-      _tourExporter.setCourseName("Longs Peak");
+      _tourExporter.setCourseName("Longs Peak"); //$NON-NLS-1$
 
       executeTest(controlTourFileName);
    }
@@ -119,10 +121,10 @@ public class ExportTcxTester {
    @Test
    void testTcxExportHikingActivity() {
 
-      final String controlTourFileName = "LongsPeak-HikingActivity.tcx";
+      final String controlTourFileName = "LongsPeak-HikingActivity.tcx"; //$NON-NLS-1$
 
       _tourExporter.setUseActivityType(true);
-      _tourExporter.setActivityType("Hiking");
+      _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
 
       executeTest(controlTourFileName);
    }

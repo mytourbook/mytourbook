@@ -139,8 +139,8 @@ public class OAuth2BrowserDialog extends Dialog {
    }
 
    public String getAuthorizationCode() {
-      return _responseContent.containsKey(IOAuth2Constants.PARAM_AUTHORIZATION_CODE)
-            ? _responseContent.get(IOAuth2Constants.PARAM_AUTHORIZATION_CODE)
+      return _responseContent.containsKey(IOAuth2Constants.PARAM_CODE)
+            ? _responseContent.get(IOAuth2Constants.PARAM_CODE)
             : UI.EMPTY_STRING;
    }
 
