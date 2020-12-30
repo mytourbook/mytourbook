@@ -358,8 +358,6 @@ public class StravaUploader extends TourbookCloudUploader {
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
 
-      tryRenewTokens();
-
       final int numberOfTours = selectedTours.size();
       _numberOfUploadedTours = new int[1];
 
@@ -367,6 +365,8 @@ public class StravaUploader extends TourbookCloudUploader {
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            tryRenewTokens();
 
             monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
