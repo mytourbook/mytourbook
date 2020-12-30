@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.IPreferences;
+import net.tourbook.cloud.Preferences;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -59,7 +59,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN)) {
+            if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
 
                closeDropboxFileSystem();
 
@@ -116,7 +116,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       boolean result = false;
 
-      final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
+      final String accessToken = DropboxClient.getValidTokens();
       if (StringUtils.isNullOrEmpty(accessToken)) {
          _dropboxFileSystem = null;
          return result;
@@ -208,7 +208,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
-            final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
+            final String accessToken = DropboxClient.getValidTokens();
 
             dropboxFolderChooser[0] = new DialogDropboxFolderBrowser(Display.getCurrent().getActiveShell(),
                   accessToken,
