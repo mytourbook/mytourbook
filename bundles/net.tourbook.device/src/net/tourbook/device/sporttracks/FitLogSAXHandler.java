@@ -313,6 +313,16 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  SUB_ATTRIB_WIND_SPEED       = "Wind Speed:";         //$NON-NLS-1$
    private static final HashMap<String, String> _weatherId                  = new HashMap<>();
 
+   private static final String                  CONST_NORMALIZEDPOWER       = "NormalizedPower [W]"; //$NON-NLS-1$
+   private static final String                  CONST_STRIDELENGTH       = "Stride length (recorded)"; //$NON-NLS-1$
+   private static final String                  CONST_VERTICALRATIO   = "Vertical Ratio"; //$NON-NLS-1$
+   private static final String                  CONST_GROUNDCONTACT_TIME_BALANCE = "Ground Contact Time Balance"; //$NON-NLS-1$
+   private static final String                  CONST_TSS                        = "TSS (Training Stress Score)"; //$NON-NLS-1$
+   private static final String                  CONST_IF                         = "IF (Intensity Factor)"; //$NON-NLS-1$
+   private static final String                  CONST_LEFT_TORQUE_EFF            = "Left Torque Effectiveness Avg. [%]"; //$NON-NLS-1$
+   private static final String                  CONST_RIGHT_TORQUE_EFF           = "Right Torque Effectiveness Avg. [%]"; //$NON-NLS-1$
+   private static final String                  CONST_LEFT_PEDAL_SMOOTH          = "Left Pedal Smoothness Avg. [%]"; //$NON-NLS-1$
+   private static final String                  CONST_RIGHT_PEDAL_SMOOTH         = "Right Pedal Smoothness Avg. [%]"; //$NON-NLS-1$
    //
    private String                               _importFilePath;
    private FitLogDeviceDataReader               _device;
@@ -544,67 +554,67 @@ public class FitLogSAXHandler extends DefaultHandler {
          });
 
          tourData.setTourDescription(tourNotes.toString());
-         if (_currentActivity.customDataFields.containsKey("NormalizedPower [W]")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_NORMALIZEDPOWER)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("NormalizedPower [W]")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_NORMALIZEDPOWER));
                tourData.setPower_Normalized((int) val);
                _currentActivity.powerNormalized = val;
             } catch (final Exception exc) {
-               StatusUtil.log("NormalizedPower [W]" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_NORMALIZEDPOWER + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("TSS (Training Stress Score)")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_TSS)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("TSS (Training Stress Score)")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_TSS));
                tourData.setPower_TrainingStressScore(val);
                _currentActivity.powerTSS = val;
             } catch (final Exception exc) {
-               StatusUtil.log("TSS (Training Stress Score)" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_TSS + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("IF (Intensity Factor)")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_IF)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("IF (Intensity Factor)")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_IF));
                tourData.setPower_IntensityFactor(val);
                _currentActivity.powerIntensityFactor = val;
             } catch (final Exception exc) {
-               StatusUtil.log("IF (Intensity Factor)" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_IF + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("Left Torque Effectiveness Avg. [%]")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_LEFT_TORQUE_EFF)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("Left Torque Effectiveness Avg. [%]")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_LEFT_TORQUE_EFF));
                tourData.setPower_AvgLeftTorqueEffectiveness(val);
                _currentActivity.avgPowerLeftTorqueEff = val;
             } catch (final Exception exc) {
-               StatusUtil.log("Left Torque Effectiveness Avg. [%]" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_LEFT_TORQUE_EFF + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("Right Torque Effectiveness Avg. [%]")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_RIGHT_TORQUE_EFF)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("Right Torque Effectiveness Avg. [%]")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_RIGHT_TORQUE_EFF));
                tourData.setPower_AvgRightTorqueEffectiveness(val);
                _currentActivity.avgPowerRightTorqueEff = val;
             } catch (final Exception exc) {
-               StatusUtil.log("Right Torque Effectiveness Avg. [%]" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_RIGHT_TORQUE_EFF + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("Left Pedal Smoothness Avg. [%]")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_LEFT_PEDAL_SMOOTH)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("Left Pedal Smoothness Avg. [%]")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_LEFT_PEDAL_SMOOTH));
                tourData.setPower_AvgLeftPedalSmoothness(val);
                _currentActivity.avgPowerLeftPedalSmooth = val;
             } catch (final Exception exc) {
-               StatusUtil.log("Left Pedal Smoothness Avg. [%]" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_LEFT_PEDAL_SMOOTH + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
-         if (_currentActivity.customDataFields.containsKey("Right Pedal Smoothness Avg. [%]")) { //$NON-NLS-1$
+         if (_currentActivity.customDataFields.containsKey(CONST_RIGHT_PEDAL_SMOOTH)) {
             try {
-               final float val = Float.parseFloat(_currentActivity.customDataFields.get("Right Pedal Smoothness Avg. [%]")); //$NON-NLS-1$
+               final float val = Float.parseFloat(_currentActivity.customDataFields.get(CONST_RIGHT_PEDAL_SMOOTH));
                tourData.setPower_AvgRightPedalSmoothness(val);
                _currentActivity.avgPowerRightPedalSmooth = val;
             } catch (final Exception exc) {
-               StatusUtil.log("Right Pedal Smoothness Avg. [%]" + ": FitlogEx parse error", exc); //$NON-NLS-1$ //$NON-NLS-2$
+               StatusUtil.log(CONST_RIGHT_PEDAL_SMOOTH + ": FitlogEx parse error", exc); //$NON-NLS-1$
             }
          }
       }
@@ -621,7 +631,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       tourData.setDeviceTimeInterval((short) -1);
 
-      if (_currentActivity.timeSlices.size() == 0) {
+      if (_currentActivity.timeSlices.isEmpty()) {
 
          // tour do not contain a track
 
@@ -749,8 +759,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          final String idS = element.getId();
          final String nameS = element.getName();
          final String unitS = element.getUnit();
-         if (nameS.compareTo("Stride length (recorded)") == 0) {} else if (nameS.compareTo("Ground Contact Time Balance") == 0) {} else if (nameS //$NON-NLS-1$ //$NON-NLS-2$
-               .compareTo("Vertical Ratio") == 0) {} else { //$NON-NLS-1$
+         if (nameS.compareTo(CONST_STRIDELENGTH) == 0) {} else if (nameS.compareTo(CONST_GROUNDCONTACT_TIME_BALANCE) == 0) {} else if (nameS
+               .compareTo(CONST_VERTICALRATIO) == 0) {} else {
             final CustomTrackDefinition item = new CustomTrackDefinition();
             item.setId(idS);
             item.setName(nameS);
@@ -1372,17 +1382,17 @@ public class FitLogSAXHandler extends DefaultHandler {
          for (final CustomST3TrackDefinition element : _currentActivity.customTrackDefinitions) {
             final String idS = element.getId();
             final String nameS = element.getName();
-            if (nameS.compareTo("Stride length (recorded)") == 0) { //$NON-NLS-1$
+            if (nameS.compareTo(CONST_STRIDELENGTH) == 0) {
                final float value = Util.parseFloat(attributes, idS);
                if (value != Float.MIN_VALUE) {
                   timeSlice.runDyn_StepLength = (short) (value * 1000.0f);//meter to mm
                }
-            } else if (nameS.compareTo("Ground Contact Time Balance") == 0) { //$NON-NLS-1$
+            } else if (nameS.compareTo(CONST_GROUNDCONTACT_TIME_BALANCE) == 0) {
                final float value = Util.parseFloat(attributes, idS);
                if (value != Float.MIN_VALUE) {
                   timeSlice.runDyn_StanceTimeBalance = (short) (value * TourData.RUN_DYN_DATA_MULTIPLIER);
                }
-            } else if (nameS.compareTo("Vertical Ratio") == 0) { //$NON-NLS-1$
+            } else if (nameS.compareTo(CONST_VERTICALRATIO) == 0) {
                final float value = Util.parseFloat(attributes, idS);
                if (value != Float.MIN_VALUE) {
                   timeSlice.runDyn_VerticalRatio = (short) (value * TourData.RUN_DYN_DATA_MULTIPLIER);
