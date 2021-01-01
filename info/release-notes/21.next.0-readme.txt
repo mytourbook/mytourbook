@@ -11,6 +11,8 @@ TODO's
 
   I am thinking you could display the logo "Compatible With Strava" on the website in the next release and that would comply with their requirements ?
 
+* Website: Map providers list in https://osmlab.github.io/editor-layer-index/
+
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
 
