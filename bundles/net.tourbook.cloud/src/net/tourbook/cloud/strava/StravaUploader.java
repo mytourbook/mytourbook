@@ -368,7 +368,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             tryRenewTokens();
 
-            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
+            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
