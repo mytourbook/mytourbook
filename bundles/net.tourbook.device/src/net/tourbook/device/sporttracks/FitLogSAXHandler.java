@@ -201,6 +201,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       _weatherId.put("Mist",           IWeather.WEATHER_ID_PART_CLOUDS); //         *)    //$NON-NLS-1$
 // SET_FORMATTING_ON
    }
+  
    private class Activity {
 
       private ArrayList<TimeData>              timeSlices             = new ArrayList<>();
@@ -371,7 +372,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          return name.toString();
       }
    }
-
    private class Lap {
 
       private long startTime;
@@ -838,7 +838,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
       final ArrayList<Equipment> equipmentNames = _currentActivity.equipmentNames;
-      if (equipmentNames.isEmpty()) {
+      if (equipmentNames.size() == 0) {
          return;
       }
 
@@ -917,7 +917,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
       final ArrayList<Lap> _laps = _currentActivity.laps;
-      if (_laps.isEmpty()) {
+      if (_laps.size() == 0) {
          return;
       }
 
@@ -1471,7 +1471,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void saveEquipmentsAsTags() {
 
-      if (_equipments.isEmpty()) {
+      if (_equipments.size() == 0) {
          return;
       }
 
