@@ -30,8 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.IOAuth2Constants;
-import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
@@ -104,7 +104,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private String computeAccessTokenExpirationDate() {
 
-      return OAuth2Utils.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
+      return TimeTools.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
             Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN));
    }
 

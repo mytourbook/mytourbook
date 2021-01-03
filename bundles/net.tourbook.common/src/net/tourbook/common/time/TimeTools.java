@@ -231,6 +231,14 @@ public class TimeTools {
       };
    }
 
+   public static String constructLocalExpireAtDateTime(final long expireAt) {
+      if (expireAt == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      return Instant.ofEpochMilli(expireAt).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
+   }
+
    /**
     * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
     *

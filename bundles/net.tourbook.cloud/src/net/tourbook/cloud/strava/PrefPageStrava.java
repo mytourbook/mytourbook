@@ -19,8 +19,8 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2BrowserDialog;
 import net.tourbook.cloud.oauth2.OAuth2Client;
-import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
@@ -217,7 +217,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _labelAccessToken_Value.setText(newTokens.getAccess_token());
             _labelRefreshToken_Value.setText(newTokens.getRefresh_token());
             _accessTokenExpiresAt = newTokens.getExpires_at();
-            _labelExpiresAt_Value.setText(OAuth2Utils.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+            _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
 
             final Athlete athlete = newTokens.getAthlete();
             if (athlete != null) {
@@ -247,7 +247,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _athleteId = _prefStore.getDefaultString(Preferences.STRAVA_ATHLETEID);
       _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
       _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-      _labelExpiresAt_Value.setText(OAuth2Utils.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+      _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
 
       UpdateButtonConnectState();
 
@@ -278,7 +278,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
       _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
       _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-      _labelExpiresAt_Value.setText(OAuth2Utils.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+      _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
 
       UpdateButtonConnectState();
    }
