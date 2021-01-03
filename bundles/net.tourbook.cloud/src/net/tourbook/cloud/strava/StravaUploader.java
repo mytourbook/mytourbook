@@ -39,9 +39,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.GZIPOutputStream;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.IPreferences;
+import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.IOAuth2Constants;
 import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
@@ -102,7 +103,7 @@ public class StravaUploader extends TourbookCloudUploader {
       return activityUpload;
    }
 
-   public static Tokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
+   public static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
       final StringBuilder body = new StringBuilder();
       String grantType;
@@ -128,7 +129,7 @@ public class StravaUploader extends TourbookCloudUploader {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
-            final Tokens token = new ObjectMapper().readValue(response.body(), Tokens.class);
+            final StravaTokens token = new ObjectMapper().readValue(response.body(), StravaTokens.class);
 
             return token;
          }
@@ -240,26 +241,15 @@ public class StravaUploader extends TourbookCloudUploader {
    }
 
    private String getAccessToken() {
-      return _prefStore.getString(IPreferences.STRAVA_ACCESSTOKEN);
+      return _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN);
    }
 
    private long getAccessTokenExpirationDate() {
-      return _prefStore.getLong(IPreferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
+      return _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
    }
 
    private String getRefreshToken() {
-      return _prefStore.getString(IPreferences.STRAVA_REFRESHTOKEN);
-   }
-
-   /**
-    * We consider that an access token is expired if there are less
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   private boolean isAccessTokenExpired() {
-
-      return getAccessTokenExpirationDate() - System.currentTimeMillis() - 300000 < 0;
+      return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
    }
 
    @Override
@@ -289,24 +279,24 @@ public class StravaUploader extends TourbookCloudUploader {
    }
 
    private void setAccessToken(final String accessToken) {
-      _prefStore.setValue(IPreferences.STRAVA_ACCESSTOKEN, accessToken);
+      _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN, accessToken);
    }
 
    private void setAccessTokenExpirationDate(final long expireAt) {
-      _prefStore.setValue(IPreferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, expireAt);
+      _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, expireAt);
    }
 
    private void setRefreshToken(final String refreshToken) {
-      _prefStore.setValue(IPreferences.STRAVA_REFRESHTOKEN, refreshToken);
+      _prefStore.setValue(Preferences.STRAVA_REFRESHTOKEN, refreshToken);
    }
 
    private void tryRenewTokens() {
 
-      if (!isAccessTokenExpired()) {
+      if (!OAuth2Utils.isAccessTokenExpired(getAccessTokenExpirationDate())) {
          return;
       }
 
-      final Tokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
+      final StravaTokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
 
       if (newTokens != null) {
          setAccessTokenExpirationDate(newTokens.getExpires_at());
@@ -368,8 +358,6 @@ public class StravaUploader extends TourbookCloudUploader {
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
 
-      tryRenewTokens();
-
       final int numberOfTours = selectedTours.size();
       _numberOfUploadedTours = new int[1];
 
@@ -378,7 +366,7 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, _prefStore.getString(IPreferences.STRAVA_ATHLETEFULLNAME)),
+            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
@@ -414,6 +402,8 @@ public class StravaUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
                   Messages.UploadToursToStrava_Icon_Check,
                   Messages.UploadToursToStrava_Icon_Hourglass));
+
+            tryRenewTokens();
 
             uploadFiles(toursToUpload);
 

@@ -13,21 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud;
+package net.tourbook.cloud.oauth2;
 
-public interface IPreferences {
+public abstract class Tokens {
 
-   /*
-    * Dropbox preferences
-    */
-   public static final String DROPBOX_ACCESSTOKEN = "DROPBOX_ACCESSTOKEN"; //$NON-NLS-1$
+   private long   expires_at;
+   private long   expires_in;
+   private String refresh_token;
+   private String access_token;
 
-   /*
-    * Strava preferences
-    */
-   public static final String STRAVA_ACCESSTOKEN            = "STRAVA_ACCESSTOKEN";            //$NON-NLS-1$
-   public static final String STRAVA_REFRESHTOKEN           = "STRAVA_REFRESHTOKEN";           //$NON-NLS-1$
-   public static final String STRAVA_ACCESSTOKEN_EXPIRES_AT = "STRAVA_ACCESSTOKEN_EXPIRES_AT"; //$NON-NLS-1$
-   public static final String STRAVA_ATHLETEID              = "STRAVA_ATHLETEID";              //$NON-NLS-1$
-   public static final String STRAVA_ATHLETEFULLNAME        = "STRAVA_ATHLETEFULLNAME";        //$NON-NLS-1$
+   public String getAccess_token() {
+      return access_token;
+   }
+
+   public long getExpires_at() {
+      return expires_at;
+   }
+
+   public long getExpires_in() {
+      return expires_in;
+   }
+
+   public String getRefresh_token() {
+      return refresh_token;
+   }
 }

@@ -15,8 +15,13 @@
 package net.tourbook.cloud.oauth2;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -26,6 +31,14 @@ import org.apache.http.message.BasicNameValuePair;
  * OAuth2 utilities.
  */
 public class OAuth2Utils {
+
+   public static String constructLocalExpireAtDateTime(final long expireAt) {
+      if (expireAt == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      return Instant.ofEpochMilli(expireAt).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
+   }
 
    /**
     * Generate authorize url for given client
@@ -50,5 +63,16 @@ public class OAuth2Utils {
 
       final String query = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
       return client.getAuthorizeUrl() + '?' + query;
+   }
+
+   /**
+    * We consider that an access token is expired if there are less
+    * than 5 mins remaining until the actual expiration
+    *
+    * @return
+    */
+   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
+
+      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
    }
 }
