@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,9 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- *
- */
 package net.tourbook.data;
 
 import de.byteholder.geoclipse.map.UI;
@@ -33,13 +30,26 @@ public class SerieData implements Serializable {
 
    public int[]              timeSerie;
 
-   public float[]            distanceSerie20;
    public float[]            altitudeSerie20;
    public float[]            cadenceSerie20;
-   public float[]            pulseSerie20;
-   public float[]            temperatureSerie20;
-   public float[]            speedSerie20;
+   public float[]            distanceSerie20;
    public float[]            powerSerie20;
+   public float[]            pulseSerie20;
+   public float[]            speedSerie20;
+   public float[]            temperatureSerie20;
+
+   /**
+    * These data series cannot be removed because they are needed to convert from int to float
+    *
+    * @since Db version 20
+    */
+   public int[]              altitudeSerie;
+   public int[]              cadenceSerie;
+   public int[]              distanceSerie;
+   public int[]              powerSerie;
+   public int[]              pulseSerie;
+   public int[]              speedSerie;
+   public int[]              temperatureSerie;
 
    /**
     * Gears are in this format (left to right)
@@ -73,8 +83,24 @@ public class SerieData implements Serializable {
     */
    public long[]             gears;
 
+   /**
+    * These data series cannot be removed because they are needed to convert from double to int
+    *
+    * @since Db version 43
+    */
    public double[]           longitude;
    public double[]           latitude;
+
+   /**
+    * Source: https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
+    * <br>
+    * Worst case scenario is at the equator where one degree in Longitude is 111.320km. With the E6
+    * number you are able to represent 0.000001 degree or a distance of 0.11132m (less than 4.5
+    * inches). You are never going to get that level of accuracy out of a GPS system available to
+    * the public anyway, so the loss of a single digit of precision will never be noticed.
+    */
+   public int[]              longitudeE6;
+   public int[]              latitudeE6;
 
    /**
     * Pulse times in milliseconds.
@@ -84,56 +110,46 @@ public class SerieData implements Serializable {
     */
    public int[]              pulseTimes;
 
-   /*
+   /**
     * Running dynamics data
+    *
     * @since Version 18.7
     */
-   public short[] runDyn_StanceTime;
-   public short[] runDyn_StanceTimeBalance;
-   public short[] runDyn_StepLength;
-   public short[] runDyn_VerticalOscillation;
-   public short[] runDyn_VerticalRatio;
+   public short[]            runDyn_StanceTime;
+   public short[]            runDyn_StanceTimeBalance;
+   public short[]            runDyn_StepLength;
+   public short[]            runDyn_VerticalOscillation;
+   public short[]            runDyn_VerticalRatio;
 
-   /*
+   /**
     * Swim data
+    *
     * @since Version 18.10
     */
-   public short[]   swim_LengthType;      // e.g. active, idle
+   public short[]            swim_LengthType;           // e.g. active, idle
 
-   public short[]   swim_Cadence;         // strokes/min
-   public short[]   swim_Strokes;         // strokes/length
-   public short[]   swim_StrokeStyle;     // e.g. freestyle, breaststroke
-   public int[]     swim_Time;            // relative time to the start time
+   public short[]            swim_Cadence;              // strokes/min
+   public short[]            swim_Strokes;              // strokes/length
+   public short[]            swim_StrokeStyle;          // e.g. freestyle, breaststroke
+   public int[]              swim_Time;                 // relative time to the start time
 
    /**
     * Is <code>true</code> when a time slice in a data serie is visible.
     *
     * @since Version 18.12
     */
-   public boolean[] visiblePoints_Surfing;
+   public boolean[]          visiblePoints_Surfing;
 
-   /*
-    * These data series cannot be removed because they are needed to convert from int to float in db
-    * version 20
-    */
-   public int[] distanceSerie;
-
-   public int[] altitudeSerie;
-   public int[] cadenceSerie;
-   public int[] pulseSerie;
-   public int[] temperatureSerie;
-   public int[] speedSerie;
-   public int[] powerSerie;
-   public int[] deviceMarker;
+   public int[]              deviceMarker;
 
    /**
     * An array containing the start time of each pause (in milliseconds)
     */
-   public long[] pausedTime_Start;
+   public long[]             pausedTime_Start;
    /**
     * An array containing the end time of each pause (in milliseconds)
     */
-   public long[] pausedTime_End;
+   public long[]             pausedTime_End;
 
    @Override
    public String toString() {
