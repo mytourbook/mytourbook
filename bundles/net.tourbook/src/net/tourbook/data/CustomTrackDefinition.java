@@ -8,6 +8,7 @@ public class CustomTrackDefinition implements Serializable {
     */
    private static final long serialVersionUID = -4880414084528375769L;
    //Custom Track Definition
+
    private String            _Name;
    private String            _Id;
    private String            _Unit;
@@ -34,5 +35,6 @@ public class CustomTrackDefinition implements Serializable {
 
    public void setUnit(final String unit) {
       _Unit = unit;
+
    }
 }
