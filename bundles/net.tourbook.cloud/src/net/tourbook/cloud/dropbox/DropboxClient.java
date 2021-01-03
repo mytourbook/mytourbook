@@ -202,6 +202,7 @@ public class DropboxClient {
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
       return token;
