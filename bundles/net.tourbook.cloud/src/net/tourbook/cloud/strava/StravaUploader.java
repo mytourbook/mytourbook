@@ -366,8 +366,6 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            tryRenewTokens();
-
             monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
@@ -404,6 +402,8 @@ public class StravaUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
                   Messages.UploadToursToStrava_Icon_Check,
                   Messages.UploadToursToStrava_Icon_Hourglass));
+
+            tryRenewTokens();
 
             uploadFiles(toursToUpload);
 
