@@ -750,7 +750,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   frontShiftCount;
    private int                   rearShiftCount;
 
-
    // ############################################# RUNNING DYNAMICS #######################################
 
    private short                 runDyn_StanceTime_Min;
@@ -1538,6 +1537,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public boolean             isBackupImportFile;
+   
    /*
     * Running dynamics data
     *
@@ -1568,6 +1568,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    // ############################################# CUSTOM TRACKS STATS#######################################
    @Transient
    private HashMap<String, CustomTrackStatEntry> customTracksStat = new HashMap<>();
+
 
    // ############################################# RUNNING DYNAMICS TRANSIENT#######################################
 
@@ -3563,7 +3564,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             valE.value_Avg = numValues == 0 ? 0 : sumValue / numValues;
             customTracksStat.put(i, valE);
          }
-
        }
    }
 
@@ -7257,6 +7257,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _customTracks_UI;
    }
 
+
+   //CUSTOM TRACKS
    public float[] getCustomTracks(final String idx) {
 
       if (!_customTracks_UI.containsKey(idx)) {
@@ -7286,7 +7288,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the UI values for CUSTOM TRACKS definition.
     */
    public HashMap<String, CustomTrackDefinition> getCustomTracksDefinition() {
-
            return customTracksDefinition;
    }
 

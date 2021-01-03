@@ -150,7 +150,7 @@ public class SerieData implements Serializable {
 
       final int maxLen = 10;
 
-    //CUSTOM TRACKS
+      //CUSTOM TRACKS
       String custTrack = "\n"; //$NON-NLS-1$
       if(customTracksDefinition!=null && !customTracksDefinition.isEmpty()) {
          custTrack += "  --CUSTOM TRACKS Definition...len=" + Integer.toString(customTracksDefinition.size()) + "--  \n"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -173,7 +173,6 @@ public class SerieData implements Serializable {
             }
          }
          custTrack += "  --END CUSTOM TRACKS--  \n"; //$NON-NLS-1$
-
       }
 
       return "\n" //$NON-NLS-1$
