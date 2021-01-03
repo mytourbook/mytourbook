@@ -122,7 +122,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       try {
          _server = HttpServer.create(new InetSocketAddress("localhost", _callBackPort), 0); //$NON-NLS-1$
          final TokensRetrievalHandler tokensRetrievalHandler = new TokensRetrievalHandler(codeVerifier);
-         _server.createContext("/dropboxAuthorizationCode", tokensRetrievalHandler); //$NON-NLS-1$
+         _server.createContext("/", tokensRetrievalHandler); //$NON-NLS-1$
          _threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
          _server.setExecutor(_threadPoolExecutor);
