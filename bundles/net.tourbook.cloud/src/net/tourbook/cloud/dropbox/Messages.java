@@ -36,8 +36,6 @@ public class Messages extends NLS {
 
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Label;
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip;
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved;
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
    public static String        Pref_CloudConnectivity_Dropbox_Button_Authorize;
    public static String        Pref_CloudConnectivity_Dropbox_RefreshToken_Label;
    public static String        Pref_CloudConnectivity_Dropbox_ExpiresAt_Label;
