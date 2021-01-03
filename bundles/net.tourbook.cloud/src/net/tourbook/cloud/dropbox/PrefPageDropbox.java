@@ -38,8 +38,8 @@ import net.tourbook.web.WEB;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -47,14 +47,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageDropbox extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    public static final String      ID         = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
@@ -133,17 +132,16 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
    }
 
    @Override
-   protected Control createContents(final Composite parent) {
+   protected void createFieldEditors() {
 
-      final Composite ui = createUI(parent);
+      createUI();
 
       restoreState();
-
-      return ui;
    }
 
-   private Composite createUI(final Composite parent) {
+   private Composite createUI() {
 
+      final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
       createUI_10_Authorize(parent);
@@ -337,4 +335,5 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
    }
+
 }
