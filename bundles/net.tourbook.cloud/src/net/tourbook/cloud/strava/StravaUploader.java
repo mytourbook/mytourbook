@@ -198,39 +198,6 @@ public class StravaUploader extends TourbookCloudUploader {
       return absoluteFilePath;
    }
 
-//   /**
-//    * Retrieving the activity Id after the uploaded activity was created.
-//    * Note: Maybe we don't want to do that as it is possible that activities are not fully processed
-//    * and that it can take quite some times, and therefore a lot of API calls, until the activity is
-//    * available
-//    *
-//    * @param uploadId
-//    * @return The activity Id
-//    */
-//   private String getActivityId(final String uploadId) {
-//
-//      final HttpRequest request = HttpRequest.newBuilder()
-//            .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
-//            .GET()
-//            .uri(URI.create(_stravaBaseUrl + "uploads/" + uploadId))//$NON-NLS-1$
-//            .build();
-//
-//      try {
-//         final java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-//
-//         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-//            final ObjectMapper mapper = new ObjectMapper();
-//            final ActivityUpload activityUpload = mapper.readValue(response.body(),
-//                  ActivityUpload.class);
-//            return activityUpload.getActivity_id();
-//         }
-//      } catch (IOException | InterruptedException e) {
-//         e.printStackTrace();
-//      }
-//
-//      return UI.EMPTY_STRING;
-//   }
-
    private void deleteTemporaryFile(final String filePath) {
 
       try {
