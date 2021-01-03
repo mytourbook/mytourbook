@@ -166,49 +166,49 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Activity {
 
-      private ArrayList<TimeData>  timeSlices         = new ArrayList<>();
-      private ArrayList<Lap>       laps               = new ArrayList<>();
-      private ArrayList<Pause>     pauses             = new ArrayList<>();
-      private ArrayList<Equipment> equipmentNames     = new ArrayList<>();
+      private ArrayList<TimeData>  _timeSlices         = new ArrayList<>();
+      private ArrayList<Lap>       _laps               = new ArrayList<>();
+      private ArrayList<Pause>     _pauses             = new ArrayList<>();
+      private ArrayList<Equipment> _equipmentNames     = new ArrayList<>();
 
-      private ZonedDateTime        tourStartTime;
-      private long                 tourStartTimeMills = Long.MIN_VALUE;
+      private ZonedDateTime        _tourStartTime;
+      private long                 _tourStartTimeMills = Long.MIN_VALUE;
 //      private DateTime         trackTourDateTime;
 //      private long            trackTourStartTime   = Long.MIN_VALUE;
 
-      private String  location;
-      private String  name;
-      private String  notes;
-      private String  categoryName;
+      private String  _location;
+      private String  _name;
+      private String  _notes;
+      private String  _categoryName;
 
-      private int     calories;
-      private int     duration;
-      private int     distance;
+      private int     _calories;
+      private int     _duration;
+      private int     _distance;
 
-      private int     elevationUp;
-      private int     elevationDown;
+      private int     _elevationUp;
+      private int     _elevationDown;
 
-      private int     avgPulse;
-      private int     maxPulse;
+      private int     _avgPulse;
+      private int     _maxPulse;
 
-      private float   avgPower;
-      private float   maxPower;
+      private float   _avgPower;
+      private float   _maxPower;
 
-      private int     timeZoneUtcOffset;
-      private boolean hasTimeZoneUtcOffset = false;
-      private boolean hasStartTime         = false;
+      private int     _timeZoneUtcOffset;
+      private boolean _hasTimeZoneUtcOffset = false;
+      private boolean _hasStartTime         = false;
 
-      private boolean hasGpsData           = false;
+      private boolean _hasGpsData           = false;
 
-      private int     avgCadence;
+      private int     _avgCadence;
 //      private int               maxCadence;      is not yet supported
 
-      private String                        weatherText;
-      private String                        weatherConditions;
-      private float                         weatherTemperature = Float.MIN_VALUE;
-      private int                           weatherWindSpeed   = Integer.MIN_VALUE;
+      private String                        _weatherText;
+      private String                        _weatherConditions;
+      private float                         _weatherTemperature = Float.MIN_VALUE;
+      private int                           _weatherWindSpeed   = Integer.MIN_VALUE;
 
-      private LinkedHashMap<String, String> customDataFields   = new LinkedHashMap<>();
+      private LinkedHashMap<String, String> _customDataFields   = new LinkedHashMap<>();
    }
 
    static public class Equipment {
@@ -286,15 +286,15 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Lap {
 
-      private long startTime;
-      private long endTime;
+      private long _startTime;
+      private long _endTime;
    }
 
    private class Pause {
 
-      private long startTime;
-      private long endTime;
-      private long duration;
+      private long _startTime;
+      private long _endTime;
+      private long _duration;
    }
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
@@ -405,32 +405,32 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
+      final ZonedDateTime tourStartTime_FromImport = _currentActivity._tourStartTime;
 
       tourData.setTourStartTime(tourStartTime_FromImport);
 
-      tourData.setTourTitle(_currentActivity.name);
-      tourData.setTourDescription(_currentActivity.notes);
-      tourData.setTourStartPlace(_currentActivity.location);
+      tourData.setTourTitle(_currentActivity._name);
+      tourData.setTourDescription(_currentActivity._notes);
+      tourData.setTourStartPlace(_currentActivity._location);
 
-      tourData.setCalories(_currentActivity.calories);
+      tourData.setCalories(_currentActivity._calories);
 
       /*
        * weather
        */
-      tourData.setWeather(_currentActivity.weatherText);
-      tourData.setWeatherClouds(_weatherId.get(_currentActivity.weatherConditions));
+      tourData.setWeather(_currentActivity._weatherText);
+      tourData.setWeatherClouds(_weatherId.get(_currentActivity._weatherConditions));
 
-      final float weatherTemperature = _currentActivity.weatherTemperature;
+      final float weatherTemperature = _currentActivity._weatherTemperature;
       if (weatherTemperature != Float.MIN_VALUE) {
          tourData.setAvgTemperature(weatherTemperature);
       }
 
-      if (_currentActivity.weatherWindSpeed != Integer.MIN_VALUE) {
-         tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
+      if (_currentActivity._weatherWindSpeed != Integer.MIN_VALUE) {
+         tourData.setWeatherWindSpeed(_currentActivity._weatherWindSpeed);
       }
 
-      if (_currentActivity.customDataFields.size() > 0) {
+      if (_currentActivity._customDataFields.size() > 0) {
 
          final StringBuilder tourNotes = new StringBuilder(tourData.getTourDescription());
 
@@ -439,7 +439,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          tourNotes.append(Messages.FitLog_CustomDataFields_Label);
-         _currentActivity.customDataFields.forEach((key, value) -> {
+         _currentActivity._customDataFields.forEach((key, value) -> {
             if (!tourNotes.toString().trim().isEmpty()) {
                //If there is already content in the notes fields, then we insert a new line
                tourNotes.append(UI.NEW_LINE);
@@ -454,18 +454,18 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       tourData.setDeviceTimeInterval((short) -1);
 
-      if (_currentActivity.timeSlices.isEmpty()) {
+      if (_currentActivity._timeSlices.isEmpty()) {
 
          // tour do not contain a track
 
-         tourData.setTourDistance(_currentActivity.distance);
+         tourData.setTourDistance(_currentActivity._distance);
 
-         tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
-         tourData.setTourComputedTime_Moving(_currentActivity.duration);
+         tourData.setTourDeviceTime_Elapsed(_currentActivity._duration);
+         tourData.setTourComputedTime_Moving(_currentActivity._duration);
          isComputeMovingTime = false;
 
-         tourData.setTourAltUp(_currentActivity.elevationUp);
-         tourData.setTourAltDown(_currentActivity.elevationDown);
+         tourData.setTourAltUp(_currentActivity._elevationUp);
+         tourData.setTourAltDown(_currentActivity._elevationDown);
 
          // We set the tour as manual since it was a manual tour created in SportTracks in the first place.
          tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
@@ -474,13 +474,13 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          // create 'normal' tour
 
-         tourData.createTimeSeries(_currentActivity.timeSlices, false);
+         tourData.createTimeSeries(_currentActivity._timeSlices, false);
 
          // If the activity doesn't have GPS data but contains a distance value,
          // we set the distance manually
-         if (!_currentActivity.hasGpsData &&
-               _currentActivity.distance > 0) {
-            tourData.setTourDistance(_currentActivity.distance);
+         if (!_currentActivity._hasGpsData &&
+               _currentActivity._distance > 0) {
+            tourData.setTourDistance(_currentActivity._distance);
          }
 
          /*
@@ -497,30 +497,30 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setDeviceId(_device.deviceId);
       }
 
-      if (_currentActivity.avgPower != 0) {
-         tourData.setPower_Avg(_currentActivity.avgPower);
+      if (_currentActivity._avgPower != 0) {
+         tourData.setPower_Avg(_currentActivity._avgPower);
       }
-      if (_currentActivity.maxPower != 0) {
-         tourData.setPower_Max((int) (_currentActivity.maxPower + 0.5));
+      if (_currentActivity._maxPower != 0) {
+         tourData.setPower_Max((int) (_currentActivity._maxPower + 0.5));
       }
 
       if (tourData.pulseSerie == null) {
-         tourData.setAvgPulse(_currentActivity.avgPulse);
-         tourData.setMaxPulse(_currentActivity.maxPulse);
+         tourData.setAvgPulse(_currentActivity._avgPulse);
+         tourData.setMaxPulse(_currentActivity._maxPulse);
       }
 
       if (tourData.getCadenceSerie() == null) {
-         tourData.setAvgCadence(_currentActivity.avgCadence);
+         tourData.setAvgCadence(_currentActivity._avgCadence);
       }
 
-      if (_currentActivity.pauses.size() > 0) {
+      if (_currentActivity._pauses.size() > 0) {
 
          final ArrayList<Long> _pausedTime_Start = new ArrayList<>();
          final ArrayList<Long> _pausedTime_End = new ArrayList<>();
 
-         for (final Pause element : _currentActivity.pauses) {
-            _pausedTime_Start.add(element.startTime);
-            _pausedTime_End.add(element.endTime);
+         for (final Pause element : _currentActivity._pauses) {
+            _pausedTime_Start.add(element._startTime);
+            _pausedTime_End.add(element._endTime);
          }
 
          tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
@@ -529,7 +529,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
       // when the time series were created) or if the activity has no time zone UTC offset or no start time.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
-            _currentActivity.hasTimeZoneUtcOffset && _currentActivity.hasStartTime) {
+            _currentActivity._hasTimeZoneUtcOffset && _currentActivity._hasStartTime) {
 
          final int offSet = tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000;
          final String[] ids = TimeZone.getAvailableIDs(offSet);
@@ -579,9 +579,9 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
 
       // cleanup
-      _currentActivity.timeSlices.clear();
-      _currentActivity.laps.clear();
-      _currentActivity.equipmentNames.clear();
+      _currentActivity._timeSlices.clear();
+      _currentActivity._laps.clear();
+      _currentActivity._equipmentNames.clear();
 
       _isImported = true;
    }
@@ -593,7 +593,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void finalizeTour_10_SetTourType(final TourData tourData) {
 
-      final String categoryName = _currentActivity.categoryName;
+      final String categoryName = _currentActivity._categoryName;
 
       if (StringUtils.isNullOrEmpty(categoryName)) {
          return;
@@ -642,7 +642,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
-      final ArrayList<Equipment> equipmentNames = _currentActivity.equipmentNames;
+      final ArrayList<Equipment> equipmentNames = _currentActivity._equipmentNames;
       if (equipmentNames.isEmpty()) {
          return;
       }
@@ -721,7 +721,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
-      final ArrayList<Lap> _laps = _currentActivity.laps;
+      final ArrayList<Lap> _laps = _currentActivity._laps;
       if (_laps.isEmpty()) {
          return;
       }
@@ -741,23 +741,23 @@ public class FitLogSAXHandler extends DefaultHandler {
       /*
        * tour and track can have different start times
        */
-      final long tourStartTime = _currentActivity.tourStartTimeMills;
+      final long tourStartTime = _currentActivity._tourStartTimeMills;
 //      final long tour2sliceTimeDiff = _currentActivity.trackTourStartTime - tourStartTime;
 
       int lapCounter = 1;
 
       for (final Lap lap : _laps) {
 
-         long startTimeDiff = lap.endTime - tourStartTime;// - tour2sliceTimeDiff;
+         long startTimeDiff = lap._endTime - tourStartTime;// - tour2sliceTimeDiff;
 
          // If present, we add the total pause time
-         for (final Pause pause : _currentActivity.pauses) {
+         for (final Pause pause : _currentActivity._pauses) {
 
             //We need to make sure to only add the pauses that are
             //within the current lap time interval.
-            if (pause.startTime < lap.endTime &&
-                  pause.endTime > lap.startTime) {
-               startTimeDiff += pause.duration;
+            if (pause._startTime < lap._endTime &&
+                  pause._endTime > lap._startTime) {
+               startTimeDiff += pause._duration;
             }
          }
          int lapRelativeTime = (int) (startTimeDiff / 1000);
@@ -822,7 +822,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       // If there is no custom data field definition for the current field, we add its value as-is.
       if (!_customDataFieldDefinitions.containsKey(customDataFieldName)) {
-         activity.customDataFields.put(customDataFieldName, customDataFieldValue);
+         activity._customDataFields.put(customDataFieldName, customDataFieldValue);
          return;
       }
 
@@ -832,10 +832,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          final String format = "%." + numberOfDecimals + "f"; //$NON-NLS-1$ //$NON-NLS-2$
          final String formattedNumber = String.format(format, (double) Math.round(Double.valueOf(customDataFieldValue)));
 
-         if (activity.customDataFields.containsKey(customDataFieldName)) {
-            activity.customDataFields.replace(customDataFieldName, formattedNumber);
+         if (activity._customDataFields.containsKey(customDataFieldName)) {
+            activity._customDataFields.replace(customDataFieldName, formattedNumber);
          } else {
-            activity.customDataFields.put(customDataFieldName, formattedNumber);
+            activity._customDataFields.put(customDataFieldName, formattedNumber);
          }
 
       } catch (final NumberFormatException e) {
@@ -858,8 +858,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final ZonedDateTime tourDateTime = ZonedDateTime.parse(startTime);
 
-         _currentActivity.tourStartTime = tourDateTime;
-         _currentActivity.tourStartTimeMills = tourDateTime.toInstant().toEpochMilli();
+         _currentActivity._tourStartTime = tourDateTime;
+         _currentActivity._tourStartTimeMills = tourDateTime.toInstant().toEpochMilli();
       }
    }
 
@@ -887,18 +887,18 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       } else if (name.equals(TAG_ACTIVITY_LOCATION)) {
 
-         _currentActivity.location = attributes.getValue(ATTRIB_NAME);
+         _currentActivity._location = attributes.getValue(ATTRIB_NAME);
 
       } else if (name.equals(TAG_ACTIVITY_CATEGORY)) {
 
-         _currentActivity.categoryName = attributes.getValue(ATTRIB_NAME);
+         _currentActivity._categoryName = attributes.getValue(ATTRIB_NAME);
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT_ITEM)) {
 
          final Equipment newEquipment = new Equipment();
          newEquipment.Name = attributes.getValue(ATTRIB_NAME);
          newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
 
-         _currentActivity.equipmentNames.add(newEquipment);
+         _currentActivity._equipmentNames.add(newEquipment);
 
       } else if (name.equals(TAG_ACTIVITY_CALORIES)) {
 
@@ -909,7 +909,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          //      </xs:element>
 
          // Converting from Calories to calories
-         _currentActivity.calories = Math.round(Util.parseFloat0(attributes, ATTRIB_TOTAL_CAL) * 1000f);
+         _currentActivity._calories = Math.round(Util.parseFloat0(attributes, ATTRIB_TOTAL_CAL) * 1000f);
 
       } else if (name.equals(TAG_ACTIVITY_DURATION)) {
 
@@ -918,7 +918,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="TotalSeconds" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
-         _currentActivity.duration = Util.parseInt0(attributes, ATTRIB_TOTAL_SECONDS);
+         _currentActivity._duration = Util.parseInt0(attributes, ATTRIB_TOTAL_SECONDS);
 
       } else if (name.equals(TAG_ACTIVITY_DISTANCE)) {
 
@@ -927,7 +927,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="TotalMeters" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
-         _currentActivity.distance = Util.parseInt0(attributes, ATTRIB_TOTAL_METERS);
+         _currentActivity._distance = Util.parseInt0(attributes, ATTRIB_TOTAL_METERS);
 
       } else if (name.equals(TAG_ACTIVITY_ELEVATION)) {
 
@@ -937,8 +937,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="AscendMeters" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
-         _currentActivity.elevationUp = Util.parseInt0(attributes, ATTRIB_ASCEND_METERS);
-         _currentActivity.elevationDown = Util.parseInt0(attributes, ATTRIB_DESCEND_METERS);
+         _currentActivity._elevationUp = Util.parseInt0(attributes, ATTRIB_ASCEND_METERS);
+         _currentActivity._elevationDown = Util.parseInt0(attributes, ATTRIB_DESCEND_METERS);
 
       } else if (name.equals(TAG_ACTIVITY_HEART_RATE)) {
 
@@ -948,13 +948,13 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="MaximumBPM" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
-         _currentActivity.avgPulse = Util.parseInt0(attributes, ATTRIB_AVERAGE_BPM);
-         _currentActivity.maxPulse = Util.parseInt0(attributes, ATTRIB_MAXIMUM_BPM);
+         _currentActivity._avgPulse = Util.parseInt0(attributes, ATTRIB_AVERAGE_BPM);
+         _currentActivity._maxPulse = Util.parseInt0(attributes, ATTRIB_MAXIMUM_BPM);
 
       } else if (name.equals(TAG_ACTIVITY_POWER)) {
 
-         _currentActivity.avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
-         _currentActivity.maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
+         _currentActivity._avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
+         _currentActivity._maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
 
       } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET)) {
 
@@ -972,15 +972,15 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="MaximumRPM" type="xs:decimal" use="optional "/>
          //         </xs:complexType>
          //      </xs:element>
-         _currentActivity.avgCadence = Util.parseInt0(attributes, ATTRIB_AVERAGE_RPM);
+         _currentActivity._avgCadence = Util.parseInt0(attributes, ATTRIB_AVERAGE_RPM);
 //   !!! not yet supported !!!
 //         _currentActivity.maxCadence = Util.parseInt0(attributes, ATTRIB_MAXIMUM_RPM);
 
       } else if (name.equals(TAG_ACTIVITY_WEATHER)) {
 
          _isInWeather = true;
-         _currentActivity.weatherTemperature = Util.parseFloat(attributes, ATTRIB_WEATHER_TEMP);
-         _currentActivity.weatherConditions = attributes.getValue(ATTRIB_WEATHER_CONDITIONS);
+         _currentActivity._weatherTemperature = Util.parseFloat(attributes, ATTRIB_WEATHER_TEMP);
+         _currentActivity._weatherConditions = attributes.getValue(ATTRIB_WEATHER_CONDITIONS);
 
       } else {
          return;
@@ -994,23 +994,23 @@ public class FitLogSAXHandler extends DefaultHandler {
       if (_isInName) {
 
          _isInName = false;
-         _currentActivity.name = _characters.toString();
+         _currentActivity._name = _characters.toString();
 
       } else if (_isInNotes) {
 
          _isInNotes = false;
-         _currentActivity.notes = _characters.toString();
+         _currentActivity._notes = _characters.toString();
 
       } else if (_isInWeather) {
 
          _isInWeather = false;
-         _currentActivity.weatherText = _characters.toString();
-         _currentActivity.weatherWindSpeed = parseWindSpeed(_characters.toString());
+         _currentActivity._weatherText = _characters.toString();
+         _currentActivity._weatherWindSpeed = parseWindSpeed(_characters.toString());
 
       } else if (_isInTimeZoneUtcOffset) {
 
          _isInTimeZoneUtcOffset = false;
-         _currentActivity.hasTimeZoneUtcOffset = false;
+         _currentActivity._hasTimeZoneUtcOffset = false;
 
          if (StringUtils.isNullOrEmpty(_characters.toString())) {
             return;
@@ -1018,30 +1018,30 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final int timeZoneUtcOffset = Integer.parseInt(_characters.toString());
 
-         _currentActivity.hasTimeZoneUtcOffset = true;
-         _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
+         _currentActivity._hasTimeZoneUtcOffset = true;
+         _currentActivity._timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
-         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
+         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity._tourStartTime.toInstant()
                .atOffset(ZoneOffset.ofHours(
-                     _currentActivity.timeZoneUtcOffset))
+                     _currentActivity._timeZoneUtcOffset))
                .toZonedDateTime();
-         _currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
+         _currentActivity._tourStartTime = tourStartTimeWithUTCOffset;
 
       } else if (_isInHasStartTime) {
 
          _isInHasStartTime = false;
 
-         _currentActivity.hasStartTime = Boolean.parseBoolean(_characters.toString());
+         _currentActivity._hasStartTime = Boolean.parseBoolean(_characters.toString());
 
-         if (_currentActivity.hasStartTime == false) {
+         if (_currentActivity._hasStartTime == false) {
             //We remove the hour from the start time
             final ZonedDateTime tourDateTime = ZonedDateTime.parse(String.format("%d-%02d-%02dT00:00:00.000Z", //$NON-NLS-1$
-                  _currentActivity.tourStartTime.getYear(),
-                  _currentActivity.tourStartTime.getMonthValue(),
-                  _currentActivity.tourStartTime.getDayOfMonth()));
+                  _currentActivity._tourStartTime.getYear(),
+                  _currentActivity._tourStartTime.getMonthValue(),
+                  _currentActivity._tourStartTime.getDayOfMonth()));
 
-            _currentActivity.tourStartTime = tourDateTime;
+            _currentActivity._tourStartTime = tourDateTime;
          }
       }
    }
@@ -1077,10 +1077,10 @@ public class FitLogSAXHandler extends DefaultHandler {
             final long lapDurationSeconds = (long) Float.parseFloat(durationSeconds);
 
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds(lapDurationSeconds);
-            lap.startTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
-            lap.endTime = lapEndTime.toInstant().toEpochMilli();
+            lap._startTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
+            lap._endTime = lapEndTime.toInstant().toEpochMilli();
 
-            _currentActivity.laps.add(lap);
+            _currentActivity._laps.add(lap);
          }
       }
    }
@@ -1097,12 +1097,12 @@ public class FitLogSAXHandler extends DefaultHandler {
             final Pause pause = new Pause();
 
             final ZonedDateTime lapStartTime = ZonedDateTime.parse(startTime);
-            pause.startTime = lapStartTime.toInstant().toEpochMilli();
+            pause._startTime = lapStartTime.toInstant().toEpochMilli();
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(endTime);
-            pause.endTime = lapEndTime.toInstant().toEpochMilli();
-            pause.duration = Duration.between(lapStartTime, lapEndTime).toMillis();
+            pause._endTime = lapEndTime.toInstant().toEpochMilli();
+            pause._duration = Duration.between(lapStartTime, lapEndTime).toMillis();
 
-            _currentActivity.pauses.add(pause);
+            _currentActivity._pauses.add(pause);
          }
       }
    }
@@ -1111,7 +1111,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (name.equals(TAG_TRACK_PT)) {
 
-         if (_currentActivity.tourStartTimeMills == Long.MIN_VALUE) {
+         if (_currentActivity._tourStartTimeMills == Long.MIN_VALUE) {
             throw new InvalidDeviceSAXException(NLS.bind(Messages.FitLog_Error_InvalidStartTime, _importFilePath));
          }
 
@@ -1120,7 +1120,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          // relative time in seconds
          final long tmValue = Util.parseLong(attributes, ATTRIB_PT_TM);
          if (tmValue != Long.MIN_VALUE) {
-            timeSlice.absoluteTime = _currentActivity.tourStartTimeMills + (tmValue * 1000);
+            timeSlice.absoluteTime = _currentActivity._tourStartTimeMills + (tmValue * 1000);
          }
 
          final double tpDistance = Util.parseDouble(attributes, ATTRIB_PT_DIST);
@@ -1142,7 +1142,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          if (latitude != Double.MIN_VALUE && longitude != Double.MIN_VALUE) {
             _prevLatitude = latitude;
             _prevLongitude = longitude;
-            _currentActivity.hasGpsData = true;
+            _currentActivity._hasGpsData = true;
          }
 
          timeSlice.absoluteDistance = (float) _distanceAbsolute;
@@ -1154,7 +1154,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          timeSlice.latitude = latitude;
          timeSlice.longitude = longitude;
 
-         _currentActivity.timeSlices.add(timeSlice);
+         _currentActivity._timeSlices.add(timeSlice);
       }
    }
 
