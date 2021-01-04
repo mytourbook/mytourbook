@@ -44,7 +44,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
-   public static final int         _callBackPort = 4918;
+   public static final int         CALLBACK_PORT = 4918;
 
    private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
@@ -218,7 +218,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private void onClickAuthorize() {
 
       final StravaTokensRetrievalHandler tokensRetrievalHandler = new StravaTokensRetrievalHandler();
-      _server = new LocalHostServer(_callBackPort, "Strava", _prefChangeListener); //$NON-NLS-1$
+      _server = new LocalHostServer(CALLBACK_PORT, "Strava", _prefChangeListener); //$NON-NLS-1$
 
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 

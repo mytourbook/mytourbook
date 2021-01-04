@@ -53,7 +53,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
 
-   public static final int         _callBackPort = 4917;
+   public static final int         CALLBACK_PORT = 4917;
 
    private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
@@ -212,7 +212,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final String codeChallenge = generateCodeChallenge(codeVerifier);
 
       final DropboxTokensRetrievalHandler tokensRetrievalHandler = new DropboxTokensRetrievalHandler(codeVerifier);
-      _server = new LocalHostServer(_callBackPort, "Dropbox", _prefChangeListener); //$NON-NLS-1$
+      _server = new LocalHostServer(CALLBACK_PORT, "Dropbox", _prefChangeListener); //$NON-NLS-1$
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
       if (!isServerCreated) {

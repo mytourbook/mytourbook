@@ -57,7 +57,7 @@ public class DropboxClient {
    private static DbxClientV2    _dropboxClient;
 
    private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                         //$NON-NLS-1$
-   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox._callBackPort + "/";            //$NON-NLS-1$ //$NON-NLS-2$
+   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/";            //$NON-NLS-1$ //$NON-NLS-2$
 
    static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
 
