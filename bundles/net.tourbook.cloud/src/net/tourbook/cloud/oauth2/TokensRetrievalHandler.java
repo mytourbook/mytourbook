@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import net.tourbook.cloud.Messages;
 import net.tourbook.common.UI;
@@ -57,11 +58,12 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
 
       String authorizationCode = UI.EMPTY_STRING;
       final List<NameValuePair> params = URLEncodedUtils.parse(response, StandardCharsets.UTF_8, separators);
-      for (final NameValuePair param : params) {
-         if (param.getName().equals(OAuth2Constants.PARAM_CODE)) {
-            authorizationCode = param.getValue();
-            break;
-         }
+      final Optional<NameValuePair> result = params
+            .stream()
+            .filter(param -> param.getName().equals(OAuth2Constants.PARAM_CODE)).findAny();
+
+      if (result.isPresent()) {
+         authorizationCode = result.get().getValue();
       }
 
       return retrieveTokens(authorizationCode);
