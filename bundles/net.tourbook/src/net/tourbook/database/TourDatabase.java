@@ -146,8 +146,8 @@ public class TourDatabase {
 
 //   private static final String SQL_STATE_XJ004_DATABASE_NOT_FOUND         = "XJ004";                                                 //$NON-NLS-1$
 
-   public static boolean       IS_POST_UPDATE_019_to_020                  = false;
-   public static boolean       IS_POST_UPDATE_042_to_043                  = false;
+   public static boolean       IS_IN_POST_UPDATE_019_to_020               = false;
+   public static boolean       IS_IN_POST_UPDATE_042_to_043               = false;
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
 
@@ -5922,7 +5922,7 @@ public class TourDatabase {
    private void updateDbDesign_019_to_020_PostUpdate(final Connection conn, final SplashManager splashManager)
          throws SQLException {
 
-      IS_POST_UPDATE_019_to_020 = true;
+      IS_IN_POST_UPDATE_019_to_020 = true;
 
       final long startTime = System.currentTimeMillis();
 
@@ -5963,7 +5963,7 @@ public class TourDatabase {
          e.printStackTrace();
       } finally {
 
-         IS_POST_UPDATE_019_to_020 = false;
+         IS_IN_POST_UPDATE_019_to_020 = false;
 
          em.close();
       }
@@ -7620,7 +7620,7 @@ public class TourDatabase {
     */
    private void updateDbDesign_042_to_043_PostUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      IS_POST_UPDATE_042_to_043 = true;
+      IS_IN_POST_UPDATE_042_to_043 = true;
 
       final long startTime = System.currentTimeMillis();
       long lastUpdateTime = startTime;
@@ -7658,18 +7658,21 @@ public class TourDatabase {
             final TourData tourData = em.find(TourData.class, tourId);
             if (tourData != null) {
 
-               tourData.updateDatabase_042_to_043();
+               // ignore tours without geo data
+               if (tourData.altitudeSerie != null) {
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+                  tourData.updateDatabase_042_to_043();
+
+                  TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               }
             }
-
          }
 
       } catch (final Exception e) {
          e.printStackTrace();
       } finally {
 
-         IS_POST_UPDATE_042_to_043 = false;
+         IS_IN_POST_UPDATE_042_to_043 = false;
 
          em.close();
       }

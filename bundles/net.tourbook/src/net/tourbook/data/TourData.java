@@ -9143,7 +9143,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Disable post load when data are converted
        */
-      if (TourDatabase.IS_POST_UPDATE_019_to_020 || TourDatabase.IS_POST_UPDATE_042_to_043) {
+      if (TourDatabase.IS_IN_POST_UPDATE_019_to_020) {
          return;
       }
 
@@ -9171,8 +9171,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       pausedTime_Start     = serieData.pausedTime_Start;
       pausedTime_End       = serieData.pausedTime_End;
 
-      latitudeSerie        = convertDataSerie_FromE6(serieData.latitudeE6);
-      longitudeSerie       = convertDataSerie_FromE6(serieData.longitudeE6);
+      if (TourDatabase.IS_IN_POST_UPDATE_042_to_043) {
+
+         // use still exising lat/lon double serie data -> saving the tour will convert them into E6 format
+
+         latitudeSerie        = serieData.latitude;
+         longitudeSerie       = serieData.longitude;
+
+      } else {
+
+         /*
+          * Db version >= 43 contain lat/lon in E6 format
+          */
+         latitudeSerie        = convertDataSerie_FromE6(serieData.latitudeE6);
+         longitudeSerie       = convertDataSerie_FromE6(serieData.longitudeE6);
+      }
       computeGeo_Grid();
 
       gearSerie            = serieData.gears;
@@ -9249,6 +9262,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       serieData.latitudeE6      = convertDataSerie_ToE6(latitudeSerie);
       serieData.longitudeE6     = convertDataSerie_ToE6(longitudeSerie);
+
 
       serieData.gears         = gearSerie;
 
@@ -10980,6 +10994,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void updateDatabase_042_to_043() {
 
+      // convert lat/lon double -> E6
+      onPrePersist();
+
+      // remove double data series
+      serieData.latitude = null;
+      serieData.longitude = null;
    }
 
    /**
