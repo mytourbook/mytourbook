@@ -10996,10 +10996,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       // convert lat/lon double -> E6
       onPrePersist();
-
-      // remove double data series
-      serieData.latitude = null;
-      serieData.longitude = null;
    }
 
    /**
