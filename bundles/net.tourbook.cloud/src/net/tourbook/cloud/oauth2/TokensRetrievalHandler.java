@@ -33,7 +33,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 
 public abstract class TokensRetrievalHandler implements HttpHandler {
 
-   public TokensRetrievalHandler() {}
+   protected TokensRetrievalHandler() {}
 
    @Override
    public void handle(final HttpExchange httpExchange) throws IOException {
