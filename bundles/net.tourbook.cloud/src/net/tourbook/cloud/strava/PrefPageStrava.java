@@ -17,20 +17,17 @@ package net.tourbook.cloud.strava;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.OAuth2BrowserDialog;
-import net.tourbook.cloud.oauth2.OAuth2Client;
+import net.tourbook.cloud.oauth2.LocalHostServer;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,12 +43,15 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String ID         = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
+   public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
+   public static final int         _callBackPort = 4918;
 
-   private IPreferenceStore   _prefStore = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   private IPropertyChangeListener _prefChangeListener;
+   private LocalHostServer         _server;
 
-   private String             _athleteId;
-   private long               _accessTokenExpiresAt;
+   private String                  _athleteId;
+   private long                    _accessTokenExpiresAt;
 
    /*
     * UI controls
@@ -86,6 +86,31 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       createUI();
 
       restoreState();
+
+      _prefChangeListener = event -> {
+
+         if (event.getProperty().equals(Preferences.STRAVA_ACCESSTOKEN)) {
+
+            Display.getDefault().syncExec(() -> {
+
+               if (!event.getOldValue().equals(event.getNewValue())) {
+
+                  _labelAccessToken_Value.setText(_prefStore.getString(Preferences.STRAVA_ACCESSTOKEN));
+                  _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.STRAVA_REFRESHTOKEN));
+                  _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
+                  _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+
+                  _labelAthleteName_Value.setText(_prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME));
+                  _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
+                  _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
+
+                  updateTokensInformationGroup();
+               }
+
+               _server.stopCallBackServer();
+            });
+         }
+      };
    }
 
    private void createUI() {
@@ -192,50 +217,28 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
     */
    private void onClickAuthorize() {
 
-      final OAuth2Client client = new OAuth2Client();
+      final StravaTokensRetrievalHandler tokensRetrievalHandler = new StravaTokensRetrievalHandler();
+      _server = new LocalHostServer(_callBackPort, "Strava", _prefChangeListener); //$NON-NLS-1$
 
-      client.setAuthorizeUrl(StravaUploader.HerokuAppUrl + "/authorize"); //$NON-NLS-1$
-      client.setRedirectUri("http://localhost:5000"); //$NON-NLS-1$
+      final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
-      final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client, "Strava"); //$NON-NLS-1$
-      if (oAuth2Browser.open() != Window.OK) {
+      if (!isServerCreated) {
          return;
       }
 
-      final String authorizationCode = oAuth2Browser.getAuthorizationCode();
+      Display.getDefault().syncExec(() -> WEB.openUrl(StravaUploader.HerokuAppUrl + "/authorize"));//$NON-NLS-1$
+   }
 
-      String dialogMessage;
-      if (StringUtils.isNullOrEmpty(authorizationCode)) {
-         dialogMessage = NLS.bind(
-               Messages.Pref_CloudConnectivity_Strava_AccessToken_NotRetrieved,
-               oAuth2Browser.getResponse());
-      } else {
-         final StravaTokens newTokens = StravaUploader.getTokens(authorizationCode, false, UI.EMPTY_STRING);
+   @Override
+   public boolean performCancel() {
 
-         if (newTokens != null) {
+      final boolean isCancel = super.performCancel();
 
-            _labelAccessToken_Value.setText(newTokens.getAccess_token());
-            _labelRefreshToken_Value.setText(newTokens.getRefresh_token());
-            _accessTokenExpiresAt = newTokens.getExpires_at();
-            _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
-
-            final Athlete athlete = newTokens.getAthlete();
-            if (athlete != null) {
-               _labelAthleteName_Value.setText(athlete.getFirstName() + UI.SPACE1 + athlete.getLastName());
-               _athleteId = athlete.getId();
-               _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
-            }
-         }
-
-         dialogMessage = Messages.Pref_CloudConnectivity_Strava_AccessToken_Retrieved;
+      if (isCancel && _server != null) {
+         _server.stopCallBackServer();
       }
 
-      MessageDialog.openInformation(
-            Display.getCurrent().getActiveShell(),
-            Messages.Pref_CloudConnectivity_Strava_AccessToken_Retrieval_Title,
-            dialogMessage);
-
-      UpdateButtonConnectState();
+      return isCancel;
    }
 
    @Override
@@ -249,7 +252,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
       _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
 
-      UpdateButtonConnectState();
+      updateTokensInformationGroup();
 
       super.performDefaults();
    }
@@ -265,6 +268,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          _prefStore.setValue(Preferences.STRAVA_ATHLETEFULLNAME, _labelAthleteName_Value.getText());
          _prefStore.setValue(Preferences.STRAVA_ATHLETEID, _athleteId);
          _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, _accessTokenExpiresAt);
+
+         if (_server != null) {
+            _server.stopCallBackServer();
+         }
       }
 
       return isOK;
@@ -280,10 +287,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
       _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
 
-      UpdateButtonConnectState();
+      updateTokensInformationGroup();
    }
 
-   private void UpdateButtonConnectState() {
+   private void updateTokensInformationGroup() {
 
       final boolean isAuthorized = StringUtils.hasContent(_labelAccessToken_Value.getText()) && StringUtils.hasContent(_labelRefreshToken_Value
             .getText());

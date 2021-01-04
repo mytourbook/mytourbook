@@ -1,4 +1,19 @@
-package net.tourbook.cloud.dropbox;
+/*******************************************************************************
+ * Copyright (C) 2021 Frédéric Bard
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+package net.tourbook.cloud.oauth2;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -10,35 +25,20 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
+import net.tourbook.cloud.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StringUtils;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.eclipse.jface.preference.IPreferenceStore;
 
-public class TokensRetrievalHandler implements HttpHandler {
+public abstract class TokensRetrievalHandler implements HttpHandler {
 
-   private String           _codeVerifier;
-
-   private IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
-   private String           _authorizationCode;
-
-   public TokensRetrievalHandler(final String codeVerifier) {
-      _codeVerifier = codeVerifier;
-   }
-
-   public String getAuthorizationCode() {
-      return _authorizationCode;
-   }
+   public TokensRetrievalHandler() {}
 
    @Override
    public void handle(final HttpExchange httpExchange) throws IOException {
 
-      DropboxTokens tokens = new DropboxTokens();
+      Tokens tokens = null;
       if ("GET".equals(httpExchange.getRequestMethod())) { //$NON-NLS-1$
 
          tokens = handleGetRequest(httpExchange);
@@ -46,16 +46,10 @@ public class TokensRetrievalHandler implements HttpHandler {
 
       handleResponse(httpExchange);
 
-      if (StringUtils.hasContent(tokens.getAccess_token())) {
-
-         _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN, tokens.getExpires_in());
-         _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, tokens.getRefresh_token());
-         _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME, System.currentTimeMillis());
-         _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, tokens.getAccess_token());
-      }
+      saveTokensInPreferences(tokens);
    }
 
-   private DropboxTokens handleGetRequest(final HttpExchange httpExchange) {
+   private Tokens handleGetRequest(final HttpExchange httpExchange) {
 
       final char[] separators = { '#', '&', '?' };
 
@@ -64,21 +58,13 @@ public class TokensRetrievalHandler implements HttpHandler {
       String authorizationCode = UI.EMPTY_STRING;
       final List<NameValuePair> params = URLEncodedUtils.parse(response, StandardCharsets.UTF_8, separators);
       for (final NameValuePair param : params) {
-         if (param.getName().equals(IOAuth2Constants.PARAM_CODE)) {
+         if (param.getName().equals(OAuth2Constants.PARAM_CODE)) {
             authorizationCode = param.getValue();
             break;
          }
       }
 
-      DropboxTokens newTokens = new DropboxTokens();
-      if (StringUtils.isNullOrEmpty(authorizationCode)) {
-         return newTokens;
-      }
-
-      //get tokens from the authorization code
-      newTokens = DropboxClient.getTokens(authorizationCode, false, UI.EMPTY_STRING, _codeVerifier);
-
-      return newTokens;
+      return retrieveTokens(authorizationCode);
    }
 
    private void handleResponse(final HttpExchange httpExchange) throws IOException {
@@ -96,4 +82,8 @@ public class TokensRetrievalHandler implements HttpHandler {
          outputStream.flush();
       }
    }
+
+   public abstract Tokens retrieveTokens(final String authorizationCode);
+
+   public abstract void saveTokensInPreferences(final Tokens tokens);
 }

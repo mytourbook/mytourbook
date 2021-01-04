@@ -40,8 +40,8 @@ import java.util.zip.GZIPOutputStream;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
 import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -108,16 +108,16 @@ public class StravaUploader extends TourbookCloudUploader {
       final StringBuilder body = new StringBuilder();
       String grantType;
       if (isRefreshToken) {
-         body.append("{\"" + IOAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
-         grantType = IOAuth2Constants.PARAM_REFRESH_TOKEN;
+         body.append("{\"" + OAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else
 
       {
-         body.append("{\"" + IOAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
-         grantType = IOAuth2Constants.PARAM_AUTHORIZATION_CODE;
+         body.append("{\"" + OAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
       }
 
-      body.append("\", \"" + IOAuth2Constants.PARAM_GRANT_TYPE + "\" : \"" + grantType + "\"}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      body.append("\", \"" + OAuth2Constants.PARAM_GRANT_TYPE + "\" : \"" + grantType + "\"}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .header("Content-Type", "application/json") //$NON-NLS-1$ //$NON-NLS-2$

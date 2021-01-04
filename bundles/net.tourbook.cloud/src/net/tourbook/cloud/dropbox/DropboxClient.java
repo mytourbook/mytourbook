@@ -39,7 +39,7 @@ import java.util.Map;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -56,7 +56,7 @@ public class DropboxClient {
    private static HttpClient     _httpClient        = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
    private static DbxClientV2    _dropboxClient;
 
-   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                                      //$NON-NLS-1$
+   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                         //$NON-NLS-1$
    public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox._callBackPort + "/";            //$NON-NLS-1$ //$NON-NLS-2$
 
    static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
@@ -170,20 +170,20 @@ public class DropboxClient {
                                                final String codeVerifier) {
 
       final Map<String, String> data = new HashMap<>();
-      data.put(IOAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
+      data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
 
       String grantType;
       if (isRefreshToken) {
-         data.put(IOAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
-         grantType = IOAuth2Constants.PARAM_REFRESH_TOKEN;
+         data.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else {
          data.put("code_verifier", codeVerifier); //$NON-NLS-1$
-         data.put(IOAuth2Constants.PARAM_CODE, authorizationCode);
-         grantType = IOAuth2Constants.PARAM_AUTHORIZATION_CODE;
-         data.put(IOAuth2Constants.PARAM_REDIRECT_URI, DropboxCallbackUrl);
+         data.put(OAuth2Constants.PARAM_CODE, authorizationCode);
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
+         data.put(OAuth2Constants.PARAM_REDIRECT_URI, DropboxCallbackUrl);
       }
 
-      data.put(IOAuth2Constants.PARAM_GRANT_TYPE, grantType);
+      data.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
 
       final HttpRequest request = HttpRequest.newBuilder()
             .header("Content-Type", "application/x-www-form-urlencoded") //$NON-NLS-1$ //$NON-NLS-2$
