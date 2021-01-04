@@ -135,6 +135,7 @@ public class StravaUploader extends TourbookCloudUploader {
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
       return null;
@@ -399,6 +400,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
    }
 }
