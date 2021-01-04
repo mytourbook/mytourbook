@@ -151,6 +151,8 @@ public class TourDatabase {
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
 
+   private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
+
    /**
     * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
     * work !!! </b>
@@ -2199,7 +2201,7 @@ public class TourDatabase {
 
       if (isSaved == false) {
          MessageDialog.openError(
-               Display.getCurrent().getActiveShell(), //
+               Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -2218,7 +2220,8 @@ public class TourDatabase {
     * @param entityClass
     * @return Returns the saved entity
     */
-   public static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
+   @SuppressWarnings("unused")
+   private static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
       final EntityTransaction ts = em.getTransaction();
 
@@ -6948,7 +6951,7 @@ public class TourDatabase {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIdx / tourList.size() * 100.0);
 
                   splashManager.setMessage(
                         NLS.bind(//
@@ -7063,7 +7066,7 @@ public class TourDatabase {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
                   splashManager.setMessage(
                         NLS.bind(//
@@ -7279,7 +7282,7 @@ public class TourDatabase {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
                   final String message = NLS.bind(Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
                         new Object[] { tourIndex, numTours, percent });
@@ -7628,9 +7631,10 @@ public class TourDatabase {
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
       try {
 
-         int tourIndex = 1;
          final List<Long> allTourIds = getAllTourIds();
          final int numTourIds = allTourIds.size();
+
+         int tourIndex = 1;
 
          // loop: all tours
          for (final Long tourId : allTourIds) {
@@ -7641,15 +7645,19 @@ public class TourDatabase {
                final long timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > 500
+
+                     // update UI for the last tour otherwise it looks like that not all tours are converted
+                     || tourIndex == numTourIds) {
 
                   lastUpdateTime = currentTime;
 
-                  final long durationInSeconds = (currentTime - startTime) / 1000;
+                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTourIds * 100.0);
 
+                  // Update 43: Converting lat/lon -> E6 - {0} of {1}  -  {2} %
                   splashManager.setMessage(NLS.bind(
-                        Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
-                        new Object[] { tourIndex, numTourIds, (int) durationInSeconds }));
+                        Messages.Tour_Database_PostUpdate_043_LatLonE6,
+                        new Object[] { tourIndex, numTourIds, percentValue }));
                }
 
                tourIndex++;

@@ -611,11 +611,6 @@ public class TourData_View extends ViewPart {
       label.setToolTipText(Messages.Tour_Info_Label_AllFields_Tooltip);
       GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
 
-//      _txtAllFields = new Text(parent,
-//            SWT.MULTI
-//                  | SWT.BORDER //
-//                  | SWT.READ_ONLY);
-
       _txtAllFields = new Label(parent,
             SWT.READ_ONLY
 //                  | SWT.BORDER
