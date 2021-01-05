@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,6 @@ import net.tourbook.common.util.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
@@ -48,6 +47,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    private java.nio.file.FileSystem _dropboxFileSystem;
    private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
+   private IPropertyChangeListener  _prefChangeListenerCommon;
 
    public DropboxFileSystem() {
 
@@ -55,26 +55,25 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       createDropboxFileSystem();
 
-      final IPropertyChangeListener prefChangeListenerCommon = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListenerCommon = event -> {
 
-            if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
+         if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
 
-               closeDropboxFileSystem();
+            closeDropboxFileSystem();
 
-               // Re create the Dropbox file system
-               createDropboxFileSystem();
-            }
+            // Re create the Dropbox file system
+            createDropboxFileSystem();
          }
       };
 
       // register the listener
-      _prefStore.addPropertyChangeListener(prefChangeListenerCommon);
+      _prefStore.addPropertyChangeListener(_prefChangeListenerCommon);
    }
 
    @Override
    protected void close() {
+
+      _prefStore.removePropertyChangeListener(_prefChangeListenerCommon);
       closeDropboxFileSystem();
    }
 
@@ -99,11 +98,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
    protected File copyFileLocally(final String dropboxFilePath) {
       final Path localFilePath = DropboxClient.CopyLocally(dropboxFilePath);
 
-      if (localFilePath != null) {
-         return localFilePath.toFile();
-      }
-
-      return null;
+      return localFilePath != null ? localFilePath.toFile() : null;
    }
 
    /**
@@ -205,16 +200,13 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       final DialogDropboxFolderBrowser[] dropboxFolderChooser = new DialogDropboxFolderBrowser[1];
       final int[] folderChooserResult = new int[1];
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            final String accessToken = DropboxClient.getValidTokens();
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+         final String accessToken = DropboxClient.getValidTokens();
 
-            dropboxFolderChooser[0] = new DialogDropboxFolderBrowser(Display.getCurrent().getActiveShell(),
-                  accessToken,
-                  workingDirectory);
-            folderChooserResult[0] = dropboxFolderChooser[0].open();
-         }
+         dropboxFolderChooser[0] = new DialogDropboxFolderBrowser(Display.getCurrent().getActiveShell(),
+               accessToken,
+               workingDirectory);
+         folderChooserResult[0] = dropboxFolderChooser[0].open();
       });
 
       if (folderChooserResult[0] == Window.OK) {

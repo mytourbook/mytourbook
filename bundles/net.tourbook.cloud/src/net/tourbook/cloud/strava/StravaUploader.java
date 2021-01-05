@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,8 +40,8 @@ import java.util.zip.GZIPOutputStream;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
 import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -108,16 +108,16 @@ public class StravaUploader extends TourbookCloudUploader {
       final StringBuilder body = new StringBuilder();
       String grantType;
       if (isRefreshToken) {
-         body.append("{\"" + IOAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
-         grantType = IOAuth2Constants.PARAM_REFRESH_TOKEN;
+         body.append("{\"" + OAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else
 
       {
-         body.append("{\"" + IOAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
-         grantType = IOAuth2Constants.PARAM_AUTHORIZATION_CODE;
+         body.append("{\"" + OAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
       }
 
-      body.append("\", \"" + IOAuth2Constants.PARAM_GRANT_TYPE + "\" : \"" + grantType + "\"}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      body.append("\", \"" + OAuth2Constants.PARAM_GRANT_TYPE + "\" : \"" + grantType + "\"}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .header("Content-Type", "application/json") //$NON-NLS-1$ //$NON-NLS-2$
@@ -135,6 +135,7 @@ public class StravaUploader extends TourbookCloudUploader {
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
       return null;
@@ -197,39 +198,6 @@ public class StravaUploader extends TourbookCloudUploader {
       }
       return absoluteFilePath;
    }
-
-//   /**
-//    * Retrieving the activity Id after the uploaded activity was created.
-//    * Note: Maybe we don't want to do that as it is possible that activities are not fully processed
-//    * and that it can take quite some times, and therefore a lot of API calls, until the activity is
-//    * available
-//    *
-//    * @param uploadId
-//    * @return The activity Id
-//    */
-//   private String getActivityId(final String uploadId) {
-//
-//      final HttpRequest request = HttpRequest.newBuilder()
-//            .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
-//            .GET()
-//            .uri(URI.create(_stravaBaseUrl + "uploads/" + uploadId))//$NON-NLS-1$
-//            .build();
-//
-//      try {
-//         final java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-//
-//         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-//            final ObjectMapper mapper = new ObjectMapper();
-//            final ActivityUpload activityUpload = mapper.readValue(response.body(),
-//                  ActivityUpload.class);
-//            return activityUpload.getActivity_id();
-//         }
-//      } catch (IOException | InterruptedException e) {
-//         e.printStackTrace();
-//      }
-//
-//      return UI.EMPTY_STRING;
-//   }
 
    private void deleteTemporaryFile(final String filePath) {
 
@@ -432,6 +400,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
    }
 }

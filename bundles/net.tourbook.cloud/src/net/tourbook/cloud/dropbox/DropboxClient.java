@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ import java.util.Map;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -48,7 +48,6 @@ import net.tourbook.common.util.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 
@@ -58,20 +57,17 @@ public class DropboxClient {
    private static DbxClientV2    _dropboxClient;
 
    private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                         //$NON-NLS-1$
-   public static final String    DropboxCallbackUrl = "http://localhost:8001/dropboxAuthorizationCode";                     //$NON-NLS-1$
+   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/";            //$NON-NLS-1$ //$NON-NLS-2$
 
    static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
 
    static {
-      final IPropertyChangeListener prefChangeListenerCommon = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener prefChangeListenerCommon = event -> {
 
-            if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
+         if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
 
-               // Re create the Dropbox client
-               createDefaultDropboxClient();
-            }
+            // Re create the Dropbox client
+            createDefaultDropboxClient();
          }
       };
 
@@ -88,7 +84,7 @@ public class DropboxClient {
     *           The Dropbox path of the file
     * @return The local path of the downloaded file
     */
-   public static Path CopyLocally(String dropboxFilePath) {
+   public static final Path CopyLocally(String dropboxFilePath) {
 
       if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
@@ -141,7 +137,7 @@ public class DropboxClient {
     * @param accessToken
     * @return
     */
-   private static DbxClientV2 createDropboxClient(final String accessToken) {
+   private static final DbxClientV2 createDropboxClient(final String accessToken) {
 
       //Getting the current version of MyTourbook
       final Version version = FrameworkUtil.getBundle(DropboxClient.class).getVersion();
@@ -159,7 +155,7 @@ public class DropboxClient {
     * @param accessToken
     * @return
     */
-   public static DbxClientV2 getDefault(final String accessToken) {
+   public static final DbxClientV2 getDefault(final String accessToken) {
 
       if (StringUtils.isNullOrEmpty(accessToken)) {
          return _dropboxClient;
@@ -168,26 +164,26 @@ public class DropboxClient {
       return createDropboxClient(accessToken);
    }
 
-   public static DropboxTokens getTokens(final String authorizationCode,
-                                         final boolean isRefreshToken,
-                                         final String refreshToken,
-                                         final String codeVerifier) {
+   public static final DropboxTokens getTokens(final String authorizationCode,
+                                               final boolean isRefreshToken,
+                                               final String refreshToken,
+                                               final String codeVerifier) {
 
       final Map<String, String> data = new HashMap<>();
-      data.put(IOAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
+      data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
 
       String grantType;
       if (isRefreshToken) {
-         data.put(IOAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
-         grantType = IOAuth2Constants.PARAM_REFRESH_TOKEN;
+         data.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else {
          data.put("code_verifier", codeVerifier); //$NON-NLS-1$
-         data.put(IOAuth2Constants.PARAM_CODE, authorizationCode);
-         grantType = IOAuth2Constants.PARAM_AUTHORIZATION_CODE;
-         data.put(IOAuth2Constants.PARAM_REDIRECT_URI, DropboxCallbackUrl);
+         data.put(OAuth2Constants.PARAM_CODE, authorizationCode);
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
+         data.put(OAuth2Constants.PARAM_REDIRECT_URI, DropboxCallbackUrl);
       }
 
-      data.put(IOAuth2Constants.PARAM_GRANT_TYPE, grantType);
+      data.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
 
       final HttpRequest request = HttpRequest.newBuilder()
             .header("Content-Type", "application/x-www-form-urlencoded") //$NON-NLS-1$ //$NON-NLS-2$
@@ -206,12 +202,13 @@ public class DropboxClient {
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
+         Thread.currentThread().interrupt();
       }
 
       return token;
    }
 
-   public static String getValidTokens() {
+   public static final String getValidTokens() {
 
       if (StringUtils.isNullOrEmpty(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN))) {
          return UI.EMPTY_STRING;
@@ -234,7 +231,7 @@ public class DropboxClient {
       return UI.EMPTY_STRING;
    }
 
-   private static BodyPublisher ofFormData(final Map<String, String> parameters) {
+   private static final BodyPublisher ofFormData(final Map<String, String> parameters) {
 
       final StringBuilder result = new StringBuilder();
 

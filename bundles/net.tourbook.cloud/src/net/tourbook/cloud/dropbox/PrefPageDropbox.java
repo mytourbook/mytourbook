@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,59 +15,53 @@
  *******************************************************************************/
 package net.tourbook.cloud.dropbox;
 
-import com.sun.net.httpserver.HttpServer;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.IOAuth2Constants;
-import net.tourbook.cloud.oauth2.OAuth2Utils;
+import net.tourbook.cloud.oauth2.LocalHostServer;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageDropbox extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID         = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
+   public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
-   public static final String      ClientId   = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
+   public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore = Activator.getDefault().getPreferenceStore();
+   public static final int         CALLBACK_PORT = 4917;
+
+   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
-
-   private HttpServer              _server;
-   private ThreadPoolExecutor      _threadPoolExecutor;
+   private LocalHostServer         _server;
    /*
     * UI controls
     */
+   private Group                   _group;
    private Label                   _labelAccessToken;
    private Label                   _labelAccessToken_Value;
    private Label                   _labelExpiresAt;
@@ -75,75 +69,45 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
    private Label                   _labelRefreshToken;
    private Label                   _labelRefreshToken_Value;
 
-   private void addPrefListener() {
-
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
-
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-
-                     _labelAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
-                     _labelExpiresAt_Value.setText(computeAccessTokenExpirationDate());
-                     _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
-
-                     stopCallBackServer();
-
-                     updateTokensInformationGroup();
-                  }
-               });
-            }
-         }
-      };
-
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
-   }
-
    private String computeAccessTokenExpirationDate() {
 
-      return OAuth2Utils.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
+      return TimeTools.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
             Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN));
    }
 
-   private void createCallBackServer(final String codeVerifier) {
-
-      if (_server != null) {
-         stopCallBackServer();
-      }
-
-      try {
-         _server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0); //$NON-NLS-1$
-         final TokensRetrievalHandler tokensRetrievalHandler = new TokensRetrievalHandler(codeVerifier);
-         _server.createContext("/dropboxAuthorizationCode", tokensRetrievalHandler); //$NON-NLS-1$
-         _threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-
-         _server.setExecutor(_threadPoolExecutor);
-
-         _server.start();
-
-         addPrefListener();
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-   }
-
    @Override
-   protected Control createContents(final Composite parent) {
+   protected void createFieldEditors() {
 
-      final Composite ui = createUI(parent);
+      createUI();
 
       restoreState();
 
-      return ui;
+      _prefChangeListener = event -> {
+
+         if (event.getProperty().equals(Preferences.DROPBOX_ACCESSTOKEN)) {
+
+            Display.getDefault().syncExec(() -> {
+
+               if (!event.getOldValue().equals(event.getNewValue())) {
+
+                  _labelAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
+                  _labelExpiresAt_Value.setText(computeAccessTokenExpirationDate());
+                  _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_REFRESHTOKEN));
+
+                  _group.redraw();
+
+                  updateTokensInformationGroup();
+               }
+
+               _server.stopCallBackServer();
+            });
+         }
+      };
    }
 
-   private Composite createUI(final Composite parent) {
+   private Composite createUI() {
 
+      final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
       createUI_10_Authorize(parent);
@@ -178,34 +142,34 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
 
       final PixelConverter pc = new PixelConverter(parent);
 
-      final Group group = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(Messages.Pref_CloudConnectivity_Dropbox_Tokens_Information_Group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      _group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
+      _group.setText(Messages.Pref_CloudConnectivity_Dropbox_Tokens_Information_Group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {
-            _labelAccessToken = new Label(group, SWT.NONE);
+            _labelAccessToken = new Label(_group, SWT.NONE);
             _labelAccessToken.setText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Label);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
-            _labelAccessToken_Value = new Label(group, SWT.WRAP);
+            _labelAccessToken_Value = new Label(_group, SWT.WRAP);
             _labelAccessToken_Value.setToolTipText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
          }
          {
-            _labelExpiresAt = new Label(group, SWT.NONE);
+            _labelExpiresAt = new Label(_group, SWT.NONE);
             _labelExpiresAt.setText(Messages.Pref_CloudConnectivity_Dropbox_ExpiresAt_Label);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
-            _labelExpiresAt_Value = new Label(group, SWT.NONE);
+            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
-            _labelRefreshToken = new Label(group, SWT.NONE);
+            _labelRefreshToken = new Label(_group, SWT.NONE);
             _labelRefreshToken.setText(Messages.Pref_CloudConnectivity_Dropbox_RefreshToken_Label);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
-            _labelRefreshToken_Value = new Label(group, SWT.WRAP);
+            _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
          }
       }
@@ -247,21 +211,22 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
       final String codeVerifier = generateCodeVerifier();
       final String codeChallenge = generateCodeChallenge(codeVerifier);
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      final DropboxTokensRetrievalHandler tokensRetrievalHandler = new DropboxTokensRetrievalHandler(codeVerifier);
+      _server = new LocalHostServer(CALLBACK_PORT, "Dropbox", _prefChangeListener); //$NON-NLS-1$
+      final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
-            createCallBackServer(codeVerifier);
+      if (!isServerCreated) {
+         return;
+      }
 
-            WEB.openUrl(
-                  "https://www.dropbox.com/oauth2/authorize?" + //$NON-NLS-1$
-                        IOAuth2Constants.PARAM_CLIENT_ID + UI.SYMBOL_EQUAL + ClientId +
-                        "&response_type=" + IOAuth2Constants.PARAM_CODE + //$NON-NLS-1$
-                        "&" + IOAuth2Constants.PARAM_REDIRECT_URI + UI.SYMBOL_EQUAL + DropboxClient.DropboxCallbackUrl + //$NON-NLS-1$
-                        "&code_challenge=" + codeChallenge + //$NON-NLS-1$
-                        "&code_challenge_method=S256&token_access_type=offline"); //$NON-NLS-1$
-         }
-      });
+      Display.getDefault().syncExec(() -> WEB.openUrl(
+            "https://www.dropbox.com/oauth2/authorize?" + //$NON-NLS-1$
+                  OAuth2Constants.PARAM_CLIENT_ID + UI.SYMBOL_EQUAL + ClientId +
+                  "&response_type=" + OAuth2Constants.PARAM_CODE + //$NON-NLS-1$
+                  "&" + OAuth2Constants.PARAM_REDIRECT_URI + UI.SYMBOL_EQUAL + DropboxClient.DropboxCallbackUrl + //$NON-NLS-1$
+                  "&code_challenge=" + codeChallenge + //$NON-NLS-1$
+                  "&code_challenge_method=S256&token_access_type=offline") //$NON-NLS-1$
+      );
    }
 
    @Override
@@ -269,8 +234,8 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
 
       final boolean isCancel = super.performCancel();
 
-      if (isCancel) {
-         stopCallBackServer();
+      if (isCancel && _server != null) {
+         _server.stopCallBackServer();
       }
 
       return isCancel;
@@ -301,7 +266,9 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
             _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN, UI.EMPTY_STRING);
          }
 
-         stopCallBackServer();
+         if (_server != null) {
+            _server.stopCallBackServer();
+         }
       }
 
       return isOK;
@@ -316,19 +283,6 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
       updateTokensInformationGroup();
    }
 
-   private void stopCallBackServer() {
-
-      if (_server != null) {
-         _server.stop(0);
-         _server = null;
-
-         _prefStore.removePropertyChangeListener(_prefChangeListener);
-      }
-      if (_threadPoolExecutor != null) {
-         _threadPoolExecutor.shutdownNow();
-      }
-   }
-
    private void updateTokensInformationGroup() {
 
       final boolean isAuthorized = StringUtils.hasContent(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
@@ -337,4 +291,5 @@ public class PrefPageDropbox extends PreferencePage implements IWorkbenchPrefere
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
    }
+
 }
