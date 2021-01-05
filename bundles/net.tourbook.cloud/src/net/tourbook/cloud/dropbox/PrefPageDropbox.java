@@ -160,20 +160,20 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
          }
          {
-            _labelExpiresAt = new Label(_group, SWT.NONE);
-            _labelExpiresAt.setText(Messages.Pref_CloudConnectivity_Dropbox_ExpiresAt_Label);
-            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
-
-            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
-         }
-         {
             _labelRefreshToken = new Label(_group, SWT.NONE);
             _labelRefreshToken.setText(Messages.Pref_CloudConnectivity_Dropbox_RefreshToken_Label);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
+         }
+         {
+            _labelExpiresAt = new Label(_group, SWT.NONE);
+            _labelExpiresAt.setText(Messages.Pref_CloudConnectivity_Dropbox_ExpiresAt_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
+
+            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
       }
    }
