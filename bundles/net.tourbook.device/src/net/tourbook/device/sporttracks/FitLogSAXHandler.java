@@ -1399,8 +1399,8 @@ public class FitLogSAXHandler extends DefaultHandler {
                }
             } else {
                final CustomTrackValue item = new CustomTrackValue();
-               item.Id = idS;
-               item.Value = Util.parseFloat(attributes, idS);
+               item.id = idS;
+               item.value = Util.parseFloat(attributes, idS);
                customTracksT.add(item);
             }
          }

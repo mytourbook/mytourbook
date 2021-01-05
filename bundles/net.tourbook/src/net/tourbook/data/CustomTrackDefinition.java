@@ -9,32 +9,32 @@ public class CustomTrackDefinition implements Serializable {
    private static final long serialVersionUID = -4880414084528375769L;
    //Custom Track Definition
 
-   private String            _Name;
-   private String            _Id;
-   private String            _Unit;
+   private String            _name;
+   private String            _id;
+   private String            _unit;
 
    public String getId() {
-      return _Id;
+      return _id;
    }
 
    public String getName() {
-      return _Name;
+      return _name;
    }
 
    public String getUnit() {
-      return _Unit;
+      return _unit;
    }
 
    public void setId(final String id) {
-      _Id = id;
+      _id = id;
    }
 
    public void setName(final String name) {
-      _Name = name;
+      _name = name;
    }
 
    public void setUnit(final String unit) {
-      _Unit = unit;
+      _unit = unit;
 
    }
 }

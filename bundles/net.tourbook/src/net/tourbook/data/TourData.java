@@ -6093,8 +6093,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
              */
             if (isCustomTracks) {
                for (final CustomTrackValue customTrack : timeData.customTracks) {
-                  final float tdValue = customTrack.Value;
-                  final String tdId = customTrack.Id;
+                  final float tdValue = customTrack.value;
+                  final String tdId = customTrack.id;
                   if (customTracks.containsKey(tdId)) {
                      customTracks.get(tdId)[serieIndex] = tdValue == Float.MIN_VALUE ? 0 : tdValue;
                   }
@@ -10489,14 +10489,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          customTracks.clear();
          for (int j = 0; j < firstTimeData.customTracks.length; j++) {
 
-            if (firstTimeData.customTracks[j].Value == Float.MIN_VALUE) {
+            if (firstTimeData.customTracks[j].value == Float.MIN_VALUE) {
 
                // search for first value
 
                for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
                   final TimeData timeData = timeDataSerie[timeDataIndex];
-                  final float custValue = timeData.customTracks[j].Value;
+                  final float custValue = timeData.customTracks[j].value;
 
                   if (custValue != Float.MIN_VALUE) {
 
@@ -10504,9 +10504,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                      isAvailable = true;
 
                      for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                        timeDataSerie[invalidIndex].customTracks[j].Value = custValue;
+                        timeDataSerie[invalidIndex].customTracks[j].value = custValue;
                      }
-                     customTracks.put(firstTimeData.customTracks[j].Id, custSerie);
+                     customTracks.put(firstTimeData.customTracks[j].id, custSerie);
                      break;
                   }
                }
@@ -10514,7 +10514,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             } else {
                isAvailable = true;
                final float[] custSerie = new float[serieSize];
-               customTracks.put(firstTimeData.customTracks[j].Id, custSerie);
+               customTracks.put(firstTimeData.customTracks[j].id, custSerie);
             }
 
          }
