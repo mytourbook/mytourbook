@@ -71,8 +71,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private String computeAccessTokenExpirationDate() {
 
-      return TimeTools.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
-            Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN));
+      final long expireAt = _prefStore.getLong(
+            Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
+                  Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN);
+
+      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.constructLocalExpireAtDateTime(expireAt);
    }
 
    @Override
