@@ -10,4 +10,5 @@ public class CustomTrackValue implements Serializable {
 
    public String             id               = net.tourbook.common.UI.EMPTY_STRING; //Reference to CustomTrackDefinition
    public float              value            = Float.MIN_VALUE;
+
 }

@@ -545,6 +545,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (_currentActivity._customDataFields.size() > 0) {
 
+
          final StringBuilder tourNotes = new StringBuilder(tourData.getTourDescription());
 
          if (!tourNotes.toString().trim().isEmpty()) {
@@ -625,6 +626,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             }
          }
       }
+
 
       if (_currentActivity._avgPowerBalance != Float.MIN_VALUE) {
          tourData.setPower_PedalLeftRightBalance((int) _currentActivity._avgPowerBalance);

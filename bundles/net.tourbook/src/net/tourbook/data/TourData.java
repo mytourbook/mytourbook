@@ -1553,7 +1553,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 
    // ############################################# RUNNING DYNAMICS TRANSIENT#######################################
-
    /*
     * Running dynamics data
     *
