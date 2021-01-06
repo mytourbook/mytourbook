@@ -150,29 +150,29 @@ public class SerieData implements Serializable {
 
       final int maxLen = 10;
 
-    //CUSTOM TRACKS
-      String custTrack = "\n";
+      //CUSTOM TRACKS
+      String custTrack = "\n"; //$NON-NLS-1$
       if(customTracksDefinition!=null && !customTracksDefinition.isEmpty()) {
-         custTrack += "...Definition...len=" + Integer.toString(customTracksDefinition.size()) + "\n";
+         custTrack += "  --CUSTOM TRACKS Definition...len=" + Integer.toString(customTracksDefinition.size()) + "--  \n"; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String i : customTracksDefinition.keySet()) {
             final CustomTrackDefinition item = customTracksDefinition.get(i);
-            custTrack += "  Id=\"" + i + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + "\n";
+            custTrack += "  Id=\"" + i + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
          }
-         custTrack += "-- --\n";
+         custTrack += "  --CUSTOM TRACKS Definition End--  \n"; //$NON-NLS-1$
       }
       if(customTracks!=null && !customTracks.isEmpty()) {
+         custTrack += "  --CUSTOM TRACKS--  \n"; //$NON-NLS-1$
          for (final String i : customTracks.keySet()) {
-            custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null         ? Arrays.toString(Arrays.copyOf(customTracks.get(i),          Math.min(customTracks.get(i).length, maxLen)))        : UI.EMPTY_STRING) + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
+            custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null         ? Arrays.toString(Arrays.copyOf(customTracks.get(i),          Math.min(customTracks.get(i).length, maxLen)))        : UI.EMPTY_STRING) + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             if(customTracksStat!= null && customTracksStat.get(i)!=null) {
                final CustomTrackStatEntry valE = customTracksStat.get(i);
-               custTrack += "  Id:\"" + i + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg);
-               custTrack +=  ";Min=" + String.format("%.2f", valE.value_Min);
-               custTrack +=  ";Max=" + String.format("%.2f", valE.value_Max);
-               custTrack += "]\n";
+               custTrack += "  Id:\"" + i + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+               custTrack +=  ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
+               custTrack +=  ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
+               custTrack += "]\n"; //$NON-NLS-1$
             }
          }
-         custTrack += "  --END CUSTOM TRACKS--  \n";
-
+         custTrack += "  --END CUSTOM TRACKS--  \n"; //$NON-NLS-1$
       }
 
       return "\n" //$NON-NLS-1$
@@ -215,10 +215,7 @@ public class SerieData implements Serializable {
             + "   powerSerie                 " + (powerSerie != null             ? Arrays.toString(Arrays.copyOf(powerSerie,              Math.min(powerSerie.length, maxLen)))            : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   pausedTime_Start           " + (pausedTime_Start != null       ? Arrays.toString(Arrays.copyOf(pausedTime_Start,        Math.min(pausedTime_Start.length, maxLen)))      : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   pausedTime_End             " + (pausedTime_End != null         ? Arrays.toString(Arrays.copyOf(pausedTime_End,          Math.min(pausedTime_End.length, maxLen)))        : UI.EMPTY_STRING) + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + " --CUSTOM TRACKS--            " + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-
             + custTrack
-
             + "   deviceMarker               " + (deviceMarker != null           ? Arrays.toString(Arrays.copyOf(deviceMarker,            Math.min(deviceMarker.length, maxLen)))          : UI.EMPTY_STRING) ; //$NON-NLS-1$
 
    }
