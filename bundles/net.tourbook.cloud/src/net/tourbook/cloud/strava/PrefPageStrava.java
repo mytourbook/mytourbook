@@ -154,7 +154,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(Messages.PrefPage_Account_Information_Group);
+      group.setText(net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
          {
@@ -213,7 +213,9 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
+   public void init(final IWorkbench workbench) {
+      //Not needed
+   }
 
    /**
     * When the user clicks on the "Authorize" button, a browser is opened

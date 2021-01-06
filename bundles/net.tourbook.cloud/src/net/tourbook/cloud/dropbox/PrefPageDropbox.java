@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -147,9 +148,25 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(Messages.Pref_CloudConnectivity_Dropbox_Tokens_Information_Group);
+      _group.setText(net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
+         {
+            final Label labelWebPage = new Label(_group, SWT.NONE);
+            labelWebPage.setText(Messages.Pref_CloudConnectivity_Dropbox_WebPage_Label);
+            GridDataFactory.fillDefaults().applyTo(labelWebPage);
+
+            final Link linkWebPage = new Link(_group, SWT.NONE);
+            linkWebPage.setText(UI.LINK_TAG_START + Messages.Pref_CloudConnectivity_Dropbox_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setEnabled(true);
+            linkWebPage.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  WEB.openUrl(Messages.Pref_CloudConnectivity_Dropbox_WebPage_Link);
+               }
+            });
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
+         }
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
             _labelAccessToken.setText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Label);
@@ -202,7 +219,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
+   public void init(final IWorkbench workbench) {
+      //Not needed
+   }
 
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
