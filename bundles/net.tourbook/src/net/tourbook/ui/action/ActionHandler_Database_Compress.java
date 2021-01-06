@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionHandlerDb_CompressDB extends AbstractHandler {
+public class ActionHandler_Database_Compress extends AbstractHandler {
 
    private void checkConsistency() {
 
@@ -44,6 +44,7 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
          private void logTableSize(final Connection conn) throws SQLException {
 
             String sqlSize = UI.EMPTY_STRING
+
                   + "SELECT " //$NON-NLS-1$
 
                   + " TableName," //$NON-NLS-1$
@@ -70,6 +71,7 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
                   + " from SYS.SYSTABLES t"; //$NON-NLS-1$
 
             sqlSize = UI.EMPTY_STRING
+
                   + "select" //$NON-NLS-1$
                   + " v.* from SYS.SYSSCHEMAS s," //$NON-NLS-1$
                   + " SYS.SYSTABLES t," //$NON-NLS-1$
@@ -91,26 +93,27 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
             ;
 
             sqlSize = UI.EMPTY_STRING
-                  + "SELECT" //$NON-NLS-1$
-                  + " v.*," //$NON-NLS-1$
-                  + " ((NUMALLOCATEDPAGES + NUMFREEPAGES) * PAGESIZE) as USEDSPACE," //$NON-NLS-1$
-                  + " s.*" //$NON-NLS-1$
-                  + "   from SYS.SYSSCHEMAS s, SYS.SYSTABLES t, new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v" //$NON-NLS-1$
+                  + "SELECT"
+                  + " v.*,"
+                  + " ((NUMALLOCATEDPAGES + NUMFREEPAGES) * PAGESIZE) as USEDSPACE,"
+                  + " s.*"
 
-                  + " where s.SCHEMAID = t.SCHEMAID" //$NON-NLS-1$
-                  + " order by USEDSPACE desc"; //$NON-NLS-1$
+                  + " FROM SYS.SYSSCHEMAS s, SYS.SYSTABLES t, new org.apache.derby.diag.SpaceTable(SCHEMANAME,TABLENAME) v"
+
+                  + " WHERE s.SCHEMAID = t.SCHEMAID"
+                  + " ORDER by USEDSPACE desc";
 
             final Statement stmtSize = conn.createStatement();
-            final ResultSet resultSetSize = stmtSize.executeQuery(sqlSize);
+            final ResultSet result = stmtSize.executeQuery(sqlSize);
 
-            while (resultSetSize.next()) {
+            while (result.next()) {
 
                System.out.println(String.format("%-35s %10d %10d", //$NON-NLS-1$
 
-                     resultSetSize.getString(1),
-                     resultSetSize.getInt(2),
-                     resultSetSize.getInt(3),
-                     resultSetSize.getInt(4)
+                     result.getString(1),
+                     result.getInt(2),
+                     result.getInt(3),
+                     result.getInt(4)
 
                ));
             }

@@ -859,19 +859,26 @@
          <!-- Database Consistency Check -->
          <command
             commandId   ="net.tourbook.command.dbTool.consistencyCheck"
-            label      ="%command_dbtool_consistency_check"
-            mnemonic   ="%command_dbtool_consistency_check_mnemonic"
-            style      ="push"/>
+            label       ="%command_dbtool_consistency_check"
+            mnemonic    ="%command_dbtool_consistency_check_mnemonic"
+            style       ="push"/>
+
+         <!-- Database Size Info -->
+         <command
+            commandId   ="net.tourbook.command.DbTool.SizeInfo"
+            label       ="%Command_DbTool_SizeInfo"
+            mnemonic    ="%Command_DbTool_SizeInfo_Mnemonic"
+            style       ="push"/>
 
          <!-- Compress Database 
          
 THIS IS NOT YET FULLY IMPLEMENTED
 
          <command
-            commandId   ="net.tourbook.command.dbTool.CompressDB"
-            label      ="%Command_DbTool_Compress_Database"
-            mnemonic   ="%Command_DbTool_Compress_Database_Mnemonic"
-            style      ="push"/>
+            commandId   ="net.tourbook.command.DbTool.CompressDB"
+            label       ="%Command_DbTool_Compress_Database"
+            mnemonic    ="%Command_DbTool_Compress_Database_Mnemonic"
+            style       ="push"/>
          -->
 
       </menuContribution>
@@ -1389,19 +1396,23 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
          name           ="%command_dbtool_consistency_check"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"/>
-
-<!-- 
-
-   THIS IS NOT YET FULLY IMPLEMENTED
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_ConsistencyCheck"/>
 
       <command
-         id            ="net.tourbook.command.dbTool.CompressDB"
-         name         ="%Command_DbTool_Compress_Database"
-         defaultHandler   ="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
+         id             ="net.tourbook.command.DbTool.SizeInfo"
+         name           ="%Command_DbTool_SizeInfo"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_SizeInfo"
+      />
+<!-- 
+   THIS IS NOT YET FULLY IMPLEMENTED
+-->
+
+      <command
+         id             ="net.tourbook.command.DbTool.CompressDB"
+         name           ="%Command_DbTool_Compress_Database"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"
       />
 
--->
 
       <command
          id             ="net.tourbook.command.OpenHomePage"

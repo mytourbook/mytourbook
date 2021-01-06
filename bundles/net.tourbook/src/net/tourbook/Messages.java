@@ -558,6 +558,13 @@ public class Messages extends NLS {
    public static String        App_Cadence_Rpm;
    public static String        App_Cadence_Spm;
 
+   public static String        App_Db_SizeInfo;
+   public static String        App_Db_SizeInfo_DialogTitle;
+   public static String        App_Db_SizeInfo_HeaderLabel_Index;
+   public static String        App_Db_SizeInfo_HeaderLabel_NotUsed;
+   public static String        App_Db_SizeInfo_HeaderLabel_Table;
+   public static String        App_Db_SizeInfo_HeaderLabel_Used;
+
    public static String        App_Default_PersonFirstName;
 
    public static String        App_Dialog_FirstStartup_Message;
