@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,10 +19,14 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.cloud.messages"; //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.cloud.messages";   //$NON-NLS-1$
+
+   public static String        Html_CloseBrowser_Text;
+
+   public static String        Pref_CloudConnectivity_UnavailablePort_Message;
+   public static String        Pref_CloudConnectivity_UnavailablePort_Title;
 
    static {
-      // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
    }
 

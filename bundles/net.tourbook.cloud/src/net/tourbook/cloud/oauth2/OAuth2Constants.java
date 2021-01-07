@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,17 @@
  *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
-public class OAuth2Utils {
+public class OAuth2Constants {
 
-   /**
-    * We consider that an access token is expired if there are less
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
+   public static final String PARAM_AUTHORIZATION_CODE = "authorization_code"; //$NON-NLS-1$
 
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
-   }
+   public static final String PARAM_REFRESH_TOKEN      = "refresh_token";      //$NON-NLS-1$
+
+   public static final String PARAM_CLIENT_ID          = "client_id";          //$NON-NLS-1$
+
+   public static final String PARAM_CODE               = "code";               //$NON-NLS-1$
+
+   public static final String PARAM_GRANT_TYPE         = "grant_type";         //$NON-NLS-1$
+
+   public static final String PARAM_REDIRECT_URI       = "redirect_uri";       //$NON-NLS-1$
 }
