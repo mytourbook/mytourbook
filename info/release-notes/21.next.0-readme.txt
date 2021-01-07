@@ -13,6 +13,7 @@ TODO's
 
 * Website: Map providers list in https://osmlab.github.io/editor-layer-index/
 
+
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
 
