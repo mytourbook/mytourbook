@@ -21,23 +21,25 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.DisposeEvent;
@@ -52,24 +54,28 @@ import org.eclipse.swt.widgets.Text;
 
 public class ActionHandler_Database_SizeInfo extends AbstractHandler {
 
-   private static final String NL = UI.NEW_LINE;
+   private static final String       NL = UI.NEW_LINE1;
 
-   private class MessageDialogLogging extends MessageDialog {
+   private static final NumberFormat _nf0;
+
+   static {
+
+      _nf0 = NumberFormat.getNumberInstance();
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
+   }
+
+   private final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.action.ActionHandler_Database_SizeInfo");//$NON-NLS-1$
+
+   private class DialogLogInfo extends Dialog {
 
       private String _logText;
       private Font   _monoFont;
 
-      public MessageDialogLogging(final Shell parentShell,
-                                  final String dialogTitle,
-                                  final String logText) {
+      public DialogLogInfo(final Shell parentShell,
+                           final String logText) {
 
-         super(parentShell,
-               dialogTitle,
-               null,
-               UI.EMPTY_STRING,
-               0, //INFORMATION,
-               0,
-               new String[] { IDialogConstants.OK_LABEL });
+         super(parentShell);
 
          _logText = logText;
 
@@ -83,18 +89,32 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
                }
             }
          });
-
       }
 
       @Override
-      protected Control createCustomArea(final Composite parent) {
+      protected void configureShell(final Shell shell) {
+
+         super.configureShell(shell);
+
+         // set window title
+         shell.setText(Messages.App_Db_SizeInfo_DialogTitle);
+      }
+
+      @Override
+      protected void createButtonsForButtonBar(final Composite parent) {
+
+         createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+      }
+
+      @Override
+      protected Control createDialogArea(final Composite parent) {
 
          createMonoFont(parent.getDisplay());
 
          final Text txtLog = new Text(parent, SWT.MULTI);
          txtLog.setFont(_monoFont);
          txtLog.setText(_logText);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(txtLog);
+         GridDataFactory.fillDefaults().grab(false, true).applyTo(txtLog);
 
          return txtLog;
       }
@@ -115,6 +135,13 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
          if (_monoFont == null) {
             _monoFont = new Font(display, MTFont.DEFAULT_MONO_FONT, 9, SWT.NORMAL);
          }
+      }
+
+      @Override
+      protected IDialogSettings getDialogBoundsSettings() {
+
+         // keep window size and position
+         return _state;
       }
 
    }
@@ -152,7 +179,7 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
                   + " ORDER BY ISINDEX, CONGLOMERATENAME" + NL //                                  //$NON-NLS-1$
             ;
 
-            try (Connection conn = TourDatabase.getInstance().getConnection()) {
+            try (final Connection conn = TourDatabase.getInstance().getConnection()) {
 
                final ArrayList<String> allNames = new ArrayList<>();
                final TIntArrayList allUsedSpaces = new TIntArrayList();
@@ -177,22 +204,34 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
                   }
                }
 
-               final int valueWidth = 10;
-               final String header1Format = " %-" + (maxNameWidth + 2) + "s" + " %" + valueWidth + "s %" + valueWidth + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-               final String header2Format = " %-" + (maxNameWidth + 2) + "s" + " %" + valueWidth + "s %" + valueWidth + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-               final String valueFormat = " %-" + (maxNameWidth + 2) + "s" + " %" + valueWidth + "d %" + valueWidth + "d"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+               int maxValueWidth = 11; // 123'456'789 kByte
+               maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
+               maxValueWidth = Math.max(maxValueWidth, Messages.App_Db_SizeInfo_HeaderLabel_Used.length());
+               maxValueWidth = Math.max(maxValueWidth, Messages.App_Db_SizeInfo_HeaderLabel_NotUsed.length());
+
+               final String lineFormat = " %-" + (maxNameWidth + 2) + "s" + " %" + maxValueWidth + "s  %" + maxValueWidth + "s "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
                final StringBuilder sb = new StringBuilder();
 
                sb.append(NL);
-               sb.append(String.format(header1Format,
-                     Messages.App_Db_SizeInfo_HeaderLabel_Table,
+               sb.append(String.format(lineFormat,
+                     UI.EMPTY_STRING,
                      Messages.App_Db_SizeInfo_HeaderLabel_Used,
                      Messages.App_Db_SizeInfo_HeaderLabel_NotUsed));
+
+               sb.append(NL);
+               sb.append(String.format(lineFormat,
+                     Messages.App_Db_SizeInfo_HeaderLabel_Table,
+                     UI.UNIT_KBYTE,
+                     UI.UNIT_KBYTE));
+
                sb.append(NL);
                sb.append(NL);
 
                boolean isIndexTitleDisplayed = false;
+
+               int sumUsedSpaces = 0;
+               int sumSpaceSavings = 0;
 
                for (int rowIndex = 0; rowIndex < allNames.size(); rowIndex++) {
 
@@ -200,47 +239,51 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
                   final int usedSpace = allUsedSpaces.get(rowIndex);
                   final int spaceSavings = allSpaceSavings.get(rowIndex);
 
+                  sumUsedSpaces += usedSpace;
+                  sumSpaceSavings += spaceSavings;
+
                   final boolean dbIsIndex = allIsIndex.get(rowIndex) == 1 ? true : false;
 
                   if (dbIsIndex && isIndexTitleDisplayed == false) {
 
+                     // show index header
+
                      sb.append(NL);
                      sb.append(NL);
-                     sb.append(String.format(header1Format,
-                           Messages.App_Db_SizeInfo_HeaderLabel_Index,
-                           Messages.App_Db_SizeInfo_HeaderLabel_Used,
-                           Messages.App_Db_SizeInfo_HeaderLabel_NotUsed));
+                     sb.append(UI.SPACE + Messages.App_Db_SizeInfo_HeaderLabel_Index);
                      sb.append(NL);
                      sb.append(NL);
 
                      isIndexTitleDisplayed = true;
                   }
 
-                  sb.append(String.format(
-
-                        valueFormat,
+                  sb.append(String.format(lineFormat,
 
                         name,
-                        usedSpace / 1024,
-                        spaceSavings / 1024));
+                        _nf0.format(usedSpace / 1024),
+                        _nf0.format(spaceSavings / 1024)));
 
                   sb.append(NL);
                }
+
+               /*
+                * Show totals
+                */
+               sb.append(NL);
+               sb.append(NL);
+               sb.append(String.format(lineFormat,
+
+                     Messages.App_Db_SizeInfo_HeaderLabel_Totals,
+                     _nf0.format(sumUsedSpaces / 1024),
+                     _nf0.format(sumSpaceSavings / 1024)));
+
+               sb.append(NL);
 
                resultInfo[0] = sb.toString();
 
             } catch (final Exception e) {
 
                StatusUtil.log(e);
-
-               String message = e.getMessage();
-
-               final int maxLength = 3000;
-               if (message.length() > maxLength) {
-                  message = message.substring(0, maxLength) + "\n...\n...\n..."; //$NON-NLS-1$
-               }
-
-               error[0] = NLS.bind(Messages.app_db_consistencyCheck_checkFailed, message);
             }
          }
       });
@@ -249,14 +292,8 @@ public class ActionHandler_Database_SizeInfo extends AbstractHandler {
 
          // no error
 
-//         MessageDialogLogging.openInformation(
-//               Display.getCurrent().getActiveShell(),
-//               Messages.app_db_consistencyCheck_dlgTitle,
-//               resultInfo[0]);
-
-         new MessageDialogLogging(
+         new DialogLogInfo(
                Display.getDefault().getActiveShell(),
-               Messages.App_Db_SizeInfo_DialogTitle,
                resultInfo[0]).open();
 
       } else {

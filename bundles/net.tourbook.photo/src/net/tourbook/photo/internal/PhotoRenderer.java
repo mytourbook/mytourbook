@@ -1034,7 +1034,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                 */
                final String textSize = _nfMByte.format(photo.imageFileSize / 1024.0 / 1024.0)
                      + UI.SPACE
-                     + UI.UNIT_MBYTES;
+                     + UI.UNIT_MBYTE;
 
                /*
                 * date/time
