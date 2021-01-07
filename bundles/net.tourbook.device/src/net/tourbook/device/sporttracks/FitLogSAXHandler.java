@@ -118,7 +118,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_PT_LON                       = "lon";                                 //$NON-NLS-1$
    private static final String                  ATTRIB_PT_POWER                     = "power";                               //$NON-NLS-1$
    private static final String                  ATTRIB_PT_TEMP                      = "temp";                                //$NON-NLS-1$
-
+   //
    private static final String                  ATTRIB_PT_TM                        = "tm";                                  //$NON-NLS-1$
    private static final String                  ATTRIB_PT_GCT                       = "gct";                                 //$NON-NLS-1$
    private static final String                  ATTRIB_PT_LP                        = "lp";                                  //$NON-NLS-1$
