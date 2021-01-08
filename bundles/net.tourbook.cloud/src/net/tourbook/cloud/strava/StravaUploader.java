@@ -349,7 +349,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
                //Check that a tour has a non empty time serie to avoid this Strava error
                //"error": "Time information is missing from file.
-               //V2?: Create activities without timeseries using this API endpoint :
+               //TODO V2?: Create activities without timeseries using this API endpoint :
                //https://developers.strava.com/playground/#/Activities/createActivity
                if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
 

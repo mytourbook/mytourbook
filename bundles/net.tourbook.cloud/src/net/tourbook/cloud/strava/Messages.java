@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.cloud.strava.messages";       //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.cloud.strava.messages"; //$NON-NLS-1$
 
    public static String        Dialog_StravaUpload_Summary;
    public static String        Dialog_StravaUpload_Message;
@@ -32,12 +32,7 @@ public class Messages extends NLS {
    public static String        Log_UploadToursToStrava_004_UploadError;
    public static String        Log_UploadToursToStrava_005_End;
 
-   public static String        Pref_CloudConnectivity_Strava_AccessToken_Retrieval_Title;
-   public static String        Pref_CloudConnectivity_Strava_AccessToken_NotRetrieved;
-   public static String        Pref_CloudConnectivity_Strava_AccessToken_Retrieved;
-
    public static String        VendorName_Strava;
-   public static String        PrefPage_Account_Information_Group;
    public static String        PrefPage_Account_Information_AthleteName_Label;
    public static String        PrefPage_Account_Information_AthleteWebPage_Label;
    public static String        PrefPage_Account_Information_AccessToken_Label;

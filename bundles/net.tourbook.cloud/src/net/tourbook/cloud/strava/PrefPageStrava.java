@@ -98,7 +98,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
                   _labelAccessToken_Value.setText(_prefStore.getString(Preferences.STRAVA_ACCESSTOKEN));
                   _labelRefreshToken_Value.setText(_prefStore.getString(Preferences.STRAVA_REFRESHTOKEN));
                   _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-                  _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+                  _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
                   _labelAthleteName_Value.setText(_prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME));
                   _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
@@ -154,7 +154,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(Messages.PrefPage_Account_Information_Group);
+      group.setText(net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
          {
@@ -207,8 +207,15 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
+   private String getLocalExpireAtDateTime() {
+      return (_accessTokenExpiresAt == 0) ? UI.EMPTY_STRING : TimeTools.constructLocalExpireAtDateTime(
+            _accessTokenExpiresAt);
+   }
+
    @Override
-   public void init(final IWorkbench workbench) {}
+   public void init(final IWorkbench workbench) {
+      //Not needed
+   }
 
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
@@ -250,7 +257,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _athleteId = _prefStore.getDefaultString(Preferences.STRAVA_ATHLETEID);
       _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
       _accessTokenExpiresAt = _prefStore.getDefaultLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-      _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+      _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
       updateTokensInformationGroup();
 
@@ -285,7 +292,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _athleteId = _prefStore.getString(Preferences.STRAVA_ATHLETEID);
       _linkAthleteWebPage.setText(constructAthleteWebPageLinkWithTags(_athleteId));
       _accessTokenExpiresAt = _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
-      _labelExpiresAt_Value.setText(TimeTools.constructLocalExpireAtDateTime(_accessTokenExpiresAt));
+      _labelExpiresAt_Value.setText(getLocalExpireAtDateTime());
 
       updateTokensInformationGroup();
    }
