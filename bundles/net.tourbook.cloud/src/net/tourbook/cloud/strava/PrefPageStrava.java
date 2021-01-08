@@ -208,7 +208,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    }
 
    private String getLocalExpireAtDateTime() {
-      return (_accessTokenExpiresAt == 0) ? UI.EMPTY_STRING : TimeTools.constructLocalExpireAtDateTime(
+      return (_accessTokenExpiresAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(
             _accessTokenExpiresAt);
    }
 

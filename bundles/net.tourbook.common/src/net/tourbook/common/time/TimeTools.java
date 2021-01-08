@@ -230,10 +230,6 @@ public class TimeTools {
       };
    }
 
-   public static String constructLocalExpireAtDateTime(final long expireAt) {
-      return Instant.ofEpochMilli(expireAt).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
-   }
-
    /**
     * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
     *
@@ -567,6 +563,10 @@ public class TimeTools {
       }
 
       return tzIndex;
+   }
+
+   public static String getUTCISODateTime(final long date) {
+      return Instant.ofEpochMilli(date).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
    }
 
    /**

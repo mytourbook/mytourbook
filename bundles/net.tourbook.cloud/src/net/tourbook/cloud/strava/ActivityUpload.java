@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,31 +16,29 @@
 package net.tourbook.cloud.strava;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityUpload {
+
    private String id;
    private String error;
+   private String name;
    private String status;
-   private String activityId;
 
    private String tourDate;
 
    ActivityUpload() {}
 
-   @JsonProperty("activity_id")
-   public String getActivityId() {
-      return activityId;
-   }
-
    public String getError() {
       return error;
    }
 
-   @JsonProperty("id_str")
    public String getId() {
       return id;
+   }
+
+   public String getName() {
+      return name;
    }
 
    public String getStatus() {
