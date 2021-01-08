@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.cloud.dropbox.messages";       //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.cloud.dropbox.messages";    //$NON-NLS-1$
 
    public static String        Dialog_DropboxFolderChooser_Area_Title;
    public static String        Dialog_DropboxFolderChooser_Area_Text;
@@ -32,11 +32,12 @@ public class Messages extends NLS {
    public static String        Image__Dropbox_Folder;
    public static String        Image__Dropbox_Parentfolder;
 
+   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Label;
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip;
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved;
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Retrieval_Title;
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
    public static String        Pref_CloudConnectivity_Dropbox_Button_Authorize;
+   public static String        Pref_CloudConnectivity_Dropbox_RefreshToken_Label;
+   public static String        Pref_CloudConnectivity_Dropbox_ExpiresAt_Label;
+   public static String        Pref_CloudConnectivity_Dropbox_Tokens_Information_Group;
 
    static {
       // initialize resource bundle

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,8 +39,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -64,8 +62,8 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
    private static final String   ROOT_FOLDER    = "/";                                                   //$NON-NLS-1$
 
-   private static String         _accessToken;
-   private static String         _workingDirectory;
+   private String                _accessToken;
+   private String                _workingDirectory;
 
    final IPreferenceStore        _prefStore     = CommonActivator.getPrefStore();
 
@@ -83,11 +81,6 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
     */
    private Text                  _textSelectedAbsolutePath;
    private Button                _buttonParentFolder;
-   private Button                _btnOk;
-   /*
-    * Error Message UI controls
-    */
-   private Label                 _labelErrorMessage;
 
    public DialogDropboxFolderBrowser(final Shell parentShell, final String accessToken, final String workingDirectory) {
 
@@ -127,12 +120,12 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       super.createButtonsForButtonBar(parent);
 
       // set text for the OK button
-      _btnOk = getButton(IDialogConstants.OK_ID);
-      _btnOk.setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
-      setButtonLayoutData(_btnOk);
+      final Button btnOk = getButton(IDialogConstants.OK_ID);
+      btnOk.setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
+      setButtonLayoutData(btnOk);
 
       if (_isInErrorState) {
-         _btnOk.setEnabled(false);
+         btnOk.setEnabled(false);
       }
    }
 
@@ -175,8 +168,8 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
          /*
           * Error message obtained when trying to retrieve the Dropbox folder content
           */
-         _labelErrorMessage = new Label(container, SWT.LEFT);
-         _labelErrorMessage.setText(dropboxMessage);
+         final Label labelErrorMessage = new Label(container, SWT.LEFT);
+         labelErrorMessage.setText(dropboxMessage);
       }
 
       return container;
@@ -273,12 +266,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
          public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
       });
 
-      _contentViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onSelectItem(event.getSelection());
-         }
-      });
+      _contentViewer.addDoubleClickListener(event -> onSelectItem(event.getSelection()));
    }
 
    @Override

@@ -1537,7 +1537,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public boolean             isBackupImportFile;
-   
+
+   // ############################################# CUSTOM TRACKS TRANSIENT#######################################
+   @Transient
+   HashMap<String, float[]> customTracks = new HashMap<>();
+
+   @Transient
+   public HashMap<String, CustomTrackDefinition> customTracksDefinition = new HashMap<>();
+
+   @Transient
+   HashMap<String, float[]> _customTracks_UI = new HashMap<>();
+   // ############################################# CUSTOM TRACKS STATS#######################################
+   @Transient
+   private HashMap<String, CustomTrackStatEntry> customTracksStat = new HashMap<>();
+
+
+   // ############################################# RUNNING DYNAMICS TRANSIENT#######################################
    /*
     * Running dynamics data
     *
@@ -1555,22 +1570,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @since Version 18.7
     */
-
-   // ############################################# CUSTOM TRACKS TRANSIENT#######################################
-   @Transient
-   HashMap<String, float[]> customTracks = new HashMap<>();
-
-   @Transient
-   public HashMap<String, CustomTrackDefinition> customTracksDefinition = new HashMap<>();
-
-   @Transient
-   HashMap<String, float[]> _customTracks_UI = new HashMap<>();
-   // ############################################# CUSTOM TRACKS STATS#######################################
-   @Transient
-   private HashMap<String, CustomTrackStatEntry> customTracksStat = new HashMap<>();
-
-
-   // ############################################# RUNNING DYNAMICS TRANSIENT#######################################
 
    @Transient
    public short[]       runDyn_StanceTime;
@@ -1736,8 +1735,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       int sumRunDyn_VerticalRatio = 0;
       //CUSTOM TRACKS
       final HashMap<String, Float> sumCustomTracks = new HashMap<>();
-      for (final String i : customTracks.keySet()) {
-         sumCustomTracks.put(i, (float) 0.0);
+      for (final String custTrackDefId : customTracks.keySet()) {
+         sumCustomTracks.put(custTrackDefId, (float) 0.0);
       }
 
       double mapMinLatitude = 0;
@@ -1799,12 +1798,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          //CUSTOM TRACKS
-         for (final String i : customTracks.keySet()) {
-            final float[] track = customTracks.get(i);
-            Float valS = sumCustomTracks.get(i);
+         for (final String custTrackDefId : customTracks.keySet()) {
+            final float[] track = customTracks.get(custTrackDefId);
+            Float valS = sumCustomTracks.get(custTrackDefId);
             if (track != null && track.length > serieIndex && valS == 0) {
                valS += track[serieIndex];
-               sumCustomTracks.put(i, valS);
+               sumCustomTracks.put(custTrackDefId, valS);
             }
          }
 
@@ -1925,9 +1924,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       //CUSTOM TRACKS
-      for (final String i : sumCustomTracks.keySet()) {
-         if (sumCustomTracks.get(i) == 0) {
-            clear_Custom_Tracks(i);
+      for (final String custTrackKey : sumCustomTracks.keySet()) {
+         if (sumCustomTracks.get(custTrackKey) == 0) {
+            clear_Custom_Tracks(custTrackKey);
          }
       }
    }
@@ -3527,8 +3526,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    //CUSTOM TRACKS
    private void computeCustomTracks() {
-      for (final String i : customTracks.keySet()) {
-         final float[] valarr = customTracks.get(i);
+      for (final String custTrackDefId : customTracks.keySet()) {
+         final float[] valarr = customTracks.get(custTrackDefId);
          if (valarr != null && valarr.length > 0) {
 
             float minValue;
@@ -3562,7 +3561,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             valE.value_Min = minValue;
             valE.value_Max = maxValue;
             valE.value_Avg = numValues == 0 ? 0 : sumValue / numValues;
-            customTracksStat.put(i, valE);
+            customTracksStat.put(custTrackDefId, valE);
          }
        }
    }

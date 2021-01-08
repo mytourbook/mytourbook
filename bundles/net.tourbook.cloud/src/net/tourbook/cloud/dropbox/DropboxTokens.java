@@ -13,31 +13,29 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.strava;
+package net.tourbook.cloud.dropbox;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import net.tourbook.cloud.oauth2.Tokens;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Tokens {
+public class DropboxTokens extends Tokens {
 
-   private long   expires_at;
-   private String refresh_token;
-   private String access_token;
-   Athlete        athlete;
+   private String uid;
+   private String token_type;
+   private String account_id;
 
-   public String getAccess_token() {
-      return access_token;
+   public String getAccount_id() {
+      return account_id;
    }
 
-   public long getExpires_at() {
-      return expires_at;
+   public String getToken_type() {
+      return token_type;
    }
 
-   public String getRefresh_token() {
-      return refresh_token;
+   public String getUid() {
+      return uid;
    }
 
-   public Athlete getAthlete() {
-      return athlete;
-   }
 }

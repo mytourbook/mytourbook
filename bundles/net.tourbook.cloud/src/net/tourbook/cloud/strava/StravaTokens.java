@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,18 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.oauth2;
+package net.tourbook.cloud.strava;
 
-public class OAuth2Utils {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-   /**
-    * We consider that an access token is expired if there are less
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
+import net.tourbook.cloud.oauth2.Tokens;
 
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class StravaTokens extends Tokens {
+
+   private Athlete athlete;
+
+   public Athlete getAthlete() {
+      return athlete;
    }
+
 }
