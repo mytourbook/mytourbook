@@ -426,8 +426,8 @@ public class StravaUploader extends TourbookCloudUploader {
                   Messages.UploadToursToStrava_Icon_Hourglass,
                   UI.EMPTY_STRING));
 
-            final Map<String, TourData> toursToUpload = new HashMap<>();
-            final List<TourData> manualToursToUpload = new ArrayList<>();
+            final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
+            final List<TourData> manualTours = new ArrayList<>();
             for (int index = 0; index < numberOfTours; ++index) {
 
                final TourData tourData = selectedTours.get(index);
@@ -443,14 +443,14 @@ public class StravaUploader extends TourbookCloudUploader {
 
                   } else {
 
-                     manualToursToUpload.add(tourData);
+                     manualTours.add(tourData);
                      monitor.worked(1);
                   }
                } else {
 
                   final String absoluteTourFilePath = createTemporaryTourFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
 
-                  toursToUpload.put(processTour(tourData, absoluteTourFilePath), tourData);
+                  toursWithTimeSeries.put(processTour(tourData, absoluteTourFilePath), tourData);
 
                   deleteTemporaryFile(absoluteTourFilePath);
 
@@ -464,9 +464,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
             tryRenewTokens();
 
-            uploadTours(toursToUpload, manualToursToUpload);
+            uploadTours(toursWithTimeSeries, manualTours);
 
-            monitor.worked(toursToUpload.size());
+            monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
                   Messages.UploadToursToStrava_Icon_Check,
@@ -496,11 +496,11 @@ public class StravaUploader extends TourbookCloudUploader {
       }
    }
 
-   private void uploadTours(final Map<String, TourData> toursToUpload, final List<TourData> manualToursToUpload) {
+   private void uploadTours(final Map<String, TourData> toursWithTimeSeries, final List<TourData> manualTours) {
 
       final List<CompletableFuture<ActivityUpload>> activityUploads = new ArrayList<>();
 
-      for (final Map.Entry<String, TourData> tourToUpload : toursToUpload.entrySet()) {
+      for (final Map.Entry<String, TourData> tourToUpload : toursWithTimeSeries.entrySet()) {
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
          final TourData tourData = tourToUpload.getValue();
@@ -508,14 +508,14 @@ public class StravaUploader extends TourbookCloudUploader {
          activityUploads.add(uploadFile(compressedTourAbsoluteFilePath, tourData));
       }
 
-      for (final TourData tourData : manualToursToUpload) {
+      for (final TourData tourData : manualTours) {
 
          activityUploads.add(uploadManualTour(tourData));
       }
 
       activityUploads.stream().map(CompletableFuture::join).forEach(StravaUploader::logUploadResult);
 
-      for (final Map.Entry<String, TourData> tourToUpload : toursToUpload.entrySet()) {
+      for (final Map.Entry<String, TourData> tourToUpload : toursWithTimeSeries.entrySet()) {
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
          deleteTemporaryFile(compressedTourAbsoluteFilePath);
