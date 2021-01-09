@@ -26,12 +26,18 @@ import net.tourbook.common.UI;
  */
 public class SerieData implements Serializable {
 
-   private static final long   serialVersionUID  = 1L;
+   private static final long   serialVersionUID      = 1L;
 
-   private static final String NL                = UI.NEW_LINE1;
-   private static final String DATA_SERIE_FORMAT = "%5d %s";   //$NON-NLS-1$
+   private static final String NL                    = UI.NEW_LINE1;
+   private static final String DATA_SERIE_FORMAT     = "%5d %s";    //$NON-NLS-1$
 
-   private static final int    SERIE_MAX_LENGTH  = 100;
+   private static final int    SERIE_MAX_LENGTH      = 100;
+
+   /**
+    * This is necessary otherwise the text is wrapped in the text control, it seems that the max
+    * length of a line in the text controls is 1024
+    */
+   private static final int    VALUE_TEXT_MAX_LENGTH = 990;
 
    public int[]                timeSerie;
 
@@ -131,12 +137,12 @@ public class SerieData implements Serializable {
     *
     * @since Version 18.10
     */
-   public short[]              swim_LengthType;                // e.g. active, idle
+   public short[]              swim_LengthType;                     // e.g. active, idle
 
-   public short[]              swim_Cadence;                   // strokes/min
-   public short[]              swim_Strokes;                   // strokes/length
-   public short[]              swim_StrokeStyle;               // e.g. freestyle, breaststroke
-   public int[]                swim_Time;                      // relative time to the start time
+   public short[]              swim_Cadence;                        // strokes/min
+   public short[]              swim_Strokes;                        // strokes/length
+   public short[]              swim_StrokeStyle;                    // e.g. freestyle, breaststroke
+   public int[]                swim_Time;                           // relative time to the start time
 
    /**
     * Is <code>true</code> when a time slice in a data serie is visible.
@@ -161,67 +167,77 @@ public class SerieData implements Serializable {
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
-      if (dataSerie == null) {
+      if (dataSerie == null || dataSerie.length == 0) {
          return UI.EMPTY_STRING;
       }
 
       final int numDataSlices = dataSerie.length;
 
-      return String.format(DATA_SERIE_FORMAT,
+      final String formattedText = String.format(DATA_SERIE_FORMAT,
             numDataSlices,
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
+
+      return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
    private String dataSerieValues(final float[] dataSerie) {
 
-      if (dataSerie == null) {
+      if (dataSerie == null || dataSerie.length == 0) {
          return UI.EMPTY_STRING;
       }
 
       final int numDataSlices = dataSerie.length;
 
-      return String.format(DATA_SERIE_FORMAT,
+      final String formattedText = String.format(DATA_SERIE_FORMAT,
             numDataSlices,
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
+
+      return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
    private String dataSerieValues(final int[] dataSerie) {
 
-      if (dataSerie == null) {
+      if (dataSerie == null || dataSerie.length == 0) {
          return UI.EMPTY_STRING;
       }
 
       final int numDataSlices = dataSerie.length;
 
-      return String.format(DATA_SERIE_FORMAT,
+      final String formattedText = String.format(DATA_SERIE_FORMAT,
             numDataSlices,
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
+
+      return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
    private String dataSerieValues(final long[] dataSerie) {
 
-      if (dataSerie == null) {
+      if (dataSerie == null || dataSerie.length == 0) {
          return UI.EMPTY_STRING;
       }
 
       final int numDataSlices = dataSerie.length;
 
-      return String.format(DATA_SERIE_FORMAT,
+      final String formattedText = String.format(DATA_SERIE_FORMAT,
             numDataSlices,
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
+
+      return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
    private String dataSerieValues(final short[] dataSerie) {
 
-      if (dataSerie == null) {
+      if (dataSerie == null || dataSerie.length == 0) {
          return UI.EMPTY_STRING;
       }
 
       final int numDataSlices = dataSerie.length;
 
-      return String.format(DATA_SERIE_FORMAT,
+      final String formattedText = String.format(DATA_SERIE_FORMAT,
             numDataSlices,
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
+
+      return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
    }
 
    @Override
@@ -246,10 +262,10 @@ public class SerieData implements Serializable {
             + "   speedSerie20               " + dataSerieValues(speedSerie20)                  + NL //$NON-NLS-1$
             + "   temperatureSerie20         " + dataSerieValues(temperatureSerie20)            + NL //$NON-NLS-1$
 
+            + "   gears                      " + dataSerieValues(gears)                         + NL //$NON-NLS-1$
+
             + "   latitudeE6                 " + dataSerieValues(latitudeE6)                    + NL //$NON-NLS-1$
             + "   longitudeE6                " + dataSerieValues(longitudeE6)                   + NL //$NON-NLS-1$
-
-            + "   gears                      " + dataSerieValues(gears)                         + NL //$NON-NLS-1$
 
             + "   runDyn_StanceTime          " + dataSerieValues(runDyn_StanceTime)             + NL //$NON-NLS-1$
             + "   runDyn_StanceTimeBalance   " + dataSerieValues(runDyn_StanceTimeBalance)      + NL //$NON-NLS-1$
