@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -229,6 +229,14 @@ public class TimeTools {
             weekDayFormatter_Full.format(DayOfWeek.SATURDAY),
             weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
       };
+   }
+
+   public static String constructLocalExpireAtDateTime(final long expireAt) {
+      if (expireAt == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      return Instant.ofEpochMilli(expireAt).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
    }
 
    /**

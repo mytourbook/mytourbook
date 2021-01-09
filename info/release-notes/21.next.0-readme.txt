@@ -13,6 +13,8 @@ TODO's
 
 * Website: Map providers list in https://osmlab.github.io/editor-layer-index/
 
+* Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
+
 
 Issues
 ======
@@ -48,7 +50,9 @@ Improvements
 Changes  
 =======
 
-* 
+* Dropbox Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/277
+  - Switched to the new PKCE OAuth2 flow (The Implicit grant flow previously used is now considered deprecated by Dropbox: "[Legacy. We recommend the PKCE flow.]")
+  - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
 
 
 Bugfix
