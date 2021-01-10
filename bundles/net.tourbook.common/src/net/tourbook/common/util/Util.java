@@ -80,7 +80,7 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+   // public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
@@ -118,6 +118,8 @@ public class Util {
    public static final String ATTR_COLOR_BLUE             = "blue";             //$NON-NLS-1$
 
    public static final String CSV_FILE_EXTENSION          = "csv";              //$NON-NLS-1$
+
+   private static final char  NL                          = UI.NEW_LINE;
 
    public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -911,12 +913,13 @@ public class Util {
 
    public static String getSQLExceptionText(final SQLException e) {
 
-      final String text = UI.EMPTY_STRING//
+      final String text = UI.EMPTY_STRING
 
-            + ("SQLException" + UI.NEW_LINE2) //$NON-NLS-1$
-            + ("SQLState: " + (e).getSQLState() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("ErrorCode: " + (e).getErrorCode() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("Message: " + (e).getMessage() + UI.NEW_LINE); //$NON-NLS-1$
+            + "SQLException" + NL //$NON-NLS-1$
+            + NL
+            + "SQLState: " + e.getSQLState() + NL //$NON-NLS-1$
+            + "ErrorCode: " + e.getErrorCode() + NL //$NON-NLS-1$
+            + "Message: " + e.getMessage() + NL; //$NON-NLS-1$
 
       return text;
    }
@@ -2003,7 +2006,7 @@ public class Util {
          try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
-               sb.append(line).append(UI.NEW_LINE);
+               sb.append(line).append(NL);
             }
          } finally {
             inputStream.close();

@@ -559,13 +559,17 @@ public class Messages extends NLS {
    public static String        App_Cadence_Spm;
 
    public static String        App_Db_CompressTables_Button_CompressByCopying;
+   public static String        App_Db_CompressTables_Button_CompressDatabase;
    public static String        App_Db_CompressTables_Button_CompressInplace;
+   public static String        App_Db_CompressTables_Dialog_ConfirmCompress_Message;
    public static String        App_Db_CompressTables_DialogTitle;
    public static String        App_Db_CompressTables_HeaderLabel_Index;
    public static String        App_Db_CompressTables_HeaderLabel_NotUsed;
    public static String        App_Db_CompressTables_HeaderLabel_Table;
    public static String        App_Db_CompressTables_HeaderLabel_Totals;
    public static String        App_Db_CompressTables_HeaderLabel_Used;
+   public static String        App_Db_CompressTables_Monitor_SubTask;
+   public static String        App_Db_CompressTables_Monitor_Task;
 
    public static String        App_Default_PersonFirstName;
 
