@@ -59,7 +59,7 @@ public class GraphColorManager {
    public static final String PREF_GRAPH_PACE                         = "pace";                       //$NON-NLS-1$
    public static final String PREF_GRAPH_POWER                        = "power";                      //$NON-NLS-1$
    public static final String PREF_GRAPH_SPEED                        = "speed";                      //$NON-NLS-1$
-   public static final String PREF_GRAPH_TEMPTERATURE                 = "tempterature";               //$NON-NLS-1$
+   public static final String            PREF_GRAPH_TEMPTERATURE                 = "temperature";                //$NON-NLS-1$
    public static final String PREF_GRAPH_TIME                         = "duration";                   //$NON-NLS-1$
    public static final String PREF_GRAPH_TOUR                         = "tour";                       //$NON-NLS-1$
    public static final String PREF_GRAPH_TOUR_COMPARE                 = "tourCompare";                //$NON-NLS-1$
@@ -75,6 +75,8 @@ public class GraphColorManager {
    public static final String PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";       //$NON-NLS-1$
    public static final String PREF_GRAPH_BODYFAT                      = "BodyFat";                    //$NON-NLS-1$
    public static final String PREF_GRAPH_BODYWEIGHT                   = "BodyWeight";                 //$NON-NLS-1$
+   //CUSTOM TRACKS
+   public static final String            PREF_GRAPH_CUSTOM_TRACKS                = "Custom_Tracks";              //$NON-NLS-1$
 
    public static final String            PREF_COLOR_BRIGHT           = "bright";            //$NON-NLS-1$
    public static final String            PREF_COLOR_DARK             = "dark";              //$NON-NLS-1$
@@ -419,6 +421,15 @@ public class GraphColorManager {
             Messages.Graph_Label_Temperature,
             new RGB(255, 255, 255),
             new RGB(0, 217, 240),
+            new RGB(0, 216, 240),
+            new RGB(0, 134, 147),
+            null));
+
+      //CUSTOM TRACKS
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_CUSTOM_TRACKS, //
+            Messages.Graph_Label_Custom_Tracks,
+            new RGB(255, 255, 255),
+            new RGB(0, 200, 240),
             new RGB(0, 216, 240),
             new RGB(0, 134, 147),
             null));

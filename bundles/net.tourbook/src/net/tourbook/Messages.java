@@ -1041,6 +1041,9 @@ public class Messages extends NLS {
    public static String        Image__Graph_Swim_Strokes_Disabled;
    public static String        Image__Graph_Swim_Swolf;
    public static String        Image__Graph_Swim_Swolf_Disabled;
+   //CUSTOM TRACKS
+   public static String        Image__Graph_Custom_Tracks;
+   public static String        Image__Graph_Custom_Tracks_Disabled;
    public static String        Image__GraphMinMax;
    public static String        Image__GraphMinMax_Disabled;
    public static String        Image__GroupValues;
@@ -2272,6 +2275,10 @@ public class Messages extends NLS {
    public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_TourChartGraph_Label_Title;
 
+   //CUSTOM TRACKS
+   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part1;
+   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part2;
+
    public static String Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
    public static String Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
    public static String Slideout_TourChartGraphBackground_Label_BackgroundSource;
@@ -2505,6 +2512,8 @@ public class Messages extends NLS {
    public static String Tour_Action_ShowTourPauses_Tooltip;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
+   //CUSTOM TRACKS
+   public static String Tour_Action_Custom_Tracks_Tooltip_Prefix;
    public static String Tour_Action_TourInfo_Tooltip;
    public static String Tour_Action_TourPhotos;
    public static String Tour_Action_TourPhotosWithoutTooltip_Tooltip;

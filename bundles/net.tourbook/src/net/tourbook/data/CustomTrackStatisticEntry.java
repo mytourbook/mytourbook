@@ -2,7 +2,7 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-public class CustomTrackStatEntry implements Serializable {
+public class CustomTrackStatisticEntry implements Serializable {
    /**
     *
     */

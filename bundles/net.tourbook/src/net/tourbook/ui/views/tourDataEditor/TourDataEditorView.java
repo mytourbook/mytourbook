@@ -68,6 +68,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.data.CustomTrackDefinition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -220,111 +221,115 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   public static final String  ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
-   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String           VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   private static final int              COLUMN_SPACING                            = 20;
+   private static final int    COLUMN_SPACING                            = 20;
    //
-   private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
+   private static final String WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
+   private static final String WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
+   private static final String WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
+   private static final String MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS                      = 5000;
+   private static final int    BUSY_INDICATOR_ITEMS                      = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   private static final String STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
-   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
-   static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
+   static final String         STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
+   static final int            STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
+   static final String         STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int            STATE_LAT_LON_DIGITS_DEFAULT              = 5;
    //
-   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
-   private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
-   private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
+   private static final String COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
-   private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateTimeSlice   = TourbookPlugin.getState(ID + ".slice");     //$NON-NLS-1$
+   private static final IDialogSettings  _stateSwimSlice   = TourbookPlugin.getState(ID + ".swimSlice"); //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
-   private static final boolean          IS_OSX                                    = UI.IS_OSX;
+   private static final boolean          IS_LINUX          = UI.IS_LINUX;
+   private static final boolean          IS_OSX            = UI.IS_OSX;
    //
    private ZonedDateTime                 _tourStartTime;
    //
    /*
     * Data series which are displayed in the viewer, all are metric system
     */
-   private int[]                   _serieTime;
-   private float[]                 _serieDistance;
-   private float[]                 _serieAltitude;
-   private float[]                 _serieTemperature;
-   private float[]                 _serieCadence;
-   private float[]                 _serieGradient;
-   private float[]                 _serieSpeed;
-   private float[]                 _seriePace;
-   private float[]                 _seriePower;
-   private float[]                 _seriePulse;
-   private double[]                _serieLatitude;
-   private double[]                _serieLongitude;
-   private float[][]               _serieGears;
-   private boolean[]               _serieBreakTime;
+   private int[]                          _serieTime;
+   private float[]                        _serieDistance;
+   private float[]                        _serieAltitude;
+   private float[]                        _serieTemperature;
+   private float[]                        _serieCadence;
+   private float[]                        _serieGradient;
+   private float[]                        _serieSpeed;
+   private float[]                        _seriePace;
+   private float[]                        _seriePower;
+   private float[]                        _seriePulse;
+   private double[]                       _serieLatitude;
+   private double[]                       _serieLongitude;
+   private float[][]                      _serieGears;
+   private boolean[]                      _serieBreakTime;
+   //CUSTOM TRACKS
+   HashMap<String, float[]>               _customTracks;
+   HashMap<String, CustomTrackDefinition> _customTracksDefinition;
+   Long                                   _tourId_for_CustTracks = null;
    //
-   private short[]                 _swimSerie_StrokeRate;
-// private short[]                 _swimSerie_LengthType;
-   private short[]                 _swimSerie_StrokesPerlength;
-   private short[]                 _swimSerie_StrokeStyle;
-   private int[]                   _swimSerie_Time;
+   private short[]                        _swimSerie_StrokeRate;
+   // private short[]                 _swimSerie_LengthType;
+   private short[]                        _swimSerie_StrokesPerlength;
+   private short[]                        _swimSerie_StrokeStyle;
+   private int[]                          _swimSerie_Time;
    //
-   private ColumnDefinition        _timeSlice_ColDef_Altitude;
-   private ColumnDefinition        _timeSlice_ColDef_Cadence;
-   private ColumnDefinition        _timeSlice_ColDef_Pulse;
-   private ColumnDefinition        _timeSlice_ColDef_Temperature;
-   private ColumnDefinition        _timeSlice_ColDef_Latitude;
-   private ColumnDefinition        _timeSlice_ColDef_Longitude;
+   private ColumnDefinition               _timeSlice_ColDef_Altitude;
+   private ColumnDefinition               _timeSlice_ColDef_Cadence;
+   private ColumnDefinition               _timeSlice_ColDef_Pulse;
+   private ColumnDefinition               _timeSlice_ColDef_Temperature;
+   private ColumnDefinition               _timeSlice_ColDef_Latitude;
+   private ColumnDefinition               _timeSlice_ColDef_Longitude;
    //
-   private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
-   private ColumnDefinition        _swimSlice_ColDef_Strokes;
-   private ColumnDefinition        _swimSlice_ColDef_StrokeStyle;
+   private ColumnDefinition               _swimSlice_ColDef_StrokeRate;
+   private ColumnDefinition               _swimSlice_ColDef_Strokes;
+   private ColumnDefinition               _swimSlice_ColDef_StrokeStyle;
    //
-   private MessageManager          _messageManager;
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPartListener2          _partListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private ITourSaveListener       _tourSaveListener;
+   private MessageManager                 _messageManager;
+   private PostSelectionProvider          _postSelectionProvider;
+   private ISelectionListener             _postSelectionListener;
+   private IPartListener2                 _partListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
+   private ITourEventListener             _tourEventListener;
+   private ITourSaveListener              _tourSaveListener;
    //
-   private final NumberFormat      _nf1        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf1NoGroup = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf2        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf3        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf6        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf3NoGroup = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                   = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1NoGroup            = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf2                   = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf3                   = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf6                   = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf3NoGroup            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -1622,6 +1627,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _timeSlice_Viewer.setSelection(previousSelection, true);
                }
+               //CUSTOM TRACKS add dispose check below
+               if (table.isDisposed()) {
+                  return;
+               }
                table.setRedraw(true);
             }
 
@@ -1922,7 +1931,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.isEmpty()) {
+      if (selection.size() == 0) {
          return;
       }
 
@@ -2071,6 +2080,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                sb.append(_serieBreakTime[serieIndex] ? 1 : 0);
             }
             sb.append(UI.TAB);
+
+            //CUSTOM TRACKS
+            //TODO write custom tracks to CSV
 
             // end of line
             sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
@@ -5257,6 +5269,68 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
+    * column: CUSTOM TRACKS
+    *
+    * @param reloadT
+    */
+   private void defineColumn_TimeSlice_Custom_Tracks(final boolean reloadT) {
+
+      if (_customTracks != null) {
+         if (reloadT) {
+
+            _timeSlice_ColumnManager.clearCustColumns();
+
+            //TODO for swim
+            //_swimSlice_ColumnManager.clearCustColumns();
+
+         }
+
+         for (final String custTrkId : _customTracks.keySet()) {
+            final float[] seriesC = _customTracks.get(custTrkId);
+            CustomTrackDefinition custTrkDefinition = null;
+            if (_customTracksDefinition != null) {
+               custTrkDefinition = _customTracksDefinition.get(custTrkId);
+            }
+            if (custTrkDefinition == null) {
+               custTrkDefinition = new CustomTrackDefinition();
+               custTrkDefinition.setId(custTrkId);
+               custTrkDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + custTrkId);
+               custTrkDefinition.setUnit("");
+            }
+            final ColumnDefinition colDef = TableColumnFactory.CUSTOM_TRACKS_TIME_SLICES.createColumnCustTrack(_timeSlice_ColumnManager,
+                  _pc,
+                  custTrkDefinition);
+            colDef.setColumnSelectionListener(_columnSortListener);
+            colDef.setCanModifyVisibility(true);
+            colDef.setIsColumnChecked(false);
+
+            colDef.setLabelProvider(new CellLabelProvider() {
+               @Override
+               public void update(final ViewerCell cell) {
+                  if (seriesC != null) {
+                     final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+                     if (timeSlice.serieIndex < seriesC.length) {
+                        cell.setText(Float.toString(seriesC[timeSlice.serieIndex]));
+                     } else {
+                        cell.setText("Error idx:" + Integer.toString(timeSlice.serieIndex));
+                     }
+                  } else {
+                     cell.setText(UI.EMPTY_STRING);
+                  }
+               }
+            });
+         }
+
+         if (reloadT) {
+            _timeSlice_Viewer = (TableViewer) _timeSlice_TourViewer.recreateViewer(_timeSlice_Viewer);
+            //TODO for swim
+            //_swimSlice_Viewer = (TableViewer) _swimSlice_TourViewer.recreateViewer(_swimSlice_Viewer);
+         }
+
+      }
+   }
+
+   /**
     * 1. column will be hidden because the alignment for the first column is always to the left
     */
    private void defineColumn_TimeSlice_Data_1_First() {
@@ -6005,7 +6079,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.isEmpty()) {
+      if (selection.size() == 0) {
          return;
       }
       final Object[] selectedTimeSlices = selection.toArray();
@@ -6662,6 +6736,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _serieTemperature = _tourData.temperatureSerie;
 
+      // CUSTOM TRACKS
+      _customTracksDefinition = _tourData.getCustomTracksDefinition();
+      _customTracks = _tourData.getCustomTracks();
+
       _swimSerie_StrokeRate = _tourData.swim_Cadence;
 //    _swimSerie_LengthType = _tourData.swim_LengthType;
       _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
@@ -6702,6 +6780,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _tourData.computeComputedValues();
       }
+
+      //CUSTOM TRACKS, remove and then load the new custom track for the new tour
+      //if tour changes.
+      //custom tracks can be loaded only after the time series are loaded here above
+      //flag _tourId_for_CustTracks is used to prevent reload of the same custom tracks here
+      if (_customTracks != null && _customTracks.size() > 0) {
+         if (_tourId_for_CustTracks == null) {//first time
+            defineColumn_TimeSlice_Custom_Tracks(false);
+            _tourId_for_CustTracks = _tourData.getTourId();
+         } else if (_tourData.getTourId() != _tourId_for_CustTracks) {
+            //tour has changed so reload all
+            _tourId_for_CustTracks = _tourData.getTourId();
+            //clean previous Cust Tracks definition and load new one
+            defineColumn_TimeSlice_Custom_Tracks(true);
+         }
+      }
+
    }
 
    /**

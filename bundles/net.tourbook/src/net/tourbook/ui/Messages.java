@@ -194,6 +194,8 @@ public class Messages extends NLS {
 
    public static String        ColumnFactory_Category_Altitude;
    public static String        ColumnFactory_Category_Body;
+   //CUSTOM TRACKS
+   public static String        ColumnFactory_Category_Custom_Tracks;
    public static String        ColumnFactory_Category_Data;
    public static String        ColumnFactory_Category_Device;
    public static String        ColumnFactory_Category_Marker;
