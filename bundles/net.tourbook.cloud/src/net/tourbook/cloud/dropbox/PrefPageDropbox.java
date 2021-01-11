@@ -50,13 +50,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
+   private static final String     PREF_CLOUD_CONNECTIVITY_CLOUD_ACCOUNT_GROUP =
+         net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group;
 
-   public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
+   public static final String      ID                                          = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
-   public static final int         CALLBACK_PORT = 4917;
+   public static final String      ClientId                                    = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   public static final int         CALLBACK_PORT                               = 4917;
+
+   private IPreferenceStore        _prefStore                                  = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
    /*
@@ -76,7 +79,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
                   Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN);
 
-      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.constructLocalExpireAtDateTime(expireAt);
+      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
    }
 
    @Override
@@ -148,7 +151,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group);
+      _group.setText(PREF_CLOUD_CONNECTIVITY_CLOUD_ACCOUNT_GROUP);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {

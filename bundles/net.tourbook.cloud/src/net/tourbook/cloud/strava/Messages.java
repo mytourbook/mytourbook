@@ -27,7 +27,8 @@ public class Messages extends NLS {
    public static String        Image__Connect_With_Strava;
 
    public static String        Log_UploadToursToStrava_001_Start;
-   public static String        Log_UploadToursToStrava_002_NoTimeDataSeries;
+   public static String        Log_UploadToursToStrava_002_NoTourTitle;
+   public static String        Log_UploadToursToStrava_003_ActivityLink;
    public static String        Log_UploadToursToStrava_003_UploadStatus;
    public static String        Log_UploadToursToStrava_004_UploadError;
    public static String        Log_UploadToursToStrava_005_End;
