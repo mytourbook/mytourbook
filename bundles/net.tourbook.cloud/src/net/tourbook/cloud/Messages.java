@@ -25,6 +25,7 @@ public class Messages extends NLS {
 
    public static String        Pref_CloudConnectivity_UnavailablePort_Message;
    public static String        Pref_CloudConnectivity_UnavailablePort_Title;
+   public static String        Pref_CloudConnectivity_CloudAccount_Group;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

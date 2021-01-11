@@ -17,6 +17,8 @@ package net.tourbook.cloud.oauth2;
 
 public class OAuth2Constants {
 
+   public static final String CONTENT_TYPE             = "Content-Type";       //$NON-NLS-1$
+
    public static final String PARAM_AUTHORIZATION_CODE = "authorization_code"; //$NON-NLS-1$
 
    public static final String PARAM_REFRESH_TOKEN      = "refresh_token";      //$NON-NLS-1$

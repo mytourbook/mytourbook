@@ -44,18 +44,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
+   private static final String     PREF_CLOUD_CONNECTIVITY_CLOUD_ACCOUNT_GROUP =
+         net.tourbook.cloud.Messages.Pref_CloudConnectivity_CloudAccount_Group;
 
-   public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
+   public static final String      ID                                          = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
-   public static final int         CALLBACK_PORT = 4917;
+   public static final String      ClientId                                    = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   public static final int         CALLBACK_PORT                               = 4917;
+
+   private IPreferenceStore        _prefStore                                  = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
    /*
@@ -71,8 +75,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private String computeAccessTokenExpirationDate() {
 
-      return TimeTools.constructLocalExpireAtDateTime(_prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
-            Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN));
+      final long expireAt = _prefStore.getLong(
+            Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME) + _prefStore.getInt(
+                  Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN);
+
+      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
    }
 
    @Override
@@ -144,9 +151,25 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(Messages.Pref_CloudConnectivity_Dropbox_Tokens_Information_Group);
+      _group.setText(PREF_CLOUD_CONNECTIVITY_CLOUD_ACCOUNT_GROUP);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
+         {
+            final Label labelWebPage = new Label(_group, SWT.NONE);
+            labelWebPage.setText(Messages.Pref_CloudConnectivity_Dropbox_WebPage_Label);
+            GridDataFactory.fillDefaults().applyTo(labelWebPage);
+
+            final Link linkWebPage = new Link(_group, SWT.NONE);
+            linkWebPage.setText(UI.LINK_TAG_START + Messages.Pref_CloudConnectivity_Dropbox_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setEnabled(true);
+            linkWebPage.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  WEB.openUrl(Messages.Pref_CloudConnectivity_Dropbox_WebPage_Link);
+               }
+            });
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
+         }
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
             _labelAccessToken.setText(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Label);
@@ -157,20 +180,20 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
          }
          {
-            _labelExpiresAt = new Label(_group, SWT.NONE);
-            _labelExpiresAt.setText(Messages.Pref_CloudConnectivity_Dropbox_ExpiresAt_Label);
-            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
-
-            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
-         }
-         {
             _labelRefreshToken = new Label(_group, SWT.NONE);
             _labelRefreshToken.setText(Messages.Pref_CloudConnectivity_Dropbox_RefreshToken_Label);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
             GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
+         }
+         {
+            _labelExpiresAt = new Label(_group, SWT.NONE);
+            _labelExpiresAt.setText(Messages.Pref_CloudConnectivity_Dropbox_ExpiresAt_Label);
+            GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
+
+            _labelExpiresAt_Value = new Label(_group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
       }
    }
@@ -199,7 +222,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
+   public void init(final IWorkbench workbench) {
+      //Not needed
+   }
 
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
