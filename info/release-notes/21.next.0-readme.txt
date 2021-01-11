@@ -44,7 +44,8 @@ New
 Improvements
 ============
 
-* 
+* TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/2XX
+  - Added the speed and power values in the TCX exports
 
 
 Changes  
@@ -59,6 +60,9 @@ Bugfix
 ======
 
 * A few measurement system values were wrong
+
+* TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/2XX
+  - Fixed the TCX Course Export format as it was not properly formatted before and was preventing from importing TCX Courses in Garmin Connect
 
 
 Translation    

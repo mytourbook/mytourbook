@@ -210,7 +210,7 @@
             <time>$dateformat.format($point.Date)</time>
 #end
 ##
-#if($point.hasValidExtention())
+#if($point.hasValidExtension())
             <extensions>
                <gpxtpx:TrackPointExtension>
 #if($point.hasValidTemperature())
