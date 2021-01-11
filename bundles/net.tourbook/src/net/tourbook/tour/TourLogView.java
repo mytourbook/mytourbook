@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.graphics.Color;
@@ -145,8 +147,8 @@ public class TourLogView extends ViewPart {
                ? CSS_LOG_ITEM
                : tourLog.css;
 
-         final String stateWithBrowser[] = { UI.EMPTY_STRING };
-         final String stateNoBrowser[] = { UI.EMPTY_STRING };
+         final String[] stateWithBrowser = { UI.EMPTY_STRING };
+         final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
          setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
 
@@ -364,7 +366,7 @@ public class TourLogView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -427,8 +429,17 @@ public class TourLogView extends ViewPart {
                @Override
                public void completed(final ProgressEvent event) {
 
-                  onBrowser_Completed(event);
+                  onBrowser_Completed();
                }
+            });
+
+            _browser.addLocationListener(new LocationAdapter() {
+               @Override
+               public void changing(final LocationEvent event) {
+
+                  onLocation_Changing(event);
+               }
+
             });
          }
 
@@ -469,7 +480,17 @@ public class TourLogView extends ViewPart {
       tbm.add(_actionReset);
    }
 
-   private void initUI(final Composite parent) {
+   private boolean httpAction(final String location) {
+
+      if (location.toLowerCase().startsWith("http://") || //$NON-NLS-1$
+            location.toLowerCase().startsWith("https://")) { //$NON-NLS-1$
+         WEB.openUrl(location);
+         return true;
+      }
+      return false;
+   }
+
+   private void initUI() {
 
       /*
        * Webpage css
@@ -500,7 +521,7 @@ public class TourLogView extends ViewPart {
       return "td.style.backgroundImage=\"url('" + imageUrl + "')\";" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private void onBrowser_Completed(final ProgressEvent event) {
+   private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
 
@@ -512,6 +533,16 @@ public class TourLogView extends ViewPart {
       for (final TourLog importLog : importLogs) {
          addLog(importLog);
       }
+   }
+
+   private void onLocation_Changing(final LocationEvent event) {
+
+      if (httpAction(event.location)) {
+
+         // keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
+         event.doit = false;
+      }
+
    }
 
    private void restoreState() {
@@ -557,6 +588,7 @@ public class TourLogView extends ViewPart {
          break;
 
       case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
@@ -564,11 +596,6 @@ public class TourLogView extends ViewPart {
       case EASY_IMPORT_DELETE_DEVICE:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-         break;
-
-      case TOUR_DELETED:
-         stateNoBrowser[0] = STATE_DELETE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
 
       case TOUR_SAVED:
@@ -612,8 +639,8 @@ public class TourLogView extends ViewPart {
           */
          for (final TourLog tourLog : TourLogManager.getLogs()) {
 
-            final String stateWithBrowser[] = { UI.EMPTY_STRING };
-            final String stateNoBrowser[] = { UI.EMPTY_STRING };
+            final String[] stateWithBrowser = { UI.EMPTY_STRING };
+            final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
             setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);

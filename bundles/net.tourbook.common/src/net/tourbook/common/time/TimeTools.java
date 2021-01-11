@@ -41,7 +41,6 @@ import java.time.temporal.WeekFields;
 import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
@@ -87,7 +86,7 @@ public class TimeTools {
    public static String[]                         weekDays_Short;
 
    /**
-    * Contails the full text, typically the full description. For example, day-of-week Monday might
+    * Contains the full text, typically the full description. For example, day-of-week Monday might
     * output "Monday".
     */
    public static String[]                         weekDays_Full;
@@ -133,7 +132,7 @@ public class TimeTools {
 
    public static final DateTimeFormatter  Formatter_Time_ISO;
 
-   private final static IPreferenceStore  _prefStoreCommon     = CommonActivator.getPrefStore();
+   private static final IPreferenceStore  _prefStoreCommon     = CommonActivator.getPrefStore();
 
    private static ArrayList<TimeZoneData> _allSortedTimeZones;
 
@@ -229,14 +228,6 @@ public class TimeTools {
             weekDayFormatter_Full.format(DayOfWeek.SATURDAY),
             weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
       };
-   }
-
-   public static String constructLocalExpireAtDateTime(final long expireAt) {
-      if (expireAt == 0) {
-         return UI.EMPTY_STRING;
-      }
-
-      return Instant.ofEpochMilli(expireAt).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
    }
 
    /**
@@ -390,21 +381,15 @@ public class TimeTools {
             sortedTimeZones.add(timeZone);
          }
 
-         Collections.sort(sortedTimeZones, new Comparator<TimeZoneData>() {
+         Collections.sort(sortedTimeZones, (timeZoneData1, timeZoneData2) -> {
 
-            @Override
-            public int compare(final TimeZoneData tz1, final TimeZoneData tz2) {
+            int result = timeZoneData1.zoneId.compareTo(timeZoneData2.zoneId);
 
-               int result;
-
-               result = tz1.zoneId.compareTo(tz2.zoneId);
-
-               if (result == 0) {
-                  result = tz1.zoneOffsetSeconds - tz2.zoneOffsetSeconds;
-               }
-
-               return result;
+            if (result == 0) {
+               result = timeZoneData1.zoneOffsetSeconds - timeZoneData2.zoneOffsetSeconds;
             }
+
+            return result;
          });
 
          _allSortedTimeZones = sortedTimeZones;
@@ -578,6 +563,10 @@ public class TimeTools {
       }
 
       return tzIndex;
+   }
+
+   public static String getUTCISODateTime(final long date) {
+      return Instant.ofEpochMilli(date).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
    }
 
    /**
