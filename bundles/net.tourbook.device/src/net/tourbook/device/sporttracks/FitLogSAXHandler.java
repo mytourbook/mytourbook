@@ -539,13 +539,14 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
       if (_currentActivity._weatherWindDirection != Float.MIN_VALUE) {
          tourData.setWeatherWindDir((int) _currentActivity._weatherWindDirection);
+
       }
       if (_currentActivity._weatherPressure != Float.MIN_VALUE) {
          tourData.setWeather_Pressure(_currentActivity._weatherPressure);
       }
       if (_currentActivity._weatherPrecipitation != Float.MIN_VALUE) {
          tourData.setWeather_Precipitation(_currentActivity._weatherPrecipitation);
-      }
+
 
       if (_currentActivity._customDataFields.size() > 0) {
 
@@ -571,6 +572,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                tourData.setPower_Normalized((int) val);
                _currentActivity._powerNormalized = val;
             } catch (final Exception exc) {
+
                StatusUtil.log(CONST_NORMALIZEDPOWER + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
             }
          }
@@ -581,6 +583,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                _currentActivity._powerTSS = val;
             } catch (final Exception exc) {
                StatusUtil.log(CONST_TSS + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
+
             }
          }
          if (_currentActivity._customDataFields.containsKey(CONST_IF)) {
@@ -590,6 +593,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                _currentActivity._powerIntensityFactor = val;
             } catch (final Exception exc) {
                StatusUtil.log(CONST_IF + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
+
             }
          }
          if (_currentActivity._customDataFields.containsKey(CONST_LEFT_TORQUE_EFF)) {
@@ -599,7 +603,7 @@ public class FitLogSAXHandler extends DefaultHandler {
                _currentActivity._avgPowerLeftTorqueEff = val;
             } catch (final Exception exc) {
                StatusUtil.log(CONST_LEFT_TORQUE_EFF + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
-            }
+          }
          }
          if (_currentActivity._customDataFields.containsKey(CONST_RIGHT_TORQUE_EFF)) {
             try {
@@ -607,7 +611,9 @@ public class FitLogSAXHandler extends DefaultHandler {
                tourData.setPower_AvgRightTorqueEffectiveness(val);
                _currentActivity._avgPowerRightTorqueEff = val;
             } catch (final Exception exc) {
+
                StatusUtil.log(CONST_RIGHT_TORQUE_EFF + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
+
             }
          }
          if (_currentActivity._customDataFields.containsKey(CONST_LEFT_PEDAL_SMOOTH)) {
@@ -616,7 +622,9 @@ public class FitLogSAXHandler extends DefaultHandler {
                tourData.setPower_AvgLeftPedalSmoothness(val);
                _currentActivity._avgPowerLeftPedalSmooth = val;
             } catch (final Exception exc) {
+
                StatusUtil.log(CONST_LEFT_PEDAL_SMOOTH + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
+
             }
          }
          if (_currentActivity._customDataFields.containsKey(CONST_RIGHT_PEDAL_SMOOTH)) {
@@ -625,10 +633,13 @@ public class FitLogSAXHandler extends DefaultHandler {
                tourData.setPower_AvgRightPedalSmoothness(val);
                _currentActivity._avgPowerRightPedalSmooth = val;
             } catch (final Exception exc) {
+
                StatusUtil.log(CONST_RIGHT_PEDAL_SMOOTH + ": " + CONST_FITLOGEX_ERROR_STRING, exc); //$NON-NLS-1$
+
             }
          }
       }
+
 
       if (_currentActivity._avgPowerBalance != Float.MIN_VALUE) {
          tourData.setPower_PedalLeftRightBalance((int) _currentActivity._avgPowerBalance);
@@ -846,6 +857,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       final ArrayList<Equipment> equipmentNames = _currentActivity._equipmentNames;
       if (equipmentNames.isEmpty()) {
+
          return;
       }
 
@@ -924,6 +936,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
       final ArrayList<Lap> _laps = _currentActivity._laps;
+
       if (_laps.isEmpty()) {
          return;
       }
@@ -1478,7 +1491,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void saveEquipmentsAsTags() {
 
-      if (_equipments.isEmpty()) {
+      if (_equipments.size() == 0) {
          return;
       }
 

@@ -8,6 +8,7 @@ public class CustomTrackDefinition implements Serializable {
     */
    private static final long serialVersionUID = -4880414084528375769L;
    //Custom Track Definition
+
    public static final String DEFAULT_CUSTOM_TRACK_NAME = "default";            //$NON-NLS-1$
 
    private String            _name;

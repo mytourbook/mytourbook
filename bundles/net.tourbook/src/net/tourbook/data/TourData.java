@@ -1735,10 +1735,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       int sumRunDyn_VerticalRatio = 0;
       //CUSTOM TRACKS
       final HashMap<String, Float> sumCustomTracks = new HashMap<>();
+
       if (_customTracks != null) {
          for (final String custTrackDefId : _customTracks.keySet()) {
             sumCustomTracks.put(custTrackDefId, (float) 0.0);
          }
+
       }
 
       double mapMinLatitude = 0;
@@ -1946,10 +1948,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        * customTracks_UI.put(i, null);
        * }
        */
+
       if (_customTracks == null) {
          return;
       }
       _customTracks.remove(idx);
+
       _customTracks_UI.remove(idx);
       customTracksStat.remove(idx);
    }
@@ -3537,6 +3541,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    //CUSTOM TRACKS
    private void computeCustomTracks() {
+
       if (_customTracks == null) {
          return;
       }
@@ -3547,6 +3552,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
       for (final String custTrackDefId : _customTracks.keySet()) {
          final float[] valarr = _customTracks.get(custTrackDefId);
+
          if (valarr != null && valarr.length > 0) {
 
             float minValue;
@@ -7252,7 +7258,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public HashMap<String, float[]> getCustomTracks() {
 
-
       if (_customTracks != null && _customTracks.size() > 0) {
          if (_customTracks_UI == null) {
             _customTracks_UI = new HashMap<>();
@@ -7277,6 +7282,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (_customTracks_UI == null) {
          return new HashMap();
       }
+
 
       return _customTracks_UI;
    }
@@ -7303,6 +7309,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             }
             final int serieSize = _customTracks.get(idx).length;
             final float[] serieData = _customTracks.get(idx);
+
             final float[] serieValues = new float[serieSize];
             for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
                serieValues[serieIndex] = serieData[serieIndex];
@@ -7335,6 +7342,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    //CUSTOM TRACKS
    public CustomTrackStatisticEntry getCustomTracksStat(final String key) {
+
       if (customTracksStat == null) {
          return null;
       }
@@ -9086,6 +9094,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean isCustomTracksAvailable() {
 
       if (_customTracks != null && _customTracks.size() > 0) {
+
          return true;
       }
       return false;
@@ -9479,6 +9488,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       //CUSTOM TRACKS
       serieData.customTracks = _customTracks;
+
       serieData.customTracksStat = customTracksStat;
       serieData.customTracksDefinition = customTracksDefinition;
 
@@ -10524,6 +10534,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             _customTracks = new HashMap();
          }
          _customTracks.clear();
+
          for (int j = 0; j < firstTimeData.customTracks.length; j++) {
 
             if (firstTimeData.customTracks[j].value == Float.MIN_VALUE) {
@@ -10543,7 +10554,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                      for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
                         timeDataSerie[invalidIndex].customTracks[j].value = custValue;
                      }
+
                      _customTracks.put(firstTimeData.customTracks[j].id, custSerie);
+
                      break;
                   }
                }
@@ -10551,7 +10564,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             } else {
                isAvailable = true;
                final float[] custSerie = new float[serieSize];
+
                _customTracks.put(firstTimeData.customTracks[j].id, custSerie);
+
             }
 
          }
