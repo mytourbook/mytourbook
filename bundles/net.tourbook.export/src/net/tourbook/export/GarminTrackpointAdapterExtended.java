@@ -50,11 +50,7 @@ public class GarminTrackpointAdapterExtended extends GarminTrackpointAdapter {
 
    public boolean hasValidExtension() {
 
-      if (hasValidTemperature() || hasValidHeartrate() || hasValidCadence() || hasValidDistance() || hasValidGear()) {
-         return true;
-      }
-
-      return false;
+      return hasValidTemperature() || hasValidHeartrate() || hasValidCadence() || hasValidDistance() || hasValidGear();
    }
 
    /**

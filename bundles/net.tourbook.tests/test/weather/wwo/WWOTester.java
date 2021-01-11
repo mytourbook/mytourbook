@@ -37,7 +37,7 @@ public class WWOTester {
    @BeforeAll
    static void initAll() {
 
-      API_KEY = Initializer.getCredential("WorldWeatherOnline");
+      API_KEY = Initializer.getCredential("WorldWeatherOnline"); //$NON-NLS-1$
       _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, API_KEY);
 
    }

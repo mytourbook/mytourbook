@@ -47,7 +47,7 @@ public class Initializer {
 
    private static HashMap<String, String> _vendorCredentials        = new HashMap<>();
 
-   private static final String            VendorCredentialsFileName = "Credentials.json";
+   private static final String            VendorCredentialsFileName = "Credentials.json"; //$NON-NLS-1$
    private static final String            UTIL_FILE_PATH            = "test/utils/files/"; //$NON-NLS-1$
 
    static {
