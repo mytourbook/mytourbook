@@ -88,16 +88,22 @@ public class DialogCompressDatabase extends Dialog {
    private Shell                        _dialogShell;
 
    private List<String>                 _allTableNames;
-   private TIntArrayList                _allInitialUsedSpaces;
-   private TIntArrayList                _allUsedSpacesAfterCompress;
+   private List<String>                 _allConglomerateNames;
+
+   private TIntArrayList                _allIndexFlags;
+   private TIntArrayList                _allUsedSpaces_BeforeCompress;
+   private TIntArrayList                _allUsedSpaces_AfterCompress;
 
    private String                       _logText = UI.EMPTY_STRING;
 
    /*
     * UI controls
     */
-   private Text _txtLog;
-   private Font _monoFont;
+   private Text   _txtLog;
+   private Font   _monoFont;
+
+   private Button _btnCompressByCopying;
+   private Button _btnCompressInplace;
 
    public DialogCompressDatabase() {
 
@@ -109,9 +115,7 @@ public class DialogCompressDatabase extends Dialog {
 
    private void appendLogText(final String newText) {
 
-      _logText = _logText.length() == 0
-            ? newText
-            : _logText + NL + newText;
+      _logText = _logText + NL + newText;
 
       _txtLog.setText(_logText);
 
@@ -144,13 +148,14 @@ public class DialogCompressDatabase extends Dialog {
          /*
           * Button: Compress by copying
           */
-         final Button button = createButton(
+         _btnCompressByCopying = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 1,
                Messages.App_Db_CompressTables_Button_CompressByCopying,
                false);
+         _btnCompressByCopying.setToolTipText(Messages.App_Db_CompressTables_Button_CompressByCopying_Tooltip);
 
-         button.addSelectionListener(new SelectionAdapter() {
+         _btnCompressByCopying.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onCompress(false);
@@ -161,13 +166,14 @@ public class DialogCompressDatabase extends Dialog {
          /*
           * Button: Inplace compress
           */
-         final Button button = createButton(
+         _btnCompressInplace = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 2,
                Messages.App_Db_CompressTables_Button_CompressInplace,
                false);
+         _btnCompressInplace.setToolTipText(Messages.App_Db_CompressTables_Button_CompressInplace_Tooltip);
 
-         button.addSelectionListener(new SelectionAdapter() {
+         _btnCompressInplace.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onCompress(true);
@@ -191,6 +197,303 @@ public class DialogCompressDatabase extends Dialog {
       return ui;
    }
 
+   private String createLog_BeforeCompressed(final TIntArrayList allUsedSpaces,
+                                             final ArrayList<String> allNames,
+                                             final TIntArrayList allSpaceSavings,
+                                             final TIntArrayList allAllocatedPages,
+                                             final TIntArrayList allFreePages,
+                                             final TIntArrayList allUnfilledPages,
+                                             final TIntArrayList allPageSize) {
+      // get width of the largest table/index name
+      int maxWidth_Name = 0;
+      for (final String name : allNames) {
+         if (name.length() > maxWidth_Name) {
+            maxWidth_Name = name.length();
+         }
+      }
+
+  // SET_FORMATTING_OFF
+
+         int maxValueWidth = 11; // 123'456'789 kByte
+         maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
+
+         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_Used.length());
+         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_NotUsed.length());
+
+         final String lineFormat = UI.EMPTY_STRING
+
+               + UI.SPACE                          // empty column
+
+               + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Used      + "s" // USEDSPACE            //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_NotUsed   + "s" // ESTIMSPACESAVING     //$NON-NLS-1$ //$NON-NLS-2$
+
+               + "  %"  + maxValueWidth      + "s" // NUMALLOCATEDPAGES    //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxValueWidth      + "s" // NUMFREEPAGES         //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxValueWidth      + "s" // NUMUNFILLEDPAGES     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxValueWidth      + "s" // PAGESIZE             //$NON-NLS-1$ //$NON-NLS-2$
+
+               + UI.SPACE                          // empty column
+
+         ;
+
+  // SET_FORMATTING_ON
+
+      //ISINDEX|CONGLOMERATENAME               |USEDSPACE|ESTIMSPACESAVING|NUMALLOCATEDPAGES|NUMFREEPAGES|NUMUNFILLEDPAGES|PAGESIZE|
+      //-------|-------------------------------|---------|----------------|-----------------|------------|----------------|--------|
+//         0|DBVERSION                      |     4096|               0|                1|           0|               0|    4096|
+//         0|TOURBIKE                       |     4096|               0|                1|           0|               0|    4096|
+//         0|TOURCOMPARED                   |   491520|               0|              120|           0|               0|    4096|
+//         0|TOURDATA                       |667615232|        99418112|            17340|        3034|            2089|   32768|
+//         0|TOURDATA_TOURTAG               |   376832|               0|               92|           0|               0|    4096|
+//         0|TOURGEOPARTS                   |  7966720|               0|             1945|           0|               1|    4096|
+//         0|TOURMARKER                     |  3649536|               0|              891|           0|               1|    4096|
+//         0|TOURPERSON                     |    16384|               0|                4|           0|               0|    4096|
+//         0|TOURPERSONHRZONE               |    32768|               0|                1|           0|               1|   32768|
+//         0|TOURPHOTO                      |  2424832|               0|              592|           0|               0|    4096|
+//         0|TOURREFERENCE                  |   102400|           77824|                6|          19|               1|    4096|
+//         0|TOURTAG                        |    57344|               0|               14|           0|               0|    4096|
+//         0|TOURTAGCATEGORY                |     4096|               0|                1|           0|               1|    4096|
+//         0|TOURTAGCATEGORY_TOURTAG        |     4096|               0|                1|           0|               1|    4096|
+//         0|TOURTAGCATEGORY_TOURTAGCATEGORY|     4096|               0|                1|           0|               1|    4096|
+//         0|TOURTYPE                       |   118784|           40960|               19|          10|               2|    4096|
+//         0|TOURWAYPOINT                   |    32768|               0|                1|           0|               1|   32768|
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(NL);
+      sb.append(String.format(lineFormat,
+
+            UI.EMPTY_STRING,
+            Messages.App_Db_CompressTables_HeaderLabel_Used,
+            Messages.App_Db_CompressTables_HeaderLabel_NotUsed,
+
+            HEADER_ALLOCATED_PAGES_1,
+            HEADER_FREE_PAGES_1,
+            HEADER_UNFILLED_PAGES_1,
+            HEADER_PAGE_SIZE_1
+
+      ));
+
+      sb.append(NL);
+      sb.append(String.format(lineFormat,
+
+            Messages.App_Db_CompressTables_HeaderLabel_Table,
+            UI.UNIT_KBYTE,
+            UI.UNIT_KBYTE,
+
+            HEADER_ALLOCATED_PAGES_2,
+            HEADER_FREE_PAGES_2,
+            HEADER_UNFILLED_PAGES_2,
+            HEADER_PAGE_SIZE_2
+
+      ));
+
+      sb.append(NL);
+      sb.append(NL);
+
+      boolean isIndexTitleDisplayed = false;
+
+      int sumUsedSpaces = 0;
+      int sumSpaceSavings = 0;
+
+      for (int rowIndex = 0; rowIndex < allNames.size(); rowIndex++) {
+
+         final String name = allNames.get(rowIndex);
+         final int usedSpace = allUsedSpaces.get(rowIndex);
+         final int spaceSavings = allSpaceSavings.get(rowIndex);
+
+         sumUsedSpaces += usedSpace;
+         sumSpaceSavings += spaceSavings;
+
+         final boolean dbIsIndex = _allIndexFlags.get(rowIndex) == 1 ? true : false;
+
+         if (dbIsIndex && isIndexTitleDisplayed == false) {
+
+            // show index header
+
+            sb.append(NL);
+            sb.append(NL);
+            sb.append(UI.SPACE + Messages.App_Db_CompressTables_HeaderLabel_Index);
+            sb.append(NL);
+            sb.append(NL);
+
+            isIndexTitleDisplayed = true;
+         }
+
+         sb.append(String.format(lineFormat,
+
+               name,
+
+               _nf0.format(usedSpace / 1024),
+               _nf0.format(spaceSavings / 1024),
+
+               _nf0.format(allAllocatedPages.get(rowIndex)),
+               _nf0.format(allFreePages.get(rowIndex)),
+               _nf0.format(allUnfilledPages.get(rowIndex)),
+               _nf0.format(allPageSize.get(rowIndex))
+
+         ));
+
+         sb.append(NL);
+      }
+
+      /*
+       * Show totals
+       */
+      sb.append(NL);
+      sb.append(NL);
+      sb.append(String.format(lineFormat,
+
+            Messages.App_Db_CompressTables_HeaderLabel_Totals,
+
+            _nf0.format(sumUsedSpaces / 1024),
+            _nf0.format(sumSpaceSavings / 1024),
+
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING));
+
+      sb.append(NL);
+
+      return sb.toString();
+   }
+
+   private String createLog_DiffSize() {
+
+      // get width of the largest table/index name
+      int maxWidth_Name = 0;
+      for (final String name : _allConglomerateNames) {
+         if (name.length() > maxWidth_Name) {
+            maxWidth_Name = name.length();
+         }
+      }
+
+// SET_FORMATTING_OFF
+
+         int maxValueWidth = 11; // 123'456'789 kByte
+         maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
+
+         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_Before.length());
+         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_After.length());
+
+         final String lineFormat_Header = UI.EMPTY_STRING
+
+               + UI.SPACE                          // empty column
+
+               + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Used      + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
+               + UI.SPACE2
+               + "  %"  + maxWidth_NotUsed   + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+
+               + UI.SPACE                          // empty column
+
+         ;
+
+         final String lineFormat_Value = UI.EMPTY_STRING
+
+               + UI.SPACE                          // empty column
+
+               + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Used      + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
+               + UI.SPACE + UI.SYMBOL_ARROW_RIGHT
+               + "  %"  + maxWidth_NotUsed   + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+
+               + UI.SPACE                          // empty column
+
+               ;
+
+// SET_FORMATTING_ON
+
+      final StringBuilder sb = new StringBuilder();
+
+      // header line 1
+      sb.append(NL);
+      sb.append(String.format(lineFormat_Header,
+
+            UI.EMPTY_STRING,
+            Messages.App_Db_CompressTables_HeaderLabel_Before,
+            Messages.App_Db_CompressTables_HeaderLabel_After
+
+      ));
+
+      // header line 2
+      sb.append(NL);
+      sb.append(String.format(lineFormat_Header,
+
+            Messages.App_Db_CompressTables_HeaderLabel_Table,
+            UI.UNIT_KBYTE,
+            UI.UNIT_KBYTE
+
+      ));
+
+      sb.append(NL);
+      sb.append(NL);
+
+      boolean isIndexTitleDisplayed = false;
+
+      int sumBefore = 0;
+      int sumAfter = 0;
+
+      for (int rowIndex = 0; rowIndex < _allConglomerateNames.size(); rowIndex++) {
+
+         final String name = _allConglomerateNames.get(rowIndex);
+         final int usedSpace_BeforeCompress = _allUsedSpaces_BeforeCompress.get(rowIndex);
+         final int usedSpace_AfterCompress = _allUsedSpaces_AfterCompress.get(rowIndex);
+
+         sumBefore += usedSpace_BeforeCompress;
+         sumAfter += usedSpace_AfterCompress;
+
+         final boolean dbIsIndex = _allIndexFlags.get(rowIndex) == 1 ? true : false;
+
+         if (dbIsIndex && isIndexTitleDisplayed == false) {
+
+            // show index header
+
+            sb.append(NL);
+            sb.append(NL);
+            sb.append(UI.SPACE + Messages.App_Db_CompressTables_HeaderLabel_Index);
+            sb.append(NL);
+            sb.append(NL);
+
+            isIndexTitleDisplayed = true;
+         }
+
+         sb.append(String.format(lineFormat_Value,
+
+               name,
+
+               _nf0.format(usedSpace_BeforeCompress / 1024),
+               _nf0.format(usedSpace_AfterCompress / 1024)
+
+         ));
+
+         sb.append(NL);
+      }
+
+      /*
+       * Show totals
+       */
+      sb.append(NL);
+      sb.append(NL);
+      sb.append(String.format(lineFormat_Value,
+
+            Messages.App_Db_CompressTables_HeaderLabel_Totals,
+
+            _nf0.format(sumBefore / 1024),
+            _nf0.format(sumAfter / 1024),
+
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING));
+
+      sb.append(NL);
+
+      return sb.toString();
+   }
+
    private Control createUI(final Composite parent) {
 
       _txtLog = new Text(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -200,9 +503,18 @@ public class DialogCompressDatabase extends Dialog {
       return _txtLog;
    }
 
-   private String getDatabaseSize(final List<String> allTableNames, final TIntArrayList allUsedSpaces) {
+   private String getDatabaseSize(final List<String> allConglomerateNames,
+                                  final List<String> allTableNames,
+                                  final TIntArrayList allUsedSpaces) {
 
       final String[] returnData = new String[1];
+
+      final boolean[] isSetIndexFlag = { false };
+
+      if (_allIndexFlags == null) {
+         _allIndexFlags = new TIntArrayList();
+         isSetIndexFlag[0] = true;
+      }
 
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
@@ -237,7 +549,6 @@ public class DialogCompressDatabase extends Dialog {
                final ArrayList<String> allNames = new ArrayList<>();
 
                final TIntArrayList allSpaceSavings = new TIntArrayList();
-               final TIntArrayList allIsIndex = new TIntArrayList();
 
                final TIntArrayList allAllocatedPages = new TIntArrayList();
                final TIntArrayList allFreePages = new TIntArrayList();
@@ -253,175 +564,35 @@ public class DialogCompressDatabase extends Dialog {
 
                   allUsedSpaces.add(result.getInt(2));
                   allSpaceSavings.add(result.getInt(3));
-                  final int dbIsIndex = result.getInt(4);
-                  allIsIndex.add(dbIsIndex);
-
+                  final int dbIndexFlag = result.getInt(4);
                   allAllocatedPages.add(result.getInt(5));
                   allFreePages.add(result.getInt(6));
                   allUnfilledPages.add(result.getInt(7));
                   allPageSize.add(result.getInt(8));
 
-                  if (dbIsIndex != 1) {
+                  // keep state if it is a table or index
+                  if (isSetIndexFlag[0]) {
+                     _allIndexFlags.add(dbIndexFlag);
+                  }
 
-                     // item is a table
+                  // keep all names
+                  if (allConglomerateNames != null) {
+                     allConglomerateNames.add(name);
+                  }
+
+                  // keep table names separately
+                  if (allTableNames != null && dbIndexFlag != 1) {
                      allTableNames.add(name);
                   }
                }
 
-               // get width of the largest table/index name
-               int maxWidth_Name = 0;
-               for (final String name : allNames) {
-                  if (name.length() > maxWidth_Name) {
-                     maxWidth_Name = name.length();
-                  }
-               }
-
-   // SET_FORMATTING_OFF
-
-                  int maxValueWidth = 11; // 123'456'789 kByte
-                  maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
-
-                  final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_Used.length());
-                  final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_NotUsed.length());
-
-                  final String lineFormat = UI.EMPTY_STRING
-
-                        + UI.SPACE                          // empty column
-
-                        + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  %"  + maxWidth_Used      + "s" // USEDSPACE            //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  %"  + maxWidth_NotUsed   + "s" // ESTIMSPACESAVING     //$NON-NLS-1$ //$NON-NLS-2$
-
-                        + "  %"  + maxValueWidth      + "s" // NUMALLOCATEDPAGES    //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  %"  + maxValueWidth      + "s" // NUMFREEPAGES         //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  %"  + maxValueWidth      + "s" // NUMUNFILLEDPAGES     //$NON-NLS-1$ //$NON-NLS-2$
-                        + "  %"  + maxValueWidth      + "s" // PAGESIZE             //$NON-NLS-1$ //$NON-NLS-2$
-
-                        + UI.SPACE                          // empty column
-
-                  ;
-
-   // SET_FORMATTING_ON
-
-               //ISINDEX|CONGLOMERATENAME               |USEDSPACE|ESTIMSPACESAVING|NUMALLOCATEDPAGES|NUMFREEPAGES|NUMUNFILLEDPAGES|PAGESIZE|
-               //-------|-------------------------------|---------|----------------|-----------------|------------|----------------|--------|
-//         0|DBVERSION                      |     4096|               0|                1|           0|               0|    4096|
-//         0|TOURBIKE                       |     4096|               0|                1|           0|               0|    4096|
-//         0|TOURCOMPARED                   |   491520|               0|              120|           0|               0|    4096|
-//         0|TOURDATA                       |667615232|        99418112|            17340|        3034|            2089|   32768|
-//         0|TOURDATA_TOURTAG               |   376832|               0|               92|           0|               0|    4096|
-//         0|TOURGEOPARTS                   |  7966720|               0|             1945|           0|               1|    4096|
-//         0|TOURMARKER                     |  3649536|               0|              891|           0|               1|    4096|
-//         0|TOURPERSON                     |    16384|               0|                4|           0|               0|    4096|
-//         0|TOURPERSONHRZONE               |    32768|               0|                1|           0|               1|   32768|
-//         0|TOURPHOTO                      |  2424832|               0|              592|           0|               0|    4096|
-//         0|TOURREFERENCE                  |   102400|           77824|                6|          19|               1|    4096|
-//         0|TOURTAG                        |    57344|               0|               14|           0|               0|    4096|
-//         0|TOURTAGCATEGORY                |     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTAGCATEGORY_TOURTAG        |     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTAGCATEGORY_TOURTAGCATEGORY|     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTYPE                       |   118784|           40960|               19|          10|               2|    4096|
-//         0|TOURWAYPOINT                   |    32768|               0|                1|           0|               1|   32768|
-
-               final StringBuilder sb = new StringBuilder();
-
-               sb.append(NL);
-               sb.append(String.format(lineFormat,
-
-                     UI.EMPTY_STRING,
-                     Messages.App_Db_CompressTables_HeaderLabel_Used,
-                     Messages.App_Db_CompressTables_HeaderLabel_NotUsed,
-
-                     HEADER_ALLOCATED_PAGES_1,
-                     HEADER_FREE_PAGES_1,
-                     HEADER_UNFILLED_PAGES_1,
-                     HEADER_PAGE_SIZE_1
-
-               ));
-
-               sb.append(NL);
-               sb.append(String.format(lineFormat,
-
-                     Messages.App_Db_CompressTables_HeaderLabel_Table,
-                     UI.UNIT_KBYTE,
-                     UI.UNIT_KBYTE,
-
-                     HEADER_ALLOCATED_PAGES_2,
-                     HEADER_FREE_PAGES_2,
-                     HEADER_UNFILLED_PAGES_2,
-                     HEADER_PAGE_SIZE_2
-
-               ));
-
-               sb.append(NL);
-               sb.append(NL);
-
-               boolean isIndexTitleDisplayed = false;
-
-               int sumUsedSpaces = 0;
-               int sumSpaceSavings = 0;
-
-               for (int rowIndex = 0; rowIndex < allNames.size(); rowIndex++) {
-
-                  final String name = allNames.get(rowIndex);
-                  final int usedSpace = allUsedSpaces.get(rowIndex);
-                  final int spaceSavings = allSpaceSavings.get(rowIndex);
-
-                  sumUsedSpaces += usedSpace;
-                  sumSpaceSavings += spaceSavings;
-
-                  final boolean dbIsIndex = allIsIndex.get(rowIndex) == 1 ? true : false;
-
-                  if (dbIsIndex && isIndexTitleDisplayed == false) {
-
-                     // show index header
-
-                     sb.append(NL);
-                     sb.append(NL);
-                     sb.append(UI.SPACE + Messages.App_Db_CompressTables_HeaderLabel_Index);
-                     sb.append(NL);
-                     sb.append(NL);
-
-                     isIndexTitleDisplayed = true;
-                  }
-
-                  sb.append(String.format(lineFormat,
-
-                        name,
-
-                        _nf0.format(usedSpace / 1024),
-                        _nf0.format(spaceSavings / 1024),
-
-                        _nf0.format(allAllocatedPages.get(rowIndex)),
-                        _nf0.format(allFreePages.get(rowIndex)),
-                        _nf0.format(allUnfilledPages.get(rowIndex)),
-                        _nf0.format(allPageSize.get(rowIndex))
-
-                  ));
-
-                  sb.append(NL);
-               }
-
-               /*
-                * Show totals
-                */
-               sb.append(NL);
-               sb.append(NL);
-               sb.append(String.format(lineFormat,
-
-                     Messages.App_Db_CompressTables_HeaderLabel_Totals,
-
-                     _nf0.format(sumUsedSpaces / 1024),
-                     _nf0.format(sumSpaceSavings / 1024),
-
-                     UI.EMPTY_STRING,
-                     UI.EMPTY_STRING,
-                     UI.EMPTY_STRING,
-                     UI.EMPTY_STRING));
-
-               sb.append(NL);
-
-               returnData[0] = sb.toString();
+               returnData[0] = createLog_BeforeCompressed(allUsedSpaces,
+                     allNames,
+                     allSpaceSavings,
+                     allAllocatedPages,
+                     allFreePages,
+                     allUnfilledPages,
+                     allPageSize);
 
             } catch (final SQLException e) {
                SQL.showException(e);
@@ -503,7 +674,7 @@ public class DialogCompressDatabase extends Dialog {
             public void run(final IProgressMonitor monitor)
                   throws InvocationTargetException, InterruptedException {
 
-               monitor.beginTask(NLS.bind(Messages.App_Db_CompressTables_Monitor_Task, numTables), numTables);
+               monitor.beginTask(Messages.App_Db_CompressTables_Monitor_Task, numTables);
 
                try (final Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -555,12 +726,13 @@ public class DialogCompressDatabase extends Dialog {
 
                   _dialogShell.getDisplay().asyncExec(() -> {
 
-                     _allUsedSpacesAfterCompress = new TIntArrayList();
-                     _allTableNames = new ArrayList<>();
+                     _allUsedSpaces_AfterCompress = new TIntArrayList();
 
-                     final String dbSizeInfo = getDatabaseSize(_allTableNames, _allUsedSpacesAfterCompress);
+                     appendLogText(Messages.App_Db_CompressTables_LogHeader_After);
+                     appendLogText(getDatabaseSize(null, null, _allUsedSpaces_AfterCompress));
 
-                     appendLogText(dbSizeInfo);
+                     appendLogText(Messages.App_Db_CompressTables_LogHeader_Difference);
+                     appendLogText(createLog_DiffSize());
                   });
                }
             }
@@ -575,17 +747,22 @@ public class DialogCompressDatabase extends Dialog {
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.showStatus(e);
       }
+
+      // disable compress buttons that it cannot be run twice -> db sizes would be wrong when running more than once
+      _btnCompressByCopying.setEnabled(false);
+      _btnCompressInplace.setEnabled(false);
    }
 
    private void updateUI_ShowInitialDbSize() {
 
       // setup return values
-      _allInitialUsedSpaces = new TIntArrayList();
+      _allConglomerateNames = new ArrayList<>();
       _allTableNames = new ArrayList<>();
 
-      final String dbSizeInfo = getDatabaseSize(_allTableNames, _allInitialUsedSpaces);
+      _allUsedSpaces_BeforeCompress = new TIntArrayList();
 
-      appendLogText(dbSizeInfo);
+      appendLogText(Messages.App_Db_CompressTables_LogHeader_Before);
+      appendLogText(getDatabaseSize(_allConglomerateNames, _allTableNames, _allUsedSpaces_BeforeCompress));
 
       // MUST be run async otherwise it has the wrong location
       _dialogShell.getDisplay().asyncExec(() -> {
