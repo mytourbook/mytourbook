@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,19 +15,16 @@
  *******************************************************************************/
 package utils;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TourData;
 
 import org.junit.jupiter.api.Assertions;
@@ -118,13 +115,7 @@ public class Comparison {
 
       final String controlDocumentFilePath = Paths.get(controlDocumentFileName).toAbsolutePath().toString();
 
-      String controlDocument = UI.EMPTY_STRING;
-      try {
-         controlDocument = Files.readString(Paths.get(controlDocumentFilePath), StandardCharsets.US_ASCII);
-      } catch (final IOException e) {
-         e.printStackTrace();
-      }
-      return controlDocument;
+      return FilesUtils.readFileContentString(controlDocumentFilePath);
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
