@@ -124,6 +124,7 @@ public class Initializer {
          final SAXParser parser = factory.newSAXParser();
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
+         return parser;
       } catch (final ParserConfigurationException | SAXException e) {
          e.printStackTrace();
       }
