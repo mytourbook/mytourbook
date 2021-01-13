@@ -131,7 +131,7 @@ public class DialogCompressDatabase extends Dialog {
       _dialogShell = shell;
 
       // set window title
-      shell.setText(Messages.App_Db_CompressTables_DialogTitle);
+      shell.setText(Messages.App_Db_Compress_DialogTitle);
 
       shell.addDisposeListener(e -> {
 
@@ -151,9 +151,9 @@ public class DialogCompressDatabase extends Dialog {
          _btnCompressByCopying = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 1,
-               Messages.App_Db_CompressTables_Button_CompressByCopying,
+               Messages.App_Db_Compress_Button_CompressByCopying,
                false);
-         _btnCompressByCopying.setToolTipText(Messages.App_Db_CompressTables_Button_CompressByCopying_Tooltip);
+         _btnCompressByCopying.setToolTipText(Messages.App_Db_Compress_Button_CompressByCopying_Tooltip);
 
          _btnCompressByCopying.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -169,9 +169,9 @@ public class DialogCompressDatabase extends Dialog {
          _btnCompressInplace = createButton(
                parent,
                IDialogConstants.CLIENT_ID + 2,
-               Messages.App_Db_CompressTables_Button_CompressInplace,
+               Messages.App_Db_Compress_Button_CompressInplace,
                false);
-         _btnCompressInplace.setToolTipText(Messages.App_Db_CompressTables_Button_CompressInplace_Tooltip);
+         _btnCompressInplace.setToolTipText(Messages.App_Db_Compress_Button_CompressInplace_Tooltip);
 
          _btnCompressInplace.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -217,8 +217,8 @@ public class DialogCompressDatabase extends Dialog {
          int maxValueWidth = 11; // 123'456'789 kByte
          maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
 
-         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_Used.length());
-         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_NotUsed.length());
+         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_Compress_LogLabel_Used.length());
+         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_Compress_LogLabel_NotUsed.length());
 
          final String lineFormat = UI.EMPTY_STRING
 
@@ -265,8 +265,8 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(String.format(lineFormat,
 
             UI.EMPTY_STRING,
-            Messages.App_Db_CompressTables_HeaderLabel_Used,
-            Messages.App_Db_CompressTables_HeaderLabel_NotUsed,
+            Messages.App_Db_Compress_LogLabel_Used,
+            Messages.App_Db_Compress_LogLabel_NotUsed,
 
             HEADER_ALLOCATED_PAGES_1,
             HEADER_FREE_PAGES_1,
@@ -278,7 +278,7 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(NL);
       sb.append(String.format(lineFormat,
 
-            Messages.App_Db_CompressTables_HeaderLabel_Table,
+            Messages.App_Db_Compress_LogLabel_Table,
             UI.UNIT_KBYTE,
             UI.UNIT_KBYTE,
 
@@ -314,7 +314,7 @@ public class DialogCompressDatabase extends Dialog {
 
             sb.append(NL);
             sb.append(NL);
-            sb.append(UI.SPACE + Messages.App_Db_CompressTables_HeaderLabel_Index);
+            sb.append(UI.SPACE + Messages.App_Db_Compress_LogLabel_Index);
             sb.append(NL);
             sb.append(NL);
 
@@ -345,7 +345,7 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(NL);
       sb.append(String.format(lineFormat,
 
-            Messages.App_Db_CompressTables_HeaderLabel_Totals,
+            Messages.App_Db_Compress_LogLabel_Totals,
 
             _nf0.format(sumUsedSpaces / 1024),
             _nf0.format(sumSpaceSavings / 1024),
@@ -375,17 +375,18 @@ public class DialogCompressDatabase extends Dialog {
          int maxValueWidth = 11; // 123'456'789 kByte
          maxValueWidth = Math.max(maxValueWidth, UI.UNIT_KBYTE.length());
 
-         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_Before.length());
-         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_CompressTables_HeaderLabel_After.length());
+         final int maxWidth_Used             = Math.max(maxValueWidth, Messages.App_Db_Compress_LogLabel_Before.length());
+         final int maxWidth_NotUsed          = Math.max(maxValueWidth, Messages.App_Db_Compress_LogLabel_After.length());
+         final int maxWidth_Difference       = Math.max(maxValueWidth, Messages.App_Db_Compress_LogLabel_Difference.length());
 
          final String lineFormat_Header = UI.EMPTY_STRING
 
                + UI.SPACE                          // empty column
 
-               + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
-               + "  %"  + maxWidth_Used      + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
-               + UI.SPACE2
-               + "  %"  + maxWidth_NotUsed   + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+               + "%-"   + maxWidth_Name         + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Used         + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_NotUsed      + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Difference   + "s" // difference           //$NON-NLS-1$ //$NON-NLS-2$
 
                + UI.SPACE                          // empty column
 
@@ -395,10 +396,10 @@ public class DialogCompressDatabase extends Dialog {
 
                + UI.SPACE                          // empty column
 
-               + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
-               + "  %"  + maxWidth_Used      + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
-               + UI.SPACE + UI.SYMBOL_ARROW_RIGHT
-               + "  %"  + maxWidth_NotUsed   + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+               + "%-"   + maxWidth_Name         + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Used         + "s" // before compress      //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_NotUsed      + "s" // after compress       //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxWidth_Difference   + "s" // difference           //$NON-NLS-1$ //$NON-NLS-2$
 
                + UI.SPACE                          // empty column
 
@@ -413,8 +414,9 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(String.format(lineFormat_Header,
 
             UI.EMPTY_STRING,
-            Messages.App_Db_CompressTables_HeaderLabel_Before,
-            Messages.App_Db_CompressTables_HeaderLabel_After
+            Messages.App_Db_Compress_LogLabel_Before,
+            Messages.App_Db_Compress_LogLabel_After,
+            Messages.App_Db_Compress_LogLabel_Difference
 
       ));
 
@@ -422,7 +424,8 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(NL);
       sb.append(String.format(lineFormat_Header,
 
-            Messages.App_Db_CompressTables_HeaderLabel_Table,
+            Messages.App_Db_Compress_LogLabel_Table,
+            UI.UNIT_KBYTE,
             UI.UNIT_KBYTE,
             UI.UNIT_KBYTE
 
@@ -453,7 +456,7 @@ public class DialogCompressDatabase extends Dialog {
 
             sb.append(NL);
             sb.append(NL);
-            sb.append(UI.SPACE + Messages.App_Db_CompressTables_HeaderLabel_Index);
+            sb.append(UI.SPACE + Messages.App_Db_Compress_LogLabel_Index);
             sb.append(NL);
             sb.append(NL);
 
@@ -465,7 +468,8 @@ public class DialogCompressDatabase extends Dialog {
                name,
 
                _nf0.format(usedSpace_BeforeCompress / 1024),
-               _nf0.format(usedSpace_AfterCompress / 1024)
+               _nf0.format(usedSpace_AfterCompress / 1024),
+               _nf0.format((usedSpace_AfterCompress - usedSpace_BeforeCompress) / 1024)
 
          ));
 
@@ -479,15 +483,13 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(NL);
       sb.append(String.format(lineFormat_Value,
 
-            Messages.App_Db_CompressTables_HeaderLabel_Totals,
+            Messages.App_Db_Compress_LogLabel_Totals,
 
             _nf0.format(sumBefore / 1024),
             _nf0.format(sumAfter / 1024),
+            _nf0.format((sumAfter - sumBefore) / 1024)
 
-            UI.EMPTY_STRING,
-            UI.EMPTY_STRING,
-            UI.EMPTY_STRING,
-            UI.EMPTY_STRING));
+      ));
 
       sb.append(NL);
 
@@ -632,17 +634,17 @@ public class DialogCompressDatabase extends Dialog {
 
       final MessageDialog messageDialog = new MessageDialog(getShell(),
 
-            Messages.App_Db_CompressTables_DialogTitle,
+            Messages.App_Db_Compress_DialogTitle,
             null,
 
-            NLS.bind(Messages.App_Db_CompressTables_Dialog_ConfirmCompress_Message,
+            NLS.bind(Messages.App_Db_Compress_Dialog_ConfirmCompress_Message,
                   TourDatabase.getDatabasePath()),
 
             MessageDialog.QUESTION,
 
             // define buttons
             new String[] {
-                  Messages.App_Db_CompressTables_Button_CompressDatabase,
+                  Messages.App_Db_Compress_Button_CompressDatabase,
                   IDialogConstants.NO_LABEL },
 
             // default button index
@@ -674,7 +676,7 @@ public class DialogCompressDatabase extends Dialog {
             public void run(final IProgressMonitor monitor)
                   throws InvocationTargetException, InterruptedException {
 
-               monitor.beginTask(Messages.App_Db_CompressTables_Monitor_Task, numTables);
+               monitor.beginTask(Messages.App_Db_Compress_Monitor_Task, numTables);
 
                try (final Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -706,7 +708,7 @@ public class DialogCompressDatabase extends Dialog {
                      final String schema = resultSet.getString(1);
                      final String tableName = resultSet.getString(2);
 
-                     monitor.subTask(NLS.bind(Messages.App_Db_CompressTables_Monitor_SubTask,
+                     monitor.subTask(NLS.bind(Messages.App_Db_Compress_Monitor_SubTask,
                            new Object[] { ++numCompressed, numTables, tableName }));
 
                      // compress one table
@@ -728,10 +730,10 @@ public class DialogCompressDatabase extends Dialog {
 
                      _allUsedSpaces_AfterCompress = new TIntArrayList();
 
-                     appendLogText(Messages.App_Db_CompressTables_LogHeader_After);
+                     appendLogText(Messages.App_Db_Compress_LogHeader_After);
                      appendLogText(getDatabaseSize(null, null, _allUsedSpaces_AfterCompress));
 
-                     appendLogText(Messages.App_Db_CompressTables_LogHeader_Difference);
+                     appendLogText(Messages.App_Db_Compress_LogHeader_Difference);
                      appendLogText(createLog_DiffSize());
                   });
                }
@@ -761,7 +763,7 @@ public class DialogCompressDatabase extends Dialog {
 
       _allUsedSpaces_BeforeCompress = new TIntArrayList();
 
-      appendLogText(Messages.App_Db_CompressTables_LogHeader_Before);
+      appendLogText(Messages.App_Db_Compress_LogHeader_Before);
       appendLogText(getDatabaseSize(_allConglomerateNames, _allTableNames, _allUsedSpaces_BeforeCompress));
 
       // MUST be run async otherwise it has the wrong location
