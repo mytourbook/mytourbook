@@ -47,7 +47,7 @@ public class Initializer {
 
    private static HashMap<String, String> _vendorCredentials        = new HashMap<>();
 
-   private static final String            VendorCredentialsFileName = "Credentials.json"; //$NON-NLS-1$
+   private static final String            VendorCredentialsFileName = "Credentials.json";  //$NON-NLS-1$
    private static final String            UTIL_FILE_PATH            = "test/utils/files/"; //$NON-NLS-1$
 
    static {
@@ -105,28 +105,29 @@ public class Initializer {
             alreadyImportedTours,
             newlyImportedTours);
 
-      try {
-         if (parser != null) {
+      if (parser != null) {
+         try {
             parser.parse(gpx, handler);
+         } catch (SAXException | IOException e) {
+            e.printStackTrace();
          }
-      } catch (SAXException | IOException e) {
-         e.printStackTrace();
       }
 
       return Comparison.retrieveImportedTour(newlyImportedTours);
    }
 
    public static SAXParser initializeParser() {
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = null;
+
       try {
-         parser = factory.newSAXParser();
+
+         final SAXParserFactory factory = SAXParserFactory.newInstance();
+         final SAXParser parser = factory.newSAXParser();
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
       } catch (final ParserConfigurationException | SAXException e) {
          e.printStackTrace();
       }
 
-      return parser;
+      return null;
    }
 }
