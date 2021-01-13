@@ -505,8 +505,7 @@ public class TourExporter {
 
       final int[] timeSerie = _tourData.timeSerie;
 
-      // check if all dataseries are available
-      if ((timeSerie == null) /* || (latitudeSerie == null) || (longitudeSerie == null) */) {
+      if ((timeSerie == null)) {
          return null;
       }
 
@@ -862,9 +861,6 @@ public class TourExporter {
 
          wayPoint.setUrlAddress(twp.getUrlAddress());
          wayPoint.setUrlText(twp.getUrlText());
-//
-//       // <sym>...</sym>
-//       wayPoint.setSymbolName(twp.getSymbol());
 
          exportedWayPoints.add(wayPoint);
       }
