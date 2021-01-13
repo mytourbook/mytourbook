@@ -40,6 +40,8 @@ New
   - Ability to upload tours to a Strava account.
 
 
+* Compress Database
+  This tool can compress the internal sql database. After updating MyTourbook to 21.2, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
 
 Improvements
 ============
@@ -54,6 +56,10 @@ Changes
   - Switched to the new PKCE OAuth2 flow (The Implicit grant flow previously used is now considered deprecated by Dropbox: "[Legacy. We recommend the PKCE flow.]")
   - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
 
+* Latitude/longitude values are saved in E6 format
+  This reduces the precision in the worst case (at the equator) to 0.11132m which is less than the accuracy of the GPS system
+  https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
+    
 
 Bugfix
 ======
