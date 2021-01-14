@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ public class TileImageLoader implements Runnable {
 
       if (tile.isLoadingError()) {
 
-         // move tile from tile cache into the cache which contails tiles with errors
+         // move tile from tile cache into the cache which contains tiles with errors
 
          MP.getErrorTiles().add(tileKey, tile);
 
@@ -215,7 +215,7 @@ public class TileImageLoader implements Runnable {
                } catch (final Exception e) {
 
                   /*
-                   * exception occures when loading the image, don't remove them from the
+                   * exception occurs when loading the image, don't remove them from the
                    * loading list, so that the tiles don't get reloaded
                    */
 
@@ -223,7 +223,7 @@ public class TileImageLoader implements Runnable {
                      if (inputStream != null) {
 
                         /*
-                         * Print stack track otherwise many popups can occure
+                         * Print stack track otherwise many popups can occur
                          */
 
                         if (_stackTraceCounter++ > 1) {
@@ -483,7 +483,7 @@ public class TileImageLoader implements Runnable {
 
             } else if (tile.isOfflimeImageAvailable()) {
 
-               // parent tile has no chilren which needs to be loaded, behave as a normal tile
+               // parent tile has no children which needs to be loaded, behave as a normal tile
 
                getTileImage(tile);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,16 +19,14 @@ import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
-import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,13 +44,9 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -127,6 +121,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
    private Label            _lblLog;
 
    private Text             _txtImageFormat;
+   private Text             _txtUserAgent;
 
    /*
     * NON-UI fields
@@ -237,11 +232,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       private final Combo                       rowCombo;
 
       /**
-       * The hashmap contains all widgets for one row
+       * The EnumMap contains all widgets for one row
        */
-      private final HashMap<WIDGET_KEY, Widget> rowWidgets;
+      private final EnumMap<WIDGET_KEY, Widget> rowWidgets;
 
-      public PartRow(final Combo combo, final HashMap<WIDGET_KEY, Widget> widgets) {
+      public PartRow(final Combo combo, final EnumMap<WIDGET_KEY, Widget> widgets) {
          rowCombo = combo;
          rowWidgets = widgets;
       }
@@ -348,13 +343,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       shell.setText(Messages.Dialog_CustomConfig_DialogTitle);
 
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-
-            MP.removeTileListener(DialogMPCustom.this);
-         }
-      });
+      shell.addDisposeListener(event -> MP.removeTileListener(DialogMPCustom.this));
    }
 
    @Override
@@ -493,6 +482,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          }
 
          createUI220Detail(container);
+         createUI230UserAgent(container);
          createUI240DebugInfo(container);
       }
    }
@@ -515,7 +505,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
             /*
              * show page according to the selected item in the combobox
              */
-            final HashMap<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
+            final EnumMap<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
 
             onSelectPart(combo, rowWidgets);
          }
@@ -532,36 +522,28 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       /*
        * pagebook: parameter widgets
        */
-      final HashMap<WIDGET_KEY, Widget> paraWidgets = createUI212ParaWidgets(container);
+      final EnumMap<WIDGET_KEY, Widget> paraWidgets = createUI212ParaWidgets(container);
 
       return new PartRow(combo, paraWidgets);
    }
 
-   private HashMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent) {
+   private EnumMap<WIDGET_KEY, Widget> createUI212ParaWidgets(final Composite parent) {
 
-      final HashMap<WIDGET_KEY, Widget> paraWidgets = new HashMap<>();
+      final EnumMap<WIDGET_KEY, Widget> paraWidgets = new EnumMap<>(WIDGET_KEY.class);
 
-      final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+      final MouseWheelListener mouseWheelListener = event -> {
 
-            Util.adjustSpinnerValueOnMouseScroll(event);
+         Util.adjustSpinnerValueOnMouseScroll(event);
 
-            // validate values
-            if (event.widget == (Spinner) paraWidgets.get(WIDGET_KEY.SPINNER_RANDOM_START)) {
-               onSelectRandomSpinnerMin(paraWidgets);
-            } else {
-               onSelectRandomSpinnerMax(paraWidgets);
-            }
+         // validate values
+         if (event.widget == (Spinner) paraWidgets.get(WIDGET_KEY.SPINNER_RANDOM_START)) {
+            onSelectRandomSpinnerMin(paraWidgets);
+         } else {
+            onSelectRandomSpinnerMax(paraWidgets);
          }
       };
 
-      final ModifyListener modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            updateUICustomUrl();
-         }
-      };
+      final ModifyListener modifyListener = event -> updateUICustomUrl();
 
       final PageBook bookParameter = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(bookParameter);
@@ -654,14 +636,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                   onSelectRandomSpinnerMin(paraWidgets);
                }
             });
-            fromSpinner.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isInitUI) {
-                     return;
-                  }
-                  onSelectRandomSpinnerMin(paraWidgets);
+            fromSpinner.addModifyListener(event -> {
+               if (_isInitUI) {
+                  return;
                }
+               onSelectRandomSpinnerMin(paraWidgets);
             });
 
             paraWidgets.put(WIDGET_KEY.SPINNER_RANDOM_START, fromSpinner);
@@ -684,12 +663,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                   onSelectRandomSpinnerMax(paraWidgets);
                }
             });
-            toSpinner.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  onSelectRandomSpinnerMax(paraWidgets);
-               }
-            });
+            toSpinner.addModifyListener(event -> onSelectRandomSpinnerMax(paraWidgets));
 
             paraWidgets.put(WIDGET_KEY.SPINNER_RANDOM_END, toSpinner);
          }
@@ -718,18 +692,15 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
    private void createUI220Detail(final Composite parent) {
 
       Label label;
-      final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+      final MouseWheelListener mouseWheelListener = event -> {
 
-            Util.adjustSpinnerValueOnMouseScroll(event);
+         Util.adjustSpinnerValueOnMouseScroll(event);
 
-            // validate values
-            if (event.widget == _spinMinZoom) {
-               onSelectZoomSpinnerMin();
-            } else {
-               onSelectZoomSpinnerMax();
-            }
+         // validate values
+         if (event.widget == _spinMinZoom) {
+            onSelectZoomSpinnerMin();
+         } else {
+            onSelectZoomSpinnerMax();
          }
       };
 
@@ -775,14 +746,11 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                   onSelectZoomSpinnerMin();
                }
             });
-            _spinMinZoom.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isInitUI) {
-                     return;
-                  }
-                  onSelectZoomSpinnerMin();
+            _spinMinZoom.addModifyListener(e -> {
+               if (_isInitUI) {
+                  return;
                }
+               onSelectZoomSpinnerMin();
             });
 
             // ################################################
@@ -808,16 +776,31 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                   onSelectZoomSpinnerMax();
                }
             });
-            _spinMaxZoom.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isInitUI) {
-                     return;
-                  }
-                  onSelectZoomSpinnerMax();
+            _spinMaxZoom.addModifyListener(event -> {
+               if (_isInitUI) {
+                  return;
                }
+               onSelectZoomSpinnerMax();
             });
          }
+      }
+   }
+
+   private void createUI230UserAgent(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         // label: image format
+         final Label label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText(Messages.Dialog_CustomConfig_Text_UserAgent_Label);
+
+         // label: image format value
+         _txtUserAgent = new Text(container, SWT.BORDER);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtUserAgent);
+         _txtUserAgent.setToolTipText(Messages.Dialog_CustomConfig_Text_UserAgent_Tooltip);
       }
    }
 
@@ -910,27 +893,23 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       _map.setPainting(false);
       _map.setShowScale(true);
 
-      _map.addMousePositionListener(new IPositionListener() {
+      _map.addMousePositionListener(event -> {
 
-         @Override
-         public void setPosition(final MapPositionEvent event) {
+         final GeoPosition mousePosition = event.mapGeoPosition;
 
-            final GeoPosition mousePosition = event.mapGeoPosition;
+         double lon = mousePosition.longitude % 360;
+         lon = lon > 180 ? //
+         lon - 360
+               : lon < -180 ? //
+         lon + 360
+                     : lon;
 
-            double lon = mousePosition.longitude % 360;
-            lon = lon > 180 ? //
-            lon - 360
-                  : lon < -180 ? //
-            lon + 360
-                        : lon;
-
-            _lblMapInfo.setText(NLS.bind(
-                  Messages.Dialog_MapConfig_Label_MapInfo,
-                  new Object[] {
-                        _nfLatLon.format(mousePosition.latitude),
-                        _nfLatLon.format(lon),
-                        Integer.toString(event.mapZoomLevel + 1) }));
-         }
+         _lblMapInfo.setText(NLS.bind(
+               Messages.Dialog_MapConfig_Label_MapInfo,
+               new Object[] {
+                     _nfLatLon.format(mousePosition.latitude),
+                     _nfLatLon.format(lon),
+                     Integer.toString(event.mapZoomLevel + 1) }));
       });
 
       /*
@@ -1071,8 +1050,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          /*
           * set zoom level
           */
-         final int minZoomLevel = _mpCustom.getMinZoomLevel();
-         final int maxZoomLevel = _mpCustom.getMaxZoomLevel();
+         final int minZoomLevel = _mpCustom.getMinimumZoomLevel();
+         final int maxZoomLevel = _mpCustom.getMaximumZoomLevel();
          _spinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
          _spinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
 
@@ -1081,6 +1060,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          _previousMaxZoom = maxZoomLevel;
 
          _txtImageFormat.setText(_mpCustom.getImageFormat());
+         _txtUserAgent.setText(_mpCustom.getUserAgent());
       }
       _isInitUI = false;
 
@@ -1112,9 +1092,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       final int minZoom = _spinMinZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
       final int maxZoom = _spinMaxZoom.getSelection() - UI_MIN_ZOOM_LEVEL;
 
-      // check if the custom url or zoom level has changed
+      // check if the custom URL or zoom level has changed
       if (_customUrl.equals(_previousCustomUrl) && (_previousMinZoom == minZoom) && (_previousMaxZoom == maxZoom)) {
-         // do nothing to optimize performace
+         // do nothing to optimize performance
          return;
       }
 
@@ -1175,7 +1155,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
     * @param combo
     * @param rowWidgets
     */
-   private void onSelectPart(final Combo combo, final HashMap<WIDGET_KEY, Widget> rowWidgets) {
+   private void onSelectPart(final Combo combo, final EnumMap<WIDGET_KEY, Widget> rowWidgets) {
 
       final PartUIItem selectedPartItem = PART_ITEMS.get(combo.getSelectionIndex());
 
@@ -1189,7 +1169,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       updateUICustomUrl();
    }
 
-   private void onSelectRandomSpinnerMax(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
+   private void onSelectRandomSpinnerMax(final EnumMap<WIDGET_KEY, Widget> paraWidgets) {
 
       /*
        * ensure the to value is larger than the from value
@@ -1213,7 +1193,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       updateUICustomUrl();
    }
 
-   private void onSelectRandomSpinnerMin(final HashMap<WIDGET_KEY, Widget> paraWidgets) {
+   private void onSelectRandomSpinnerMin(final EnumMap<WIDGET_KEY, Widget> paraWidgets) {
 
       /*
        * ensure the from value is smaller than the to value
@@ -1355,7 +1335,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
             _statIsQueued--;
          }
 
-         // when stat is cleared, que can get negative, prevent this
+         // when stat is cleared, queue can get negative, prevent this
          if (_statIsQueued < 0) {
             _statIsQueued = 0;
          }
@@ -1381,7 +1361,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
                // check if this is the last created runnable
                if (fRunnableCounter != _statUpdateCounter) {
-                  // a new update event occured
+                  // a new update event occurred
                   return;
                }
 
@@ -1475,6 +1455,8 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       // update image format from the mp, the image format is set in the mp when images are loaded
       _txtImageFormat.setText(_mpCustom.getImageFormat());
+
+      _mpCustom.setUserAgent(_txtUserAgent.getText());
    }
 
    /**
@@ -1487,7 +1469,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       for (final PartRow row : PART_ROWS) {
 
-         final HashMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
+         final EnumMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
          final PartUIItem partItem = PART_ITEMS.get(row.rowCombo.getSelectionIndex());
 
          // skip empty parts
@@ -1573,7 +1555,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       for (final PartRow row : PART_ROWS) {
 
-         final HashMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
+         final EnumMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
          final PartUIItem selectedParaItem = PART_ITEMS.get(row.rowCombo.getSelectionIndex());
 
          switch (selectedParaItem.partKey) {
