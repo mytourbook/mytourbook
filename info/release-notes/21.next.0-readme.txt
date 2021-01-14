@@ -39,6 +39,9 @@ New
 * Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/273
   - Ability to upload tours to a Strava account.
 
+* 2D Map (Frederic)
+ - Added the possibility to configure a "User-Agent" for a custom map provider
+ - Added the possibility to export the current map view to an image file (jpg, png or bmp)
 
 
 Improvements

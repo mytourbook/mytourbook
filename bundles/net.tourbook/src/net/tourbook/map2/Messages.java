@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.map2.messages";    //$NON-NLS-1$
+
+   public static String        Image__floppy_disk;
 
    public static String        App_Action_Apply;
 
@@ -99,6 +101,7 @@ public class Messages extends NLS {
 
    public static String        map_action_dim_map;
    public static String        map_action_dim_map_disabled;
+   public static String        map_action_export_map_view_image;
    public static String        map_action_reload_map;
    public static String        map_action_save_default_position;
    public static String        map_action_set_default_position;
@@ -153,6 +156,9 @@ public class Messages extends NLS {
    public static String        map_dlg_dim_warning_title;
    public static String        map_dlg_dim_warning_toggle_message;
 
+   public static String        map_dialog_export_view_to_image_title;
+   public static String        map_dialog_export_view_to_image_message;
+
    public static String        map_properties_map_dim_level;
 
    public static String        statusLine_mapInfo_data;
@@ -162,6 +168,11 @@ public class Messages extends NLS {
 
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
+
+   public static String        map_dialog_export_group_image_format;
+   public static String        map_dialog_export_group_image_format_label;
+
+   public static String        map_dialog_error_image_format_not_selected;
 
    static {
       // initialize resource bundle

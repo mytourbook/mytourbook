@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,6 +81,7 @@ import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
+import net.tourbook.map2.action.ActionExportMapViewImage;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
@@ -446,6 +447,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2_TourColors;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
+   private ActionExportMapViewImage          _actionExportMapViewImage;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
    private ActionSetDefaultPosition          _actionSetDefaultPosition;
    private ActionShowAllFilteredPhotos       _actionShowAllFilteredPhotos;
@@ -1079,7 +1081,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowValuePoint() {
 
-      if (_allTourData != null && _allTourData.size() > 0) {
+      if (_allTourData.size() > 0) {
 
          updateUI_HoveredValuePoint();
       }
@@ -1237,18 +1239,15 @@ public class Map2View extends ViewPart implements
 
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == Map2View.this) {
+            if (partRef.getPart(false) == Map2View.this && _isPartVisible == false) {
 
-               if (_isPartVisible == false) {
+               _isPartVisible = true;
 
-                  _isPartVisible = true;
+               if (_selectionWhenHidden != null) {
 
-                  if (_selectionWhenHidden != null) {
+                  onSelectionChanged(_selectionWhenHidden, true);
 
-                     onSelectionChanged(_selectionWhenHidden, true);
-
-                     _selectionWhenHidden = null;
-                  }
+                  _selectionWhenHidden = null;
                }
             }
          }
@@ -1581,7 +1580,7 @@ public class Map2View extends ViewPart implements
       _openDlgMgr.closeOpenedDialogs(openingDialog);
    }
 
-   private void createActions(final Composite parent) {
+   private void createActions() {
 
       _actionTourColor_Altitude = new ActionTourColor(
             this,
@@ -1663,6 +1662,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
+      _actionExportMapViewImage           = new     ActionExportMapViewImage    (this);
       _actionSearchTourByLocation         = new ActionSearchTourByLocation();
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
@@ -1751,8 +1751,7 @@ public class Map2View extends ViewPart implements
       } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
          isDataAvailable = createLegendImage_20_SetProviderValues(
-               (IDiscreteColorProvider) mapColorProvider,
-               legendHeightNoMargin);
+               (IDiscreteColorProvider) mapColorProvider);
       }
 
       final Color transparentColor = new Color(display, rgbTransparent);
@@ -1773,8 +1772,7 @@ public class Map2View extends ViewPart implements
       _mapLegend.setImage(legendImage);
    }
 
-   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider,
-                                                          final int legendHeight) {
+   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider) {
 
       if (_allTourData.isEmpty()) {
          return false;
@@ -1863,7 +1861,7 @@ public class Map2View extends ViewPart implements
          }
       });
 
-      createActions(parent);
+      createActions();
 
       fillActionBars();
 
@@ -2176,6 +2174,7 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
+      menuMgr.add(_actionExportMapViewImage);
 
       menuMgr.add(new Separator());
 
@@ -2382,6 +2381,10 @@ public class Map2View extends ViewPart implements
     */
    public ArrayList<Photo> getFilteredPhotos() {
       return _filteredPhotos;
+   }
+
+   public Composite getMainComposite() {
+      return _parent;
    }
 
    public Map getMap() {
@@ -3310,11 +3313,8 @@ public class Map2View extends ViewPart implements
       }
 
       // prevent loading the same tour
-      if (forceRedraw == false) {
-
-         if ((_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
-            return;
-         }
+      if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
+         return;
       }
 
       // force multiple tours to be repainted
@@ -3897,21 +3897,10 @@ public class Map2View extends ViewPart implements
 
             final int ratingStars = photo.ratingStars;
 
-            if (isNoStar && ratingStars == 0) {
-
-               // only photos without stars are displayed
-
-               _filteredPhotos.add(photo);
-
-            } else if (isEqual && ratingStars == _photoFilter_RatingStars) {
-
-               _filteredPhotos.add(photo);
-
-            } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
-
-               _filteredPhotos.add(photo);
-
-            } else if (isLess && ratingStars <= _photoFilter_RatingStars) {
+            if ((isNoStar && ratingStars == 0) ||
+                  (isEqual && ratingStars == _photoFilter_RatingStars) ||
+                  (isMore && ratingStars >= _photoFilter_RatingStars) ||
+                  (isLess && ratingStars <= _photoFilter_RatingStars)) {
 
                _filteredPhotos.add(photo);
             }
