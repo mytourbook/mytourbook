@@ -4882,19 +4882,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void setupChartConfig() {
 
-      graphAntialiasing = _prefStore.getBoolean(//
-            ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+      graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
-      isShowSegmentAlternateColor = _prefStore.getBoolean(//
-            ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
+      isShowSegmentAlternateColor = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor = PreferenceConverter.getColor(
-            _prefStore, //
+            _prefStore,
             ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
 
-      graphTransparencyLine = _prefStore.getInt(//
-            ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-      graphTransparencyFilling = _prefStore.getInt(//
-            ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+      graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
       isShowHorizontalGridLines = Util.getPrefixPrefBoolean(
             _prefStore,
@@ -4906,12 +4902,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-      gridVerticalDistance = Util.getPrefixPrefInt(//
+      gridVerticalDistance = Util.getPrefixPrefInt(
             _prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 
-      gridHorizontalDistance = Util.getPrefixPrefInt(//
+      gridHorizontalDistance = Util.getPrefixPrefInt(
             _prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);

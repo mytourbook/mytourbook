@@ -20,6 +20,7 @@ import com.garmin.fit.HrvMesgListener;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.device.garmin.fit.FitData;
 
@@ -57,8 +58,8 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
             continue;
          }
 
-         System.out.println(String.format("   time: %-2.3f s", time));
-         // TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println(String.format("   time: %-2.3f s", time));
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
          // add pulse time in ms
          pulseTime.add((int) (time * 1_000));
@@ -68,7 +69,17 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
 
          final TimeData timeData = fitData.getLastAdded_TimeData();
 
-         timeData.pulseTime = pulseTime.toArray();
+         if (timeData.pulseTime == null) {
+
+            timeData.pulseTime = pulseTime.toArray();
+
+         } else {
+
+            // append to existing values
+
+            timeData.pulseTime = Util.concatInt(timeData.pulseTime, pulseTime.toArray());
+         }
+
       }
    }
 }

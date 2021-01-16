@@ -1004,8 +1004,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private float[]               pulseSerieSmoothed;
 
+   /**
+    * Pulse times in milliseconds.
+    * <p>
+    * <b>This data serie has not the same serie length as the other data series because 1 second can
+    * have multiple values, depending on the heartrate.</b>
+    */
    @Transient
    public int[]                  pulseTimeSerie;
+
+   /**
+    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}
+    */
+   @Transient
+   public int[]                  pulseTime_TimeIndex;
 
    /**
     * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
@@ -6369,26 +6381,74 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (isPulseTimes == false) {
-         // no data
+
+         // no pulse time data
          return;
       }
 
-      final TIntArrayList pulseTimes = new TIntArrayList(allTimeData.length * 3);
+      final int numTimeSlices = allTimeData.length;
 
-      for (final TimeData timeData : allTimeData) {
+      final TIntArrayList allPulseTimes = new TIntArrayList(numTimeSlices * 3);
+      final TIntArrayList allPulseTimeIndex = new TIntArrayList(numTimeSlices);
 
-         final int[] pulseTimes2 = timeData.pulseTime;
+      // for testing contains bpm from pulse time
+      isPowerSerieFromDevice = true;
+      powerSerie = new float[numTimeSlices];
 
-         if (pulseTimes2 != null) {
+      int sumPulseTime = 0;
 
-            for (final int pulseTime : pulseTimes2) {
-               if (pulseTime != 0) {
+      for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
-                  if (pulseTime == 65535) {
+         final TimeData timeData = allTimeData[timeIndex];
+         final int[] timeSlice_AllPulseTimes = timeData.pulseTime;
+
+         if (timeSlice_AllPulseTimes != null) {
+
+            int addedPulseTimeIndex = -1;
+
+            for (final int pulseTimeMS : timeSlice_AllPulseTimes) {
+               if (pulseTimeMS != 0) {
+
+                  if (pulseTimeMS == 65535) {
                      // ignore, this value occurred in daum data
                   } else {
 
-                     pulseTimes.add(pulseTime);
+                     allPulseTimes.add(pulseTimeMS);
+
+                     if (addedPulseTimeIndex < 0) {
+
+                        // set index only for the first pulse time
+                        addedPulseTimeIndex = timeIndex;
+
+                        allPulseTimeIndex.add(timeIndex);
+                     }
+
+                     sumPulseTime += pulseTimeMS;
+                     final int relativeTime = timeSerie[timeIndex];
+
+                     final float pulseFromDevice = pulseSerie[timeIndex];
+                     final double pulseTimeSeconds = pulseTimeMS / 1000.0;
+                     final double pulseFromPulseTime = 60.0 / pulseTimeSeconds;
+
+                     powerSerie[timeIndex] = (float) pulseFromPulseTime;
+
+                     final String pulseFlag = pulseTimeMS > 1000
+                           ? String.format("> 1000 ms  %6.3f", pulseTimeSeconds / 2)
+                           : "";
+
+                     System.out.println((String.format("%5d  %6.0f sum    %6.3f       %5.1f  %5.1f       %s",
+
+                           relativeTime,
+                           sumPulseTime / 1000.0,
+                           pulseTimeSeconds,
+
+                           pulseFromDevice,
+                           pulseFromPulseTime,
+                           pulseFlag
+
+                     )));
+                     // TODO remove SYSTEM.OUT.PRINTLN
+
                   }
 
 //                  445
@@ -6438,8 +6498,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      if (pulseTimes.size() > 0) {
-         pulseTimeSerie = pulseTimes.toArray();
+      if (allPulseTimes.size() > 0) {
+
+         pulseTimeSerie = allPulseTimes.toArray();
+         pulseTime_TimeIndex = allPulseTimeIndex.toArray();
       }
    }
 
@@ -9142,6 +9204,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       gearSerie = serieData.gears;
 
       pulseTimeSerie = serieData.pulseTimes;
+      pulseTime_TimeIndex = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
@@ -9213,6 +9276,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.gears = gearSerie;
 
       serieData.pulseTimes = pulseTimeSerie;
+      serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
 
       // running dynamics
       serieData.runDyn_StanceTime = runDyn_StanceTime;

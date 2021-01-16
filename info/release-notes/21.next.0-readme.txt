@@ -44,7 +44,8 @@ New
 Improvements
 ============
 
-* 
+* Fit Import
+  - Import HRV-RR values which can be displayed in the Heart Rate Variability view
 
 
 Changes  

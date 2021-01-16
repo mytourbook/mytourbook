@@ -224,7 +224,7 @@ public class FitDataReader extends TourbookDevice {
 
                // HR
 
-//               || fieldName.equals("heart_rate") //                                                      //$NON-NLS-1$
+               || fieldName.equals("heart_rate") //                                                      //$NON-NLS-1$
                || fieldName.equals("avg_heart_rate") //                                                  //$NON-NLS-1$
                || fieldName.equals("min_heart_rate") //                                   62 bpm         //$NON-NLS-1$
                || fieldName.equals("max_heart_rate") //                                                  //$NON-NLS-1$
@@ -433,9 +433,9 @@ public class FitDataReader extends TourbookDevice {
 
                // Other
 
-//               || fieldName.equals("") //                                                                //$NON-NLS-1$
-//               || fieldName.equals("unknown") //                                                         //$NON-NLS-1$
-         //
+               || fieldName.equals("") //                                                                //$NON-NLS-1$
+               || fieldName.equals("unknown") //                                                         //$NON-NLS-1$
+
          ) {
             continue;
          }

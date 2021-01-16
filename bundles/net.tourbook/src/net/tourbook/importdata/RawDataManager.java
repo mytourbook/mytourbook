@@ -1396,7 +1396,9 @@ public class RawDataManager {
          // re-import pulse
 
          oldTourData.pulseSerie = reimportedTourData.pulseSerie;
+
          oldTourData.pulseTimeSerie = reimportedTourData.pulseTimeSerie;
+         oldTourData.pulseTime_TimeIndex = reimportedTourData.pulseTime_TimeIndex;
       }
 
       // Speed
