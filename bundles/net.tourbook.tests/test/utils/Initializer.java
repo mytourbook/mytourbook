@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import javax.persistence.Persistence;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -114,6 +115,11 @@ public class Initializer {
       }
 
       return Comparison.retrieveImportedTour(newlyImportedTours);
+   }
+
+   public static void initializeDatabase() {
+
+      Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
    }
 
    public static SAXParser initializeParser() {

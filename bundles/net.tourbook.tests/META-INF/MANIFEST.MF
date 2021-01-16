@@ -5,7 +5,8 @@ Bundle-SymbolicName: net.tourbook.tests;singleton:=true
 Bundle-Version: 20.12.1.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook,
- net.tourbook.ext.jars
+ net.tourbook.ext.jars,
+ net.tourbook.ext.ejb3
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
