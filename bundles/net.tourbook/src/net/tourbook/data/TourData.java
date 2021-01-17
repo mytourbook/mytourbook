@@ -998,11 +998,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private float[]               cadenceSerie;
 
+   /**
+    * Pulse values from the device
+    */
    @Transient
    public float[]                pulseSerie;
 
    @Transient
-   private float[]               pulseSerieSmoothed;
+   private float[]               _pulseSerie_Smoothed;
+
+   /**
+    * Pulse values computed from the pulse times in {@link #pulseTimeSerie}
+    */
+   @Transient
+   private float[]                _pulseSerie_FromTime;
 
    /**
     * Pulse times in milliseconds.
@@ -2018,7 +2027,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       breakTimeSerie = null;
 
-      pulseSerieSmoothed = null;
+      _pulseSerie_FromTime = null;
+      _pulseSerie_Smoothed = null;
+
       gradientSerie = null;
 
       paceSerieSeconds = null;
@@ -3139,18 +3150,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return 0;
       }
 
-      if (pulseSerieSmoothed == null) {
+      if (_pulseSerie_Smoothed == null) {
          computePulseSmoothed();
       }
 
       // check for 1 point
       if (firstIndex == lastIndex) {
-         return pulseSerieSmoothed[firstIndex];
+         return _pulseSerie_Smoothed[firstIndex];
       }
 
       // check for 2 points
       if (lastIndex - firstIndex == 1) {
-         return (pulseSerieSmoothed[firstIndex] + pulseSerieSmoothed[lastIndex]) / 2;
+         return (_pulseSerie_Smoothed[firstIndex] + _pulseSerie_Smoothed[lastIndex]) / 2;
       }
 
       // get break time when not yet set
@@ -3199,7 +3210,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             }
          }
 
-         final float pulse = pulseSerieSmoothed[serieIndex];
+         final float pulse = _pulseSerie_Smoothed[serieIndex];
 
          float timeDiffPrev = 0;
          float timeDiffNext = 0;
@@ -4157,7 +4168,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      if (pulseSerieSmoothed == null) {
+      if (_pulseSerie_Smoothed == null) {
          computePulseSmoothed();
 
       }
@@ -4186,7 +4197,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // compute zone values
       for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
-         final float pulse = pulseSerieSmoothed[serieIndex];
+         final float pulse = _pulseSerie_Smoothed[serieIndex];
          final int time = timeSerie[serieIndex];
 
          final int timeDiff = time - prevTime;
@@ -4285,13 +4296,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      if (pulseSerieSmoothed == null) {
+      if (_pulseSerie_Smoothed == null) {
          computePulseSmoothed();
       }
 
       float maxPulse = 0;
 
-      for (final float pulse : pulseSerieSmoothed) {
+      for (final float pulse : _pulseSerie_Smoothed) {
          if (pulse > maxPulse) {
             maxPulse = pulse;
          }
@@ -4327,7 +4338,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      if (pulseSerieSmoothed != null) {
+      if (_pulseSerie_Smoothed != null) {
          return;
       }
 
@@ -4338,7 +4349,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (isJametAlgorithm == false) {
 
          // smoothing is disabled for pulse values
-         pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+         _pulseSerie_Smoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
 
          return;
       }
@@ -4348,7 +4359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (isPulseSmoothed == false) {
 
          // pulse is not smoothed
-         pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
+         _pulseSerie_Smoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
 
          return;
       }
@@ -4368,11 +4379,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       Smooth.smoothing(timeSerie, heart_rate, heart_rate_sc, tauPulse, false, repeatedSmoothing, repeatedTau);
 
-      pulseSerieSmoothed = new float[size];
+      _pulseSerie_Smoothed = new float[size];
 
       // convert double into float
       for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-         pulseSerieSmoothed[serieIndex] = (float) heart_rate_sc[serieIndex];
+         _pulseSerie_Smoothed[serieIndex] = (float) heart_rate_sc[serieIndex];
       }
    }
 
@@ -6389,13 +6400,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int numTimeSlices = allTimeData.length;
 
       final TIntArrayList allPulseTimes = new TIntArrayList(numTimeSlices * 3);
-      final TIntArrayList allPulseTimeIndex = new TIntArrayList(numTimeSlices);
+      final int[] allPulseTime_TimeIndex = new int[numTimeSlices];
 
       // for testing contains bpm from pulse time
       isPowerSerieFromDevice = true;
       powerSerie = new float[numTimeSlices];
 
       int sumPulseTime = 0;
+      int pulseTimesIndex = -1;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
@@ -6414,13 +6426,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                   } else {
 
                      allPulseTimes.add(pulseTimeMS);
+                     pulseTimesIndex++;
 
                      if (addedPulseTimeIndex < 0) {
 
                         // set index only for the first pulse time
                         addedPulseTimeIndex = timeIndex;
 
-                        allPulseTimeIndex.add(timeIndex);
+                        allPulseTime_TimeIndex[timeIndex] = pulseTimesIndex;
                      }
 
                      sumPulseTime += pulseTimeMS;
@@ -6432,67 +6445,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      powerSerie[timeIndex] = (float) pulseFromPulseTime;
 
-                     final String pulseFlag = pulseTimeMS > 1000
-                           ? String.format("> 1000 ms  %6.3f", pulseTimeSeconds / 2)
-                           : "";
-
-                     System.out.println((String.format("%5d  %6.0f sum    %6.3f       %5.1f  %5.1f       %s",
-
-                           relativeTime,
-                           sumPulseTime / 1000.0,
-                           pulseTimeSeconds,
-
-                           pulseFromDevice,
-                           pulseFromPulseTime,
-                           pulseFlag
-
-                     )));
+//                     final String pulseFlag = pulseTimeMS > 1000
+//                           ? String.format("> 1000 ms  %6.3f", pulseTimeSeconds / 2)
+//                           : "";
+//
+//                     System.out.println((String.format("%5d  %6.0f sum    %6.3f       %5.1f  %5.1f       %s",
+//
+//                           relativeTime,
+//                           sumPulseTime / 1000.0,
+//                           pulseTimeSeconds,
+//
+//                           pulseFromDevice,
+//                           pulseFromPulseTime,
+//                           pulseFlag
+//
+//                     )));
                      // TODO remove SYSTEM.OUT.PRINTLN
 
                   }
-
-//                  445
-//                  480
-//                  470
-//                  590
-//                  65535
-//                  1500
-//                  620
-//                  65535
-//                  615
-//                  620
-//                  1225
-//                  615
-//                  615
-//                  65535
-//                  620
-//                  65535
-//                  615
-//                  610
-//                  615
-//                  65535
-//                  835
-//                  595
-//                  600
-//                  605
-//                  600
-//                  590
-//                  595
-//                  595
-//                  605
-//                  65535
-//                  595
-//                  585
-//                  1165
-//                  585
-//                  585
-//                  580
-//                  1155
-//                  575
-//                  580
-//                  575
-//                  575
-//                  575
                }
             }
          }
@@ -6501,8 +6471,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       if (allPulseTimes.size() > 0) {
 
          pulseTimeSerie = allPulseTimes.toArray();
-         pulseTime_TimeIndex = allPulseTimeIndex.toArray();
+         pulseTime_TimeIndex = allPulseTime_TimeIndex;
       }
+
+      int a = 0;
+      a++;
    }
 
    /**
@@ -7877,19 +7850,105 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return powerSerie;
    }
 
-   public float[] getPulseSmoothedSerie() {
+   public float[] getPulse_SmoothedSerie() {
 
       if (pulseSerie == null) {
          return null;
       }
 
-      if (pulseSerieSmoothed != null) {
-         return pulseSerieSmoothed;
+      if (_pulseSerie_Smoothed != null) {
+         return _pulseSerie_Smoothed;
       }
 
       computePulseSmoothed();
 
-      return pulseSerieSmoothed;
+      return _pulseSerie_Smoothed;
+   }
+
+   public float[] getPulse_TimeSerie() {
+
+      if (pulseTimeSerie == null) {
+         return null;
+      }
+
+      if (_pulseSerie_FromTime != null) {
+         return _pulseSerie_FromTime;
+      }
+
+      /*
+       * Compute pulse serie from pulse times
+       */
+
+      final boolean isUseFirstPulseSlice = true;
+      final boolean isUseLastPulseSlice = false;
+
+      _pulseSerie_FromTime = new float[timeSerie.length];
+
+      for (int serieIndex = 1; serieIndex < pulseTime_TimeIndex.length - 1; serieIndex++) {
+
+         final int time2TimeIndex = pulseTime_TimeIndex[serieIndex];
+         final int time2TimeIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
+
+         final int pulseTimeMS_First = pulseTimeSerie[time2TimeIndex];
+         final int pulseTimeMS_Last = pulseTimeSerie[time2TimeIndex_Next - 1];
+
+         if (time2TimeIndex == time2TimeIndex_Next - 1) {
+
+            // there is only 1 pulse time
+
+            final float pulseFromPulseTime = 60.0f / (pulseTimeMS_First / 1000.0f);
+
+            _pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+
+         } else {
+
+            if (isUseFirstPulseSlice) {
+
+               final float pulseFromPulseTime = 60.0f / (pulseTimeMS_First / 1000.0f);
+
+               _pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+
+            } else if (isUseLastPulseSlice) {
+
+               final float pulseFromPulseTime = 60.0f / (pulseTimeMS_Last / 1000.0f);
+
+               _pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+
+            } else {
+
+               // use average value
+
+               long sumPulseTimeMS = 0;
+
+               for (int avgSerieIndex = time2TimeIndex; avgSerieIndex < time2TimeIndex_Next; avgSerieIndex++) {
+
+                  sumPulseTimeMS += pulseTimeSerie[avgSerieIndex];
+               }
+
+               final int numPulseTimes = time2TimeIndex_Next - time2TimeIndex;
+               final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
+
+               final float pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
+
+               _pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+            }
+
+         }
+
+      }
+
+      for (int pulseTimeIndex = 0; pulseTimeIndex < pulseTimeSerie.length; pulseTimeIndex++) {
+
+         final int pulseTimeMS = pulseTimeSerie[pulseTimeIndex];
+
+         final float pulseTimeSeconds = pulseTimeMS / 1000.0f;
+         final float pulseFromPulseTime = 60.0f / pulseTimeSeconds;
+
+         _pulseSerie_FromTime[pulseTimeIndex] = pulseFromPulseTime;
+      }
+
+      // TODO Auto-generated method stub
+      return _pulseSerie_FromTime;
    }
 
    public int getRearShiftCount() {

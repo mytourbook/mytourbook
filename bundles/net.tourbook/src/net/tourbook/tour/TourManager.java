@@ -3626,8 +3626,8 @@ public class TourManager {
 
       } else if (prefShow_SwimStyle && canShowBackground_SwimStyle == false) {
 
-            // swimming style cannot be displayed -> show default
-            graphBgSource = GraphBackgroundSource.DEFAULT;
+         // swimming style cannot be displayed -> show default
+         graphBgSource = GraphBackgroundSource.DEFAULT;
       }
 
       tcc.graphBackground_Source = graphBgSource;
@@ -3943,7 +3943,7 @@ public class TourManager {
                if (srtmDataSerie != null) {
 
                   // create altitude dataserie and adjust min/max values with with the srtm values
-                  yDataAltitude = createChartDataSerie(//
+                  yDataAltitude = createChartDataSerie(
                         new float[][] { altitudeSerie, srtmDataSerie },
                         chartType);
                }
@@ -3964,7 +3964,6 @@ public class TourManager {
          yDataAltitude.setShowYSlider(true);
          yDataAltitude.setDisplayedFractionalDigits(2);
          yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
-         yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
          yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
 
          if (useGraphBgStyle) {
@@ -4138,10 +4137,22 @@ public class TourManager {
        */
       ChartDataYSerie yDataPulse = null;
 
-      final float[] pulseSerie = tourData.getPulseSmoothedSerie();
+      final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
       if (pulseSerie != null) {
 
-         yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+         final float[] pulseTimeSerie = tourData.getPulse_TimeSerie();
+         if (pulseTimeSerie != null) {
+
+            // show pulse from pulse time as 2nd graph
+
+            yDataPulse = createChartDataSerie(
+                  new float[][] { pulseSerie, pulseTimeSerie },
+                  chartType);
+
+         } else {
+
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+         }
 
          yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
          yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);

@@ -3209,13 +3209,18 @@ public class ChartComponentGraph extends Canvas {
       path.dispose();
 
       /*
-       * draw path2 above the other graph, this is currently used to draw the srtm graph
+       * Draw path2 above the other graph, this is currently used to draw the srtm or pulse by time
+       * graph
        */
       if (path2 != null) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         final int gray = 0x66;
+         final Color path2Color = new Color(gray, gray, gray);
+
+         gc.setForeground(path2Color);
          gc.drawPath(path2);
 
+         path2Color.dispose();
          path2.dispose();
       }
 
