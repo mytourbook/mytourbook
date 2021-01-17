@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.PngTransfer;
@@ -34,7 +33,6 @@ public class ActionExportMapViewClipboard extends Action {
 
       super(null, AS_PUSH_BUTTON);
       setText(Messages.map_action_export_map_view_clipboard);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__clipboard));
 
       _map2View = mapView;
    }
