@@ -41,7 +41,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
@@ -124,7 +123,6 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
       _map2View = map2View;
-
    }
 
    @Override
@@ -220,8 +218,6 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private void createUI_90_ExportImage(final Composite parent) {
 
-      Label label;
-
       /*
        * group: filename
        */
@@ -230,6 +226,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
+
+         Label label;
          /*
           * label: filename
           */
@@ -341,19 +339,12 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final Composite mainComposite = _map2View.getMainComposite();
-      final Image image = new Image(mainComposite.getDisplay(),
-            mainComposite.getSize().x,
-            mainComposite.getSize().y);
-
-      final GC gc = new GC(mainComposite);
-      gc.copyArea(image, 0, 0);
+      final Image mapViewImage = _map2View.getMapViewImage();
 
       final ImageLoader saver = new ImageLoader();
-      saver.data = new ImageData[] { image.getImageData() };
+      saver.data = new ImageData[] { mapViewImage.getImageData() };
       saver.save(exportFileName, getSwtImageType());
-      image.dispose();
-      gc.dispose();
+      mapViewImage.dispose();
    }
 
    private void enableOK(final boolean isEnabled) {

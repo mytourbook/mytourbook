@@ -21,6 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.map2.messages";    //$NON-NLS-1$
 
+   public static String        Image__clipboard;
    public static String        Image__floppy_disk;
 
    public static String        App_Action_Apply;
@@ -101,6 +102,7 @@ public class Messages extends NLS {
 
    public static String        map_action_dim_map;
    public static String        map_action_dim_map_disabled;
+   public static String        map_action_export_map_view_clipboard;
    public static String        map_action_export_map_view_image;
    public static String        map_action_export_map_view_image_tooltip;
    public static String        map_action_reload_map;

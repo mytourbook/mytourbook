@@ -81,6 +81,7 @@ import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
+import net.tourbook.map2.action.ActionExportMapViewClipboard;
 import net.tourbook.map2.action.ActionExportMapViewImage;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
@@ -448,6 +449,7 @@ public class Map2View extends ViewPart implements
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionExportMapViewImage          _actionExportMapViewImage;
+   private ActionExportMapViewClipboard      _actionExportMapViewClipboard;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
    private ActionSetDefaultPosition          _actionSetDefaultPosition;
    private ActionShowAllFilteredPhotos       _actionShowAllFilteredPhotos;
@@ -1373,22 +1375,19 @@ public class Map2View extends ViewPart implements
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+            _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
+            createLegendImage(_tourPainterConfig.getMapColorProvider());
 
-               _map.paint();
-            }
+            _map.paint();
          }
       };
 
@@ -1662,7 +1661,8 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
-      _actionExportMapViewImage           = new     ActionExportMapViewImage    (this);
+      _actionExportMapViewImage           = new ActionExportMapViewImage(this);
+      _actionExportMapViewClipboard       = new ActionExportMapViewClipboard(this);
       _actionSearchTourByLocation         = new ActionSearchTourByLocation();
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
@@ -2175,6 +2175,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
       menuMgr.add(_actionExportMapViewImage);
+      menuMgr.add(_actionExportMapViewClipboard);
 
       menuMgr.add(new Separator());
 
@@ -2402,6 +2403,19 @@ public class Map2View extends ViewPart implements
       final int mapZoomLevel = _map.getZoom() - 1;
 
       return new MapLocation(mapPosition, mapZoomLevel);
+   }
+
+   public Image getMapViewImage() {
+
+      final Image image = new Image(_parent.getDisplay(),
+            _parent.getSize().x,
+            _parent.getSize().y);
+
+      final GC gc = new GC(_parent);
+      gc.copyArea(image, 0, 0);
+      gc.dispose();
+
+      return image;
    }
 
    /**
@@ -2967,13 +2981,7 @@ public class Map2View extends ViewPart implements
             paintTours_20_One(tourData, false);
 
             // delay to show the poi otherwise the map is being painted OVER the poi !!!
-            _map.getDisplay().timerExec(500, new Runnable() {
-               @Override
-               public void run() {
-
-                  _map.setPOI(_wayPointToolTipProvider, wp);
-               }
-            });
+            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
 
             enableActions();
          }
@@ -3622,16 +3630,13 @@ public class Map2View extends ViewPart implements
 
    public void redrawMap() {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-            _map.redraw();
+         if (_parent.isDisposed()) {
+            return;
          }
+
+         _map.redraw();
       });
    }
 
@@ -4107,23 +4112,20 @@ public class Map2View extends ViewPart implements
 
       if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
 
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getCurrent().asyncExec(() -> {
 
-               final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.map_dlg_dim_warning_title, // title
-                     Messages.map_dlg_dim_warning_message, // message
-                     Messages.map_dlg_dim_warning_toggle_message, // toggle message
-                     false, // toggle default state
-                     null,
-                     null);
+            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.map_dlg_dim_warning_title, // title
+                  Messages.map_dlg_dim_warning_message, // message
+                  Messages.map_dlg_dim_warning_toggle_message, // toggle message
+                  false, // toggle default state
+                  null,
+                  null);
 
-               _prefStore.setValue(
-                     ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
-                     dialog.getToggleState());
-            }
+            _prefStore.setValue(
+                  ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+                  dialog.getToggleState());
          });
       }
    }
@@ -4135,31 +4137,28 @@ public class Map2View extends ViewPart implements
 
    private void showToursFromTourProvider() {
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_map.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_map.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour is set from a selection provider
-             */
-            if (_allTourData.size() > 0) {
-               return;
-            }
+         /*
+          * check if tour is set from a selection provider
+          */
+         if (_allTourData.size() > 0) {
+            return;
+         }
 
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
-            if (tourDataList != null) {
+         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+         if (tourDataList != null) {
 
-               _allTourData.clear();
-               _allTourData.addAll(tourDataList);
-               _hash_AllTourData = _allTourData.hashCode();
+            _allTourData.clear();
+            _allTourData.addAll(tourDataList);
+            _hash_AllTourData = _allTourData.hashCode();
 
-               paintTours_10_All();
-            }
+            paintTours_10_All();
          }
       });
    }

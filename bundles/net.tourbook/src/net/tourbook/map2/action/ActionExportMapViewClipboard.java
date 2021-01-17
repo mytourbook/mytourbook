@@ -17,22 +17,24 @@ package net.tourbook.map2.action;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.DialogMap2ExportViewImage;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.PngTransfer;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionExportMapViewImage extends Action {
+public class ActionExportMapViewClipboard extends Action {
 
    private Map2View _map2View;
 
-   public ActionExportMapViewImage(final Map2View mapView) {
+   public ActionExportMapViewClipboard(final Map2View mapView) {
 
       super(null, AS_PUSH_BUTTON);
-      setText(Messages.map_action_export_map_view_image);
-      setToolTipText(Messages.map_action_export_map_view_image_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__floppy_disk));
+      setText(Messages.map_action_export_map_view_clipboard);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__clipboard));
 
       _map2View = mapView;
    }
@@ -40,9 +42,15 @@ public class ActionExportMapViewImage extends Action {
    @Override
    public void run() {
 
-      final DialogMap2ExportViewImage dialogMap2ExportViewImage = new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _map2View);
-      dialogMap2ExportViewImage.open();
+      final Image mapViewImage = _map2View.getMapViewImage();
 
+      final Clipboard cb = new Clipboard(Display.getCurrent());
+
+      final PngTransfer imageTransfer = PngTransfer.getInstance();
+      cb.setContents(new Object[] { mapViewImage.getImageData() },
+            new Transfer[] { imageTransfer });
+
+      mapViewImage.dispose();
    }
 
 }
