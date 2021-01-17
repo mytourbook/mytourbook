@@ -2979,6 +2979,8 @@ public class Messages extends NLS {
 
    public static String TourChart_Property_chart_type_bar;
    public static String TourChart_Property_chart_type_line;
+   public static String TourChart_Property_ChartType_Dot;
+
    public static String TourChart_Property_check_customize_pace_clipping;
    public static String TourChart_Property_check_customize_value_clipping;
    public static String TourChart_Property_label_chart_type;
