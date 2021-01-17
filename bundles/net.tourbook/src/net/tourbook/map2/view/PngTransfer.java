@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 /**
  * Custom clipboard transfer to work around SWT bug 283960 that make copy image to clipboard not
  * working on Linux 64.
+ * Source : https://bugs.eclipse.org/bugs/show_bug.cgi?id=283960
  */
 public class PngTransfer extends ByteArrayTransfer {
 
