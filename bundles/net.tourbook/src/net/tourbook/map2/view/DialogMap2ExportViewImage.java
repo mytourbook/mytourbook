@@ -38,7 +38,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -60,7 +59,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
-   private static final List<String> DistanceData                             = List.of(UI.EMPTY_STRING, "jpg", "png", "bmp");        //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+   private static final List<String> DistanceData                             = List.of("jpg", "png", "bmp");                         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
    private static final String       APP_BTN_BROWSE                           =
          net.tourbook.Messages.app_btn_browse;
@@ -164,12 +163,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       _pc = new PixelConverter(parent);
 
-      _filePathModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            validateFields();
-         }
-      };
+      _filePathModifyListener = modifyEvent -> validateFields();
 
       _selectionAdapter = new SelectionAdapter() {
          @Override
@@ -195,7 +189,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.map_dialog_export_group_image_format);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
          /*
           * label: Image format
@@ -207,14 +201,18 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * combo: Image format
           */
          _comboImageFormat = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory.fillDefaults().applyTo(_comboImageFormat);
-         _comboImageFormat.setVisibleItemCount(20);
+         _comboImageFormat.setVisibleItemCount(3);
          _comboImageFormat.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                validateFields();
             }
          });
+         GridDataFactory
+               .fillDefaults()
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
+               .applyTo(_comboImageFormat);
 
       }
 
@@ -337,23 +335,25 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
          isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehavior, exportFile);
       }
 
-      if (isOverwrite == false) {
+      if (!isOverwrite) {
          return;
       }
 
-      final Composite mainComposite = _map2View.getMainComposite();
+      net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final GC gc = new GC(mainComposite);
+      final Composite mainComposite = _map2View.getMainComposite();
       final Image image = new Image(mainComposite.getDisplay(),
             mainComposite.getSize().x,
             mainComposite.getSize().y);
+
+      final GC gc = new GC(mainComposite);
       gc.copyArea(image, 0, 0);
+
       final ImageLoader saver = new ImageLoader();
       saver.data = new ImageData[] { image.getImageData() };
       saver.save(exportFileName, getSwtImageType());
       image.dispose();
       gc.dispose();
-
    }
 
    private void enableOK(final boolean isEnabled) {
@@ -372,6 +372,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    }
 
    private String getExportFileName() {
+
       return _comboFile.getText().trim();
    }
 
@@ -389,10 +390,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       switch (_comboImageFormat.getSelectionIndex()) {
 
-      case 2:
+      case 1:
          return SWT.IMAGE_PNG;
 
-      case 3:
+      case 2:
          return SWT.IMAGE_BMP;
 
       case 0:
@@ -404,19 +405,11 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            doExport();
-         }
-
-      });
+      BusyIndicator.showWhile(Display.getCurrent(), this::doExport);
 
       if (_exportState_FileCollisionBehavior.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
          return;
       }
-
-      net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
       super.okPressed();
    }
@@ -426,12 +419,12 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       final DirectoryDialog dialog = new DirectoryDialog(_dlgContainer.getShell(), SWT.SAVE);
       dialog.setText(DIALOG_EXPORT_DIR_DIALOG_TEXT);
       dialog.setMessage(DIALOG_EXPORT_DIR_DIALOG_MESSAGE);
-
       dialog.setFilterPath(getExportPathName());
 
       final String selectedDirectoryName = dialog.open();
 
       if (selectedDirectoryName != null) {
+
          setErrorMessage(null);
          _comboPath.setText(selectedDirectoryName);
       }
@@ -458,10 +451,9 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private void restoreState() {
 
-      //Image type
-      for (final String imageFormat : DistanceData) {
-         _comboImageFormat.add(imageFormat);
-      }
+      //Image format
+      DistanceData.forEach(_comboImageFormat::add);
+
       _comboImageFormat.select(Util.getStateInt(_state, STATE_IMAGE_FORMAT, 0));
 
       // export file/path
@@ -487,6 +479,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    }
 
    private void setError(final String message) {
+
       setErrorMessage(message);
       enableOK(false);
    }
@@ -495,13 +488,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       setErrorMessage(null);
 
-      if (_comboImageFormat.getSelectionIndex() == 0) {
-
-         setErrorMessage(Messages.map_dialog_error_image_format_not_selected);
-         return;
-      }
-
-      if (validateFilePath() == false) {
+      if (!validateFilePath()) {
          return;
       }
 
@@ -513,7 +500,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       // check path
       IPath filePath = new Path(getExportPathName());
-      if (new File(filePath.toOSString()).exists() == false) {
+      if (!new File(filePath.toOSString()).exists()) {
 
          // invalid path
          setError(NLS.bind(DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE, filePath.toOSString()));

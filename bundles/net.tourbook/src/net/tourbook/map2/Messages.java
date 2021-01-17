@@ -173,8 +173,6 @@ public class Messages extends NLS {
    public static String        map_dialog_export_group_image_format;
    public static String        map_dialog_export_group_image_format_label;
 
-   public static String        map_dialog_error_image_format_not_selected;
-
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
