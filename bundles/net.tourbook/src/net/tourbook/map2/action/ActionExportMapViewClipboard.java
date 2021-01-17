@@ -31,8 +31,7 @@ public class ActionExportMapViewClipboard extends Action {
 
    public ActionExportMapViewClipboard(final Map2View mapView) {
 
-      super(null, AS_PUSH_BUTTON);
-      setText(Messages.map_action_export_map_view_clipboard);
+      super(Messages.map_action_export_map_view_clipboard, AS_PUSH_BUTTON);
 
       _map2View = mapView;
    }
