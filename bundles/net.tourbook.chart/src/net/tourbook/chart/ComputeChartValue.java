@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,21 +17,20 @@ package net.tourbook.chart;
 
 public abstract class ComputeChartValue {
 
-	public int				valueIndexLeft;
-	public int				valueIndexRight;
+   public int             valueIndexLeft;
+   public int             valueIndexRight;
 
-	public ChartDataXSerie	xData;
-	public ChartDataYSerie	yData;
+   public ChartDataXSerie xData;
+   public ChartDataYSerie yData;
 
-	public ChartDataModel	chartModel;
+   public ChartDataModel  chartModel;
 
-	/**
-	 * Breaktime in seconds between the left and right value index
-	 */
-	public int				breakTime;
+   /**
+    * Breaktime in seconds between the left and right value index
+    */
+   public int             breakTime;
 
-   //CUSTOM TRACK Id
-   public String custTrackId;
+   public String          customTrackId;
 
-	public abstract float compute();
+   public abstract float compute();
 }

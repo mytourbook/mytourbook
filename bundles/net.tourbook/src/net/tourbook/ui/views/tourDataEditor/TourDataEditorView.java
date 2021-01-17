@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -136,6 +136,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
@@ -175,6 +176,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -221,58 +223,59 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String  ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String           VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   private static final int    COLUMN_SPACING                            = 20;
+   private static final int              COLUMN_SPACING                            = 20;
    //
-   private static final String WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
-   private static final String WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
-   private static final String WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
    //
-   private static final String MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int    BUSY_INDICATOR_ITEMS                      = 5000;
+   private static final int              BUSY_INDICATOR_ITEMS                      = 5000;
    //
-   private static final String STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
    //
-   private static final String STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String           STATE_SECTION_CUSTOM_TRACKS               = "STATE_SECTION_CUSTOM_TRACKS";                          //$NON-NLS-1$
    //
-   static final String         STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
-   static final int            STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
-   static final String         STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int            STATE_LAT_LON_DIGITS_DEFAULT              = 5;
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
+   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
+   static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
    //
-   private static final String COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
-   private static final String COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
-   private static final String COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
+   private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateTimeSlice   = TourbookPlugin.getState(ID + ".slice");     //$NON-NLS-1$
-   private static final IDialogSettings  _stateSwimSlice   = TourbookPlugin.getState(ID + ".swimSlice"); //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
+   private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX          = UI.IS_LINUX;
-   private static final boolean          IS_OSX            = UI.IS_OSX;
+   private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
+   private static final boolean          IS_OSX                                    = UI.IS_OSX;
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -293,7 +296,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private double[]                       _serieLongitude;
    private float[][]                      _serieGears;
    private boolean[]                      _serieBreakTime;
-   //CUSTOM TRACKS
+   //
    HashMap<String, float[]>               _customTracks;
    HashMap<String, CustomTrackDefinition> _customTracksDefinition;
    Long                                   _tourId_for_CustTracks = null;
@@ -571,6 +574,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Section                  _sectionWeather;
    private Section                  _sectionCharacteristics;
    //
+   private Section                  _sectionCustomTracks;
+   //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
    private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
@@ -589,77 +594,79 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * tab: tour
     */
-   private Combo              _comboTitle;
+   private Combo                                  _comboTitle;
    //
-   private ComboViewerCadence _comboCadence;
+   private ComboViewerCadence                     _comboCadence;
    //
-   private CLabel             _lblCloudIcon;
-   private CLabel             _lblTourType;
+   private CLabel                                 _lblCloudIcon;
+   private CLabel                                 _lblTourType;
    //
-   private ControlDecoration  _decoTimeZone;
+   private ControlDecoration                      _decoTimeZone;
    //
-   private Combo              _comboLocation_Start;
-   private Combo              _comboLocation_End;
-   private Combo              _comboTimeZone;
-   private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_WindDirectionText;
-   private Combo              _comboWeather_WindSpeedText;
+   private Combo                                  _comboLocation_Start;
+   private Combo                                  _comboLocation_End;
+   private Combo                                  _comboTimeZone;
+   private Combo                                  _comboWeather_Clouds;
+   private Combo                                  _comboWeather_WindDirectionText;
+   private Combo                                  _comboWeather_WindSpeedText;
    //
-   private DateTime           _dtStartTime;
-   private DateTime           _dtTourDate;
+   private DateTime                               _dtStartTime;
+   private DateTime                               _dtTourDate;
    //
-   private Label              _lblAltitudeUpUnit;
-   private Label              _lblAltitudeDownUnit;
-   private Label              _lblDistanceUnit;
-   private Label              _lblPerson_BodyWeightUnit;
-   private Label              _lblPerson_BodyFatUnit;
-   private Label              _lblSpeedUnit;
-   private Label              _lblStartTime;
-   private Label              _lblTags;
-   private Label              _lblTimeZone;
-   private Label              _lblWeather_PrecipitationUnit;
-   private Label              _lblWeather_PressureUnit;
-   private Label              _lblWeather_TemperatureUnit_Avg;
-   private Label              _lblWeather_TemperatureUnit_Max;
-   private Label              _lblWeather_TemperatureUnit_Min;
-   private Label              _lblWeather_TemperatureUnit_WindChill;
+   private Label                                  _lblAltitudeUpUnit;
+   private Label                                  _lblAltitudeDownUnit;
+   private Label                                  _lblDistanceUnit;
+   private Label                                  _lblPerson_BodyWeightUnit;
+   private Label                                  _lblPerson_BodyFatUnit;
+   private Label                                  _lblSpeedUnit;
+   private Label                                  _lblStartTime;
+   private Label                                  _lblTags;
+   private Label                                  _lblTimeZone;
+   private Label                                  _lblWeather_PrecipitationUnit;
+   private Label                                  _lblWeather_PressureUnit;
+   private Label                                  _lblWeather_TemperatureUnit_Avg;
+   private Label                                  _lblWeather_TemperatureUnit_Max;
+   private Label                                  _lblWeather_TemperatureUnit_Min;
+   private Label                                  _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link               _linkDefaultTimeZone;
-   private Link               _linkGeoTimeZone;
-   private Link               _linkRemoveTimeZone;
-   private Link               _linkTag;
-   private Link               _linkTourType;
-   private Link               _linkWeather;
+   private Link                                   _linkDefaultTimeZone;
+   private Link                                   _linkGeoTimeZone;
+   private Link                                   _linkRemoveTimeZone;
+   private Link                                   _linkTag;
+   private Link                                   _linkTourType;
+   private Link                                   _linkWeather;
    //
-   private Spinner            _spinPerson_BodyFat;
-   private Spinner            _spinPerson_BodyWeight;
-   private Spinner            _spinPerson_Calories;
-   private Spinner            _spinPerson_FTP;
-   private Spinner            _spinPerson_RestPulse;
-   private Spinner            _spinWeather_Humidity;
-   private Spinner            _spinWeather_PrecipitationValue;
-   private Spinner            _spinWeather_PressureValue;
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Max;
-   private Spinner            _spinWeather_Temperature_WindChill;
-   private Spinner            _spinWeather_Wind_DirectionValue;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner                                _spinPerson_BodyFat;
+   private Spinner                                _spinPerson_BodyWeight;
+   private Spinner                                _spinPerson_Calories;
+   private Spinner                                _spinPerson_FTP;
+   private Spinner                                _spinPerson_RestPulse;
+   private Spinner                                _spinWeather_Humidity;
+   private Spinner                                _spinWeather_PrecipitationValue;
+   private Spinner                                _spinWeather_PressureValue;
+   private Spinner                                _spinWeather_Temperature_Average;
+   private Spinner                                _spinWeather_Temperature_Min;
+   private Spinner                                _spinWeather_Temperature_Max;
+   private Spinner                                _spinWeather_Temperature_WindChill;
+   private Spinner                                _spinWeather_Wind_DirectionValue;
+   private Spinner                                _spinWeather_Wind_SpeedValue;
    //
-   private Text               _txtAltitudeDown;
-   private Text               _txtAltitudeUp;
-   private Text               _txtDescription;
-   private Text               _txtDistance;
-   private Text               _txtWeather;
+   private Text                                   _txtAltitudeDown;
+   private Text                                   _txtAltitudeUp;
+   private Text                                   _txtDescription;
+   private Text                                   _txtDistance;
+   private Text                                   _txtWeather;
    //
-   private TimeDuration       _deviceTime_Elapsed;                  // Total time of the activity
-   private TimeDuration       _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
-   private TimeDuration       _deviceTime_Paused;                   // Time where the user deliberately paused the device
-   private TimeDuration       _computedTime_Moving;                 // Computed time moving
-   private TimeDuration       _computedTime_Break;                  // Computed time stopped
+   private HashMap<String, CustomTrackEditorText> _customTrackTextControls;
+   //
+   private TimeDuration                           _deviceTime_Elapsed;                  // Total time of the activity
+   private TimeDuration                           _deviceTime_Recorded;                 // Time recorded by the device = Total time - paused times
+   private TimeDuration                           _deviceTime_Paused;                   // Time where the user deliberately paused the device
+   private TimeDuration                           _computedTime_Moving;                 // Computed time moving
+   private TimeDuration                           _computedTime_Break;                  // Computed time stopped
+   private Menu                                   _swimViewer_ContextMenu;
 
-   private Menu               _swimViewer_ContextMenu;
-   private Menu               _timeViewer_ContextMenu;
+   private Menu                                   _timeViewer_ContextMenu;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -768,6 +775,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       protected void focusLost() {
          super.focusLost();
       }
+   }
+
+   public class CustomTrackEditorText {
+      public Text nr;
+      public Text id;
+      public Text unit;
+      public Text name;
    }
 
    private final class SliceEditingSupport_Double extends EditingSupport {
@@ -2081,7 +2095,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
             sb.append(UI.TAB);
 
-            //CUSTOM TRACKS
             //TODO write custom tracks to CSV
 
             // end of line
@@ -4601,6 +4614,54 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
+   /*
+    * CUSTOM TRACKS editor section
+    */
+   private void createUI_Section_160_CustomTracks(final Composite parent) {
+
+      _sectionCustomTracks = createSection(parent, _tk, Messages.tour_editor_section_custom_tracks, false, true);
+      final Composite container = (Composite) _sectionCustomTracks.getClient();
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+
+      final Label label = new Label(parent, SWT.NONE);
+      final FontDescriptor boldDescriptor = FontDescriptor.createFrom(label.getFont()).setStyle(SWT.BOLD);
+      final Font boldFont = boldDescriptor.createFont(label.getDisplay());
+      /*
+       * Nr
+       */
+      final Label labelnr = _tk.createLabel(container,
+            Messages.Tour_Editor_Label_Custom_Tracks_Column_Number);
+      labelnr.setToolTipText(Messages.Tour_Editor_Label_Custom_Tracks_Column_Number_Tooltip);
+      labelnr.setFont(boldFont);
+      _firstColumnControls.add(labelnr);
+
+      /*
+       * Id
+       */
+      final Label labelId = _tk.createLabel(container,
+            Messages.Tour_Editor_Label_Custom_Tracks_Column_Id);
+      labelId.setToolTipText(Messages.Tour_Editor_Label_Custom_Tracks_Column_Id_Tooltip);
+      labelId.setFont(boldFont);
+      _secondColumnControls.add(labelId);
+
+      /*
+       * Name
+       */
+      final Label labelName = _tk.createLabel(container,
+            Messages.Tour_Editor_Label_Custom_Tracks_Column_Name);
+      labelName.setToolTipText(Messages.Tour_Editor_Label_Custom_Tracks_Column_Name_Tooltip);
+      labelName.setFont(boldFont);
+      //_secondColumnControls.add(labelName);
+      /*
+       * Unit
+       */
+      final Label labelUnit = _tk.createLabel(container,
+            Messages.Tour_Editor_Label_Custom_Tracks_Column_Unit);
+      labelUnit.setToolTipText(Messages.Tour_Editor_Label_Custom_Tracks_Column_Unit_Tooltip);
+      labelUnit.setFont(boldFont);
+
+   }
+
    private void createUI_SectionSeparator(final Composite parent) {
 
       final Composite sep = _tk.createComposite(parent);
@@ -4644,6 +4705,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             createUI_SectionSeparator(_tourContainer);
 
             createUI_Section_150_Characteristics(_tourContainer);
+
+            //CUSTOM TRACKS
+            createUI_SectionSeparator(_tourContainer);
+            createUI_Section_160_CustomTracks(_tourContainer);
          }
       }
 
@@ -5278,7 +5343,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (_customTracks != null) {
          if (reloadT) {
 
-            _timeSlice_ColumnManager.clearCustColumns();
+            _timeSlice_ColumnManager.clearCustomTracksColumns();
 
             //TODO for swim
             //_swimSlice_ColumnManager.clearCustColumns();
@@ -5297,7 +5362,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                custTrkDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + custTrkId);
                custTrkDefinition.setUnit("");
             }
-            final ColumnDefinition colDef = TableColumnFactory.CUSTOM_TRACKS_TIME_SLICES.createColumnCustTrack(_timeSlice_ColumnManager,
+            final ColumnDefinition colDef = TableColumnFactory.CUSTOM_TRACKS_TIME_SLICES.createColumnCustomTrack(_timeSlice_ColumnManager,
                   _pc,
                   custTrkDefinition);
             colDef.setColumnSelectionListener(_columnSortListener);
@@ -6463,6 +6528,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
+      /*
+       * for CUSTOM TRACKS enable only the edition of name and unit, id and number are not to be
+       * editable
+       */
+      if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
+         for (final String key : _customTrackTextControls.keySet()) {
+            final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(key);
+            UIentryDefinition.name.setEnabled(canEdit);
+            UIentryDefinition.unit.setEnabled(canEdit);
+            UIentryDefinition.id.setEnabled(false);
+            UIentryDefinition.nr.setEnabled(false);
+         }
+      }
       timeSliceTable.setEnabled(isDeviceTour);
    }
 
@@ -6736,7 +6814,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _serieTemperature = _tourData.temperatureSerie;
 
-      // CUSTOM TRACKS
       _customTracksDefinition = _tourData.getCustomTracksDefinition();
       _customTracks = _tourData.getCustomTracks();
 
@@ -7878,6 +7955,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _sectionPersonal.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL, true));
       _sectionTitle.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE, true));
       _sectionWeather.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER, true));
+      //CUSTOM TRACKS state are only saved in memory not on disk for now
+      _sectionCustomTracks.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CUSTOM_TRACKS, true));
    }
 
    @PersistState
@@ -7900,6 +7979,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _state.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
       _state.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
       _state.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
+      _state.put(STATE_SECTION_CUSTOM_TRACKS, _sectionCustomTracks.isExpanded());
    }
 
    /**
@@ -8558,6 +8638,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tourData.setTourComputedTime_Moving(_computedTime_Moving.getTime());
          }
 
+         /*
+          * CUSTOM TRACKS
+          */
+         if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
+            final HashMap<String, CustomTrackDefinition> CustTrackDef = new HashMap<>();
+            for (final String key : _customTrackTextControls.keySet()) {
+               final CustomTrackDefinition newCustomDef = new CustomTrackDefinition();
+               final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(key);
+               newCustomDef.setId(UIentryDefinition.id.getText().trim());
+               newCustomDef.setName(UIentryDefinition.name.getText().trim());
+               newCustomDef.setUnit(UIentryDefinition.unit.getText().trim());
+               CustTrackDef.put(key, newCustomDef);
+            }
+            _tourData.customTracksDefinition = CustTrackDef;
+         }
+
       } catch (final IllegalArgumentException e) {
 
          // this should not happen (but it happened when developing the tour data editor :-)
@@ -9092,6 +9188,86 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // cadence rpm/spm
       final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
+
+      //CUSTOM TRACKS create edit controls
+      final Composite container = (Composite) _sectionCustomTracks.getClient();
+      //GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      //clear previous CUSTOM TRACKS control of Tour
+      if (_customTrackTextControls == null) {
+         _customTrackTextControls = new HashMap<>();
+      }
+      for (final String key : _customTrackTextControls.keySet()) {
+         final CustomTrackEditorText custTestSet = _customTrackTextControls.get(key);
+         _firstColumnControls.remove(custTestSet.nr);
+         _secondColumnControls.remove(custTestSet.id);
+         custTestSet.id.dispose();
+         custTestSet.nr.dispose();
+         custTestSet.name.dispose();
+         custTestSet.unit.dispose();
+      }
+      _customTrackTextControls.clear();
+
+      //add new CUSTOM TRACKS control for this Tour
+      final HashMap<String, CustomTrackDefinition> DefcustTrk = _tourData.getCustomTracksDefinition();
+      final HashMap<String, float[]> CustomTrackSeries = _tourData.getCustomTracks();
+      if (DefcustTrk != null && DefcustTrk.size() > 0) {
+         final ArrayList<String> listKey = new ArrayList<>(DefcustTrk.keySet());
+         java.util.Collections.sort(listKey);
+
+         for (int idx = 0; idx < DefcustTrk.size(); idx++) {
+            final CustomTrackDefinition custDef = DefcustTrk.get(listKey.get(idx));
+            final CustomTrackEditorText custTestSet = new CustomTrackEditorText();
+            final Text textNrEntry = _tk.createText(
+                  container, //
+                  Integer.toString(idx),
+                  SWT.BORDER //
+            );
+            _firstColumnControls.add(textNrEntry);
+
+            if (CustomTrackSeries.get(listKey.get(idx)) == null) {
+               textNrEntry.setBackground(textNrEntry.getDisplay().getSystemColor(SWT.COLOR_RED));
+               textNrEntry.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            } else if (CustomTrackSeries.get(listKey.get(idx)).length == 0) {
+               textNrEntry.setBackground(textNrEntry.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+               textNrEntry.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            }
+            custTestSet.nr = textNrEntry;
+
+            final Text textIdEntry = _tk.createText(
+                  container, //
+                  custDef.getId(),
+                  SWT.BORDER //
+            );
+            _secondColumnControls.add(textIdEntry);
+            custTestSet.id = textIdEntry;
+            if (CustomTrackSeries.get(listKey.get(idx)) == null) {
+               custTestSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_RED));
+               custTestSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            } else if (CustomTrackSeries.get(listKey.get(idx)).length == 0) {
+               custTestSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+               custTestSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            }
+
+            final Text textNameEntry = _tk.createText(
+                  container, //
+                  custDef.getName(),
+                  SWT.BORDER //
+            );
+            //_secondColumnControls.add(textNameEntry);
+            textNameEntry.addModifyListener(_modifyListener);
+            custTestSet.name = textNameEntry;
+
+            final Text textUnitEntry = _tk.createText(
+                  container, //
+                  custDef.getUnit(),
+                  SWT.BORDER //
+            );
+            textUnitEntry.addModifyListener(_modifyListener);
+            custTestSet.unit = textUnitEntry;
+
+            _customTrackTextControls.put(listKey.get(idx), custTestSet);
+         }
+      }
 
       /*
        * layout container to resize labels

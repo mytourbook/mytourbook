@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -167,6 +167,7 @@ public class TourManager {
    public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
    public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CUSTOM_TRACKS                       = "Custom_Tracks";                                                    //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
@@ -174,8 +175,6 @@ public class TourManager {
    public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
-   //CUSTOM TRACKS
-   public static final String  CUSTOM_DATA_CUSTOM_TRACKS                       = "Custom_Tracks";                                                    //$NON-NLS-1$
    //
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
@@ -207,12 +206,14 @@ public class TourManager {
    public static final int     GRAPH_TRAINING_EFFECT_AEROB                     = 1300;
    public static final int     GRAPH_TRAINING_EFFECT_ANAEROB                   = 1301;
    public static final int     GRAPH_TRAINING_PERFORMANCE                      = 1302;
-   //CUSTOM TRACKS
+
    public static final int     GRAPH_CUSTOM_TRACKS                             = 1400;
-   //use for debugging to limit the number of visible CUSTOM TRACKS
-   public static final int     MAX_VISIBLE_CUSTOM_TRACKS                       = 0;
 
    public static final int     GRAPH_TOUR_COMPARE                              = 2000;
+   //use for debugging to limit the number of visible CUSTOM TRACKS
+   public static final int     MAX_VISIBLE_CUSTOM_TRACKS                       = 0;
+   public static final boolean MAX_VISIBLE_CUSTOM_TRACKS_DEBUG                 = false;
+
    //
    //
    /**
@@ -240,8 +241,6 @@ public class TourManager {
 
          GRAPH_SWIM_STROKES,
          GRAPH_SWIM_SWOLF,
-
-         GRAPH_CUSTOM_TRACKS,
 
          GRAPH_TOUR_COMPARE
    };
@@ -3720,7 +3719,7 @@ public class TourManager {
       if (tourData != null && tourData.getCustomTracks() != null && !tourData.getCustomTracks().isEmpty()) {
 
          final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
-         yData_Cust_Tracks_List = new HashMap();
+         yData_Cust_Tracks_List = new HashMap<>();
          final HashMap<String, CustomTrackDefinition> custTrkDefMap = tourData.getCustomTracksDefinition();
          final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
          java.util.Collections.sort(lisKey);
@@ -3895,15 +3894,6 @@ public class TourManager {
                      custTrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
                   }
                   if (actionId == (idx + GRAPH_CUSTOM_TRACKS)) {
-                     /*
-                      * final ChartDataYSerie yData_Cust_Tracks =
-                      * createModelData_Custom_Tracks(custTrk.get(key),
-                      * custTrkDef,
-                      * idx,
-                      * chartDataModel,
-                      * chartType,
-                      * useCustomBackground);
-                      */
                      final ChartDataYSerie yData_Cust_Tracks = yData_Cust_Tracks_List.get(idx + GRAPH_CUSTOM_TRACKS);
                      if (yData_Cust_Tracks != null) {
                         chartDataModel.addYData(yData_Cust_Tracks);
@@ -4170,7 +4160,7 @@ public class TourManager {
    }
 
    /**
-    * CUSTOM TRACKS
+    * CUSTOM TRACKS model creation
     */
    private ChartDataYSerie createModelData_Custom_Tracks(final float[] custSerie,
                                                          final CustomTrackDefinition custDef,
@@ -4201,7 +4191,7 @@ public class TourManager {
          setGraphColor(yDataCustSerie, GraphColorManager.PREF_GRAPH_CUSTOM_TRACKS);
          chartDataModel.addXyData(yDataCustSerie);
 
-         // adjust min/max values when it's defined in the pref store
+         // TODO adjust min/max values when it's defined in the pref store
          /*
           * setVisibleForcedValues(
           * yDataTemperature,
@@ -4806,7 +4796,7 @@ public class TourManager {
             yDataTemperature.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPTERATURE);
+         setGraphColor(yDataTemperature, GraphColorManager.PREF_GRAPH_TEMPERATURE);
          chartDataModel.addXyData(yDataTemperature);
 
          // adjust min/max values when it's defined in the pref store

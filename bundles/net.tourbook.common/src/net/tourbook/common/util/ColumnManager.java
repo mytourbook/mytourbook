@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -126,7 +126,7 @@ public class ColumnManager {
    //
    static final String         COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
    static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
-   //CUSTOM TRACKS
+   //
    public static final String  CUSTOM_TRACKS_TIME_SLICES_ID              = "CUSTOM_TRACKS_TIME_SLICES";         //$NON-NLS-1$
 
    /**
@@ -519,8 +519,8 @@ public class ColumnManager {
       _allDefinedColumnDefinitions.clear();
    }
 
-   // CUSTOM TRACKS
-   public void clearCustColumns() {
+   // remove only the custom tracks columns from the overall list of defined column
+   public void clearCustomTracksColumns() {
       final ArrayList<String> columnIds = new ArrayList<>();
       final Iterator<ColumnDefinition> itrColDef = _allDefinedColumnDefinitions.iterator();
       while (itrColDef.hasNext()) {
@@ -2206,7 +2206,7 @@ public class ColumnManager {
 
                   // frozen column id
                   final String xmlFrozenColumnId = xmlProfile.getString(ATTR_FROZEN_COLUMN_ID);
-                  //CUSTOM TRACKS add xmlFrozenColumnId != null && !xmlFrozenColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)
+
                   if (xmlFrozenColumnId != null && !xmlFrozenColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
                      currentProfile.frozenColumnId = xmlFrozenColumnId;
                   }
@@ -2214,7 +2214,6 @@ public class ColumnManager {
                   // visible column id's
                   final String xmlColumnIds = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS);
                   if (xmlColumnIds != null) {
-                     //CUSTOM TRACKS
                      final String[] tmpArr = StringToArrayConverter.convertStringToArray(xmlColumnIds);
                      final ArrayList<String> tmpArrLlist = new ArrayList<>();
                      for (final String element : tmpArr) {
@@ -2225,14 +2224,11 @@ public class ColumnManager {
                      if (tmpArrLlist.size() > 0) {
                         currentProfile.setVisibleColumnIds(tmpArrLlist.toArray(new String[tmpArrLlist.size()]));
                      }
-                     //CUSTOM TRACKS commented below line
-                     //currentProfile.setVisibleColumnIds(StringToArrayConverter.convertStringToArray(xmlColumnIds));
                   }
 
                   // visible column id's and width
                   final String xmlColumnIdsAndWidth = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH);
                   if (xmlColumnIdsAndWidth != null) {
-                     //CUSTOM TRACKS
                      final String[] tmpArr = StringToArrayConverter.convertStringToArray(xmlColumnIdsAndWidth);
                      final ArrayList<String> tmpArrLlist = new ArrayList<>();
                      for (int j = 0; j < tmpArr.length; j++) {
@@ -2245,8 +2241,6 @@ public class ColumnManager {
                      if (tmpArrLlist.size() > 0) {
                         currentProfile.visibleColumnIdsAndWidth = tmpArrLlist.toArray(new String[tmpArrLlist.size()]);
                      }
-                     //CUSTOM TRACKS commented below line
-                     // currentProfile.visibleColumnIdsAndWidth = StringToArrayConverter.convertStringToArray(xmlColumnIdsAndWidth);
                   }
 
                   /*
@@ -2274,7 +2268,7 @@ public class ColumnManager {
                               ValueFormat.DUMMY_VALUE);
 
                         if (columnId != null //
-                              && !columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID) //CUSTOM TRACKS
+                              && !columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)
                               && (valueFormat_Category != ValueFormat.DUMMY_VALUE //
                                     || valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
 
@@ -2456,7 +2450,6 @@ public class ColumnManager {
          /*
           * frozenColumnId
           */
-         //CUSTOM TRACKS add check on CUSTOM_TRACKS_TIME_SLICES_ID
          if (profile.frozenColumnId != null && !profile.frozenColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
             xmlProfile.putString(ATTR_FROZEN_COLUMN_ID, profile.frozenColumnId);
          }
@@ -2467,7 +2460,7 @@ public class ColumnManager {
          final String[] visibleColumnIds = profile.getVisibleColumnIds();
 
          if (visibleColumnIds != null) {
-            //CUSTOM TRACKS
+            //CUSTOM TRACKS visible column must not be saved
             final ArrayList<String> visibleColumnIdsNoCustArr = new ArrayList<>();
             for (final String visibleColumnId : visibleColumnIds) {
                if (!visibleColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
@@ -2478,8 +2471,6 @@ public class ColumnManager {
                final String[] visibleColumnIdsNoCust = visibleColumnIdsNoCustArr.toArray(new String[visibleColumnIdsNoCustArr.size()]);
                xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIdsNoCust));
             }
-            //CUSTOM TRACKS commented below line
-            //  xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIds));
          }
 
          /*
@@ -2487,7 +2478,7 @@ public class ColumnManager {
           */
          final String[] visibleColumnIdsAndWidth = profile.visibleColumnIdsAndWidth;
          if (visibleColumnIdsAndWidth != null) {
-            //CUSTOM TRACKS
+            //CUSTOM TRACKS visibleColumnIdsAndWidth must not be saved on disk
             final ArrayList<String> visibleColumnIdsAndWidthNoCustArr = new ArrayList<>();
             for (int j = 0; j < visibleColumnIdsAndWidth.length; j++) {
                final String visibleColumnId = visibleColumnIdsAndWidth[j++];
@@ -2501,15 +2492,13 @@ public class ColumnManager {
                      .size()]);
                xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH, StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidthNoCust));
             }
-            //CUSTOM TRACKS commented below line
-            //  xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH, StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidth));
          }
 
          /*
           * Column properties
           */
          for (final ColumnProperties columnProperty : profile.columnProperties) {
-            //CUSTOM TRACKS add if(!columnProperty.columnId.startsWi...)
+
             if (!columnProperty.columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
                final IMemento xmlColumn = xmlProfile.createChild(TAG_COLUMN);
 

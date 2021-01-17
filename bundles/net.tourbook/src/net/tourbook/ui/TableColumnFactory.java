@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,9 +67,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory BODY_WEIGHT;
    public static final String             BODY_WEIGHT_ID                                     = "BODY_WEIGHT";                                     //$NON-NLS-1$
 
-   // CUSTOM TRACKS
    public static final TableColumnFactory CUSTOM_TRACKS_TIME_SLICES;
-   // CUSTOM TRACKS
    //CUSTOM_TRACKS_TIME_SLICES_ID also defined in package net.tourbook.common.util;->public class ColumnManager
    //public static final String           CUSTOM_TRACKS_TIME_SLICES_ID                       = "CUSTOM_TRACKS_TIME_SLICES";                       //$NON-NLS-1$
 
@@ -4141,7 +4139,7 @@ public abstract class TableColumnFactory {
          }
       };
 
-      //CUSTOM TRACKS
+
       CUSTOM_TRACKS_TIME_SLICES = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
@@ -4151,7 +4149,7 @@ public abstract class TableColumnFactory {
          }
 
          @Override
-         public TableColumnDefinition createColumnCustTrack(final ColumnManager columnManager,
+         public TableColumnDefinition createColumnCustomTrack(final ColumnManager columnManager,
                                                             final PixelConverter pixelConverter,
                                                             final CustomTrackDefinition custTD) {
 
@@ -4185,8 +4183,7 @@ public abstract class TableColumnFactory {
     */
    public abstract TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter);
 
-   // CUSTOM TRACKS
-   public TableColumnDefinition createColumnCustTrack(final ColumnManager columnManager,
+   public TableColumnDefinition createColumnCustomTrack(final ColumnManager columnManager,
                                                       final PixelConverter pixelConverter,
                                                       final CustomTrackDefinition custTD) {
       //default implementation doesn't do anything !!

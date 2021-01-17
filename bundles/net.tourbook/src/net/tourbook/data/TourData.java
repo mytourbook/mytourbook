@@ -3541,7 +3541,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
       if (customTracksStat == null) {
-         customTracksStat = new HashMap();
+         customTracksStat = new HashMap<>();
       } else {
          customTracksStat.clear();
       }
@@ -7275,7 +7275,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (_customTracks_UI == null) {
-         return new HashMap();
+         return new HashMap<String, float[]>();
       }
 
       return _customTracks_UI;
@@ -7289,7 +7289,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
       if (_customTracks_UI == null) {
-         _customTracks_UI= new HashMap();
+         _customTracks_UI= new HashMap<String, float[]>();
       }
 
       if (!_customTracks_UI.containsKey(idx)) {
@@ -7320,7 +7320,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public HashMap<String, CustomTrackDefinition> getCustomTracksDefinition() {
       if (customTracksDefinition == null) {
-         return new HashMap();
+         return new HashMap<String, CustomTrackDefinition>();
       }
       return customTracksDefinition;
    }
@@ -7328,7 +7328,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    //CUSTOM TRACKS
    public HashMap<String, CustomTrackStatisticEntry> getCustomTracksStat() {
       if (customTracksStat == null) {
-         return new HashMap();
+         return new HashMap<String, CustomTrackStatisticEntry>();
       }
       return customTracksStat;
    }
@@ -10521,7 +10521,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       boolean isAvailable = false;
       if (firstTimeData.customTracks != null && firstTimeData.customTracks.length > 0) {
          if (_customTracks == null) {
-            _customTracks = new HashMap();
+            _customTracks = new HashMap<String, float[]>();
          }
          _customTracks.clear();
          for (int j = 0; j < firstTimeData.customTracks.length; j++) {
