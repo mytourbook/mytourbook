@@ -20,6 +20,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -76,7 +77,7 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
       final byte[] response = htmlBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
       // this line is a must
-      httpExchange.sendResponseHeaders(200, response.length);
+      httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
 
       try (OutputStream outputStream = httpExchange.getResponseBody()) {
 
