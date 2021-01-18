@@ -146,9 +146,7 @@ public class StravaUploader extends TourbookCloudUploader {
       if (isRefreshToken) {
          body.append("{\"" + OAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
          grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
-      } else
-
-      {
+      } else {
          body.append("{\"" + OAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
          grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
       }
