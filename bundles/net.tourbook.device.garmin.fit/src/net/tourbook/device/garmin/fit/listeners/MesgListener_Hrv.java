@@ -44,24 +44,18 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
     */
    private void onMesg_Hrv(final HrvMesg mesg) {
 
-//      System.out.println((System.currentTimeMillis() + " onMesg_Hrv()"));
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       final TIntArrayList pulseTime = new TIntArrayList();
 
       final Float[] allTimes = mesg.getTime();
 
       for (final Float time : allTimes) {
 
-         // skip invalid values
+         // skip invalid values which occurred
          if (time == 65535.0) {
             continue;
          }
 
-//         System.out.println(String.format("   time: %-2.3f s", time));
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
-         // add pulse time in ms
+         // add pulse time in ms, sec -> ms
          pulseTime.add((int) (time * 1_000));
       }
 
@@ -69,17 +63,19 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
 
          final TimeData timeData = fitData.getLastAdded_TimeData();
 
-         if (timeData.pulseTime == null) {
+         if (timeData != null) {
 
-            timeData.pulseTime = pulseTime.toArray();
+            if (timeData.pulseTime == null) {
 
-         } else {
+               timeData.pulseTime = pulseTime.toArray();
 
-            // append to existing values
+            } else {
 
-            timeData.pulseTime = Util.concatInt(timeData.pulseTime, pulseTime.toArray());
+               // append to existing values
+
+               timeData.pulseTime = Util.concatInt(timeData.pulseTime, pulseTime.toArray());
+            }
          }
-
       }
    }
 }

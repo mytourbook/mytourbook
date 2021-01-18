@@ -829,6 +829,7 @@ public class TourManager {
       final double[] toLongitudeSerie = joinedTourData.longitudeSerie = new double[numTimeSlices];
       final float[] toPowerSerie = new float[numTimeSlices];
       final float[] toPulseSerie = joinedTourData.pulseSerie = new float[numTimeSlices];
+      final float[] toPulseSerie_FromTime = joinedTourData.pulseSerie_FromTime = new float[numTimeSlices];
       final float[] toTemperaturSerie = joinedTourData.temperatureSerie = new float[numTimeSlices];
 
       final short[] toRunDyn_StanceTime = joinedTourData.runDyn_StanceTime = new short[numTimeSlices];
@@ -877,6 +878,7 @@ public class TourManager {
       boolean isLatLonSerie = false;
       boolean isPowerSerie = false;
       boolean isPulseSerie = false;
+      boolean isPulseSerie_FromTime = false;
       boolean isTempSerie = false;
 
       boolean isRunDyn_StanceTime = false;
@@ -910,6 +912,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
+         final float[] fromPulse_TimeSerie = fromTourData.getPulse_TimeSerie();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -1014,6 +1017,10 @@ public class TourManager {
          if (fromPulseSerie != null) {
             isPulseSerie = true;
             System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
+         }
+         if (fromPulse_TimeSerie != null) {
+            isPulseSerie_FromTime = true;
+            System.arraycopy(fromPulse_TimeSerie, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
          }
          if (fromTemperaturSerie != null) {
             isTempSerie = true;
@@ -1162,6 +1169,9 @@ public class TourManager {
       }
       if (!isPulseSerie) {
          joinedTourData.pulseSerie = null;
+      }
+      if (!isPulseSerie_FromTime) {
+         joinedTourData.pulseSerie_FromTime = null;
       }
       if (!isTempSerie) {
          joinedTourData.temperatureSerie = null;
@@ -4143,7 +4153,7 @@ public class TourManager {
          final float[] pulseTimeSerie = tourData.getPulse_TimeSerie();
          if (pulseTimeSerie != null) {
 
-            // show pulse from pulse time as 2nd graph
+            // show bpm from pulse time as 2nd graph
 
             yDataPulse = createChartDataSerie(
                   new float[][] { pulseSerie, pulseTimeSerie },

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -3214,8 +3215,9 @@ public class ChartComponentGraph extends Canvas {
        */
       if (path2 != null) {
 
-         final int gray = 0x66;
-         final Color path2Color = new Color(gray, gray, gray);
+         // this color is not yet user defined
+         final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+         final Color path2Color = new Color(complimentColor);
 
          gc.setForeground(path2Color);
          gc.drawPath(path2);
