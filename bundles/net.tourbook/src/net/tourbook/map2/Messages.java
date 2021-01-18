@@ -101,6 +101,7 @@ public class Messages extends NLS {
 
    public static String        map_action_dim_map;
    public static String        map_action_dim_map_disabled;
+   public static String        map_action_export_map_view;
    public static String        map_action_export_map_view_clipboard;
    public static String        map_action_export_map_view_image;
    public static String        map_action_export_map_view_image_tooltip;
