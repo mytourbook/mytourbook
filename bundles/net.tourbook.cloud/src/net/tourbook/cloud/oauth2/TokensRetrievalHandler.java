@@ -71,15 +71,15 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
 
    private void handleResponse(final HttpExchange httpExchange) throws IOException {
 
-      final OutputStream outputStream = httpExchange.getResponseBody();
-
       final StringBuilder htmlBuilder = new StringBuilder();
       htmlBuilder.append("<html><body><h1>" + Messages.Html_CloseBrowser_Text + "</h1></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 
       // this line is a must
       httpExchange.sendResponseHeaders(200, htmlBuilder.length());
 
-      try (Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+      try (final OutputStream outputStream = httpExchange.getResponseBody();
+            Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+
          writer.write(htmlBuilder.toString());
          outputStream.flush();
       }
