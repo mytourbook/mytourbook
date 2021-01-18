@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,10 +81,12 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
    @Override
    public void dispose() {
 
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
+      if (_menu == null) {
+         return;
       }
+
+      _menu.dispose();
+      _menu = null;
 
    }
 
@@ -107,7 +109,7 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       _menu = new Menu(parent);
 
-      // Add listener to repopulate the menu each time
+      // Add listener to re-populate the menu each time
       _menu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuShown(final MenuEvent e) {
@@ -138,7 +140,6 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
       if (selectedTours == null || selectedTours.isEmpty()) {
 
          // a tour is not selected
-
          MessageDialog.openInformation(
                shell,
                Messages.Dialog_SetWeatherDescription_Dialog_Title,
@@ -149,14 +150,15 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       for (final TourData tourData : selectedTours) {
 
-         if (tourData.getWeatherClouds() != weatherDescription) {
-
-            // Weather description is not the same
-
-            tourData.setWeatherClouds(weatherDescription);
-
-            modifiedTours.add(tourData);
+         if (tourData.getWeatherClouds().equals(weatherDescription)) {
+            continue;
          }
+
+         // Weather description is not the same
+
+         tourData.setWeatherClouds(weatherDescription);
+
+         modifiedTours.add(tourData);
       }
 
       if (modifiedTours.size() > 0) {
