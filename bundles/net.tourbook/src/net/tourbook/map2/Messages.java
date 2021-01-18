@@ -118,6 +118,7 @@ public class Messages extends NLS {
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;
    public static String        Map_Action_SearchTourByLocation;
+   public static String        Map_Action_SearchTourByLocation_Tooltip;
    public static String        Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String        Map_Action_ShowPhotos_Tooltip;
    public static String        Map_Action_ShowTourInfoInMap;

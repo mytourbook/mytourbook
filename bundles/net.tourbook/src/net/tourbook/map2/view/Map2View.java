@@ -529,6 +529,7 @@ public class Map2View extends ViewPart implements
       public ActionSearchTourByLocation() {
 
          setText(Messages.Map_Action_SearchTourByLocation);
+         setToolTipText(Messages.Map_Action_SearchTourByLocation_Tooltip);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       }
 
