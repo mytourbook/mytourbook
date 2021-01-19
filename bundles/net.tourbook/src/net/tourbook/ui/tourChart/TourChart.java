@@ -256,17 +256,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_SWIM_SWOLF
    };
 
-   public static final PulseValueLayout   PULSE_VALUE_LAYOUT_DEFAULT       = PulseValueLayout.DEVICE_BPM__AND__PULSE_TIME;
-
 //SET_FORMATTING_ON
 
-   static {}
+   public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM__AND__PULSE_TIME;
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
-   public static final double MIN_ADJUSTMENT = 1e-3;
-   public static final double MAX_ADJUSTMENT = 1e-5;
+   public static final double     MIN_ADJUSTMENT      = 1e-3;
+   public static final double     MAX_ADJUSTMENT      = 1e-5;
    //
    //
    private final IDialogSettings                            _state;
@@ -4895,23 +4893,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
       graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
-      isShowHorizontalGridLines = Util.getPrefixPrefBoolean(
-            _prefStore,
+      isShowHorizontalGridLines = Util.getPrefixPrefBoolean(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 
-      isShowVerticalGridLines = Util.getPrefixPrefBoolean(
-            _prefStore,
+      isShowVerticalGridLines = Util.getPrefixPrefBoolean(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-      gridVerticalDistance = Util.getPrefixPrefInt(
-            _prefStore,
+      gridVerticalDistance = Util.getPrefixPrefInt(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 
-      gridHorizontalDistance = Util.getPrefixPrefInt(
-            _prefStore,
+      gridHorizontalDistance = Util.getPrefixPrefInt(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
    }

@@ -170,28 +170,26 @@ public class TourChartConfiguration {
     * When <code>true</code> tour marker labels are displayed.
     */
    public boolean                 isShowMarkerLabel;
-
    public boolean                 isShowMarkerTooltip;
-
    public boolean                 isShowAbsoluteValues;
 
    public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
+
    public boolean                 isShowMarkerPoint;
-
    public boolean                 isShowSignImage;
-
    public boolean                 isGraphOverlapped;
-   public int                     markerHoverSize;
 
+   public int                     markerHoverSize;
    public int                     markerLabelOffset;
 
    public boolean                 isShowLabelTempPos;
    public int                     markerLabelTempPos;
-
+   
    /**
     * Size of the marker point in DLU (Dialog Units).
     */
    public int                     markerPointSize;
+
    /**
     * Size of the sign image in DLU (Dialog Units).
     */
@@ -216,7 +214,7 @@ public class TourChartConfiguration {
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
     * is detected.
     */
-   public boolean                 isShowBreaktimeValues   = true;
+   public boolean               isShowBreaktimeValues       = true;
 
    /*
     * Graph background
@@ -243,36 +241,38 @@ public class TourChartConfiguration {
     * available .
     */
    public boolean               canShowBackground_SwimStyle = false;
-
    /*
     * Tour photos
     */
-   public boolean isShowTourPhotos       = true;
-   public boolean isShowTourPhotoTooltip = true;
-
+   public boolean               isShowTourPhotos            = true;
+   public boolean               isShowTourPhotoTooltip      = true;
+   
    /*
     * Tour info
     */
-   public boolean isTourInfoVisible;
-   public boolean isShowInfoTitle;
-   public boolean isShowInfoTooltip;
-   public boolean isShowInfoTourSeparator;
-   public int     tourInfoTooltipDelay;
+   public boolean               isTourInfoVisible;
+   public boolean               isShowInfoTitle;
+   public boolean               isShowInfoTooltip;
+   public boolean               isShowInfoTourSeparator;
+
+   public int                   tourInfoTooltipDelay;
 
    /*
-    * Pulse values
+    * Pulse graphs
     */
-   public PulseValueLayout pulseValueLayout;
+   public PulseGraph pulseGraph;
+   public boolean    canShowPulseSerie;
+   public boolean    canShowPulseTimeSerie;
 
    /**
     * Is <code>true</code> when the geo compare action is visible and can be used
     */
-   public boolean          canUseGeoCompareTool;
+   public boolean    canUseGeoCompareTool;
 
    /**
     * Is <code>true</code> to show geo diff unit in compared tour chart
     */
-   public boolean          isGeoCompareDiff;
+   public boolean    isGeoCompareDiff;
 
    @SuppressWarnings("unused")
    private TourChartConfiguration() {}
@@ -332,9 +332,9 @@ public class TourChartConfiguration {
       /*
        * Pulse values
        */
-      pulseValueLayout = (PulseValueLayout) Util.getEnumValue(
-            _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_VALUE_LAYOUT),
-            TourChart.PULSE_VALUE_LAYOUT_DEFAULT
+      pulseGraph = (PulseGraph) Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
+            TourChart.PULSE_GRAPH_DEFAULT
       );
 
 // SET_FORMATTING_ON

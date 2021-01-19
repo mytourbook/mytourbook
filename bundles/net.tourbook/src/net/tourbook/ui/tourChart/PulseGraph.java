@@ -15,7 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-public enum PulseValueLayout {
+/**
+ * Pulse graph parts which are displayed in the pulse graph
+ */
+public enum PulseGraph {
 
    /**
     * Device bpm values are displayed as graph, pulse times are displayed as line

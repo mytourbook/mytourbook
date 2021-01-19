@@ -193,11 +193,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE,              true);
 
       // pulse values
-      store.setDefault(ITourbookPreferences.GRAPH_PULSE_VALUE_LAYOUT,         TourChart.PULSE_VALUE_LAYOUT_DEFAULT.name());
-
+      store.setDefault(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES,      TourChart.PULSE_GRAPH_DEFAULT.name());
 
       //tour pauses
-      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, true);
+      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE,      true);
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,  new RGB(0xff, 0x0, 0x80));

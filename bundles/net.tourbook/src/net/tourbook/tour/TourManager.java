@@ -3650,7 +3650,7 @@ public class TourManager {
 // SET_FORMATTING_OFF
 
       final ChartDataYSerie yDataAltitude       = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
       final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
@@ -4138,31 +4138,71 @@ public class TourManager {
       return yDataGradient;
    }
 
+   /**
+    * Heartbeat
+    */
    private ChartDataYSerie createModelData_Heartbeat(final TourData tourData,
                                                      final ChartDataModel chartDataModel,
                                                      final ChartType chartType,
-                                                     final boolean useGraphBgStyle) {
-      /**
-       * Heartbeat
-       */
+                                                     final boolean useGraphBgStyle,
+                                                     final TourChartConfiguration tcc) {
+
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      if (pulseSerie != null) {
+      final float[] pulseTimeSerie = tourData.getPulse_TimeSerie();
 
-         final float[] pulseTimeSerie = tourData.getPulse_TimeSerie();
-         if (pulseTimeSerie != null) {
+      final boolean isPulseSerie = pulseSerie != null;
+      final boolean isPulseTimeSerie = pulseTimeSerie != null;
 
-            // show bpm from pulse time as 2nd graph
+      tcc.canShowPulseSerie = isPulseSerie;
+      tcc.canShowPulseTimeSerie = isPulseTimeSerie;
 
-            yDataPulse = createChartDataSerie(
-                  new float[][] { pulseSerie, pulseTimeSerie },
-                  chartType);
+      // set graph/line according to the selection
+      switch (tcc.pulseGraph) {
+      case DEVIDE_BPM_ONLY:
 
-         } else {
-
+         if (isPulseSerie) {
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
          }
+         break;
+
+      case PULSE_TIME_ONLY:
+
+         if (isPulseTimeSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         }
+         break;
+
+      case PULSE_TIME__AND_DEVICE_BPM:
+
+         if (isPulseSerie && isPulseTimeSerie) {
+            yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
+         }
+         break;
+
+      case DEVICE_BPM__AND__PULSE_TIME:
+      default:
+
+         if (isPulseSerie && isPulseTimeSerie) {
+            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, pulseTimeSerie }, chartType);
+         }
+      }
+
+      // when user selection could not be applied, try to use the remaining possibilities
+      if (yDataPulse == null) {
+
+         if (isPulseSerie) {
+
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+
+         } else if (isPulseTimeSerie) {
+
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         }
+      }
+
+      if (yDataPulse != null) {
 
          yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
          yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -4193,13 +4233,13 @@ public class TourManager {
       return yDataPulse;
    }
 
+   /**
+    * Pace
+    */
    private ChartDataYSerie createModelData_Pace(final TourData tourData,
                                                 final ChartDataModel chartDataModel,
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
-      /*
-       * pace
-       */
       final float[] paceSerie = tourData.getPaceSerieSeconds();
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
