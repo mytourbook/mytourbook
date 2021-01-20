@@ -19,6 +19,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.CustomTrackDefinition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourSegment;
@@ -97,6 +99,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -135,11 +138,12 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-//SET_FORMATTING_OFF
-
    private static final int      PAGE_NAVIGATION_SEGMENTS                  = 10;
 
+//SET_FORMATTING_OFF
+
    private static final String   GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
+
    private static final String   GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
    private static final String   GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
    private static final String   GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
@@ -157,8 +161,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
    private static final String   GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
    private static final String   GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
-
    public static final String    ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER         = "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";       //$NON-NLS-1$
+
    public static final String    ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED    = "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";  //$NON-NLS-1$
    public static final String    ACTION_ID_EDIT_CHART_PREFERENCES          = "ACTION_ID_EDIT_CHART_PREFERENCES";        //$NON-NLS-1$
    private static final String   ACTION_ID_IS_GRAPH_OVERLAPPED             = "ACTION_ID_IS_GRAPH_OVERLAPPED";           //$NON-NLS-1$
@@ -166,16 +170,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    public static final String    ACTION_ID_IS_SHOW_TOUR_PAUSES             = "ACTION_ID_IS_SHOW_TOUR_PAUSES";           //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_DISTANCE                 = "ACTION_ID_X_AXIS_DISTANCE";               //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_TIME                     = "ACTION_ID_X_AXIS_TIME";                   //$NON-NLS-1$
-
    private static final String   GRID_PREF_PREFIX                          = "GRID_TOUR_CHART__";                       //$NON-NLS-1$
+
    private static final String   GRID_IS_SHOW_VERTICAL_GRIDLINES           = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
    private static final String   GRID_IS_SHOW_HORIZONTAL_GRIDLINES         = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
    private static final String   GRID_VERTICAL_DISTANCE                    = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
    private static final String   GRID_HORIZONTAL_DISTANCE                  = (GRID_PREF_PREFIX   + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
-
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE";                      //$NON-NLS-1$
+
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER                             = "STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER";                     //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE                               = "STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE";                       //$NON-NLS-1$
+   static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS                         = "STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS";                 //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS                                 = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS";                         //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT                              = "STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT";                      //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE                                  = "STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE";                          //$NON-NLS-1$
@@ -190,10 +195,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO                = "STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO";        //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES                          = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES";                  //$NON-NLS-1$
    static final String  STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF                            = "STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF";                    //$NON-NLS-1$
-
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE_DEFAULT                      = true;
+
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER_DEFAULT                     = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE_DEFAULT                       = false;
+   static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS_DEFAULT                 = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS_DEFAULT                         = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT_DEFAULT                      = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_DEFAULT                          = false;
@@ -208,12 +214,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO_DEFAULT        = false;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT                  = true;
    static final boolean STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT                    = false;
-
+   //
    private static final String GRAPH_CONTRIBUTION_ID_SLIDEOUT                       = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
 
    private static final String GRAPH_CONTRIBUTION_ID_ALTIMETER                      = "GRAPH_CONTRIBUTION_ID_ALTIMETER";                     //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_ALTITUDE                       = "GRAPH_CONTRIBUTION_ID_ALTITUDE";                      //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_CADENCE                        = "GRAPH_CONTRIBUTION_ID_CADENCE";                       //$NON-NLS-1$
+   private static final String GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS                  = "GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS";                 //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_GEARS                          = "GRAPH_CONTRIBUTION_ID_GEARS";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_GRADIENT                       = "GRAPH_CONTRIBUTION_ID_GRADIENT";                      //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_PACE                           = "GRAPH_CONTRIBUTION_ID_PACE";                          //$NON-NLS-1$
@@ -222,16 +229,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String GRAPH_CONTRIBUTION_ID_SPEED                          = "GRAPH_CONTRIBUTION_ID_SPEED";                         //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TEMPERATURE                    = "GRAPH_CONTRIBUTION_ID_TEMPERATURE";                   //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_TOUR_COMPARE                   = "GRAPH_CONTRIBUTION_ID_TOUR_COMPARE";                  //$NON-NLS-1$
-
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME            = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME";           //$NON-NLS-1$
+
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED   = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED";  //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH            = "GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH";           //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION   = "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION";  //$NON-NLS-1$
    private static final String GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO         = "GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO";        //$NON-NLS-1$
-
    private static final String GRAPH_CONTRIBUTION_ID_SWIM_STROKES                   = "GRAPH_CONTRIBUTION_ID_SWIM_STROKES";                  //$NON-NLS-1$
-   private static final String GRAPH_CONTRIBUTION_ID_SWIM_SWOLF                     = "GRAPH_CONTRIBUTION_ID_SWIM_SWOLF";                    //$NON-NLS-1$
 
+   private static final String GRAPH_CONTRIBUTION_ID_SWIM_SWOLF                     = "GRAPH_CONTRIBUTION_ID_SWIM_SWOLF";                    //$NON-NLS-1$
    private static final String[]   _allGraphContribId = {
 
       GRAPH_CONTRIBUTION_ID_ALTIMETER,
@@ -255,18 +261,22 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_SWIM_SWOLF
    };
 
-//SET_FORMATTING_ON
-
    static {}
+
+//SET_FORMATTING_ON
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
    public static final double MIN_ADJUSTMENT = 1e-3;
+
    public static final double MAX_ADJUSTMENT = 1e-5;
+
+   private LinkedHashMap<String, Boolean> _state_CustomTracksToolBarChart = new LinkedHashMap<>();
+   private ArrayList<String>              _customTracksGraphContribId     = new ArrayList<>();
    //
    //
-   private final IDialogSettings                            _state;
+   private final IDialogSettings  _state;
    private final IPreferenceStore                           _prefStore                   = TourbookPlugin.getPrefStore();
    private final IPreferenceStore                           _prefStore_Common            = CommonActivator.getPrefStore();
    private final IDialogSettings                            _tourSegmenterState          = TourSegmenterView.getState();
@@ -278,6 +288,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    //
    private TourData                                         _tourData;
    private TourChartConfiguration                           _tcc;
+
+   private Long                                             _currentTourId                  = null;
    //
    private Map<String, Action>                              _allTourChartActions;
    //
@@ -288,6 +300,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private ActionOpenMarkerDialog                           _actionOpenMarkerDialog;
    private Action_AllGraphs                                 _actionTourChartGraphs;
    private Action_TourChart_Info                            _actionTourInfo;
+
    private ActionTourChartMarker                            _actionTourMarker;
    private Action_TourChart_Options                         _actionTourChartOptions;
    private Action_TourChart_Smoothing                       _actionTourChartSmoothing;
@@ -315,16 +328,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * it.
     */
    private TourMarker                                       _selectedTourMarker;
-
    //
    private ImageDescriptor               _imagePhoto                     = TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
-   private ImageDescriptor               _imagePhotoTooltip              = TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
 
+   private ImageDescriptor               _imagePhotoTooltip              = TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
    private IFillPainter                  _customBackgroundPainter;
 
    private OpenDialogManager             _openDlgMgr                     = new OpenDialogManager();
 
    private ChartPhotoToolTip             _photoTooltip;
+
    private TourToolTip                   _tourInfoIconTooltip;
    private TourInfoIconToolTipProvider   _tourInfoIconTooltipProvider;
    private ChartMarkerToolTip            _tourMarkerTooltip;
@@ -384,7 +397,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    //
    private Color                     _photoOverlayBGColorLink;
    private Color                     _photoOverlayBGColorTour;
-
    private class Action_AllGraphs extends ActionToolbarSlideout {
 
       public Action_AllGraphs() {
@@ -1071,6 +1083,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       fireXAxisSelection(_tcc.isShowTimeOnXAxis);
    }
 
+
+
    /**
     * ########################### Recursive #########################################<br>
     * <p>
@@ -1449,6 +1463,52 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             Messages.Image__Graph_Swim_Swolf,
             Messages.Image__Graph_Swim_Swolf_Disabled,
             GRAPH_CONTRIBUTION_ID_SWIM_SWOLF);
+
+      /*
+       * CUSTOM TRACKS
+       */
+      createActions_10_GraphActionsCustomTracks();
+   }
+
+   /**
+    * Create all graph actions for CUSTOM TRACKS
+    */
+   private void createActions_10_GraphActionsCustomTracks() {
+      if (_tourData != null && _tourData.getCustomTracks() != null && !_tourData.getCustomTracks().isEmpty()) {
+         final HashMap<String, CustomTrackDefinition> custDef = _tourData.getCustomTracksDefinition();
+         final HashMap<String, float[]> custTracks = _tourData.getCustomTracks();
+         final ArrayList<String> listKey = new ArrayList<>(custTracks.keySet());
+         java.util.Collections.sort(listKey);
+         int cnt = 0;
+         for (int idx = 0; idx < listKey.size(); idx++) {
+            if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
+               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+                  break;
+               }
+            }
+            final String key = listKey.get(idx);
+            final float[] Trk = custTracks.get(key);
+            CustomTrackDefinition TrkDef = custDef.get(key);
+            if (TrkDef == null && Trk != null) {
+               TrkDef = new CustomTrackDefinition();
+               TrkDef.setId(key);
+               TrkDef.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
+               TrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
+            }
+            if (Trk != null && TrkDef != null) {
+               //final int idx2 = lisKey.indexOf(key);
+               createActions_12_GraphAction(
+                     TourManager.GRAPH_CUSTOM_TRACKS + idx,
+                     TrkDef.getName(),
+                     Messages.Tour_Action_Custom_Tracks_Tooltip_Prefix + TrkDef.getName(),
+                     Messages.Image__Graph_Custom_Tracks,
+                     Messages.Image__Graph_Custom_Tracks_Disabled,
+                     GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+               _customTracksGraphContribId.add(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+            }
+            cnt++;
+         }
+      }
    }
 
    /**
@@ -2698,7 +2758,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        * Remove all previous graph actions
        */
       for (final String contribId : _allGraphContribId) {
-         tbm.remove(contribId);
+         final IContributionItem item = tbm.remove(contribId);
+      }
+
+      if (_tourData != null && _tourData.getCustomTracks() != null &&
+            _tourData.getCustomTracks().size() > 0) {
+         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         //final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
+         //java.util.Collections.sort(lisKey);
+         for (final String key : custTrk.keySet()) {
+            //final int idx = lisKey.indexOf(key);
+            final IContributionItem item = tbm.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+            if (item == null) {}
+         }
       }
 
       /*
@@ -2813,6 +2885,34 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_SWIM_SWOLF,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT);
+
+      /*
+       * CUSTOM TRACKS
+       */
+      if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
+         int cnt = 0;
+         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         final ArrayList<String> listKey = new ArrayList<>(custTrk.keySet());
+         java.util.Collections.sort(listKey);
+         for (int idx = 0; idx < listKey.size(); idx++) {
+            if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
+               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+                  break;
+               }
+            }
+            //final int idx = lisKey.indexOf(key);
+            final String key = listKey.get(idx);
+            final Boolean theState = _state_CustomTracksToolBarChart.getOrDefault(key,
+                  TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS_DEFAULT);
+            fillToolbar_Graphs_Graph(
+                  tbm,
+                  TourManager.GRAPH_CUSTOM_TRACKS + idx,
+                  TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS + key, //TODO add id as suffix
+                  theState);
+            cnt++;
+         }
+      }
+
    }
 
    private void fillToolbar_Graphs_Graph(final IToolBarManager tbm,
@@ -2820,11 +2920,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                                          final String stateKey,
                                          final boolean stateDefaultValue) {
 
-      if (Util.getStateBoolean(_state, stateKey, stateDefaultValue)) {
-
-         tbm.insertBefore(
-               GRAPH_CONTRIBUTION_ID_SLIDEOUT,
-               _allTourChartActions.get(getGraphActionId(graphId)));
+      if (stateKey.startsWith(STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS)) {
+         if (stateDefaultValue) {
+            tbm.insertBefore(
+                  GRAPH_CONTRIBUTION_ID_SLIDEOUT,
+                  _allTourChartActions.get(getGraphActionId(graphId)));
+            }
+         } else if (Util.getStateBoolean(_state, stateKey, stateDefaultValue)) {
+            tbm.insertBefore(
+                  GRAPH_CONTRIBUTION_ID_SLIDEOUT,
+                  _allTourChartActions.get(getGraphActionId(graphId)));
       }
    }
 
@@ -2894,6 +2999,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final IXAxisSelectionListener listener = (IXAxisSelectionListener) listener2;
          listener.selectionChanged(showTimeOnXAxis);
       }
+   }
+
+   public LinkedHashMap<String, Boolean> get_state_CustomTracksToolBarChart() {
+      return _state_CustomTracksToolBarChart;
    }
 
    IAction getGraphAction(final int graphId) {
@@ -3660,6 +3769,41 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // show tool tip again
       _valuePointTooltip.setShellVisible(true);
+   }
+
+   private void removeActions_10_GraphActionsCustomTracks() {
+      if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
+         final HashMap<String, CustomTrackDefinition> custDef = _tourData.getCustomTracksDefinition();
+         final HashMap<String, float[]> custTracks = _tourData.getCustomTracks();
+         final ArrayList<String> listKey = new ArrayList<>(custTracks.keySet());
+         java.util.Collections.sort(listKey);
+         int cnt = 0;
+         for (int idx = 0; idx < listKey.size(); idx++) {
+            if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
+               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+                  break;
+               }
+            }
+            final String key = listKey.get(idx);
+            final float[] Trk = custTracks.get(key);
+            CustomTrackDefinition TrkDef = custDef.get(key);
+            if (TrkDef == null && Trk != null) {
+               TrkDef = new CustomTrackDefinition();
+               TrkDef.setId(key);
+               TrkDef.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
+               TrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
+            }
+            if (Trk != null && TrkDef != null) {
+
+               _customTracksGraphContribId.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+               //final Action tourAction = _allTourChartActions.get(getGraphActionId(TourManager.GRAPH_CUSTOM_TRACKS + idx));
+               //tourAction.setEnabled(false);
+               _allTourChartActions.remove(getGraphActionId(TourManager.GRAPH_CUSTOM_TRACKS + idx));
+               _tcc.removeVisibleGraph(TourManager.GRAPH_CUSTOM_TRACKS + idx);//remove cutom raph from being visible
+            }
+            cnt++;
+         }
+      }
    }
 
    public void removeTourMarkerSelectionListener(final ITourMarkerSelectionListener listener) {
@@ -4848,6 +4992,39 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             0.1,
             isMinMaxEnabled);
 
+      //CUSTOM TRACKS TODO set Min Max for Custom Tracks
+      /*
+       * if (_tourData != null && _tourData.getCustomTracks() != null &&
+       * !_tourData.getCustomTracks().isEmpty()) {
+       * final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+       * final HashMap<String, CustomTrackDefinition> custTrkDef =
+       * _tourData.getCustomTracksDefinition();
+       * final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
+       * java.util.Collections.sort(lisKey);
+       * for (final String key : custTrk.keySet()) {
+       * final int idx = lisKey.indexOf(key);
+       * isChartModified |= setMinDefaultValue(
+       * property,
+       * isChartModified,
+       * ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED,
+       * ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE,
+       * TourManager.GRAPH_CUSTOM_TRACKS,
+       * 0,
+       * 0.1,
+       * isMinMaxEnabled);
+       * isChartModified |= setMaxDefaultValue(
+       * property,
+       * isChartModified,
+       * ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED,
+       * ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE,
+       * TourManager.GRAPH_CUSTOM_TRACKS,
+       * 0,
+       * 0.1,
+       * isMinMaxEnabled);
+       * }
+       * }
+       */
+
       return isChartModified;
    }
 
@@ -5015,6 +5192,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_SWIM_SWOLF);
       }
 
+      if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
+         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         for (final String key : custTrk.keySet()) {
+            if (yDataWithLabels == null) {
+               yDataWithLabels = (ChartDataYSerie) dataModel.getCustomData(TourManager.CUSTOM_DATA_CUSTOM_TRACKS + key);
+            }
+         }
+      }
+
       ConfigGraphSegment cfgAltitude = null;
       ConfigGraphSegment cfgPulse = null;
       ConfigGraphSegment cfgSpeed = null;
@@ -5101,6 +5287,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_STROKES, yDataWithLabels, null);
       setupGraphLayer_Layer(TourManager.CUSTOM_DATA_SWIM_SWOLF, yDataWithLabels, null);
+
+      if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
+         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         for (final String key : custTrk.keySet()) {
+            setupGraphLayer_Layer(TourManager.CUSTOM_DATA_CUSTOM_TRACKS + key, yDataWithLabels, null);
+         }
+      }
    }
 
    /**
@@ -5466,7 +5659,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * all graph actions
        */
-      final int[] allGraphIds = TourManager.getAllGraphIDs();
+      int[] allGraphIds = TourManager.getAllGraphIDs();
+
+      if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
+         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         final ArrayList<Integer> custIds = new ArrayList<>(allGraphIds.length + custTrk.size());
+         for (final int graphId : allGraphIds) {
+            custIds.add(graphId);
+         }
+
+         final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
+         java.util.Collections.sort(lisKey);
+         for (final String key : custTrk.keySet()) {
+            final int idx = lisKey.indexOf(key);
+            custIds.add(idx);
+         }
+         allGraphIds = custIds.stream().mapToInt(Integer::intValue).toArray();//custIds.toArray(new Integer[custIds.size()]);
+      }
+
       final ArrayList<Integer> visibleGraphIds = _tcc.getVisibleGraphs();
       final ArrayList<Integer> enabledGraphIds = new ArrayList<>();
 
@@ -5487,7 +5697,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       for (final int graphId : allGraphIds) {
 
          tourAction = _allTourChartActions.get(getGraphActionId(graphId));
-
+         if (tourAction == null) {
+            continue;
+         }
          tourAction.setChecked(visibleGraphIds.contains(graphId));
          tourAction.setEnabled(enabledGraphIds.contains(graphId));
       }
@@ -5649,6 +5861,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
       }
 
+      //cleanup previous Tour custom tracks from chart and graph!!
+      if (_allTourChartActions != null && _currentTourId != null && _currentTourId != newTourData.getTourId()) {
+         removeActions_10_GraphActionsCustomTracks();
+      }
+      if (_isTourChartToolbarCreated && _currentTourId != newTourData.getTourId()) {
+         final IToolBarManager tbm = getToolBarManager();
+         int cnt = 0;
+         for (final String contribId : _customTracksGraphContribId) {
+            final IContributionItem item = tbm.remove(contribId);
+            if (item == null) {
+
+            }
+            cnt++;
+         }
+         if (_tourData != null && _tourData.getCustomTracks() != null &&
+               _tourData.getCustomTracks().size() > 0) {
+            final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+            for (final String key : custTrk.keySet()) {
+               final IContributionItem item = tbm.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+               if (item == null) {}
+            }
+         }
+         tbm.update(true);
+      }
+
       // set current tour data and chart config to new values
       _tourData = newTourData;
       _tcc = newTCC;
@@ -5670,6 +5907,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setDataModel(newChartDataModel);
 
       // create actions
+      /*
+       * create CUSTOM TRACKS actions specific for this Tour.
+       */
+      if (_allTourChartActions != null && _currentTourId != null && _currentTourId != newTourData.getTourId()) {//re-create custom tracks entries
+
+         createActions_10_GraphActionsCustomTracks();
+         _state_CustomTracksToolBarChart.clear();
+      }
+      _currentTourId = newTourData.getTourId();
+
       createActions();
       fillToolbar();
       updateTourActions();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1023,6 +1023,8 @@ public class Messages extends NLS {
    public static String        Image__Graph;
    public static String        Image__Graph_Background;
    public static String        Image__Graph_Background_Disabled;
+   public static String        Image__Graph_Custom_Tracks;
+   public static String        Image__Graph_Custom_Tracks_Disabled;
    public static String        Image__Graph_Disabled;
    public static String        Image__Graph_Gears;
    public static String        Image__Graph_Gears_disabled;
@@ -2272,6 +2274,9 @@ public class Messages extends NLS {
    public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_TourChartGraph_Label_Title;
 
+   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part1;
+   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part2;
+
    public static String Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
    public static String Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
    public static String Slideout_TourChartGraphBackground_Label_BackgroundSource;
@@ -2467,6 +2472,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ComputeCadenceZonesTimes;
    public static String Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String Tour_Action_ComputeCadenceZonesTimes_Title;
+   public static String Tour_Action_Custom_Tracks_Tooltip_Prefix;
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;
@@ -2582,6 +2588,14 @@ public class Messages extends NLS {
    public static String Tour_Editor_Label_BodyWeight_Tooltip;
    public static String Tour_Editor_Label_Cadence;
    public static String Tour_Editor_Label_Cadence_Tooltip;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Number;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Number_Tooltip;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Id;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Id_Tooltip;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Name;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Name_Tooltip;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Unit;
+   public static String Tour_Editor_Label_Custom_Tracks_Column_Unit_Tooltip;
    public static String Tour_Editor_Label_DateTimeCreated;
    public static String Tour_Editor_Label_DateTimeModified;
    public static String Tour_Editor_Label_DeviceFirmwareVersion;
@@ -2619,6 +2633,7 @@ public class Messages extends NLS {
    public static String Tour_Editor_Link_SetGeoTimeZone_Tooltip;
    public static String Tour_Editor_Link_RetrieveWeather;
    public static String Tour_Editor_Link_RetrieveWeather_Tooltip;
+   public static String Tour_Editor_No_Custom_Track_Data_Tooltip;
    public static String Tour_Editor_NoSwimData;
    public static String Tour_Editor_TabLabel_SwimSlices;
 
@@ -2856,6 +2871,7 @@ public class Messages extends NLS {
    public static String tour_editor_message_person_is_required;
    public static String tour_editor_message_show_another_tour;
    public static String tour_editor_section_characteristics;
+   public static String tour_editor_section_custom_tracks;
    public static String tour_editor_section_date_time;
    public static String tour_editor_section_tour;
    public static String tour_editor_section_personal;

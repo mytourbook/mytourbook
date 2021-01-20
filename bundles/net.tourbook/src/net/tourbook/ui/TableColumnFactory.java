@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.data.CustomTrackDefinition;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -65,6 +66,10 @@ public abstract class TableColumnFactory {
    public static final String             BODY_RESTPULSE_ID                                  = "BODY_RESTPULSE";                                  //$NON-NLS-1$
    public static final TableColumnFactory BODY_WEIGHT;
    public static final String             BODY_WEIGHT_ID                                     = "BODY_WEIGHT";                                     //$NON-NLS-1$
+
+   public static final TableColumnFactory CUSTOM_TRACKS_TIME_SLICES;
+   //CUSTOM_TRACKS_TIME_SLICES_ID also defined in package net.tourbook.common.util;->public class ColumnManager
+   //public static final String           CUSTOM_TRACKS_TIME_SLICES_ID                       = "CUSTOM_TRACKS_TIME_SLICES";                       //$NON-NLS-1$
 
    public static final TableColumnFactory DATA_DP_TOLERANCE;
    public static final String             DATA_DP_TOLERANCE_ID                               = "DATA_DP_TOLERANCE";                               //$NON-NLS-1$
@@ -4133,6 +4138,42 @@ public abstract class TableColumnFactory {
             return colDef;
          }
       };
+
+
+      CUSTOM_TRACKS_TIME_SLICES = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+            //for custom tracks it doesn't work
+            return null;
+         }
+
+         @Override
+         public TableColumnDefinition createColumnCustomTrack(final ColumnManager columnManager,
+                                                            final PixelConverter pixelConverter,
+                                                            final CustomTrackDefinition custTD) {
+
+            final String colId = ColumnManager.CUSTOM_TRACKS_TIME_SLICES_ID + "_" + custTD.getId();
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, colId, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Custom_Tracks);
+
+            colDef.setColumnLabel(custTD.getId());
+            String colHead = custTD.getName();
+            if(colHead.length() > 11) {
+               colHead = custTD.getName().substring(0, 11) + "...";
+            }
+
+            colDef.setColumnHeaderText(colHead + "[" + custTD.getUnit() + "]");
+            colDef.setColumnUnit(custTD.getUnit());
+            colDef.setColumnHeaderToolTipText(custTD.getName());
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+            colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+
+            return colDef;
+         }
+      };
    }
 
    /**
@@ -4141,4 +4182,11 @@ public abstract class TableColumnFactory {
     * @return Returns a {@link TableColumnDefinition}
     */
    public abstract TableColumnDefinition createColumn(ColumnManager columnManager, PixelConverter pixelConverter);
+
+   public TableColumnDefinition createColumnCustomTrack(final ColumnManager columnManager,
+                                                      final PixelConverter pixelConverter,
+                                                      final CustomTrackDefinition custTD) {
+      //default implementation doesn't do anything !!
+      return null;
+   }
 }
