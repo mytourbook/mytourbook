@@ -23,23 +23,23 @@ public enum PulseGraph {
    /**
     * Device bpm values are displayed as graph, pulse times are displayed as line
     */
-   DEVICE_BPM__AND__PULSE_TIME,
-
-   /**
-    * Pulse times are displayed as line, device bpm values are displayed as graph
-    */
-   PULSE_TIME__AND_DEVICE_BPM,
+   DEVICE_BPM__2ND__RR_INTERVALS,
 
    /**
     * Only device bpm values are displayed, however when not available then the pulse time values
     * are displayed
     */
-   DEVIDE_BPM_ONLY,
+   DEVICE_BPM_ONLY,
+
+   /**
+    * Pulse times are displayed as line, device bpm values are displayed as graph
+    */
+   RR_INTERVALS__2ND_DEVICE_BPM,
 
    /**
     * Only pulse time values are displayed, however when not available then the device bpm values
     * are displayed
     */
-   PULSE_TIME_ONLY
+   RR_INTERVALS_ONLY
 
 }

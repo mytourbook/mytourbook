@@ -67,10 +67,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private PulseGraph[]           _allPulseGraph_Value = {
 
-         PulseGraph.DEVICE_BPM__AND__PULSE_TIME,
-         PulseGraph.DEVIDE_BPM_ONLY,
-         PulseGraph.PULSE_TIME__AND_DEVICE_BPM,
-         PulseGraph.PULSE_TIME_ONLY,
+         PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
+         PulseGraph.DEVICE_BPM_ONLY,
+         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
+         PulseGraph.RR_INTERVALS_ONLY,
 
    };
 
@@ -79,10 +79,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private String[]               _allPulseGraph_Label = {
 
-         Messages.TourChart_PulseGraph_DeviceBpm_And_PulseTime,
+         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
-         Messages.TourChart_PulseGraph_PulseTime_And_DeviceBpm,
-         Messages.TourChart_PulseGraph_PulseTime_Only
+         Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
+         Messages.TourChart_PulseGraph_RRIntervals_Only
    };
 
    private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
@@ -436,6 +436,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             ? X_AXIS_START_TIME.TOUR_START_TIME
             : X_AXIS_START_TIME.START_WITH_0;
 
+      final PulseGraph pulseGraph = getSelectedPulseGraph();
+
       /*
        * Update pref store
        */
@@ -443,6 +445,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES, pulseGraph.name());
 
       _gridUI.saveState();
 
@@ -453,7 +457,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
        */
       tcc.isShowBreaktimeValues = isShowBreaktimeValues;
       tcc.isSRTMDataVisible = isSrtmDataVisible;
-      tcc.pulseGraph = getSelectedPulseGraph();
+      tcc.pulseGraph = pulseGraph;
       tcc.xAxisTime = xAxisStartTime;
    }
 
@@ -482,20 +486,27 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
          _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_DeviceBpm_Only);
 
          // update model
-         _possiblePulseGraph_Values.add(PulseGraph.DEVIDE_BPM_ONLY);
+         _possiblePulseGraph_Values.add(PulseGraph.DEVICE_BPM_ONLY);
 
       } else if (canShowPulseTimeSerie) {
 
          // update UI
-         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_PulseTime_Only);
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_Only);
 
          // update model
-         _possiblePulseGraph_Values.add(PulseGraph.PULSE_TIME_ONLY);
+         _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS_ONLY);
       }
 
       final int numComboItems = _possiblePulseGraph_Values.size();
 
-      if (numComboItems > 0) {
+      if (numComboItems == 0) {
+
+         // pulse values are not available
+
+         _comboPulseValueGraph.add(Messages.App_Label_NotAvailable);
+         _comboPulseValueGraph.select(0);
+
+      } else {
 
          // set first item in combobox as default
          int comboIndex = 0;
@@ -509,6 +520,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
          }
 
          _comboPulseValueGraph.select(comboIndex);
+
       }
 
       // disable combo when only 1 or 0 items can be selected

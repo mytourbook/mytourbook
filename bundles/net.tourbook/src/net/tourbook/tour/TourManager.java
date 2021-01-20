@@ -912,7 +912,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_TimeSerie = fromTourData.getPulse_TimeSerie();
+         final float[] fromPulse_TimeSerie = fromTourData.getPulse_RRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -4150,7 +4150,7 @@ public class TourManager {
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      final float[] pulseTimeSerie = tourData.getPulse_TimeSerie();
+      final float[] pulseTimeSerie = tourData.getPulse_RRIntervals();
 
       final boolean isPulseSerie = pulseSerie != null;
       final boolean isPulseTimeSerie = pulseTimeSerie != null;
@@ -4160,28 +4160,28 @@ public class TourManager {
 
       // set graph/line according to the selection
       switch (tcc.pulseGraph) {
-      case DEVIDE_BPM_ONLY:
+      case DEVICE_BPM_ONLY:
 
          if (isPulseSerie) {
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
          }
          break;
 
-      case PULSE_TIME_ONLY:
+      case RR_INTERVALS_ONLY:
 
          if (isPulseTimeSerie) {
             yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
          }
          break;
 
-      case PULSE_TIME__AND_DEVICE_BPM:
+      case RR_INTERVALS__2ND_DEVICE_BPM:
 
          if (isPulseSerie && isPulseTimeSerie) {
             yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
          }
          break;
 
-      case DEVICE_BPM__AND__PULSE_TIME:
+      case DEVICE_BPM__2ND__RR_INTERVALS:
       default:
 
          if (isPulseSerie && isPulseTimeSerie) {

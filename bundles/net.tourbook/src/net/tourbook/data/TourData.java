@@ -7846,22 +7846,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return powerSerie;
    }
 
-   public float[] getPulse_SmoothedSerie() {
-
-      if (pulseSerie == null) {
-         return null;
-      }
-
-      if (_pulseSerie_Smoothed != null) {
-         return _pulseSerie_Smoothed;
-      }
-
-      computePulseSmoothed();
-
-      return _pulseSerie_Smoothed;
-   }
-
-   public float[] getPulse_TimeSerie() {
+   /**
+    * @return Returns beat values computed from the R-R intervals
+    */
+   public float[] getPulse_RRIntervals() {
 
       if (pulseSerie_FromTime != null) {
          return pulseSerie_FromTime;
@@ -7962,6 +7950,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return pulseSerie_FromTime;
+   }
+
+   public float[] getPulse_SmoothedSerie() {
+
+      if (pulseSerie == null) {
+         return null;
+      }
+
+      if (_pulseSerie_Smoothed != null) {
+         return _pulseSerie_Smoothed;
+      }
+
+      computePulseSmoothed();
+
+      return _pulseSerie_Smoothed;
    }
 
    public int getRearShiftCount() {

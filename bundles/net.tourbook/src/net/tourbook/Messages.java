@@ -570,6 +570,7 @@ public class Messages extends NLS {
    public static String        App_Label_H_MM;
    public static String        App_Label_ISO8601;
    public static String        App_Label_max;
+   public static String        App_Label_NotAvailable;
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
@@ -2277,7 +2278,7 @@ public class Messages extends NLS {
    public static String Slideout_TourChartGraphBackground_Label_BackgroundSource;
    public static String Slideout_TourChartGraphBackground_Label_BackgroundStyle;
    public static String Slideout_TourChartGraphBackground_Label_Title;
-   
+
    public static String Slideout_TourChartOptions_Label_PulseGraph;
    public static String Slideout_TourChartOptions_Label_Title;
 
@@ -2989,13 +2990,11 @@ public class Messages extends NLS {
    public static String TourChart_Property_label_pace_speed;
    public static String TourChart_Property_label_time_slices;
 
-   public static String TourChart_PulseGraph_DeviceBpm_And_PulseTime;
-
+   public static String TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals;
    public static String TourChart_PulseGraph_DeviceBpm_Only;
-
-   public static String TourChart_PulseGraph_PulseTime_And_DeviceBpm;
-
-   public static String TourChart_PulseGraph_PulseTime_Only;
+   public static String TourChart_PulseGraph_NotAvailable;
+   public static String TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm;
+   public static String TourChart_PulseGraph_RRIntervals_Only;
 
    public static String TourChart_Smoothing_Algorithm_Initial;
    public static String TourChart_Smoothing_Algorithm_Jamet;
