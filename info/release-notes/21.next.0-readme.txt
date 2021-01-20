@@ -49,6 +49,9 @@ Improvements
 
 * TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/287
   - Added the speed and power values in the TCX exports
+  
+* Fit Import
+  - Import HRV-RR values which can be displayed in the Heart Rate Variability view
 
 
 Changes  

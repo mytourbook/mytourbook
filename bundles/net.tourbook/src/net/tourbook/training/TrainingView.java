@@ -1226,7 +1226,7 @@ public class TrainingView extends ViewPart {
 
    private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
-      final float[] pulseSerie = _tourData.getPulseSmoothedSerie();
+      final float[] pulseSerie = _tourData.getPulse_SmoothedSerie();
       final int[] timeSerie = _tourData.timeSerie;
       final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
       final int timeSerieSize = timeSerie.length;

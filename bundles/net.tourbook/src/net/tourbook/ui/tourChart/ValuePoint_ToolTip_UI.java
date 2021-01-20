@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,6 +174,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isVisible_And_Available_RunDyn_VerticalOscillation;
    private boolean _isVisible_And_Available_RunDyn_VerticalRatio;
 
+   private boolean _isAvailable_Pulse_BpmFromDevice;
+   private boolean _isAvailable_Pulse_RRIntervals;
+
    /*
     * UI resources
     */
@@ -210,6 +213,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblTimeDuration;
    private Label     _lblTimeOfDay;
    private Label     _lblTourCompareResult;
+
    private Label     _lblRunDyn_StanceTime;
    private Label     _lblRunDyn_StanceTimeBalance;
    private Label     _lblRunDyn_StepLength;
@@ -1390,50 +1394,53 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
 // SET_FORMATTING_OFF
 
-      final long visibleId_Altimeter                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTIMETER);
-      final long visibleId_Altitude                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTITUDE);
-      final long visibleId_Cadence                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CADENCE);
+      final long visibleId_Altimeter                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTIMETER);
+      final long visibleId_Altitude                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_ALTITUDE);
+      final long visibleId_Cadence                    = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CADENCE);
       final long visibleId_ChartZoomFactor            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_CHART_ZOOM_FACTOR);
-      final long visibleId_Distance                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_DISTANCE);
-      final long visibleId_Gears                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GEARS);
-      final long visibleId_Gradient                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GRADIENT);
-      final long visibleId_Pace                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE);
-      final long visibleId_Power                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_POWER);
-      final long visibleId_Pulse                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PULSE);
-      final long visibleId_RunDyn_StanceTime            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
+      final long visibleId_Distance                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_DISTANCE);
+      final long visibleId_Gears                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GEARS);
+      final long visibleId_Gradient                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_GRADIENT);
+      final long visibleId_Pace                       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PACE);
+      final long visibleId_Power                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_POWER);
+      final long visibleId_Pulse                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_PULSE);
+      final long visibleId_RunDyn_StanceTime          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME);
       final long visibleId_RunDyn_StanceTimeBalance   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED);
-      final long visibleId_RunDyn_StepLength            = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
-      final long visibleId_RunDyn_VerticalOscillation   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
-      final long visibleId_RunDyn_VerticalRatio         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
-      final long visibleId_Speed                   = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED);
-      final long visibleId_Temperature             = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
-      final long visibleId_TimeDuration             = getState(ttVisibleValues,   ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
-      final long visibleId_TimeOfDay                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
-      final long visibleId_TimeSlice                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
-      final long visibleId_TourCompareResult         = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
+      final long visibleId_RunDyn_StepLength          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_STEP_LENGTH);
+      final long visibleId_RunDyn_VerticalOscillation = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION);
+      final long visibleId_RunDyn_VerticalRatio       = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_RUN_DYN_VERTICAL_RATIO);
+      final long visibleId_Speed                      = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_SPEED);
+      final long visibleId_Temperature                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
+      final long visibleId_TimeDuration               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
+      final long visibleId_TimeOfDay                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
+      final long visibleId_TimeSlice                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
+      final long visibleId_TourCompareResult          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
 
-      final boolean isAvailable_Altimeter          = _tourData.getAltimeterSerie() != null;
-      final boolean isAvailable_Altitude             = _tourData.getAltitudeSerie() != null;
-      final boolean isAvailable_Cadence             = _tourData.getCadenceSerie() != null;
+      _isAvailable_Pulse_BpmFromDevice                = _tourData.pulseSerie != null;
+      _isAvailable_Pulse_RRIntervals                  = _tourData.getPulse_RRIntervals() != null;
+
+      final boolean isAvailable_Altimeter             = _tourData.getAltimeterSerie() != null;
+      final boolean isAvailable_Altitude              = _tourData.getAltitudeSerie() != null;
+      final boolean isAvailable_Cadence               = _tourData.getCadenceSerie() != null;
       final boolean isAvailable_ChartZoomFactor       = true;
-      final boolean isAvailable_Distance             = _tourData.distanceSerie != null;
-      final boolean isAvailable_Gears             = _tourData.getGears() != null;
-      final boolean isAvailable_Gradient             = _tourData.getGradientSerie() != null;
-      final boolean isAvailable_Pace                = _tourData.getPaceSerie() != null;
-      final boolean isAvailable_Power             = _tourData.getPowerSerie() != null;
-      final boolean isAvailable_Pulse             = _tourData.pulseSerie != null;
-      final boolean isAvailable_Speed             = _tourData.getSpeedSerie() != null;
-      final boolean isAvailable_Temperature          = _tourData.temperatureSerie != null;
+      final boolean isAvailable_Distance              = _tourData.distanceSerie != null;
+      final boolean isAvailable_Gears                 = _tourData.getGears() != null;
+      final boolean isAvailable_Gradient              = _tourData.getGradientSerie() != null;
+      final boolean isAvailable_Pace                  = _tourData.getPaceSerie() != null;
+      final boolean isAvailable_Power                 = _tourData.getPowerSerie() != null;
+      final boolean isAvailable_Pulse                 = _isAvailable_Pulse_BpmFromDevice ||_isAvailable_Pulse_RRIntervals;
+      final boolean isAvailable_Speed                 = _tourData.getSpeedSerie() != null;
+      final boolean isAvailable_Temperature           = _tourData.temperatureSerie != null;
       final boolean isAvailable_TimeDuration          = _tourData.timeSerie != null;
-      final boolean isAvailable_TimeOfDay          = _tourData.timeSerie != null;
-      final boolean isAvailable_TimeSlice          = true;
-      final boolean isAvailable_TourCompareResult      = _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
+      final boolean isAvailable_TimeOfDay             = _tourData.timeSerie != null;
+      final boolean isAvailable_TimeSlice             = true;
+      final boolean isAvailable_TourCompareResult     = _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
 
-      final boolean isAvailable_RunDyn_StanceTime            = _tourData.getRunDyn_StanceTime() != null;
-      final boolean isAvailable_RunDyn_StanceTimeBalance      = _tourData.getRunDyn_StanceTimeBalance() != null;
-      final boolean isAvailable_RunDyn_StepLength            = _tourData.getRunDyn_StepLength() != null;
-      final boolean isAvailable_RunDyn_VerticalOscillation   = _tourData.getRunDyn_VerticalOscillation() != null;
-      final boolean isAvailable_RunDyn_VerticalRatio         = _tourData.getRunDyn_VerticalRatio() != null;
+      final boolean isAvailable_RunDyn_StanceTime           = _tourData.getRunDyn_StanceTime() != null;
+      final boolean isAvailable_RunDyn_StanceTimeBalance    = _tourData.getRunDyn_StanceTimeBalance() != null;
+      final boolean isAvailable_RunDyn_StepLength           = _tourData.getRunDyn_StepLength() != null;
+      final boolean isAvailable_RunDyn_VerticalOscillation  = _tourData.getRunDyn_VerticalOscillation() != null;
+      final boolean isAvailable_RunDyn_VerticalRatio        = _tourData.getRunDyn_VerticalRatio() != null;
 
       _allVisibleValueIds =
 
@@ -1463,78 +1470,78 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _allVisibleAndAvailable_ValueIds =
 
-              (isAvailable_Altimeter          ? visibleId_Altimeter : 0)
-            + (isAvailable_Altitude          ? visibleId_Altitude : 0)
-            + (isAvailable_Cadence             ? visibleId_Cadence : 0)
-            + (isAvailable_ChartZoomFactor       ? visibleId_ChartZoomFactor : 0)
-            + (isAvailable_Distance          ? visibleId_Distance : 0)
-            + (isAvailable_Gears             ? visibleId_Gears : 0)
-            + (isAvailable_Gradient          ? visibleId_Gradient : 0)
-            + (isAvailable_Pace             ? visibleId_Pace : 0)
-            + (isAvailable_Power             ? visibleId_Power : 0)
-            + (isAvailable_Pulse             ? visibleId_Pulse : 0)
-            + (isAvailable_Speed             ? visibleId_Speed : 0)
-            + (isAvailable_Temperature          ? visibleId_Temperature : 0)
-            + (isAvailable_TimeDuration       ? visibleId_TimeDuration : 0)
-            + (isAvailable_TimeOfDay          ? visibleId_TimeOfDay : 0)
-            + (isAvailable_TimeSlice          ? visibleId_TimeSlice : 0)
-            + (isAvailable_TourCompareResult   ? visibleId_TourCompareResult : 0)
+              (isAvailable_Altimeter         ? visibleId_Altimeter         : 0)
+            + (isAvailable_Altitude          ? visibleId_Altitude          : 0)
+            + (isAvailable_Cadence           ? visibleId_Cadence           : 0)
+            + (isAvailable_ChartZoomFactor   ? visibleId_ChartZoomFactor   : 0)
+            + (isAvailable_Distance          ? visibleId_Distance          : 0)
+            + (isAvailable_Gears             ? visibleId_Gears             : 0)
+            + (isAvailable_Gradient          ? visibleId_Gradient          : 0)
+            + (isAvailable_Pace              ? visibleId_Pace              : 0)
+            + (isAvailable_Power             ? visibleId_Power             : 0)
+            + (isAvailable_Pulse             ? visibleId_Pulse             : 0)
+            + (isAvailable_Speed             ? visibleId_Speed             : 0)
+            + (isAvailable_Temperature       ? visibleId_Temperature       : 0)
+            + (isAvailable_TimeDuration      ? visibleId_TimeDuration      : 0)
+            + (isAvailable_TimeOfDay         ? visibleId_TimeOfDay         : 0)
+            + (isAvailable_TimeSlice         ? visibleId_TimeSlice         : 0)
+            + (isAvailable_TourCompareResult ? visibleId_TourCompareResult : 0)
 
-            + (isAvailable_RunDyn_StanceTime            ? visibleId_RunDyn_StanceTime          : 0)
-            + (isAvailable_RunDyn_StanceTimeBalance   ? visibleId_RunDyn_StanceTimeBalance : 0)
-            + (isAvailable_RunDyn_StepLength            ? visibleId_RunDyn_StepLength          : 0)
-            + (isAvailable_RunDyn_VerticalOscillation   ? visibleId_RunDyn_VerticalOscillation : 0)
-            + (isAvailable_RunDyn_VerticalRatio         ? visibleId_RunDyn_VerticalRatio       : 0)
+            + (isAvailable_RunDyn_StanceTime          ? visibleId_RunDyn_StanceTime          : 0)
+            + (isAvailable_RunDyn_StanceTimeBalance   ? visibleId_RunDyn_StanceTimeBalance   : 0)
+            + (isAvailable_RunDyn_StepLength          ? visibleId_RunDyn_StepLength          : 0)
+            + (isAvailable_RunDyn_VerticalOscillation ? visibleId_RunDyn_VerticalOscillation : 0)
+            + (isAvailable_RunDyn_VerticalRatio       ? visibleId_RunDyn_VerticalRatio       : 0)
 
             ;
 
-      _isVisible_And_Available_Altimeter          = isAvailable_Altimeter         && visibleId_Altimeter > 0;
-      _isVisible_And_Available_Altitude          = isAvailable_Altitude          && visibleId_Altitude > 0;
-      _isVisible_And_Available_Cadence          = isAvailable_Cadence          && visibleId_Cadence > 0;
-      _isVisible_And_Available_ChartZoomFactor    = isAvailable_ChartZoomFactor    && visibleId_ChartZoomFactor > 0;
-      _isVisible_And_Available_Distance          = isAvailable_Distance          && visibleId_Distance > 0;
-      _isVisible_And_Available_Gears             = isAvailable_Gears          && visibleId_Gears > 0;
-      _isVisible_And_Available_Gradient          = isAvailable_Gradient          && visibleId_Gradient > 0;
-      _isVisible_And_Available_Pace             = isAvailable_Pace             && visibleId_Pace > 0;
-      _isVisible_And_Available_Power             = isAvailable_Power          && visibleId_Power > 0;
-      _isVisible_And_Available_Pulse             = isAvailable_Pulse          && visibleId_Pulse > 0;
-      _isVisible_And_Available_Speed             = isAvailable_Speed          && visibleId_Speed > 0;
-      _isVisible_And_Available_Temperature       = isAvailable_Temperature       && visibleId_Temperature > 0;
-      _isVisible_And_Available_TimeDuration       = isAvailable_TimeDuration       && visibleId_TimeDuration > 0;
-      _isVisible_And_Available_TimeOfDay          = isAvailable_TimeOfDay       && visibleId_TimeOfDay > 0;
-      _isVisible_And_Available_TimeSlice          = isAvailable_TimeSlice       && visibleId_TimeSlice > 0;
-      _isVisible_And_Available_TourCompareResult   = isAvailable_TourCompareResult   && visibleId_TourCompareResult > 0;
+      _isVisible_And_Available_Altimeter           = isAvailable_Altimeter          && visibleId_Altimeter > 0;
+      _isVisible_And_Available_Altitude            = isAvailable_Altitude           && visibleId_Altitude > 0;
+      _isVisible_And_Available_Cadence             = isAvailable_Cadence            && visibleId_Cadence > 0;
+      _isVisible_And_Available_ChartZoomFactor     = isAvailable_ChartZoomFactor    && visibleId_ChartZoomFactor > 0;
+      _isVisible_And_Available_Distance            = isAvailable_Distance           && visibleId_Distance > 0;
+      _isVisible_And_Available_Gears               = isAvailable_Gears              && visibleId_Gears > 0;
+      _isVisible_And_Available_Gradient            = isAvailable_Gradient           && visibleId_Gradient > 0;
+      _isVisible_And_Available_Pace                = isAvailable_Pace               && visibleId_Pace > 0;
+      _isVisible_And_Available_Power               = isAvailable_Power              && visibleId_Power > 0;
+      _isVisible_And_Available_Pulse               = isAvailable_Pulse              && visibleId_Pulse > 0;
+      _isVisible_And_Available_Speed               = isAvailable_Speed              && visibleId_Speed > 0;
+      _isVisible_And_Available_Temperature         = isAvailable_Temperature        && visibleId_Temperature > 0;
+      _isVisible_And_Available_TimeDuration        = isAvailable_TimeDuration       && visibleId_TimeDuration > 0;
+      _isVisible_And_Available_TimeOfDay           = isAvailable_TimeOfDay          && visibleId_TimeOfDay > 0;
+      _isVisible_And_Available_TimeSlice           = isAvailable_TimeSlice          && visibleId_TimeSlice > 0;
+      _isVisible_And_Available_TourCompareResult   = isAvailable_TourCompareResult  && visibleId_TourCompareResult > 0;
 
-      _isVisible_And_Available_RunDyn_StanceTime            = isAvailable_RunDyn_StanceTime          && visibleId_RunDyn_StanceTime          > 0;
-      _isVisible_And_Available_RunDyn_StanceTimeBalance   = isAvailable_RunDyn_StanceTimeBalance && visibleId_RunDyn_StanceTimeBalance > 0;
-      _isVisible_And_Available_RunDyn_StepLength            = isAvailable_RunDyn_StepLength          && visibleId_RunDyn_StepLength          > 0;
-      _isVisible_And_Available_RunDyn_VerticalOscillation   = isAvailable_RunDyn_VerticalOscillation && visibleId_RunDyn_VerticalOscillation > 0;
-      _isVisible_And_Available_RunDyn_VerticalRatio         = isAvailable_RunDyn_VerticalRatio       && visibleId_RunDyn_VerticalRatio       > 0;
+      _isVisible_And_Available_RunDyn_StanceTime            = isAvailable_RunDyn_StanceTime           && visibleId_RunDyn_StanceTime          > 0;
+      _isVisible_And_Available_RunDyn_StanceTimeBalance     = isAvailable_RunDyn_StanceTimeBalance    && visibleId_RunDyn_StanceTimeBalance > 0;
+      _isVisible_And_Available_RunDyn_StepLength            = isAvailable_RunDyn_StepLength           && visibleId_RunDyn_StepLength          > 0;
+      _isVisible_And_Available_RunDyn_VerticalOscillation   = isAvailable_RunDyn_VerticalOscillation  && visibleId_RunDyn_VerticalOscillation > 0;
+      _isVisible_And_Available_RunDyn_VerticalRatio         = isAvailable_RunDyn_VerticalRatio        && visibleId_RunDyn_VerticalRatio       > 0;
 
       _allVisibleAndAvailable_ValueCounter =
 
-              (_isVisible_And_Available_Altimeter                  ? 1 : 0)
-            + (_isVisible_And_Available_Altitude                   ? 1 : 0)
-            + (_isVisible_And_Available_Cadence                   ? 1 : 0)
-            + (_isVisible_And_Available_ChartZoomFactor             ? 1 : 0)
-            + (_isVisible_And_Available_Distance                   ? 1 : 0)
-            + (_isVisible_And_Available_Gears                      ? 1 : 0)
-            + (_isVisible_And_Available_Gradient                   ? 1 : 0)
-            + (_isVisible_And_Available_Pace                      ? 1 : 0)
-            + (_isVisible_And_Available_Power                      ? 1 : 0)
-            + (_isVisible_And_Available_Pulse                      ? 1 : 0)
-            + (_isVisible_And_Available_Speed                      ? 1 : 0)
-            + (_isVisible_And_Available_Temperature                ? 1 : 0)
-            + (_isVisible_And_Available_TimeDuration                ? 1 : 0)
-            + (_isVisible_And_Available_TimeOfDay                   ? 1 : 0)
-            + (_isVisible_And_Available_TimeSlice                   ? 1 : 0)
-            + (_isVisible_And_Available_TourCompareResult             ? 1 : 0)
+              (_isVisible_And_Available_Altimeter                    ? 1 : 0)
+            + (_isVisible_And_Available_Altitude                     ? 1 : 0)
+            + (_isVisible_And_Available_Cadence                      ? 1 : 0)
+            + (_isVisible_And_Available_ChartZoomFactor              ? 1 : 0)
+            + (_isVisible_And_Available_Distance                     ? 1 : 0)
+            + (_isVisible_And_Available_Gears                        ? 1 : 0)
+            + (_isVisible_And_Available_Gradient                     ? 1 : 0)
+            + (_isVisible_And_Available_Pace                         ? 1 : 0)
+            + (_isVisible_And_Available_Power                        ? 1 : 0)
+            + (_isVisible_And_Available_Pulse                        ? 1 : 0)
+            + (_isVisible_And_Available_Speed                        ? 1 : 0)
+            + (_isVisible_And_Available_Temperature                  ? 1 : 0)
+            + (_isVisible_And_Available_TimeDuration                 ? 1 : 0)
+            + (_isVisible_And_Available_TimeOfDay                    ? 1 : 0)
+            + (_isVisible_And_Available_TimeSlice                    ? 1 : 0)
+            + (_isVisible_And_Available_TourCompareResult            ? 1 : 0)
 
-            + (_isVisible_And_Available_RunDyn_StanceTime                ? 1 : 0)
-            + (_isVisible_And_Available_RunDyn_StanceTimeBalance       ? 1 : 0)
-            + (_isVisible_And_Available_RunDyn_StepLength                ? 1 : 0)
-            + (_isVisible_And_Available_RunDyn_VerticalOscillation       ? 1 : 0)
-            + (_isVisible_And_Available_RunDyn_VerticalRatio             ? 1 : 0)
+            + (_isVisible_And_Available_RunDyn_StanceTime            ? 1 : 0)
+            + (_isVisible_And_Available_RunDyn_StanceTimeBalance     ? 1 : 0)
+            + (_isVisible_And_Available_RunDyn_StepLength            ? 1 : 0)
+            + (_isVisible_And_Available_RunDyn_VerticalOscillation   ? 1 : 0)
+            + (_isVisible_And_Available_RunDyn_VerticalRatio         ? 1 : 0)
       ;
 
 // SET_FORMATTING_ON
@@ -1647,10 +1654,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final long pace = (long) _tourData.getPaceSerieSeconds()[valueIndex];
 
-         _lblPace.setText(String.format(
-               Messages.Tooltip_ValuePoint_Format_Pace,
+         _lblPace.setText(String.format(Messages.Tooltip_ValuePoint_Format_Pace,
+
                pace / 60,
-               pace % 60)//
+               pace % 60)
+
                .toString());
       }
 
@@ -1659,7 +1667,29 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Pulse) {
-         _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
+
+         final PulseGraph pulseGraph = (PulseGraph) Util.getEnumValue(
+               _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
+               TourChart.PULSE_GRAPH_DEFAULT);
+
+         // @FJBDev: Do NOT optimize these if statements, this way it is better readable for me !
+
+         if (_isAvailable_Pulse_BpmFromDevice) {
+
+            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS) {
+
+               _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
+            }
+
+         }
+
+         if (_isAvailable_Pulse_RRIntervals) {
+
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
+
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_RRIntervals()[valueIndex]));
+            }
+         }
       }
 
       if (_isVisible_And_Available_Speed) {

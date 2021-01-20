@@ -24,6 +24,7 @@ import java.util.HashMap;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -3209,13 +3210,19 @@ public class ChartComponentGraph extends Canvas {
       path.dispose();
 
       /*
-       * draw path2 above the other graph, this is currently used to draw the srtm graph
+       * Draw path2 above the other graph, this is currently used to draw the srtm or pulse by time
+       * graph
        */
       if (path2 != null) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         // this color is not yet user defined
+         final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+         final Color path2Color = new Color(complimentColor);
+
+         gc.setForeground(path2Color);
          gc.drawPath(path2);
 
+         path2Color.dispose();
          path2.dispose();
       }
 

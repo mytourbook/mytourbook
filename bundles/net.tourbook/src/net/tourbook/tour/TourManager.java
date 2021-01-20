@@ -829,6 +829,7 @@ public class TourManager {
       final double[] toLongitudeSerie = joinedTourData.longitudeSerie = new double[numTimeSlices];
       final float[] toPowerSerie = new float[numTimeSlices];
       final float[] toPulseSerie = joinedTourData.pulseSerie = new float[numTimeSlices];
+      final float[] toPulseSerie_FromTime = joinedTourData.pulseSerie_FromTime = new float[numTimeSlices];
       final float[] toTemperaturSerie = joinedTourData.temperatureSerie = new float[numTimeSlices];
 
       final short[] toRunDyn_StanceTime = joinedTourData.runDyn_StanceTime = new short[numTimeSlices];
@@ -877,6 +878,7 @@ public class TourManager {
       boolean isLatLonSerie = false;
       boolean isPowerSerie = false;
       boolean isPulseSerie = false;
+      boolean isPulseSerie_FromTime = false;
       boolean isTempSerie = false;
 
       boolean isRunDyn_StanceTime = false;
@@ -910,6 +912,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
+         final float[] fromPulse_TimeSerie = fromTourData.getPulse_RRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -1014,6 +1017,10 @@ public class TourManager {
          if (fromPulseSerie != null) {
             isPulseSerie = true;
             System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
+         }
+         if (fromPulse_TimeSerie != null) {
+            isPulseSerie_FromTime = true;
+            System.arraycopy(fromPulse_TimeSerie, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
          }
          if (fromTemperaturSerie != null) {
             isTempSerie = true;
@@ -1162,6 +1169,9 @@ public class TourManager {
       }
       if (!isPulseSerie) {
          joinedTourData.pulseSerie = null;
+      }
+      if (!isPulseSerie_FromTime) {
+         joinedTourData.pulseSerie_FromTime = null;
       }
       if (!isTempSerie) {
          joinedTourData.temperatureSerie = null;
@@ -3626,8 +3636,8 @@ public class TourManager {
 
       } else if (prefShow_SwimStyle && canShowBackground_SwimStyle == false) {
 
-            // swimming style cannot be displayed -> show default
-            graphBgSource = GraphBackgroundSource.DEFAULT;
+         // swimming style cannot be displayed -> show default
+         graphBgSource = GraphBackgroundSource.DEFAULT;
       }
 
       tcc.graphBackground_Source = graphBgSource;
@@ -3639,27 +3649,27 @@ public class TourManager {
 
 // SET_FORMATTING_OFF
 
-      final ChartDataYSerie yDataAltitude         = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(   tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataAltitude       = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
       final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataPace             = createModelData_Pace(         tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataAltimeter        = createModelData_Altimeter(   tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataAltimeter      = createModelData_Altimeter(  tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataGradient       = createModelData_Gradient(   tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataCadence          = createModelData_Cadence(      tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataCadence        = createModelData_Cadence(    tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataGears          = createModelData_Gears(      tourData, chartDataModel);
       final ChartDataYSerie yDataTemperature    = createModelData_Temperature(tourData, chartDataModel, chartType, useCustomBackground);
 
       final ChartDataYSerie yDataTourCompare    = createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
 
       final ChartDataYSerie yData_RunDyn_StanceTime            = createModelData_RunDyn_StanceTime(         tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_RunDyn_StanceTimeBalance      = createModelData_RunDyn_StanceTimeBalance(   tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_RunDyn_StanceTimeBalance     = createModelData_RunDyn_StanceTimeBalance(  tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_RunDyn_StepLength            = createModelData_RunDyn_StepLength(         tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_RunDyn_VerticalOscillation   = createModelData_RunDyn_VerticalOscillation(tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_RunDyn_VerticalRatio         = createModelData_RunDyn_VerticalRatio(      tourData, chartDataModel, chartType, useCustomBackground);
 
-      final ChartDataYSerie yData_Swim_Strokes                  = createModelData_Swim_Strokes(               tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yData_Swim_Swolf                     = createModelData_Swim_Swolf(                  tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_Swim_Strokes                 = createModelData_Swim_Strokes(              tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yData_Swim_Swolf                   = createModelData_Swim_Swolf(                tourData, chartDataModel, chartType, useCustomBackground);
 
 // SET_FORMATTING_ON
 
@@ -3943,7 +3953,7 @@ public class TourManager {
                if (srtmDataSerie != null) {
 
                   // create altitude dataserie and adjust min/max values with with the srtm values
-                  yDataAltitude = createChartDataSerie(//
+                  yDataAltitude = createChartDataSerie(
                         new float[][] { altitudeSerie, srtmDataSerie },
                         chartType);
                }
@@ -3964,7 +3974,6 @@ public class TourManager {
          yDataAltitude.setShowYSlider(true);
          yDataAltitude.setDisplayedFractionalDigits(2);
          yDataAltitude.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTITUDE);
-         yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true));
          yDataAltitude.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Altitude, 0));
 
          if (useGraphBgStyle) {
@@ -4129,19 +4138,71 @@ public class TourManager {
       return yDataGradient;
    }
 
+   /**
+    * Heartbeat
+    */
    private ChartDataYSerie createModelData_Heartbeat(final TourData tourData,
                                                      final ChartDataModel chartDataModel,
                                                      final ChartType chartType,
-                                                     final boolean useGraphBgStyle) {
-      /**
-       * Heartbeat
-       */
+                                                     final boolean useGraphBgStyle,
+                                                     final TourChartConfiguration tcc) {
+
       ChartDataYSerie yDataPulse = null;
 
-      final float[] pulseSerie = tourData.getPulseSmoothedSerie();
-      if (pulseSerie != null) {
+      final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
+      final float[] pulseTimeSerie = tourData.getPulse_RRIntervals();
 
-         yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+      final boolean isPulseSerie = pulseSerie != null;
+      final boolean isPulseTimeSerie = pulseTimeSerie != null;
+
+      tcc.canShowPulseSerie = isPulseSerie;
+      tcc.canShowPulseTimeSerie = isPulseTimeSerie;
+
+      // set graph/line according to the selection
+      switch (tcc.pulseGraph) {
+      case DEVICE_BPM_ONLY:
+
+         if (isPulseSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+         }
+         break;
+
+      case RR_INTERVALS_ONLY:
+
+         if (isPulseTimeSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         }
+         break;
+
+      case RR_INTERVALS__2ND_DEVICE_BPM:
+
+         if (isPulseSerie && isPulseTimeSerie) {
+            yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
+         }
+         break;
+
+      case DEVICE_BPM__2ND__RR_INTERVALS:
+      default:
+
+         if (isPulseSerie && isPulseTimeSerie) {
+            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, pulseTimeSerie }, chartType);
+         }
+      }
+
+      // when user selection could not be applied, try to use the remaining possibilities
+      if (yDataPulse == null) {
+
+         if (isPulseSerie) {
+
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+
+         } else if (isPulseTimeSerie) {
+
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+         }
+      }
+
+      if (yDataPulse != null) {
 
          yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
          yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
@@ -4172,13 +4233,13 @@ public class TourManager {
       return yDataPulse;
    }
 
+   /**
+    * Pace
+    */
    private ChartDataYSerie createModelData_Pace(final TourData tourData,
                                                 final ChartDataModel chartDataModel,
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
-      /*
-       * pace
-       */
       final float[] paceSerie = tourData.getPaceSerieSeconds();
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
