@@ -160,9 +160,6 @@ public class Messages extends NLS {
    public static String        map_dlg_dim_warning_title;
    public static String        map_dlg_dim_warning_toggle_message;
 
-   public static String        map_dialog_export_view_to_image_title;
-   public static String        map_dialog_export_view_to_image_message;
-
    public static String        map_properties_map_dim_level;
 
    public static String        statusLine_mapInfo_data;
@@ -173,8 +170,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
 
-   public static String        map_dialog_export_group_image_format;
-   public static String        map_dialog_export_group_image_format_label;
+   public static String        Dialog_ExportImage_Group_Format;
+   public static String        Dialog_ExportImage_Group_Format_Label;
+   public static String        Dialog_ExportImage_Title;
+   public static String        Dialog_ExportImage_Message;
 
    static {
       // initialize resource bundle

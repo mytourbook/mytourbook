@@ -1408,9 +1408,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 //         }
 //      });
 
-      _map.addMousePositionListener(propertyChangeEvent -> {
+      _map.addMousePositionListener(mapPositionEvent -> {
 
-         final GeoPosition mousePosition = propertyChangeEvent.mapGeoPosition;
+         final GeoPosition mousePosition = mapPositionEvent.mapGeoPosition;
 
          double lon = mousePosition.longitude % 360;
          lon = lon > 180 ? //
@@ -1424,7 +1424,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                new Object[] {
                      _nfLatLon.format(mousePosition.latitude),
                      _nfLatLon.format(lon),
-                     Integer.toString(propertyChangeEvent.mapZoomLevel + 1) }));
+                     Integer.toString(mapPositionEvent.mapZoomLevel + 1) }));
       });
 
       /*
