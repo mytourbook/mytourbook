@@ -41,6 +41,20 @@ public class SerieData implements Serializable {
    public float[]            speedSerie20;
    public float[]            powerSerie20;
 
+   /*
+    * These data series cannot be removed because they are needed to convert from int to float in db
+    * version 20
+    */
+   public int[]    altitudeSerie;
+   public int[]    cadenceSerie;
+   public int[]    distanceSerie;
+   public int[]    powerSerie;
+   public int[]    pulseSerie;
+   public int[]    speedSerie;
+   public int[]    temperatureSerie;
+
+   public int[]    deviceMarker;
+
    /**
     * Gears are in this format (left to right)
     * <p>
@@ -71,10 +85,10 @@ public class SerieData implements Serializable {
     *
     * @since Db-version 27
     */
-   public long[]             gears;
+   public long[]   gears;
 
-   public double[]           longitude;
-   public double[]           latitude;
+   public double[] longitude;
+   public double[] latitude;
 
    /**
     * Pulse times in milliseconds.
@@ -82,7 +96,13 @@ public class SerieData implements Serializable {
     * <b>This data serie has not the same serie length as the other data series because 1 second can
     * have multiple values, depending on the heartrate.</b>
     */
-   public int[]              pulseTimes;
+   public int[]    pulseTimes;
+
+   /**
+    * Contains the time index into {@link TourData#timeSerie} for the pulse time(s) in
+    * {@link TourData#pulseTimeSerie}
+    */
+   public int[]    pulseTime_TimeIndex;
 
    /*
     * Running dynamics data
@@ -112,28 +132,14 @@ public class SerieData implements Serializable {
     */
    public boolean[] visiblePoints_Surfing;
 
-   /*
-    * These data series cannot be removed because they are needed to convert from int to float in db
-    * version 20
-    */
-   public int[] distanceSerie;
-
-   public int[] altitudeSerie;
-   public int[] cadenceSerie;
-   public int[] pulseSerie;
-   public int[] temperatureSerie;
-   public int[] speedSerie;
-   public int[] powerSerie;
-   public int[] deviceMarker;
-
    /**
     * An array containing the start time of each pause (in milliseconds)
     */
-   public long[] pausedTime_Start;
+   public long[]    pausedTime_Start;
    /**
     * An array containing the end time of each pause (in milliseconds)
     */
-   public long[] pausedTime_End;
+   public long[]    pausedTime_End;
 
    @Override
    public String toString() {

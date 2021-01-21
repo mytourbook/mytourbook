@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,16 +15,26 @@
  *******************************************************************************/
 package utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
+import javax.persistence.Persistence;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminDeviceDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
@@ -33,6 +43,50 @@ import net.tourbook.importdata.DeviceData;
 import org.xml.sax.SAXException;
 
 public class Initializer {
+
+   private static ObjectMapper            _mapper                   = new ObjectMapper();
+
+   private static HashMap<String, String> _vendorCredentials        = new HashMap<>();
+
+   private static final String            VendorCredentialsFileName = "Credentials.json";  //$NON-NLS-1$
+   private static final String            UTIL_FILE_PATH            = "test/utils/files/"; //$NON-NLS-1$
+
+   static {
+      deserializeVendorCredentials();
+   }
+
+   public static boolean deserializeVendorCredentials() {
+
+      final String vendorCredentialsFilePath = Paths.get(UTIL_FILE_PATH + VendorCredentialsFileName).toAbsolutePath().toString();
+
+      final File vendorCredentialsFile = new File(vendorCredentialsFilePath);
+
+      if (!vendorCredentialsFile.exists()) {
+         return false;
+      }
+      final String fileContent = FilesUtils.readFileContentString(vendorCredentialsFilePath);
+      if (StringUtils.isNullOrEmpty(fileContent)) {
+         return false;
+      }
+
+      final TypeReference<HashMap<String, String>> typeReference = new TypeReference<>() {};
+      try {
+         _vendorCredentials = _mapper.readValue(fileContent, typeReference);
+      } catch (final JsonProcessingException e) {
+         StatusUtil.log(e);
+         return false;
+      }
+
+      return true;
+   }
+
+   public static String getCredential(final String vendorName) {
+      if (_vendorCredentials.isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      return _vendorCredentials.get(vendorName);
+   }
 
    public static TourData importTour() {
       final SAXParser parser = Initializer.initializeParser();
@@ -52,28 +106,35 @@ public class Initializer {
             alreadyImportedTours,
             newlyImportedTours);
 
-      try {
-         if (parser != null) {
+      if (parser != null) {
+         try {
             parser.parse(gpx, handler);
+         } catch (SAXException | IOException e) {
+            e.printStackTrace();
          }
-      } catch (SAXException | IOException e) {
-         e.printStackTrace();
       }
 
       return Comparison.retrieveImportedTour(newlyImportedTours);
    }
 
+   public static void initializeDatabase() {
+
+      Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
+   }
+
    public static SAXParser initializeParser() {
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = null;
+
       try {
-         parser = factory.newSAXParser();
+
+         final SAXParserFactory factory = SAXParserFactory.newInstance();
+         final SAXParser parser = factory.newSAXParser();
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
+         return parser;
       } catch (final ParserConfigurationException | SAXException e) {
          e.printStackTrace();
       }
 
-      return parser;
+      return null;
    }
 }

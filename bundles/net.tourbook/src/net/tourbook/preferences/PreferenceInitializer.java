@@ -29,6 +29,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.DialogSetTimeZone;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartMarkerToolTip;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -173,25 +174,29 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, true);
 
       // tour marker
-      store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE, 4);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET, 2);
+      store.setDefault(ITourbookPreferences.GRAPH_IS_MARKER_VISIBLE,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE,          4);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET,        2);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION, TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE, 2);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE, 50); // in DLU
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES, false);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER, false);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, false);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION, false);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE, true);
-      store.setDefault(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION, ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE,          2);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_SIGN_IMAGE_SIZE,     50); // in DLU
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION,    ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION);
+
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR,      true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES,         false);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER,           false);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION,   false);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION,     false);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL,            true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT,            true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE,              true);
+
+      // pulse values
+      store.setDefault(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES,      TourChart.PULSE_GRAPH_DEFAULT.name());
 
       //tour pauses
-      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, true);
+      store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE,      true);
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, new RGB(0x60, 0x60, 0x60));
       PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,  new RGB(0xff, 0x0, 0x80));

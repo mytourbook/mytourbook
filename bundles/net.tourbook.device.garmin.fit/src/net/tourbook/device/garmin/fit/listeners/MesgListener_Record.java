@@ -77,6 +77,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    @Override
    public void onMesg(final RecordMesg mesg) {
 
+//      System.out.println((System.currentTimeMillis() + " onMesg Record"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
       fitData.onSetup_Record_10_Initialize();
       {
          setRecord(mesg);

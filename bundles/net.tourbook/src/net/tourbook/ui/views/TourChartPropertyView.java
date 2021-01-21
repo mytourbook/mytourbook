@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -37,142 +37,171 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourChartPropertyView extends ViewPart {
 
-	public static final String		ID			= "net.tourbook.views.TourChartPropertyView";	//$NON-NLS-1$
+   public static final String     ID         = "net.tourbook.views.TourChartPropertyView";      //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault()//
-														.getPreferenceStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-	private Button					_rdoLineChartType;
-	private Button					_rdoBarChartType;
+   private SelectionAdapter       _defaultSelectionListener;
 
-	private SelectionAdapter		_defaultSelectionListener;
+   /*
+    * UI controls
+    */
+   private Button _rdoChartType_Bar;
+   private Button _rdoChartType_Dot;
+   private Button _rdoChartType_Line;
 
-	@Override
-	public void createPartControl(final Composite parent) {
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		initUI();
-		createUI(parent);
-		restoreState();
-	}
+      initUI();
+      createUI(parent);
+      restoreState();
+   }
 
-	private void createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-		final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-		scrolledContainer.setExpandVertical(true);
-		scrolledContainer.setExpandHorizontal(true);
+      final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+      scrolledContainer.setExpandVertical(true);
+      scrolledContainer.setExpandHorizontal(true);
 
-		final Composite container = new Composite(scrolledContainer, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-//				.spacing(0, 0)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			createUI10ChartType(container);
-		}
+      final Composite container = new Composite(scrolledContainer, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         createUI_10_ChartType(container);
+      }
 
-		/*
-		 * setup scrolled container
-		 */
-		scrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
+      /*
+       * setup scrolled container
+       */
+      scrolledContainer.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
+            scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+         }
+      });
 
-		scrolledContainer.setContent(container);
-	}
+      scrolledContainer.setContent(container);
+   }
 
-	private void createUI10ChartType(final Composite parent) {
+   private void createUI_10_ChartType(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(container);
-		{
-			/*
-			 * chart type
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.TourChart_Property_label_chart_type);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(container);
+      {
+         {
+            /*
+             * chart type
+             */
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.TourChart_Property_label_chart_type);
+         }
 
-			final Composite group = new Composite(container, SWT.NONE);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(group);
-			{
-				// radio: line chart
-				_rdoLineChartType = new Button(group, SWT.RADIO);
-				_rdoLineChartType.setText(Messages.TourChart_Property_chart_type_line);
-				_rdoLineChartType.addSelectionListener(_defaultSelectionListener);
+         final Composite group = new Composite(container, SWT.NONE);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(group);
+         {
+            {
+               // radio: line chart
+               _rdoChartType_Line = new Button(group, SWT.RADIO);
+               _rdoChartType_Line.setText(Messages.TourChart_Property_chart_type_line);
+               _rdoChartType_Line.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               // radio: bar chart
+               _rdoChartType_Bar = new Button(group, SWT.RADIO);
+               _rdoChartType_Bar.setText(Messages.TourChart_Property_chart_type_bar);
+               _rdoChartType_Bar.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               // radio: dot
+               _rdoChartType_Dot = new Button(group, SWT.RADIO);
+               _rdoChartType_Dot.setText(Messages.TourChart_Property_ChartType_Dot);
+               _rdoChartType_Dot.addSelectionListener(_defaultSelectionListener);
+            }
+         }
+      }
+   }
 
-				// radio: bar chart
-				_rdoBarChartType = new Button(group, SWT.RADIO);
-				_rdoBarChartType.setText(Messages.TourChart_Property_chart_type_bar);
-				_rdoBarChartType.addSelectionListener(_defaultSelectionListener);
-			}
-		}
-	}
+   private void enableControls() {
 
-	private void enableControls() {
+   }
 
-	}
+   private void initUI() {
 
-	private void initUI() {
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent event) {
+            onChangeProperty();
+         }
+      };
+   }
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				onChangeProperty();
-			}
-		};
-	}
+   /**
+    * Property was changed, fire a property change event
+    */
+   private void onChangeProperty() {
 
-	/**
-	 * Property was changed, fire a property change event
-	 */
-	private void onChangeProperty() {
+      enableControls();
 
-		enableControls();
+      saveState();
 
-		saveState();
+      TourManager.getInstance().removeAllToursFromCache();
 
-		TourManager.getInstance().removeAllToursFromCache();
-//		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, TourChartPropertyView.this);
+      // fire unique event for all changes
+      TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
+   }
 
-		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED);
-	}
+   private void restoreState() {
 
-	private void restoreState() {
+      /*
+       * Chart type
+       */
+      ChartType chartType;
+      final String chartTypeName = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
+      try {
+         chartType = ChartType.valueOf(ChartType.class, chartTypeName);
+      } catch (final Exception e) {
+         // set default value
+         chartType = ChartType.LINE;
+      }
 
-		/*
-		 * chart type
-		 */
-		final String chartType = _prefStore.getString(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE);
-		if (chartType.length() == 0 || chartType.equals(ChartType.LINE.name())) {
-			_rdoLineChartType.setSelection(true);
-		} else {
-			_rdoBarChartType.setSelection(true);
-		}
+      switch (chartType) {
+      case BAR:
+         _rdoChartType_Bar.setSelection(true);
+         break;
 
-		enableControls();
-	}
+      case DOT:
+         _rdoChartType_Dot.setSelection(true);
+         break;
 
-	/**
-	 * Update new values in the pref store
-	 */
-	private void saveState() {
+      case LINE:
+      default:
+         _rdoChartType_Line.setSelection(true);
+         break;
+      }
 
-		/*
-		 * chart type
-		 */
-		final ChartType chartType = _rdoLineChartType.getSelection()//
-				? ChartType.LINE
-				: ChartType.BAR;
+      enableControls();
+   }
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, chartType.name());
-	}
+   /**
+    * Update new values in the pref store
+    */
+   private void saveState() {
 
-	@Override
-	public void setFocus() {
-		_rdoLineChartType.setFocus();
-	}
+      /*
+       * Chart type
+       */
+      final ChartType chartType = _rdoChartType_Line.getSelection() ? ChartType.LINE
+            : _rdoChartType_Dot.getSelection() ? ChartType.DOT
+                  : ChartType.BAR;
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PROPERTY_CHARTTYPE, chartType.name());
+   }
+
+   @Override
+   public void setFocus() {
+
+      _rdoChartType_Line.setFocus();
+   }
 
 }

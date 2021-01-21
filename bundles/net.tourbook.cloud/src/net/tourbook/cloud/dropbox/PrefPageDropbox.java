@@ -226,6 +226,16 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       //Not needed
    }
 
+   @Override
+   public boolean okToLeave() {
+
+      if (_server != null) {
+         _server.stopCallBackServer();
+      }
+
+      return super.okToLeave();
+   }
+
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
     * so that the user can allow the MyTourbook Dropbox app to have access

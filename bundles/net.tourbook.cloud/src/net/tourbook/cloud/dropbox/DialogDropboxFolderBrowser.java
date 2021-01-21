@@ -230,22 +230,19 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
             final Metadata entry = ((Metadata) cell.getElement());
 
-            String entryName = null;
-            Image entryImage = null;
-
-            entryName = entry.getName();
+            String imageName = UI.EMPTY_STRING;
 
             if (entry instanceof FolderMetadata) {
 
-               entryImage =
-                     Activator.getImageDescriptor(Messages.Image__Dropbox_Folder).createImage();
+               imageName = Messages.Image__Dropbox_Folder;
             } else if (entry instanceof FileMetadata) {
 
-               entryImage =
-                     Activator.getImageDescriptor(Messages.Image__Dropbox_File).createImage();
+               imageName = Messages.Image__Dropbox_File;
             }
 
-            cell.setText(entryName);
+            final Image entryImage = StringUtils.hasContent(imageName) ? Activator.getImageDescriptor(imageName).createImage() : null;
+
+            cell.setText(entry.getName());
             cell.setImage(entryImage);
          }
       });

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,12 +26,13 @@ import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLogSAXHandler;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.Initializer;
 
-class FitLogTester {
+public class FitLogTester {
 
    private static final String            IMPORT_PATH = "/importdata/sporttracks/fitlog/files/"; //$NON-NLS-1$
 
@@ -42,23 +43,18 @@ class FitLogTester {
 
    @BeforeAll
    static void initAll() {
+
+      Initializer.initializeDatabase();
       parser = Initializer.initializeParser();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
-   /**
-    * 2015-1018
-    * NOTE: Test skipped at the moment because I don't know how to resolve this issue
-    * javax.persistence.PersistenceException: No Persistence provider for EntityManager named
-    * tourdatabase
-    * at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:56)
-    */
-//   @Test
-   void testImport20152018() throws SAXException, IOException {
+   @Test
+   void testImportTimothyLake() throws SAXException, IOException {
       final String filePathWithoutExtension = IMPORT_PATH +
-            "SportTracks2015-2018"; //$NON-NLS-1$
+            "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
       final InputStream fitLogFile = FitLogTester.class.getResourceAsStream(importFilePath);
 

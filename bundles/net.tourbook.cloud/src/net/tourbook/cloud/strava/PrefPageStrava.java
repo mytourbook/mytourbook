@@ -217,6 +217,16 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       //Not needed
    }
 
+   @Override
+   public boolean okToLeave() {
+
+      if (_server != null) {
+         _server.stopCallBackServer();
+      }
+
+      return super.okToLeave();
+   }
+
    /**
     * When the user clicks on the "Authorize" button, a browser is opened
     * so that the user can allow the MyTourbook Strava app to have access
