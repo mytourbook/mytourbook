@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -80,8 +81,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private static final String   STATE_IS_OVERWRITE_IMAGE_FILE = "STATE_IS_OVERWRITE_IMAGE_FILE";                      //$NON-NLS-1$
    private static final String   STATE_EXPORT_IMAGE_FILE_PATH  = "STATE_EXPORT_IMAGE_FILE_PATH";                       //$NON-NLS-1$
    private static final String   STATE_EXPORT_IMAGE_FILE_NAME  = "STATE_EXPORT_IMAGE_FILE_NAME";                       //$NON-NLS-1$
+   private static final String   STATE_IMAGE_COMPRESSION_VALUE = "STATE_IMAGE_COMPRESSION_VALUE";                      //$NON-NLS-1$
 
    private static final int      COMBO_HISTORY_LENGTH          = 20;
+   private static final int      DEFAULT_JPG_COMPRESSION       = 75;
 
    private final IDialogSettings _state                        = TourbookPlugin.getState("DialogMap2ExportViewImage"); //$NON-NLS-1$
 
@@ -94,6 +97,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    /*
     * UI controls
     */
+   private Label            _labelImageCompression;
+   private Label            _labelImageCompressionValue;
    private Composite        _dlgContainer;
    private Composite        _inputContainer;
 
@@ -102,6 +107,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private Combo            _comboFile;
    private Combo            _comboPath;
    private Button           _chkOverwriteFiles;
+   private Scale            _scaleImageCompression;
 
    private ModifyListener   _filePathModifyListener;
    private SelectionAdapter _selectionAdapter;
@@ -178,7 +184,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Dialog_ExportImage_Group_Format);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
          /*
           * label: Image format
@@ -194,15 +200,55 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
          _comboImageFormat.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
+               updateCompressionScale();
                validateFields();
             }
+
          });
          GridDataFactory
                .fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
+               .span(2, 1)
                .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
                .applyTo(_comboImageFormat);
 
+         /*
+          * label: Image Compression
+          */
+         _labelImageCompression = new Label(group, SWT.NONE);
+         _labelImageCompression.setText(Messages.Dialog_ExportImage_Group_Compression_Label);
+         _labelImageCompression.setToolTipText(Messages.Dialog_ExportImage_Group_Compression_Tooltip);
+
+         /*
+          * label: Compression Value
+          */
+         _labelImageCompressionValue = new Label(group, SWT.NONE);
+         GridDataFactory
+               .fillDefaults()
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+               .applyTo(_labelImageCompressionValue);
+
+         /*
+          * scale: JPG Image Compression
+          */
+         _scaleImageCompression = new Scale(group, SWT.NONE);
+         _scaleImageCompression.setMinimum(1);
+         _scaleImageCompression.setMaximum(100);
+         _scaleImageCompression.setIncrement(1);
+         _scaleImageCompression.setPageIncrement(10);
+         _scaleImageCompression.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               updateCompressionLabel(String.valueOf(_scaleImageCompression.getSelection()));
+            }
+
+         });
+         GridDataFactory
+               .fillDefaults()
+               .grab(true, false)
+               .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
+               .applyTo(_scaleImageCompression);
       }
 
    }
@@ -333,6 +379,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       final Image mapViewImage = _map2View.getMapViewImage();
 
       final ImageLoader saver = new ImageLoader();
+
+      if (_comboImageFormat.getSelectionIndex() == 0) {
+         saver.compression = _scaleImageCompression.getSelection();
+      }
       saver.data = new ImageData[] { mapViewImage.getImageData() };
       saver.save(exportFileName, getSwtImageType());
       mapViewImage.dispose();
@@ -438,6 +488,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       _comboImageFormat.select(Util.getStateInt(_state, STATE_IMAGE_FORMAT, 0));
 
+      final int compressionValue = Util.getStateInt(_state, STATE_IMAGE_COMPRESSION_VALUE, DEFAULT_JPG_COMPRESSION);
+      _scaleImageCompression.setSelection(compressionValue);
+      updateCompressionScale();
+
       // export file/path
       UI.restoreCombo(_comboFile, _state.getArray(STATE_EXPORT_IMAGE_FILE_NAME));
       UI.restoreCombo(_comboPath, _state.getArray(STATE_EXPORT_IMAGE_FILE_PATH));
@@ -447,6 +501,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private void saveState() {
 
       _state.put(STATE_IMAGE_FORMAT, _comboImageFormat.getSelectionIndex());
+
+      if (_comboImageFormat.getSelectionIndex() == 0) {
+         _state.put(STATE_IMAGE_COMPRESSION_VALUE, _scaleImageCompression.getSelection());
+      }
 
       // export file/path
       if (validateFilePath()) {
@@ -464,6 +522,21 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       setErrorMessage(message);
       enableOK(false);
+   }
+
+   private void updateCompressionLabel(final String compressionValue) {
+
+      _labelImageCompressionValue.setText(compressionValue);
+   }
+
+   private void updateCompressionScale() {
+
+      final boolean enableCompressionControls = _comboImageFormat.getSelectionIndex() == 0;
+      _scaleImageCompression.setEnabled(enableCompressionControls);
+      _labelImageCompression.setEnabled(enableCompressionControls);
+      _labelImageCompressionValue.setEnabled(enableCompressionControls);
+
+      updateCompressionLabel(String.valueOf(_scaleImageCompression.getSelection()));
    }
 
    private void validateFields() {
@@ -507,7 +580,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       final File newFile = new File(filePath.toOSString());
 
-      if ((fileName.length() == 0) || newFile.isDirectory()) {
+      if (fileName.length() == 0 || newFile.isDirectory()) {
 
          // invalid filename
 
