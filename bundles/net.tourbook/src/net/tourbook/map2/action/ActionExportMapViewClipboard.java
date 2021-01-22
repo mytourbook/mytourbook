@@ -21,6 +21,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.PngTransfer;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.ImageTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -51,6 +52,15 @@ public class ActionExportMapViewClipboard extends Action {
             new Transfer[] { (ImageTransfer) imageTransfer });
 
       mapViewImage.dispose();
+
+      final IStatusLineManager statusLineManager = UI.getStatusLineManager();
+      if (statusLineManager == null) {
+         return;
+      }
+
+      statusLineManager.setMessage(Messages.Map_Action_Export_Map_Clipboard_Copied_Info);
+
+      Display.getCurrent().timerExec(2000, () -> statusLineManager.setMessage(null));
    }
 
 }
