@@ -481,8 +481,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
             PART_ROWS.add(createUI210PartRow(_partContainer, 11));
          }
 
-         createUI220Detail(container);
-         createUI230UserAgent(container);
+         createUI220Details(container);
          createUI240DebugInfo(container);
       }
    }
@@ -689,7 +688,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       return UI.EMPTY_STRING;
    }
 
-   private void createUI220Detail(final Composite parent) {
+   private void createUI220Details(final Composite parent) {
 
       Label label;
       final MouseWheelListener mouseWheelListener = event -> {
@@ -710,15 +709,13 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       {
          // label: image format
          label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(label);
          label.setText(Messages.Dialog_CustomConfig_Label_ImageFormat);
 
          // label: image format value
          _txtImageFormat = new Text(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImageFormat);
          _txtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
          _txtImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         _txtImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImageFormat);
 
          // ################################################
 
@@ -782,25 +779,17 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                }
                onSelectZoomSpinnerMax();
             });
+
+            // label: image format
+            label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(label);
+            label.setText(Messages.Dialog_CustomConfig_Text_UserAgent_Label);
+
+            // label: image format value
+            _txtUserAgent = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtUserAgent);
+            _txtUserAgent.setToolTipText(Messages.Dialog_CustomConfig_Text_UserAgent_Tooltip);
          }
-      }
-   }
-
-   private void createUI230UserAgent(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         // label: image format
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText(Messages.Dialog_CustomConfig_Text_UserAgent_Label);
-
-         // label: image format value
-         _txtUserAgent = new Text(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtUserAgent);
-         _txtUserAgent.setToolTipText(Messages.Dialog_CustomConfig_Text_UserAgent_Tooltip);
       }
    }
 
