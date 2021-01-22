@@ -18,6 +18,7 @@ package net.tourbook.cloud.strava;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
@@ -243,7 +244,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          return;
       }
 
-      Display.getDefault().syncExec(() -> WEB.openUrl(StravaUploader.HerokuAppUrl + "/authorize"));//$NON-NLS-1$
+      Display.getDefault().syncExec(() -> WEB.openUrl(OAuth2Constants.HEROKU_APP_URL + "/strava/authorize"));//$NON-NLS-1$
    }
 
    @Override
