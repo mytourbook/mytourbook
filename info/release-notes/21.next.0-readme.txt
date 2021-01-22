@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* 2D Map: reorder context menu actions a little bit
+
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
