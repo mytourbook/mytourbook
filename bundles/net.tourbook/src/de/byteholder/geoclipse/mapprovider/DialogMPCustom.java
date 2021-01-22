@@ -16,7 +16,6 @@
 package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -27,6 +26,7 @@ import de.byteholder.geoclipse.ui.ViewerDetailForm;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -97,7 +97,6 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
     * UI controls
     */
    private Display          _display;
-   private Button           _btnOk;
 
    private Composite        _leftContainer;
    private ViewerDetailForm _detailForm;
@@ -114,13 +113,12 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
    private Button           _btnShowMap;
    private Spinner          _spinMinZoom;
    private Spinner          _spinMaxZoom;
-   private Button           _btnShowOsmMap;
    private Composite        _partContainer;
 
    private Button           _chkShowTileImageLog;
    private Label            _lblLog;
+   private Label            _labelImageFormat;
 
-   private Text             _txtImageFormat;
    private Text             _txtUserAgent;
 
    /*
@@ -187,7 +185,6 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
    private final PrefPage_Map2_Providers         _prefPageMapFactory;
 
-   private String                                _defaultMessage;
    /**
     * contains the custom url with all url parts which are converted to a string
     */
@@ -229,14 +226,14 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
    private class PartRow {
 
-      private final Combo                       rowCombo;
+      private final Combo                   rowCombo;
 
       /**
        * The EnumMap contains all widgets for one row
        */
-      private final EnumMap<WIDGET_KEY, Widget> rowWidgets;
+      private final Map<WIDGET_KEY, Widget> rowWidgets;
 
-      public PartRow(final Combo combo, final EnumMap<WIDGET_KEY, Widget> widgets) {
+      public PartRow(final Combo combo, final Map<WIDGET_KEY, Widget> widgets) {
          rowCombo = combo;
          rowWidgets = widgets;
       }
@@ -386,9 +383,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       super.createButtonsForButtonBar(parent);
 
-      // set text for the OK button
-      _btnOk = getButton(IDialogConstants.OK_ID);
-      _btnOk.setText(Messages.Dialog_MapConfig_Button_Save);
+      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_MapConfig_Button_Save);
    }
 
    @Override
@@ -504,7 +499,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
             /*
              * show page according to the selected item in the combobox
              */
-            final EnumMap<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
+            final Map<WIDGET_KEY, Widget> rowWidgets = PART_ROWS.get(row).rowWidgets;
 
             onSelectPart(combo, rowWidgets);
          }
@@ -712,10 +707,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          label.setText(Messages.Dialog_CustomConfig_Label_ImageFormat);
 
          // label: image format value
-         _txtImageFormat = new Text(container, SWT.READ_ONLY);
-         _txtImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
-         _txtImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImageFormat);
+         _labelImageFormat = new Label(container, SWT.NONE);
+         _labelImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
+         _labelImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelImageFormat);
 
          // ################################################
 
@@ -743,7 +738,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                   onSelectZoomSpinnerMin();
                }
             });
-            _spinMinZoom.addModifyListener(e -> {
+            _spinMinZoom.addModifyListener(modifyEvent -> {
                if (_isInitUI) {
                   return;
                }
@@ -855,10 +850,10 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          // ############################################################
 
          // button: osm map
-         _btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
-         _btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
-         _btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-         _btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
+         final Button btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
+         btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
+         btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
+         btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onSelectOsmMap();
@@ -874,7 +869,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
                .applyTo(_toolbar);
       }
 
-      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
+      _map = new de.byteholder.geoclipse.map.Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
       GridDataFactory.fillDefaults()//
             .grab(true, true)
             .applyTo(_map);
@@ -1027,9 +1022,9 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 //		return null;
    }
 
-   private void initializeUIFromModel(final MPCustom mp) {
+   private void initializeUIFromModel(final MPCustom customMapProfile) {
 
-      _mpCustom = mp;
+      _mpCustom = customMapProfile;
 
       _isInitUI = true;
       {
@@ -1044,21 +1039,20 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
          _spinMinZoom.setSelection(minZoomLevel + UI_MIN_ZOOM_LEVEL);
          _spinMaxZoom.setSelection(maxZoomLevel + UI_MIN_ZOOM_LEVEL);
 
-         _previousCustomUrl = mp.getCustomUrl();
+         _previousCustomUrl = customMapProfile.getCustomUrl();
          _previousMinZoom = minZoomLevel;
          _previousMaxZoom = maxZoomLevel;
 
-         _txtImageFormat.setText(_mpCustom.getImageFormat());
+         _labelImageFormat.setText(_mpCustom.getImageFormat());
          _txtUserAgent.setText(_mpCustom.getUserAgent());
       }
       _isInitUI = false;
 
       // show map provider in the message area
-      _defaultMessage = NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, _mpCustom.getName());
-      setMessage(_defaultMessage);
+      setMessage(NLS.bind(Messages.Dialog_MapConfig_DialogArea_Message, _mpCustom.getName()));
 
       // set factory and display map
-      _map.setMapProviderWithReset(mp);
+      _map.setMapProviderWithReset(customMapProfile);
 
       // set position to previous position
       _map.setZoom(_mpCustom.getLastUsedZoom());
@@ -1144,7 +1138,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
     * @param combo
     * @param rowWidgets
     */
-   private void onSelectPart(final Combo combo, final EnumMap<WIDGET_KEY, Widget> rowWidgets) {
+   private void onSelectPart(final Combo combo, final Map<WIDGET_KEY, Widget> rowWidgets) {
 
       final PartUIItem selectedPartItem = PART_ITEMS.get(combo.getSelectionIndex());
 
@@ -1443,7 +1437,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
       }
 
       // update image format from the mp, the image format is set in the mp when images are loaded
-      _txtImageFormat.setText(_mpCustom.getImageFormat());
+      _labelImageFormat.setText(_mpCustom.getImageFormat());
 
       _mpCustom.setUserAgent(_txtUserAgent.getText());
    }
@@ -1458,7 +1452,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       for (final PartRow row : PART_ROWS) {
 
-         final EnumMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
+         final Map<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
          final PartUIItem partItem = PART_ITEMS.get(row.rowCombo.getSelectionIndex());
 
          // skip empty parts
@@ -1544,7 +1538,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
       for (final PartRow row : PART_ROWS) {
 
-         final EnumMap<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
+         final Map<WIDGET_KEY, Widget> rowWidgets = row.rowWidgets;
          final PartUIItem selectedParaItem = PART_ITEMS.get(row.rowCombo.getSelectionIndex());
 
          switch (selectedParaItem.partKey) {
