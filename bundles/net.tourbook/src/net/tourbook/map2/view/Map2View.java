@@ -1611,7 +1611,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
-      _actionExportMap_SubMenu           = new Action_ExportMap_SubMenu(this);
+      _actionExportMap_SubMenu            = new Action_ExportMap_SubMenu(this);
       _actionSearchTourByLocation         = new ActionSearchTourByLocation();
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
