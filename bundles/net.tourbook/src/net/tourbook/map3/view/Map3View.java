@@ -134,6 +134,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -147,6 +148,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
@@ -512,7 +514,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void mouseDragged(final MouseEvent e) {
-            onAWTMouseDragged();
+            onAWTMouseDragged(e);
          }
 
       };
@@ -520,7 +522,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void mouseWheelMoved(final MouseWheelEvent e) {
-            onAWTMouseDragged();
+            onAWTMouseDragged(e);
          }
 
       };
@@ -571,15 +573,18 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == Map3View.this && _isPartVisible == false) {
+            if (partRef.getPart(false) == Map3View.this) {
 
-               _isPartVisible = true;
+               if (_isPartVisible == false) {
 
-               if (_lastHiddenSelection != null) {
+                  _isPartVisible = true;
 
-                  onSelectionChanged(_lastHiddenSelection);
+                  if (_lastHiddenSelection != null) {
 
-                  _lastHiddenSelection = null;
+                     onSelectionChanged(_lastHiddenSelection);
+
+                     _lastHiddenSelection = null;
+                  }
                }
             }
          }
@@ -625,25 +630,31 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void addPrefListener() {
 
-      _prefChangeListener = propertyChangeEvent -> {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
 
-            // update map colors
+               // update map colors
 
-            setColorProvider(_graphId);
+               setColorProvider(_graphId);
+            }
          }
       };
 
-      _prefChangeListener_Common = propertyChangeEvent -> {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            _actionShowTourInMap.updateMeasurementSystem();
+               _actionShowTourInMap.updateMeasurementSystem();
+            }
          }
       };
 
@@ -656,60 +667,66 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = (workbenchPart, selection) -> {
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-         if (workbenchPart == Map3View.this) {
-            // ignore own selections
-            return;
+            if (part == Map3View.this) {
+               // ignore own selections
+               return;
+            }
+
+            onSelectionChanged(selection);
          }
-
-         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-         if (workbenchPart == Map3View.this) {
-            return;
-         }
-
-         if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-            showAllTours_InternalTours();
-
-         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-               updateModifiedTours(modifiedTours);
+            if (part == Map3View.this) {
+               return;
             }
 
-         } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-            clearView();
+               showAllTours_InternalTours();
 
-         } else if (tourEventId == TourEventId.MARKER_SELECTION) {
+            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-            if (eventData instanceof SelectionTourMarker) {
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+                  updateModifiedTours(modifiedTours);
+               }
 
-               final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+            } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               final TourData tourData = selection.getTourData();
-               final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
+               clearView();
 
-               syncMapWith_TourMarker(tourData, tourMarker);
+            } else if (eventId == TourEventId.MARKER_SELECTION) {
+
+               if (eventData instanceof SelectionTourMarker) {
+
+                  final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+
+                  final TourData tourData = selection.getTourData();
+                  final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
+
+                  syncMapWith_TourMarker(tourData, tourMarker);
+               }
+
+            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+               onSelectionChanged((ISelection) eventData);
+
+            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+               onSelectionChanged((ISelection) eventData);
             }
-
-         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-            onSelectionChanged((ISelection) eventData);
-
-         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
-
-            onSelectionChanged((ISelection) eventData);
          }
       };
 
@@ -907,7 +924,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(() -> hideTourInfo());
+            Display.getCurrent().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+
+                  hideTourInfo();
+               }
+            });
          }
 
          @Override
@@ -930,7 +953,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
 
-      display.asyncExec(() -> swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen));
+      display.asyncExec(new Runnable() {
+         @Override
+         public void run() {
+//				System.out.println("SWT calling menu"); //$NON-NLS-1$
+            swt_awt_ContextMenu.swtIndirectShowMenu(xPosScreen, yPosScreen);
+         }
+      });
    }
 
    @Override
@@ -961,27 +990,30 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       /*
        * !!! It requires 2x asyncExec that the a tour provider is providing tours !!!
        */
-      Display.getCurrent().asyncExec(() -> {
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-         restoreState();
-         enableActions();
+            restoreState();
+            enableActions();
 
-         _isRestored = true;
+            _isRestored = true;
 
-         if (_lastHiddenSelection != null) {
+            if (_lastHiddenSelection != null) {
 
-            onSelectionChanged(_lastHiddenSelection);
+               onSelectionChanged(_lastHiddenSelection);
 
-            _lastHiddenSelection = null;
+               _lastHiddenSelection = null;
 
-         } else if (_allTours.isEmpty()) {
+            } else if (_allTours.isEmpty()) {
 
-            // a tour is not displayed, find a tour provider which provides a tour
-            showToursFromTourProvider();
+               // a tour is not displayed, find a tour provider which provides a tour
+               showToursFromTourProvider();
 
-         } else {
+            } else {
 
-            showAllTours_InternalTours();
+               showAllTours_InternalTours();
+            }
          }
       });
    }
@@ -1321,7 +1353,15 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
 
       // run in SWT thread
-      _mapContainer.getDisplay().asyncExec(() -> TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, Map3View.this));
+      _mapContainer.getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            // activate this view
+
+            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, Map3View.this);
+         }
+      });
    }
 
    public ArrayList<TourData> getAllTours() {
@@ -1426,10 +1466,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    }
 
    /**
+    * @param trackSliderLayer
     * @return Returns {@link TourData} of the selected tour track or <code>null</code> when a tour
     *         is not selected.
     */
-   private TourData getSelectedTour() {
+   private TourData getSelectedTour(final TrackSliderLayer trackSliderLayer) {
 
       TourData tourData;
       final ITrackPath selectedTrack = Map3Manager.getLayer_TourTrack().getSelectedTrack();
@@ -1597,12 +1638,19 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // set state here because opening the context menu is async
          _isContextMenuVisible = true;
 
-         _mapContainer.getDisplay().asyncExec(() -> createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen()));
+         _mapContainer.getDisplay().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+
+               createContextMenu(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
+            }
+         });
          mouseEvent.consume();
       }
    }
 
-   private void onAWTMouseDragged() {
+   private void onAWTMouseDragged(final MouseEvent mouseEvent) {
 
       final MapPosition mapPosition = getMapPosition();
 
@@ -2267,21 +2315,24 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void showToursFromTourProvider() {
 
-      Display.getCurrent().asyncExec(() -> {
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-         // validate widget
-         if (_mapContainer.isDisposed()) {
-            return;
-         }
+            // validate widget
+            if (_mapContainer.isDisposed()) {
+               return;
+            }
 
-         // check if tour is set from a selection provider
-         if (_allTours.size() > 0) {
-            return;
-         }
+            // check if tour is set from a selection provider
+            if (_allTours.size() > 0) {
+               return;
+            }
 
-         final ArrayList<TourData> allTours = TourManager.getSelectedTours();
-         if (allTours != null) {
-            showAllTours_NewTours(allTours);
+            final ArrayList<TourData> allTours = TourManager.getSelectedTours();
+            if (allTours != null) {
+               showAllTours_NewTours(allTours);
+            }
          }
       });
    }
@@ -2476,12 +2527,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void updateTrackSlider() {
 
-//      final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
-//      if (trackSliderLayer == null) {
-//         return;
-//      }
+      final TrackSliderLayer trackSliderLayer = getLayerTrackSlider();
+      if (trackSliderLayer == null) {
+         return;
+      }
 
-      final TourData tourData = getSelectedTour();
+      final TourData tourData = getSelectedTour(trackSliderLayer);
       if (tourData == null) {
 // ???		trackSliderLayer.setSliderVisible(false);
          return;
