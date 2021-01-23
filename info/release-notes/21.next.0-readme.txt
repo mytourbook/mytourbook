@@ -54,7 +54,7 @@ Improvements
 
 * TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/287
   - Added the speed and power values in the TCX exports
-  
+
 * Tour Chart
   - Show heartbeat values
     - Beat values from device
