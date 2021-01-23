@@ -47,8 +47,13 @@ Improvements
 ============
 
 * Fit Import
-  - Import HRV-RR values which can be displayed in the Heart Rate Variability view
+  - Import R-R intervals
 
+
+* Tour Chart
+  - Show heartbeat values
+    - Beat values from device
+    - R-R intervals
 
 Changes  
 =======
