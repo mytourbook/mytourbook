@@ -26,6 +26,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.ImageTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionExportMapViewClipboard extends Action {
@@ -42,14 +43,20 @@ public class ActionExportMapViewClipboard extends Action {
    @Override
    public void run() {
 
-      final Image mapViewImage = _map2View.getMapViewImage();
-
       final Clipboard clipboard = new Clipboard(Display.getCurrent());
 
-      final Object imageTransfer = UI.IS_LINUX ? PngTransfer.getInstance() : ImageTransfer.getInstance();
+      final Image mapViewImage = _map2View.getMapViewImage();
+      final ImageData imageData = mapViewImage.getImageData();
 
-      clipboard.setContents(new Object[] { mapViewImage.getImageData() },
-            new Transfer[] { (ImageTransfer) imageTransfer });
+      if (UI.IS_LINUX) {
+         final PngTransfer imageTransfer = PngTransfer.getInstance();
+         clipboard.setContents(new Object[] { imageData },
+               new Transfer[] { imageTransfer });
+      } else {
+         final ImageTransfer imageTransfer = ImageTransfer.getInstance();
+         clipboard.setContents(new Object[] { imageData },
+               new Transfer[] { imageTransfer });
+      }
 
       mapViewImage.dispose();
 
