@@ -428,6 +428,7 @@ public class Map2View extends ViewPart implements
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private ActionDimMap                      _actionDimMap;
    private ActionOpenPrefDialog              _actionEditMap2Preferences;
+   private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2_Bookmarks;
    private ActionMap2Color                   _actionMap2_Color;
@@ -437,7 +438,6 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2_TourColors;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
-   private Action_ExportMap_SubMenu          _action_ExportMap_SubMenu;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
    private ActionSetDefaultPosition          _actionSetDefaultPosition;
    private ActionShowAllFilteredPhotos       _actionShowAllFilteredPhotos;
@@ -1041,7 +1041,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowSlider() {
 
-      if (_allTourData == null || _allTourData.isEmpty()) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -1611,7 +1611,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
-      _action_ExportMap_SubMenu           = new Action_ExportMap_SubMenu(this);
+      _actionExportMap_SubMenu            = new Action_ExportMap_SubMenu(this);
       _actionSearchTourByLocation         = new ActionSearchTourByLocation();
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
@@ -2120,7 +2120,7 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
-      menuMgr.add(_action_ExportMap_SubMenu);
+      menuMgr.add(_actionExportMap_SubMenu);
 
       menuMgr.add(new Separator());
 
@@ -3847,6 +3847,7 @@ public class Map2View extends ViewPart implements
 
             final int ratingStars = photo.ratingStars;
 
+            // only photos without stars are displayed
             if ((isNoStar && ratingStars == 0) ||
                   (isEqual && ratingStars == _photoFilter_RatingStars) ||
                   (isMore && ratingStars >= _photoFilter_RatingStars) ||

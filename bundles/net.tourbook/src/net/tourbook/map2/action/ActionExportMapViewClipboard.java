@@ -15,12 +15,15 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.PngTransfer;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.ImageTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -31,7 +34,7 @@ public class ActionExportMapViewClipboard extends Action {
 
    public ActionExportMapViewClipboard(final Map2View mapView) {
 
-      super(Messages.map_action_export_map_view_clipboard, AS_PUSH_BUTTON);
+      super(Messages.Map_Action_Export_Map_View_Clipboard, AS_PUSH_BUTTON);
 
       _map2View = mapView;
    }
@@ -41,13 +44,23 @@ public class ActionExportMapViewClipboard extends Action {
 
       final Image mapViewImage = _map2View.getMapViewImage();
 
-      final Clipboard cb = new Clipboard(Display.getCurrent());
+      final Clipboard clipboard = new Clipboard(Display.getCurrent());
 
-      final PngTransfer imageTransfer = PngTransfer.getInstance();
-      cb.setContents(new Object[] { mapViewImage.getImageData() },
-            new Transfer[] { imageTransfer });
+      final Object imageTransfer = UI.IS_LINUX ? PngTransfer.getInstance() : ImageTransfer.getInstance();
+
+      clipboard.setContents(new Object[] { mapViewImage.getImageData() },
+            new Transfer[] { (ImageTransfer) imageTransfer });
 
       mapViewImage.dispose();
+
+      final IStatusLineManager statusLineManager = UI.getStatusLineManager();
+      if (statusLineManager == null) {
+         return;
+      }
+
+      statusLineManager.setMessage(Messages.Map_Action_Export_Map_Clipboard_Copied_Info);
+
+      Display.getCurrent().timerExec(2000, () -> statusLineManager.setMessage(null));
    }
 
 }

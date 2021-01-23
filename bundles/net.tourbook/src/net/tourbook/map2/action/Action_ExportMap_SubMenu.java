@@ -36,7 +36,7 @@ public class Action_ExportMap_SubMenu extends Action implements IMenuCreator {
 
    public Action_ExportMap_SubMenu(final Map2View map2View) {
 
-      super(Messages.map_action_export_map_view, AS_DROP_DOWN_MENU);
+      super(Messages.Map_Action_Export_Map_View, AS_DROP_DOWN_MENU);
 
       _actionExportMapViewImage = new ActionExportMapViewImage(map2View);
       _actionExportMapViewClipboard = new ActionExportMapViewClipboard(map2View);

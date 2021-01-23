@@ -29,8 +29,8 @@ public class ActionExportMapViewImage extends Action {
 
    public ActionExportMapViewImage(final Map2View mapView) {
 
-      super(Messages.map_action_export_map_view_image, AS_PUSH_BUTTON);
-      setToolTipText(Messages.map_action_export_map_view_image_tooltip);
+      super(Messages.Map_Action_Export_Map_View_Image, AS_PUSH_BUTTON);
+      setToolTipText(Messages.Map_Action_Export_Map_View_Image_Tooltip);
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__floppy_disk));
 
       _map2View = mapView;

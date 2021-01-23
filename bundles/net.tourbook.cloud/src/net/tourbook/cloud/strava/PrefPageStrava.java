@@ -18,6 +18,7 @@ package net.tourbook.cloud.strava;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
@@ -45,6 +46,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
    public static final int         CALLBACK_PORT = 4918;
+
+   public static final String      ClientId      = "55536";                                    //$NON-NLS-1$
 
    private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
@@ -243,7 +246,11 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          return;
       }
 
-      Display.getDefault().syncExec(() -> WEB.openUrl(StravaUploader.HerokuAppUrl + "/authorize"));//$NON-NLS-1$
+      Display.getDefault().syncExec(() -> WEB.openUrl(
+            "http://www.strava.com/oauth/authorize?client_id=" + ClientId //$NON-NLS-1$
+                  + "&response_type=" + OAuth2Constants.PARAM_CODE + //$NON-NLS-1$
+                  "&" + OAuth2Constants.PARAM_REDIRECT_URI + "=http://localhost:" + CALLBACK_PORT + //$NON-NLS-1$ //$NON-NLS-2$
+                  "&scope=read,activity:write")); //$NON-NLS-1$
    }
 
    @Override
