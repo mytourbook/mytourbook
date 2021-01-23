@@ -173,9 +173,9 @@ public class Messages extends NLS {
    public static String        Tour_Action_ShowHrZones_Tooltip;
 
    public static String        Dialog_ExportImage_Group_Format;
-   public static String        Dialog_ExportImage_Group_Compression_Label;
-   public static String        Dialog_ExportImage_Group_Compression_Tooltip;
-   public static String        Dialog_ExportImage_Group_Format_Label;
+   public static String        Dialog_ExportImage_Compression_Label;
+   public static String        Dialog_ExportImage_Compression_Tooltip;
+   public static String        Dialog_ExportImage_Format_Label;
    public static String        Dialog_ExportImage_Title;
    public static String        Dialog_ExportImage_Message;
 

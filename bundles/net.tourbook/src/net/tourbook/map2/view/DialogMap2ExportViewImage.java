@@ -190,7 +190,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: Image format
           */
          final Label label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_ExportImage_Group_Format_Label);
+         label.setText(Messages.Dialog_ExportImage_Format_Label);
 
          /*
           * combo: Image format
@@ -216,8 +216,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: Image Compression
           */
          _labelImageCompression = new Label(group, SWT.NONE);
-         _labelImageCompression.setText(Messages.Dialog_ExportImage_Group_Compression_Label);
-         _labelImageCompression.setToolTipText(Messages.Dialog_ExportImage_Group_Compression_Tooltip);
+         _labelImageCompression.setText(Messages.Dialog_ExportImage_Compression_Label);
+         _labelImageCompression.setToolTipText(Messages.Dialog_ExportImage_Compression_Tooltip);
 
          /*
           * label: Compression Value
