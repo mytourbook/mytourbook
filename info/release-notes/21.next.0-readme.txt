@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* 2D Map: reorder context menu actions a little bit
+
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
@@ -46,8 +48,14 @@ New
 Improvements
 ============
 
-* 
+* Fit Import
+  - Import R-R intervals
 
+
+* Tour Chart
+  - Show heartbeat values
+    - Beat values from device
+    - R-R intervals
 
 Changes  
 =======

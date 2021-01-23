@@ -89,7 +89,7 @@ public class FitData {
    private final List<Long>        _pausedTime_End       = new ArrayList<>();
 
    private TimeData                _current_TimeData;
-
+   private TimeData                _lastAdded_TimeData;
    private TimeData                _previous_TimeData;
 
    private TourMarker              _current_TourMarker;
@@ -619,8 +619,7 @@ public class FitData {
 
             /*
              * Ignore and merge duplicated records. The device Bryton 210 creates duplicated
-             * entries,
-             * to have valid data for this device, they must be merged.
+             * entries, to have valid data for this device, they must be merged.
              */
 
             useThisTimeSlice = false;
@@ -665,6 +664,7 @@ public class FitData {
 
       if (useThisTimeSlice) {
          _allTimeData.add(_current_TimeData);
+         _lastAdded_TimeData = _current_TimeData;
       }
 
       _previous_TimeData = _current_TimeData;
@@ -734,5 +734,9 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
+   }
+
+   public TimeData getLastAdded_TimeData() {
+      return _lastAdded_TimeData;
    }
 }

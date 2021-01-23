@@ -62,6 +62,20 @@ public class SerieData implements Serializable {
    public int[]                speedSerie;
    public int[]                temperatureSerie;
 
+   /*
+    * These data series cannot be removed because they are needed to convert from int to float in db
+    * version 20
+    */
+   public int[]    altitudeSerie;
+   public int[]    cadenceSerie;
+   public int[]    distanceSerie;
+   public int[]    powerSerie;
+   public int[]    pulseSerie;
+   public int[]    speedSerie;
+   public int[]    temperatureSerie;
+
+   public int[]    deviceMarker;
+
    /**
     * Gears are in this format (left to right)
     * <p>
@@ -122,6 +136,11 @@ public class SerieData implements Serializable {
    public int[]                pulseTimes;
 
    /**
+    * Contains the time index into {@link TourData#timeSerie} for the pulse time(s) in
+    * {@link TourData#pulseTimeSerie}
+    */
+   public int[]    pulseTime_TimeIndex;
+
     * Running dynamics data
     *
     * @since Version 18.7

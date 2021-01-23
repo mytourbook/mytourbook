@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -31,9 +34,12 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -44,7 +50,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout {
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
    private SelectionAdapter       _defaultSelectionListener;
 
@@ -52,6 +58,34 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private Action                 _actionRestoreDefaults;
 
    private ChartOptions_Grid      _gridUI;
+
+   private SelectionAdapter       _defaultSelectionAdapter;
+   private FocusListener          _keepOpenListener;
+
+   /**
+    * Pulse graph values MUST be in sync with pulse graph labels
+    */
+   private PulseGraph[]           _allPulseGraph_Value = {
+
+         PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
+         PulseGraph.DEVICE_BPM_ONLY,
+         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
+         PulseGraph.RR_INTERVALS_ONLY,
+
+   };
+
+   /**
+    * Pulse graph labels MUST be in sync with pulse graph values
+    */
+   private String[]               _allPulseGraph_Label = {
+
+         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
+         Messages.TourChart_PulseGraph_DeviceBpm_Only,
+         Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
+         Messages.TourChart_PulseGraph_RRIntervals_Only
+   };
+
+   private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
 
    /*
     * UI controls
@@ -63,6 +97,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private Button    _chkShowStartTimeOnXAxis;
    private Button    _chkShowValuePointTooltip;
    private Button    _chkSelectAllTimeSlices;
+
+   private Combo     _comboPulseValueGraph;
 
    /**
     * @param ownerControl
@@ -94,13 +130,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
-      _actionPrefDialog = new ActionOpenPrefDialog(
-            Messages.Tour_Action_EditChartPreferences,
-            PrefPageAppearanceTourChart.ID);
+      _actionPrefDialog = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
       _actionPrefDialog.closeThisTooltip(this);
       _actionPrefDialog.setShell(_tourChart.getShell());
    }
@@ -126,7 +159,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -158,7 +191,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private void createUI_12_Actions(final Composite parent) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(toolbar);
@@ -174,7 +207,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private void createUI_20_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
             .applyTo(container);
@@ -187,7 +220,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkShowBreaktimeValues = new Button(container, SWT.CHECK);
             _chkShowBreaktimeValues.setText(Messages.Tour_Action_ShowBreaktimeValues);
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowBreaktimeValues);
 
@@ -200,7 +233,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkShowStartTimeOnXAxis = new Button(container, SWT.CHECK);
             _chkShowStartTimeOnXAxis.setText(Messages.Tour_Action_show_start_time_on_x_axis);
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowStartTimeOnXAxis);
 
@@ -213,7 +246,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkShowSrtmData = new Button(container, SWT.CHECK);
             _chkShowSrtmData.setText(Messages.tour_action_show_srtm_data);
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowSrtmData);
 
@@ -226,7 +259,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
             _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowValuePointTooltip);
 
@@ -251,13 +284,37 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkSelectAllTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
             _chkSelectAllTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkSelectAllTimeSlices);
 
             _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
+         {
+            /*
+             * Pulse graph
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourChartOptions_Label_PulseGraph);
+
+            // combo
+            _comboPulseValueGraph = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.FILL, SWT.FILL)
+                  .applyTo(_comboPulseValueGraph);
+            _comboPulseValueGraph.setVisibleItemCount(20);
+            _comboPulseValueGraph.addSelectionListener(_defaultSelectionAdapter);
+            _comboPulseValueGraph.addFocusListener(_keepOpenListener);
+         }
       }
+   }
+
+   private PulseGraph getSelectedPulseGraph() {
+
+      return _allPulseGraph_Value[_comboPulseValueGraph.getSelectionIndex()];
    }
 
    private void initUI() {
@@ -266,6 +323,31 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             onChangeUI();
+         }
+      };
+
+      _defaultSelectionAdapter = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeUI();
+         }
+      };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsAnotherDialogOpened(false);
          }
       };
    }
@@ -295,12 +377,15 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       tcc.isShowBreaktimeValues = isShowBreaktimeValues;
       tcc.isSRTMDataVisible = isSrtmDataVisible;
       tcc.xAxisTime = xAxisStartTime;
+      tcc.pulseGraph = TourChart.PULSE_GRAPH_DEFAULT;
 
       _chkShowBreaktimeValues.setSelection(isShowBreaktimeValues);
       _chkShowSrtmData.setSelection(isSrtmDataVisible);
       _chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
       _chkShowValuePointTooltip.setSelection(isShowValuePointTooltip);
       _chkSelectAllTimeSlices.setSelection(isSelectInBetweenTimeSlices);
+
+      setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT, tcc.canShowPulseSerie, tcc.canShowPulseTimeSerie);
 
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
@@ -333,6 +418,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
       _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
+      setSelection_PulseGraph(tcc.pulseGraph, tcc.canShowPulseSerie, tcc.canShowPulseTimeSerie);
+
       _gridUI.restoreState();
    }
 
@@ -349,6 +436,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             ? X_AXIS_START_TIME.TOUR_START_TIME
             : X_AXIS_START_TIME.START_WITH_0;
 
+      final PulseGraph pulseGraph = getSelectedPulseGraph();
+
       /*
        * Update pref store
        */
@@ -356,6 +445,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES, pulseGraph.name());
 
       _gridUI.saveState();
 
@@ -366,6 +457,73 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
        */
       tcc.isShowBreaktimeValues = isShowBreaktimeValues;
       tcc.isSRTMDataVisible = isSrtmDataVisible;
+      tcc.pulseGraph = pulseGraph;
       tcc.xAxisTime = xAxisStartTime;
+   }
+
+   private void setSelection_PulseGraph(final PulseGraph pulseGraph,
+                                        final boolean canShowPulseSerie,
+                                        final boolean canShowPulseTimeSerie) {
+
+      _comboPulseValueGraph.removeAll();
+      _possiblePulseGraph_Values = new ArrayList<>();
+
+      if (canShowPulseSerie && canShowPulseTimeSerie) {
+
+         // all options can be selected
+
+         // update UI
+         for (final String pulseGraphLabel : _allPulseGraph_Label) {
+            _comboPulseValueGraph.add(pulseGraphLabel);
+         }
+
+         // update model
+         Collections.addAll(_possiblePulseGraph_Values, _allPulseGraph_Value);
+
+      } else if (canShowPulseSerie) {
+
+         // update UI
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_DeviceBpm_Only);
+
+         // update model
+         _possiblePulseGraph_Values.add(PulseGraph.DEVICE_BPM_ONLY);
+
+      } else if (canShowPulseTimeSerie) {
+
+         // update UI
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_Only);
+
+         // update model
+         _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS_ONLY);
+      }
+
+      final int numComboItems = _possiblePulseGraph_Values.size();
+
+      if (numComboItems == 0) {
+
+         // pulse values are not available
+
+         _comboPulseValueGraph.add(Messages.App_Label_NotAvailable);
+         _comboPulseValueGraph.select(0);
+
+      } else {
+
+         // set first item in combobox as default
+         int comboIndex = 0;
+
+         // get index of the requested pulse graph
+         for (int graphIndex = 0; graphIndex < numComboItems; graphIndex++) {
+            if (_possiblePulseGraph_Values.get(graphIndex).equals(pulseGraph)) {
+               comboIndex = graphIndex;
+               break;
+            }
+         }
+
+         _comboPulseValueGraph.select(comboIndex);
+
+      }
+
+      // disable combo when only 1 or 0 items can be selected
+      _comboPulseValueGraph.setEnabled(numComboItems > 1);
    }
 }
