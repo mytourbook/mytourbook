@@ -164,6 +164,7 @@ public class SerieData implements Serializable {
          custTrack += "  --CUSTOM TRACKS--  " + UI.NEW_LINE; //$NON-NLS-1$
          for (final String i : customTracks.keySet()) {
             custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null         ? Arrays.toString(Arrays.copyOf(customTracks.get(i),          Math.min(customTracks.get(i).length, maxLen)))        : UI.EMPTY_STRING) + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+
             if(customTracksStat!= null && customTracksStat.get(i)!=null) {
                final CustomTrackStatisticEntry valE = customTracksStat.get(i);
                custTrack += "  Id:\"" + i + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

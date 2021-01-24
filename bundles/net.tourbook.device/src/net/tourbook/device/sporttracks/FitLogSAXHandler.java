@@ -96,6 +96,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_PATHNAME                     = "PathName";                            //$NON-NLS-1$
    private static final String                  ATTRIB_REFID                        = "RefId";                               //$NON-NLS-1$
    private static final String                  ATTRIB_REST                         = "Rest";                                //$NON-NLS-1$
+
    private static final String                  ATTRIB_START_TIME                   = "StartTime";                           //$NON-NLS-1$
    private static final String                  ATTRIB_SOURCE                       = "Source";                              //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_SECONDS                = "TotalSeconds";                        //$NON-NLS-1$
@@ -221,6 +222,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       private ZonedDateTime                  _tourStartTime;
       private long                           _tourStartTimeMills     = Long.MIN_VALUE;
+
 //      private DateTime         trackTourDateTime;
 //      private long            trackTourStartTime   = Long.MIN_VALUE;
 
@@ -392,6 +394,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private long    _endTime;
       private String  _notes;
       private boolean _rest;
+
    }
 
    private class Pause {
@@ -936,6 +939,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
       final List<Lap> _laps = _currentActivity._laps;
+
       if (_laps.isEmpty()) {
          return;
       }
@@ -1352,6 +1356,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds(lapDurationSeconds);
             lap._startTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
             lap._endTime = lapEndTime.toInstant().toEpochMilli();
+
             if (rest == null) {
                lap._rest = false;
             } else {
@@ -1424,6 +1429,42 @@ public class FitLogSAXHandler extends DefaultHandler {
             _prevLongitude = longitude;
             _currentActivity._hasGpsData = true;
          }
+
+         if (runD_vo != Double.MIN_VALUE) {
+            timeSlice.runDyn_VerticalOscillation = (short) (runD_vo * TourData.RUN_DYN_DATA_MULTIPLIER);
+         }
+         if (runD_vo != Double.MIN_VALUE) {
+            timeSlice.runDyn_StanceTime = (short) runD_gct;
+         }
+         timeSlice.powerDataSource = _currentActivity._srcPower;
+         //timeSlice.customTracks = new CustomTrackValue[_currentActivity.customTrackDefinitions.size()];
+         final ArrayList<CustomTrackValue> customTracksT = new ArrayList<>();
+         for (final CustomST3TrackDefinition element : _currentActivity._customTrackDefinitions) {
+            final String idS = element.getId();
+            final String nameS = element.getName();
+            if (nameS.compareTo(CONST_STRIDELENGTH) == 0) {
+               final float value = Util.parseFloat(attributes, idS);
+               if (value != Float.MIN_VALUE) {
+                  timeSlice.runDyn_StepLength = (short) (value * 1000.0f);//meter to mm
+               }
+            } else if (nameS.compareTo(CONST_GROUNDCONTACT_TIME_BALANCE) == 0) {
+               final float value = Util.parseFloat(attributes, idS);
+               if (value != Float.MIN_VALUE) {
+                  timeSlice.runDyn_StanceTimeBalance = (short) (value * TourData.RUN_DYN_DATA_MULTIPLIER);
+               }
+            } else if (nameS.compareTo(CONST_VERTICALRATIO) == 0) {
+               final float value = Util.parseFloat(attributes, idS);
+               if (value != Float.MIN_VALUE) {
+                  timeSlice.runDyn_VerticalRatio = (short) (value * TourData.RUN_DYN_DATA_MULTIPLIER);
+               }
+            } else {
+               final CustomTrackValue item = new CustomTrackValue();
+               item.id = idS;
+               item.value = Util.parseFloat(attributes, idS);
+               customTracksT.add(item);
+            }
+         }
+         timeSlice.customTracks = customTracksT.toArray(new CustomTrackValue[customTracksT.size()]);
 
          if (runD_vo != Double.MIN_VALUE) {
             timeSlice.runDyn_VerticalOscillation = (short) (runD_vo * TourData.RUN_DYN_DATA_MULTIPLIER);

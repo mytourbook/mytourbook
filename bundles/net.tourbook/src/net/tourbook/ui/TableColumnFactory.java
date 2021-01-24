@@ -4159,6 +4159,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Custom_Tracks);
 
             colDef.setColumnLabel(custTD.getName());
+
             String colHead = custTD.getName();
             if(colHead.length() > 11) {
                colHead = custTD.getName().substring(0, 11) + "...";
