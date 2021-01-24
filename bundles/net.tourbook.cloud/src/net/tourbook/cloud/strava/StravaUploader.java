@@ -28,7 +28,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -163,9 +162,7 @@ public class StravaUploader extends TourbookCloudUploader {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
-            final StravaTokens token = new ObjectMapper().readValue(response.body(), StravaTokens.class);
-
-            return token;
+            return new ObjectMapper().readValue(response.body(), StravaTokens.class);
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
@@ -179,14 +176,14 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final String compressedFilePath = file + ".gz"; //$NON-NLS-1$
 
-      try (final FileInputStream fis = new FileInputStream(file);
-            final FileOutputStream fos = new FileOutputStream(compressedFilePath);
-            final GZIPOutputStream gzipOS = new GZIPOutputStream(fos)) {
+      try (final FileInputStream fileInputStream = new FileInputStream(file);
+            final FileOutputStream fileOutputStream = new FileOutputStream(compressedFilePath);
+            final GZIPOutputStream gzipOS = new GZIPOutputStream(fileOutputStream)) {
 
          final byte[] buffer = new byte[1024];
-         int len;
-         while ((len = fis.read(buffer)) != -1) {
-            gzipOS.write(buffer, 0, len);
+         int length;
+         while ((length = fileInputStream.read(buffer)) != -1) {
+            gzipOS.write(buffer, 0, length);
          }
       } catch (final IOException e) {
          StatusUtil.log(e);
@@ -231,11 +228,7 @@ public class StravaUploader extends TourbookCloudUploader {
       String absoluteFilePath = UI.EMPTY_STRING;
 
       try {
-         final String fileName = tourId + UI.SYMBOL_DOT + extension;
-         final Path filePath = Paths.get(fileName);
-         if (Files.exists(filePath)) {
-            Files.delete(filePath);
-         }
+         deleteTemporaryFile(tourId + UI.SYMBOL_DOT + extension);
 
          absoluteFilePath = Files.createTempFile(tourId, UI.SYMBOL_DOT + extension).toString();
 
@@ -248,7 +241,7 @@ public class StravaUploader extends TourbookCloudUploader {
    private void deleteTemporaryFile(final String filePath) {
 
       try {
-         Files.delete(Paths.get(filePath));
+         Files.deleteIfExists(Paths.get(filePath));
       } catch (final IOException e) {
          StatusUtil.log(e);
       }
@@ -268,13 +261,10 @@ public class StravaUploader extends TourbookCloudUploader {
 
    @Override
    protected boolean isReady() {
-      return StringUtils.hasContent(getAccessToken()) &&
-            StringUtils.hasContent(getRefreshToken());
+      return StringUtils.hasContent(getAccessToken() + getRefreshToken());
    }
 
    private String mapTourType(final TourData manualTour) {
-
-      final String defaultStravaActivityType = StravaActivityTypes.get(0);
 
       final String tourTypeName = manualTour.getTourType() != null ? manualTour.getTourType().getName() : UI.EMPTY_STRING;
 
@@ -284,7 +274,7 @@ public class StravaUploader extends TourbookCloudUploader {
          }
       }
 
-      return defaultStravaActivityType;
+      return StravaActivityTypes.get(0);
    }
 
    private String processTour(final TourData tourData, final String absoluteTourFilePath) {
