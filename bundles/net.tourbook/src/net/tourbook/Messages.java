@@ -2274,9 +2274,6 @@ public class Messages extends NLS {
    public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_TourChartGraph_Label_Title;
 
-   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part1;
-   public static String Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part2;
-
    public static String Slideout_TourChartGraphBackground_Action_Colors_Tooltip;
    public static String Slideout_TourChartGraphBackground_Combo_BackgroundSource_Tooltip;
    public static String Slideout_TourChartGraphBackground_Label_BackgroundSource;

@@ -4158,11 +4158,12 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Custom_Tracks);
 
-            colDef.setColumnLabel(custTD.getId());
+            colDef.setColumnLabel(custTD.getName());
             String colHead = custTD.getName();
             if(colHead.length() > 11) {
                colHead = custTD.getName().substring(0, 11) + "...";
             }
+            //colDef.setColumnLabel(colHead + UI.SYMBOL_BRACKET_LEFT + custTD.getId() + UI.SYMBOL_BRACKET_RIGHT);
 
             colDef.setColumnHeaderText(colHead + "[" + custTD.getUnit() + "]");
             colDef.setColumnUnit(custTD.getUnit());

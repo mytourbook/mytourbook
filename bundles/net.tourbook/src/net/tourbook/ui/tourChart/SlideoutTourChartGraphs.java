@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -36,8 +37,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -49,14 +53,16 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
-   private static final int        GRID_TOOLBAR_SLIDEOUT_NB_COLUMN      = 17;
+   private static final int     GRID_TOOLBAR_SLIDEOUT_NB_COLUMN                  = 17;
+   private static final int     GRID_TOOLBAR_SLIDEOUT_NB_ROW                     = 7;
+   private static final int     GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING = 5;
 
-   private IDialogSettings         _state;
+   private IDialogSettings      _state;
 
-   private Action                  _actionRestoreDefaults;
-   private ActionOpenPrefDialog    _actionPrefDialog;
+   private Action               _actionRestoreDefaults;
+   private ActionOpenPrefDialog _actionPrefDialog;
 
-   private SelectionAdapter        _defaultSelectionListener;
+   private SelectionAdapter     _defaultSelectionListener;
    //
    /*
     * UI controls
@@ -83,7 +89,11 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
    private Button                  _chkShowInChartToolbar_Swim_Strokes;
    private Button                  _chkShowInChartToolbar_Swim_Swolf;
 
-   private HashMap<String, Button> _chkShowInChartToolbar_Custom_Tracks = new HashMap<>();
+   private HashMap<String, Button> _chkShowInChartToolbar_Custom_Tracks   = new HashMap<>();
+   private HashMap<String, Label>  _labelShowInChartToolbar_Custom_Tracks = new HashMap<>();
+
+   private ScrolledComposite       _scrolledContainer;
+   private Composite               _container;
 
    public SlideoutTourChartGraphs(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -94,6 +104,14 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
       _tourChart = tourChart;
       _state = state;
+   }
+
+   private int computePreferredHeight(final Composite parent) {
+      final Label text = new Label(parent, SWT.BORDER);
+      text.setText("X");
+      final Point preferredSize = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      text.dispose();
+      return GRID_TOOLBAR_SLIDEOUT_NB_ROW * (preferredSize.y + GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING);
    }
 
    private void createActions() {
@@ -184,131 +202,223 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       tbm.update(true);
    }
 
-   @SuppressWarnings("unused")
    private void createUI_20_Graphs(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(GRID_TOOLBAR_SLIDEOUT_NB_COLUMN).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
+      final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
+      if (tourData != null && tourData.getCustomTracks() != null && tourData.getCustomTracks().size() > 0) {
+         /*
+          * TOUR contains CUSTOM TRACKS
+          */
+
+         _scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.BORDER);
+
+         _container = new Composite(_scrolledContainer, SWT.NONE);
+
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_container);
+
+         GridLayoutFactory.fillDefaults().numColumns(12).applyTo(_container);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_ALTITUDE);
+         _chkShowInChartToolbar_Altitude = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Altitude);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Altitude);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_PULSE);
+         _chkShowInChartToolbar_Pulse = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Heartbeat);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Heartbeat);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_SPEED);
+         _chkShowInChartToolbar_Speed = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Speed);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Speed);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_PACE);
+         _chkShowInChartToolbar_Pace = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Pace);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Pace);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_POWER);
+         _chkShowInChartToolbar_Power = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Power);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Power);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_TEMPERATURE);
+         _chkShowInChartToolbar_Tempterature = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Temperature);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_Temperature);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_GRADIENT);
+         _chkShowInChartToolbar_Gradient = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Gradient);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Gradient);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_ALTIMETER);
+         _chkShowInChartToolbar_Altimeter = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Altimeter);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_Altimeter);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_CADENCE);
+         _chkShowInChartToolbar_Cadence = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Cadence);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Cadence);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_GEARS);
+         _chkShowInChartToolbar_Gears = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Gears);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container, net.tourbook.common.Messages.Graph_Label_Gears);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_RUN_DYN_STANCE_TIME);
+         _chkShowInChartToolbar_RunDyn_StanceTime = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+         _chkShowInChartToolbar_RunDyn_StanceTimeBalance = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_RUN_DYN_STEP_LENGTH);
+         _chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+         _chkShowInChartToolbar_RunDyn_VerticalOscillation = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO);
+         _chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_SWIM_STROKES);
+         _chkShowInChartToolbar_Swim_Strokes = createUI_GraphCheckbox_Custom_Tracks(_container,
+               net.tourbook.common.Messages.Graph_Label_Swim_Strokes);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_Swim_Strokes);
+
+         createUI_GraphAction(_container, TourManager.GRAPH_SWIM_SWOLF);
+         _chkShowInChartToolbar_Swim_Swolf = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Swim_Swolf);
+         createUI_GraphCheckbox_Custom_Tracks_Label(_container,
+               net.tourbook.common.Messages.Graph_Label_Swim_Swolf);
 
          {
-            /*
-             * Actions: chart graphs
-             */
-            {
-               createUI_GraphAction(container, TourManager.GRAPH_ALTITUDE);
-               createUI_GraphAction(container, TourManager.GRAPH_PULSE);
-               createUI_GraphAction(container, TourManager.GRAPH_SPEED);
-               createUI_GraphAction(container, TourManager.GRAPH_PACE);
-               createUI_GraphAction(container, TourManager.GRAPH_POWER);
-               createUI_GraphAction(container, TourManager.GRAPH_TEMPERATURE);
-               createUI_GraphAction(container, TourManager.GRAPH_GRADIENT);
-               createUI_GraphAction(container, TourManager.GRAPH_ALTIMETER);
-               createUI_GraphAction(container, TourManager.GRAPH_CADENCE);
-               createUI_GraphAction(container, TourManager.GRAPH_GEARS);
-
-               createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME);
-               createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
-               createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STEP_LENGTH);
-               createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
-               createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO);
-
-               createUI_GraphAction(container, TourManager.GRAPH_SWIM_STROKES);
-               createUI_GraphAction(container, TourManager.GRAPH_SWIM_SWOLF);
+            //CUSTOM TRACKS toolbarChart entries
+            for (final Map.Entry<String, Button> entry : _chkShowInChartToolbar_Custom_Tracks.entrySet()) {
+               if (entry.getValue() != null && !entry.getValue().isDisposed()) {
+                  entry.getValue().dispose();
+               }
             }
-            {
-               /*
-                * Checkbox: show in chart toolbar
-                */
-               _chkShowInChartToolbar_Altitude = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Pulse = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Speed = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Pace = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Power = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Tempterature = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Gradient = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Altimeter = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Cadence = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Gears = createUI_GraphCheckbox(container);
-
-               _chkShowInChartToolbar_RunDyn_StanceTime = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_RunDyn_StanceTimeBalance = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_RunDyn_VerticalOscillation = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox(container);
-
-               _chkShowInChartToolbar_Swim_Strokes = createUI_GraphCheckbox(container);
-               _chkShowInChartToolbar_Swim_Swolf = createUI_GraphCheckbox(container);
+            for (final Map.Entry<String, Label> entry : _labelShowInChartToolbar_Custom_Tracks.entrySet()) {
+               if (entry.getValue() != null && !entry.getValue().isDisposed()) {
+                  entry.getValue().dispose();
+               }
             }
-            {
-               /*
-                * CUSTOM TRACKS
-                */
-               _chkShowInChartToolbar_Custom_Tracks.clear();
-               final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
-               if (tourData != null && tourData.getCustomTracks() != null && tourData.getCustomTracks().size() > 0) {
-                  int cnt = 0;
-                  final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
-                  final ArrayList<String> listKey = new ArrayList<>(custTrk.keySet());
-                  java.util.Collections.sort(listKey);
-                  final HashMap<String, CustomTrackDefinition> custTrkDefinitions = tourData.getCustomTracksDefinition();
-                  int startIdx = 0;
+            _labelShowInChartToolbar_Custom_Tracks.clear();
+            _chkShowInChartToolbar_Custom_Tracks.clear();
 
-                  for (int idx = 0; idx < listKey.size(); idx++) {
-                     if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS > 0 && cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+            if (tourData != null && tourData.getCustomTracks() != null && tourData.getCustomTracks().size() > 0) {
+               int cnt = 0;
+               final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
+               final ArrayList<String> listKey = new ArrayList<>(custTrk.keySet());
+               java.util.Collections.sort(listKey);
+               final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
+                     tourData.getCustomTracksDefinition();
+               for (int idx = 0; idx < listKey.size(); idx++) {
+                  if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
+                     if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                         break;
                      }
-                     createUI_GraphAction(container, TourManager.GRAPH_CUSTOM_TRACKS + idx);
-                     if ((idx % GRID_TOOLBAR_SLIDEOUT_NB_COLUMN) == (GRID_TOOLBAR_SLIDEOUT_NB_COLUMN - 1)) {
-                        for (int idx2 = startIdx; idx2 <= idx; idx2++) {
-                           final String key = listKey.get(idx2);
-                           final CustomTrackDefinition custTrkDefinition = custTrkDefinitions.get(key);
-                           final Button chkShowInChartToolbar_Cust_Track;
-                           if (custTrkDefinition != null && custTrkDefinition.getName() != null && custTrkDefinition.getName().length() > 0) {
-                              final String toolTip = Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part1
-                                    + " '"
-                                    + custTrkDefinition.getName() + "' "
-                                    + Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part2;
-                              chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox_Custom_Tracks(container, toolTip);
-                           } else {
-                              chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox(container);
-                           }
-                           _chkShowInChartToolbar_Custom_Tracks.put(key, chkShowInChartToolbar_Cust_Track);
-                        }
-                        startIdx = idx + 1;
-                     } else if (idx == (listKey.size() - 1) || idx == (TourManager.MAX_VISIBLE_CUSTOM_TRACKS - 1)) {
-                        //last entry so fill with empty label remaining of line
-                        //to be able to add checkbox under the image
-                        for (final int idx2 = 0; idx2 < (GRID_TOOLBAR_SLIDEOUT_NB_COLUMN - (idx % GRID_TOOLBAR_SLIDEOUT_NB_COLUMN) - 1); idx++) {
-                           createUI_GraphCheckbox_Custom_Tracks_Fill(container);
-                        }
-                        int maxIdx = listKey.size();
-                        if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS > 0) {
-                           maxIdx = TourManager.MAX_VISIBLE_CUSTOM_TRACKS;
-                        }
-                        for (int idx2 = startIdx; idx2 < maxIdx; idx2++) {
-                           final String key = listKey.get(idx2);
-                           final CustomTrackDefinition custTrkDefinition = custTrkDefinitions.get(key);
-                           final Button chkShowInChartToolbar_Cust_Track;
-                           if (custTrkDefinition != null && custTrkDefinition.getName() != null &&
-                                 custTrkDefinition.getName().length() > 0) {
-                              final String toolTip =
-                                    Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part1
-                                          + " '"
-                                          + custTrkDefinition.getName() + "' "
-                                          + Messages.Slideout_TourChartGraph_Checkbox_ShowInChartToolbar_Tooltip_Cust_Tracks_part2;
-                              chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox_Custom_Tracks(container, toolTip);
-                           } else {
-                              chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox(container);
-                           }
-                           _chkShowInChartToolbar_Custom_Tracks.put(key, chkShowInChartToolbar_Cust_Track);
-                        }
-                     }
-                     cnt++;
                   }
+                  createUI_GraphAction(_container, TourManager.GRAPH_CUSTOM_TRACKS + idx);
+                  final String key = listKey.get(idx);
+                  final CustomTrackDefinition custTrkDefinition = custTrkDefinitions.get(key);
+                  final String toolTip = custTrkDefinition.getName();
+
+                  final Button chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox_Custom_Tracks(_container, toolTip);
+                  _chkShowInChartToolbar_Custom_Tracks.put(key, chkShowInChartToolbar_Cust_Track);
+                  final Label _labelShowInChartToolbar_Custom_Track = createUI_GraphCheckbox_Custom_Tracks_Label(_container, toolTip);
+                  _labelShowInChartToolbar_Custom_Tracks.put(key, _labelShowInChartToolbar_Custom_Track);
+                  cnt++;
                }
+            }
+         }
+
+         _scrolledContainer.setContent(_container);
+         _scrolledContainer.setExpandVertical(true);
+         _scrolledContainer.setExpandHorizontal(true);
+
+         _scrolledContainer.addListener(SWT.Resize, event -> {
+            if (_scrolledContainer != null && !_scrolledContainer.isDisposed()
+                  && _container != null && !_container.isDisposed()) {
+               final int width = _scrolledContainer.getClientArea().width;
+               _scrolledContainer.setMinSize(_container.computeSize(width, SWT.DEFAULT));
+            }
+         });
+
+         final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+         gridData.heightHint = computePreferredHeight(_container);
+         _scrolledContainer.setLayoutData(gridData);
+
+      } else {
+         /*
+          * Tour doesn't contain Custom Tracks
+          */
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(GRID_TOOLBAR_SLIDEOUT_NB_COLUMN).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+         {
+
+            {
+               /*
+                * Actions: chart graphs
+                */
+               {
+                  createUI_GraphAction(container, TourManager.GRAPH_ALTITUDE);
+                  createUI_GraphAction(container, TourManager.GRAPH_PULSE);
+                  createUI_GraphAction(container, TourManager.GRAPH_SPEED);
+                  createUI_GraphAction(container, TourManager.GRAPH_PACE);
+                  createUI_GraphAction(container, TourManager.GRAPH_POWER);
+                  createUI_GraphAction(container, TourManager.GRAPH_TEMPERATURE);
+                  createUI_GraphAction(container, TourManager.GRAPH_GRADIENT);
+                  createUI_GraphAction(container, TourManager.GRAPH_ALTIMETER);
+                  createUI_GraphAction(container, TourManager.GRAPH_CADENCE);
+                  createUI_GraphAction(container, TourManager.GRAPH_GEARS);
+
+                  createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME);
+                  createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
+                  createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_STEP_LENGTH);
+                  createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
+                  createUI_GraphAction(container, TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO);
+
+                  createUI_GraphAction(container, TourManager.GRAPH_SWIM_STROKES);
+                  createUI_GraphAction(container, TourManager.GRAPH_SWIM_SWOLF);
+               }
+               {
+                  /*
+                   * Checkbox: show in chart toolbar
+                   */
+                  _chkShowInChartToolbar_Altitude = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Pulse = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Speed = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Pace = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Power = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Tempterature = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Gradient = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Altimeter = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Cadence = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Gears = createUI_GraphCheckbox(container);
+
+                  _chkShowInChartToolbar_RunDyn_StanceTime = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_RunDyn_StanceTimeBalance = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_RunDyn_StepLength = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_RunDyn_VerticalOscillation = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_RunDyn_VerticalRatio = createUI_GraphCheckbox(container);
+
+                  _chkShowInChartToolbar_Swim_Strokes = createUI_GraphCheckbox(container);
+                  _chkShowInChartToolbar_Swim_Swolf = createUI_GraphCheckbox(container);
+               }
+
             }
          }
       }
@@ -356,13 +466,13 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       return checkbox;
    }
 
-   private Label createUI_GraphCheckbox_Custom_Tracks_Fill(final Composite parent) {
-      final Label labelbox = new Label(parent, 0);
-      //labelbox.setEnabled(false);
+   private Label createUI_GraphCheckbox_Custom_Tracks_Label(final Composite parent, final String text) {
+      final Label labelbox = new Label(parent, SWT.NONE);
+      labelbox.setText(text);
       GridDataFactory
             .fillDefaults()
             .grab(true, false)
-            .align(SWT.CENTER, SWT.FILL)
+            .align(SWT.LEFT, SWT.FILL)
             .applyTo(labelbox);
 
       return labelbox;

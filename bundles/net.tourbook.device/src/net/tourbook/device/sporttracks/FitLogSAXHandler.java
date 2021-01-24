@@ -93,7 +93,9 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_MAXIMUM_WATTS                = "MaximumWatts";                        //$NON-NLS-1$
    private static final String                  ATTRIB_NAME                         = "Name";                                //$NON-NLS-1$
    //
+   private static final String                  ATTRIB_PATHNAME                     = "PathName";                            //$NON-NLS-1$
    private static final String                  ATTRIB_REFID                        = "RefId";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_REST                         = "Rest";                                //$NON-NLS-1$
    private static final String                  ATTRIB_START_TIME                   = "StartTime";                           //$NON-NLS-1$
    private static final String                  ATTRIB_SOURCE                       = "Source";                              //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_SECONDS                = "TotalSeconds";                        //$NON-NLS-1$
@@ -129,6 +131,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  SUB_ATTRIB_WIND_SPEED               = "Wind Speed:";                         //$NON-NLS-1$
 
    private static final String                  TAG_LAP                             = "Lap";                                 //$NON-NLS-1$
+   private static final String                  TAG_LAP_NOTES                       = "Notes";                               //$NON-NLS-1$
    private static final String                  TAG_LAPS                            = "Laps";                                //$NON-NLS-1$
    private static final String                  TAG_PAUSE                           = "Pause";                               //$NON-NLS-1$
    private static final String                  TAG_TRACK                           = "Track";                               //$NON-NLS-1$
@@ -155,6 +158,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private HashMap<Long, TourData>              _alreadyImportedTours;
    private HashMap<Long, TourData>              _newlyImportedTours;
    private Activity                             _currentActivity;
+   private Lap                                  _currentLap;
    private double                               _prevLatitude;
    private double                               _prevLongitude;
    private double                               _distanceAbsolute;
@@ -177,6 +181,8 @@ public class FitLogSAXHandler extends DefaultHandler {
    private boolean                              _isInWeather;
    private StringBuilder                        _characters                         = new StringBuilder(100);
 
+   private boolean                              _isInLap;
+   private boolean                              _isInLapNotes;
    private boolean                              _isInLaps;
    private boolean                              _isInPauses;
    private ArrayList<TourType>                  _allTourTypes;
@@ -207,14 +213,14 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Activity {
 
-      private ArrayList<TimeData>                 _timeSlices             = new ArrayList<>();
-      private ArrayList<Lap>                      _laps                   = new ArrayList<>();
-      private ArrayList<Pause>                    _pauses                 = new ArrayList<>();
-      private ArrayList<Equipment>                _equipmentNames         = new ArrayList<>();
-      private ArrayList<CustomST3TrackDefinition> _customTrackDefinitions = new ArrayList<>();
+      private List<TimeData>                 _timeSlices             = new ArrayList<>();
+      private List<Lap>                      _laps                   = new ArrayList<>();
+      private List<Pause>                    _pauses                 = new ArrayList<>();
+      private List<Equipment>                _equipmentNames         = new ArrayList<>();
+      private List<CustomST3TrackDefinition> _customTrackDefinitions = new ArrayList<>();
 
-      private ZonedDateTime                       _tourStartTime;
-      private long                                _tourStartTimeMills     = Long.MIN_VALUE;
+      private ZonedDateTime                  _tourStartTime;
+      private long                           _tourStartTimeMills     = Long.MIN_VALUE;
 //      private DateTime         trackTourDateTime;
 //      private long            trackTourStartTime   = Long.MIN_VALUE;
 
@@ -382,8 +388,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Lap {
 
-      private long _startTime;
-      private long _endTime;
+      private long    _startTime;
+      private long    _endTime;
+      private String  _notes;
+      private boolean _rest;
    }
 
    private class Pause {
@@ -433,7 +441,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather) {
+      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather || _isInLapNotes) {
 
          _characters.append(chars, startIndex, length);
       }
@@ -445,7 +453,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       /*
        * get values
        */
-      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather) {
+      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather || _isInLapNotes) {
          parseActivity_02_End(name);
       }
 
@@ -459,6 +467,10 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_LAPS)) {
 
          _isInLaps = false;
+
+      } else if (name.equals(TAG_LAP)) {
+
+         _isInLap = false;
 
       } else if (name.equals(TAG_ACTIVITY_CUSTOMTRACKS)) {
 
@@ -844,7 +856,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour_20_SetTags(final TourData tourData) {
 
-      final ArrayList<Equipment> equipmentNames = _currentActivity._equipmentNames;
+      final List<Equipment> equipmentNames = _currentActivity._equipmentNames;
       if (equipmentNames.isEmpty()) {
          return;
       }
@@ -923,7 +935,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour_30_CreateMarkers(final TourData tourData) {
 
-      final ArrayList<Lap> _laps = _currentActivity._laps;
+      final List<Lap> _laps = _currentActivity._laps;
       if (_laps.isEmpty()) {
          return;
       }
@@ -988,6 +1000,12 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourMarker.setLabel(Integer.toString(lapCounter));
          tourMarker.setSerieIndex(serieIndex);
          tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));
+         String notes = ATTRIB_REST + UI.SYMBOL_COLON;
+         notes += Boolean.toString(lap._rest) + UI.SYMBOL_SEMICOLON;
+         if (lap._notes != null && lap._notes.trim().length() > 0) {
+            notes += TAG_LAP_NOTES + UI.SYMBOL_COLON + lap._notes.trim();
+         }
+         tourMarker.setDescription(notes);
 
          if (distanceSerie != null) {
             tourMarker.setDistance(distanceSerie[serieIndex]);
@@ -1093,8 +1111,13 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity._location = attributes.getValue(ATTRIB_NAME);
 
       } else if (name.equals(TAG_ACTIVITY_CATEGORY)) {
+         final String CategoryName = attributes.getValue(ATTRIB_PATHNAME);
+         if (CategoryName == null || CategoryName.trim().length() == 0) {
+            _currentActivity._categoryName = attributes.getValue(ATTRIB_NAME);
+         } else {
+            _currentActivity._categoryName = CategoryName;
+         }
 
-         _currentActivity._categoryName = attributes.getValue(ATTRIB_NAME);
       } else if (name.equals(TAG_ACTIVITY_EQUIPMENT_ITEM)) {
 
          final Equipment newEquipment = new Equipment();
@@ -1212,6 +1235,14 @@ public class FitLogSAXHandler extends DefaultHandler {
          _isInNotes = false;
          _currentActivity._notes = _characters.toString();
 
+      } else if (_isInLapNotes) {
+
+         _isInLapNotes = false;
+         if (_currentLap != null) {
+            _currentLap._notes = _characters.toString();
+         }
+         _characters.delete(0, _characters.length());
+
       } else if (_isInWeather) {
 
          _isInWeather = false;
@@ -1296,22 +1327,36 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
    }
 
+   private void parseLap(final String name, final Attributes attributes) {
+
+      if (name.equals(TAG_LAP_NOTES)) {
+         _isInLapNotes = true;
+      }
+   }
+
    private void parseLaps(final String name, final Attributes attributes) {
 
       if (name.equals(TAG_LAP)) {
 
          final String startTime = attributes.getValue(ATTRIB_START_TIME);
          final String durationSeconds = attributes.getValue(ATTRIB_DURATION_SECONDS);
+         final String rest = attributes.getValue(ATTRIB_REST);
 
          if (!StringUtils.isNullOrEmpty(startTime)) {
 
             final Lap lap = new Lap();
+            _currentLap = lap;
 
             final long lapDurationSeconds = (long) Float.parseFloat(durationSeconds);
 
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds(lapDurationSeconds);
             lap._startTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
             lap._endTime = lapEndTime.toInstant().toEpochMilli();
+            if (rest == null) {
+               lap._rest = false;
+            } else {
+               lap._rest = Boolean.parseBoolean(rest.trim().toLowerCase());
+            }
 
             _currentActivity._laps.add(lap);
          }
@@ -1526,6 +1571,9 @@ public class FitLogSAXHandler extends DefaultHandler {
             parseTrackPoints(name, attributes);
          } else if (_isInLaps) {
             parseLaps(name, attributes);
+            if (_isInLap) {
+               parseLap(name, attributes);
+            }
          } else if (_isInCustomTrackDefinition) {
             parseCustomTrackDefinitions(name, attributes);
          } else if (_isInPauses) {
@@ -1546,6 +1594,10 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_LAPS)) {
 
          _isInLaps = true;
+
+      } else if (name.equals(TAG_LAP)) {
+
+         _isInLap = true;
 
       } else if (name.equals(TAG_ACTIVITY_CUSTOMTRACKS)) {
 
