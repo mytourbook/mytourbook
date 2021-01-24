@@ -64,6 +64,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
@@ -140,17 +141,17 @@ public class StravaUploader extends TourbookCloudUploader {
 
    public static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final StringBuilder body = new StringBuilder();
+      JSONObject body;
       String grantType;
       if (isRefreshToken) {
-         body.append("{\"" + OAuth2Constants.PARAM_REFRESH_TOKEN + "\" : \"" + refreshToken); //$NON-NLS-1$ //$NON-NLS-2$
+         body = new JSONObject().put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
          grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else {
-         body.append("{\"" + OAuth2Constants.PARAM_CODE + "\" : \"" + authorizationCode);//$NON-NLS-1$ //$NON-NLS-2$
+         body = new JSONObject().put(OAuth2Constants.PARAM_CODE, authorizationCode);
          grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
       }
 
-      body.append("\", \"" + OAuth2Constants.PARAM_GRANT_TYPE + "\" : \"" + grantType + "\"}"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      body.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
 
       final HttpRequest request = HttpRequest.newBuilder()
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
