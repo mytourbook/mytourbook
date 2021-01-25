@@ -381,7 +381,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       final ImageLoader loader = new ImageLoader();
 
-      if (_comboImageFormat.getSelectionIndex() == 0) {
+      if (isEnableJpegQuality()) {
          loader.compression = _scaleImageQuality.getSelection();
       }
       loader.data = new ImageData[] { mapViewImage.getImageData() };
@@ -433,6 +433,10 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       default:
          return SWT.IMAGE_JPEG;
       }
+   }
+
+   private boolean isEnableJpegQuality() {
+      return _comboImageFormat.getSelectionIndex() == 0 && !UI.IS_LINUX;
    }
 
    @Override
@@ -530,7 +534,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private void updateQualityScale() {
 
-      final boolean enableQualityControls = _comboImageFormat.getSelectionIndex() == 0;
+      final boolean enableQualityControls = isEnableJpegQuality();
       _scaleImageQuality.setEnabled(enableQualityControls);
       _labelImageQuality.setEnabled(enableQualityControls);
       _labelImageQualityValue.setEnabled(enableQualityControls);
