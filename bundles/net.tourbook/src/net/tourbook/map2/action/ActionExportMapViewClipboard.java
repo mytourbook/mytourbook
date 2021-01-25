@@ -67,6 +67,8 @@ public class ActionExportMapViewClipboard extends Action {
 
       statusLineManager.setMessage(Messages.Map_Action_Export_Map_Clipboard_Copied_Info);
 
+      clipboard.dispose();
+
       Display.getCurrent().timerExec(2000, () -> statusLineManager.setMessage(null));
    }
 
