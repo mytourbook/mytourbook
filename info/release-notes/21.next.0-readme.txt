@@ -45,7 +45,7 @@ New
 
 * 2D Map (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/289
  - Added the possibility to configure a "User-Agent" for a custom map provider
- - Added the possibility to export the current map view to an image file (jpg, png or bmp) or to the clipboard
+ - Added the possibility to export the current map view to an image file (jpeg, png or bmp) or to the clipboard
 
 
 Improvements
