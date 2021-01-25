@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.osgi.util.NLS;
@@ -165,7 +166,7 @@ public class TileImageLoader implements Runnable {
 
                         final String userAgent = mp.getUserAgent();
 
-                        if (userAgent != null) {
+                        if (StringUtils.hasContent(userAgent)) {
                            connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
                         }
 
