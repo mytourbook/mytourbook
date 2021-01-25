@@ -17,6 +17,7 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -150,7 +151,7 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       for (final TourData tourData : selectedTours) {
 
-         if (tourData.getWeatherClouds().equals(weatherDescription)) {
+         if (Objects.equals(tourData.getWeatherClouds(), weatherDescription)) {
             continue;
          }
 
