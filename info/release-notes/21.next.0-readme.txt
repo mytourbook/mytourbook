@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Fix tour marker editor dialog initial issue: tour chart is toooo small
+
 * 2D Map: reorder context menu actions a little bit
 
 * Website: Document cloud connections
