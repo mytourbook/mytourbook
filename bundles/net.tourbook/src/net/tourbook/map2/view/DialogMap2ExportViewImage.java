@@ -59,7 +59,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
-   private static final List<String> DistanceData = List.of("jpg", "png", "bmp"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+   private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 // SET_FORMATTING_OFF
    private static final String       APP_BTN_BROWSE                           = net.tourbook.Messages.app_btn_browse;
@@ -84,7 +84,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private static final String   STATE_IMAGE_COMPRESSION_VALUE = "STATE_IMAGE_COMPRESSION_VALUE";                      //$NON-NLS-1$
 
    private static final int      COMBO_HISTORY_LENGTH          = 20;
-   private static final int      DEFAULT_JPG_COMPRESSION       = 75;
+   private static final int      DEFAULT_JPEG_COMPRESSION      = 75;
 
    private final IDialogSettings _state                        = TourbookPlugin.getState("DialogMap2ExportViewImage"); //$NON-NLS-1$
 
@@ -223,6 +223,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: Compression Value
           */
          _labelImageCompressionValue = new Label(group, SWT.NONE);
+         _labelImageCompressionValue.setToolTipText(Messages.Dialog_ExportImage_Compression_Tooltip);
          GridDataFactory
                .fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
@@ -244,6 +245,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
             }
 
          });
+         _scaleImageCompression.setToolTipText(Messages.Dialog_ExportImage_Compression_Tooltip);
          GridDataFactory
                .fillDefaults()
                .grab(true, false)
@@ -415,7 +417,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private String getFileExtension() {
 
-      return _comboImageFormat.getText();
+      return _comboImageFormat.getSelectionIndex() == 0 ? "jpg" : _comboImageFormat.getText().toLowerCase();
    }
 
    private int getSwtImageType() {
@@ -485,10 +487,9 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       //Image format
       DistanceData.forEach(_comboImageFormat::add);
-
       _comboImageFormat.select(Util.getStateInt(_state, STATE_IMAGE_FORMAT, 0));
 
-      final int compressionValue = Util.getStateInt(_state, STATE_IMAGE_COMPRESSION_VALUE, DEFAULT_JPG_COMPRESSION);
+      final int compressionValue = Util.getStateInt(_state, STATE_IMAGE_COMPRESSION_VALUE, DEFAULT_JPEG_COMPRESSION);
       _scaleImageCompression.setSelection(compressionValue);
       updateCompressionScale();
 
