@@ -50,11 +50,11 @@ public class ActionExportMapViewClipboard extends Action {
 
       if (UI.IS_LINUX) {
          final PngTransfer imageTransfer = PngTransfer.getInstance();
-         clipboard.setContents(new Object[] { imageData },
+         clipboard.setContents(new ImageData[] { imageData },
                new Transfer[] { imageTransfer });
       } else {
          final ImageTransfer imageTransfer = ImageTransfer.getInstance();
-         clipboard.setContents(new Object[] { imageData },
+         clipboard.setContents(new ImageData[] { imageData },
                new Transfer[] { imageTransfer });
       }
 

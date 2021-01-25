@@ -379,13 +379,13 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       final Image mapViewImage = _map2View.getMapViewImage();
 
-      final ImageLoader saver = new ImageLoader();
+      final ImageLoader loader = new ImageLoader();
 
       if (_comboImageFormat.getSelectionIndex() == 0) {
-         saver.compression = _scaleImageQuality.getSelection();
+         loader.compression = _scaleImageQuality.getSelection();
       }
-      saver.data = new ImageData[] { mapViewImage.getImageData() };
-      saver.save(exportFileName, getSwtImageType());
+      loader.data = new ImageData[] { mapViewImage.getImageData() };
+      loader.save(exportFileName, getSwtImageType());
       mapViewImage.dispose();
    }
 
