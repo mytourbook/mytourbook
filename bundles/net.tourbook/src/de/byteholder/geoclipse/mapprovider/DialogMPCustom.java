@@ -708,7 +708,7 @@ public class DialogMPCustom extends DialogMP implements ITileListener, IMapDefau
 
          // label: image format value
          _labelImageFormat = new Label(container, SWT.NONE);
-         _labelImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Text_ImageFormat_Tooltip);
+         _labelImageFormat.setToolTipText(Messages.Dialog_CustomConfig_Label_ImageFormat_Tooltip);
          _labelImageFormat.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelImageFormat);
 
