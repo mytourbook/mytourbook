@@ -1921,6 +1921,13 @@ public class TourManager {
 
       final TourData tourData = getInstance().getTourData(tourId);
 
+      if (tourData == null) {
+
+         // this happened when switching tour type during normal startup but all was not yet loaded
+
+         return;
+      }
+
       if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
 
          // keep tour data for each tour id
