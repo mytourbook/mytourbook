@@ -94,22 +94,27 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private FileCollisionBehavior _exportState_FileCollisionBehavior;
 
+   private ModifyListener        _filePathModifyListener;
+   private SelectionAdapter      _selectionAdapter;
+
    /*
     * UI controls
     */
-   private Composite        _dlgContainer;
-   private Composite        _inputContainer;
-   private Combo            _comboImageFormat;
-   private Label            _labelImageQuality;
-   private Label            _labelImageQualityValue;
-   private Scale            _scaleImageQuality;
-   private Text             _txtFilePath;
-   private Combo            _comboFile;
-   private Combo            _comboPath;
-   private Button           _chkOverwriteFiles;
+   private Composite _dlgContainer;
+   private Composite _inputContainer;
 
-   private ModifyListener   _filePathModifyListener;
-   private SelectionAdapter _selectionAdapter;
+   private Button    _chkOverwriteFiles;
+
+   private Combo     _comboFile;
+   private Combo     _comboImageFormat;
+   private Combo     _comboPath;
+
+   private Label     _labelImageQuality;
+   private Label     _labelImageQualityValue;
+
+   private Scale     _scaleImageQuality;
+
+   private Text      _txtFilePath;
 
    public DialogMap2ExportViewImage(final Shell parentShell, final Map2View map2View) {
 
@@ -189,7 +194,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: Image format
           */
          final Label label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_ExportImage_Format_Label);
+         label.setText(Messages.Dialog_ExportImage_Label_ImageFormat);
 
          /*
           * combo: Image format
@@ -215,14 +220,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: Image Quality
           */
          _labelImageQuality = new Label(group, SWT.NONE);
-         _labelImageQuality.setText(Messages.Dialog_ExportImage_Label_Quality);
-         _labelImageQuality.setToolTipText(Messages.Dialog_ExportImage_Quality_Tooltip);
+         _labelImageQuality.setText(Messages.Dialog_ExportImage_Label_ImageQuality);
+         _labelImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
 
          /*
           * label: Quality Value
           */
          _labelImageQualityValue = new Label(group, SWT.NONE);
-         _labelImageQualityValue.setToolTipText(Messages.Dialog_ExportImage_Quality_Tooltip);
+         _labelImageQualityValue.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
          GridDataFactory
                .fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
@@ -244,7 +249,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
             }
 
          });
-         _scaleImageQuality.setToolTipText(Messages.Dialog_ExportImage_Quality_Tooltip);
+         _scaleImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
          GridDataFactory
                .fillDefaults()
                .grab(true, false)
