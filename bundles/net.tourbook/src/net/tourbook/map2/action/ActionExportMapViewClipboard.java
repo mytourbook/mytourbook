@@ -59,16 +59,17 @@ public class ActionExportMapViewClipboard extends Action {
          clipboard.setContents(new ImageData[] { mapViewImage.getImageData() },
                new Transfer[] { imageTransfer });
       } else {
+
          //Workaround for the issue on Windows where the map is missing but the legend
          //is displayed (GIMP and Inkscape). No issue when sing MS Paint
 
          try {
-            final String absoluteFilePath = Files.createTempFile("map", ".jpg").toString(); //$NON-NLS-1$ //$NON-NLS-2$
+            final String absoluteFilePath = Files.createTempFile("map", ".png").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
             //We export the image to a file as a JPEG image
             final ImageLoader loader = new ImageLoader();
             loader.data = new ImageData[] { mapViewImage.getImageData() };
-            loader.save(absoluteFilePath, SWT.IMAGE_JPEG);
+            loader.save(absoluteFilePath, SWT.IMAGE_PNG);
 
             //We reload it to put it in the clipboard
             final Image image = new Image(Display.getCurrent(), absoluteFilePath);
@@ -92,7 +93,7 @@ public class ActionExportMapViewClipboard extends Action {
 
       statusLineManager.setMessage(Messages.Map_Action_Export_Map_Clipboard_Copied_Info);
 
-      Display.getCurrent().timerExec(2000, () -> statusLineManager.setMessage(null));
+      Display.getCurrent().timerExec(3000, () -> statusLineManager.setMessage(null));
    }
 
 }
