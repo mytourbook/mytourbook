@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import de.byteholder.geoclipse.map.UI;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import net.tourbook.common.util.StatusUtil;
 
@@ -66,34 +65,30 @@ public class MPProfile extends MP implements ITileChildrenCreator {
     */
    static void sortMpWrapper(final ArrayList<MPWrapper> mpWrapper) {
 
-      Collections.sort(mpWrapper, new Comparator<MPWrapper>() {
+      Collections.sort(mpWrapper, (mp1, mp2) -> {
 
-         @Override
-         public int compare(final MPWrapper mp1, final MPWrapper mp2) {
+         final int pos1 = mp1.getPositionIndex();
+         final int pos2 = mp2.getPositionIndex();
 
-            final int pos1 = mp1.getPositionIndex();
-            final int pos2 = mp2.getPositionIndex();
+         if (pos1 > -1 && pos2 > -1) {
 
-            if (pos1 > -1 && pos2 > -1) {
+            // sort by position
+            return pos1 - pos2;
 
-               // sort by position
-               return pos1 - pos2;
+         } else if (pos1 > -1) {
 
-            } else if (pos1 > -1) {
+            // set wrapper with position before the others
+            return -2;
 
-               // set wrapper with position before the others
-               return -2;
+         } else if (pos2 > -1) {
 
-            } else if (pos2 > -1) {
+            // set wrapper with position before the others
+            return 2;
 
-               // set wrapper with position before the others
-               return 2;
+         } else {
 
-            } else {
-
-               // sort by name when position is not set
-               return mp1.getMP().getName().compareTo(mp2.getMP().getName());
-            }
+            // sort by name when position is not set
+            return mp1.getMP().getName().compareTo(mp2.getMP().getName());
          }
       });
    }
@@ -196,7 +191,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
          final int parentZoom = parentTile.getZoom();
          final MP wrapperMP = mpWrapper.getMP();
 
-         if (parentZoom < wrapperMP.getMinZoomLevel() || parentZoom > wrapperMP.getMaxZoomLevel()) {
+         if (parentZoom < wrapperMP.getMinimumZoomLevel() || parentZoom > wrapperMP.getMaximumZoomLevel()) {
 
             // ignore map providers which do not support the current zoom level
 

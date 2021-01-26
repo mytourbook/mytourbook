@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,72 +20,78 @@ import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 
 public class GarminTrackpointAdapterExtended extends GarminTrackpointAdapter {
 
-	private double	_temperature	= Double.NaN;
-	private long	gear;
+   private double _speed       = Double.NaN;
+   private double _temperature = Double.NaN;
+   private short  _power       = Short.MIN_VALUE;
+   private long   _gear;
 
-	public GarminTrackpointAdapterExtended(final GarminTrackpoint trackpoint) {
-		super(trackpoint);
-	}
+   public GarminTrackpointAdapterExtended(final GarminTrackpoint trackpoint) {
+      super(trackpoint);
+   }
 
-	public long getGear() {
-		return gear;
-	}
+   public long getGear() {
+      return _gear;
+   }
 
-	/**
-	 * @return Returns temperature or {@link Double#NaN} when temperature is not set
-	 */
-	public double getTemperature() {
-		return _temperature;
-	}
+   public short getPower() {
+      return _power;
+   }
 
-	public boolean hasValidExtention() {
+   public double getSpeed() {
+      return _speed;
+   }
 
-		if (hasValidTemperature()) {
-			return true;
-		}
+   /**
+    * @return Returns temperature or {@link Double#NaN} when temperature is not set
+    */
+   public double getTemperature() {
+      return _temperature;
+   }
 
-		if (hasValidHeartrate()) {
-			return true;
-		}
+   public boolean hasValidExtension() {
 
-		if (hasValidCadence()) {
-			return true;
-		}
+      return hasValidTemperature() || hasValidHeartrate() || hasValidCadence() || hasValidDistance() || hasValidGear();
+   }
 
-		if (hasValidDistance()) {
-			return true;
-		}
+   /**
+    * @return Returns <code>true</code> when valid gear is available.
+    */
+   public boolean hasValidGear() {
+      return _gear != 0;
+   }
 
-		if (hasValidGear()) {
-			return true;
-		}
+   public boolean hasValidPower() {
+      return Short.MIN_VALUE != _power;
+   }
 
-		return false;
-	}
+   public boolean hasValidSpeed() {
+      return !Double.isNaN(_speed);
+   }
 
-	/**
-	 * @return Returns <code>true</code> when valid gear is available.
-	 */
-	public boolean hasValidGear() {
-		return (gear != 0);
-	}
+   /**
+    * Returns <code>true</code> if the temperature of this waypoint is valid. This is equal to the
+    * expression <code>!Double.isNaN(getTemperature())</code>.
+    *
+    * @return Returns <code>true</code> if waypoint has valid temperature.
+    */
+   public boolean hasValidTemperature() {
+      return !Double.isNaN(_temperature);
+   }
 
-	/**
-	 * Returns <code>true</code> if the temperature of this waypoint is valid. This is equal to the
-	 * expression <code>!Double.isNaN(getTemperature())</code>.
-	 * 
-	 * @return Returns <code>true</code> if waypoint has valid temperature.
-	 */
-	public boolean hasValidTemperature() {
-		return (!Double.isNaN(_temperature));
-	}
+   public void setGear(final long gear) {
+      _gear = gear;
+   }
 
-	public void setGear(final long gear) {
-		this.gear = gear;
-	}
+   public void setPower(final short power) {
+      _power = power;
+   }
 
-	public void setTemperature(final double temperature) {
-		_temperature = temperature;
-	}
+   public void setSpeed(final double speed) {
+      _speed = speed;
+   }
+
+   public void setTemperature(final double temperature) {
+      _temperature = temperature;
+   }
 
 }

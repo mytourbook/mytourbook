@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 
@@ -155,6 +156,7 @@ public class MapProviderManager {
    private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
+   private static final String ATTR_MP_USER_AGENT                  = "UserAgent";             //$NON-NLS-1$
    private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";               //$NON-NLS-1$
    private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";               //$NON-NLS-1$
    private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";     //$NON-NLS-1$
@@ -299,7 +301,7 @@ public class MapProviderManager {
          WMS_LOCK.lock();
          try {
 
-            // recheck again, it's possible tha another thread could have loaded the caps
+            // recheck again, it's possible that another thread could have loaded the caps
             if (mpWms == null || mpWms.getWmsCaps() == null) {
                checkWmsRunnable(mpWms, capsUrl, returnMpWms);
             }
@@ -377,14 +379,11 @@ public class MapProviderManager {
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
-            } catch (final InvocationTargetException | InterruptedException e1) {
-               StatusUtil.showStatus(e1.getMessage(), e1);
-            }
+      display.syncExec(() -> {
+         try {
+            new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
+         } catch (final InvocationTargetException | InterruptedException e1) {
+            StatusUtil.showStatus(e1.getMessage(), e1);
          }
       });
    }
@@ -1695,6 +1694,9 @@ public class MapProviderManager {
             xmlModified = Util.getXmlDateTime(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, null);
          }
 
+         // User Agent
+         final String userAgent = tagMapProvider.getString(ATTR_MP_USER_AGENT);
+
          // zoom level
          final Integer xmlZoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
          final Integer xmlZoomMax = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MAX);
@@ -1812,6 +1814,9 @@ public class MapProviderManager {
             // image
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
             mapProvider.setImageFormat(xmlImageFormat == null ? DEFAULT_IMAGE_FORMAT : xmlImageFormat);
+
+            // User Agent
+            mapProvider.setUserAgent(StringUtils.hasContent(userAgent) ? userAgent : UI.EMPTY_STRING);
 
             // zoom level
             final int minZoom = xmlZoomMin == null ? 0 : xmlZoomMin;
@@ -2033,8 +2038,6 @@ public class MapProviderManager {
              * read wms layer state
              */
 
-            @SuppressWarnings("unused")
-            int displayedLayers = 0;
             final ArrayList<LayerOfflineData> wmsOfflineLayers = new ArrayList<>();
 
             for (final IMemento tagLayer : tagProfileMapProvider.getChildren(TAG_LAYER)) {
@@ -2089,10 +2092,6 @@ public class MapProviderManager {
                offlineLayer.position = layerPosition == null ? -1 : layerPosition;
 
                wmsOfflineLayers.add(offlineLayer);
-
-               if (layerIsDisplayed) {
-                  displayedLayers++;
-               }
             }
 
             mpWrapper.setWmsOfflineLayerList(wmsOfflineLayers);
@@ -2562,9 +2561,12 @@ public class MapProviderManager {
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
       tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mp.getImageFormat());
 
+      // User Agent
+      tagMapProvider.putString(ATTR_MP_USER_AGENT, mp.getUserAgent());
+
       // zoom level
-      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mp.getMinZoomLevel());
-      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mp.getMaxZoomLevel());
+      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MIN, mp.getMinimumZoomLevel());
+      tagMapProvider.putInteger(ATTR_MP_ZOOM_LEVEL_MAX, mp.getMaximumZoomLevel());
 
       // favorite position
       tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());

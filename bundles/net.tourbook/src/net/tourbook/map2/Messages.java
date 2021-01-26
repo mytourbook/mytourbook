@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.map2.messages";    //$NON-NLS-1$
+
+   public static String        Image__floppy_disk;
 
    public static String        App_Action_Apply;
 
@@ -106,12 +108,19 @@ public class Messages extends NLS {
    public static String        Map_Action_CreateTourMarkerFromMap;
    public static String        Map_Action_Edit2DMapPreferences;
 
+   public static String        Map_Action_Export_Map_Clipboard_Copied_Info;
+   public static String        Map_Action_Export_Map_View;
+   public static String        Map_Action_Export_Map_View_Clipboard;
+   public static String        Map_Action_Export_Map_View_Image;
+   public static String        Map_Action_Export_Map_View_Image_Tooltip;
+
    public static String        Map_Action_ManageMapProviders;
    public static String        Map_Action_PhotoFilter_Tooltip;
    public static String        Map_Action_PhotoFilter2_Tooltip;
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;
    public static String        Map_Action_SearchTourByLocation;
+   public static String        Map_Action_SearchTourByLocation_Tooltip;
    public static String        Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String        Map_Action_ShowPhotos_Tooltip;
    public static String        Map_Action_ShowTourInfoInMap;
@@ -162,6 +171,13 @@ public class Messages extends NLS {
 
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
+
+   public static String        Dialog_ExportImage_Group_Format;
+   public static String        Dialog_ExportImage_Label_Quality;
+   public static String        Dialog_ExportImage_Quality_Tooltip;
+   public static String        Dialog_ExportImage_Format_Label;
+   public static String        Dialog_ExportImage_Title;
+   public static String        Dialog_ExportImage_Message;
 
    static {
       // initialize resource bundle
