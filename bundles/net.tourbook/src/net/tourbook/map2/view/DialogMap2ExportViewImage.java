@@ -44,15 +44,18 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -62,19 +65,19 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 // SET_FORMATTING_OFF
-   private static final String       APP_BTN_BROWSE                           = net.tourbook.Messages.app_btn_browse;
-   private static final String       DIALOG_EXPORT_CHK_OVERWRITEFILES         = net.tourbook.Messages.dialog_export_chk_overwriteFiles;
-   private static final String       DIALOG_EXPORT_CHK_OVERWRITEFILES_TOOLTIP = net.tourbook.Messages.dialog_export_chk_overwriteFiles_tooltip;
-   private static final String       DIALOG_EXPORT_DIR_DIALOG_MESSAGE         = net.tourbook.Messages.dialog_export_dir_dialog_message;
-   private static final String       DIALOG_EXPORT_DIR_DIALOG_TEXT            = net.tourbook.Messages.dialog_export_dir_dialog_text;
-   private static final String       DIALOG_EXPORT_GROUP_EXPORTFILENAME       = net.tourbook.Messages.dialog_export_group_exportFileName;
-   private static final String       DIALOG_EXPORT_LABEL_EXPORTFILEPATH       = net.tourbook.Messages.dialog_export_label_exportFilePath;
-   private static final String       DIALOG_EXPORT_LABEL_FILENAME             = net.tourbook.Messages.dialog_export_label_fileName;
-   private static final String       DIALOG_EXPORT_LABEL_FILEPATH             = net.tourbook.Messages.dialog_export_label_filePath;
-   private static final String       DIALOG_EXPORT_MSG_FILEALREADYEXISTS      = net.tourbook.Messages.dialog_export_msg_fileAlreadyExists;
-   private static final String       DIALOG_EXPORT_MSG_FILENAMEISINVALID      = net.tourbook.Messages.dialog_export_msg_fileNameIsInvalid;
-   private static final String       DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE     = net.tourbook.Messages.dialog_export_msg_pathIsNotAvailable;
-   private static final String       DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP       = net.tourbook.Messages.dialog_export_txt_filePath_tooltip;
+   private static final String   APP_BTN_BROWSE                           = net.tourbook.Messages.app_btn_browse;
+   private static final String   DIALOG_EXPORT_CHK_OVERWRITEFILES         = net.tourbook.Messages.dialog_export_chk_overwriteFiles;
+   private static final String   DIALOG_EXPORT_CHK_OVERWRITEFILES_TOOLTIP = net.tourbook.Messages.dialog_export_chk_overwriteFiles_tooltip;
+   private static final String   DIALOG_EXPORT_DIR_DIALOG_MESSAGE         = net.tourbook.Messages.dialog_export_dir_dialog_message;
+   private static final String   DIALOG_EXPORT_DIR_DIALOG_TEXT            = net.tourbook.Messages.dialog_export_dir_dialog_text;
+   private static final String   DIALOG_EXPORT_GROUP_EXPORTFILENAME       = net.tourbook.Messages.dialog_export_group_exportFileName;
+   private static final String   DIALOG_EXPORT_LABEL_EXPORTFILEPATH       = net.tourbook.Messages.dialog_export_label_exportFilePath;
+   private static final String   DIALOG_EXPORT_LABEL_FILENAME             = net.tourbook.Messages.dialog_export_label_fileName;
+   private static final String   DIALOG_EXPORT_LABEL_FILEPATH             = net.tourbook.Messages.dialog_export_label_filePath;
+   private static final String   DIALOG_EXPORT_MSG_FILEALREADYEXISTS      = net.tourbook.Messages.dialog_export_msg_fileAlreadyExists;
+   private static final String   DIALOG_EXPORT_MSG_FILENAMEISINVALID      = net.tourbook.Messages.dialog_export_msg_fileNameIsInvalid;
+   private static final String   DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE     = net.tourbook.Messages.dialog_export_msg_pathIsNotAvailable;
+   private static final String   DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP       = net.tourbook.Messages.dialog_export_txt_filePath_tooltip;
 // SET_FORMATTING_ON
 
    private static final String   STATE_IMAGE_FORMAT            = "STATE_IMAGE_FORMAT";                                 //$NON-NLS-1$
@@ -89,6 +92,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private final IDialogSettings _state                        = TourbookPlugin.getState("DialogMap2ExportViewImage"); //$NON-NLS-1$
 
    private PixelConverter        _pc;
+   private Point                 _shellDefaultSize;
 
    private Map2View              _map2View;
 
@@ -132,6 +136,31 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       saveState();
 
       return super.close();
+   }
+
+   @Override
+   protected void configureShell(final Shell shell) {
+
+      super.configureShell(shell);
+
+      shell.addListener(SWT.Resize, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
+
+            // allow resizing the width but not the height
+
+            if (_shellDefaultSize == null) {
+               _shellDefaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+            }
+
+            final Point shellSize = shell.getSize();
+
+            shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
+            shellSize.y = _shellDefaultSize.y;
+
+            shell.setSize(shellSize);
+         }
+      });
    }
 
    @Override
@@ -598,14 +627,13 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
          // file already exists
 
-         setMessage(
-               NLS.bind(DIALOG_EXPORT_MSG_FILEALREADYEXISTS, filePath.toOSString()),
-               IMessageProvider.WARNING);
+         setMessage(NLS.bind(DIALOG_EXPORT_MSG_FILEALREADYEXISTS, filePath.toOSString()), IMessageProvider.WARNING);
+
          returnValue = true;
 
       } else {
 
-         setMessage(UI.EMPTY_STRING);
+         setMessage(Messages.Dialog_ExportImage_Message);
 
          try {
             final boolean isFileCreated = newFile.createNewFile();
