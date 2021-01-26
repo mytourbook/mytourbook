@@ -31,9 +31,9 @@ public class Messages extends NLS {
    public static String        Dialog_CustomConfig_Label_ImageFormat;
    public static String        Dialog_CustomConfig_Label_UrlParts;
    public static String        Dialog_CustomConfig_Label_ZoomLevel;
-   public static String        Dialog_CustomConfig_Text_ImageFormat_Tooltip;
-   public static String        Dialog_CustomConfig_Text_UserAgent_Label;
-   public static String        Dialog_CustomConfig_Text_UserAgent_Tooltip;
+   public static String        Dialog_CustomConfig_Label_ImageFormat_Tooltip;
+   public static String        Dialog_CustomConfig_Label_UserAgent;
+   public static String        Dialog_CustomConfig_Label_UserAgent_Tooltip;
 
    public static String        Dialog_DropNoPOI_InvalidData;
    public static String        Dialog_DropNoPOI_Message;

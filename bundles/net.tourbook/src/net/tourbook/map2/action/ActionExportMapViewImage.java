@@ -39,8 +39,7 @@ public class ActionExportMapViewImage extends Action {
    @Override
    public void run() {
 
-      final DialogMap2ExportViewImage dialogMap2ExportViewImage = new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _map2View);
-      dialogMap2ExportViewImage.open();
+      new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _map2View).open();
 
    }
 

@@ -47,7 +47,7 @@ public class PngTransfer extends ByteArrayTransfer {
 
       if (isSupportedType(transferData)) {
          final ImageData image = (ImageData) object;
-         try (ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             // write data to a byte array and then ask super to convert to pMedium
 
             final ImageLoader imgLoader = new ImageLoader();
@@ -55,7 +55,6 @@ public class PngTransfer extends ByteArrayTransfer {
             imgLoader.save(out, SWT.IMAGE_PNG);
 
             final byte[] buffer = out.toByteArray();
-            out.close();
 
             super.javaToNative(buffer, transferData);
          } catch (final IOException e) {

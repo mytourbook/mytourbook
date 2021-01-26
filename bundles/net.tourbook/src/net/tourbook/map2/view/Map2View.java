@@ -2356,8 +2356,11 @@ public class Map2View extends ViewPart implements
             _parent.getSize().x,
             _parent.getSize().y);
 
-      final GC gc = new GC(_parent);
-      gc.copyArea(image, 0, 0);
+      final GC gc = new GC(image);
+      _parent.print(gc);
+      //This produces the same result
+      //  final GC gc = new GC(_parent);
+      //  gc.copyArea(image, 0, 0);
       gc.dispose();
 
       return image;
