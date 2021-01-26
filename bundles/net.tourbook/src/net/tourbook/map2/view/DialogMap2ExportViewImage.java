@@ -219,73 +219,75 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
-         /*
-          * label: Image format
-          */
-         final Label label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_ExportImage_Label_ImageFormat);
+         {
+            /*
+             * label: Image format
+             */
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Dialog_ExportImage_Label_ImageFormat);
 
-         /*
-          * combo: Image format
-          */
-         _comboImageFormat = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
-         _comboImageFormat.setVisibleItemCount(3);
-         _comboImageFormat.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateQualityScale();
-               validateFields();
-            }
+            /*
+             * combo: Image format
+             */
+            _comboImageFormat = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
+            _comboImageFormat.setVisibleItemCount(3);
+            _comboImageFormat.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  updateQualityScale();
+                  validateFields();
+               }
 
-         });
-         GridDataFactory
-               .fillDefaults()
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .span(2, 1)
-               .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
-               .applyTo(_comboImageFormat);
+            });
+            GridDataFactory
+                  .fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .span(2, 1)
+                  .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
+                  .applyTo(_comboImageFormat);
+         }
+         {
+            /*
+             * label: Image Quality
+             */
+            _labelImageQuality = new Label(group, SWT.NONE);
+            _labelImageQuality.setText(Messages.Dialog_ExportImage_Label_ImageQuality);
+            _labelImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
 
-         /*
-          * label: Image Quality
-          */
-         _labelImageQuality = new Label(group, SWT.NONE);
-         _labelImageQuality.setText(Messages.Dialog_ExportImage_Label_ImageQuality);
-         _labelImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
+            /*
+             * scale: JPEG Image Quality
+             */
+            _scaleImageQuality = new Scale(group, SWT.NONE);
+            _scaleImageQuality.setMinimum(1);
+            _scaleImageQuality.setMaximum(100);
+            _scaleImageQuality.setIncrement(1);
+            _scaleImageQuality.setPageIncrement(10);
+            _scaleImageQuality.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  updateJpegQualityLabel(String.valueOf(_scaleImageQuality.getSelection()));
+               }
 
-         /*
-          * label: Quality Value
-          */
-         _labelImageQualityValue = new Label(group, SWT.NONE);
-         _labelImageQualityValue.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
-         GridDataFactory
-               .fillDefaults()
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
-               .applyTo(_labelImageQualityValue);
+            });
+            _scaleImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
+            GridDataFactory
+                  .fillDefaults()
+                  .grab(true, false)
+                  .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
+                  .applyTo(_scaleImageQuality);
 
-         /*
-          * scale: JPEG Image Quality
-          */
-         _scaleImageQuality = new Scale(group, SWT.NONE);
-         _scaleImageQuality.setMinimum(1);
-         _scaleImageQuality.setMaximum(100);
-         _scaleImageQuality.setIncrement(1);
-         _scaleImageQuality.setPageIncrement(10);
-         _scaleImageQuality.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateJpegQualityLabel(String.valueOf(_scaleImageQuality.getSelection()));
-            }
-
-         });
-         _scaleImageQuality.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
-         GridDataFactory
-               .fillDefaults()
-               .grab(true, false)
-               .hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
-               .applyTo(_scaleImageQuality);
+            /*
+             * label: Quality Value
+             */
+            _labelImageQualityValue = new Label(group, SWT.NONE);
+            _labelImageQualityValue.setToolTipText(Messages.Dialog_ExportImage_Label_ImageQuality_Tooltip);
+            GridDataFactory
+                  .fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .applyTo(_labelImageQualityValue);
+         }
       }
-
    }
 
    private void createUI_90_ExportImage(final Composite parent) {
