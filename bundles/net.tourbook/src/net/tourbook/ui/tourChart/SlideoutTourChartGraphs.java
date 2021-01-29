@@ -37,11 +37,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -54,8 +51,8 @@ import org.eclipse.swt.widgets.ToolBar;
 public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
    private static final int     GRID_TOOLBAR_SLIDEOUT_NB_COLUMN                  = 17;
-   private static final int     GRID_TOOLBAR_SLIDEOUT_NB_ROW                     = 17;
-   private static final int     GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING = 5;
+   //private static final int     GRID_TOOLBAR_SLIDEOUT_NB_ROW                     = 17;
+   //private static final int     GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING = 5;
 
    private IDialogSettings      _state;
 
@@ -92,7 +89,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
    private HashMap<String, Button> _chkShowInChartToolbar_Custom_Tracks   = new HashMap<>();
    private HashMap<String, Label>  _labelShowInChartToolbar_Custom_Tracks = new HashMap<>();
 
-   private ScrolledComposite       _scrolledContainer;
+   //private ScrolledComposite       _scrolledContainer;
    private Composite               _container;
    private Composite               _containerLevel1;
 
@@ -107,13 +104,16 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       _state = state;
    }
 
-   private int computePreferredHeight(final Composite parent) {
-      final Label text = new Label(parent, SWT.BORDER);
-      text.setText("X");
-      final Point preferredSize = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-      text.dispose();
-      return GRID_TOOLBAR_SLIDEOUT_NB_ROW * (preferredSize.y + GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING);
-   }
+   /*
+    * private int computePreferredHeight(final Composite parent) {
+    * final Label text = new Label(parent, SWT.BORDER);
+    * text.setText("X");
+    * final Point preferredSize = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    * text.dispose();
+    * return GRID_TOOLBAR_SLIDEOUT_NB_ROW * (preferredSize.y +
+    * GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING);
+    * }
+    */
 
    private void createActions() {
 
@@ -231,15 +231,15 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
           * TOUR contains CUSTOM TRACKS
           */
 
-         _scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.BORDER);
+         //_scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.BORDER);
 
          int numColums = numCustomTracks / GRID_TOOLBAR_SLIDEOUT_NB_COLUMN;
          if ((numCustomTracks % GRID_TOOLBAR_SLIDEOUT_NB_COLUMN) != 0) {
             numColums++;
          }
 
-         _containerLevel1 = new Composite(_scrolledContainer, SWT.NONE);
-         _container = new Composite(_containerLevel1, SWT.NONE | SWT.BORDER);
+         _containerLevel1 = new Composite(parent, SWT.NONE);
+         _container = new Composite(_containerLevel1, SWT.NONE);
 
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_container);
 
@@ -251,7 +251,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
          final Composite[] _containerCustomTracks = new Composite[numColums];
          for (int index = 0; index < numColums; index++) {
-            _containerCustomTracks[index] = new Composite(_containerLevel1, SWT.NONE | SWT.BORDER);
+            _containerCustomTracks[index] = new Composite(_containerLevel1, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerCustomTracks[index]);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerCustomTracks[index]);
          }
@@ -380,19 +380,21 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
          }
 
-         _scrolledContainer.setContent(_containerLevel1);
-         _scrolledContainer.setExpandVertical(true);
-         _scrolledContainer.setExpandHorizontal(true);
-         _scrolledContainer.addListener(SWT.Resize, event -> {
-            if (_scrolledContainer != null && !_scrolledContainer.isDisposed()
-                  && _containerLevel1 != null && !_containerLevel1.isDisposed()) {
-               final int width = _scrolledContainer.getClientArea().width;
-               _scrolledContainer.setMinSize(_containerLevel1.computeSize(width, SWT.DEFAULT));
-            }
-         });
-         final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-         gridData.heightHint = computePreferredHeight(_containerLevel1);
-         _scrolledContainer.setLayoutData(gridData);
+         /*
+          * _scrolledContainer.setContent(_containerLevel1);
+          * _scrolledContainer.setExpandVertical(true);
+          * _scrolledContainer.setExpandHorizontal(true);
+          * _scrolledContainer.addListener(SWT.Resize, event -> {
+          * if (_scrolledContainer != null && !_scrolledContainer.isDisposed()
+          * && _containerLevel1 != null && !_containerLevel1.isDisposed()) {
+          * final int width = _scrolledContainer.getClientArea().width;
+          * _scrolledContainer.setMinSize(_containerLevel1.computeSize(width, SWT.DEFAULT));
+          * }
+          * });
+          * final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+          * gridData.heightHint = computePreferredHeight(_containerLevel1);
+          * _scrolledContainer.setLayoutData(gridData);
+          */
 
       } else {
          /*
@@ -600,7 +602,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
       int count = 0;
-      final HashMap<String, float[]> customTracksMap = tourData.getCustomTracks();
+      //final HashMap<String, float[]> customTracksMap = tourData.getCustomTracks();
       final HashMap<String, CustomTrackDefinition> custTrkDefinitions = tourData.getCustomTracksDefinition();
       final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
       java.util.Collections.sort(listCustomTrackDefinition);
