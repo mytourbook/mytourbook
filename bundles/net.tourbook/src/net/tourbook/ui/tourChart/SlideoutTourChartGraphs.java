@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.ToolBar;
 public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
    private static final int     GRID_TOOLBAR_SLIDEOUT_NB_COLUMN                  = 17;
-   private static final int     GRID_TOOLBAR_SLIDEOUT_NB_ROW                     = 7;
+   private static final int     GRID_TOOLBAR_SLIDEOUT_NB_ROW                     = 17;
    private static final int     GRID_TOOLBAR_SLIDEOUT_DEFAULT_HORIZONTAL_SPACING = 5;
 
    private IDialogSettings      _state;
@@ -94,6 +94,7 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
    private ScrolledComposite       _scrolledContainer;
    private Composite               _container;
+   private Composite               _containerLevel1;
 
    public SlideoutTourChartGraphs(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -203,20 +204,57 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
    }
 
    private void createUI_20_Graphs(final Composite parent) {
-
+      HashMap<String, float[]> CustomTracks = null;
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
-      if (tourData != null && tourData.getCustomTracks() != null && tourData.getCustomTracks().size() > 0) {
+      if (tourData != null) {
+         CustomTracks = tourData.getCustomTracks();
+      }
+
+      int numCustomTracks = 0;
+      final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
+            tourData.getCustomTracksDefinition();
+      ArrayList<CustomTrackDefinition> listCustomTrackDefinition = null;
+      if (custTrkDefinitions != null && custTrkDefinitions.size() > 0 && CustomTracks != null && CustomTracks.size() > 0) {
+         listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
+         for (final CustomTrackDefinition element : listCustomTrackDefinition) {
+            final String key = element.getId();
+            if (CustomTracks.get(key) == null || CustomTracks.get(key).length == 0) {
+               continue;
+            }
+            numCustomTracks++;
+         }
+         java.util.Collections.sort(listCustomTrackDefinition);
+      }
+
+      if (numCustomTracks > 0) {
          /*
           * TOUR contains CUSTOM TRACKS
           */
 
          _scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.BORDER);
 
-         _container = new Composite(_scrolledContainer, SWT.NONE);
+         int numColums = numCustomTracks / GRID_TOOLBAR_SLIDEOUT_NB_COLUMN;
+         if ((numCustomTracks % GRID_TOOLBAR_SLIDEOUT_NB_COLUMN) != 0) {
+            numColums++;
+         }
+
+         _containerLevel1 = new Composite(_scrolledContainer, SWT.NONE);
+         _container = new Composite(_containerLevel1, SWT.NONE | SWT.BORDER);
 
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_container);
 
-         GridLayoutFactory.fillDefaults().numColumns(12).applyTo(_container);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_container);
+
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerLevel1);
+
+         GridLayoutFactory.fillDefaults().numColumns(numColums + 1).applyTo(_containerLevel1);
+
+         final Composite[] _containerCustomTracks = new Composite[numColums];
+         for (int index = 0; index < numColums; index++) {
+            _containerCustomTracks[index] = new Composite(_containerLevel1, SWT.NONE | SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_containerCustomTracks[index]);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerCustomTracks[index]);
+         }
 
          createUI_GraphAction(_container, TourManager.GRAPH_ALTITUDE);
          _chkShowInChartToolbar_Altitude = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Altitude);
@@ -316,47 +354,44 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
             _labelShowInChartToolbar_Custom_Tracks.clear();
             _chkShowInChartToolbar_Custom_Tracks.clear();
 
-            if (tourData != null && tourData.getCustomTracks() != null && tourData.getCustomTracks().size() > 0) {
-               int cnt = 0;
-               final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
-               final ArrayList<String> listKey = new ArrayList<>(custTrk.keySet());
-               java.util.Collections.sort(listKey);
-               final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
-                     tourData.getCustomTracksDefinition();
-               for (int idx = 0; idx < listKey.size(); idx++) {
-                  if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-                     if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
-                        break;
-                     }
-                  }
-                  createUI_GraphAction(_container, TourManager.GRAPH_CUSTOM_TRACKS + idx);
-                  final String key = listKey.get(idx);
-                  final CustomTrackDefinition custTrkDefinition = custTrkDefinitions.get(key);
-                  final String toolTip = custTrkDefinition.getName();
+            int numDisplayCustomTracks = 0;
 
-                  final Button chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox_Custom_Tracks(_container, toolTip);
-                  _chkShowInChartToolbar_Custom_Tracks.put(key, chkShowInChartToolbar_Cust_Track);
-                  final Label _labelShowInChartToolbar_Custom_Track = createUI_GraphCheckbox_Custom_Tracks_Label(_container, toolTip);
-                  _labelShowInChartToolbar_Custom_Tracks.put(key, _labelShowInChartToolbar_Custom_Track);
-                  cnt++;
+            for (int indexAlphabetical = 0; indexAlphabetical < listCustomTrackDefinition.size(); indexAlphabetical++) {
+               if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
+                  if (numDisplayCustomTracks >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+                     break;
+                  }
                }
+               final String key = listCustomTrackDefinition.get(indexAlphabetical).getId();
+               if (CustomTracks.get(key) == null || CustomTracks.get(key).length == 0) {
+                  continue;
+               }
+               final Composite _containerCurrent = _containerCustomTracks[numDisplayCustomTracks / GRID_TOOLBAR_SLIDEOUT_NB_COLUMN];
+               createUI_GraphAction(_containerCurrent, TourManager.GRAPH_CUSTOM_TRACKS + indexAlphabetical);
+               final CustomTrackDefinition custTrkDefinition = listCustomTrackDefinition.get(indexAlphabetical);
+               final String toolTip = custTrkDefinition.getName();
+
+               final Button chkShowInChartToolbar_Cust_Track = createUI_GraphCheckbox_Custom_Tracks(_containerCurrent, toolTip);
+               _chkShowInChartToolbar_Custom_Tracks.put(key, chkShowInChartToolbar_Cust_Track);
+               final Label _labelShowInChartToolbar_Custom_Track = createUI_GraphCheckbox_Custom_Tracks_Label(_containerCurrent, toolTip);
+               _labelShowInChartToolbar_Custom_Tracks.put(key, _labelShowInChartToolbar_Custom_Track);
+               numDisplayCustomTracks++;
             }
+
          }
 
-         _scrolledContainer.setContent(_container);
+         _scrolledContainer.setContent(_containerLevel1);
          _scrolledContainer.setExpandVertical(true);
          _scrolledContainer.setExpandHorizontal(true);
-
          _scrolledContainer.addListener(SWT.Resize, event -> {
             if (_scrolledContainer != null && !_scrolledContainer.isDisposed()
-                  && _container != null && !_container.isDisposed()) {
+                  && _containerLevel1 != null && !_containerLevel1.isDisposed()) {
                final int width = _scrolledContainer.getClientArea().width;
-               _scrolledContainer.setMinSize(_container.computeSize(width, SWT.DEFAULT));
+               _scrolledContainer.setMinSize(_containerLevel1.computeSize(width, SWT.DEFAULT));
             }
          });
-
          final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-         gridData.heightHint = computePreferredHeight(_container);
+         gridData.heightHint = computePreferredHeight(_containerLevel1);
          _scrolledContainer.setLayoutData(gridData);
 
       } else {
@@ -564,26 +599,27 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       _chkShowInChartToolbar_Swim_Swolf.setSelection(                   Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,                     TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT));
 
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
-      int cnt = 0;
+      int count = 0;
       final HashMap<String, float[]> customTracksMap = tourData.getCustomTracks();
-      final ArrayList<String> listKey = new ArrayList<>(customTracksMap.keySet());
-      java.util.Collections.sort(listKey);
-      //final HashMap<String, CustomTrackDefinition> custTrkDef = tourData.getCustomTracksDefinition();
+      final HashMap<String, CustomTrackDefinition> custTrkDefinitions = tourData.getCustomTracksDefinition();
+      final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
+      java.util.Collections.sort(listCustomTrackDefinition);
+
       final HashMap<String, Boolean> state_CustomTracks = TourManager.getInstance().getActiveTourChart().get_state_CustomTracksToolBarChart();
-      for (final String key : listKey) {
+      for (final CustomTrackDefinition key : listCustomTrackDefinition) {
          if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-            if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+            if (count >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                break;
             }
          }
-         final Button chkShowInChartToolbar_Cust_Track = _chkShowInChartToolbar_Custom_Tracks.get(key);
+         final Button chkShowInChartToolbar_Cust_Track = _chkShowInChartToolbar_Custom_Tracks.get(key.getId());
 
          if(chkShowInChartToolbar_Cust_Track != null && state_CustomTracks!= null) {
-            final Boolean state = state_CustomTracks.getOrDefault(key, false);
+            final Boolean state = state_CustomTracks.getOrDefault(key.getId(), false);
             chkShowInChartToolbar_Cust_Track.setSelection(state);
          }
 
-         cnt++;
+         count++;
       }
 // SET_FORMATTING_ON
    }
@@ -613,24 +649,26 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,                     _chkShowInChartToolbar_Swim_Swolf.getSelection());
 
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
-      int cnt = 0;
-      final HashMap<String, float[]> customTracksMap = tourData.getCustomTracks();
-      final ArrayList<String> listKey = new ArrayList<>(customTracksMap.keySet());
-      java.util.Collections.sort(listKey);
+      int numDisplayCustomTracks = 0;
+      final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
+            tourData.getCustomTracksDefinition();
+      final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
+      java.util.Collections.sort(listCustomTrackDefinition);
+
       final LinkedHashMap<String, Boolean> state_CustomTracks = TourManager.getInstance().getActiveTourChart().get_state_CustomTracksToolBarChart();
 
-      for (final String key : listKey) {
+      for (final CustomTrackDefinition key : listCustomTrackDefinition) {
          if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-            if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+            if (numDisplayCustomTracks >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                break;
             }
          }
-         final Button chkShowInChartToolbar_Cust_Track = _chkShowInChartToolbar_Custom_Tracks.get(key);
+         final Button chkShowInChartToolbar_Cust_Track = _chkShowInChartToolbar_Custom_Tracks.get(key.getId());
          if(chkShowInChartToolbar_Cust_Track != null && state_CustomTracks != null ) {
-            state_CustomTracks.put(key, chkShowInChartToolbar_Cust_Track.getSelection());
+            state_CustomTracks.put(key.getId(), chkShowInChartToolbar_Cust_Track.getSelection());
          }
 
-         cnt++;
+         numDisplayCustomTracks++;
       }
 // SET_FORMATTING_ON
    }

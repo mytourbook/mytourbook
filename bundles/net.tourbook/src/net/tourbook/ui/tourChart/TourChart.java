@@ -1486,37 +1486,37 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void createActions_10_GraphActionsCustomTracks() {
       if (_tourData != null && _tourData.getCustomTracks() != null && !_tourData.getCustomTracks().isEmpty()) {
          final HashMap<String, CustomTrackDefinition> custDef = _tourData.getCustomTracksDefinition();
-         final HashMap<String, float[]> custTracks = _tourData.getCustomTracks();
-         final ArrayList<String> listKey = new ArrayList<>(custTracks.keySet());
-         java.util.Collections.sort(listKey);
-         int cnt = 0;
-         for (int idx = 0; idx < listKey.size(); idx++) {
+         final HashMap<String, float[]> customTracks = _tourData.getCustomTracks();
+         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custDef.values());
+         java.util.Collections.sort(listCustomTrackDefinition);
+
+         int numDisplayCustomTracks = 0;
+         for (int indexAlphabetic = 0; indexAlphabetic < listCustomTrackDefinition.size(); indexAlphabetic++) {
             if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+               if (numDisplayCustomTracks >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                   break;
                }
             }
-            final String key = listKey.get(idx);
-            final float[] Trk = custTracks.get(key);
-            CustomTrackDefinition TrkDef = custDef.get(key);
-            if (TrkDef == null && Trk != null) {
-               TrkDef = new CustomTrackDefinition();
-               TrkDef.setId(key);
-               TrkDef.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
-               TrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
+            final String key = listCustomTrackDefinition.get(indexAlphabetic).getId();
+            final float[] customTrack = customTracks.get(key);
+            CustomTrackDefinition customTrackDefinition = listCustomTrackDefinition.get(indexAlphabetic);
+            if (customTrackDefinition == null && customTrack != null) {
+               customTrackDefinition = new CustomTrackDefinition();
+               customTrackDefinition.setId(key);
+               customTrackDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
+               customTrackDefinition.setUnit(net.tourbook.common.UI.EMPTY_STRING);
             }
-            if (Trk != null && TrkDef != null) {
-               //final int idx2 = lisKey.indexOf(key);
+            if (customTrack != null && customTrackDefinition != null) {
                createActions_12_GraphAction(
-                     TourManager.GRAPH_CUSTOM_TRACKS + idx,
-                     TrkDef.getName(),
-                     Messages.Tour_Action_Custom_Tracks_Tooltip_Prefix + TrkDef.getName(),
+                     TourManager.GRAPH_CUSTOM_TRACKS + indexAlphabetic,
+                     customTrackDefinition.getName(),
+                     Messages.Tour_Action_Custom_Tracks_Tooltip_Prefix + customTrackDefinition.getName(),
                      Messages.Image__Graph_Custom_Tracks,
                      Messages.Image__Graph_Custom_Tracks_Disabled,
                      GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
                _customTracksGraphContribId.add(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
             }
-            cnt++;
+            numDisplayCustomTracks++;
          }
       }
    }
@@ -2768,16 +2768,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        * Remove all previous graph actions
        */
       for (final String contribId : _allGraphContribId) {
-         final IContributionItem item = tbm.remove(contribId);
+         tbm.remove(contribId);
       }
 
       if (_tourData != null && _tourData.getCustomTracks() != null &&
             _tourData.getCustomTracks().size() > 0) {
          final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
-         //final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
-         //java.util.Collections.sort(lisKey);
          for (final String key : custTrk.keySet()) {
-            //final int idx = lisKey.indexOf(key);
             final IContributionItem item = tbm.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
             if (item == null) {}
          }
@@ -2900,18 +2897,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        * CUSTOM TRACKS
        */
       if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
-         int cnt = 0;
-         final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
-         final ArrayList<String> listKey = new ArrayList<>(custTrk.keySet());
-         java.util.Collections.sort(listKey);
-         for (int idx = 0; idx < listKey.size(); idx++) {
+         int numDisplayCustomTracks = 0;
+         //final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
+               _tourData.getCustomTracksDefinition();
+         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
+         java.util.Collections.sort(listCustomTrackDefinition);
+
+         for (int idx = 0; idx < listCustomTrackDefinition.size(); idx++) {
             if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+               if (numDisplayCustomTracks >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                   break;
                }
             }
             //final int idx = lisKey.indexOf(key);
-            final String key = listKey.get(idx);
+            final String key = listCustomTrackDefinition.get(idx).getId();
             final Boolean theState = _state_CustomTracksToolBarChart.getOrDefault(key,
                   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS_DEFAULT);
             fillToolbar_Graphs_Graph(
@@ -2919,7 +2919,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   TourManager.GRAPH_CUSTOM_TRACKS + idx,
                   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_CUSTOM_TRACKS + key, //TODO add id as suffix
                   theState);
-            cnt++;
+            numDisplayCustomTracks++;
          }
       }
 
@@ -3784,34 +3784,34 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private void removeActions_10_GraphActionsCustomTracks() {
       if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
          final HashMap<String, CustomTrackDefinition> custDef = _tourData.getCustomTracksDefinition();
-         final HashMap<String, float[]> custTracks = _tourData.getCustomTracks();
-         final ArrayList<String> listKey = new ArrayList<>(custTracks.keySet());
-         java.util.Collections.sort(listKey);
-         int cnt = 0;
-         for (int idx = 0; idx < listKey.size(); idx++) {
+         final HashMap<String, float[]> customTracks = _tourData.getCustomTracks();
+         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custDef.values());
+         java.util.Collections.sort(listCustomTrackDefinition);
+         int numDisplayCustomTracks = 0;
+         for (int indexAlphabetic = 0; indexAlphabetic < listCustomTrackDefinition.size(); indexAlphabetic++) {
             if (TourManager.MAX_VISIBLE_CUSTOM_TRACKS_DEBUG) {
-               if (cnt >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
+               if (numDisplayCustomTracks >= TourManager.MAX_VISIBLE_CUSTOM_TRACKS) {
                   break;
                }
             }
-            final String key = listKey.get(idx);
-            final float[] Trk = custTracks.get(key);
-            CustomTrackDefinition TrkDef = custDef.get(key);
-            if (TrkDef == null && Trk != null) {
-               TrkDef = new CustomTrackDefinition();
-               TrkDef.setId(key);
-               TrkDef.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
-               TrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
+            final String key = listCustomTrackDefinition.get(indexAlphabetic).getId();
+            final float[] customTrack = customTracks.get(key);
+            CustomTrackDefinition customTrackDefinition = custDef.get(key);
+            if (customTrackDefinition == null && customTrack != null) {
+               customTrackDefinition = new CustomTrackDefinition();
+               customTrackDefinition.setId(key);
+               customTrackDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " -- " + key);
+               customTrackDefinition.setUnit(net.tourbook.common.UI.EMPTY_STRING);
             }
-            if (Trk != null && TrkDef != null) {
+            if (customTrack != null && customTrackDefinition != null) {
 
                _customTracksGraphContribId.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
                //final Action tourAction = _allTourChartActions.get(getGraphActionId(TourManager.GRAPH_CUSTOM_TRACKS + idx));
                //tourAction.setEnabled(false);
-               _allTourChartActions.remove(getGraphActionId(TourManager.GRAPH_CUSTOM_TRACKS + idx));
-               _tcc.removeVisibleGraph(TourManager.GRAPH_CUSTOM_TRACKS + idx);//remove cutom raph from being visible
+               _allTourChartActions.remove(getGraphActionId(TourManager.GRAPH_CUSTOM_TRACKS + indexAlphabetic));
+               _tcc.removeVisibleGraph(TourManager.GRAPH_CUSTOM_TRACKS + indexAlphabetic);//remove cutom raph from being visible
             }
-            cnt++;
+            numDisplayCustomTracks++;
          }
       }
    }
@@ -5665,15 +5665,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
          final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
+         final HashMap<String, CustomTrackDefinition> custTrkDefMap = _tourData.getCustomTracksDefinition();
+         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefMap.values());
+         java.util.Collections.sort(listCustomTrackDefinition);
          final ArrayList<Integer> custIds = new ArrayList<>(allGraphIds.length + custTrk.size());
          for (final int graphId : allGraphIds) {
             custIds.add(graphId);
          }
 
-         final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
-         java.util.Collections.sort(lisKey);
-         for (final String key : custTrk.keySet()) {
-            final int idx = lisKey.indexOf(key);
+         for (int idx = 0; idx < listCustomTrackDefinition.size(); idx++) {
+            //final String key = listCustomTrackDefinition.get(idx).getId();
             custIds.add(idx);
          }
          allGraphIds = custIds.stream().mapToInt(Integer::intValue).toArray();//custIds.toArray(new Integer[custIds.size()]);
@@ -5869,20 +5870,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
       if (_isTourChartToolbarCreated && _currentTourId != newTourData.getTourId()) {
          final IToolBarManager tbm = getToolBarManager();
-         int cnt = 0;
          for (final String contribId : _customTracksGraphContribId) {
-            final IContributionItem item = tbm.remove(contribId);
-            if (item == null) {
+            tbm.remove(contribId);
 
-            }
-            cnt++;
          }
          if (_tourData != null && _tourData.getCustomTracks() != null &&
                _tourData.getCustomTracks().size() > 0) {
             final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
             for (final String key : custTrk.keySet()) {
-               final IContributionItem item = tbm.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
-               if (item == null) {}
+               tbm.remove(GRAPH_CONTRIBUTION_ID_CUSTOM_TRACKS + key);
+
             }
          }
          tbm.update(true);

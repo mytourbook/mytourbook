@@ -17,7 +17,7 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-public class CustomTrackDefinition implements Serializable {
+public class CustomTrackDefinition implements Serializable, Comparable<CustomTrackDefinition> {
    /**
     *
     */
@@ -28,6 +28,11 @@ public class CustomTrackDefinition implements Serializable {
    private String             _name;
    private String             _id;
    private String             _unit;
+
+   @Override
+   public int compareTo(final CustomTrackDefinition o) {
+      return this.getName().compareTo(o.getName());
+   }
 
    public String getId() {
       return _id;

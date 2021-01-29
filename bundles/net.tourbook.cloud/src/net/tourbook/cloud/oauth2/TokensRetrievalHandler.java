@@ -20,14 +20,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
 import net.tourbook.cloud.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -71,17 +71,20 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
 
    private void handleResponse(final HttpExchange httpExchange) throws IOException {
 
-      final OutputStream outputStream = httpExchange.getResponseBody();
-
       final StringBuilder htmlBuilder = new StringBuilder();
-      htmlBuilder.append("<html><body><h1>" + Messages.Html_CloseBrowser_Text + "</h1></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+      htmlBuilder.append("<html><head><meta charset=\"UTF-8\"></head><body><h1>" + Messages.Html_CloseBrowser_Text + "</h1></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+
+      final byte[] response = htmlBuilder.toString().getBytes(StandardCharsets.UTF_8);
 
       // this line is a must
-      httpExchange.sendResponseHeaders(200, htmlBuilder.length());
+      httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
 
-      try (Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-         writer.write(htmlBuilder.toString());
+      try (OutputStream outputStream = httpExchange.getResponseBody()) {
+
+         outputStream.write(response);
          outputStream.flush();
+      } catch (final Exception e) {
+         StatusUtil.log(e);
       }
    }
 

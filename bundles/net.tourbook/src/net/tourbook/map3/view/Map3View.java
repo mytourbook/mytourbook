@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,6 +66,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
@@ -221,6 +222,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenTour                 _actionOpenTour;
    private ActionPrint                    _actionPrintTour;
+   private ActionUpload                   _actionUploadTour;
    //
    private IPartListener2                 _partListener;
    private ISelectionListener             _postSelectionListener;
@@ -893,6 +895,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
+      _actionUploadTour = new ActionUpload(this);
    }
 
    /**
@@ -1241,6 +1244,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenTour.setEnabled(isTourSelected);
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
+      _actionUploadTour.setEnabled(isTourSelected && _actionUploadTour.hasUploaders());
    }
 
    private void fillActionBars() {
@@ -1325,6 +1329,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 //		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       (new Separator()).fill(menu, -1);
+      fillMenuItem(menu, _actionUploadTour);
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
 
