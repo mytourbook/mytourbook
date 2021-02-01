@@ -20,6 +20,7 @@
   "calories" : 1073000,
   "conconiDeflection" : 0,
   "containReferenceTour" : false,
+  "customTracksAvailable" : false,
   "deviceFirmwareVersion" : "0.00",
   "deviceModeName" : "RUNNING",
   "deviceName" : "SUUNTO ",
