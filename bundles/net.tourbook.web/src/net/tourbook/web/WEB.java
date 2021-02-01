@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,13 +81,13 @@ public class WEB {
                "nl"                                                                                                         //$NON-NLS-1$
          };
 
-   static final String                  DEBUG_PATH_DOJO                        = "C:/E/js-resources/dojo/";                 //$NON-NLS-1$
+   static final String                  DEBUG_PATH_DOJO                        = "C:/DAT/MT/";                              //$NON-NLS-1$
    private static final String          DEBUG_PATH_XUL_RUNNER                  = "C:/E/XULRunner/";                         //$NON-NLS-1$
    private static final String          DEBUG_PATH_FIREBUG_LITE                = "/WebContent-firebug-lite";                //$NON-NLS-1$
 
    public static final String           PROTOCOL_HTTP                          = "http://";                                 //$NON-NLS-1$
 
-   static final String                  DOJO_TOOLKIT_FOLDER                    = "/MyTourbook-DojoToolkit";                 //$NON-NLS-1$
+   static final String                  DOJO_TOOLKIT_FOLDER                    = "/mytourbook-dojo-toolkit";                //$NON-NLS-1$
 
    private static final String          WEB_CONTENT_DEVELOPMENT_FOLDER         = "/WebContent-dev";                         //$NON-NLS-1$
    private static final String          WEB_CONTENT_RELEASE_FOLDER             = "/WebContent-rel";                         //$NON-NLS-1$
