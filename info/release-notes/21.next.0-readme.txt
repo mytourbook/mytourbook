@@ -84,6 +84,9 @@ Bugfix
 * Pause Re-Import (Frederic)
   - In some scenarii, the pause re-import could be imcomplete if the tour originally contained pauses and the new file doesn't contain any
 
+* Fit Import (Frederic)
+  - When importing a file without pauses, the recorded time could sometimes be different by 1 or 2 seconds compared to the elapsed time.
+
 Translation    
 ===========
 
