@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1470,6 +1470,9 @@ public class RawDataManager {
             final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
             final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().collect(Collectors.toList());
             oldTourData.finalizeTour_TimerPauses(listPausedTime_Start, listPausedTime_End);
+         } else {
+            oldTourData.setPausedTime_Start(reimportedTourData.getPausedTime_Start());
+            oldTourData.setPausedTime_End(reimportedTourData.getPausedTime_End());
          }
 
          totalTourTimerPauses = reimportedTourData.getTourDeviceTime_Paused();

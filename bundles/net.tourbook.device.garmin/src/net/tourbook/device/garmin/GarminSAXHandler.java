@@ -693,8 +693,8 @@ public class GarminSAXHandler extends DefaultHandler {
             //we consider that a pause.
             if (_timeData.latitude == Double.MIN_VALUE &&
                   _timeData.longitude == Double.MIN_VALUE &&
-                  _timeData.altitude == Float.MIN_VALUE &&
-                  _timeData.distance == Float.MIN_VALUE &&
+                  _timeData.absoluteAltitude == Float.MIN_VALUE &&
+                  _timeData.absoluteDistance == Float.MIN_VALUE &&
                   _timeData.pulse == Float.MIN_VALUE &&
                   _timeData.speed == Float.MIN_VALUE &&
                   _timeData.power == Float.MIN_VALUE) {
