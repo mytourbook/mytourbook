@@ -22,6 +22,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.importdata.DeviceData;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,12 @@ public class GarminFitTester {
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       fitDataReader = new FitDataReader();
+   }
+
+   @AfterEach
+   void tearDown() {
+      newlyImportedTours.clear();
+      alreadyImportedTours.clear();
    }
 
    /**
