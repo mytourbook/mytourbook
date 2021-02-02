@@ -441,7 +441,7 @@ public class GarminSAXHandler extends DefaultHandler {
       }
 
       //We remove any pauses that happened before the official tour start time
-      if (!_pausedTime_Start.isEmpty() && !_pausedTime_End.isEmpty()) {
+      if (_pausedTime_Start.size() > 0 && _pausedTime_End.size() > 0) {
 
          final List<Integer> pausesToRemove = new ArrayList<>();
          for (int index = 0; index < _pausedTime_Start.size(); ++index) {
