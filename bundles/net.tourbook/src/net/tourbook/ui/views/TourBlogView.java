@@ -26,10 +26,10 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -49,7 +49,6 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionTourBlogMarker;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
@@ -79,6 +78,7 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -88,29 +88,31 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
-   public static final String  ID                                      = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
+   public static final String  ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
 
-   private static final String NL                                      = UI.NEW_LINE1;
+   private static final String NL                                              = UI.NEW_LINE1;
 
-   private static final String TOUR_BLOG_CSS                           = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
+   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
 
-   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
-   static final String         STATE_IS_SHOW_HIDDEN_MARKER             = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
+   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
+   static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
+   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
 
-   private static final String EXTERNAL_LINK_URL                       = "http";                                    //$NON-NLS-1$
-   private static final String HREF_TOKEN                              = "#";                                       //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                        = "about:blank";                             //$NON-NLS-1$
+   private static final String EXTERNAL_LINK_URL                               = "http";                                    //$NON-NLS-1$
+   private static final String HREF_TOKEN                                      = "#";                                       //$NON-NLS-1$
+   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                             //$NON-NLS-1$
 
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                              = "http://dummy";                            //$NON-NLS-1$
+   private static final String HTTP_DUMMY                                      = "http://dummy";                            //$NON-NLS-1$
 
-   private static final String ACTION_EDIT_TOUR                        = "EditTour";                                //$NON-NLS-1$
-   private static final String ACTION_EDIT_MARKER                      = "EditMarker";                              //$NON-NLS-1$
-   private static final String ACTION_HIDE_MARKER                      = "HideMarker";                              //$NON-NLS-1$
-   private static final String ACTION_OPEN_MARKER                      = "OpenMarker";                              //$NON-NLS-1$
-   private static final String ACTION_SHOW_MARKER                      = "ShowMarker";                              //$NON-NLS-1$
+   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                //$NON-NLS-1$
+   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                              //$NON-NLS-1$
+   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                              //$NON-NLS-1$
+   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                              //$NON-NLS-1$
+   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                              //$NON-NLS-1$
 
    private static String       HREF_EDIT_TOUR;
    private static String       HREF_EDIT_MARKER;
@@ -128,37 +130,36 @@ public class TourBlogView extends ViewPart {
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
 
-   private static final String     HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM = "#MarkerItem";                //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore _prefStore       = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state           = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_WEB       = WEB.getState();
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private PostSelectionProvider         _postSelectionProvider;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private ITourEventListener            _tourEventListener;
+   private IPartListener2                _partListener;
 
-   private TourData                _tourData;
+   private TourData                      _tourData;
 
-   private String                  _htmlCss;
+   private String                        _htmlCss;
 
-   private String                  _actionEditImageUrl;
-   private String                  _actionHideMarkerUrl;
-   private String                  _actionShowMarkerUrl;
+   private String                        _actionEditImageUrl;
+   private String                        _actionHideMarkerUrl;
+   private String                        _actionShowMarkerUrl;
 
-   private String                  _cssMarkerDefaultColor;
-   private String                  _cssMarkerDeviceColor;
-   private String                  _cssMarkerHiddenColor;
+   private String                        _cssMarkerDefaultColor;
+   private String                        _cssMarkerDeviceColor;
+   private String                        _cssMarkerHiddenColor;
 
-   private boolean                 _isDrawWithDefaultColor;
-   private boolean                 _isShowHiddenMarker;
+   private boolean                       _isDrawWithDefaultColor;
+   private boolean                       _isShowHiddenMarker;
 
-   private Long                    _reloadedTourMarkerId;
+   private Long                          _reloadedTourMarkerId;
 
-   private ActionTourBlogMarker    _actionTourBlogMarker;
+   private ActionTourBlogOptions         _actionTourBlogOptions;
 
    /*
     * UI controls
@@ -168,11 +169,20 @@ public class TourBlogView extends ViewPart {
    private Composite _pageNoBrowser;
    private Composite _pageNoData;
    private Composite _pageContent;
-   private Composite _uiParent;
+   private Composite _parent;
 
    private Browser   _browser;
    private TourChart _tourChart;
    private Text      _txtNoBrowser;
+
+   private class ActionTourBlogOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourBlogOptions(_parent, toolbar, TourBlogView.this, _state);
+      }
+   }
 
    private void addPartListener() {
 
@@ -220,21 +230,7 @@ public class TourBlogView extends ViewPart {
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            final String property = event.getProperty();
-
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-            }
-         }
-      };
-
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -330,13 +326,15 @@ public class TourBlogView extends ViewPart {
 
    private String create_10_Head() {
 
-//      $BODY_FONT_SIZE$
+      // set body default size
+      final int bodyFontSize = Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+      final String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
 
       final String html = UI.EMPTY_STRING
 
             + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //$NON-NLS-1$
             + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //$NON-NLS-1$
-            + _htmlCss
+            + htmlCss
             + NL;
 
       return html;
@@ -583,7 +581,7 @@ public class TourBlogView extends ViewPart {
 
    private void createActions() {
 
-      _actionTourBlogMarker = new ActionTourBlogMarker(this, _uiParent);
+      _actionTourBlogOptions = new ActionTourBlogOptions();
 
       fillActionBars();
    }
@@ -606,7 +604,7 @@ public class TourBlogView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
-      _uiParent = parent;
+      _parent = parent;
 
       initUI();
 
@@ -706,7 +704,6 @@ public class TourBlogView extends ViewPart {
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -714,11 +711,11 @@ public class TourBlogView extends ViewPart {
    private void fillActionBars() {
 
       /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionTourBlogMarker);
+      tbm.add(_actionTourBlogOptions);
    }
 
    private void fireMarkerPosition(final StructuredSelection selection) {
@@ -1057,7 +1054,7 @@ public class TourBlogView extends ViewPart {
       /*
        * Run async because a tour save will fire a tour change event.
        */
-      _uiParent.getDisplay().asyncExec(new Runnable() {
+      _parent.getDisplay().asyncExec(new Runnable() {
          @Override
          public void run() {
             TourManager.saveModifiedTour(_tourData);

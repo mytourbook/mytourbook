@@ -2266,6 +2266,8 @@ public class Messages extends NLS {
 
    public static String Slideout_StatisticOptions_Label_Title;
 
+   public static String Slideout_TourBlogOptions_Title;
+
    public static String Slideout_TourBookOptions_Checkbox_ShowTotalRow;
    public static String Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;
    public static String Slideout_TourBookOptions_Label_Title;

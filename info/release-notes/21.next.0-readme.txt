@@ -62,6 +62,10 @@ Improvements
     - Beat values from device
     - R-R intervals
 
+* Tour Blog
+  - Set blog font size
+
+
 Changes  
 =======
 
