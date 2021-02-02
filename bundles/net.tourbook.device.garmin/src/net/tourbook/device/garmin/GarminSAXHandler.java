@@ -696,6 +696,7 @@ public class GarminSAXHandler extends DefaultHandler {
                   _timeData.absoluteAltitude == Float.MIN_VALUE &&
                   _timeData.absoluteDistance == Float.MIN_VALUE &&
                   _timeData.pulse == Float.MIN_VALUE &&
+                  _timeData.cadence == Float.MIN_VALUE &&
                   _timeData.speed == Float.MIN_VALUE &&
                   _timeData.power == Float.MIN_VALUE) {
 
