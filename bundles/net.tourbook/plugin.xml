@@ -308,12 +308,12 @@
       />
       
        <!--
-         Cloud Connectivity
+         Cloud
       -->
       <page
-         class="net.tourbook.preferences.PrefPageCloudConnectivity"
-         id="net.tourbook.preferences.PrefPageCloudConnectivity"
-         name="%preference_page_cloud_connectivity"
+         class="net.tourbook.preferences.PrefPageCloud"
+         id="net.tourbook.preferences.PrefPageCloud"
+         name="%preference_page_cloud"
       />
       
       
