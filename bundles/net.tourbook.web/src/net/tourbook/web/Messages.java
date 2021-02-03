@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,8 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.web.messages";           //$NON-NLS-1$
 
-   public static String        App_Web_Label_DefaultFontSize;
+   public static String        App_Web_Label_ContentFontSize;
+   public static String        App_Web_Label_ContentFontSize_Tooltip;
 
    public static String        PrefPage_Web_Checkbox_CustomWebBrowser;
    public static String        PrefPage_Web_Checkbox_CustomWebBrowser_Tooltip_Linux;

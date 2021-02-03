@@ -20,20 +20,23 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -41,22 +44,26 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourBlogOptions extends ToolbarSlideout {
 
-   private static final String   APP_WEB_LABEL_DEFAULT_FONT_SIZE = net.tourbook.web.Messages.App_Web_Label_DefaultFontSize;
+   private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE         = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
+   private static final String          APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
 
-   final static IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
-   final private IDialogSettings _state;
+   private static final IDialogSettings _state_WEB                              = WEB.getState();
+   private static IDialogSettings       _state;
 
-   private Action                _actionRestoreDefaults;
+   private Action                       _actionRestoreDefaults;
 
-   private TourBlogView          _tourBlogView;
+   private TourBlogView                 _tourBlogView;
 
-   private SelectionAdapter      _defaultSelectionAdapter;
+   private MouseWheelListener           _defaultMouseWheelListener;
+   private SelectionAdapter             _defaultSelectionAdapter;
 
    /*
     * UI controls
     */
-   private Button _chkDrawMarkerWithDefaultColor;
-   private Button _chkShowHiddenMarker;
+   private Button  _chkDrawMarkerWithDefaultColor;
+   private Button  _chkShowHiddenMarker;
+
+   private Spinner _spinnerFontSize;
 
    /**
     * @param ownerControl
@@ -109,7 +116,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
          createUI_10_Header(shellContainer);
-         createUI_20_MapOptions(shellContainer);
+         createUI_20_Options(shellContainer);
       }
 
       return shellContainer;
@@ -152,39 +159,58 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
       }
    }
 
-   private void createUI_20_MapOptions(final Composite parent) {
+   private void createUI_20_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
              * Show hidden marker
              */
+
             _chkShowHiddenMarker = new Button(container, SWT.CHECK);
             _chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
             _chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHiddenMarker);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowHiddenMarker);
          }
          {
             /*
              * Draw marker with default color
              */
+
             _chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
             _chkDrawMarkerWithDefaultColor.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
             _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
             _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkDrawMarkerWithDefaultColor);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
 
          }
          {
             /*
              * Font size
              */
-            final Label label = new Label(container, SWT.NONE);
+
+            // label
+            Label label = new Label(container, SWT.NONE);
             label.setText(APP_WEB_LABEL_DEFAULT_FONT_SIZE);
+            label.setToolTipText(APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+
+            // spinner
+            _spinnerFontSize = new Spinner(container, SWT.BORDER);
+            _spinnerFontSize.setMinimum(WEB.STATE_BODY_FONT_SIZE_MIN);
+            _spinnerFontSize.setMaximum(WEB.STATE_BODY_FONT_SIZE_MAX);
+            _spinnerFontSize.setToolTipText(APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP);
+            _spinnerFontSize.addMouseWheelListener(_defaultMouseWheelListener);
+            _spinnerFontSize.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_spinnerFontSize);
+
+            // px
+            label = new Label(container, SWT.NONE);
+            label.setText(Messages.App_Unit_Px);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          }
       }
    }
@@ -198,6 +224,14 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
       _defaultSelectionAdapter = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
+            onChangeUI();
+         }
+      };
+
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
             onChangeUI();
          }
       };
@@ -217,6 +251,8 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
       _chkDrawMarkerWithDefaultColor.setSelection(    TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowHiddenMarker.setSelection(              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
 
+      _spinnerFontSize.setSelection(                  WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+
 // SET_FORMATTING_ON
 
       onChangeUI();
@@ -228,6 +264,8 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
 
       _chkDrawMarkerWithDefaultColor.setSelection(    Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowHiddenMarker.setSelection(              Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+
+      _spinnerFontSize.setSelection(                  Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -241,6 +279,8 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
 
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor.getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker.getSelection());
+
+      _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize.getSelection());
 
 // SET_FORMATTING_ON
    }

@@ -63,7 +63,7 @@ Improvements
     - R-R intervals
 
 * Tour Blog
-  - Set blog font size
+  - Set content font size
 
 
 Changes  

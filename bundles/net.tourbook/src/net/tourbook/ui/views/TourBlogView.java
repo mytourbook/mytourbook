@@ -326,7 +326,7 @@ public class TourBlogView extends ViewPart {
 
    private String create_10_Head() {
 
-      // set body default size
+      // set body size
       final int bodyFontSize = Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
       final String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
 
@@ -395,8 +395,8 @@ public class TourBlogView extends ViewPart {
    private void create_24_Tour(final StringBuilder sb) {
 
       String tourTitle = _tourData.getTourTitle();
-      final String tourDescription = _tourData.getTourDescription();
-      final String tourWeather = _tourData.getWeather();
+      String tourDescription = _tourData.getTourDescription();
+      String tourWeather = _tourData.getWeather();
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
@@ -413,7 +413,14 @@ public class TourBlogView extends ViewPart {
                 * Tour title
                 */
                if (isTitle == false) {
+
                   tourTitle = "&nbsp;"; //$NON-NLS-1$
+
+               } else {
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourTitle = UI.scrambleText(tourTitle);
+                  }
                }
 
                final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
@@ -437,6 +444,11 @@ public class TourBlogView extends ViewPart {
                 * Description
                 */
                if (isDescription) {
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourDescription = UI.scrambleText(tourDescription);
+                  }
+
                   sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
 
@@ -444,6 +456,10 @@ public class TourBlogView extends ViewPart {
                 * Weather
                 */
                if (isWeather) {
+
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tourWeather = UI.scrambleText(tourWeather);
+                  }
 
                   if (isDescription) {
                      // write spacer
@@ -472,7 +488,11 @@ public class TourBlogView extends ViewPart {
    private void create_30_Marker(final StringBuilder sb, final TourMarker tourMarker) {
 
       final long markerId = tourMarker.getMarkerId();
-      final String markerLabel = tourMarker.getLabel();
+      String markerLabel = tourMarker.getLabel();
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         markerLabel = UI.scrambleText(markerLabel);
+      }
 
       final String hrefOpenMarker = HTTP_DUMMY + HREF_OPEN_MARKER + markerId;
       final String hrefEditMarker = HTTP_DUMMY + HREF_EDIT_MARKER + markerId;
@@ -539,7 +559,11 @@ public class TourBlogView extends ViewPart {
        * Description
        */
       final String description = tourMarker.getDescription();
-      final String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+      String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         descriptionWithLineBreaks = UI.scrambleText(descriptionWithLineBreaks);
+      }
 
       sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       sb.append("   <p class='description'" + htmlMarkerStyle + ">" + descriptionWithLineBreaks + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
