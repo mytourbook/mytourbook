@@ -124,6 +124,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return routeUploads.items.get(0);
    }
 
+   /**
+    * Activities by Suunto
+    * https://apimgmtstfbqznm5nc6zmvgx.blob.core.windows.net/content/MediaLibrary/docs/Suunto%20Watches-%20SuuntoApp%20-Movescount-FIT-Activities.pdf
+    *
+    * @param tourData
+    * @return
+    */
    private String convertTourToGpx(final TourData tourData) {
 
       final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "gpx"); //$NON-NLS-1$
@@ -138,8 +145,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          useActivityType = true;
          activityName = tourType.getName();
       }
-      //TODO FB specify the activities ??
-      //https://apimgmtstfbqznm5nc6zmvgx.blob.core.windows.net/content/MediaLibrary/docs/Suunto%20Watches-%20SuuntoApp%20-Movescount-FIT-Activities.pdf
       _tourExporter.setUseActivityType(useActivityType);
       _tourExporter.setActivityType(activityName);
 

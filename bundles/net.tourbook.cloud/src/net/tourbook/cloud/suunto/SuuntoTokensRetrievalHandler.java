@@ -36,7 +36,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Shell;
 import org.json.JSONObject;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
@@ -44,13 +43,8 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
    private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
-   //TODO FB
-   private static Shell            _shell;
 
-   protected SuuntoTokensRetrievalHandler(final Shell shell) {
-
-      _shell = shell;
-   }
+   protected SuuntoTokensRetrievalHandler() {}
 
    public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
