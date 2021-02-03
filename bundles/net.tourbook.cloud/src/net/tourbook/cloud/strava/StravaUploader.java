@@ -399,6 +399,11 @@ public class StravaUploader extends TourbookCloudUploader {
             monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
+            if (!getValidTokens()) {
+               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+               return;
+            }
+
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
                   ICON_HOURGLASS,
                   UI.EMPTY_STRING));
@@ -439,11 +444,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   ICON_CHECK,
                   ICON_HOURGLASS));
 
-            if (getValidTokens()) {
-               uploadTours(toursWithTimeSeries, manualTours);
-            } else {
-               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
-            }
+            uploadTours(toursWithTimeSeries, manualTours);
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 

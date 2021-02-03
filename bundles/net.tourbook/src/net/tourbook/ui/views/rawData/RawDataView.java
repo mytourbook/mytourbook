@@ -471,7 +471,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private Menu                          _tableContextMenu;
 
-   private List<TourbookCloudDownloader> _cloudDownloaderList = CloudDownloaderManager.getCloudDownloaderList();
+   private List<TourbookCloudDownloader> _cloudDownloadersList = CloudDownloaderManager.getCloudDownloaderList();
 
    private class ImportComparator extends ViewerComparator {
 
@@ -2088,7 +2088,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
                _imageUrl_SerialPort_Directly);
 
-         for (final var cloudDownloader : _cloudDownloaderList) {
+         for (final var cloudDownloader : _cloudDownloadersList) {
 
             createHTML_92_TileAction(
                   sb,
@@ -4299,10 +4299,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          onSelectUI_Old();
       } else {
 
-         _cloudDownloaderList.stream()
+         _cloudDownloadersList.stream()
                .filter(cd -> cd.getId().equals(hrefAction))
                .forEach(TourbookCloudDownloader::downloadTours);
-
       }
    }
 
