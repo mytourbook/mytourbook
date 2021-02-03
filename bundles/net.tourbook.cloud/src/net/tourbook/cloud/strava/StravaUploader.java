@@ -242,6 +242,25 @@ public class StravaUploader extends TourbookCloudUploader {
       return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
    }
 
+   private boolean getValidTokens() {
+
+      if (!OAuth2Utils.isAccessTokenExpired(getAccessTokenExpirationDate())) {
+         return true;
+      }
+
+      final StravaTokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
+
+      boolean isTokenValid = false;
+      if (newTokens != null) {
+         setAccessTokenExpirationDate(newTokens.getExpires_at());
+         setRefreshToken(newTokens.getRefresh_token());
+         setAccessToken(newTokens.getAccess_token());
+         isTokenValid = true;
+      }
+
+      return isTokenValid;
+   }
+
    @Override
    protected boolean isReady() {
       return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken());
@@ -306,25 +325,6 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private void setRefreshToken(final String refreshToken) {
       _prefStore.setValue(Preferences.STRAVA_REFRESHTOKEN, refreshToken);
-   }
-
-   private boolean tryRenewTokens() {
-
-      if (!OAuth2Utils.isAccessTokenExpired(getAccessTokenExpirationDate())) {
-         return true;
-      }
-
-      final StravaTokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
-
-      boolean isTokenValid = false;
-      if (newTokens != null) {
-         setAccessTokenExpirationDate(newTokens.getExpires_at());
-         setRefreshToken(newTokens.getRefresh_token());
-         setAccessToken(newTokens.getAccess_token());
-         isTokenValid = true;
-      }
-
-      return isTokenValid;
    }
 
    /**
@@ -439,9 +439,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   ICON_CHECK,
                   ICON_HOURGLASS));
 
-            tryRenewTokens();
-
-            if (tryRenewTokens()) {
+            if (getValidTokens()) {
                uploadTours(toursWithTimeSeries, manualTours);
             } else {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
