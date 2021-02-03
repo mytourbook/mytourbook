@@ -180,9 +180,7 @@ public class FileSystemManager {
       getFileSystemsList();
 
       return _fileSystemsList.stream()
-            .filter(tfs -> absoluteFilePath.toLowerCase().startsWith(tfs.getId().toLowerCase()))
-            .findAny()
-            .isPresent();
+            .anyMatch(tfs -> absoluteFilePath.toLowerCase().startsWith(tfs.getId().toLowerCase()));
    }
 
    /**
@@ -200,27 +198,28 @@ public class FileSystemManager {
             .getExtensionRegistry()
             .getExtensionPoint("net.tourbook", extensionPointName); //$NON-NLS-1$
 
-      if (extPoint != null) {
+      if (extPoint == null) {
+         return fileSystemsList;
+      }
 
-         for (final IExtension extension : extPoint.getExtensions()) {
+      for (final IExtension extension : extPoint.getExtensions()) {
 
-            for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+         for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-               if (configElement.getName().equalsIgnoreCase("fileSystem")) { //$NON-NLS-1$
+            if (configElement.getName().equalsIgnoreCase(extensionPointName)) {
 
-                  Object object;
-                  try {
+               Object object;
+               try {
 
-                     object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
+                  object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                     if (object instanceof TourbookFileSystem) {
-                        final TourbookFileSystem fileSystem = (TourbookFileSystem) object;
-                        fileSystemsList.add(fileSystem);
-                     }
-
-                  } catch (final CoreException e) {
-                     e.printStackTrace();
+                  if (object instanceof TourbookFileSystem) {
+                     final TourbookFileSystem fileSystem = (TourbookFileSystem) object;
+                     fileSystemsList.add(fileSystem);
                   }
+
+               } catch (final CoreException e) {
+                  e.printStackTrace();
                }
             }
          }

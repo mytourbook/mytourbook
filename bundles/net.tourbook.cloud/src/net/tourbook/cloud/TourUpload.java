@@ -13,28 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.oauth2;
+package net.tourbook.cloud;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OAuth2Utils {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class TourUpload {
 
-   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime, final int accessTokenExpiresIn) {
+   @JsonProperty("error")
+   private String _error;
+   @JsonProperty("tourDate")
+   private String _tourDate;
 
-      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
+   public TourUpload() {}
 
-      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
+   public String getError() {
+      return _error;
    }
 
-   /**
-    * We consider that an access token is expired if there are less
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
+   public String getTourDate() {
+      return _tourDate;
+   }
 
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
+   public void setError(final String error) {
+      _error = error;
+   }
+
+   public void setTourDate(final String tourDate) {
+      _tourDate = tourDate;
    }
 }

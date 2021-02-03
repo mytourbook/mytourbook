@@ -3,10 +3,10 @@
 <schema targetNamespace="net.tourbook" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="net.tourbook" id="cloudUploader" name="Upload Tours"/>
+         <meta.schema plugin="net.tourbook" id="cloudDownloader" name="cloudDownloader"/>
       </appInfo>
       <documentation>
-         A plugin to upload tours on cloud services.
+         A plugin to download tours from cloud services.
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
-            <element ref="cloudUploader"/>
+            <element ref="cloudDownloader"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,12 +47,12 @@
       </complexType>
    </element>
 
-   <element name="cloudUploader">
+   <element name="cloudDownloader">
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  Each cloud uploader requires a unique id
+                  Each cloud downloader requires a unique id
                </documentation>
             </annotation>
          </attribute>

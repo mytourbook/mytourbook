@@ -27,7 +27,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -44,6 +43,7 @@ import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -66,6 +66,13 @@ import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
+
+   // SET_FORMATTING_OFF
+   private static final String   ICON_CHECK                    = net.tourbook.cloud.Messages.Icon_Check;
+   private static final String   ICON_HOURGLASS                = net.tourbook.cloud.Messages.Icon_Hourglass;
+   private static final String   LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String   LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   // SET_FORMATTING_ON
 
    private static final String     StravaBaseUrl = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
 
@@ -118,7 +125,7 @@ public class StravaUploader extends TourbookCloudUploader {
       VelocityService.init();
    }
 
-   private static ActivityUpload ConvertResponseToUpload(final HttpResponse<String> response, final String tourDate) {
+   private static ActivityUpload convertResponseToUpload(final HttpResponse<String> response, final String tourDate) {
 
       ActivityUpload activityUpload = new ActivityUpload();
       if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
@@ -127,7 +134,7 @@ public class StravaUploader extends TourbookCloudUploader {
          try {
             activityUpload = mapper.readValue(response.body(), ActivityUpload.class);
          } catch (final JsonProcessingException e) {
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       } else {
          activityUpload.setError(response.body());
@@ -140,13 +147,13 @@ public class StravaUploader extends TourbookCloudUploader {
 
    public static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      JSONObject body;
+      final JSONObject body = new JSONObject();
       String grantType;
       if (isRefreshToken) {
-         body = new JSONObject().put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
+         body.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
          grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
       } else {
-         body = new JSONObject().put(OAuth2Constants.PARAM_CODE, authorizationCode);
+         body.put(OAuth2Constants.PARAM_CODE, authorizationCode);
          grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
       }
 
@@ -223,30 +230,6 @@ public class StravaUploader extends TourbookCloudUploader {
       }
    }
 
-   private String createTemporaryTourFile(final String tourId, final String extension) {
-
-      String absoluteFilePath = UI.EMPTY_STRING;
-
-      try {
-         deleteTemporaryFile(tourId + UI.SYMBOL_DOT + extension);
-
-         absoluteFilePath = Files.createTempFile(tourId, UI.SYMBOL_DOT + extension).toString();
-
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
-      return absoluteFilePath;
-   }
-
-   private void deleteTemporaryFile(final String filePath) {
-
-      try {
-         Files.deleteIfExists(Paths.get(filePath));
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
-   }
-
    private String getAccessToken() {
       return _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN);
    }
@@ -261,7 +244,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    @Override
    protected boolean isReady() {
-      return StringUtils.hasContent(getAccessToken() + getRefreshToken());
+      return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken());
    }
 
    private String mapTourType(final TourData manualTour) {
@@ -297,17 +280,19 @@ public class StravaUploader extends TourbookCloudUploader {
       return gzipFile(absoluteTourFilePath);
    }
 
-   private CompletableFuture<ActivityUpload> sendAsyncRequest(final TourData manualTour, final HttpRequest request) {
-      final String tourDate = manualTour.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+   private CompletableFuture<ActivityUpload> sendAsyncRequest(final TourData tour, final HttpRequest request) {
+
+      final String tourDate = tour.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
 
       final CompletableFuture<ActivityUpload> activityUpload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .thenApply(name -> ConvertResponseToUpload(name, tourDate))
+            .thenApply(name -> convertResponseToUpload(name, tourDate))
             .exceptionally(e -> {
                final ActivityUpload errorUpload = new ActivityUpload();
                errorUpload.setTourDate(tourDate);
                errorUpload.setError(e.getMessage());
                return errorUpload;
             });
+
       return activityUpload;
    }
 
@@ -323,19 +308,23 @@ public class StravaUploader extends TourbookCloudUploader {
       _prefStore.setValue(Preferences.STRAVA_REFRESHTOKEN, refreshToken);
    }
 
-   private void tryRenewTokens() {
+   private boolean tryRenewTokens() {
 
       if (!OAuth2Utils.isAccessTokenExpired(getAccessTokenExpirationDate())) {
-         return;
+         return true;
       }
 
       final StravaTokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
 
+      boolean isTokenValid = false;
       if (newTokens != null) {
          setAccessTokenExpirationDate(newTokens.getExpires_at());
          setRefreshToken(newTokens.getRefresh_token());
          setAccessToken(newTokens.getAccess_token());
+         isTokenValid = true;
       }
+
+      return isTokenValid;
    }
 
    /**
@@ -355,7 +344,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(StravaBaseUrl + "/uploads")) //$NON-NLS-1$
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
+            .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .header(OAuth2Constants.CONTENT_TYPE, "multipart/form-data; boundary=" + publisher.getBoundary()) //$NON-NLS-1$
             .timeout(Duration.ofMinutes(5))
             .POST(publisher.build())
@@ -376,21 +365,21 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final boolean isTrainerActivity = manualTour.getTourType() != null && manualTour.getTourType().getName().equalsIgnoreCase("trainer"); //$NON-NLS-1$
 
-      final String body = "{" + //$NON-NLS-1$
-            "\"name\": \"" + manualTour.getTourTitle() + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"type\": \"" + stravaActivityType + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"start_date_local\": \"" + TimeTools.getUTCISODateTime(manualTour.getTourStartTimeMS()) + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"elapsed_time\": \"" + manualTour.getTourDeviceTime_Elapsed() + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"description\": \"" + manualTour.getTourDescription() + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"distance\": \"" + manualTour.getTourDistance() + "\"," + //$NON-NLS-1$ //$NON-NLS-2$
-            "\"trainer\": \"" + (isTrainerActivity ? "1" : "0") + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      final JSONObject body = new JSONObject();
+      body.put("name", manualTour.getTourTitle()); //$NON-NLS-1$
+      body.put("type", stravaActivityType); //$NON-NLS-1$
+      body.put("start_date_local", TimeTools.getUTCISODateTime(manualTour.getTourStartTimeMS())); //$NON-NLS-1$
+      body.put("elapsed_time", manualTour.getTourDeviceTime_Elapsed()); //$NON-NLS-1$
+      body.put("description", manualTour.getTourDescription()); //$NON-NLS-1$
+      body.put("distance", manualTour.getTourDistance()); //$NON-NLS-1$
+      body.put("trainer", (isTrainerActivity ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(StravaBaseUrl + "/activities")) //$NON-NLS-1$
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken()) //$NON-NLS-1$
+            .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .timeout(Duration.ofMinutes(5))
-            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
             .build();
 
       return sendAsyncRequest(manualTour, request);
@@ -411,7 +400,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   numberOfTours * 2);
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
-                  Messages.UploadToursToStrava_Icon_Hourglass,
+                  ICON_HOURGLASS,
                   UI.EMPTY_STRING));
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
@@ -436,29 +425,33 @@ public class StravaUploader extends TourbookCloudUploader {
                   }
                } else {
 
-                  final String absoluteTourFilePath = createTemporaryTourFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
+                  final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
 
                   toursWithTimeSeries.put(processTour(tourData, absoluteTourFilePath), tourData);
 
-                  deleteTemporaryFile(absoluteTourFilePath);
+                  FilesUtils.deleteFile(Paths.get(absoluteTourFilePath));
 
                   monitor.worked(1);
                }
             }
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
-                  Messages.UploadToursToStrava_Icon_Check,
-                  Messages.UploadToursToStrava_Icon_Hourglass));
+                  ICON_CHECK,
+                  ICON_HOURGLASS));
 
             tryRenewTokens();
 
-            uploadTours(toursWithTimeSeries, manualTours);
+            if (tryRenewTokens()) {
+               uploadTours(toursWithTimeSeries, manualTours);
+            } else {
+               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+            }
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
             monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask,
-                  Messages.UploadToursToStrava_Icon_Check,
-                  Messages.UploadToursToStrava_Icon_Check));
+                  ICON_CHECK,
+                  ICON_CHECK));
          }
 
       };
@@ -471,7 +464,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
 
-         TourLogManager.logTitle(String.format(Messages.Log_UploadToursToStrava_005_End, (System.currentTimeMillis() - start) / 1000.0));
+         TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
@@ -506,7 +499,7 @@ public class StravaUploader extends TourbookCloudUploader {
       for (final Map.Entry<String, TourData> tourToUpload : toursWithTimeSeries.entrySet()) {
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
-         deleteTemporaryFile(compressedTourAbsoluteFilePath);
+         FilesUtils.deleteFile(Paths.get(compressedTourAbsoluteFilePath));
       }
    }
 }

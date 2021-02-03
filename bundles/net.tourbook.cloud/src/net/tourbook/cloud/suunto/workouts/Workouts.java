@@ -13,28 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.oauth2;
+package net.tourbook.cloud.suunto.workouts;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public class OAuth2Utils {
+import java.util.ArrayList;
+import java.util.List;
 
-   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime, final int accessTokenExpiresIn) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Workouts {
+   public String        error;
+   public List<Payload> payload;
+//   public Metadata      metadata;
 
-      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
-
-      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
-   }
-
-   /**
-    * We consider that an access token is expired if there are less
-    * than 5 mins remaining until the actual expiration
-    *
-    * @return
-    */
-   public static boolean isAccessTokenExpired(final long tokenExpirationDate) {
-
-      return tokenExpirationDate - System.currentTimeMillis() - 300000 < 0;
+   public Workouts() {
+      payload = new ArrayList<>();
    }
 }

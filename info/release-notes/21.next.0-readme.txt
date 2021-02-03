@@ -40,6 +40,10 @@ Issues
 New
 ===
 
+* Suunto App Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/2XX
+  - Ability to download tours (FIT format)
+  - Ability to upload GPX routes
+
 * Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/273
   - Ability to upload tours to a Strava account.
 

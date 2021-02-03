@@ -84,13 +84,15 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    public void closeDropboxFileSystem() {
 
-      if (_dropboxFileSystem != null) {
-         try {
-            _dropboxFileSystem.close();
-            _dropboxFileSystem = null;
-         } catch (final IOException e) {
-            StatusUtil.log(e);
-         }
+      if (_dropboxFileSystem == null) {
+         return;
+      }
+
+      try {
+         _dropboxFileSystem.close();
+         _dropboxFileSystem = null;
+      } catch (final IOException e) {
+         StatusUtil.log(e);
       }
    }
 
@@ -142,12 +144,9 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    @Override
    public Iterable<FileStore> getFileStore() {
-      if (_dropboxFileSystem != null) {
+
+      if (_dropboxFileSystem != null || createDropboxFileSystem()) {
          return _dropboxFileSystem.getFileStores();
-      } else {
-         if (createDropboxFileSystem()) {
-            return _dropboxFileSystem.getFileStores();
-         }
       }
 
       return null;

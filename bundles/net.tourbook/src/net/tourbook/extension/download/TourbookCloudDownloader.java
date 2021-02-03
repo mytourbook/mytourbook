@@ -13,30 +13,39 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.strava;
+package net.tourbook.extension.download;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+public abstract class TourbookCloudDownloader {
 
-import net.tourbook.cloud.TourUpload;
+   private String CLOUD_DOWNLOADER_ID;
+   private String CLOUD_DOWNLOADER_NAME;
+   private String CLOUD_DOWNLOADER_DESCRIPTION;
+   private String CLOUD_DOWNLOADER_ICON_URL;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ActivityUpload extends TourUpload {
+   public TourbookCloudDownloader(final String id, final String name, final String description, final String iconUrl) {
+      CLOUD_DOWNLOADER_ID = id;
+      CLOUD_DOWNLOADER_NAME = name;
+      CLOUD_DOWNLOADER_DESCRIPTION = description;
+      CLOUD_DOWNLOADER_ICON_URL = iconUrl;
+   }
 
-   private String id;
-   private String name;
-   private String status;
+   public abstract void downloadTours();
 
-   public ActivityUpload() {}
+   public String getDescription() {
+      return CLOUD_DOWNLOADER_DESCRIPTION;
+   }
+
+   public String getIconUrl() {
+      return CLOUD_DOWNLOADER_ICON_URL;
+   }
 
    public String getId() {
-      return id;
+      return CLOUD_DOWNLOADER_ID;
    }
 
    public String getName() {
-      return name;
+      return CLOUD_DOWNLOADER_NAME;
    }
 
-   public String getStatus() {
-      return status;
-   }
+   protected abstract boolean isReady();
 }

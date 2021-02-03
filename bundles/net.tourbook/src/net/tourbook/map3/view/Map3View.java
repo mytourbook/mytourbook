@@ -1244,7 +1244,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenTour.setEnabled(isTourSelected);
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
-      _actionUploadTour.setEnabled(isTourSelected && _actionUploadTour.hasUploaders());
+      _actionUploadTour.setEnabled(isTourSelected);
    }
 
    private void fillActionBars() {

@@ -41,7 +41,7 @@
 	<variableList>
 		<variable>
 			<name>MT_DOJO</name>
-			<value>file:/C:/E/js-resources/dojo/MyTourbook-DojoToolkit</value>
+			<value>file:/C:/DAT/MT/mytourbook-dojo-toolkit</value>
 		</variable>
 	</variableList>
 </projectDescription>
