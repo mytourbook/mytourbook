@@ -4299,12 +4299,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          onSelectUI_Old();
       } else {
 
-         for (final var cloudDownloader : _cloudDownloaderList) {
-
-            if (cloudDownloader.getId().equals(hrefAction)) {
-               cloudDownloader.downloadTours();
-            }
-         }
+         _cloudDownloaderList.stream()
+               .filter(cd -> cd.getId().equals(hrefAction))
+               .forEach(TourbookCloudDownloader::downloadTours);
 
       }
    }
