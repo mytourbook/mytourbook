@@ -152,7 +152,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       final String tourGpx = FilesUtils.readFileContentString(absoluteTourFilePath);
 
-      FilesUtils.deleteFile(Paths.get(absoluteTourFilePath));
+      FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
       return tourGpx;
    }

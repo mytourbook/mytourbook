@@ -429,7 +429,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
                   toursWithTimeSeries.put(processTour(tourData, absoluteTourFilePath), tourData);
 
-                  FilesUtils.deleteFile(Paths.get(absoluteTourFilePath));
+                  FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
                   monitor.worked(1);
                }
@@ -499,7 +499,7 @@ public class StravaUploader extends TourbookCloudUploader {
       for (final Map.Entry<String, TourData> tourToUpload : toursWithTimeSeries.entrySet()) {
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
-         FilesUtils.deleteFile(Paths.get(compressedTourAbsoluteFilePath));
+         FilesUtils.deleteIfExists(Paths.get(compressedTourAbsoluteFilePath));
       }
    }
 }

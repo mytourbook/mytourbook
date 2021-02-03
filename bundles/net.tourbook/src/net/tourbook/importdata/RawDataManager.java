@@ -2266,7 +2266,7 @@ public class RawDataManager {
 
                if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
                   // Delete the temporary created file
-                  FilesUtils.deleteFile(importFile.toPath());
+                  FilesUtils.deleteIfExists(importFile.toPath());
                }
 
             }

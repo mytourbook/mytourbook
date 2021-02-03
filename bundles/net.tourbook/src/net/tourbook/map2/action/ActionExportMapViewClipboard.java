@@ -78,7 +78,7 @@ public class ActionExportMapViewClipboard extends Action {
                   new Transfer[] { ImageTransfer.getInstance() });
             image.dispose();
 
-            FilesUtils.deleteFile(Paths.get(absoluteFilePath));
+            FilesUtils.deleteIfExists(Paths.get(absoluteFilePath));
          } catch (final IOException e) {
             StatusUtil.log(e);
          }

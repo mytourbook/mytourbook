@@ -31,7 +31,7 @@ public final class FilesUtils {
       String absoluteFilePath = UI.EMPTY_STRING;
 
       try {
-         deleteFile(Paths.get(fileName + UI.SYMBOL_DOT + extension));
+         deleteIfExists(Paths.get(fileName + UI.SYMBOL_DOT + extension));
 
          absoluteFilePath = Files.createTempFile(fileName, UI.SYMBOL_DOT + extension).toString();
 
@@ -42,7 +42,7 @@ public final class FilesUtils {
       return absoluteFilePath;
    }
 
-   public static void deleteFile(final Path filePath) {
+   public static void deleteIfExists(final Path filePath) {
 
       try {
          Files.deleteIfExists(filePath);
