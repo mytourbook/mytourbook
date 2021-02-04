@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -244,12 +244,9 @@ public class FitData {
       _tourData.createTimeSeries(_allTimeData, false);
 
       _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
-      final long tourDeviceTimePaused = _tourData.getTourDeviceTime_Paused();
-      if (tourDeviceTimePaused > 0) {
-         //For the tours with pauses, we set the recorded time again as the elapsed time might have changed (+- few seconds)
-         //after the time series were created.
-         _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
-      }
+      //We set the recorded time again as the elapsed time might have changed (+- few seconds)
+      //after the time series were created.
+      _tourData.setTourDeviceTime_Recorded(_tourData.getTourDeviceTime_Elapsed() - _tourData.getTourDeviceTime_Paused());
 
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
@@ -280,7 +277,7 @@ public class FitData {
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
-         finalizeTour_Type(_tourData);
+         finalizeTour_Type();
       }
    }
 
@@ -474,7 +471,7 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-   private void finalizeTour_Type(final TourData tourData) {
+   private void finalizeTour_Type() {
 
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
@@ -555,6 +552,10 @@ public class FitData {
 
    public List<GearData> getGearData() {
       return _allGearData;
+   }
+
+   public TimeData getLastAdded_TimeData() {
+      return _lastAdded_TimeData;
    }
 
    public List<Long> getPausedTime_End() {
@@ -734,9 +735,5 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
-   }
-
-   public TimeData getLastAdded_TimeData() {
-      return _lastAdded_TimeData;
    }
 }
