@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.importdata.DeviceData;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +45,12 @@ public class GarminFitTester {
       fitDataReader = new FitDataReader();
    }
 
+   @AfterEach
+   void tearDown() {
+      newlyImportedTours.clear();
+      alreadyImportedTours.clear();
+   }
+
    /**
     * Regression test. This test can be useful when updating the FIT SDK and ensuring that the FIT
     * import still works as expected.
@@ -52,6 +59,22 @@ public class GarminFitTester {
    void testFitImportConeyLake() {
 
       final String filePath = IMPORT_FILE_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
+
+      final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
+      fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      Comparison.compareTourDataAgainstControl(tour, filePath);
+   }
+
+   /**
+    * Test to ensure that files without pauses have the recorded time equal to the elapsed time
+    */
+   @Test
+   void testFitImportNoPauses() {
+
+      final String filePath = IMPORT_FILE_PATH + "1-30-21 3-47 PM"; //$NON-NLS-1$
 
       final String testFilePath = Paths.get(filePath + ".fit").toAbsolutePath().toString(); //$NON-NLS-1$
       fitDataReader.processDeviceData(testFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
