@@ -60,7 +60,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
@@ -138,26 +137,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          }
       }
 
-      final boolean[] stop = new boolean[1];
-      stop[0] = true;
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-         if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
-            TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
-            return;
-         }
-         if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
-            TourLogManager.logError(Messages.Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder);
-            return;
-         }
-
-         stop[0] = false;
-      });
-
-      if (stop[0]) {
-         return;
-      }
-
       _numberOfAvailableTours = new int[1];
       _numberOfDownloadedTours = new int[1];
 
@@ -167,6 +146,18 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             monitor.beginTask(Messages.DownloadWorkoutsFromSuunto_Task, 2);
+
+            monitor.subTask(Messages.ValidatingSuuntoTokens_SubTask);
+
+            if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
+               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+               return;
+            }
+
+            if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
+               TourLogManager.logError(Messages.Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder);
+               return;
+            }
 
             monitor.subTask(NLS.bind(Messages.DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
