@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
@@ -92,7 +93,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          ++_numberOfDownloadedTours[0];
 
          TourLogManager.addLog(TourLogState.IMPORT_OK,
-               NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_004_DownloadStatus,
+               NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_005_DownloadStatus,
                      workoutDownload.getWorkoutKey(),
                      workoutDownload.getAbsoluteFilePath()));
       } else {
@@ -115,10 +116,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       final List<CompletableFuture<WorkoutDownload>> workoutDownloads = new ArrayList<>();
 
-      for (final Payload payload : newWorkouts) {
-
-         workoutDownloads.add(downloadFile(payload.workoutKey));
-      }
+      newWorkouts.stream().forEach(newWorkout -> workoutDownloads.add(downloadFile(newWorkout.workoutKey)));
 
       workoutDownloads.stream().map(CompletableFuture::join).forEach(SuuntoCloudDownloader::logDownloadResult);
 
@@ -149,7 +147,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             return;
          }
          if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
-            TourLogManager.logError(Messages.Log_DownloadWorkoutsToSuunto_003_NoSpecifiedFolder);
+            TourLogManager.logError(Messages.Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder);
             return;
          }
 
@@ -186,17 +184,17 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             final List<Long> tourStartTimes = retrieveAllTourStartTimes();
 
             //Identifying the workouts that have not yet been imported in the tour database
-            final List<Payload> newWorkouts = new ArrayList<>();
-            for (final Payload suuntoWorkout : workouts.payload) {
+            final List<Payload> newWorkouts = workouts.payload.stream()
+                  .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
+                  .collect(Collectors.toList());
 
-               if (tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L)) {
-                  continue;
-               }
-
-               newWorkouts.add(suuntoWorkout);
+            final int numNewWorkouts = newWorkouts.size();
+            if (numNewWorkouts == 0) {
+               TourLogManager.logInfo(Messages.Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist);
+               return;
             }
 
-            _numberOfAvailableTours[0] = newWorkouts.size();
+            _numberOfAvailableTours[0] = numNewWorkouts;
 
             monitor.worked(1);
 
@@ -306,7 +304,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             .thenApply(response -> writeFileToFolder(workoutKey, response))
             .exceptionally(e -> {
                final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutKey);
-               erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_006_Error,
+               erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_007_Error,
                      erroneousDownload.getWorkoutKey(),
                      e.getMessage()));
                erroneousDownload.setSuccessfullyDownloaded(false);
@@ -332,7 +330,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       if (filePath.toFile().exists()) {
 
-         workoutDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_005_FileAlreadyExists,
+         workoutDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_006_FileAlreadyExists,
                workoutDownload.getWorkoutKey(),
                filePath.toAbsolutePath().toString()));
          return workoutDownload;

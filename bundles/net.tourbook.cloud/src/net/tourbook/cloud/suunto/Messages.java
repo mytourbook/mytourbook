@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.cloud.suunto.messages";  //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.cloud.suunto.messages";      //$NON-NLS-1$
 
    public static String        Dialog_WorkoutsDownload_Message;
    public static String        Dialog_WorkoutsDownload_Summary;
@@ -34,10 +34,11 @@ public class Messages extends NLS {
    public static String        Log_UploadToursToSuunto_004_UploadError;
    public static String        Log_DownloadWorkoutsToSuunto_001_Start;
    public static String        Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound;
-   public static String        Log_DownloadWorkoutsToSuunto_003_NoSpecifiedFolder;
-   public static String        Log_DownloadWorkoutsToSuunto_004_DownloadStatus;
-   public static String        Log_DownloadWorkoutsToSuunto_005_FileAlreadyExists;
-   public static String        Log_DownloadWorkoutsToSuunto_006_Error;
+   public static String        Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist;
+   public static String        Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder;
+   public static String        Log_DownloadWorkoutsToSuunto_005_DownloadStatus;
+   public static String        Log_DownloadWorkoutsToSuunto_006_FileAlreadyExists;
+   public static String        Log_DownloadWorkoutsToSuunto_007_Error;
 
    public static String        Pref_AccountInformation_SuuntoApp_WebPage_Link;
    public static String        Pref_Checkbox_Use_SinceDateFilter;
