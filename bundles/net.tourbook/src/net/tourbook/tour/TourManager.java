@@ -3709,6 +3709,7 @@ public class TourManager {
             break;
 
          case GRAPH_PACE:
+            //TODO FB
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
@@ -4250,7 +4251,7 @@ public class TourManager {
       final float[] paceSerie = tourData.getPaceSerieSeconds();
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
-
+//TODO FB
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(GRAPH_LABEL_PACE);
