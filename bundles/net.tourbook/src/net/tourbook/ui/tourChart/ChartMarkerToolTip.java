@@ -388,8 +388,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             .applyTo(container);
       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         //todo
-//         if (_cmc.isShowAbsoluteValues)
+         if (_cmc.isShowMarkerTooltip_Distance)
+
          {
             /*
              * Altitude

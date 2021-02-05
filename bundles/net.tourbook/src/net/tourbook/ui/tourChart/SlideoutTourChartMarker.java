@@ -695,6 +695,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
       final boolean isShowMarkerPoint = _chkShowMarkerPoint.getSelection();
       final boolean isShowMarkerTooltip = _chkShowMarkerTooltip.getSelection();
+      final boolean isShowMarkerTooltip_Distance = _chkDistance.getSelection();
+      final boolean isShowMarkerTooltip_Elevation = _chkElevation.getSelection();
+      final boolean isShowMarkerTooltip_Time = _chkTime.getSelection();
+      final boolean isShowMarkerTooltip_TimeDifference = _chkLapTime.getSelection();
+      final boolean isShowMarkerTooltip_DistanceDifference = _chkLapDistance.getSelection();
+      final boolean isShowMarkerTooltip_ElevationGainDifference = _chkLapElevationGain.getSelection();
       final boolean isShowOnlyWithDescription = _chkShowOnlyWithDescription.getSelection();
 
       final int hoverSize = _spinHoverSize.getSelection();
@@ -723,6 +729,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, isShowMarkerPoint);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_Distance);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_Elevation);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_Time);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_TimeDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_DistanceDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_DistanceDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip_ElevationGainDifference);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, isShowOnlyWithDescription);
 
       PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, defaultColor);
@@ -739,6 +752,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       tcc.isShowMarkerLabel = isShowMarkerLabel;
       tcc.isShowMarkerPoint = isShowMarkerPoint;
       tcc.isShowMarkerTooltip = isShowMarkerTooltip;
+      tcc.isShowMarkerTooltip_Distance = isShowMarkerTooltip_Distance;
       tcc.isShowOnlyWithDescription = isShowOnlyWithDescription;
 
       tcc.markerHoverSize = hoverSize;
