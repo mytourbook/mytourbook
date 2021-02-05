@@ -3713,6 +3713,7 @@ public class TourManager {
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
+               //chartDataModel.setInvertedData???
             }
             break;
 
