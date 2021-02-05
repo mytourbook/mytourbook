@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -362,6 +362,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
    private void createUI_70_Values(final Composite parent) {
 
+      //todo fb ca se passe ici
+      //add lap time, lap distance, altitude gained on the lap
       int valueIndex;
       if (_tourData.isMultipleTours()) {
          valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
