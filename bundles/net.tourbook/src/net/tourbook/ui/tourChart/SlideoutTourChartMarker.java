@@ -432,7 +432,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private void createUI_70_TooltipData(final Composite container) {
 
       final Group groupData = new Group(container, SWT.NONE);
-      groupData.setText("Tooltip data");//"Messages.Slideout_ChartMarkerOptions_Group_TooltipData);
+      groupData.setText(Messages.Slideout_ChartMarkerOptions_Group_TooltipData);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupData);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(groupData);
       {
