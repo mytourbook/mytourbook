@@ -159,19 +159,14 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
          return;
       }
 
-      final boolean isToolItemHovered = item == _actionToolItem;
-
       Rectangle itemBounds = null;
 
-      if (isToolItemHovered) {
+      itemBounds = item.getBounds();
 
-         itemBounds = item.getBounds();
+      final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-         itemBounds.x = itemDisplayPosition.x;
-         itemBounds.y = itemDisplayPosition.y;
-      }
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
 
       openSlideout(itemBounds, true);
    }
