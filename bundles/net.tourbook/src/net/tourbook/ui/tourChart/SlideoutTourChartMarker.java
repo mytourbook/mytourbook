@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -55,7 +56,12 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener {
 
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private static final String     GRAPH_LABEL_ALTITUDE      = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String     GRAPH_LABEL_TIME          = net.tourbook.common.Messages.Graph_Label_Time;
+   private static final String     GRAPH_LABEL_DISTANCE      = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String     GRAPH_LABEL_ELEVATIONGAIN = net.tourbook.common.Messages.Graph_Label_ElevationGain;
+
+   private final IPreferenceStore  _prefStore                = TourbookPlugin.getPrefStore();
 
    private SelectionAdapter        _defaultSelectionAdapter;
    private MouseWheelListener      _defaultMouseWheelListener;
@@ -138,6 +144,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private Spinner               _spinHoverSize;
    private Spinner               _spinLabelOffset;
    private Spinner               _spinMarkerPointSize;
+   private Button                _chkElevation;
+   private Button                _chkDistance;
+   private Button                _chkTime;
+   private Button                _chkLapTime;
+   private Button                _chkLapDistance;
+   private Button                _chkLapElevationGain;
 
    public SlideoutTourChartMarker(final Control ownerControl,
                                   final ToolBar toolBar,
@@ -200,10 +212,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
             createUI_10_Header(container);
             createUI_20_Properties(container);
             createUI_50_TempPosition(container);
+            createUI_70_TooltipData(container);
             createUI_90_Bottom(container);
-
-            //todo fb add check boxes for the labels to display
-
          }
       }
 
@@ -419,6 +429,34 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       }
    }
 
+   private void createUI_70_TooltipData(final Composite container) {
+
+      final Group groupData = new Group(container, SWT.NONE);
+      groupData.setText("Tooltip data");//"Messages.Slideout_ChartMarkerOptions_Group_TooltipData);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupData);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(groupData);
+      {
+         _chkElevation = new Button(groupData, SWT.CHECK);
+         _chkElevation.setText(GRAPH_LABEL_ALTITUDE);
+
+         _chkDistance = new Button(groupData, SWT.CHECK);
+         _chkDistance.setText(GRAPH_LABEL_DISTANCE);
+
+         _chkTime = new Button(groupData, SWT.CHECK);
+         _chkTime.setText(GRAPH_LABEL_TIME);
+
+         _chkLapTime = new Button(groupData, SWT.CHECK);
+         _chkLapTime.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
+
+         _chkLapDistance = new Button(groupData, SWT.CHECK);
+         _chkLapDistance.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
+
+         _chkLapElevationGain = new Button(groupData, SWT.CHECK);
+         _chkLapElevationGain.setText(GRAPH_LABEL_ELEVATIONGAIN);
+
+      }
+   }
+
    private void createUI_90_Bottom(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -614,6 +652,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
       _chkShowLabelTempPosition.setEnabled(isLabelVisible);
       _comboLabelTempPosition.setEnabled(isLabelVisible && isShowTempPosition);
+      _chkElevation.setEnabled(isLabelVisible);
+      _chkDistance.setEnabled(isLabelVisible);
+      _chkTime.setEnabled(isLabelVisible);
+      _chkLapTime.setEnabled(isLabelVisible);
+      _chkLapDistance.setEnabled(isLabelVisible);
+      _chkLapElevationGain.setEnabled(isLabelVisible);
 
       _chkShowHiddenMarker.setEnabled(isMarkerVisible);
       _chkShowOnlyWithDescription.setEnabled(isMarkerVisible);
@@ -734,6 +778,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 		_comboLabelTempPosition.select(					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
 		_comboTooltipPosition.select(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
+
+		  _chkElevation.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_ELEVATION));
+		  _chkDistance.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_DISTANCE));
+		  _chkTime.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_TIME));
+		  _chkLapTime.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_TIME_DIFFERENCE));
+		  _chkLapDistance.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_DISTANCE_DIFFERENCE));
+		  _chkLapElevationGain.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_LABEL_ELEVATIONGAIN_DIFFERENCE));
 
 		_spinHoverSize.setSelection(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
 		_spinMarkerPointSize.setSelection(				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
