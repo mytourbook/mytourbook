@@ -23,6 +23,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -362,13 +363,17 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
    private void createUI_70_Values(final Composite parent) {
 
-      //todo fb ca se passe ici
-      //add lap time, lap distance, altitude gained on the lap
       int valueIndex;
       if (_tourData.isMultipleTours()) {
          valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
       } else {
          valueIndex = _hoveredTourMarker.getSerieIndex();
+      }
+
+      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      TourMarker previousTourMarker = null;
+      if (index > 0) {
+         previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
       }
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -465,6 +470,65 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                      GRAPH_LABEL_TIME,
                      UI.UNIT_LABEL_TIME,
                      FormatManager.formatElapsedTime(timeValue));
+            }
+         }
+
+         //add lap time, lap distance, altitude gained on the lap
+         {
+            /*
+             * Lap time
+             */
+            int timeValue = _hoveredTourMarker.getTime();
+
+            if (previousTourMarker != null) {
+               timeValue -= previousTourMarker.getTime();
+            }
+
+            if (timeValue != Integer.MIN_VALUE) {
+
+               createUI_72_ValueField(
+                     container,
+                     "lap time",
+                     UI.UNIT_LABEL_TIME,
+                     FormatManager.formatElapsedTime(timeValue));
+            }
+         }
+
+         {
+            /*
+             * Lap distance
+             */
+            float distance = _hoveredTourMarker.getDistance();
+
+            if (previousTourMarker != null) {
+               distance -= previousTourMarker.getDistance();
+            }
+
+            if (distance != Float.MIN_VALUE) {
+
+               createUI_72_ValueField(
+                     container,
+                     "lap distance",
+                     UI.UNIT_LABEL_DISTANCE,
+                     FormatManager.formatDistance(distance));
+            }
+         }
+
+         {
+            /*
+             * Lap elevation gain
+             */
+            final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
+            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex,
+                  _hoveredTourMarker.getSerieIndex());
+
+            if (elevationGainLoss != null) {
+
+               createUI_72_ValueField(
+                     container,
+                     "lap elevation gain",
+                     UI.UNIT_LABEL_ALTIMETER,
+                     FormatManager.formatElevation(elevationGainLoss.getAltitudeUp()));
             }
          }
       }
