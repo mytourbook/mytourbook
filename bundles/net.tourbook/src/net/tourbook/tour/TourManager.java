@@ -4250,6 +4250,7 @@ public class TourManager {
       final float[] paceSerie = tourData.getPaceSerieSeconds();
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
+
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(GRAPH_LABEL_PACE);
