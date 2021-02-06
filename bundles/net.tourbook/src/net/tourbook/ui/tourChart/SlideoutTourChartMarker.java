@@ -129,9 +129,9 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private Button                _chkMarkerTooltip_Elevation;
    private Button                _chkMarkerTooltip_Distance;
    private Button                _chkMarkerTooltip_Duration;
-   private Button                _chkMarkerTooltip_DurationDifference;
-   private Button                _chkMarkerTooltip_DistanceDifference;
    private Button                _chkMarkerTooltip_ElevationGainDifference;
+   private Button                _chkMarkerTooltip_DistanceDifference;
+   private Button                _chkMarkerTooltip_DurationDifference;
    private Button                _chkShowOnlyWithDescription;
 
    /**
@@ -438,22 +438,27 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       {
          _chkMarkerTooltip_Elevation = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_Elevation.setText(GRAPH_LABEL_ALTITUDE);
+         _chkMarkerTooltip_Elevation.addSelectionListener(_defaultSelectionAdapter);
 
          _chkMarkerTooltip_Distance = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_Distance.setText(GRAPH_LABEL_DISTANCE);
+         _chkMarkerTooltip_Distance.addSelectionListener(_defaultSelectionAdapter);
 
          _chkMarkerTooltip_Duration = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_Duration.setText(GRAPH_LABEL_TIME);
-
-         _chkMarkerTooltip_DurationDifference = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
-
-         _chkMarkerTooltip_DistanceDifference = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
+         _chkMarkerTooltip_Duration.addSelectionListener(_defaultSelectionAdapter);
 
          _chkMarkerTooltip_ElevationGainDifference = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN);
+         _chkMarkerTooltip_ElevationGainDifference.addSelectionListener(_defaultSelectionAdapter);
 
+         _chkMarkerTooltip_DistanceDifference = new Button(groupData, SWT.CHECK);
+         _chkMarkerTooltip_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
+         _chkMarkerTooltip_DistanceDifference.addSelectionListener(_defaultSelectionAdapter);
+
+         _chkMarkerTooltip_DurationDifference = new Button(groupData, SWT.CHECK);
+         _chkMarkerTooltip_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
+         _chkMarkerTooltip_DurationDifference.addSelectionListener(_defaultSelectionAdapter);
       }
    }
 
@@ -652,12 +657,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
       _chkShowLabelTempPosition.setEnabled(isLabelVisible);
       _comboLabelTempPosition.setEnabled(isLabelVisible && isShowTempPosition);
-      _chkMarkerTooltip_Elevation.setEnabled(isLabelVisible);
-      _chkMarkerTooltip_Distance.setEnabled(isLabelVisible);
-      _chkMarkerTooltip_Duration.setEnabled(isLabelVisible);
-      _chkMarkerTooltip_DurationDifference.setEnabled(isLabelVisible);
-      _chkMarkerTooltip_DistanceDifference.setEnabled(isLabelVisible);
-      _chkMarkerTooltip_ElevationGainDifference.setEnabled(isLabelVisible);
+      _chkMarkerTooltip_Elevation.setEnabled(isTooltipVisible);
+      _chkMarkerTooltip_Distance.setEnabled(isTooltipVisible);
+      _chkMarkerTooltip_Duration.setEnabled(isTooltipVisible);
+      _chkMarkerTooltip_ElevationGainDifference.setEnabled(isTooltipVisible);
+      _chkMarkerTooltip_DistanceDifference.setEnabled(isTooltipVisible);
+      _chkMarkerTooltip_DurationDifference.setEnabled(isTooltipVisible);
 
       _chkShowHiddenMarker.setEnabled(isMarkerVisible);
       _chkShowOnlyWithDescription.setEnabled(isMarkerVisible);
@@ -827,11 +832,18 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
       _chkDrawMarkerWithDefaultColor.setSelection(tcc.isDrawMarkerWithDefaultColor);
       _chkShowAbsoluteValues.setSelection(tcc.isShowAbsoluteValues);
+
       _chkShowHiddenMarker.setSelection(tcc.isShowHiddenMarker);
       _chkShowLabelTempPosition.setSelection(tcc.isShowLabelTempPos);
       _chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
       _chkShowMarkerPoint.setSelection(tcc.isShowMarkerPoint);
       _chkShowMarkerTooltip.setSelection(tcc.isShowMarkerTooltip);
+      _chkMarkerTooltip_Elevation.setSelection(tcc.isShowMarkerTooltip_Elevation);
+      _chkMarkerTooltip_Distance.setSelection(tcc.isShowMarkerTooltip_Distance);
+      _chkMarkerTooltip_Duration.setSelection(tcc.isShowMarkerTooltip_Duration);
+      _chkMarkerTooltip_ElevationGainDifference.setSelection(tcc.isShowMarkerTooltip_ElevationGainDifference);
+      _chkMarkerTooltip_DistanceDifference.setSelection(tcc.isShowMarkerTooltip_DistanceDifference);
+      _chkMarkerTooltip_DurationDifference.setSelection(tcc.isShowMarkerTooltip_DurationDifference);
       _chkShowOnlyWithDescription.setSelection(tcc.isShowOnlyWithDescription);
 
       _comboLabelTempPosition.select(tcc.markerLabelTempPos);

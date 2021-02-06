@@ -486,7 +486,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
                createUI_72_ValueField(
                      container,
-                     GRAPH_LABEL_ELEVATIONGAIN,
+                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN,
                      UI.UNIT_LABEL_ALTIMETER,
                      FormatManager.formatElevation(elevationGainLoss.getAltitudeUp()));
             }
@@ -504,11 +504,15 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
             if (distance != Float.MIN_VALUE) {
 
+               final double value = distance //
+                     / 1000
+                     / UI.UNIT_VALUE_DISTANCE;
+
                createUI_72_ValueField(
                      container,
                      UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE,
                      UI.UNIT_LABEL_DISTANCE,
-                     FormatManager.formatDistance(distance));
+                     FormatManager.formatDistance(value));
             }
          }
 
