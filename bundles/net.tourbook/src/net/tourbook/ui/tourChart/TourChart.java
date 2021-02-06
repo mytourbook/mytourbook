@@ -1739,9 +1739,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       cmc.isShowMarkerTooltip_Elevation = _tcc.isShowMarkerTooltip_Elevation;
       cmc.isShowMarkerTooltip_Distance = _tcc.isShowMarkerTooltip_Distance;
       cmc.isShowMarkerTooltip_Duration = _tcc.isShowMarkerTooltip_Duration;
-      cmc.isShowMarkerTooltip_DurationDifference = _tcc.isShowMarkerTooltip_TimeDifference;
-      cmc.isShowMarkerTooltip_DistanceDifference = _tcc.isShowMarkerTooltip_DistanceDifference;
       cmc.isShowMarkerTooltip_ElevationGainDifference = _tcc.isShowMarkerTooltip_ElevationGainDifference;
+      cmc.isShowMarkerTooltip_DistanceDifference = _tcc.isShowMarkerTooltip_DistanceDifference;
+      cmc.isShowMarkerTooltip_DurationDifference = _tcc.isShowMarkerTooltip_DurationDifference;
       cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
       cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
       cmc.isShowSignImage = _tcc.isShowSignImage;

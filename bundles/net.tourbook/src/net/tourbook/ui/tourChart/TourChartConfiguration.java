@@ -174,9 +174,9 @@ public class TourChartConfiguration {
    public boolean                 isShowMarkerTooltip_Elevation;
    public boolean                 isShowMarkerTooltip_Distance;
    public boolean                 isShowMarkerTooltip_Duration;
-   public boolean                 isShowMarkerTooltip_TimeDifference;
-   public boolean                 isShowMarkerTooltip_DistanceDifference;
    public boolean                 isShowMarkerTooltip_ElevationGainDifference;
+   public boolean                 isShowMarkerTooltip_DistanceDifference;
+   public boolean                 isShowMarkerTooltip_DurationDifference;
 
    public boolean                 isShowAbsoluteValues;
 
@@ -315,6 +315,12 @@ public class TourChartConfiguration {
       isShowMarkerLabel             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
       isShowMarkerPoint             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
       isShowMarkerTooltip           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
+      isShowMarkerTooltip_Elevation = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATION);
+      isShowMarkerTooltip_Distance  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE);
+      isShowMarkerTooltip_Duration  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION);
+      isShowMarkerTooltip_ElevationGainDifference = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATIONGAIN_DIFFERENCE);
+      isShowMarkerTooltip_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE_DIFFERENCE);
+      isShowMarkerTooltip_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION_DIFFERENCE);
       isShowOnlyWithDescription     = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
       isShowSignImage               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
 

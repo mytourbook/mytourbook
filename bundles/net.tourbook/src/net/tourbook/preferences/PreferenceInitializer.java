@@ -190,6 +190,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL,            true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT,            true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATION,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATIONGAIN_DIFFERENCE,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE_DIFFERENCE,          true);
+      store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION_DIFFERENCE,          true);
       store.setDefault(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE,              true);
 
       // pulse values
