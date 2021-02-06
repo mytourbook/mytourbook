@@ -25,18 +25,7 @@ TODO's
 Issues
 ======
 
-*  java.lang.NullPointerException
-    at net.tourbook.tour.DialogAdjustAltitude.spline_CreateDefaultSplineData(DialogAdjustAltitude.java:2231)
-    at net.tourbook.tour.DialogAdjustAltitude.createDialogArea(DialogAdjustAltitude.java:823)
-    at org.eclipse.jface.dialogs.TitleAreaDialog.createContents(TitleAreaDialog.java:161)
-    at org.eclipse.jface.window.Window.create(Window.java:431)
-    at org.eclipse.jface.dialogs.Dialog.create(Dialog.java:1094)
-    at net.tourbook.tour.DialogAdjustAltitude.create(DialogAdjustAltitude.java:629)
-    at org.eclipse.jface.window.Window.open(Window.java:788)
-    at net.tourbook.tour.ActionOpenAdjustAltitudeDialog.doAction(ActionOpenAdjustAltitudeDialog.java:95)
-    at net.tourbook.tour.ActionOpenAdjustAltitudeDialog.run(ActionOpenAdjustAltitudeDialog.java:116)
-    at org.eclipse.jface.action.Action.runWithEvent(Action.java:474)
-
+*  
 
   
 New
