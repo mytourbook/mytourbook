@@ -870,12 +870,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       // fill combo
       for (final AdjustmentType adjustType : ALL_ADJUSTMENT_TYPES) {
 
-         if (_backupSrtmSerie == null && (//
-         adjustType.__id == ADJUST_TYPE_SRTM_SPLINE //
-               || adjustType.__id == ADJUST_TYPE_SRTM //
-               || adjustType.__id == ADJUST_TYPE_HORIZONTAL_GEO_POSITION
-         //
-         )) {
+         if (_backupSrtmSerie == null &&
+               (adjustType.__id == ADJUST_TYPE_SRTM_SPLINE
+                     || adjustType.__id == ADJUST_TYPE_SRTM
+                     || adjustType.__id == ADJUST_TYPE_HORIZONTAL_GEO_POSITION
+
+               )) {
 
             // skip types which require srtm data
             continue;
@@ -2227,6 +2227,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       final int lastTimeSliceIndex = xDataSerie.length - 1;
       final float[] yDataElevationSerie = _tourData.altitudeSerie;
+
+      if (_backupSrtmSerie == null || yDataElevationSerie == null) {
+
+         /*
+          * NPE occurred, it is likely that SRTM data were not available, could not verify it but
+          * during this testing the SRTM server was sometimes not available
+          */
+
+         return;
+      }
 
       final float firstTimeSlice_ElevationDiff = _backupSrtmSerie[0] - yDataElevationSerie[0];
       final double lastTimeSlice_ElevationDiff = _backupSrtmSerie[lastTimeSliceIndex] - yDataElevationSerie[lastTimeSliceIndex];

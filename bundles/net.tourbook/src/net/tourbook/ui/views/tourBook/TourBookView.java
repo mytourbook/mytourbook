@@ -3085,6 +3085,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void run() {
 
             final Tree tree = _tourViewer_Tree.getTree();
+
+            if (tree.isDisposed()) {
+               return;
+            }
+
             tree.setRedraw(false);
             _isInReload = true;
             {
