@@ -275,6 +275,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                   _chkShowMarkerTooltip = new Button(ttContainer, SWT.CHECK);
                   GridDataFactory
                         .fillDefaults()//
+                        .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_chkShowMarkerTooltip);
                   _chkShowMarkerTooltip.setText(//
                         Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
@@ -433,7 +434,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
       final Group groupData = new Group(container, SWT.NONE);
       groupData.setText(Messages.Slideout_ChartMarkerOptions_Group_TooltipData);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(groupData);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupData);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(groupData);
       {
          _chkMarkerTooltip_Elevation = new Button(groupData, SWT.CHECK);
