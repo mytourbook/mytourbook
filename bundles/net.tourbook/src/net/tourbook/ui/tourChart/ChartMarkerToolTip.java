@@ -388,9 +388,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             .applyTo(container);
       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         if (_cmc.isShowMarkerTooltip_Distance)
-
-         {
+         if (_cmc.isShowMarkerTooltip_Elevation) {
             /*
              * Altitude
              */
@@ -407,7 +405,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_Distance) {
             /*
              * Distance
              */
@@ -445,7 +443,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_Duration) {
             /*
              * Duration
              */
@@ -476,27 +474,25 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_ElevationGainDifference) {
             /*
-             * Time difference
+             * Elevation gain difference
              */
-            int timeValue = _hoveredTourMarker.getTime();
+            final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
+            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex,
+                  _hoveredTourMarker.getSerieIndex());
 
-            if (previousTourMarker != null) {
-               timeValue -= previousTourMarker.getTime();
-            }
-
-            if (timeValue != Integer.MIN_VALUE) {
+            if (elevationGainLoss != null) {
 
                createUI_72_ValueField(
                      container,
-                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME,
-                     UI.UNIT_LABEL_TIME,
-                     FormatManager.formatElapsedTime(timeValue));
+                     GRAPH_LABEL_ELEVATIONGAIN,
+                     UI.UNIT_LABEL_ALTIMETER,
+                     FormatManager.formatElevation(elevationGainLoss.getAltitudeUp()));
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_DistanceDifference) {
             /*
              * Distance difference
              */
@@ -516,23 +512,26 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_DurationDifference) {
             /*
-             * Elevation gain difference
+             * Duration difference
              */
-            final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
-            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex,
-                  _hoveredTourMarker.getSerieIndex());
+            int timeValue = _hoveredTourMarker.getTime();
 
-            if (elevationGainLoss != null) {
+            if (previousTourMarker != null) {
+               timeValue -= previousTourMarker.getTime();
+            }
+
+            if (timeValue != Integer.MIN_VALUE) {
 
                createUI_72_ValueField(
                      container,
-                     GRAPH_LABEL_ELEVATIONGAIN,
-                     UI.UNIT_LABEL_ALTIMETER,
-                     FormatManager.formatElevation(elevationGainLoss.getAltitudeUp()));
+                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME,
+                     UI.UNIT_LABEL_TIME,
+                     FormatManager.formatElapsedTime(timeValue));
             }
          }
+
       }
 
    }

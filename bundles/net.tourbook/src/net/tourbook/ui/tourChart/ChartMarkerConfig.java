@@ -23,12 +23,17 @@ public class ChartMarkerConfig {
 
    public boolean                     isDrawMarkerWithDefaultColor;
    public boolean                     isShowAbsoluteValues;
-   public boolean                     isShowMarkerTooltip_Distance;
    public boolean                     isShowHiddenMarker;
    public boolean                     isShowLabelTempPos;
    public boolean                     isShowMarkerLabel;
    public boolean                     isShowMarkerPoint;
    public boolean                     isShowMarkerTooltip;
+   public boolean                     isShowMarkerTooltip_Elevation;
+   public boolean                     isShowMarkerTooltip_Distance;
+   public boolean                     isShowMarkerTooltip_Duration;
+   public boolean                     isShowMarkerTooltip_ElevationGainDifference;
+   public boolean                     isShowMarkerTooltip_DistanceDifference;
+   public boolean                     isShowMarkerTooltip_DurationDifference;
    public boolean                     isShowOnlyWithDescription;
    public boolean                     isShowSignImage;
 

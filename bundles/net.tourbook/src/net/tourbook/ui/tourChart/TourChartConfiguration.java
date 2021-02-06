@@ -171,7 +171,13 @@ public class TourChartConfiguration {
     */
    public boolean                 isShowMarkerLabel;
    public boolean                 isShowMarkerTooltip;
+   public boolean                 isShowMarkerTooltip_Elevation;
    public boolean                 isShowMarkerTooltip_Distance;
+   public boolean                 isShowMarkerTooltip_Duration;
+   public boolean                 isShowMarkerTooltip_TimeDifference;
+   public boolean                 isShowMarkerTooltip_DistanceDifference;
+   public boolean                 isShowMarkerTooltip_ElevationGainDifference;
+
    public boolean                 isShowAbsoluteValues;
 
    public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
