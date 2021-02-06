@@ -19,11 +19,37 @@ package net.tourbook.common.util;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.common.UI;
 
 public final class FilesUtils {
+
+   public static String createTemporaryFile(final String fileName, final String extension) {
+
+      String absoluteFilePath = UI.EMPTY_STRING;
+
+      try {
+         deleteIfExists(Paths.get(fileName + UI.SYMBOL_DOT + extension));
+
+         absoluteFilePath = Files.createTempFile(fileName, UI.SYMBOL_DOT + extension).toString();
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      return absoluteFilePath;
+   }
+
+   public static void deleteIfExists(final Path filePath) {
+
+      try {
+         Files.deleteIfExists(filePath);
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+   }
 
    public static String readFileContentString(final String filePath) {
 

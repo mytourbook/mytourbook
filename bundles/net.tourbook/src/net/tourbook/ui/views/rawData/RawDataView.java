@@ -72,6 +72,8 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.download.CloudDownloaderManager;
+import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.importdata.DeviceImportState;
@@ -448,26 +450,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /*
     * UI controls
     */
-   private PageBook  _topPageBook;
-   private Composite _topPage_Dashboard;
-   private Composite _topPage_ImportViewer;
-   private Composite _topPage_OldUI;
-   private Composite _topPage_Startup;
+   private PageBook                      _topPageBook;
+   private Composite                     _topPage_Dashboard;
+   private Composite                     _topPage_ImportViewer;
+   private Composite                     _topPage_OldUI;
+   private Composite                     _topPage_Startup;
 
-   private PageBook  _dashboard_PageBook;
-   private Composite _dashboardPage_NoBrowser;
-   private Composite _dashboardPage_WithBrowser;
+   private PageBook                      _dashboard_PageBook;
+   private Composite                     _dashboardPage_NoBrowser;
+   private Composite                     _dashboardPage_WithBrowser;
 
-   private Composite _parent;
-   private Composite _viewerContainer;
+   private Composite                     _parent;
+   private Composite                     _viewerContainer;
 
-   private Text      _txtNoBrowser;
+   private Text                          _txtNoBrowser;
 
-   private Link      _linkImport;
+   private Link                          _linkImport;
 
-   private Browser   _browser;
+   private Browser                       _browser;
 
-   private Menu      _tableContextMenu;
+   private Menu                          _tableContextMenu;
+
+   private List<TourbookCloudDownloader> _cloudDownloadersList = CloudDownloaderManager.getCloudDownloaderList();
 
    private class ImportComparator extends ViewerComparator {
 
@@ -2084,6 +2088,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
                _imageUrl_SerialPort_Directly);
 
+         for (final var cloudDownloader : _cloudDownloadersList) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  cloudDownloader.getName(),
+                  cloudDownloader.getDescription(),
+                  (HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId()),
+                  cloudDownloader.getIconUrl());
+         }
+
          createHTML_92_TileAction(
                sb,
                Messages.Import_Data_HTML_Action_OldUI,
@@ -2629,7 +2643,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-            if ((firstElement != null) && (firstElement instanceof TourData)) {
+            if (firstElement instanceof TourData) {
                TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
             }
          }
@@ -3422,8 +3436,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
       }
-
-      return;
    }
 
    @Override
@@ -3669,7 +3681,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionRemoveTour.setEnabled(selectedTours > 0);
       _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
       _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
-      _actionUploadTour.setEnabled(selectedTours > 0 && _actionUploadTour.hasUploaders());
+      _actionUploadTour.setEnabled(selectedNotDeleteTours > 0);
 
       _actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
       _actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
@@ -4285,6 +4297,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
          onSelectUI_Old();
+      } else {
+
+         _cloudDownloadersList.stream()
+               .filter(cd -> cd.getId().equals(hrefAction))
+               .forEach(TourbookCloudDownloader::downloadTours);
       }
    }
 
@@ -4598,7 +4615,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // remove tour properties
             tourData.setTourType(null);
             tourData.setTourTitle(UI.EMPTY_STRING);
-            tourData.setTourTags(new HashSet<TourTag>());
+            tourData.setTourTags(new HashSet<>());
 
             /**
              * when a remove tour is saved again, this will cause the exception: <br>

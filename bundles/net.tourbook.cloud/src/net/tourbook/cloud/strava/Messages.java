@@ -31,19 +31,13 @@ public class Messages extends NLS {
    public static String        Log_UploadToursToStrava_003_ActivityLink;
    public static String        Log_UploadToursToStrava_003_UploadStatus;
    public static String        Log_UploadToursToStrava_004_UploadError;
-   public static String        Log_UploadToursToStrava_005_End;
 
    public static String        VendorName_Strava;
    public static String        PrefPage_Account_Information_AthleteName_Label;
    public static String        PrefPage_Account_Information_AthleteWebPage_Label;
-   public static String        PrefPage_Account_Information_AccessToken_Label;
-   public static String        PrefPage_Account_Information_RefreshToken_Label;
-   public static String        PrefPage_Account_Information_ExpiresAt_Label;
 
    public static String        UploadToursToStrava_Task;
    public static String        UploadToursToStrava_SubTask;
-   public static String        UploadToursToStrava_Icon_Hourglass;
-   public static String        UploadToursToStrava_Icon_Check;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
