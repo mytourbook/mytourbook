@@ -242,9 +242,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(NLS.bind(Messages.UploadToursToSuunto_Task, numberOfTours), numberOfTours * 2);
+            monitor.beginTask(NLS.bind(Messages.Dialog_UploadRoutes_Task, numberOfTours), numberOfTours * 2);
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours; ++index) {
@@ -265,7 +265,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON__CHECK, ICON__HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__HOURGLASS));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
                numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
@@ -275,7 +275,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.worked(toursWithGpsSeries.size());
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON__CHECK, ICON__CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__CHECK));
          }
       };
 
@@ -291,8 +291,8 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_SuuntoUpload_Summary,
-               NLS.bind(Messages.Dialog_SuuntoRoutesUpload_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+               Messages.Dialog_UploadRoutes_Summary,
+               NLS.bind(Messages.Dialog_UploadRoutes_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);

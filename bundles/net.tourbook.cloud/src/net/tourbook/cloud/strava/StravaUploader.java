@@ -396,7 +396,7 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(NLS.bind(Messages.UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
+            monitor.beginTask(NLS.bind(Messages.Dialog_UploadTours_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
             if (!getValidTokens()) {
@@ -404,7 +404,7 @@ public class StravaUploader extends TourbookCloudUploader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final List<TourData> manualTours = new ArrayList<>();
@@ -438,13 +438,13 @@ public class StravaUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask, ICON__CHECK, ICON__HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__CHECK, ICON__HOURGLASS));
 
             numberOfUploadedTours[0] = uploadTours(toursWithTimeSeries, manualTours);
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToStrava_SubTask, ICON__CHECK, ICON__CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__CHECK, ICON__CHECK));
          }
 
       };
@@ -461,8 +461,8 @@ public class StravaUploader extends TourbookCloudUploader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_StravaUpload_Summary,
-               NLS.bind(Messages.Dialog_StravaUpload_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+               Messages.Dialog_UploadTours_Summary,
+               NLS.bind(Messages.Dialog_UploadTours_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);

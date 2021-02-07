@@ -23,8 +23,10 @@ public class Messages extends NLS {
 
    public static String        Image__Connect_With_Strava;
 
-   public static String        Dialog_StravaUpload_Message;
-   public static String        Dialog_StravaUpload_Summary;
+   public static String        Dialog_UploadTours_Message;
+   public static String        Dialog_UploadTours_Summary;
+   public static String        Dialog_UploadTours_SubTask;
+   public static String        Dialog_UploadTours_Task;
    public static String        Log_UploadToursToStrava_001_Start;
    public static String        Log_UploadToursToStrava_002_NoTourTitle;
    public static String        Log_UploadToursToStrava_003_ActivityLink;
@@ -32,8 +34,6 @@ public class Messages extends NLS {
    public static String        Log_UploadToursToStrava_004_UploadError;
    public static String        PrefPage_Account_Information_Label_AthleteName;
    public static String        PrefPage_Account_Information_Label_AthleteWebPage;
-   public static String        UploadToursToStrava_SubTask;
-   public static String        UploadToursToStrava_Task;
    public static String        VendorName_Strava;
 
    static {

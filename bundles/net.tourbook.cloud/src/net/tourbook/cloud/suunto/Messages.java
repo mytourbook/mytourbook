@@ -23,12 +23,14 @@ public class Messages extends NLS {
 
    public static String        Image__SuuntoApp_Icon;
 
-   public static String        Dialog_SuuntoRoutesUpload_Message;
-   public static String        Dialog_SuuntoUpload_Summary;
-   public static String        Dialog_WorkoutsDownload_Message;
-   public static String        Dialog_WorkoutsDownload_Summary;
-   public static String        DownloadWorkoutsFromSuunto_SubTask;
-   public static String        DownloadWorkoutsFromSuunto_Task;
+   public static String        Dialog_UploadRoutes_Message;
+   public static String        Dialog_UploadRoutes_SubTask;
+   public static String        Dialog_UploadRoutes_Summary;
+   public static String        Dialog_UploadRoutes_Task;
+   public static String        Dialog_DownloadWorkouts_Message;
+   public static String        Dialog_DownloadWorkouts_SubTask;
+   public static String        Dialog_DownloadWorkouts_Summary;
+   public static String        Dialog_DownloadWorkouts_Task;
    public static String        Log_DownloadWorkoutsToSuunto_001_Start;
    public static String        Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound;
    public static String        Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist;
@@ -46,8 +48,6 @@ public class Messages extends NLS {
    public static String        Pref_Combo_Workouts_FolderPath_Combo_Tooltip;
    public static String        Pref_Combo_Workouts_Label_FolderPath;
    public static String        Suunto_Workouts_Description;
-   public static String        UploadToursToSuunto_SubTask;
-   public static String        UploadToursToSuunto_Task;
    public static String        ValidatingSuuntoTokens_SubTask;
    public static String        VendorName_Suunto_Routes;
    public static String        VendorName_Suunto_Workouts;
