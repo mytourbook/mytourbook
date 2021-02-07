@@ -33,8 +33,8 @@ public class Messages extends NLS {
    public static String        Log_UploadToursToStrava_004_UploadError;
 
    public static String        VendorName_Strava;
-   public static String        PrefPage_Account_Information_AthleteName_Label;
-   public static String        PrefPage_Account_Information_AthleteWebPage_Label;
+   public static String        PrefPage_Account_Information_Label_AthleteName;
+   public static String        PrefPage_Account_Information_Label_AthleteWebPage;
 
    public static String        UploadToursToStrava_Task;
    public static String        UploadToursToStrava_SubTask;
