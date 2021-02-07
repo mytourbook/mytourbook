@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
@@ -2080,21 +2081,16 @@ public class Map2View extends ViewPart implements
 
       tbm.add(_actionMap2_MapProvider);
       tbm.add(_actionMap2_Options);
-
-      /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      fillMapContextMenu(menuMgr);
    }
+
 
    @Override
-   public void fillContextMenu(final IMenuManager menuMgr) {
-      fillMapContextMenu(menuMgr);
+   public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+
+      fillMapContextMenu(menuMgr, actionManageOfflineImages);
    }
 
-   private void fillMapContextMenu(final IMenuManager menuMgr) {
+   private void fillMapContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
       menuMgr.add(_actionSearchTourByLocation);
       menuMgr.add(new Separator());
@@ -2134,6 +2130,7 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionEditMap2Preferences);
 
       menuMgr.add(new Separator());
+      menuMgr.add(actionManageOfflineImages);
       menuMgr.add(_actionReloadFailedMapImages);
       menuMgr.add(_actionManageMapProvider);
    }

@@ -61,7 +61,7 @@ Changes
   - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
 
 * 2D Map
-  - Reorder context menu actions a little bit
+  - Reordered context menu actions a little bit
 
 
 Bugfix
