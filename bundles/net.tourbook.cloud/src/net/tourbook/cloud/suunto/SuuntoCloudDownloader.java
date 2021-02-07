@@ -74,7 +74,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
    private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
-   private static int[]            _numberOfDownloadedTours;
    private int[]                   _numberOfAvailableTours;
 
    public SuuntoCloudDownloader() {
@@ -83,21 +82,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             Messages.VendorName_Suunto_Workouts,
             Messages.Suunto_Workouts_Description,
             Activator.getImageAbsoluteFilePath(Messages.Image__SuuntoApp_Icon));
-   }
-
-   private static void logDownloadResult(final WorkoutDownload workoutDownload) {
-
-      if (workoutDownload.isSuccessfullyDownloaded()) {
-
-         ++_numberOfDownloadedTours[0];
-
-         TourLogManager.addLog(TourLogState.IMPORT_OK,
-               NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_005_DownloadStatus,
-                     workoutDownload.getWorkoutKey(),
-                     workoutDownload.getAbsoluteFilePath()));
-      } else {
-         TourLogManager.logError(workoutDownload.getError());
-      }
    }
 
    private CompletableFuture<WorkoutDownload> downloadFile(final String workoutKey) {
@@ -111,14 +95,20 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return sendAsyncRequest(workoutKey, request);
    }
 
-   private void downloadFiles(final List<Payload> newWorkouts) {
+   private int downloadFiles(final List<Payload> newWorkouts) {
 
       final List<CompletableFuture<WorkoutDownload>> workoutDownloads = new ArrayList<>();
 
       newWorkouts.stream().forEach(newWorkout -> workoutDownloads.add(downloadFile(newWorkout.workoutKey)));
 
-      workoutDownloads.stream().map(CompletableFuture::join).forEach(SuuntoCloudDownloader::logDownloadResult);
+      final int[] numberOfDownloadedTours = new int[1];
+      workoutDownloads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
+         if (logDownloadResult(activityUpload)) {
+            ++numberOfDownloadedTours[0];
+         }
+      });
 
+      return numberOfDownloadedTours[0];
    }
 
    @Override
@@ -138,7 +128,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       }
 
       _numberOfAvailableTours = new int[1];
-      _numberOfDownloadedTours = new int[1];
+      final int[] numberOfDownloadedTours = new int[1];
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
@@ -195,7 +185,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         _numberOfAvailableTours[0],
                         ICON_HOURGLASS }));
 
-            downloadFiles(newWorkouts);
+            numberOfDownloadedTours[0] = downloadFiles(newWorkouts);
 
             monitor.worked(1);
          }
@@ -216,8 +206,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                Display.getDefault().getActiveShell(),
                Messages.Dialog_WorkoutsDownload_Summary,
                NLS.bind(Messages.Dialog_WorkoutsDownload_Message,
-                     _numberOfDownloadedTours[0],
-                     _numberOfAvailableTours[0] - _numberOfDownloadedTours[0]));
+                     numberOfDownloadedTours[0],
+                     _numberOfAvailableTours[0] - numberOfDownloadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
@@ -242,6 +232,25 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    protected boolean isReady() {
       return StringUtils.hasContent(getAccessToken()) && StringUtils.hasContent(getRefreshToken()) &&
             StringUtils.hasContent(getDownloadFolder());
+   }
+
+   private boolean logDownloadResult(final WorkoutDownload workoutDownload) {
+
+      boolean isTourDownloaded = false;
+
+      if (workoutDownload.isSuccessfullyDownloaded()) {
+
+         isTourDownloaded = true;
+
+         TourLogManager.addLog(TourLogState.IMPORT_OK,
+               NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_005_DownloadStatus,
+                     workoutDownload.getWorkoutKey(),
+                     workoutDownload.getAbsoluteFilePath()));
+      } else {
+         TourLogManager.logError(workoutDownload.getError());
+      }
+
+      return isTourDownloaded;
    }
 
    private List<Long> retrieveAllTourStartTimes() {
