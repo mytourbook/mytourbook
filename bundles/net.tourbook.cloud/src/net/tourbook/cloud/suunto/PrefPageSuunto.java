@@ -140,8 +140,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
-      createUI_30_DownloadFolderPath(parent);
-      createUI_40_Misc(parent);
+      createUI_30_Misc(parent);
 
       return parent;
    }
@@ -220,7 +219,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       }
    }
 
-   private void createUI_30_DownloadFolderPath(final Composite parent) {
+   private void createUI_30_Misc(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -251,15 +250,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             });
             setButtonLayoutData(_btnSelectDirectory);
          }
-      }
-   }
 
-   private void createUI_40_Misc(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
          {
             /*
              * Checkbox: Use a "since" date filter
@@ -277,7 +268,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
             _dtFilterSince = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
             _dtFilterSince.setToolTipText(Messages.Pref_Checkbox_Use_SinceDateFilter_Tooltip);
-            GridDataFactory.fillDefaults().applyTo(_dtFilterSince);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_dtFilterSince);
          }
       }
    }
