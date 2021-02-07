@@ -21,23 +21,20 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.cloud.strava.messages"; //$NON-NLS-1$
 
-   public static String        Dialog_StravaUpload_Summary;
-   public static String        Dialog_StravaUpload_Message;
-
    public static String        Image__Connect_With_Strava;
 
+   public static String        Dialog_StravaUpload_Message;
+   public static String        Dialog_StravaUpload_Summary;
    public static String        Log_UploadToursToStrava_001_Start;
    public static String        Log_UploadToursToStrava_002_NoTourTitle;
    public static String        Log_UploadToursToStrava_003_ActivityLink;
    public static String        Log_UploadToursToStrava_003_UploadStatus;
    public static String        Log_UploadToursToStrava_004_UploadError;
-
-   public static String        VendorName_Strava;
    public static String        PrefPage_Account_Information_Label_AthleteName;
    public static String        PrefPage_Account_Information_Label_AthleteWebPage;
-
-   public static String        UploadToursToStrava_Task;
    public static String        UploadToursToStrava_SubTask;
+   public static String        UploadToursToStrava_Task;
+   public static String        VendorName_Strava;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

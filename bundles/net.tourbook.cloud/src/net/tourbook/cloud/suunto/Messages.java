@@ -23,17 +23,12 @@ public class Messages extends NLS {
 
    public static String        Image__SuuntoApp_Icon;
 
-   public static String        Dialog_WorkoutsDownload_Message;
-   public static String        Dialog_WorkoutsDownload_Summary;
    public static String        Dialog_SuuntoRoutesUpload_Message;
    public static String        Dialog_SuuntoUpload_Summary;
-   public static String        ValidatingSuuntoTokens_SubTask;
-   public static String        DownloadWorkoutsFromSuunto_Task;
+   public static String        Dialog_WorkoutsDownload_Message;
+   public static String        Dialog_WorkoutsDownload_Summary;
    public static String        DownloadWorkoutsFromSuunto_SubTask;
-   public static String        Log_UploadToursToSuunto_001_Start;
-   public static String        Log_UploadToursToSuunto_002_NoGpsCoordinate;
-   public static String        Log_UploadToursToSuunto_003_UploadStatus;
-   public static String        Log_UploadToursToSuunto_004_UploadError;
+   public static String        DownloadWorkoutsFromSuunto_Task;
    public static String        Log_DownloadWorkoutsToSuunto_001_Start;
    public static String        Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound;
    public static String        Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist;
@@ -41,16 +36,19 @@ public class Messages extends NLS {
    public static String        Log_DownloadWorkoutsToSuunto_005_DownloadStatus;
    public static String        Log_DownloadWorkoutsToSuunto_006_FileAlreadyExists;
    public static String        Log_DownloadWorkoutsToSuunto_007_Error;
-
+   public static String        Log_UploadToursToSuunto_001_Start;
+   public static String        Log_UploadToursToSuunto_002_NoGpsCoordinate;
+   public static String        Log_UploadToursToSuunto_003_UploadStatus;
+   public static String        Log_UploadToursToSuunto_004_UploadError;
    public static String        Pref_AccountInformation_SuuntoApp_WebPage_Link;
    public static String        Pref_Checkbox_Use_SinceDateFilter;
    public static String        Pref_Checkbox_Use_SinceDateFilter_Tooltip;
-   public static String        Pref_Combo_Workouts_Label_FolderPath;
    public static String        Pref_Combo_Workouts_FolderPath_Combo_Tooltip;
-
+   public static String        Pref_Combo_Workouts_Label_FolderPath;
    public static String        Suunto_Workouts_Description;
-   public static String        UploadToursToSuunto_Task;
    public static String        UploadToursToSuunto_SubTask;
+   public static String        UploadToursToSuunto_Task;
+   public static String        ValidatingSuuntoTokens_SubTask;
    public static String        VendorName_Suunto_Routes;
    public static String        VendorName_Suunto_Workouts;
 
