@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
@@ -426,7 +427,7 @@ public class Map2View extends ViewPart implements
    private ActionTourColor                   _actionTourColor_RunDyn_StepLength;
    //
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
-   private ActionDimMap                      _actionDimMap;
+   private ActionDimMap                      _actionDimMap_SubMenu;
    private ActionOpenPrefDialog              _actionEditMap2Preferences;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionManageMapProviders          _actionManageMapProvider;
@@ -1285,7 +1286,7 @@ public class Map2View extends ViewPart implements
             prefDimLevel -= 255;
 
             final int dimLevel = (int) Math.abs(prefDimLevel);
-            _actionDimMap.setDimLevel(dimLevel);
+            _actionDimMap_SubMenu.setDimLevel(dimLevel);
             actionDimMap(dimLevel);
 
          } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR)) {
@@ -1606,7 +1607,7 @@ public class Map2View extends ViewPart implements
       _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
-      _actionDimMap                       = new ActionDimMap(this);
+      _actionDimMap_SubMenu                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
@@ -2080,21 +2081,16 @@ public class Map2View extends ViewPart implements
 
       tbm.add(_actionMap2_MapProvider);
       tbm.add(_actionMap2_Options);
-
-      /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      fillMapContextMenu(menuMgr);
    }
+
 
    @Override
-   public void fillContextMenu(final IMenuManager menuMgr) {
-      fillMapContextMenu(menuMgr);
+   public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+
+      fillMapContextMenu(menuMgr, actionManageOfflineImages);
    }
 
-   private void fillMapContextMenu(final IMenuManager menuMgr) {
+   private void fillMapContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
       menuMgr.add(_actionSearchTourByLocation);
       menuMgr.add(new Separator());
@@ -2114,37 +2110,29 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowStartEndInMap);
       menuMgr.add(_actionShowTourInfoInMap);
 
+      if (isShowTrackColor_InContextMenu()) {
+         menuMgr.add(_actionMap2_Color);
+      }
+
       menuMgr.add(new Separator());
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
 
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
+
+      menuMgr.add(new Separator());
+
+
       menuMgr.add(_actionExportMap_SubMenu);
-
-      menuMgr.add(new Separator());
-
-      // it can happen that color id is not yet set
-      if (_tourColorId != null) {
-
-         // set color before menu is filled, this sets the action image and color id
-         _actionMap2_Color.setColorId(_tourColorId);
-
-         if (_tourColorId != MapGraphId.HrZone) {
-
-            // hr zone has a different color provider and is not yet supported
-
-            menuMgr.add(_actionMap2_Color);
-         }
-      }
-
-      menuMgr.add(_actionEditMap2Preferences);
-      menuMgr.add(_actionDimMap);
+      menuMgr.add(_actionDimMap_SubMenu);
       menuMgr.add(_actionZoomLevelAdjustment);
+      menuMgr.add(_actionEditMap2Preferences);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionManageMapProvider);
+      menuMgr.add(actionManageOfflineImages);
       menuMgr.add(_actionReloadFailedMapImages);
+      menuMgr.add(_actionManageMapProvider);
    }
 
    private void fillToolbar_TourColors(final IToolBarManager tbm) {
@@ -2559,6 +2547,25 @@ public class Map2View extends ViewPart implements
             || _isMapSyncWith_ValuePoint
 
       ;
+   }
+
+   private boolean isShowTrackColor_InContextMenu() {
+
+      // it can happen that color id is not yet set
+      if (_tourColorId != null) {
+
+         // set color before menu is filled, this sets the action image and color id
+         _actionMap2_Color.setColorId(_tourColorId);
+
+         if (_tourColorId != MapGraphId.HrZone) {
+
+            // hr zone has a different color provider and is not yet supported
+
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private void keepMapPosition(final TourData tourData) {
@@ -3769,7 +3776,7 @@ public class Map2View extends ViewPart implements
       }
       final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
       _map.setDimLevel(_mapDimLevel, dimColor);
-      _mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
+      _mapDimLevel = _actionDimMap_SubMenu.setDimLevel(_mapDimLevel);
 
       restoreState_Map2_TrackOptions(false);
       restoreState_Map2_Options();
