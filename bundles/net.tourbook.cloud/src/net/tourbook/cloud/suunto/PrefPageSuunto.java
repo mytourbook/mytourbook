@@ -93,7 +93,9 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
    private Label                   _labelExpiresAt_Value;
    private Label                   _labelRefreshToken;
    private Label                   _labelRefreshToken_Value;
+   private Label                   _labelDownloadFolder;
    private Combo                   _comboFolderPath;
+   private Button                  _btnSelectDirectory;
    private Button                  _chkUseDateFilter;
    private DateTime                _dtFilterSince;
 
@@ -222,9 +224,14 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
+            _labelDownloadFolder = new Label(container, SWT.NONE);
+            _labelDownloadFolder.setText(Messages.Pref_Combo_Workouts_Label_FolderPath);
+            _labelDownloadFolder.setToolTipText(Messages.Pref_Combo_Workouts_FolderPath_Combo_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_labelDownloadFolder);
+
             /*
              * combo: path
              */
@@ -233,19 +240,16 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _comboFolderPath.setToolTipText(Messages.Pref_Combo_Workouts_FolderPath_Combo_Tooltip);
             _comboFolderPath.setEnabled(false);
 
-            /*
-             * button: browse
-             */
-            final Button btnSelectDirectory = new Button(container, SWT.PUSH);
-            btnSelectDirectory.setText(APP_BTN_BROWSE);
-            btnSelectDirectory.setToolTipText(Messages.Pref_Combo_Workouts_FolderPath_Combo_Tooltip);
-            btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
+            _btnSelectDirectory = new Button(container, SWT.PUSH);
+            _btnSelectDirectory.setText(APP_BTN_BROWSE);
+            _btnSelectDirectory.setToolTipText(Messages.Pref_Combo_Workouts_FolderPath_Combo_Tooltip);
+            _btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSelectBrowseDirectory();
                }
             });
-            setButtonLayoutData(btnSelectDirectory);
+            setButtonLayoutData(_btnSelectDirectory);
          }
       }
    }
@@ -286,6 +290,10 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _labelRefreshToken.setEnabled(isAuthorized);
       _labelExpiresAt.setEnabled(isAuthorized);
       _labelAccessToken.setEnabled(isAuthorized);
+      _labelDownloadFolder.setEnabled(isAuthorized);
+      _comboFolderPath.setEnabled(isAuthorized);
+      _btnSelectDirectory.setEnabled(isAuthorized);
+      _chkUseDateFilter.setEnabled(_chkUseDateFilter.getSelection());
       _dtFilterSince.setEnabled(_chkUseDateFilter.getSelection());
    }
 

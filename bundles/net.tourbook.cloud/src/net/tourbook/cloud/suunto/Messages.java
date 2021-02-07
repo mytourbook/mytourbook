@@ -45,6 +45,7 @@ public class Messages extends NLS {
    public static String        Pref_AccountInformation_SuuntoApp_WebPage_Link;
    public static String        Pref_Checkbox_Use_SinceDateFilter;
    public static String        Pref_Checkbox_Use_SinceDateFilter_Tooltip;
+   public static String        Pref_Combo_Workouts_Label_FolderPath;
    public static String        Pref_Combo_Workouts_FolderPath_Combo_Tooltip;
 
    public static String        Suunto_Workouts_Description;
