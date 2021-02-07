@@ -35,8 +35,8 @@ public class Messages extends NLS {
    public static String        Pref_CloudConnectivity_UnavailablePort_Title;
    public static String        Pref_CloudConnectivity_WebPage_Label;
 
-   public static String        Icon_Check;
-   public static String        Icon_Hourglass;
+   public static String        Icon__Check;
+   public static String        Icon__Hourglass;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -65,15 +65,13 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   // SET_FORMATTING_OFF
-   private static final String   ICON_CHECK                    = net.tourbook.cloud.Messages.Icon_Check;
-   private static final String   ICON_HOURGLASS                = net.tourbook.cloud.Messages.Icon_Hourglass;
-   private static final String   LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String   LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
-   // SET_FORMATTING_ON
+   private static final String     ICON__CHECK                   = net.tourbook.cloud.Messages.Icon__Check;
+   private static final String     ICON__HOURGLASS               = net.tourbook.cloud.Messages.Icon__Hourglass;
+   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
+   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private int[]                   _numberOfAvailableTours;
 
    public SuuntoCloudDownloader() {
@@ -151,7 +149,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
-                        ICON_HOURGLASS,
+                        ICON__HOURGLASS,
                         UI.EMPTY_STRING,
                         UI.EMPTY_STRING }));
 
@@ -181,9 +179,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
-                        ICON_CHECK,
+                        ICON__CHECK,
                         _numberOfAvailableTours[0],
-                        ICON_HOURGLASS }));
+                        ICON__HOURGLASS }));
 
             numberOfDownloadedTours[0] = downloadFiles(newWorkouts);
 
