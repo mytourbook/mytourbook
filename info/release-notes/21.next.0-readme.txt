@@ -4,8 +4,6 @@
 TODO's
 ======
 
-* 2D Map: reorder context menu actions a little bit
-
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
@@ -61,6 +59,9 @@ Changes
 * Dropbox Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/277
   - Switched to the new PKCE OAuth2 flow (The Implicit grant flow previously used is now considered deprecated by Dropbox: "[Legacy. We recommend the PKCE flow.]")
   - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
+
+* 2D Map
+  - Reorder context menu actions a little bit
 
 
 Bugfix
