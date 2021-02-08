@@ -84,7 +84,7 @@ Bugfix
 * Dialog Adjust Elevation
   - Show dialog tour chart with a better default size when opened the first time 
 
-* Suunto SML format (Frederic)
+* Suunto SML & XML formats (Frederic)
   - Markers are now imported
   - Fixed possible NPE
 
