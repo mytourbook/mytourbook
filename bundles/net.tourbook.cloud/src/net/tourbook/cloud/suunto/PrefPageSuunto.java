@@ -283,8 +283,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       _labelDownloadFolder.setEnabled(isAuthorized);
       _comboDownloadFolderPath.setEnabled(isAuthorized);
       _btnSelectFolder.setEnabled(isAuthorized);
-      _chkUseDateFilter.setEnabled(_chkUseDateFilter.getSelection());
-      _dtFilterSince.setEnabled(_chkUseDateFilter.getSelection());
+      _chkUseDateFilter.setEnabled(isAuthorized);
+      _dtFilterSince.setEnabled(isAuthorized && _chkUseDateFilter.getSelection());
    }
 
    private long getFilterSinceDate() {
