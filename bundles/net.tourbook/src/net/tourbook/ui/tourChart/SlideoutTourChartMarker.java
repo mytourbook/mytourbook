@@ -33,11 +33,9 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -76,20 +74,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
 
-      _defaultPropertyChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onChangeUI();
-         }
-      };
+      _defaultPropertyChangeListener = propertyChangeEvent -> onChangeUI();
 
       _keepOpenListener = new FocusListener() {
 
@@ -441,21 +431,21 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          _chkMarkerTooltip_Elevation.setText(GRAPH_LABEL_ALTITUDE);
          _chkMarkerTooltip_Elevation.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_Distance = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_Distance.setText(GRAPH_LABEL_DISTANCE);
-         _chkMarkerTooltip_Distance.addSelectionListener(_defaultSelectionAdapter);
-
-         _chkMarkerTooltip_Duration = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_Duration.setText(GRAPH_LABEL_TIME);
-         _chkMarkerTooltip_Duration.addSelectionListener(_defaultSelectionAdapter);
-
          _chkMarkerTooltip_ElevationGainDifference = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN);
          _chkMarkerTooltip_ElevationGainDifference.addSelectionListener(_defaultSelectionAdapter);
 
+         _chkMarkerTooltip_Distance = new Button(groupData, SWT.CHECK);
+         _chkMarkerTooltip_Distance.setText(GRAPH_LABEL_DISTANCE);
+         _chkMarkerTooltip_Distance.addSelectionListener(_defaultSelectionAdapter);
+
          _chkMarkerTooltip_DistanceDifference = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
          _chkMarkerTooltip_DistanceDifference.addSelectionListener(_defaultSelectionAdapter);
+
+         _chkMarkerTooltip_Duration = new Button(groupData, SWT.CHECK);
+         _chkMarkerTooltip_Duration.setText(GRAPH_LABEL_TIME);
+         _chkMarkerTooltip_Duration.addSelectionListener(_defaultSelectionAdapter);
 
          _chkMarkerTooltip_DurationDifference = new Button(groupData, SWT.CHECK);
          _chkMarkerTooltip_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
