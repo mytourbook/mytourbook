@@ -4,10 +4,6 @@
 TODO's
 ======
 
-* Fix tour marker editor dialog initial issue: tour chart is toooo small
-
-* 2D Map: reorder context menu actions a little bit
-
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
@@ -71,14 +67,17 @@ Changes
   - Switched to the new PKCE OAuth2 flow (The Implicit grant flow previously used is now considered deprecated by Dropbox: "[Legacy. We recommend the PKCE flow.]")
   - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
 
+* 2D Map
+  - Reordered context menu actions a little bit
+
 
 Bugfix
 ======
 
 * A few measurement system values were wrong
 
-* TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/287
-  - Fixed the TCX Course Export format as it was not properly formatted before and was preventing from importing TCX Courses in Garmin Connect
+* Fit Import (Frederic)
+  - When importing a file without pauses, the recorded time could sometimes be different by 1 or 2 seconds compared to the elapsed time.
 
 * TCX Import (Frederic)
   - The pause import for some TCX formats could lead to multiple erroneous pauses
@@ -86,8 +85,12 @@ Bugfix
 * Pause Re-Import (Frederic)
   - In some scenarii, the pause re-import could be imcomplete if the tour originally contained pauses and the new file doesn't contain any
 
-* Fit Import (Frederic)
-  - When importing a file without pauses, the recorded time could sometimes be different by 1 or 2 seconds compared to the elapsed time.
+* TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/287
+  - Fixed the TCX Course Export format as it was not properly formatted before and was preventing from importing TCX Courses in Garmin Connect
+
+* Dialog Adjust Elevation
+  - Show dialog tour chart with a better default size when opened the first time 
+
 
 Translation    
 ===========
