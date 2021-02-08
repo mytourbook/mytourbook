@@ -316,15 +316,12 @@ public class Suunto3_STAXHandler {
 
    private void openError(final Exception e) {
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            final String message = e.getMessage();
-            MessageDialog.openError(Display.getCurrent().getActiveShell(),
-                  "Error", //$NON-NLS-1$
-                  message);
-            System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-         }
+      Display.getDefault().syncExec(() -> {
+         final String message = e.getMessage();
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               "Error", //$NON-NLS-1$
+               message);
+         System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
       });
    }
 
@@ -573,11 +570,6 @@ public class Suunto3_STAXHandler {
                _sampleData.pulse = hr * 60.0f;
                break;
 
-            case TAG_SAMPLE_LAP:
-               // set a marker
-               _markerData.marker = 1;
-               break;
-
             case TAG_SAMPLE_LATITUDE:
                data = ((Characters) eventReader.nextEvent()).getData();
                _gpsData.latitude = Util.parseDouble(data) * RADIANT_TO_DEGREE;
@@ -665,6 +657,11 @@ public class Suunto3_STAXHandler {
             switch (elementName) {
             case TAG_SAMPLE_PAUSE:
                parseXML_37_Pause(eventReader);
+               break;
+
+            case TAG_SAMPLE_LAP:
+               // set a marker
+               _markerData.marker = 1;
                break;
 
             }
