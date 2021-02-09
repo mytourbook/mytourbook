@@ -4247,11 +4247,11 @@ public class TourManager {
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
 
-      final float[] paceSerie = tourData.getPaceSerieSeconds();
+      final float[] speedSerie = tourData.getSpeedSerie();
       ChartDataYSerie yDataPace = null;
-      if (paceSerie != null) {
+      if (speedSerie != null) {
 
-         yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
+         yDataPace = createChartDataSerieNoZero(speedSerie, chartType);
 
          yDataPace.setYTitle(GRAPH_LABEL_PACE);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
