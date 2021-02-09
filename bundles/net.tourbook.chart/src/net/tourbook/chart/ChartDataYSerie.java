@@ -192,10 +192,9 @@ public class ChartDataYSerie extends ChartDataSerie {
       _isForceMaxValue = true;
 
       // ensure max is larger than min
-      _visibleMaxValue = maxValue;
-//            > _visibleMinValue //
-//            ? maxValue
-//            : _visibleMinValue * _valueDivisor;
+      _visibleMaxValue = maxValue > _visibleMinValue //
+            ? maxValue
+            : _visibleMinValue * _valueDivisor;
 
       _visibleMaxValueForced = _visibleMaxValue;
    }
