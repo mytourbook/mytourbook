@@ -4248,6 +4248,9 @@ public class TourManager {
                                                 final boolean useGraphBgStyle) {
 
       final float[] speedSerie = tourData.getSpeedSerie();
+      for (int index = 0; index < speedSerie.length; ++index) {
+         speedSerie[index] *= 60;
+      }
       ChartDataYSerie yDataPace = null;
       if (speedSerie != null) {
 
@@ -4271,7 +4274,7 @@ public class TourManager {
          // adjust min/max values when it's defined in the pref store
          setVisibleForcedValues(
                yDataPace,
-               60,
+               2500,
                0,
                ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
                ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
