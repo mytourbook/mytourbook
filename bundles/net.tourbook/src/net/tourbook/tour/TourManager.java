@@ -3711,7 +3711,6 @@ public class TourManager {
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
-               yDataPace.setYAxisDirection(false);
             }
             break;
 
