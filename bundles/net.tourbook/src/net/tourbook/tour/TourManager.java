@@ -3708,11 +3708,10 @@ public class TourManager {
             break;
 
          case GRAPH_PACE:
-            //TODO FB
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
-               //chartDataModel.setInvertedData???
+               yDataPace.setYAxisDirection(false);
             }
             break;
 
@@ -4248,17 +4247,12 @@ public class TourManager {
                                                 final ChartDataModel chartDataModel,
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
+
       final float[] paceSerie = tourData.getPaceSerieSeconds();
+      ChartDataYSerie yDataPace = null;
+      if (paceSerie != null) {
 
-//TODO FB
-
-      final int maxValue = _prefStore.getInt(ITourbookPreferences.GRAPH_PACE_MAX_VALUE) * 60;
-         final float[] invertedPaceSerie = new float[paceSerie.length];
-         for (int index = 0; index < paceSerie.length; ++index) {
-            invertedPaceSerie[index] = maxValue - paceSerie[index];
-         }
-
-         final ChartDataYSerie yDataPace = createChartDataSerieNoZero(invertedPaceSerie, chartType);
+         yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(GRAPH_LABEL_PACE);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
@@ -4267,6 +4261,7 @@ public class TourManager {
          yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
          yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
          yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
+         yDataPace.setYAxisDirection(false);
 
          final int fillMethod = useGraphBgStyle ? ChartDataYSerie.FILL_METHOD_CUSTOM : ChartDataYSerie.FILL_METHOD_FILL_BOTTOM;
          yDataPace.setGraphFillMethod(fillMethod);
@@ -4281,8 +4276,9 @@ public class TourManager {
                0,
                ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
                ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
-               ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
-               ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+               ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+               ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
 
       return yDataPace;
    }
