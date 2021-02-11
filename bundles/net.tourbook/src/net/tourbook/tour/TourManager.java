@@ -3710,7 +3710,7 @@ public class TourManager {
          case GRAPH_PACE:
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
-               chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
+               chartDataModel.setCustomData(CUSTOM_DATA_SPEED, yDataPace);
             }
             break;
 
@@ -4270,8 +4270,8 @@ public class TourManager {
 
          setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
          chartDataModel.addXyData(yDataPace);
-         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 3); //20min/mile
-         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 15);//4min/mile
+//         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 3); //20min/mile
+//         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 15);//4min/mile
 
          // adjust min/max values when it's defined in the pref store
          setVisibleForcedValues(

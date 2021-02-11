@@ -1291,8 +1291,14 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefSaveValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefSaveValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      int selection = _spinnerMin_Pace.getSelection();
+      int round = selection == 0 ? 0 : Math.round(60f / selection);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, round);
+      // prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
+      selection = _spinnerMax_Pace.getSelection();
+      round = selection == 0 ? 0 : Math.round(60f / selection);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, round);
+//      prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
 
       // min/max cadence
       prefSaveValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
