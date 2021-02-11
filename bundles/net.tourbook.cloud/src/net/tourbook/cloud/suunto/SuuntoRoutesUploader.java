@@ -130,6 +130,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       _tourExporter.setUseActivityType(useActivityType);
       _tourExporter.setActivityType(activityName);
 
+      if (tourData.timeSerie == null || tourData.timeSerie.length == 0 || tourData.getTourDeviceTime_Elapsed() == 0) {
+         _tourExporter.setIsCamouflageSpeed(true);
+         _tourExporter.setCamouflageSpeed(10);
+      } else {
+         _tourExporter.setIsCamouflageSpeed(false);
+      }
+
       _tourExporter.export(absoluteTourFilePath);
 
       final String tourGpx = FilesUtils.readFileContentString(absoluteTourFilePath);
