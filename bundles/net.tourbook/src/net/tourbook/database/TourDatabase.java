@@ -186,59 +186,60 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, is needed to drop them
-   private final static String TABLE_TOUR_CATEGORY          = "TourCategory";                              //$NON-NLS-1$
-   private final static String TABLE_TOURCATEGORY__TOURDATA = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA; //$NON-NLS-1$
-
-   /*
-    * Renaming existing fields in the tour database causes lots of troubles and additional work to
-    * fix it for ALL possible cases -> It is not a good idea to rename fields
-    */
-   private static final String                            RENAMED__BIKER_WEIGHT__FROM        = "bikerWeight";                                          //$NON-NLS-1$
-   private static final String                            RENAMED__BIKER_WEIGHT__INTO        = "BodyWeight";                                           //$NON-NLS-1$
-   private static final String                            RENAMED__TOUR_DRIVING_TIME__FROM   = "tourDrivingTime";                                      //$NON-NLS-1$
-   private static final String                            RENAMED__TOUR_DRIVING_TIME__INTO   = "TourComputedTime_Moving";                              //$NON-NLS-1$
-   private static final String                            RENAMED__TOUR_RECORDING_TIME__FROM = "tourRecordingTime";                                    //$NON-NLS-1$
-   private static final String                            RENAMED__TOUR_RECORDING_TIME__INTO = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
+   private final static String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
+   private final static String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
-   public static final int                                ENTITY_IS_NOT_SAVED                = -1;
+   public static final int     ENTITY_IS_NOT_SAVED                = -1;
    //
-   public static final String                             ENTITY_ID_BIKE                     = "BikeID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_COMPARED                 = "ComparedID";                                           //$NON-NLS-1$
-   public static final String                             ENTITY_ID_HR_ZONE                  = "HrZoneID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_MARKER                   = "MarkerID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_PERSON                   = "PersonID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_PHOTO                    = "PhotoID";                                              //$NON-NLS-1$
-   public static final String                             ENTITY_ID_REF                      = "RefID";                                                //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TAG                      = "TagID";                                                //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TAG_CATEGORY             = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TOUR                     = "TourID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TYPE                     = "TypeID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_WAY_POINT                = "WayPointID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_BIKE                     = "BikeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_COMPARED                 = "ComparedID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_HR_ZONE                  = "HrZoneID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_MARKER                   = "MarkerID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PERSON                   = "PersonID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PHOTO                    = "PhotoID";                                              //$NON-NLS-1$
+   public static final String  ENTITY_ID_REF                      = "RefID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG                      = "TagID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG_CATEGORY             = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String  ENTITY_ID_TOUR                     = "TourID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_TYPE                     = "TypeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_WAY_POINT                = "WayPointID";                                           //$NON-NLS-1$
    //
-   private static final String                            KEY_BIKE                           = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String                            KEY_PERSON                         = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   public static final String                             KEY_TAG                            = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
-   private static final String                            KEY_TAG_CATEGORY                   = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
-   public static final String                             KEY_TOUR                           = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
-   private static final String                            KEY_TYPE                           = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
+   private static final String KEY_BIKE                           = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
+   private static final String KEY_PERSON                         = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
+   public static final String  KEY_TAG                            = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY                   = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
+   public static final String  KEY_TOUR                           = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
+   private static final String KEY_TYPE                           = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
 
-   private static final String                            DEFAULT_0                          = "0";                                                    //$NON-NLS-1$
-   private static final String                            DEFAULT_1_0                        = "1.0";                                                  //$NON-NLS-1$
-   private static final String                            DEFAULT_FALSE                      = "false";                                                //$NON-NLS-1$
-   private static final String                            DEFAULT_IGNORED                    = "-1";                                                   //$NON-NLS-1$
+   /**
+    * Renaming existing fields in the tour database causes lots of troubles and additional work to
+    * fix and test it for ALL possible cases -> It is not a good idea to rename fields
+    */
+   private static final String RENAMED__BIKER_WEIGHT__FROM        = "bikerWeight";                                          //$NON-NLS-1$
+   private static final String RENAMED__BIKER_WEIGHT__INTO        = "BodyWeight";                                           //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__FROM   = "tourDrivingTime";                                      //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__INTO   = "TourComputedTime_Moving";                              //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__FROM = "tourRecordingTime";                                    //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__INTO = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
 
-   private static final String                            PERSISTENCE_UNIT_NAME              = "tourdatabase";                                         //$NON-NLS-1$
+   private static final String DEFAULT_0                          = "0";                                                    //$NON-NLS-1$
+   private static final String DEFAULT_1_0                        = "1.0";                                                  //$NON-NLS-1$
+   private static final String DEFAULT_FALSE                      = "false";                                                //$NON-NLS-1$
+   private static final String DEFAULT_IGNORED                    = "-1";                                                   //$NON-NLS-1$
 
-   private static final String                            DERBY_DATABASE                     = "derby-database";                                       //$NON-NLS-1$
-   private static final String                            DERBY_DB_TOURBOOK                  = "tourbook";                                             //$NON-NLS-1$
-   private static String                                  DERBY_DRIVER_CLASS;
-   private static String                                  DERBY_URL;
-   private static final String                            DERBY_URL_COMMAND_CREATE_TRUE      = ";create=true";                                         //$NON-NLS-1$
-   private static final String                            DERBY_URL_COMMAND_SHUTDOWN_TRUE    = ";shutdown=true";                                       //$NON-NLS-1$
-   private static final String                            DERBY_URL_COMMAND_UPGRADE_TRUE     = ";upgrade=true";                                        //$NON-NLS-1$
+   private static final String PERSISTENCE_UNIT_NAME              = "tourdatabase";                                         //$NON-NLS-1$
+
+   private static final String DERBY_DATABASE                     = "derby-database";                                       //$NON-NLS-1$
+   private static final String DERBY_DB_TOURBOOK                  = "tourbook";                                             //$NON-NLS-1$
+   private static String       DERBY_DRIVER_CLASS;
+   private static String       DERBY_URL;
+   private static final String DERBY_URL_COMMAND_CREATE_TRUE      = ";create=true";                                         //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE    = ";shutdown=true";                                       //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_UPGRADE_TRUE     = ";upgrade=true";                                        //$NON-NLS-1$
+   //
    //
    private static volatile TourDatabase                   _instance;
 
@@ -264,7 +265,7 @@ public class TourDatabase {
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>            _tagCollections                    = new HashMap<>();
+   private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
    /*
     * Cached distinct fields
