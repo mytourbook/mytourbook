@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Website: Set next version experimental because of the many database modifications
+
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/

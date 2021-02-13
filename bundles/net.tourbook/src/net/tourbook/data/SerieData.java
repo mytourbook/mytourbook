@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -133,11 +133,12 @@ public class SerieData implements Serializable {
    public boolean[] visiblePoints_Surfing;
 
    /**
-    * An array containing the start time of each pause (in milliseconds)
+    * Containing the start time of each pause (in milliseconds)
     */
    public long[]    pausedTime_Start;
+   
    /**
-    * An array containing the end time of each pause (in milliseconds)
+    * Containing the end time of each pause (in milliseconds)
     */
    public long[]    pausedTime_End;
 
