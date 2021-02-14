@@ -125,6 +125,8 @@ import org.hibernate.annotations.Cascade;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
+   private static final char           NL                                = UI.NEW_LINE;
+
    public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
@@ -9398,9 +9400,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       pausedTime_Start     = serieData.pausedTime_Start;
       pausedTime_End       = serieData.pausedTime_End;
 
-      if (TourDatabase.IS_IN_POST_UPDATE_042_to_043) {
+      if (serieData.latitude != null) {
 
-         // use still exising lat/lon double serie data -> saving the tour will convert them into E6 format
+         // use exising lat/lon double serie data from older versions
+         // -> saving the tour will convert them into E6 format
 
          latitudeSerie        = serieData.latitude;
          longitudeSerie       = serieData.longitude;
@@ -9418,7 +9421,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       gearSerie            = serieData.gears;
 
       pulseTimeSerie       = serieData.pulseTimes;
-      pulseTime_TimeIndex = serieData.pulseTime_TimeIndex;
+      pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
@@ -11106,17 +11109,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Override
    public String toString() {
-      return "TourData [\n" //                                                      //$NON-NLS-1$
 
-            + ("start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE) //               //$NON-NLS-1$
-            + (startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + UI.NEW_LINE) //
+      return "TourData [" + NL //                                                                  //$NON-NLS-1$
 
-            + ("tourId=" + tourId + UI.NEW_LINE) //                                          //$NON-NLS-1$
+            + "start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //       //$NON-NLS-1$
+            + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + ("object=" + super.toString() + UI.NEW_LINE) //                                    //$NON-NLS-1$
-            + ("identityHashCode=" + System.identityHashCode(this) + UI.NEW_LINE) //                  //$NON-NLS-1$
+            + "tourId=" + tourId + NL //                                                           //$NON-NLS-1$
 
-            //            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+            + "object=" + super.toString() + NL //                                                 //$NON-NLS-1$
+            + "identityHashCode=" + System.identityHashCode(this) + NL //                          //$NON-NLS-1$
+
+//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                    //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }
@@ -11124,8 +11128,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public String toStringWithHash() {
 
       final String string = UI.EMPTY_STRING
-            + ("   tourId: " + tourId) //$NON-NLS-1$
-            + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
+            + "   tourId: " + tourId //$NON-NLS-1$
+            + "   identityHashCode: " + System.identityHashCode(this); //$NON-NLS-1$
 
       return string;
    }
@@ -11147,9 +11151,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-     * Converts data series from db version 42 to 43
+    * Converts data series from db version 42 to 43
     */
-   public void updateDatabase_042_to_043() {
+   public void updateDatabaseDesign_042_to_043() {
+
       // convert lat/lon double -> E6
       onPrePersist();
    }
