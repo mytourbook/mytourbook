@@ -11147,10 +11147,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Converts data series from db version 42 to 43
+     * Converts data series from db version 42 to 43
     */
    public void updateDatabase_042_to_043() {
-
       // convert lat/lon double -> E6
       onPrePersist();
    }

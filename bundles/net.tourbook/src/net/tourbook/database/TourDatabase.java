@@ -105,7 +105,7 @@ public class TourDatabase {
    private static final int TOURBOOK_DB_VERSION = 43;
 
 //   private static final int TOURBOOK_DB_VERSION = 43; // 21.?
-//   private static final int TOURBOOK_DB_VERSION = 42; // 20.11
+//   private static final int TOURBOOK_DB_VERSION = 42; // 20.11.1
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -7706,7 +7706,6 @@ public class TourDatabase {
 
       logDbUpdate(createLog_PostUpdate(41, 42, startTime));
    }
-
    /**
     * @param conn
     * @param splashManager
