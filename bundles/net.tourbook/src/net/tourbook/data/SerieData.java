@@ -159,11 +159,12 @@ public class SerieData implements Serializable {
    public boolean[]            visiblePoints_Surfing;
 
    /**
-    * An array containing the start time of each pause (in milliseconds)
+    * Containing the start time of each pause (in milliseconds)
     */
    public long[]               pausedTime_Start;
+   
    /**
-    * An array containing the end time of each pause (in milliseconds)
+    * Containing the end time of each pause (in milliseconds)
     */
    public long[]               pausedTime_End;
 

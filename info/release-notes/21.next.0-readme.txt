@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Website: Set next version experimental because of the many database modifications
+
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
@@ -89,6 +91,13 @@ Bugfix
 
 * Dialog Adjust Elevation
   - Show dialog tour chart with a better default size when opened the first time 
+  
+* Tour Database Update
+  Fixed 3 different issues when updating tour database from the very first public version 3.
+  Depending on the version being updated, these issues occurred or not
+    - Column renaming could fail
+    - Serie data could be dropped
+    - Entity manager was running in update 3->4, moved it into the 3->4 post update  
 
 
 Translation    
