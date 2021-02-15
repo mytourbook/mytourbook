@@ -15,7 +15,17 @@
  *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+
 public class OAuth2Utils {
+
+   public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime, final int accessTokenExpiresIn) {
+
+      final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
+
+      return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
+   }
 
    /**
     * We consider that an access token is expired if there are less

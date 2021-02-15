@@ -2,6 +2,8 @@
 <?eclipse version="4.14"?>
 <plugin>
 	
+	<!-- FILE SYSTEMS -->
+   
    <extension   point="net.tourbook.fileSystem">
       <fileSystem
          id             ="net.tourbook.cloud.DropboxFileSystem"
@@ -9,7 +11,28 @@
          class          ="net.tourbook.cloud.dropbox.DropboxFileSystem"
       />
    </extension>
+   
+	<!-- FILE SYSTEMS -->
+	
+	
+	
+	<!-- CLOUD FILES DOWNLOADERS -->
+
+    <!-- Suunto -->
+    <extension   point="net.tourbook.cloudDownloader">
+      <cloudDownloader
+         id             ="net.tourbook.cloud.SuuntoCloudDownloader"
+         name           ="Suunto Files Downloader"
+         class          ="net.tourbook.cloud.suunto.SuuntoCloudDownloader"
+      />
+   </extension>
+   
+	<!-- CLOUD FILES DOWNLOADERS -->
       
+      
+      
+	<!-- CLOUD UPLOADERS -->
+
    <extension   point="net.tourbook.cloudUploader">
       <cloudUploader
          id             ="net.tourbook.cloud.StravaUploader"
@@ -17,24 +40,47 @@
          class          ="net.tourbook.cloud.strava.StravaUploader"
       />
    </extension>
+   
+   <extension   point="net.tourbook.cloudUploader">
+      <cloudUploader
+         id             ="net.tourbook.cloud.SuuntoRoutesUploader"
+         name           ="Suunto Routes Uploader"
+         class          ="net.tourbook.cloud.suunto.SuuntoRoutesUploader"
+      />
+   </extension>
+   
+	<!-- CLOUD UPLOADERS -->
+	
+	
 
    <!-- Dropbox -->
    <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageCloudConnectivity"
+            category="net.tourbook.preferences.PrefPageCloud"
             class="net.tourbook.cloud.dropbox.PrefPageDropbox"
             id="net.tourbook.cloud.PrefPageDropbox"
             name="Dropbox">
       </page>
    </extension>
    
+   
    <!-- Strava -->
    <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageCloudConnectivity"
+            category="net.tourbook.preferences.PrefPageCloud"
             class="net.tourbook.cloud.strava.PrefPageStrava"
-            id="net.tourbook.strava.PrefPageStrava"
+            id="net.tourbook.cloud.PrefPageStrava"
             name="Strava">
+      </page>
+   </extension>
+   
+   <!-- Suunto -->
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageCloud"
+            class="net.tourbook.cloud.suunto.PrefPageSuunto"
+            id="net.tourbook.cloud.PrefPageSuunto"
+            name="Suunto">
       </page>
    </extension>
    

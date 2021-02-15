@@ -17,21 +17,16 @@ package net.tourbook.cloud.strava;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import net.tourbook.cloud.TourUpload;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ActivityUpload {
+public class ActivityUpload extends TourUpload {
 
    private String id;
-   private String error;
    private String name;
    private String status;
 
-   private String tourDate;
-
-   ActivityUpload() {}
-
-   public String getError() {
-      return error;
-   }
+   public ActivityUpload() {}
 
    public String getId() {
       return id;
@@ -43,17 +38,5 @@ public class ActivityUpload {
 
    public String getStatus() {
       return status;
-   }
-
-   public String getTourDate() {
-      return tourDate;
-   }
-
-   public void setError(final String error) {
-      this.error = error;
-   }
-
-   public void setTourDate(final String tourDate) {
-      this.tourDate = tourDate;
    }
 }

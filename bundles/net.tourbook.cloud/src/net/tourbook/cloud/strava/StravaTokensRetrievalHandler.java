@@ -30,9 +30,9 @@ public class StravaTokensRetrievalHandler extends TokensRetrievalHandler {
 
    @Override
    public Tokens retrieveTokens(final String authorizationCode) {
-      final Tokens newTokens = new StravaTokens();
+
       if (StringUtils.isNullOrEmpty(authorizationCode)) {
-         return newTokens;
+         return new StravaTokens();
       }
 
       return StravaUploader.getTokens(authorizationCode, false, UI.EMPTY_STRING);
@@ -41,7 +41,7 @@ public class StravaTokensRetrievalHandler extends TokensRetrievalHandler {
    @Override
    public void saveTokensInPreferences(final Tokens tokens) {
 
-      if (!(tokens instanceof StravaTokens) || !StringUtils.hasContent(tokens.getAccess_token())) {
+      if (!(tokens instanceof StravaTokens) || StringUtils.isNullOrEmpty(tokens.getAccess_token())) {
 
          final String currentAccessToken = _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN);
          _prefStore.firePropertyChangeEvent(Preferences.STRAVA_ACCESSTOKEN,

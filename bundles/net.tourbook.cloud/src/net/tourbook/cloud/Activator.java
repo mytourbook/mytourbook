@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,14 @@
  *******************************************************************************/
 package net.tourbook.cloud;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -49,6 +55,19 @@ public class Activator extends AbstractUIPlugin {
       return plugin;
    }
 
+   public static String getImageAbsoluteFilePath(final String fileName) {
+
+      final Optional<URL> imageURL = ResourceLocator.locate(PLUGIN_ID, "icons/" + fileName); //$NON-NLS-1$
+
+      try {
+         return imageURL.isPresent() ? FileLocator.toFileURL(imageURL.get()).toString() : UI.EMPTY_STRING;
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
    /**
     * Returns an image descriptor for images in the plug-in path.
     *
@@ -57,6 +76,7 @@ public class Activator extends AbstractUIPlugin {
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
+
       final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
@@ -64,12 +84,14 @@ public class Activator extends AbstractUIPlugin {
 
    @Override
    public void start(final BundleContext context) throws Exception {
+
       super.start(context);
       plugin = this;
    }
 
    @Override
    public void stop(final BundleContext context) throws Exception {
+
       plugin = null;
       super.stop(context);
    }
