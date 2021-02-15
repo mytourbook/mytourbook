@@ -57,6 +57,9 @@ Improvements
     - Beat values from device
     - R-R intervals
 
+  - Marker Tooltip (Frederic)
+    - Ability to show/hide the following data: Elevation, Distance, Duration, Elevation Gain Difference, Distance Difference, Duration Difference
+    
 * Tour Blog
   - Set content font size
 

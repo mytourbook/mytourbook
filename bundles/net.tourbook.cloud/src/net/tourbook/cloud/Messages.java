@@ -27,6 +27,7 @@ public class Messages extends NLS {
    public static String        Html_CloseBrowser_Text;
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
+
    public static String        Pref_CloudConnectivity_AccessToken_Label;
    public static String        Pref_CloudConnectivity_Authorize_Button;
    public static String        Pref_CloudConnectivity_CloudAccount_Group;
