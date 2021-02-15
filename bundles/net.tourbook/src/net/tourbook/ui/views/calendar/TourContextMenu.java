@@ -218,7 +218,7 @@ public class TourContextMenu {
 
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
-      _actionUploadTour.setEnabled(isTourSelected && _actionUploadTour.hasUploaders());
+      _actionUploadTour.setEnabled(isTourSelected);
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);

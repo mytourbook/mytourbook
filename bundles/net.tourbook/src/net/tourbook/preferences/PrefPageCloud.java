@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageCloudConnectivity extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageCloud extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String ID = "net.tourbook.preferences.PrefPageCloudConnectivity"; //$NON-NLS-1$
+   public static final String ID = "net.tourbook.preferences.PrefPageCloud"; //$NON-NLS-1$
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -34,9 +34,6 @@ public class PrefPageCloudConnectivity extends PreferencePage implements IWorkbe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-
-      }
 
       return container;
    }

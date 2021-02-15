@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,6 +121,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Cadence_Unit_Spm;
    public static String        Graph_Label_Cadence_Unit_RpmSpm;
    public static String        Graph_Label_Distance;
+   public static String        Graph_Label_ElevationGain;
    public static String        Graph_Label_Gears;
    public static String        Graph_Label_Gradient;
    public static String        Graph_Label_Gradient_Unit;
