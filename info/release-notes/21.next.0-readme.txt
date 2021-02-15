@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Website: Describe structure for text key names
+
 * Website: Set next version experimental because of the many database modifications
 
 * Website: Document cloud connections
