@@ -999,7 +999,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
       final Display display = container.getDisplay();
 
-      UI.setBackgroundColorForAllChildren(container, display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+      UI.setColorForAllChildren(container,
+            display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
+            display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
    }
 
    void setIsShowMarkerActions(final boolean isShowMarkerActions) {
