@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -134,52 +134,55 @@ public class SerieData implements Serializable {
    public boolean[] visiblePoints_Surfing;
 
    /**
-    * An array containing the start time of each pause (in milliseconds)
+    * Containing the start time of each pause (in milliseconds)
     */
    public long[]    pausedTime_Start;
+
    /**
-    * An array containing the end time of each pause (in milliseconds)
+    * Containing the end time of each pause (in milliseconds)
     */
    public long[]    pausedTime_End;
 
    //CUSTOM TRACKS
-   public HashMap<String, float[]>              customTracks;
-   public HashMap<String, CustomTrackStatisticEntry> customTracksStat;
-   public HashMap<String, CustomTrackDefinition> customTracksDefinition;
+   public HashMap<String, float[]>                   customTracks;
+   public HashMap<String, CustomTrackStatisticEntry> customTracksStatistics;
+   public HashMap<String, CustomTrackDefinition>     customTracksDefinition;
 
    @Override
    public String toString() {
-
-// SET_FORMATTING_OFF
-
-      // this formatted data are displayed in the tour info view
 
       final int maxLen = 10;
 
       //CUSTOM TRACKS
       String custTrack = UI.NEW_LINE;
-      if(customTracksDefinition!=null && !customTracksDefinition.isEmpty()) {
-         custTrack += "  --CUSTOM TRACKS Definition...len=" + Integer.toString(customTracksDefinition.size()) + "--  " + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+      if (customTracksDefinition != null && !customTracksDefinition.isEmpty()) {
+         custTrack += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String i : customTracksDefinition.keySet()) {
             final CustomTrackDefinition item = customTracksDefinition.get(i);
             custTrack += "  Id=\"" + i + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
          }
          custTrack += "  --CUSTOM TRACKS Definition End--  " + UI.NEW_LINE; //$NON-NLS-1$
       }
-      if(customTracks!=null && !customTracks.isEmpty()) {
-         custTrack += "  --CUSTOM TRACKS--  " + UI.NEW_LINE; //$NON-NLS-1$
+      if (customTracks != null && !customTracks.isEmpty()) {
+         custTrack += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String i : customTracks.keySet()) {
-            custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null         ? Arrays.toString(Arrays.copyOf(customTracks.get(i),          Math.min(customTracks.get(i).length, maxLen)))        : UI.EMPTY_STRING) + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
-            if(customTracksStat!= null && customTracksStat.get(i)!=null) {
-               final CustomTrackStatisticEntry valE = customTracksStat.get(i);
+            custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null ? Arrays.toString(Arrays.copyOf(customTracks.get(i), //$NON-NLS-1$//$NON-NLS-2$
+                  Math.min(customTracks.get(i).length, maxLen))) : UI.EMPTY_STRING) + UI.NEW_LINE;
+            if (customTracksStatistics != null && customTracksStatistics.get(i) != null) {
+               final CustomTrackStatisticEntry valE = customTracksStatistics.get(i);
                custTrack += "  Id:\"" + i + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-               custTrack +=  ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
-               custTrack +=  ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
+               custTrack += ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
+               custTrack += ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
                custTrack += "]" + UI.NEW_LINE; //$NON-NLS-1$
             }
          }
          custTrack += "  --END CUSTOM TRACKS--  " + UI.NEW_LINE; //$NON-NLS-1$
       }
+
+// SET_FORMATTING_OFF
+
+      // this formatted data are displayed in the tour info view
+
 
       return UI.NEW_LINE
 

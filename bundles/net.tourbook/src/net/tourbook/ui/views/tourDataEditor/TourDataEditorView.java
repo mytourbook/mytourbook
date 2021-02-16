@@ -1641,7 +1641,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _timeSlice_Viewer.setSelection(previousSelection, true);
                }
-               //CUSTOM TRACKS add dispose check below
+               
                if (table.isDisposed()) {
                   return;
                }
@@ -4706,7 +4706,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             createUI_Section_150_Characteristics(_tourContainer);
 
-            //CUSTOM TRACKS
             createUI_SectionSeparator(_tourContainer);
             createUI_Section_160_CustomTracks(_tourContainer);
          }

@@ -424,7 +424,6 @@ public class GraphColorManager {
             new RGB(0, 134, 147),
             null));
 
-      //CUSTOM TRACKS
       allColorDef.add(new ColorDefinition(PREF_GRAPH_CUSTOM_TRACKS, //
             Messages.Graph_Label_Custom_Tracks,
             new RGB(255, 255, 255),

@@ -2387,7 +2387,7 @@ public class ColumnManager {
             final int colWidthByPos = dataLayer.getColumnWidthByPosition(createdColumnIndex);
 
             final String columnId = colDef.getColumnId();
-            //CUSTOM TRACKS
+            
             if (columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
                continue;
             }

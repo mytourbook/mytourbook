@@ -2092,10 +2092,19 @@ public class UI {
       }
    }
 
-   public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
+   /**
+    * Set color for all children controls of the parent.
+    *
+    * @param parent
+    * @param foregroundColor
+    *           Foreground color
+    * @param backgroundColor
+    *           Background color
+    */
+   public static void setColorForAllChildren(final Control parent, final Color foregroundColor, final Color backgroundColor) {
 
-      parent.setForeground(fgColor);
-      parent.setBackground(bgColor);
+      parent.setForeground(foregroundColor);
+      parent.setBackground(backgroundColor);
 
       if (parent instanceof Composite) {
 
@@ -2112,7 +2121,7 @@ public class UI {
             //
             ) {
 
-               setColorForAllChildren(child, fgColor, bgColor);
+               setColorForAllChildren(child, foregroundColor, backgroundColor);
             }
          }
       }
