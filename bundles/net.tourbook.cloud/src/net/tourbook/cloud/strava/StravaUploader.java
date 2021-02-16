@@ -29,6 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -369,7 +370,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final JSONObject body = new JSONObject();
       body.put("name", manualTour.getTourTitle()); //$NON-NLS-1$
       body.put("type", stravaActivityType); //$NON-NLS-1$
-      body.put("start_date_local", TimeTools.getUTCISODateTime(manualTour.getTourStartTimeMS())); //$NON-NLS-1$
+      body.put("start_date_local", manualTour.getTourStartTime().format(DateTimeFormatter.ISO_DATE_TIME)); //$NON-NLS-1$
       body.put("elapsed_time", manualTour.getTourDeviceTime_Elapsed()); //$NON-NLS-1$
       body.put("description", manualTour.getTourDescription()); //$NON-NLS-1$
       body.put("distance", manualTour.getTourDistance()); //$NON-NLS-1$
@@ -483,7 +484,7 @@ public class StravaUploader extends TourbookCloudUploader {
          activityUploads.add(uploadFile(compressedTourAbsoluteFilePath, tourData));
       }
 
-      manualTours.stream().forEach(this::uploadManualTour);
+      manualTours.stream().forEach(manualTour -> activityUploads.add(uploadManualTour(manualTour)));
 
       final int[] numberOfUploadedTours = new int[1];
       activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
