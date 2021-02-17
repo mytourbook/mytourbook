@@ -28,14 +28,14 @@ public class ChartMarkerConfig {
    public boolean                     isShowMarkerLabel;
    public boolean                     isShowMarkerPoint;
    public boolean                     isShowMarkerTooltip;
-   public boolean                     isShowMarkerTooltip_Elevation;
-   public boolean                     isShowMarkerTooltip_Distance;
-   public boolean                     isShowMarkerTooltip_Duration;
-   public boolean                     isShowMarkerTooltip_ElevationGainDifference;
-   public boolean                     isShowMarkerTooltip_DistanceDifference;
-   public boolean                     isShowMarkerTooltip_DurationDifference;
    public boolean                     isShowOnlyWithDescription;
    public boolean                     isShowSignImage;
+   public boolean                     isShowTooltipData_Distance;
+   public boolean                     isShowTooltipData_DistanceDifference;
+   public boolean                     isShowTooltipData_Duration;
+   public boolean                     isShowTooltipData_DurationDifference;
+   public boolean                     isShowTooltipData_Elevation;
+   public boolean                     isShowTooltipData_ElevationGainDifference;
 
    public int                         markerHoverSize;
    public int                         markerLabelOffset;

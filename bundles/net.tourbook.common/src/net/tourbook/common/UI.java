@@ -1038,6 +1038,21 @@ public class UI {
       return new Cursor(display, sourceData, 0, 0);
    }
 
+   /**
+    * Creates a {@link Label} with text.
+    *
+    * @param parent
+    * @param text
+    * @return
+    */
+   public static Label createLabel(final Composite parent, final String text) {
+
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(text);
+
+      return label;
+   }
+
    public static void createSpacer_Horizontal(final Composite parent, final int columns) {
 
       final Label label = new Label(parent, SWT.NONE);
