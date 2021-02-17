@@ -116,12 +116,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private Button                _chkShowMarkerLabel;
    private Button                _chkShowMarkerPoint;
    private Button                _chkShowMarkerTooltip;
-   private Button                _chkMarkerTooltip_Elevation;
-   private Button                _chkMarkerTooltip_Distance;
-   private Button                _chkMarkerTooltip_Duration;
-   private Button                _chkMarkerTooltip_ElevationGainDifference;
-   private Button                _chkMarkerTooltip_DistanceDifference;
-   private Button                _chkMarkerTooltip_DurationDifference;
+   private Button                _chkTooltipData_Elevation;
+   private Button                _chkTooltipData_Distance;
+   private Button                _chkTooltipData_Duration;
+   private Button                _chkTooltipData_ElevationGainDifference;
+   private Button                _chkTooltipData_DistanceDifference;
+   private Button                _chkTooltipData_DurationDifference;
    private Button                _chkShowOnlyWithDescription;
 
    /**
@@ -197,7 +197,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Header(container);
             createUI_20_Properties(container);
@@ -221,14 +221,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              * Label: Slideout title
              */
             final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(label);
             label.setText(Messages.Slideout_ChartMarkerOptions_Label_Title);
+            GridDataFactory.fillDefaults().applyTo(label);
             MTFont.setBannerFont(label);
          }
          {
             final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.BEGINNING)
                   .applyTo(toolbar);
@@ -247,12 +246,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             final Composite ttContainer = new Composite(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .span(2, 1)
                   .applyTo(ttContainer);
@@ -263,45 +261,38 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                    * Show marker tooltip
                    */
                   _chkShowMarkerTooltip = new Button(ttContainer, SWT.CHECK);
-                  GridDataFactory
-                        .fillDefaults()//
+                  _chkShowMarkerTooltip.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
+                  _chkShowMarkerTooltip.addSelectionListener(_defaultSelectionAdapter);
+                  GridDataFactory.fillDefaults()
                         .align(SWT.FILL, SWT.CENTER)
                         .applyTo(_chkShowMarkerTooltip);
-                  _chkShowMarkerTooltip.setText(//
-                        Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
-                  _chkShowMarkerTooltip.addSelectionListener(_defaultSelectionAdapter);
                }
                {
                   /*
                    * Combo: tooltip position
                    */
                   _comboTooltipPosition = new Combo(ttContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-                  GridDataFactory
-                        .fillDefaults()//
+                  _comboTooltipPosition.setVisibleItemCount(20);
+                  _comboTooltipPosition.setToolTipText(Messages.Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip);
+                  _comboTooltipPosition.addSelectionListener(_defaultSelectionAdapter);
+                  _comboTooltipPosition.addFocusListener(_keepOpenListener);
+                  GridDataFactory.fillDefaults()
                         .grab(true, false)
                         .align(SWT.END, SWT.FILL)
                         .applyTo(_comboTooltipPosition);
-                  _comboTooltipPosition.setVisibleItemCount(20);
-                  _comboTooltipPosition.setToolTipText(//
-                        Messages.Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip);
-                  _comboTooltipPosition.addSelectionListener(_defaultSelectionAdapter);
-                  _comboTooltipPosition.addFocusListener(_keepOpenListener);
                }
                {
                   /*
                    * Show relative/absolute values
                    */
                   _chkShowAbsoluteValues = new Button(ttContainer, SWT.CHECK);
-                  GridDataFactory
-                        .fillDefaults()//
+                  _chkShowAbsoluteValues.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues);
+                  _chkShowAbsoluteValues.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip);
+                  _chkShowAbsoluteValues.addSelectionListener(_defaultSelectionAdapter);
+                  GridDataFactory.fillDefaults()
                         .span(2, 1)
                         .indent(_pc.convertWidthInCharsToPixels(3), 0)
                         .applyTo(_chkShowAbsoluteValues);
-                  _chkShowAbsoluteValues.setText(//
-                        Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues);
-                  _chkShowAbsoluteValues.setToolTipText(//
-                        Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip);
-                  _chkShowAbsoluteValues.addSelectionListener(_defaultSelectionAdapter);
                }
             }
          }
@@ -312,12 +303,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              */
             // show label
             _chkShowMarkerLabel = new Button(container, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkShowMarkerLabel);
             _chkShowMarkerLabel.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarker);
             _chkShowMarkerLabel.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkShowMarkerLabel);
          }
 
          {
@@ -325,12 +315,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              * Show marker point
              */
             _chkShowMarkerPoint = new Button(container, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkShowMarkerPoint);
             _chkShowMarkerPoint.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint);
             _chkShowMarkerPoint.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkShowMarkerPoint);
          }
 
          {
@@ -338,12 +327,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              * Show hidden marker
              */
             _chkShowHiddenMarker = new Button(container, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkShowHiddenMarker);
             _chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
             _chkShowHiddenMarker.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkShowHiddenMarker);
          }
 
          {
@@ -351,13 +339,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              * Show hidden marker
              */
             _chkShowOnlyWithDescription = new Button(container, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
+            _chkShowOnlyWithDescription.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription);
+            _chkShowOnlyWithDescription.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkShowOnlyWithDescription);
-            _chkShowOnlyWithDescription
-                  .setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowOnlyWithDescription);
-            _chkShowOnlyWithDescription.addSelectionListener(_defaultSelectionAdapter);
          }
 
          {
@@ -365,15 +351,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
              * Draw marker with default color
              */
             _chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
+            _chkDrawMarkerWithDefaultColor.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
+            _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
+            _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .applyTo(_chkDrawMarkerWithDefaultColor);
-            _chkDrawMarkerWithDefaultColor.setText(//
-                  Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
-            _chkDrawMarkerWithDefaultColor.setToolTipText(//
-                  Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
-            _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionAdapter);
          }
       }
    }
@@ -391,30 +374,26 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
                .span(2, 1)
                .applyTo(tempContainer);
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(tempContainer);
-//			tempContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//         tempContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
          {
             // show temp position
             _chkShowLabelTempPosition = new Button(tempContainer, SWT.CHECK);
-            GridDataFactory
-                  .fillDefaults()//
-                  .applyTo(_chkShowLabelTempPosition);
             _chkShowLabelTempPosition.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition);
-            _chkShowLabelTempPosition.setToolTipText(//
-                  Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip);
+            _chkShowLabelTempPosition.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip);
             _chkShowLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults().applyTo(_chkShowLabelTempPosition);
 
             {
                /*
                 * Combo: temp position
                 */
                _comboLabelTempPosition = new Combo(tempContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-               GridDataFactory
-                     .fillDefaults()//
-                     .indent(_pc.convertWidthInCharsToPixels(3), 0)
-                     .applyTo(_comboLabelTempPosition);
                _comboLabelTempPosition.setVisibleItemCount(20);
                _comboLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
                _comboLabelTempPosition.addFocusListener(_keepOpenListener);
+               GridDataFactory.fillDefaults()
+                     .indent(_pc.convertWidthInCharsToPixels(3), 0)
+                     .applyTo(_comboLabelTempPosition);
             }
          }
       }
@@ -427,41 +406,39 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupData);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(groupData);
       {
-         _chkMarkerTooltip_Elevation = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_Elevation.setText(GRAPH_LABEL_ALTITUDE);
-         _chkMarkerTooltip_Elevation.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_Elevation = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_Elevation.setText(GRAPH_LABEL_ALTITUDE);
+         _chkTooltipData_Elevation.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_ElevationGainDifference = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN);
-         _chkMarkerTooltip_ElevationGainDifference.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_ElevationGainDifference = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_ElevationGainDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN);
+         _chkTooltipData_ElevationGainDifference.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_Distance = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_Distance.setText(GRAPH_LABEL_DISTANCE);
-         _chkMarkerTooltip_Distance.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_Distance = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_Distance.setText(GRAPH_LABEL_DISTANCE);
+         _chkTooltipData_Distance.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_DistanceDifference = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
-         _chkMarkerTooltip_DistanceDifference.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_DistanceDifference = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_DistanceDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE);
+         _chkTooltipData_DistanceDifference.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_Duration = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_Duration.setText(GRAPH_LABEL_TIME);
-         _chkMarkerTooltip_Duration.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_Duration = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_Duration.setText(GRAPH_LABEL_TIME);
+         _chkTooltipData_Duration.addSelectionListener(_defaultSelectionAdapter);
 
-         _chkMarkerTooltip_DurationDifference = new Button(groupData, SWT.CHECK);
-         _chkMarkerTooltip_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
-         _chkMarkerTooltip_DurationDifference.addSelectionListener(_defaultSelectionAdapter);
+         _chkTooltipData_DurationDifference = new Button(groupData, SWT.CHECK);
+         _chkTooltipData_DurationDifference.setText(UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME);
+         _chkTooltipData_DurationDifference.addSelectionListener(_defaultSelectionAdapter);
       }
    }
 
    private void createUI_90_Bottom(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(_pc.convertWidthInCharsToPixels(4), 0)
             .applyTo(container);
@@ -484,12 +461,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
             // Label
             _lblLabelOffset = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblLabelOffset);
             _lblLabelOffset.setText(Messages.Slideout_ChartMarkerOptions_Label_Offset);
             _lblLabelOffset.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_Offset_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblLabelOffset);
 
             // Spinner
             _spinLabelOffset = new Spinner(container, SWT.BORDER);
@@ -507,12 +483,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
             // Label
             _lblMarkerPointSize = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblMarkerPointSize);
             _lblMarkerPointSize.setText(Messages.Slideout_ChartMarkerOptions_Label_MarkerSize);
             _lblMarkerPointSize.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_MarkerSize_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblMarkerPointSize);
 
             // Spinner
             _spinMarkerPointSize = new Spinner(container, SWT.BORDER);
@@ -530,12 +505,11 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
             // Label
             final Label label = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
             label.setText(Messages.Slideout_ChartMarkerOptions_Label_HoverSize);
             label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_HoverSize_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
 
             // Spinner
             _spinHoverSize = new Spinner(container, SWT.BORDER);
@@ -551,13 +525,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
    private void createUI_94_Colors(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.FILL, SWT.BEGINNING)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          /*
           * Default color
@@ -565,22 +538,19 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          {
             // Label
             final Label label = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
+            label.setText(Messages.Slideout_ChartMarkerOptions_Label_MarkerColor);
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
-            label.setText(Messages.Slideout_ChartMarkerOptions_Label_MarkerColor);
 
             // Color selector
             _colorDefaultMarker = new ColorSelectorExtended(container);
-            GridDataFactory
-                  .swtDefaults()//
+            _colorDefaultMarker.addOpenListener(this);
+            _colorDefaultMarker.addListener(_defaultPropertyChangeListener);
+            GridDataFactory.swtDefaults()
                   .grab(false, true)
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_colorDefaultMarker.getButton());
-
-            _colorDefaultMarker.addOpenListener(this);
-            _colorDefaultMarker.addListener(_defaultPropertyChangeListener);
          }
 
          /*
@@ -589,21 +559,20 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          {
             // Label
             final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor);
+            label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(label);
-            label.setText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor);
-            label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip);
 
             // Color selector
             _colorDeviceMarker = new ColorSelectorExtended(container);
+            _colorDeviceMarker.addOpenListener(this);
+            _colorDeviceMarker.addListener(_defaultPropertyChangeListener);
             GridDataFactory.swtDefaults()
                   .grab(false, true)
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_colorDeviceMarker.getButton());
-
-            _colorDeviceMarker.addOpenListener(this);
-            _colorDeviceMarker.addListener(_defaultPropertyChangeListener);
          }
 
          /*
@@ -612,23 +581,20 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
          {
             // Label
             final Label label = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
             label.setText(Messages.Slideout_ChartMarkerOptions_Label_HiddenMarkerColor);
             label.setToolTipText(Messages.Slideout_ChartMarkerOptions_Label_HiddenMarkerColor_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
 
             // Color selector
             _colorHiddenMarker = new ColorSelectorExtended(container);
-            GridDataFactory
-                  .swtDefaults()//
+            _colorHiddenMarker.addOpenListener(this);
+            _colorHiddenMarker.addListener(_defaultPropertyChangeListener);
+            GridDataFactory.swtDefaults()
                   .grab(false, true)
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_colorHiddenMarker.getButton());
-
-            _colorHiddenMarker.addOpenListener(this);
-            _colorHiddenMarker.addListener(_defaultPropertyChangeListener);
          }
       }
    }
@@ -648,12 +614,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
       _chkShowLabelTempPosition.setEnabled(isLabelVisible);
       _comboLabelTempPosition.setEnabled(isLabelVisible && isShowTempPosition);
-      _chkMarkerTooltip_Elevation.setEnabled(isTooltipVisible);
-      _chkMarkerTooltip_Distance.setEnabled(isTooltipVisible);
-      _chkMarkerTooltip_Duration.setEnabled(isTooltipVisible);
-      _chkMarkerTooltip_ElevationGainDifference.setEnabled(isTooltipVisible);
-      _chkMarkerTooltip_DistanceDifference.setEnabled(isTooltipVisible);
-      _chkMarkerTooltip_DurationDifference.setEnabled(isTooltipVisible);
+      _chkTooltipData_Elevation.setEnabled(isTooltipVisible);
+      _chkTooltipData_Distance.setEnabled(isTooltipVisible);
+      _chkTooltipData_Duration.setEnabled(isTooltipVisible);
+      _chkTooltipData_ElevationGainDifference.setEnabled(isTooltipVisible);
+      _chkTooltipData_DistanceDifference.setEnabled(isTooltipVisible);
+      _chkTooltipData_DurationDifference.setEnabled(isTooltipVisible);
 
       _chkShowHiddenMarker.setEnabled(isMarkerVisible);
       _chkShowOnlyWithDescription.setEnabled(isMarkerVisible);
@@ -691,13 +657,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       final boolean isShowMarkerLabel = _chkShowMarkerLabel.getSelection();
       final boolean isShowMarkerPoint = _chkShowMarkerPoint.getSelection();
       final boolean isShowMarkerTooltip = _chkShowMarkerTooltip.getSelection();
-      final boolean isShowMarkerTooltip_Elevation = _chkMarkerTooltip_Elevation.getSelection();
-      final boolean isShowMarkerTooltip_Distance = _chkMarkerTooltip_Distance.getSelection();
-      final boolean isShowMarkerTooltip_Duration = _chkMarkerTooltip_Duration.getSelection();
-      final boolean isShowMarkerTooltip_ElevationGainDifference = _chkMarkerTooltip_ElevationGainDifference.getSelection();
-      final boolean isShowMarkerTooltip_DistanceDifference = _chkMarkerTooltip_DistanceDifference.getSelection();
-      final boolean isShowMarkerTooltip_DurationDifference = _chkMarkerTooltip_DurationDifference.getSelection();
       final boolean isShowOnlyWithDescription = _chkShowOnlyWithDescription.getSelection();
+      final boolean isShowTooltipData_Elevation = _chkTooltipData_Elevation.getSelection();
+      final boolean isShowTooltipData_Distance = _chkTooltipData_Distance.getSelection();
+      final boolean isShowTooltipData_Duration = _chkTooltipData_Duration.getSelection();
+      final boolean isShowTooltipData_ElevationGainDifference = _chkTooltipData_ElevationGainDifference.getSelection();
+      final boolean isShowTooltipData_DistanceDifference = _chkTooltipData_DistanceDifference.getSelection();
+      final boolean isShowTooltipData_DurationDifference = _chkTooltipData_DurationDifference.getSelection();
 
       final int hoverSize = _spinHoverSize.getSelection();
       final int labelOffset = _spinLabelOffset.getSelection();
@@ -725,13 +691,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL, isShowMarkerLabel);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT, isShowMarkerPoint);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATION, isShowMarkerTooltip_Elevation);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE, isShowMarkerTooltip_Distance);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION, isShowMarkerTooltip_Duration);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATIONGAIN_DIFFERENCE,
-            isShowMarkerTooltip_ElevationGainDifference);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE_DIFFERENCE, isShowMarkerTooltip_DistanceDifference);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION_DIFFERENCE, isShowMarkerTooltip_DurationDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION, isShowTooltipData_Elevation);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE, isShowTooltipData_Distance);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION, isShowTooltipData_Duration);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE,
+            isShowTooltipData_ElevationGainDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE, isShowTooltipData_DistanceDifference);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE, isShowTooltipData_DurationDifference);
       _prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, isShowOnlyWithDescription);
 
       PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, defaultColor);
@@ -748,12 +714,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       tcc.isShowMarkerLabel = isShowMarkerLabel;
       tcc.isShowMarkerPoint = isShowMarkerPoint;
       tcc.isShowMarkerTooltip = isShowMarkerTooltip;
-      tcc.isShowMarkerTooltip_Elevation = isShowMarkerTooltip_Elevation;
-      tcc.isShowMarkerTooltip_Distance = isShowMarkerTooltip_Distance;
-      tcc.isShowMarkerTooltip_Duration = isShowMarkerTooltip_Duration;
-      tcc.isShowMarkerTooltip_ElevationGainDifference = isShowMarkerTooltip_ElevationGainDifference;
-      tcc.isShowMarkerTooltip_DistanceDifference = isShowMarkerTooltip_DistanceDifference;
-      tcc.isShowMarkerTooltip_DurationDifference = isShowMarkerTooltip_DurationDifference;
+      tcc.isShowTooltipData_Elevation = isShowTooltipData_Elevation;
+      tcc.isShowTooltipData_Distance = isShowTooltipData_Distance;
+      tcc.isShowTooltipData_Duration = isShowTooltipData_Duration;
+      tcc.isShowTooltipData_ElevationGainDifference = isShowTooltipData_ElevationGainDifference;
+      tcc.isShowTooltipData_DistanceDifference = isShowTooltipData_DistanceDifference;
+      tcc.isShowTooltipData_DurationDifference = isShowTooltipData_DurationDifference;
       tcc.isShowOnlyWithDescription = isShowOnlyWithDescription;
 
       tcc.markerHoverSize = hoverSize;
@@ -777,36 +743,37 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private void resetToDefaults() {
 
+      /*
+       * Update UI with defaults from pref store
+       */
+
 // SET_FORMATTING_OFF
-		/*
-		 * Update UI with defaults from pref store
-		 */
 
-		_chkDrawMarkerWithDefaultColor.setSelection(	_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR));
-		_chkShowAbsoluteValues.setSelection(			_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES));
-		_chkShowHiddenMarker.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER));
-		_chkShowLabelTempPosition.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION));
-		_chkShowMarkerLabel.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL));
-		_chkShowMarkerPoint.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT));
-		_chkShowMarkerTooltip.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP));
-		_chkMarkerTooltip_Elevation.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATION));
-		_chkMarkerTooltip_Distance.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE));
-		_chkMarkerTooltip_Duration.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION));
-		_chkMarkerTooltip_ElevationGainDifference	.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATIONGAIN_DIFFERENCE));
-		_chkMarkerTooltip_DistanceDifference.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE_DIFFERENCE));
-		_chkMarkerTooltip_DurationDifference	.setSelection(				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION_DIFFERENCE));
-		_chkShowOnlyWithDescription.setSelection(		_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION));
+      _chkDrawMarkerWithDefaultColor.setSelection(          _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_DRAW_WITH_DEFAULT_COLOR));
+      _chkShowAbsoluteValues.setSelection(                  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ABSOLUTE_VALUES));
+      _chkShowHiddenMarker.setSelection(                    _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_HIDDEN_MARKER));
+      _chkShowLabelTempPosition.setSelection(               _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_LABEL_TEMP_POSITION));
+      _chkShowMarkerLabel.setSelection(                     _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL));
+      _chkShowMarkerPoint.setSelection(                     _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT));
+      _chkShowMarkerTooltip.setSelection(                   _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP));
+      _chkShowOnlyWithDescription.setSelection(             _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION));
+      _chkTooltipData_Elevation.setSelection(               _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION));
+      _chkTooltipData_Distance.setSelection(                _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE));
+      _chkTooltipData_Duration.setSelection(                _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION));
+      _chkTooltipData_ElevationGainDifference.setSelection( _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE));
+      _chkTooltipData_DistanceDifference.setSelection(      _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE));
+      _chkTooltipData_DurationDifference.setSelection(      _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE));
 
-		_comboLabelTempPosition.select(					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
-		_comboTooltipPosition.select(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
+      _comboLabelTempPosition.select(        _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_TEMP_POSITION));
+      _comboTooltipPosition.select(          _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_TOOLTIP_POSITION));
 
-		_spinHoverSize.setSelection(						_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
-		_spinMarkerPointSize.setSelection(				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
-		_spinLabelOffset.setSelection(					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
+      _spinHoverSize.setSelection(           _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_HOVER_SIZE));
+      _spinMarkerPointSize.setSelection(     _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_POINT_SIZE));
+      _spinLabelOffset.setSelection(         _prefStore.getDefaultInt(ITourbookPreferences.GRAPH_MARKER_LABEL_OFFSET));
 
-		_colorDefaultMarker.setColorValue(	PreferenceConverter.getColor(_prefStore, 			ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
-		_colorDeviceMarker.setColorValue(	PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
-		_colorHiddenMarker.setColorValue(	PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
+      _colorDefaultMarker.setColorValue(  PreferenceConverter.getColor(_prefStore,          ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT));
+      _colorDeviceMarker.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE));
+      _colorHiddenMarker.setColorValue(   PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN));
 
 // SET_FORMATTING_ON
 
@@ -829,12 +796,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       _chkShowMarkerLabel.setSelection(tcc.isShowMarkerLabel);
       _chkShowMarkerPoint.setSelection(tcc.isShowMarkerPoint);
       _chkShowMarkerTooltip.setSelection(tcc.isShowMarkerTooltip);
-      _chkMarkerTooltip_Elevation.setSelection(tcc.isShowMarkerTooltip_Elevation);
-      _chkMarkerTooltip_Distance.setSelection(tcc.isShowMarkerTooltip_Distance);
-      _chkMarkerTooltip_Duration.setSelection(tcc.isShowMarkerTooltip_Duration);
-      _chkMarkerTooltip_ElevationGainDifference.setSelection(tcc.isShowMarkerTooltip_ElevationGainDifference);
-      _chkMarkerTooltip_DistanceDifference.setSelection(tcc.isShowMarkerTooltip_DistanceDifference);
-      _chkMarkerTooltip_DurationDifference.setSelection(tcc.isShowMarkerTooltip_DurationDifference);
+      _chkTooltipData_Elevation.setSelection(tcc.isShowTooltipData_Elevation);
+      _chkTooltipData_Distance.setSelection(tcc.isShowTooltipData_Distance);
+      _chkTooltipData_Duration.setSelection(tcc.isShowTooltipData_Duration);
+      _chkTooltipData_ElevationGainDifference.setSelection(tcc.isShowTooltipData_ElevationGainDifference);
+      _chkTooltipData_DistanceDifference.setSelection(tcc.isShowTooltipData_DistanceDifference);
+      _chkTooltipData_DurationDifference.setSelection(tcc.isShowTooltipData_DurationDifference);
       _chkShowOnlyWithDescription.setSelection(tcc.isShowOnlyWithDescription);
 
       _comboLabelTempPosition.select(tcc.markerLabelTempPos);

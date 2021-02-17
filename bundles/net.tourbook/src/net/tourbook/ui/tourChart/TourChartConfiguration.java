@@ -171,12 +171,12 @@ public class TourChartConfiguration {
     */
    public boolean                 isShowMarkerLabel;
    public boolean                 isShowMarkerTooltip;
-   public boolean                 isShowMarkerTooltip_Elevation;
-   public boolean                 isShowMarkerTooltip_Distance;
-   public boolean                 isShowMarkerTooltip_Duration;
-   public boolean                 isShowMarkerTooltip_ElevationGainDifference;
-   public boolean                 isShowMarkerTooltip_DistanceDifference;
-   public boolean                 isShowMarkerTooltip_DurationDifference;
+   public boolean                 isShowTooltipData_Elevation;
+   public boolean                 isShowTooltipData_Distance;
+   public boolean                 isShowTooltipData_Duration;
+   public boolean                 isShowTooltipData_ElevationGainDifference;
+   public boolean                 isShowTooltipData_DistanceDifference;
+   public boolean                 isShowTooltipData_DurationDifference;
 
    public boolean                 isShowAbsoluteValues;
 
@@ -315,14 +315,15 @@ public class TourChartConfiguration {
       isShowMarkerLabel             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_LABEL);
       isShowMarkerPoint             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_POINT);
       isShowMarkerTooltip           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
-      isShowMarkerTooltip_Elevation = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATION);
-      isShowMarkerTooltip_Distance  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE);
-      isShowMarkerTooltip_Duration  = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION);
-      isShowMarkerTooltip_ElevationGainDifference = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_ELEVATIONGAIN_DIFFERENCE);
-      isShowMarkerTooltip_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DISTANCE_DIFFERENCE);
-      isShowMarkerTooltip_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP_DURATION_DIFFERENCE);
       isShowOnlyWithDescription     = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
       isShowSignImage               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
+
+      isShowTooltipData_Elevation               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION);
+      isShowTooltipData_Distance                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE);
+      isShowTooltipData_Duration                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION);
+      isShowTooltipData_ElevationGainDifference = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE);
+      isShowTooltipData_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE);
+      isShowTooltipData_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE);
 
       markerColorDefault            = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
       markerColorDevice             = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);
