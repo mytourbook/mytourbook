@@ -56,12 +56,12 @@ public class Messages extends NLS {
 
    public static String Dialog_UploadRoutes_Message;
    public static String Dialog_UploadRoutes_SubTask;
-   public static String Dialog_UploadRoutes_Summary;
    public static String Dialog_UploadRoutes_Task;
+   public static String Dialog_UploadRoutes_Title;
    public static String Dialog_DownloadWorkouts_Message;
    public static String Dialog_DownloadWorkouts_SubTask;
-   public static String Dialog_DownloadWorkouts_Summary;
    public static String Dialog_DownloadWorkouts_Task;
+   public static String Dialog_DownloadWorkouts_Title;
    public static String Log_DownloadWorkoutsToSuunto_001_Start;
    public static String Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound;
    public static String Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist;
@@ -87,9 +87,9 @@ public class Messages extends NLS {
    public static String Image__Connect_With_Strava;
 
    public static String Dialog_UploadTours_Message;
-   public static String Dialog_UploadTours_Summary;
    public static String Dialog_UploadTours_SubTask;
    public static String Dialog_UploadTours_Task;
+   public static String Dialog_UploadTours_Title;
    public static String Log_UploadToursToStrava_001_Start;
    public static String Log_UploadToursToStrava_002_NoTourTitle;
    public static String Log_UploadToursToStrava_003_ActivityLink;

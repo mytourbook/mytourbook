@@ -203,7 +203,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_DownloadWorkouts_Summary,
+               Messages.Dialog_DownloadWorkouts_Title,
                NLS.bind(Messages.Dialog_DownloadWorkouts_Message,
                      numberOfDownloadedTours[0],
                      _numberOfAvailableTours[0] - numberOfDownloadedTours[0]));

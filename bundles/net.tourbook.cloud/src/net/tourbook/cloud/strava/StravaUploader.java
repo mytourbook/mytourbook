@@ -463,7 +463,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_UploadTours_Summary,
+               Messages.Dialog_UploadTours_Title,
                NLS.bind(Messages.Dialog_UploadTours_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
