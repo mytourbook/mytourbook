@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -60,12 +61,13 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String  GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String  GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String  GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String  GRAPH_LABEL_ALTITUDE      = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String  GRAPH_LABEL_TIME          = net.tourbook.common.Messages.Graph_Label_Time;
+   private static final String  GRAPH_LABEL_DISTANCE      = net.tourbook.common.Messages.Graph_Label_Distance;
+   private static final String  GRAPH_LABEL_ELEVATIONGAIN = net.tourbook.common.Messages.Graph_Label_ElevationGain;
 
-   private static final int     DEFAULT_TEXT_WIDTH   = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int     DEFAULT_TEXT_WIDTH        = 50;
+   private static final int     DEFAULT_TEXT_HEIGHT       = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
@@ -369,6 +371,12 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          valueIndex = _hoveredTourMarker.getSerieIndex();
       }
 
+      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      TourMarker previousTourMarker = null;
+      if (index > 0) {
+         previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
+      }
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
@@ -380,7 +388,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             .applyTo(container);
       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         {
+         if (_cmc.isShowMarkerTooltip_Elevation) {
             /*
              * Altitude
              */
@@ -397,7 +405,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_Distance) {
             /*
              * Distance
              */
@@ -435,7 +443,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             }
          }
 
-         {
+         if (_cmc.isShowMarkerTooltip_Duration) {
             /*
              * Duration
              */
@@ -465,6 +473,71 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
                      FormatManager.formatElapsedTime(timeValue));
             }
          }
+
+         if (_cmc.isShowMarkerTooltip_ElevationGainDifference) {
+            /*
+             * Elevation gain difference
+             */
+            final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
+            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex,
+                  _hoveredTourMarker.getSerieIndex());
+
+            if (elevationGainLoss != null) {
+
+               final float value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
+
+               createUI_72_ValueField(
+                     container,
+                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_ELEVATIONGAIN,
+                     UI.UNIT_LABEL_ELEVATION,
+                     FormatManager.formatElevation(value));
+            }
+         }
+
+         if (_cmc.isShowMarkerTooltip_DistanceDifference) {
+            /*
+             * Distance difference
+             */
+            float distance = _hoveredTourMarker.getDistance();
+
+            if (previousTourMarker != null) {
+               distance -= previousTourMarker.getDistance();
+            }
+
+            if (distance != Float.MIN_VALUE) {
+
+               final double value = distance //
+                     / 1000
+                     / UI.UNIT_VALUE_DISTANCE;
+
+               createUI_72_ValueField(
+                     container,
+                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_DISTANCE,
+                     UI.UNIT_LABEL_DISTANCE,
+                     FormatManager.formatDistance(value));
+            }
+         }
+
+         if (_cmc.isShowMarkerTooltip_DurationDifference) {
+            /*
+             * Duration difference
+             */
+            int timeValue = _hoveredTourMarker.getTime();
+
+            if (previousTourMarker != null) {
+               timeValue -= previousTourMarker.getTime();
+            }
+
+            if (timeValue != Integer.MIN_VALUE) {
+
+               createUI_72_ValueField(
+                     container,
+                     UI.SYMBOL_DIFFERENCE_WITH_SPACE + GRAPH_LABEL_TIME,
+                     UI.UNIT_LABEL_TIME,
+                     FormatManager.formatElapsedTime(timeValue));
+            }
+         }
+
       }
 
    }
@@ -537,7 +610,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
          linkUrl.setText(linkText);
 
-         setUrlWidth(linkUrl, linkText);
+         setUrlWidth(linkUrl);
       }
    }
 
@@ -985,7 +1058,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       txtControl.setText(text);
    }
 
-   private void setUrlWidth(final Control control, final String text) {
+   private void setUrlWidth(final Control control) {
 
       final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
