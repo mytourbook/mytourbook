@@ -2097,6 +2097,7 @@ public class Messages extends NLS {
    public static String Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
    public static String Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
    public static String Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
+   public static String Slideout_ChartMarkerOptions_Group_TooltipData;
    public static String Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
    public static String Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
    public static String Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;
