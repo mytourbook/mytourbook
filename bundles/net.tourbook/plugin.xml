@@ -11,6 +11,7 @@
    <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
    <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
+   <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
 
    <extension
          id="application"
@@ -307,12 +308,12 @@
       />
       
        <!--
-         Cloud Connectivity
+         Cloud
       -->
       <page
-         class="net.tourbook.preferences.PrefPageCloudConnectivity"
-         id="net.tourbook.preferences.PrefPageCloudConnectivity"
-         name="%preference_page_cloud_connectivity"
+         class="net.tourbook.preferences.PrefPageCloud"
+         id="net.tourbook.preferences.PrefPageCloud"
+         name="%preference_page_cloud"
       />
       
       

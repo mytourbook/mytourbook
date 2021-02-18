@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1736,6 +1736,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
       cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
       cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+      cmc.isShowTooltipData_Elevation = _tcc.isShowTooltipData_Elevation;
+      cmc.isShowTooltipData_Distance = _tcc.isShowTooltipData_Distance;
+      cmc.isShowTooltipData_Duration = _tcc.isShowTooltipData_Duration;
+      cmc.isShowTooltipData_ElevationGainDifference = _tcc.isShowTooltipData_ElevationGainDifference;
+      cmc.isShowTooltipData_DistanceDifference = _tcc.isShowTooltipData_DistanceDifference;
+      cmc.isShowTooltipData_DurationDifference = _tcc.isShowTooltipData_DurationDifference;
       cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
       cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
       cmc.isShowSignImage = _tcc.isShowSignImage;
@@ -1858,7 +1864,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final boolean isDescription = tourMarker.getDescription().length() > 0;
       final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
       final boolean isUrlText = tourMarker.getUrlText().length() > 0;
-      if (isDescription | isUrlAddress | isUrlText) {
+      if (isDescription || isUrlAddress || isUrlText) {
          markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
       }
 
@@ -2984,10 +2990,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartLabel hoveredMarkerLabel = getHoveredMarkerLabel();
 
-      if (hoveredMarkerLabel != null) {
-         if (hoveredMarkerLabel.data instanceof TourMarker) {
-            tourMarker = (TourMarker) hoveredMarkerLabel.data;
-         }
+      if (hoveredMarkerLabel != null && hoveredMarkerLabel.data instanceof TourMarker) {
+         tourMarker = (TourMarker) hoveredMarkerLabel.data;
       }
 
       _lastHoveredTourMarker = tourMarker;

@@ -32,12 +32,7 @@ public class Messages extends NLS {
    public static String        Image__Dropbox_Folder;
    public static String        Image__Dropbox_Parentfolder;
 
-   public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Label;
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Tooltip;
-   public static String        Pref_CloudConnectivity_Dropbox_Button_Authorize;
-   public static String        Pref_CloudConnectivity_Dropbox_RefreshToken_Label;
-   public static String        Pref_CloudConnectivity_Dropbox_ExpiresAt_Label;
-   public static String        Pref_CloudConnectivity_Dropbox_WebPage_Label;
    public static String        Pref_CloudConnectivity_Dropbox_WebPage_Link;
 
    static {

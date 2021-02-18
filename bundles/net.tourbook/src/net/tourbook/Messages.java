@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2116,6 +2116,7 @@ public class Messages extends NLS {
    public static String Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition;
    public static String Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition_Tooltip;
    public static String Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip;
+   public static String Slideout_ChartMarkerOptions_Group_TooltipData;
    public static String Slideout_ChartMarkerOptions_Label_DeviceMarkerColor;
    public static String Slideout_ChartMarkerOptions_Label_DeviceMarkerColor_Tooltip;
    public static String Slideout_ChartMarkerOptions_Label_HiddenMarkerColor;

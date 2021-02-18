@@ -3,7 +3,7 @@
 <schema targetNamespace="net.tourbook" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="net.tourbook" id="cloudUploader" name="Cloud Uploader"/>
+         <meta.schema plugin="net.tourbook" id="cloudUploader" name="Upload Tours"/>
       </appInfo>
       <documentation>
          A plugin to upload tours on cloud services.
@@ -52,7 +52,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  each cloud uploader requires a unique id
+                  Each cloud uploader requires a unique id
                </documentation>
             </annotation>
          </attribute>
@@ -84,7 +84,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         20.X
+         21.X
       </documentation>
    </annotation>
 
