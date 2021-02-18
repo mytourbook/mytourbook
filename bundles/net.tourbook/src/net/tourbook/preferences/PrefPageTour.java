@@ -250,7 +250,7 @@ public class PrefPageTour extends PreferencePage implements IWorkbenchPreference
 			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
-               TourDatabase.getInstance().updateDbDesign_024_To_025_PostUpdate(null, monitor);
+               TourDatabase.getInstance().updateDbDesign_024_To_025_DataUpdate(null, monitor);
 				} catch (final SQLException e) {
 					net.tourbook.ui.UI.showSQLException(e);
 				}
