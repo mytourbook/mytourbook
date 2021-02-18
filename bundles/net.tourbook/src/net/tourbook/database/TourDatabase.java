@@ -44,6 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -102,8 +106,9 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 42;
+   private static final int TOURBOOK_DB_VERSION = 43;
 
+//   private static final int TOURBOOK_DB_VERSION = 43; // 21.?
 //   private static final int TOURBOOK_DB_VERSION = 42; // 20.11.1
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
@@ -149,6 +154,13 @@ public class TourDatabase {
    private static final String TIME_STAMP                                 = net.tourbook.common.UI.timeStamp();
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
+
+   private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
+
+   /**
+    * Milliseconds how log the splash message is delayed before it is updated again.
+    */
+   private static final int    DELAY_SPLASH_LOGGING                       = 1000;
 
    /**
     * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
@@ -286,14 +298,33 @@ public class TourDatabase {
 
    private static int                            _dbVersionOnStartup = -1;
 
+   private static ThreadPoolExecutor             _dbUpdateExecutor;
+   private static ArrayBlockingQueue<Long>       _dbUpdateQueue      = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+
    static {
 
       // set storage location for the database
       System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
-// set derby debug properties
+// set derby debug properties, is helpful when debugging
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
+
+      final ThreadFactory threadFactory = new ThreadFactory() {
+
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
    }
 
    private static final Object DB_LOCK = new Object();
@@ -689,7 +720,7 @@ public class TourDatabase {
 
             // create new tag
 
-            final TourTag savedTag = TourDatabase.saveEntity(//
+            final TourTag savedTag = saveEntity(
                   tourTag,
                   TourDatabase.ENTITY_IS_NOT_SAVED,
                   TourTag.class);
@@ -756,7 +787,7 @@ public class TourDatabase {
 
          // create new tag
 
-         final TourType savedType = TourDatabase.saveEntity(//
+         final TourType savedType = saveEntity(
                tourType,
                TourDatabase.ENTITY_IS_NOT_SAVED,
                TourTag.class);
@@ -2435,7 +2466,7 @@ public class TourDatabase {
       }
 
       if (isSaved == false) {
-         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -2454,7 +2485,8 @@ public class TourDatabase {
     * @param entityClass
     * @return Returns the saved entity
     */
-   public static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
+   @SuppressWarnings("unused")
+   private static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
       final EntityTransaction ts = em.getTransaction();
 
@@ -2492,7 +2524,7 @@ public class TourDatabase {
       }
 
       if (isSaved == false) {
-         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+         MessageDialog.openError(Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -4144,6 +4176,13 @@ public class TourDatabase {
       _propertyListeners.remove(listener);
    }
 
+   private void showTourSaveError(final TourData tourData) {
+
+      MessageDialog.openError(Display.getDefault().getActiveShell(),
+            "Error", //$NON-NLS-1$
+            String.format("Error occurred when saving tour '%s'", TourManager.getTourTitleDetailed(tourData))); //$NON-NLS-1$
+   }
+
    /**
     * Shutdown database server
     */
@@ -5055,6 +5094,13 @@ public class TourDatabase {
             isPostUpdate42 = true;
          }
 
+         // 42 -> 43
+         boolean isPostUpdate43 = false;
+         if (currentDbVersion == 42) {
+            currentDbVersion = newVersion = 43;
+            isPostUpdate43 = true;
+         }
+
          // update db version number
          updateDbDesign_VersionNumber(conn, newVersion);
 
@@ -5088,8 +5134,9 @@ public class TourDatabase {
                if (isPostUpdate37) {   updateDbDesign_036_To_037_PostUpdate(conn, splashManager);  }
                if (isPostUpdate40) {   updateDbDesign_039_To_040_PostUpdate(conn, splashManager);  }
                if (isPostUpdate42) {   updateDbDesign_041_To_042_PostUpdate(conn);                 }
+               if (isPostUpdate43) {   updateDbDesign_042_to_043_PostUpdate(conn, splashManager);  }
 
-      // SET_FORMATTING_ON
+         // SET_FORMATTING_ON
 
       } catch (final SQLException e) {
 
@@ -5530,7 +5577,7 @@ public class TourDatabase {
             final float timeDiff = currentTime - lastUpdateTime;
 
             // reduce logging
-            if (timeDiff > 500) {
+            if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                lastUpdateTime = currentTime;
 
@@ -6037,7 +6084,7 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
@@ -6059,7 +6106,7 @@ public class TourDatabase {
                 */
                tourData.convertDataSeries();
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
          }
 
@@ -6236,7 +6283,7 @@ public class TourDatabase {
             final float timeDiff = currentTime - lastUpdateTime;
 
             // reduce logging
-            if (timeDiff > 500) {
+            if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                lastUpdateTime = currentTime;
 
@@ -6401,7 +6448,7 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
@@ -6419,7 +6466,7 @@ public class TourDatabase {
                // compute number of time slices
                tourData.onPrePersist();
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
          }
 
@@ -6562,7 +6609,7 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
@@ -6649,7 +6696,7 @@ public class TourDatabase {
                }
             }
 
-            TourDatabase.saveEntity(tourData, tourId, TourData.class);
+            saveEntity(tourData, tourId, TourData.class);
          }
 
       } catch (final Exception e) {
@@ -6824,7 +6871,7 @@ public class TourDatabase {
             final float timeDiff = currentTime - lastUpdateTime;
 
             // reduce logging
-            if (timeDiff > 500) {
+            if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                lastUpdateTime = currentTime;
 
@@ -6934,7 +6981,7 @@ public class TourDatabase {
             final float timeDiff = currentTime - lastUpdateTime;
 
             // reduce logging
-            if (timeDiff > 500) {
+            if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                lastUpdateTime = currentTime;
 
@@ -7081,11 +7128,11 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIdx / allTourIds.size() * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIdx / allTourIds.size() * 100.0);
 
                   splashManager.setMessage(NLS.bind(
                         Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
@@ -7108,7 +7155,7 @@ public class TourDatabase {
 
                tourData.setTimeZoneId(zoneId.getId());
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
          }
 
@@ -7196,11 +7243,11 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
                   splashManager.setMessage(NLS.bind(
                         Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
@@ -7393,11 +7440,11 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
                   final String message = NLS.bind(Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
                         new Object[] { tourIndex, numTours, percent });
@@ -7568,7 +7615,7 @@ public class TourDatabase {
             + "UPDATE " + TABLE_TOUR_COMPARED //                  //$NON-NLS-1$
 
             + " SET" //                                           //$NON-NLS-1$
-            + " " + renamedField_TourRecordingTime + "=?" //   1  //$NON-NLS-1$
+            + " " + renamedField_TourRecordingTime + "=?" //   1  //$NON-NLS-1$ //$NON-NLS-2$
 
             + " WHERE comparedId=?" //                         2 //$NON-NLS-1$
       );
@@ -7588,7 +7635,7 @@ public class TourDatabase {
             final float timeDiff = currentTime - lastUpdateTime;
 
             // reduce logging
-            if (timeDiff > 500) {
+            if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                lastUpdateTime = currentTime;
 
@@ -7691,6 +7738,146 @@ public class TourDatabase {
       stmtUpdate.executeUpdate();
 
       logDbUpdate(createLog_PostUpdate(41, 42, startTime));
+   }
+
+   /**
+    * @param conn
+    * @param splashManager
+    * @throws SQLException
+    */
+   private void updateDbDesign_042_to_043_PostUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numTourIds = allTourIds.size();
+
+      // loop: all tours
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all tours are converted
+                  || tourIndex == numTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTourIds * 100.0);
+
+               // Update 43: Converting lat/lon -> E6 - {0} of {1}  -  {2} %
+               splashManager.setMessage(NLS.bind(
+                     Messages.Tour_Database_PostUpdate_043_LatLonE6,
+                     new Object[] {
+                           numTourDiff,
+                           numTourIds,
+                           percentValue }));
+            }
+
+            tourIndex++;
+         }
+
+         updateDbDesign_042_To_043_PostUpdate_Concurrent(tourId);
+      }
+
+      logDbUpdate(createLog_PostUpdate(42, 43, startTime));
+   }
+
+   /**
+    * Do post updates concurrently with all available processor threads, this is significantly
+    * reducing the time.
+    *
+    * @param tourId
+    * @param <T>
+    * @param entity
+    * @param id
+    * @param entityClass
+    */
+   private void updateDbDesign_042_To_043_PostUpdate_Concurrent(final Long tourId) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         EntityManager em = null;
+         try {
+
+            em = TourDatabase.getInstance().getEntityManager();
+
+            // get tour data by tour id
+            final TourData tourData = em.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            // ignore tours which having no geo data
+            if (tourData.altitudeSerie == null) {
+               return;
+            }
+
+            tourData.updateDatabaseDesign_042_to_043();
+
+            boolean isSaved = false;
+
+            final EntityTransaction ts = em.getTransaction();
+            try {
+
+               ts.begin();
+               {
+                  em.merge(tourData);
+               }
+               ts.commit();
+
+            } catch (final Exception e) {
+               StatusUtil.showStatus(e);
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (isSaved == false) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            if (em != null) {
+               em.close();
+            }
+         }
+
+      });
    }
 
    private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

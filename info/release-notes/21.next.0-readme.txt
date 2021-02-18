@@ -42,6 +42,8 @@ New
  - Added the possibility to configure a "User-Agent" for a custom map provider
  - Added the possibility to export the current map view to an image file (jpeg, png or bmp) or to the clipboard
 
+* Compress Database
+  This tool can compress the internal sql database. After updating MyTourbook to 21.2, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
 
 Improvements
 ============
@@ -74,6 +76,10 @@ Changes
 * 2D Map
   - Reordered context menu actions a little bit
 
+* Latitude/longitude values are saved in E6 format
+  This reduces the precision in the worst case (at the equator) to 0.11132m which is less than the accuracy of the GPS system
+  https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
+    
 
 Bugfix
 ======
