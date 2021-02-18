@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 
@@ -45,8 +46,6 @@ public class DialogMP extends TitleAreaDialog {
    private static final String            SPACE2                  = UI.SPACE2;
 
    private static final String            TIME_SPACER             = "       ";                    //$NON-NLS-1$
-
-   private static final String            DEFAULT_MONO_FONT       = "Courier";                    //$NON-NLS-1$
 
    private static final DateTimeFormatter _timeFormatter          = new DateTimeFormatterBuilder()
          .append(DateTimeFormatter.ISO_TIME)
@@ -119,7 +118,7 @@ public class DialogMP extends TitleAreaDialog {
       }
 
       if (_fontMono == null) {
-         _fontMono = new Font(display, DEFAULT_MONO_FONT, 9, SWT.NORMAL);
+         _fontMono = new Font(display, MTFont.DEFAULT_MONO_FONT, 9, SWT.NORMAL);
       }
    }
 

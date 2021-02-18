@@ -482,7 +482,8 @@ public class UI {
    public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
    public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_MBYTES                = "MByte";                    //$NON-NLS-1$
+   public static final String          UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
+   public static final String          UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
    public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
    public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
    public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$

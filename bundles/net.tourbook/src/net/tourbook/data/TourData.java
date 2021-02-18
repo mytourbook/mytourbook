@@ -126,6 +126,8 @@ import org.hibernate.annotations.Cascade;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
+   private static final char           NL                                = UI.NEW_LINE;
+
    public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_NAME      = 255;
@@ -1097,7 +1099,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    private float[]               powerSerie;
 
-
    /**
     * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
     * computed. Power data source can be an ergometer or a power sensor
@@ -1560,7 +1561,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean             isBackupImportFile;
 
    // ############################################# CUSTOM TRACKS TRANSIENT#######################################
-
    @Transient
    private HashMap<String, float[]>                   _customTracks = new HashMap<>();
 
@@ -1591,7 +1591,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @since Version 18.7
     */
-
    @Transient
    public short[]       runDyn_StanceTime;
 
@@ -5206,6 +5205,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
+   }
+
+   private double[] convertDataSeries_FromE6(final int[] dataSerieE6) {
+
+      if (dataSerieE6 == null || dataSerieE6.length == 0) {
+         return null;
+      }
+      final int serieSize = dataSerieE6.length;
+
+      final double[] doubleDataSerie = new double[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         doubleDataSerie[serieIndex] = dataSerieE6[serieIndex] / 1E6;
+      }
+
+      return doubleDataSerie;
+   }
+
+   private int[] convertDataSeries_ToE6(final double[] dataSerieDouble) {
+
+      if (dataSerieDouble == null || dataSerieDouble.length == 0) {
+         return null;
+      }
+
+      final int serieSize = dataSerieDouble.length;
+
+      final int[] dataSerieE6 = new int[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         dataSerieE6[serieIndex] = (int) (dataSerieDouble[serieIndex] * 1E6);
+      }
+
+      return dataSerieE6;
    }
 
    private float[] convertDataSeries_ToFloat(final int[] intDataSerie, final int scale) {
@@ -9307,6 +9339,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             return true;
          }
       }
+
       return false;
    }
 
@@ -9599,24 +9632,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      altitudeSerie = serieData.altitudeSerie20;
-      cadenceSerie = serieData.cadenceSerie20;
-      distanceSerie = serieData.distanceSerie20;
-      pulseSerie = serieData.pulseSerie20;
-      temperatureSerie = serieData.temperatureSerie20;
-      powerSerie = serieData.powerSerie20;
-      speedSerie = serieData.speedSerie20;
-      pausedTime_Start = serieData.pausedTime_Start;
-      pausedTime_End = serieData.pausedTime_End;
+// SET_FORMATTING_OFF
 
-      latitudeSerie = serieData.latitude;
-      longitudeSerie = serieData.longitude;
+      altitudeSerie        = serieData.altitudeSerie20;
+      cadenceSerie         = serieData.cadenceSerie20;
+      distanceSerie        = serieData.distanceSerie20;
+      pulseSerie           = serieData.pulseSerie20;
+      temperatureSerie     = serieData.temperatureSerie20;
+      powerSerie           = serieData.powerSerie20;
+      speedSerie           = serieData.speedSerie20;
+      pausedTime_Start     = serieData.pausedTime_Start;
+      pausedTime_End       = serieData.pausedTime_End;
+
+      if (serieData.latitude != null) {
+
+         // use exising lat/lon double serie data from older versions
+         // -> saving the tour will convert them into E6 format
+
+         latitudeSerie        = serieData.latitude;
+         longitudeSerie       = serieData.longitude;
+
+      } else {
+
+         /*
+          * Db version >= 43 contain lat/lon in E6 format
+          */
+         latitudeSerie        = convertDataSeries_FromE6(serieData.latitudeE6);
+         longitudeSerie       = convertDataSeries_FromE6(serieData.longitudeE6);
+      }
       computeGeo_Grid();
 
-      gearSerie = serieData.gears;
+      gearSerie            = serieData.gears;
 
-      pulseTimeSerie = serieData.pulseTimes;
-      pulseTime_TimeIndex = serieData.pulseTime_TimeIndex;
+      pulseTimeSerie       = serieData.pulseTimes;
+      pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
@@ -9633,22 +9682,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       customTracksDefinition = serieData.customTracksDefinition;
 
       // running dynamics
-      runDyn_StanceTime = serieData.runDyn_StanceTime;
-      runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
-      runDyn_StepLength = serieData.runDyn_StepLength;
+      runDyn_StanceTime          = serieData.runDyn_StanceTime;
+      runDyn_StanceTimeBalance   = serieData.runDyn_StanceTimeBalance;
+      runDyn_StepLength          = serieData.runDyn_StepLength;
       runDyn_VerticalOscillation = serieData.runDyn_VerticalOscillation;
-      runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
+      runDyn_VerticalRatio       = serieData.runDyn_VerticalRatio;
 
       // swimming
-      swim_LengthType = serieData.swim_LengthType;
-      swim_Cadence = serieData.swim_Cadence;
-      swim_Strokes = serieData.swim_Strokes;
-      swim_StrokeStyle = serieData.swim_StrokeStyle;
-      swim_Time = serieData.swim_Time;
+      swim_LengthType            = serieData.swim_LengthType;
+      swim_Cadence               = serieData.swim_Cadence;
+      swim_Strokes               = serieData.swim_Strokes;
+      swim_StrokeStyle           = serieData.swim_StrokeStyle;
+      swim_Time                  = serieData.swim_Time;
       isSwimCadence = swim_Cadence != null;
 
       // currently only surfing data can be made visible/hidden
-      visibleDataPointSerie = serieData.visiblePoints_Surfing;
+      visibleDataPointSerie      = serieData.visiblePoints_Surfing;
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -9666,14 +9717,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
       serieData = new SerieData();
 
-      serieData.timeSerie = timeSerie;
-      serieData.altitudeSerie20 = altitudeSerie;
-      serieData.cadenceSerie20 = cadenceSerie;
-      serieData.distanceSerie20 = distanceSerie;
-      serieData.pulseSerie20 = pulseSerie;
-      serieData.temperatureSerie20 = temperatureSerie;
-      serieData.pausedTime_Start = pausedTime_Start;
-      serieData.pausedTime_End = pausedTime_End;
+// SET_FORMATTING_OFF
+
+      serieData.timeSerie           = timeSerie;
+      serieData.altitudeSerie20     = altitudeSerie;
+      serieData.cadenceSerie20      = cadenceSerie;
+      serieData.distanceSerie20     = distanceSerie;
+      serieData.pulseSerie20        = pulseSerie;
+      serieData.temperatureSerie20  = temperatureSerie;
+      serieData.pausedTime_Start    = pausedTime_Start;
+      serieData.pausedTime_End      = pausedTime_End;
 
       /*
        * don't save computed data series
@@ -9686,12 +9739,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.powerSerie20 = powerSerie;
       }
 
-      serieData.latitude = latitudeSerie;
-      serieData.longitude = longitudeSerie;
+      serieData.latitudeE6      = convertDataSeries_ToE6(latitudeSerie);
+      serieData.longitudeE6     = convertDataSeries_ToE6(longitudeSerie);
 
-      serieData.gears = gearSerie;
 
-      serieData.pulseTimes = pulseTimeSerie;
+      serieData.gears         = gearSerie;
+
+      serieData.pulseTimes    = pulseTimeSerie;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
 
       serieData.customTracks = _customTracks;
@@ -9699,25 +9753,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       serieData.customTracksDefinition = customTracksDefinition;
 
       // running dynamics
-      serieData.runDyn_StanceTime = runDyn_StanceTime;
-      serieData.runDyn_StanceTimeBalance = runDyn_StanceTimeBalance;
-      serieData.runDyn_StepLength = runDyn_StepLength;
-      serieData.runDyn_VerticalRatio = runDyn_VerticalRatio;
-      serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
+      serieData.runDyn_StanceTime            = runDyn_StanceTime;
+      serieData.runDyn_StanceTimeBalance     = runDyn_StanceTimeBalance;
+      serieData.runDyn_StepLength            = runDyn_StepLength;
+      serieData.runDyn_VerticalRatio         = runDyn_VerticalRatio;
+      serieData.runDyn_VerticalOscillation   = runDyn_VerticalOscillation;
 
       // swimming
-      serieData.swim_LengthType = swim_LengthType;
-      serieData.swim_Cadence = swim_Cadence;
-      serieData.swim_Strokes = swim_Strokes;
-      serieData.swim_StrokeStyle = swim_StrokeStyle;
-      serieData.swim_Time = swim_Time;
+      serieData.swim_LengthType              = swim_LengthType;
+      serieData.swim_Cadence                 = swim_Cadence;
+      serieData.swim_Strokes                 = swim_Strokes;
+      serieData.swim_StrokeStyle             = swim_StrokeStyle;
+      serieData.swim_Time                    = swim_Time;
 
       if (isSwimCadence) {
          // cadence is computed from cadence swim data
          serieData.cadenceSerie20 = null;
       }
 
-      serieData.visiblePoints_Surfing = visiblePoints_ForSurfing;
+      serieData.visiblePoints_Surfing        = visiblePoints_ForSurfing;
+
+// SET_FORMATTING_ON
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
@@ -11357,17 +11413,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Override
    public String toString() {
-      return "TourData [\n" //                                                      //$NON-NLS-1$
 
-            + ("start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE) //               //$NON-NLS-1$
-            + (startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + UI.NEW_LINE) //
+      return "TourData [" + NL //                                                                  //$NON-NLS-1$
 
-            + ("tourId=" + tourId + UI.NEW_LINE) //                                          //$NON-NLS-1$
+            + "start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //       //$NON-NLS-1$
+            + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + ("object=" + super.toString() + UI.NEW_LINE) //                                    //$NON-NLS-1$
-            + ("identityHashCode=" + System.identityHashCode(this) + UI.NEW_LINE) //                  //$NON-NLS-1$
+            + "tourId=" + tourId + NL //                                                           //$NON-NLS-1$
 
-            //            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+            + "object=" + super.toString() + NL //                                                 //$NON-NLS-1$
+            + "identityHashCode=" + System.identityHashCode(this) + NL //                          //$NON-NLS-1$
+
+//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                    //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }
@@ -11375,8 +11432,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public String toStringWithHash() {
 
       final String string = UI.EMPTY_STRING
-            + ("   tourId: " + tourId) //$NON-NLS-1$
-            + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
+            + "   tourId: " + tourId //$NON-NLS-1$
+            + "   identityHashCode: " + System.identityHashCode(this); //$NON-NLS-1$
 
       return string;
    }
@@ -11395,6 +11452,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return null;
+   }
+
+   /**
+    * Converts data series from db version 42 to 43
+    */
+   public void updateDatabaseDesign_042_to_043() {
+
+      // convert lat/lon double -> E6
+      onPrePersist();
    }
 
    /**
