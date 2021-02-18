@@ -123,3 +123,4 @@ System
 ======
 
 * Eclipse 2020-12 (maybe)
+* FIT SDK 21.47
