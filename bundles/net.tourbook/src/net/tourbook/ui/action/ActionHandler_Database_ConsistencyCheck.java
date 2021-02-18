@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 package net.tourbook.ui.action;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import net.tourbook.Messages;
@@ -32,7 +31,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
+public class ActionHandler_Database_ConsistencyCheck extends AbstractHandler {
 
    private void checkConsistency() {
 
@@ -43,31 +42,30 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
          @Override
          public void run() {
 
-            final StringBuilder sbSQL = new StringBuilder();
+            final String sql = UI.EMPTY_STRING
 
-            sbSQL.append("SELECT"); //$NON-NLS-1$
-            //
-            sbSQL.append(" schemaname || '.' || tablename as TableName,"); //$NON-NLS-1$
-            sbSQL.append(" SYSCS_UTIL.SYSCS_CHECK_TABLE(schemaname, tablename) AS OK"); //$NON-NLS-1$
-            //
-            sbSQL.append(" FROM sys.sysschemas s, sys.systables t"); //$NON-NLS-1$
-            //
-            sbSQL.append(" WHERE s.schemaid = t.schemaid"); //$NON-NLS-1$
-            sbSQL.append("   and t.tabletype = 'T'"); //$NON-NLS-1$
+                  + "SELECT" //                                                     //$NON-NLS-1$
+
+                  + " schemaname || '.' || tablename as TableName," //              //$NON-NLS-1$
+                  + " SYSCS_UTIL.SYSCS_CHECK_TABLE(schemaname, tablename) AS OK" //$NON-NLS-1$
+
+                  + " FROM sys.sysschemas s, sys.systables t" //                    //$NON-NLS-1$
+
+                  + " WHERE s.schemaid = t.schemaid" //                             //$NON-NLS-1$
+                  + "   and t.tabletype = 'T'"; //                                  //$NON-NLS-1$
 
             try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                final StringBuilder sbResult = new StringBuilder();
+
                sbResult.append(Messages.app_db_consistencyCheck_checkIsOK);
 
-               final PreparedStatement statement = conn.prepareStatement(sbSQL.toString());
-
-               final ResultSet result = statement.executeQuery();
+               final ResultSet result = conn.prepareStatement(sql).executeQuery();
 
                while (result.next()) {
+                  sbResult.append("1".equals(result.getString(2)) ? "✓" : "✕"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  sbResult.append(UI.SPACE2);
                   sbResult.append(result.getString(1));
-                  sbResult.append(UI.COLON_SPACE);
-                  sbResult.append(result.getString(2));
                   sbResult.append(UI.NEW_LINE);
                }
 
