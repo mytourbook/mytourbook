@@ -143,7 +143,9 @@ public class SerieData implements Serializable {
     */
    public long[]    pausedTime_End;
 
-   //CUSTOM TRACKS
+   /**
+    * Custom Tracks
+    */
    public HashMap<String, float[]>                   customTracks;
    public HashMap<String, CustomTrackStatisticEntry> customTracksStatistics;
    public HashMap<String, CustomTrackDefinition>     customTracksDefinition;
@@ -153,24 +155,23 @@ public class SerieData implements Serializable {
 
       final int maxLen = 10;
 
-      //CUSTOM TRACKS
       String custTrack = UI.NEW_LINE;
       if (customTracksDefinition != null && !customTracksDefinition.isEmpty()) {
          custTrack += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
-         for (final String i : customTracksDefinition.keySet()) {
-            final CustomTrackDefinition item = customTracksDefinition.get(i);
-            custTrack += "  Id=\"" + i + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+         for (final String customTrackId : customTracksDefinition.keySet()) {
+            final CustomTrackDefinition item = customTracksDefinition.get(customTrackId);
+            custTrack += "  Id=\"" + customTrackId + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
          }
          custTrack += "  --CUSTOM TRACKS Definition End--  " + UI.NEW_LINE; //$NON-NLS-1$
       }
       if (customTracks != null && !customTracks.isEmpty()) {
          custTrack += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
-         for (final String i : customTracks.keySet()) {
-            custTrack += "  Id:\"" + i + "\"    " + (customTracks.get(i) != null ? Arrays.toString(Arrays.copyOf(customTracks.get(i), //$NON-NLS-1$//$NON-NLS-2$
-                  Math.min(customTracks.get(i).length, maxLen))) : UI.EMPTY_STRING) + UI.NEW_LINE;
-            if (customTracksStatistics != null && customTracksStatistics.get(i) != null) {
-               final CustomTrackStatisticEntry valE = customTracksStatistics.get(i);
-               custTrack += "  Id:\"" + i + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+         for (final String customTrackId : customTracks.keySet()) {
+            custTrack += "  Id:\"" + customTrackId + "\"    " + (customTracks.get(customTrackId) != null ? Arrays.toString(Arrays.copyOf(customTracks.get(customTrackId), //$NON-NLS-1$//$NON-NLS-2$
+                  Math.min(customTracks.get(customTrackId).length, maxLen))) : UI.EMPTY_STRING) + UI.NEW_LINE;
+            if (customTracksStatistics != null && customTracksStatistics.get(customTrackId) != null) {
+               final CustomTrackStatisticEntry valE = customTracksStatistics.get(customTrackId);
+               custTrack += "  Id:\"" + customTrackId + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                custTrack += ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
                custTrack += ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
                custTrack += "]" + UI.NEW_LINE; //$NON-NLS-1$

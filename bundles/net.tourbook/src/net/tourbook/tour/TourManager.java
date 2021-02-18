@@ -865,7 +865,7 @@ public class TourManager {
       final short[] toRunDyn_VertOscillation = joinedTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
       final short[] toRunDyn_VertRatio = joinedTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-      //CUSTOM TRACKS
+      
       final HashMap<String, float[]> toCustomTracks = new HashMap<>();
       for (final String custTrkName : toCustomTracksDefinition.keySet()) {
          toCustomTracks.put(custTrkName, new float[numTimeSlices]);
@@ -3895,7 +3895,6 @@ public class TourManager {
             break;
 
          default:
-            //CUSTOM TRACKS
             if (tourData != null && tourData.getCustomTracks() != null && !tourData.getCustomTracks().isEmpty()) {
                //final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
                final HashMap<String, CustomTrackDefinition> custTrkDefMap = tourData.getCustomTracksDefinition();

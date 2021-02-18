@@ -349,7 +349,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
          _chkShowInChartToolbar_Swim_Swolf = createUI_GraphCheckbox_Custom_Tracks(_container, net.tourbook.common.Messages.Graph_Label_Swim_Swolf);
 
          {
-            //CUSTOM TRACKS toolbarChart entries
             for (final Map.Entry<String, Button> entry : _chkShowInChartToolbar_Custom_Tracks.entrySet()) {
                if (entry.getValue() != null && !entry.getValue().isDisposed()) {
                   entry.getValue().dispose();
@@ -459,30 +458,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       tbm.update(true);
    }
 
-   private Button createUI_GraphAction_Custom_Tracks(final Composite parent, final int graphId) {
-
-      final Button btngraph = new Button(parent, SWT.PUSH);
-
-      btngraph.setEnabled(true);
-      btngraph.setVisible(true);
-      btngraph.setImage(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Custom_Tracks).createImage());
-      GridDataFactory
-            .fillDefaults()
-            .grab(true, false)
-            .align(SWT.CENTER, SWT.FILL)
-            .applyTo(btngraph);
-
-      btngraph.addSelectionListener(new SelectionAdapter() {
-
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            _tourChart.getGraphAction(graphId).run();
-         }
-      });
-
-      return btngraph;
-   }
-
    private Button createUI_GraphAction_Custom_Tracks_wText(final Composite parent, final int graphId, final String text) {
 
       final Button btngraph = new Button(parent, SWT.PUSH);
@@ -490,7 +465,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       btngraph.setEnabled(true);
       btngraph.setVisible(true);
       btngraph.setImage(TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Custom_Tracks).createImage());
-      //btngraph.setText(text);
       GridDataFactory
             .fillDefaults()
             .grab(true, false)
@@ -553,7 +527,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
       final Button checkbox = new Button(parent, SWT.CHECK);
 
-      //checkbox.setToolTipText(toolTip);
       checkbox.setText(toolTip);
       checkbox.addSelectionListener(_defaultSelectionListener);
 
@@ -564,18 +537,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
             .applyTo(checkbox);
 
       return checkbox;
-   }
-
-   private Label createUI_GraphCheckbox_Custom_Tracks_Label(final Composite parent, final String text) {
-      final Label labelbox = new Label(parent, SWT.NONE);
-      labelbox.setText(text);
-      GridDataFactory
-            .fillDefaults()
-            .grab(true, false)
-            .align(SWT.LEFT, SWT.FILL)
-            .applyTo(labelbox);
-
-      return labelbox;
    }
 
    private void initUI(final Composite parent) {
@@ -663,9 +624,10 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       _chkShowInChartToolbar_Swim_Strokes.setSelection(                 Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES,                   TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES_DEFAULT));
       _chkShowInChartToolbar_Swim_Swolf.setSelection(                   Util.getStateBoolean(_state, TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,                     TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT));
 
+// SET_FORMATTING_ON
+
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
       int count = 0;
-      //final HashMap<String, float[]> customTracksMap = tourData.getCustomTracks();
       final HashMap<String, CustomTrackDefinition> custTrkDefinitions = tourData.getCustomTracksDefinition();
       final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefinitions.values());
       java.util.Collections.sort(listCustomTrackDefinition);
@@ -686,7 +648,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
          count++;
       }
-// SET_FORMATTING_ON
    }
 
    private void saveState() {
@@ -713,6 +674,8 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES,                   _chkShowInChartToolbar_Swim_Strokes.getSelection());
       _state.put(TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF,                     _chkShowInChartToolbar_Swim_Swolf.getSelection());
 
+// SET_FORMATTING_ON
+
       final TourData tourData = TourManager.getInstance().getActiveTourChart().getTourData();
       int numDisplayCustomTracks = 0;
       final HashMap<String, CustomTrackDefinition> custTrkDefinitions =
@@ -735,6 +698,6 @@ public class SlideoutTourChartGraphs extends ToolbarSlideout {
 
          numDisplayCustomTracks++;
       }
-// SET_FORMATTING_ON
+
    }
 }

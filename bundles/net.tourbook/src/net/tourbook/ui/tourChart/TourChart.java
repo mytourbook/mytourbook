@@ -5007,37 +5007,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             isMinMaxEnabled);
 
       //CUSTOM TRACKS TODO set Min Max for Custom Tracks
-      /*
-       * if (_tourData != null && _tourData.getCustomTracks() != null &&
-       * !_tourData.getCustomTracks().isEmpty()) {
-       * final HashMap<String, float[]> custTrk = _tourData.getCustomTracks();
-       * final HashMap<String, CustomTrackDefinition> custTrkDef =
-       * _tourData.getCustomTracksDefinition();
-       * final ArrayList<String> lisKey = new ArrayList<>(custTrk.keySet());
-       * java.util.Collections.sort(lisKey);
-       * for (final String key : custTrk.keySet()) {
-       * final int idx = lisKey.indexOf(key);
-       * isChartModified |= setMinDefaultValue(
-       * property,
-       * isChartModified,
-       * ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED,
-       * ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE,
-       * TourManager.GRAPH_CUSTOM_TRACKS,
-       * 0,
-       * 0.1,
-       * isMinMaxEnabled);
-       * isChartModified |= setMaxDefaultValue(
-       * property,
-       * isChartModified,
-       * ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED,
-       * ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE,
-       * TourManager.GRAPH_CUSTOM_TRACKS,
-       * 0,
-       * 0.1,
-       * isMinMaxEnabled);
-       * }
-       * }
-       */
+
 
       return isChartModified;
    }
