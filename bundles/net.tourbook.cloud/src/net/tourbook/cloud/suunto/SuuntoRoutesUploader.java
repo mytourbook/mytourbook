@@ -252,6 +252,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.beginTask(NLS.bind(Messages.Dialog_UploadRoutes_Task, numberOfTours), numberOfTours * 2);
 
+            monitor.subTask(Messages.ValidatingSuuntoTokens_SubTask);
+
+            if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
+               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+               return;
+            }
+
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
