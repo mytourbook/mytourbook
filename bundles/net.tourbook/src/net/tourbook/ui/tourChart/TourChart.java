@@ -5872,7 +5872,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * create CUSTOM TRACKS actions specific for this Tour.
        */
-      if (_allTourChartActions != null && _currentTourId_for_CustomTracks != null && _currentTourId_for_CustomTracks != newTourData.getTourId()) {//re-create custom tracks entries
+      if (_allTourChartActions != null && _currentTourId_for_CustomTracks != null && _currentTourId_for_CustomTracks != newTourData.getTourId()) {
 
          createActions_10_GraphActionsCustomTracks();
          _state_CustomTracksToolBarChart.clear();
