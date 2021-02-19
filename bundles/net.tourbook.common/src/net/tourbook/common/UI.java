@@ -482,7 +482,8 @@ public class UI {
    public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
    public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_MBYTES                = "MByte";                    //$NON-NLS-1$
+   public static final String          UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
+   public static final String          UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
    public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
    public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
    public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
@@ -1036,6 +1037,21 @@ public class UI {
       sourceData.transparentPixel = 0;
 
       return new Cursor(display, sourceData, 0, 0);
+   }
+
+   /**
+    * Creates a {@link Label} with text.
+    *
+    * @param parent
+    * @param text
+    * @return
+    */
+   public static Label createLabel(final Composite parent, final String text) {
+
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(text);
+
+      return label;
    }
 
    public static void createSpacer_Horizontal(final Composite parent, final int columns) {
@@ -2092,10 +2108,19 @@ public class UI {
       }
    }
 
-   public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
+   /**
+    * Set color for all children controls of the parent.
+    *
+    * @param parent
+    * @param foregroundColor
+    *           Foreground color
+    * @param backgroundColor
+    *           Background color
+    */
+   public static void setColorForAllChildren(final Control parent, final Color foregroundColor, final Color backgroundColor) {
 
-      parent.setForeground(fgColor);
-      parent.setBackground(bgColor);
+      parent.setForeground(foregroundColor);
+      parent.setBackground(backgroundColor);
 
       if (parent instanceof Composite) {
 
@@ -2112,7 +2137,7 @@ public class UI {
             //
             ) {
 
-               setColorForAllChildren(child, fgColor, bgColor);
+               setColorForAllChildren(child, foregroundColor, backgroundColor);
             }
          }
       }

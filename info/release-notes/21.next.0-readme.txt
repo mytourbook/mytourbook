@@ -4,6 +4,10 @@
 TODO's
 ======
 
+* Website: Describe structure for text key names
+
+* Website: Set next version experimental because of the many database modifications
+
 * Website: Document cloud connections
 
   @wolfgang-ch In the Strava guidelines, I read this : https://developers.strava.com/guidelines/
@@ -27,6 +31,10 @@ Issues
 New
 ===
 
+* Suunto App Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/299
+  - Ability to download tours (FIT format)
+  - Ability to upload tours as routes to be used for navigation
+
 * Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/273
   - Ability to upload tours to a Strava account.
 
@@ -34,6 +42,8 @@ New
  - Added the possibility to configure a "User-Agent" for a custom map provider
  - Added the possibility to export the current map view to an image file (jpeg, png or bmp) or to the clipboard
 
+* Compress Database
+  This tool can compress the internal sql database. After updating MyTourbook to 21.2, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
 
 Improvements
 ============
@@ -49,6 +59,9 @@ Improvements
     - Beat values from device
     - R-R intervals
 
+  - Marker Tooltip (Frederic)
+    - Ability to show/hide the following data: Elevation, Distance, Duration, Elevation Gain Difference, Distance Difference, Duration Difference
+    
 * Tour Blog
   - Set content font size
 
@@ -63,6 +76,10 @@ Changes
 * 2D Map
   - Reordered context menu actions a little bit
 
+* Latitude/longitude values are saved in E6 format
+  This reduces the precision in the worst case (at the equator) to 0.11132m which is less than the accuracy of the GPS system
+  https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
+    
 
 Bugfix
 ======
@@ -83,6 +100,13 @@ Bugfix
 
 * Dialog Adjust Elevation
   - Show dialog tour chart with a better default size when opened the first time 
+  
+* Tour Database Update
+  Fixed 3 different issues when updating tour database from the very first public version 3.
+  Depending on the version being updated, these issues occurred or not
+    - Column renaming could fail
+    - Serie data could be dropped
+    - Entity manager was running in update 3->4, moved it into the 3->4 post update  
 
 
 Translation    

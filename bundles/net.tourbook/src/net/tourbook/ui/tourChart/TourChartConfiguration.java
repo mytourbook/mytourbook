@@ -42,14 +42,14 @@ public class TourChartConfiguration {
     */
    public static final GraphBgSourceType[]   GRAPH_BACKGROUND_SOURCE_TYPE;
 
-   public final static GraphBackgroundSource GRAPH_BACKGROUND_SOURCE_DEFAULT = GraphBackgroundSource.DEFAULT;
+   public static final GraphBackgroundSource GRAPH_BACKGROUND_SOURCE_DEFAULT = GraphBackgroundSource.DEFAULT;
 
    /**
     * Graph background style, they must correspond to the position id GRAPH_BACKGROUND_SOURCE_*.
     */
    public static final GraphBgStyleType[]    GRAPH_BACKGROUND_STYLE_TYPE;
 
-   public final static GraphBackgroundStyle  GRAPH_BACKGROUND_STYLE_DEFAULT  = GraphBackgroundStyle.NO_GRADIENT;
+   public static final GraphBackgroundStyle  GRAPH_BACKGROUND_STYLE_DEFAULT  = GraphBackgroundStyle.NO_GRADIENT;
 
 // SET_FORMATTING_OFF
 
@@ -171,6 +171,13 @@ public class TourChartConfiguration {
     */
    public boolean                 isShowMarkerLabel;
    public boolean                 isShowMarkerTooltip;
+   public boolean                 isShowTooltipData_Elevation;
+   public boolean                 isShowTooltipData_Distance;
+   public boolean                 isShowTooltipData_Duration;
+   public boolean                 isShowTooltipData_ElevationGainDifference;
+   public boolean                 isShowTooltipData_DistanceDifference;
+   public boolean                 isShowTooltipData_DurationDifference;
+
    public boolean                 isShowAbsoluteValues;
 
    public int                     markerTooltipPosition   = ChartMarkerToolTip.DEFAULT_TOOLTIP_POSITION;
@@ -184,7 +191,7 @@ public class TourChartConfiguration {
 
    public boolean                 isShowLabelTempPos;
    public int                     markerLabelTempPos;
-   
+
    /**
     * Size of the marker point in DLU (Dialog Units).
     */
@@ -214,7 +221,7 @@ public class TourChartConfiguration {
     * Is <code>true</code> when graph values are displayed when they are recorded when a break time
     * is detected.
     */
-   public boolean               isShowBreaktimeValues       = true;
+   public boolean                 isShowBreaktimeValues   = true;
 
    /*
     * Graph background
@@ -246,16 +253,16 @@ public class TourChartConfiguration {
     */
    public boolean               isShowTourPhotos            = true;
    public boolean               isShowTourPhotoTooltip      = true;
-   
+
    /*
     * Tour info
     */
-   public boolean               isTourInfoVisible;
-   public boolean               isShowInfoTitle;
-   public boolean               isShowInfoTooltip;
-   public boolean               isShowInfoTourSeparator;
+   public boolean isTourInfoVisible;
+   public boolean isShowInfoTitle;
+   public boolean isShowInfoTooltip;
+   public boolean isShowInfoTourSeparator;
 
-   public int                   tourInfoTooltipDelay;
+   public int     tourInfoTooltipDelay;
 
    /*
     * Pulse graphs
@@ -310,6 +317,13 @@ public class TourChartConfiguration {
       isShowMarkerTooltip           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP);
       isShowOnlyWithDescription     = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION);
       isShowSignImage               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_SIGN_IMAGE);
+
+      isShowTooltipData_Elevation               = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATION);
+      isShowTooltipData_Distance                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE);
+      isShowTooltipData_Duration                = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION);
+      isShowTooltipData_ElevationGainDifference = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_ELEVATIONGAIN_DIFFERENCE);
+      isShowTooltipData_DistanceDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DISTANCE_DIFFERENCE);
+      isShowTooltipData_DurationDifference      = _prefStore.getBoolean(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_TOOLTIP_DATA_DURATION_DIFFERENCE);
 
       markerColorDefault            = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT);
       markerColorDevice             = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE);

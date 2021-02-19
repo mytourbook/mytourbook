@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -124,6 +124,8 @@ import org.hibernate.annotations.Cascade;
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
+
+   private static final char           NL                                = UI.NEW_LINE;
 
    public static final int             DB_LENGTH_DEVICE_TOUR_TYPE        = 2;
    public static final int             DB_LENGTH_DEVICE_PLUGIN_ID        = 255;
@@ -5015,7 +5017,117 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   private float[] convertDataSeries(final int[] intDataSerie, final int scale) {
+   /**
+    * Convert old int[] data series into float[], this was done in the previous versions in this
+    * method updateDatabase_019_to_020() but did not work in any cases
+    */
+   public void convertDataSeries() {
+
+      if (serieData.altitudeSerie != null) {
+
+         if (isDataSerieWithContent(serieData.altitudeSerie)) {
+            serieData.altitudeSerie20 = convertDataSeries_ToFloat(serieData.altitudeSerie, 0);
+         }
+
+         serieData.altitudeSerie = null;
+      }
+
+      if (serieData.cadenceSerie != null) {
+
+         if (isDataSerieWithContent(serieData.cadenceSerie)) {
+            serieData.cadenceSerie20 = convertDataSeries_ToFloat(serieData.cadenceSerie, 0);
+         }
+
+         serieData.cadenceSerie = null;
+      }
+
+      if (serieData.distanceSerie != null) {
+
+         if (isDataSerieWithContent(serieData.distanceSerie)) {
+            serieData.distanceSerie20 = convertDataSeries_ToFloat(serieData.distanceSerie, 0);
+         }
+
+         serieData.distanceSerie = null;
+      }
+
+      if (serieData.pulseSerie != null) {
+
+         if (isDataSerieWithContent(serieData.pulseSerie)) {
+            serieData.pulseSerie20 = convertDataSeries_ToFloat(serieData.pulseSerie, 0);
+         }
+
+         serieData.pulseSerie = null;
+      }
+
+      if (serieData.temperatureSerie != null) {
+
+         if (isDataSerieWithContent(serieData.temperatureSerie)) {
+            serieData.temperatureSerie20 = convertDataSeries_ToFloat(serieData.temperatureSerie, temperatureScale);
+         }
+
+         serieData.temperatureSerie = null;
+      }
+
+      /*
+       * Don't convert computed data series
+       */
+      if (serieData.speedSerie != null) {
+
+         if (isSpeedSerieFromDevice && isDataSerieWithContent(serieData.speedSerie)) {
+            serieData.speedSerie20 = convertDataSeries_ToFloat(serieData.speedSerie, 10);
+         }
+
+         serieData.speedSerie = null;
+      }
+
+      if (serieData.powerSerie != null) {
+
+         if (isPowerSerieFromDevice & isDataSerieWithContent(serieData.powerSerie)) {
+            serieData.powerSerie20 = convertDataSeries_ToFloat(serieData.powerSerie, 0);
+         }
+
+         serieData.powerSerie = null;
+      }
+
+      for (final TourMarker tourMarker : tourMarkers) {
+         tourMarker.updateDatabase_019_to_020();
+      }
+   }
+
+   private double[] convertDataSeries_FromE6(final int[] dataSerieE6) {
+
+      if (dataSerieE6 == null || dataSerieE6.length == 0) {
+         return null;
+      }
+      final int serieSize = dataSerieE6.length;
+
+      final double[] doubleDataSerie = new double[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         doubleDataSerie[serieIndex] = dataSerieE6[serieIndex] / 1E6;
+      }
+
+      return doubleDataSerie;
+   }
+
+   private int[] convertDataSeries_ToE6(final double[] dataSerieDouble) {
+
+      if (dataSerieDouble == null || dataSerieDouble.length == 0) {
+         return null;
+      }
+
+      final int serieSize = dataSerieDouble.length;
+
+      final int[] dataSerieE6 = new int[serieSize];
+
+      for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
+         dataSerieE6[serieIndex] = (int) (dataSerieDouble[serieIndex] * 1E6);
+      }
+
+      return dataSerieE6;
+   }
+
+   private float[] convertDataSeries_ToFloat(final int[] intDataSerie, final int scale) {
 
       if (intDataSerie == null) {
          return null;
@@ -8970,6 +9082,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   /**
+    * @param dataSerie
+    * @return Returns <code>true</code> when the data serie contains at least one value which is > 0
+    */
+   private boolean isDataSerieWithContent(final int[] dataSerie) {
+
+//      return Arrays.stream(dataSerie).anyMatch(value -> value > 0);
+
+      for (final int dataValue : dataSerie) {
+         if (dataValue > 0) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
    public boolean isDistanceSensorPresent() {
       return isDistanceFromSensor == 1;
    }
@@ -9243,11 +9372,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @PostUpdate
    public void onPostLoad() {
 
-      /*
-       * disable post load when database is updated from 19 to 20 because data are converted
-       */
-      if (TourDatabase.IS_POST_UPDATE_019_to_020) {
-         return;
+      if (TourDatabase.getDbVersionOnStartup() < 20) {
+         convertDataSeries();
       }
 
       onPostLoadGetDataSeries();
@@ -9262,24 +9388,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      altitudeSerie = serieData.altitudeSerie20;
-      cadenceSerie = serieData.cadenceSerie20;
-      distanceSerie = serieData.distanceSerie20;
-      pulseSerie = serieData.pulseSerie20;
-      temperatureSerie = serieData.temperatureSerie20;
-      powerSerie = serieData.powerSerie20;
-      speedSerie = serieData.speedSerie20;
-      pausedTime_Start = serieData.pausedTime_Start;
-      pausedTime_End = serieData.pausedTime_End;
+// SET_FORMATTING_OFF
 
-      latitudeSerie = serieData.latitude;
-      longitudeSerie = serieData.longitude;
+      altitudeSerie        = serieData.altitudeSerie20;
+      cadenceSerie         = serieData.cadenceSerie20;
+      distanceSerie        = serieData.distanceSerie20;
+      pulseSerie           = serieData.pulseSerie20;
+      temperatureSerie     = serieData.temperatureSerie20;
+      powerSerie           = serieData.powerSerie20;
+      speedSerie           = serieData.speedSerie20;
+      pausedTime_Start     = serieData.pausedTime_Start;
+      pausedTime_End       = serieData.pausedTime_End;
+
+      if (serieData.latitude != null) {
+
+         // use exising lat/lon double serie data from older versions
+         // -> saving the tour will convert them into E6 format
+
+         latitudeSerie        = serieData.latitude;
+         longitudeSerie       = serieData.longitude;
+
+      } else {
+
+         /*
+          * Db version >= 43 contain lat/lon in E6 format
+          */
+         latitudeSerie        = convertDataSeries_FromE6(serieData.latitudeE6);
+         longitudeSerie       = convertDataSeries_FromE6(serieData.longitudeE6);
+      }
       computeGeo_Grid();
 
-      gearSerie = serieData.gears;
+      gearSerie            = serieData.gears;
 
-      pulseTimeSerie = serieData.pulseTimes;
-      pulseTime_TimeIndex = serieData.pulseTime_TimeIndex;
+      pulseTimeSerie       = serieData.pulseTimes;
+      pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
@@ -9292,22 +9434,24 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       hasGeoData = latitudeSerie != null && latitudeSerie.length > 0;
 
       // running dynamics
-      runDyn_StanceTime = serieData.runDyn_StanceTime;
-      runDyn_StanceTimeBalance = serieData.runDyn_StanceTimeBalance;
-      runDyn_StepLength = serieData.runDyn_StepLength;
+      runDyn_StanceTime          = serieData.runDyn_StanceTime;
+      runDyn_StanceTimeBalance   = serieData.runDyn_StanceTimeBalance;
+      runDyn_StepLength          = serieData.runDyn_StepLength;
       runDyn_VerticalOscillation = serieData.runDyn_VerticalOscillation;
-      runDyn_VerticalRatio = serieData.runDyn_VerticalRatio;
+      runDyn_VerticalRatio       = serieData.runDyn_VerticalRatio;
 
       // swimming
-      swim_LengthType = serieData.swim_LengthType;
-      swim_Cadence = serieData.swim_Cadence;
-      swim_Strokes = serieData.swim_Strokes;
-      swim_StrokeStyle = serieData.swim_StrokeStyle;
-      swim_Time = serieData.swim_Time;
+      swim_LengthType            = serieData.swim_LengthType;
+      swim_Cadence               = serieData.swim_Cadence;
+      swim_Strokes               = serieData.swim_Strokes;
+      swim_StrokeStyle           = serieData.swim_StrokeStyle;
+      swim_Time                  = serieData.swim_Time;
       isSwimCadence = swim_Cadence != null;
 
       // currently only surfing data can be made visible/hidden
-      visibleDataPointSerie = serieData.visiblePoints_Surfing;
+      visibleDataPointSerie      = serieData.visiblePoints_Surfing;
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -9325,14 +9469,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
       serieData = new SerieData();
 
-      serieData.timeSerie = timeSerie;
-      serieData.altitudeSerie20 = altitudeSerie;
-      serieData.cadenceSerie20 = cadenceSerie;
-      serieData.distanceSerie20 = distanceSerie;
-      serieData.pulseSerie20 = pulseSerie;
-      serieData.temperatureSerie20 = temperatureSerie;
-      serieData.pausedTime_Start = pausedTime_Start;
-      serieData.pausedTime_End = pausedTime_End;
+// SET_FORMATTING_OFF
+
+      serieData.timeSerie           = timeSerie;
+      serieData.altitudeSerie20     = altitudeSerie;
+      serieData.cadenceSerie20      = cadenceSerie;
+      serieData.distanceSerie20     = distanceSerie;
+      serieData.pulseSerie20        = pulseSerie;
+      serieData.temperatureSerie20  = temperatureSerie;
+      serieData.pausedTime_Start    = pausedTime_Start;
+      serieData.pausedTime_End      = pausedTime_End;
 
       /*
        * don't save computed data series
@@ -9345,34 +9491,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          serieData.powerSerie20 = powerSerie;
       }
 
-      serieData.latitude = latitudeSerie;
-      serieData.longitude = longitudeSerie;
+      serieData.latitudeE6      = convertDataSeries_ToE6(latitudeSerie);
+      serieData.longitudeE6     = convertDataSeries_ToE6(longitudeSerie);
 
-      serieData.gears = gearSerie;
 
-      serieData.pulseTimes = pulseTimeSerie;
+      serieData.gears         = gearSerie;
+
+      serieData.pulseTimes    = pulseTimeSerie;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
 
       // running dynamics
-      serieData.runDyn_StanceTime = runDyn_StanceTime;
-      serieData.runDyn_StanceTimeBalance = runDyn_StanceTimeBalance;
-      serieData.runDyn_StepLength = runDyn_StepLength;
-      serieData.runDyn_VerticalRatio = runDyn_VerticalRatio;
-      serieData.runDyn_VerticalOscillation = runDyn_VerticalOscillation;
+      serieData.runDyn_StanceTime            = runDyn_StanceTime;
+      serieData.runDyn_StanceTimeBalance     = runDyn_StanceTimeBalance;
+      serieData.runDyn_StepLength            = runDyn_StepLength;
+      serieData.runDyn_VerticalRatio         = runDyn_VerticalRatio;
+      serieData.runDyn_VerticalOscillation   = runDyn_VerticalOscillation;
 
       // swimming
-      serieData.swim_LengthType = swim_LengthType;
-      serieData.swim_Cadence = swim_Cadence;
-      serieData.swim_Strokes = swim_Strokes;
-      serieData.swim_StrokeStyle = swim_StrokeStyle;
-      serieData.swim_Time = swim_Time;
+      serieData.swim_LengthType              = swim_LengthType;
+      serieData.swim_Cadence                 = swim_Cadence;
+      serieData.swim_Strokes                 = swim_Strokes;
+      serieData.swim_StrokeStyle             = swim_StrokeStyle;
+      serieData.swim_Time                    = swim_Time;
 
       if (isSwimCadence) {
          // cadence is computed from cadence swim data
          serieData.cadenceSerie20 = null;
       }
 
-      serieData.visiblePoints_Surfing = visiblePoints_ForSurfing;
+      serieData.visiblePoints_Surfing        = visiblePoints_ForSurfing;
+
+// SET_FORMATTING_ON
 
       // time serie size
       numberOfTimeSlices = timeSerie == null ? 0 : timeSerie.length;
@@ -10960,17 +11109,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @Override
    public String toString() {
-      return "TourData [\n" //                                                      //$NON-NLS-1$
 
-            + ("start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE) //               //$NON-NLS-1$
-            + (startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + UI.NEW_LINE) //
+      return "TourData [" + NL //                                                                  //$NON-NLS-1$
 
-            + ("tourId=" + tourId + UI.NEW_LINE) //                                          //$NON-NLS-1$
+            + "start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //       //$NON-NLS-1$
+            + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + ("object=" + super.toString() + UI.NEW_LINE) //                                    //$NON-NLS-1$
-            + ("identityHashCode=" + System.identityHashCode(this) + UI.NEW_LINE) //                  //$NON-NLS-1$
+            + "tourId=" + tourId + NL //                                                           //$NON-NLS-1$
 
-            //            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+            + "object=" + super.toString() + NL //                                                 //$NON-NLS-1$
+            + "identityHashCode=" + System.identityHashCode(this) + NL //                          //$NON-NLS-1$
+
+//            + "marker size:" + tourMarkers.size() + " " + tourMarkers + NL //                    //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }
@@ -10978,8 +11128,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public String toStringWithHash() {
 
       final String string = UI.EMPTY_STRING
-            + ("   tourId: " + tourId) //$NON-NLS-1$
-            + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
+            + "   tourId: " + tourId //$NON-NLS-1$
+            + "   identityHashCode: " + System.identityHashCode(this); //$NON-NLS-1$
 
       return string;
    }
@@ -11001,75 +11151,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Converts data series from db version 19 to 20
+    * Converts data series from db version 42 to 43
     */
-   public void updateDatabase_019_to_020() {
+   public void updateDatabaseDesign_042_to_043() {
 
-      updateDatabase_019_to_020_10DataSeries();
-      updateDatabase_019_to_020_20TourMarker();
-   }
-
-   private void updateDatabase_019_to_020_10DataSeries() {
-
-      /*
-       * cleanup dataseries because dataseries has been saved before version 1.3.0 even when no data
-       * are available
-       */
-// this DO NOT WORK because time serie is not set !!!!
-//      cleanupDataSeries();
-
-      final SerieData serieData19 = serieData;
-      final SerieData serieData20 = new SerieData();
-
-      serieData20.timeSerie = serieData19.timeSerie;
-
-      serieData20.altitudeSerie20 = convertDataSeries(serieData19.altitudeSerie, 0);
-      serieData20.altitudeSerie = null;
-
-      serieData20.cadenceSerie20 = convertDataSeries(serieData19.cadenceSerie, 0);
-      serieData20.cadenceSerie = null;
-
-      serieData20.distanceSerie20 = convertDataSeries(serieData19.distanceSerie, 0);
-      serieData20.distanceSerie = null;
-
-      serieData20.pulseSerie20 = convertDataSeries(serieData19.pulseSerie, 0);
-      serieData20.pulseSerie = null;
-
-      serieData20.temperatureSerie20 = convertDataSeries(serieData19.temperatureSerie, temperatureScale);
-      serieData20.temperatureSerie = null;
-
-      /*
-       * don't convert computed data series
-       */
-
-      if (serieData19.speedSerie != null) {
-         isSpeedSerieFromDevice = true;
-         serieData20.speedSerie20 = convertDataSeries(serieData19.speedSerie, 10);
-      }
-      serieData20.speedSerie = null;
-
-      if (serieData19.powerSerie != null) {
-         isPowerSerieFromDevice = true;
-         serieData20.powerSerie20 = convertDataSeries(serieData19.powerSerie, 0);
-      }
-      serieData20.powerSerie = null;
-
-      serieData20.latitude = serieData19.latitude;
-      serieData20.longitude = serieData19.longitude;
-
-      // this serie is never used
-      serieData20.deviceMarker = null;
-
-      serieData = serieData20;
-
-      onPostLoadGetDataSeries();
-   }
-
-   private void updateDatabase_019_to_020_20TourMarker() {
-
-      for (final TourMarker tourMarker : tourMarkers) {
-         tourMarker.updateDatabase_019_to_020();
-      }
+      // convert lat/lon double -> E6
+      onPrePersist();
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,7 +80,7 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+   // public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
@@ -107,17 +107,24 @@ public class Util {
    /*
     * default xml attributes
     */
-   public static final String ATTR_ROOT_DATETIME          = "Created";          //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier"; //$NON-NLS-1$
+   public static final String ATTR_ROOT_DATETIME          = "Created";                                 //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier";                        //$NON-NLS-1$
 
-   public static final String ATTR_COLOR_RED              = "red";              //$NON-NLS-1$
-   public static final String ATTR_COLOR_GREEN            = "green";            //$NON-NLS-1$
-   public static final String ATTR_COLOR_BLUE             = "blue";             //$NON-NLS-1$
+   public static final String ATTR_COLOR_RED              = "red";                                     //$NON-NLS-1$
+   public static final String ATTR_COLOR_GREEN            = "green";                                   //$NON-NLS-1$
+   public static final String ATTR_COLOR_BLUE             = "blue";                                    //$NON-NLS-1$
 
-   public static final String CSV_FILE_EXTENSION          = "csv";              //$NON-NLS-1$
+   public static final String CSV_FILE_EXTENSION          = "csv";                                     //$NON-NLS-1$
+
+   private static final char  NL                          = UI.NEW_LINE;
+
+   /**
+    * Number of processors available to the Java virtual machine.
+    */
+   public static final int    NUMBER_OF_PROCESSORS        = Runtime.getRuntime().availableProcessors();
 
    public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -927,12 +934,13 @@ public class Util {
 
    public static String getSQLExceptionText(final SQLException e) {
 
-      final String text = UI.EMPTY_STRING//
+      final String text = UI.EMPTY_STRING
 
-            + ("SQLException" + UI.NEW_LINE2) //$NON-NLS-1$
-            + ("SQLState: " + (e).getSQLState() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("ErrorCode: " + (e).getErrorCode() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("Message: " + (e).getMessage() + UI.NEW_LINE); //$NON-NLS-1$
+            + "SQLException" + NL //$NON-NLS-1$
+            + NL
+            + "SQLState: " + e.getSQLState() + NL //$NON-NLS-1$
+            + "ErrorCode: " + e.getErrorCode() + NL //$NON-NLS-1$
+            + "Message: " + e.getMessage() + NL; //$NON-NLS-1$
 
       return text;
    }
@@ -2019,7 +2027,7 @@ public class Util {
          try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
-               sb.append(line).append(UI.NEW_LINE);
+               sb.append(line).append(NL);
             }
          } finally {
             inputStream.close();

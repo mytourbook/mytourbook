@@ -11,6 +11,7 @@
    <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
    <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
+   <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
 
    <extension
          id="application"
@@ -307,12 +308,12 @@
       />
       
        <!--
-         Cloud Connectivity
+         Cloud
       -->
       <page
-         class="net.tourbook.preferences.PrefPageCloudConnectivity"
-         id="net.tourbook.preferences.PrefPageCloudConnectivity"
-         name="%preference_page_cloud_connectivity"
+         class="net.tourbook.preferences.PrefPageCloud"
+         id="net.tourbook.preferences.PrefPageCloud"
+         name="%preference_page_cloud"
       />
       
       
@@ -859,20 +860,16 @@
          <!-- Database Consistency Check -->
          <command
             commandId   ="net.tourbook.command.dbTool.consistencyCheck"
-            label      ="%command_dbtool_consistency_check"
-            mnemonic   ="%command_dbtool_consistency_check_mnemonic"
-            style      ="push"/>
+            label       ="%command_dbtool_consistency_check"
+            mnemonic    ="%command_dbtool_consistency_check_mnemonic"
+            style       ="push"/>
 
-         <!-- Compress Database 
-         
-THIS IS NOT YET FULLY IMPLEMENTED
-
+         <!-- Database Size Info -->
          <command
-            commandId   ="net.tourbook.command.dbTool.CompressDB"
-            label      ="%Command_DbTool_Compress_Database"
-            mnemonic   ="%Command_DbTool_Compress_Database_Mnemonic"
-            style      ="push"/>
-         -->
+            commandId   ="net.tourbook.command.DbTool.CompressDatabase"
+            label       ="%Command_DbTool_CompressDatabase"
+            mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
+            style       ="push"/>
 
       </menuContribution>
 
@@ -1389,19 +1386,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
          name           ="%command_dbtool_consistency_check"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"/>
-
-<!-- 
-
-   THIS IS NOT YET FULLY IMPLEMENTED
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_ConsistencyCheck"/>
 
       <command
-         id            ="net.tourbook.command.dbTool.CompressDB"
-         name         ="%Command_DbTool_Compress_Database"
-         defaultHandler   ="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
+         id             ="net.tourbook.command.DbTool.CompressDatabase"
+         name           ="%Command_DbTool_CompressDatabase"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"
       />
-
--->
 
       <command
          id             ="net.tourbook.command.OpenHomePage"

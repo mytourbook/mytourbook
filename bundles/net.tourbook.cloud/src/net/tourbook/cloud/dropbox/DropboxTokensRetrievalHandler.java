@@ -36,9 +36,9 @@ public class DropboxTokensRetrievalHandler extends TokensRetrievalHandler {
 
    @Override
    public Tokens retrieveTokens(final String authorizationCode) {
-      final DropboxTokens newTokens = new DropboxTokens();
+
       if (StringUtils.isNullOrEmpty(authorizationCode)) {
-         return newTokens;
+         return new DropboxTokens();
       }
 
       return DropboxClient.getTokens(authorizationCode, false, UI.EMPTY_STRING, _codeVerifier);
@@ -47,7 +47,7 @@ public class DropboxTokensRetrievalHandler extends TokensRetrievalHandler {
    @Override
    public void saveTokensInPreferences(final Tokens tokens) {
 
-      if (!(tokens instanceof DropboxTokens) || !StringUtils.hasContent(tokens.getAccess_token())) {
+      if (!(tokens instanceof DropboxTokens) || StringUtils.isNullOrEmpty(tokens.getAccess_token())) {
 
          final String currentAccessToken = _prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN);
          _prefStore.firePropertyChangeEvent(Preferences.DROPBOX_ACCESSTOKEN,
