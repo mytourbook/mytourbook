@@ -1756,8 +1756,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final HashMap<String, Float> sumCustomTracks = new HashMap<>();
       if (_customTracks != null) {
-         for (final String custTrackDefId : _customTracks.keySet()) {
-            sumCustomTracks.put(custTrackDefId, (float) 0.0);
+         for (final String customTracksId : _customTracks.keySet()) {
+            sumCustomTracks.put(customTracksId, (float) 0.0);
          }
       }
 
@@ -1820,12 +1820,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          if (_customTracks != null) {
-            for (final String custTrackDefId : _customTracks.keySet()) {
-               final float[] track = _customTracks.get(custTrackDefId);
-               Float sumOfTrack = sumCustomTracks.get(custTrackDefId);
-               if (track != null && track.length > serieIndex && sumOfTrack == 0) {
-                  sumOfTrack += track[serieIndex];
-                  sumCustomTracks.put(custTrackDefId, sumOfTrack);
+            for (final String customTracksId : _customTracks.keySet()) {
+               final float[] customTracksSerie = _customTracks.get(customTracksId);
+               Float sumOfTrack = sumCustomTracks.get(customTracksId);
+               if (customTracksSerie != null && customTracksSerie.length > serieIndex && sumOfTrack == 0) {
+                  sumOfTrack += customTracksSerie[serieIndex];
+                  sumCustomTracks.put(customTracksId, sumOfTrack);
                }
             }
          }
@@ -1947,9 +1947,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (_customTracks != null) {
-         for (final String custTrackKey : sumCustomTracks.keySet()) {
-            if (sumCustomTracks.get(custTrackKey) == 0) {
-               clear_Custom_Tracks(custTrackKey);
+         for (final String customTracksId : sumCustomTracks.keySet()) {
+            if (sumCustomTracks.get(customTracksId) == 0) {
+               clear_Custom_Tracks(customTracksId);
             }
          }
       }
@@ -1957,12 +1957,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void clear_Custom_Tracks(final String idx) {
 
-      /*
-       * for (final String i : customTracks.keySet()) {
-       * customTracks.put(i, null);
-       * customTracks_UI.put(i, null);
-       * }
-       */
       if (_customTracks == null) {
          return;
       }
@@ -3561,19 +3555,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
          customTracksStatistics.clear();
       }
-      for (final String custTrackDefId : _customTracks.keySet()) {
-         final float[] valarr = _customTracks.get(custTrackDefId);
-         if (valarr != null && valarr.length > 0) {
+      for (final String customTracksId : _customTracks.keySet()) {
+         final float[] customTracksSerie = _customTracks.get(customTracksId);
+         if (customTracksSerie != null && customTracksSerie.length > 0) {
 
             float minValue;
             float maxValue;
 
-            minValue = maxValue = getFirstNot0ValueFloat(valarr);
+            minValue = maxValue = getFirstNot0ValueFloat(customTracksSerie);
 
             int numValues = 0;
             float sumValue = 0;
 
-            for (final float value : valarr) {
+            for (final float value : customTracksSerie) {
 
                // ignore 0 values
                if (value == 0) {
@@ -3596,7 +3590,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             custTrackStatisticEntry.value_Min = minValue;
             custTrackStatisticEntry.value_Max = maxValue;
             custTrackStatisticEntry.value_Avg = numValues == 0 ? 0 : sumValue / numValues;
-            customTracksStatistics.put(custTrackDefId, custTrackStatisticEntry);
+            customTracksStatistics.put(customTracksId, custTrackStatisticEntry);
          }
       }
    }
@@ -6236,11 +6230,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
              * CUSTOM TRACKS
              */
             if (isCustomTracks && _customTracks != null) {
-               for (final CustomTrackValue customTrack : timeData.customTracks) {
-                  final float tdValue = customTrack.value;
-                  final String tdId = customTrack.id;
-                  if (_customTracks.containsKey(tdId)) {
-                     _customTracks.get(tdId)[serieIndex] = tdValue == Float.MIN_VALUE ? 0 : tdValue;
+               for (final CustomTrackValue customTracksValue : timeData.customTracks) {
+                  final float tdCustomTracksValue = customTracksValue.value;
+                  final String customTracksId = customTracksValue.id;
+                  if (_customTracks.containsKey(customTracksId)) {
+                     _customTracks.get(customTracksId)[serieIndex] = tdCustomTracksValue == Float.MIN_VALUE ? 0 : tdCustomTracksValue;
                   }
                }
             }
@@ -7393,17 +7387,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             _customTracks_UI.clear();
          }
          // create UI data serie
-         for (final String idx : _customTracks.keySet()) {
-            if (_customTracks.get(idx) == null) {
+         for (final String customTracksId : _customTracks.keySet()) {
+            if (_customTracks.get(customTracksId) == null) {
                continue;
             }
-            final int serieSize = _customTracks.get(idx).length;
-            final float[] serieData = _customTracks.get(idx);
+            final int serieSize = _customTracks.get(customTracksId).length;
+            final float[] serieData = _customTracks.get(customTracksId);
             final float[] serieValues = new float[serieSize];
             for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
                serieValues[serieIndex] = serieData[serieIndex];
             }
-            _customTracks_UI.put(idx, serieValues);
+            _customTracks_UI.put(customTracksId, serieValues);
          }
       }
 
@@ -7414,7 +7408,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _customTracks_UI;
    }
 
-   public float[] getCustomTracks(final String idx) {
+   public float[] getCustomTracks(final String customTracksId) {
 
       if (_customTracks == null) {
          return null;
@@ -7423,27 +7417,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          _customTracks_UI = new HashMap<>();
       }
 
-      if (!_customTracks_UI.containsKey(idx)) {
+      if (!_customTracks_UI.containsKey(customTracksId)) {
 
-         if (_customTracks != null && !_customTracks.isEmpty() && _customTracks.containsKey(idx)) {
+         if (_customTracks != null && !_customTracks.isEmpty() && _customTracks.containsKey(customTracksId)) {
 
             // create UI data serie
 
-            if (_customTracks.get(idx) == null) {
+            if (_customTracks.get(customTracksId) == null) {
                return null;
             }
-            final int serieSize = _customTracks.get(idx).length;
-            final float[] serieData = _customTracks.get(idx);
+            final int serieSize = _customTracks.get(customTracksId).length;
+            final float[] serieData = _customTracks.get(customTracksId);
             final float[] serieValues = new float[serieSize];
             for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
                serieValues[serieIndex] = serieData[serieIndex];
             }
-            _customTracks_UI.put(idx, serieValues);
+            _customTracks_UI.put(customTracksId, serieValues);
 
          }
       }
 
-      return _customTracks_UI.get(idx);
+      return _customTracks_UI.get(customTracksId);
    }
 
    /**
@@ -7463,11 +7457,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return customTracksStatistics;
    }
 
-   public CustomTrackStatisticEntry getCustomTracksStat(final String key) {
+   public CustomTrackStatisticEntry getCustomTracksStat(final String customTracksId) {
       if (customTracksStatistics == null) {
          return null;
       }
-      return customTracksStatistics.get(key);
+      return customTracksStatistics.get(customTracksId);
    }
 
    /**
@@ -9941,7 +9935,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.conconiDeflection = conconiDeflection;
    }
 
-   //CUSTOM TRACK
    public void setCustomTracks(final HashMap<String, float[]> newCustTracks) {
       _customTracks = newCustTracks;
    }
@@ -10804,25 +10797,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                for (int timeDataIndex = 0; timeDataIndex < serieSize; timeDataIndex++) {
 
                   final TimeData timeData = timeDataSerie[timeDataIndex];
-                  final float custValue = timeData.customTracks[j].value;
+                  final float customTracksValue = timeData.customTracks[j].value;
 
-                  if (custValue != Float.MIN_VALUE) {
+                  if (customTracksValue != Float.MIN_VALUE) {
 
-                     final float[] custSerie = new float[serieSize];
+                     final float[] customTracksSerie = new float[serieSize];
                      isAvailable = true;
 
                      for (int invalidIndex = 0; invalidIndex < timeDataIndex; invalidIndex++) {
-                        timeDataSerie[invalidIndex].customTracks[j].value = custValue;
+                        timeDataSerie[invalidIndex].customTracks[j].value = customTracksValue;
                      }
-                     _customTracks.put(firstTimeData.customTracks[j].id, custSerie);
+                     _customTracks.put(firstTimeData.customTracks[j].id, customTracksSerie);
                      break;
                   }
                }
 
             } else {
                isAvailable = true;
-               final float[] custSerie = new float[serieSize];
-               _customTracks.put(firstTimeData.customTracks[j].id, custSerie);
+               final float[] customTracksSerie = new float[serieSize];
+               _customTracks.put(firstTimeData.customTracks[j].id, customTracksSerie);
             }
 
          }

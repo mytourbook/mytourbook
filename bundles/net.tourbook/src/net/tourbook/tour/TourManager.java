@@ -798,11 +798,8 @@ public class TourManager {
 
       int numTimeSlices = 0;
       int numSwimTimeSlices = 0;
-      //CUSTOM TRACKS concatenate all the custom tracks definition in the below
-      //HashMap with the key being the defintion name instead of the id since id is not
-      //globally unique but name MUST at this point !!!
       final HashMap<String, CustomTrackDefinition> toCustomTracksDefinition = new HashMap<>();
-      int cntTrkDef = 0;
+      int nbrOfCustomTrackDefinition = 0;
 
       // get tours which have data series
       for (final TourData tourData : allMultipleTours) {
@@ -823,9 +820,9 @@ public class TourManager {
                final CustomTrackDefinition customTrackDefinitionEntry = customTrackDefinitionMap.get(customTrackDefinitionId);
                if (customTrackDefinitionEntry != null) {
                   if (toCustomTracksDefinition.get(customTrackDefinitionEntry.getName()) != null) {
-                     customTrackDefinitionEntry.setId("_" + Integer.toString(cntTrkDef));// new local id
+                     customTrackDefinitionEntry.setId("_" + Integer.toString(nbrOfCustomTrackDefinition));// new local id
                      toCustomTracksDefinition.put(customTrackDefinitionEntry.getName(), customTrackDefinitionEntry);
-                     cntTrkDef++;
+                     nbrOfCustomTrackDefinition++;
                   }
                }
             }
@@ -865,10 +862,9 @@ public class TourManager {
       final short[] toRunDyn_VertOscillation = joinedTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
       final short[] toRunDyn_VertRatio = joinedTourData.runDyn_VerticalRatio = new short[numTimeSlices];
 
-      
       final HashMap<String, float[]> toCustomTracks = new HashMap<>();
-      for (final String custTrkName : toCustomTracksDefinition.keySet()) {
-         toCustomTracks.put(custTrkName, new float[numTimeSlices]);
+      for (final String customTrackDefinitionName : toCustomTracksDefinition.keySet()) {
+         toCustomTracks.put(customTrackDefinitionName, new float[numTimeSlices]);
       }
 
       final short[] toswim_LengthType = joinedTourData.swim_LengthType = new short[numSwimTimeSlices];
@@ -1096,13 +1092,11 @@ public class TourManager {
          if (fromTourData.getCustomTracks() != null && fromTourData.getCustomTracks().size() > 0) {
             final HashMap<String, CustomTrackDefinition> fromCustomTrackDefinition = fromTourData.getCustomTracksDefinition();
             final HashMap<String, float[]> customTracksMap = fromTourData.getCustomTracks();
-            final ArrayList<String> listKey = new ArrayList<>(customTracksMap.keySet());
-            java.util.Collections.sort(listKey);
-            for (final String key : customTracksMap.keySet()) {
-               final float[] fromTrk = customTracksMap.get(key);
-               final CustomTrackDefinition customTrackDefinitionEntry = fromCustomTrackDefinition.get(key);
+            for (final String customTracksId : customTracksMap.keySet()) {
+               final float[] fromCustomTrack = customTracksMap.get(customTracksId);
+               final CustomTrackDefinition customTrackDefinitionEntry = fromCustomTrackDefinition.get(customTracksId);
                if (customTrackDefinitionEntry != null && toCustomTracks.containsKey(customTrackDefinitionEntry.getName())) {
-                  System.arraycopy(fromTrk, 0, toCustomTracks.get(customTrackDefinitionEntry.getName()), toStartIndex, fromSerieLength);
+                  System.arraycopy(fromCustomTrack, 0, toCustomTracks.get(customTrackDefinitionEntry.getName()), toStartIndex, fromSerieLength);
                }
             }
          }
@@ -1194,7 +1188,6 @@ public class TourManager {
          tourDeviceTime_Paused += fromTourData.getTourDeviceTime_Paused();
       }
 
-      //CUSTOM TRACK TODO change id from name to actual ID ?
       joinedTourData.customTracksDefinition = toCustomTracksDefinition;
       joinedTourData.setCustomTracks(toCustomTracks);
 
@@ -3730,37 +3723,37 @@ public class TourManager {
 
       final ChartDataYSerie yData_Swim_Strokes                  = createModelData_Swim_Strokes(               tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_Swim_Swolf                    = createModelData_Swim_Swolf(                  tourData, chartDataModel, chartType, useCustomBackground);
-      HashMap<Integer,ChartDataYSerie> yData_Custom_Tracks_List = null;
+
+// SET_FORMATTING_ON
+
+      HashMap<Integer, ChartDataYSerie> yData_Custom_Tracks_List = null;
 
       if (tourData != null && tourData.getCustomTracks() != null && !tourData.getCustomTracks().isEmpty()) {
 
-         final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
+         final HashMap<String, float[]> customTracks = tourData.getCustomTracks();
          yData_Custom_Tracks_List = new HashMap<>();
          final HashMap<String, CustomTrackDefinition> customTrackDefinitionMap = tourData.getCustomTracksDefinition();
          final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(customTrackDefinitionMap.values());
          java.util.Collections.sort(listCustomTrackDefinition);
-         for (int idx=0; idx<listCustomTrackDefinition.size(); idx++ ) {
-            final String key = listCustomTrackDefinition.get(idx).getId();
-            CustomTrackDefinition customTrackDefinition = listCustomTrackDefinition.get(idx);
+         for (int indexCustomTrackDefinition = 0; indexCustomTrackDefinition < listCustomTrackDefinition.size(); indexCustomTrackDefinition++) {
+            final String customTracksId = listCustomTrackDefinition.get(indexCustomTrackDefinition).getId();
+            CustomTrackDefinition customTrackDefinition = listCustomTrackDefinition.get(indexCustomTrackDefinition);
             if (customTrackDefinition == null) {
                customTrackDefinition = new CustomTrackDefinition();
-               customTrackDefinition.setId(key);
-               customTrackDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " for " + key);
+               customTrackDefinition.setId(customTracksId);
+               customTrackDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + UI.SYMBOL_UNDERSCORE + customTracksId);
                customTrackDefinition.setUnit(net.tourbook.common.UI.EMPTY_STRING);
             }
 
-            final ChartDataYSerie yData_Custom_Tracks = createModelData_Custom_Tracks(custTrk.get(key),
-                     customTrackDefinition,
-                     idx,
-                     chartDataModel,
-                     chartType,
-                     useCustomBackground);
-            yData_Custom_Tracks_List.put(idx + GRAPH_CUSTOM_TRACKS, yData_Custom_Tracks);
+            final ChartDataYSerie yData_Custom_Tracks = createModelData_Custom_Tracks(customTracks.get(customTracksId),
+                  customTrackDefinition,
+                  indexCustomTrackDefinition,
+                  chartDataModel,
+                  chartType,
+                  useCustomBackground);
+            yData_Custom_Tracks_List.put(indexCustomTrackDefinition + GRAPH_CUSTOM_TRACKS, yData_Custom_Tracks);
          }
       }
-
-
-// SET_FORMATTING_ON
 
       /*
        * all visible graphs are added as y-data to the chart data model in the sequence as they were
@@ -3896,25 +3889,24 @@ public class TourManager {
 
          default:
             if (tourData != null && tourData.getCustomTracks() != null && !tourData.getCustomTracks().isEmpty()) {
-               //final HashMap<String, float[]> custTrk = tourData.getCustomTracks();
-               final HashMap<String, CustomTrackDefinition> custTrkDefMap = tourData.getCustomTracksDefinition();
-               final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(custTrkDefMap.values());
+               final HashMap<String, CustomTrackDefinition> customTracksDefinitionMap = tourData.getCustomTracksDefinition();
+               final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(customTracksDefinitionMap.values());
                java.util.Collections.sort(listCustomTrackDefinition);
 
-               for (int idx = 0; idx < listCustomTrackDefinition.size(); idx++) {
-                  final String key = listCustomTrackDefinition.get(idx).getId();
-                  CustomTrackDefinition custTrkDef = listCustomTrackDefinition.get(idx);
-                  if (custTrkDef == null) {
-                     custTrkDef = new CustomTrackDefinition();
-                     custTrkDef.setId(key);
-                     custTrkDef.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + " for " + key);
-                     custTrkDef.setUnit(net.tourbook.common.UI.EMPTY_STRING);
+               for (int indexCustomTracksDefinition = 0; indexCustomTracksDefinition < listCustomTrackDefinition.size(); indexCustomTracksDefinition++) {
+                  final String customTracksDefinitionId = listCustomTrackDefinition.get(indexCustomTracksDefinition).getId();
+                  CustomTrackDefinition customTrackDefinition = listCustomTrackDefinition.get(indexCustomTracksDefinition);
+                  if (customTrackDefinition == null) {
+                     customTrackDefinition = new CustomTrackDefinition();
+                     customTrackDefinition.setId(customTracksDefinitionId);
+                     customTrackDefinition.setName(CustomTrackDefinition.DEFAULT_CUSTOM_TRACK_NAME + UI.SYMBOL_UNDERSCORE + customTracksDefinitionId);
+                     customTrackDefinition.setUnit(net.tourbook.common.UI.EMPTY_STRING);
                   }
-                  if (actionId == (idx + GRAPH_CUSTOM_TRACKS)) {
-                     final ChartDataYSerie yData_Cust_Tracks = yData_Custom_Tracks_List.get(idx + GRAPH_CUSTOM_TRACKS);
+                  if (actionId == (indexCustomTracksDefinition + GRAPH_CUSTOM_TRACKS)) {
+                     final ChartDataYSerie yData_Cust_Tracks = yData_Custom_Tracks_List.get(indexCustomTracksDefinition + GRAPH_CUSTOM_TRACKS);
                      if (yData_Cust_Tracks != null) {
                         chartDataModel.addYData(yData_Cust_Tracks);
-                        chartDataModel.setCustomData(CUSTOM_DATA_CUSTOM_TRACKS + key, yData_Cust_Tracks);//TODO add key as suffix
+                        chartDataModel.setCustomData(CUSTOM_DATA_CUSTOM_TRACKS + customTracksDefinitionId, yData_Cust_Tracks);
                      }
                   }
                }
@@ -4178,48 +4170,39 @@ public class TourManager {
    /**
     * CUSTOM TRACKS model creation
     */
-   private ChartDataYSerie createModelData_Custom_Tracks(final float[] custSerie,
-                                                         final CustomTrackDefinition custDef,
-                                                         final int idx,
+   private ChartDataYSerie createModelData_Custom_Tracks(final float[] customTracksSerie,
+                                                         final CustomTrackDefinition customTrackDefinition,
+                                                         final int indexCustomTracksSerie,
                                                          final ChartDataModel chartDataModel,
                                                          final ChartType chartType,
                                                          final boolean useGraphBgStyle) {
 
-      ChartDataYSerie yDataCustSerie = null;
-      if (custSerie != null && custDef != null) {
+      ChartDataYSerie yDataCustomTracksSerie = null;
+      if (customTracksSerie != null && customTrackDefinition != null) {
 
-         yDataCustSerie = createChartDataSerie(custSerie, chartType);
+         yDataCustomTracksSerie = createChartDataSerie(customTracksSerie, chartType);
 
-         yDataCustSerie.setYTitle(custDef.getName());
-         yDataCustSerie.setUnitLabel(custDef.getUnit());
-         yDataCustSerie.setShowYSlider(true);
-         yDataCustSerie.setDisplayedFractionalDigits(1);
-         yDataCustSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CUSTOM_TRACKS + idx);
-         //yDataCustSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false));
+         yDataCustomTracksSerie.setYTitle(customTrackDefinition.getName());
+         yDataCustomTracksSerie.setUnitLabel(customTrackDefinition.getUnit());
+         yDataCustomTracksSerie.setShowYSlider(true);
+         yDataCustomTracksSerie.setDisplayedFractionalDigits(1);
+         yDataCustomTracksSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CUSTOM_TRACKS + indexCustomTracksSerie);
+         // TODO yDataCustSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false));
 
          if (useGraphBgStyle) {
-            yDataCustSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+            yDataCustomTracksSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
          } else {
-            yDataCustSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+            yDataCustomTracksSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          }
 
-         setGraphColor(yDataCustSerie, GraphColorManager.PREF_GRAPH_CUSTOM_TRACKS);
-         chartDataModel.addXyData(yDataCustSerie);
+         setGraphColor(yDataCustomTracksSerie, GraphColorManager.PREF_GRAPH_CUSTOM_TRACKS);
+         chartDataModel.addXyData(yDataCustomTracksSerie);
 
          // TODO adjust min/max values when it's defined in the pref store
-         /*
-          * setVisibleForcedValues(
-          * yDataTemperature,
-          * 1,
-          * 0,
-          * ITourbookPreferences.GRAPH_TEMPERATURE_IS_MIN_ENABLED,
-          * ITourbookPreferences.GRAPH_TEMPERATURE_IS_MAX_ENABLED,
-          * ITourbookPreferences.GRAPH_TEMPERATURE_MIN_VALUE,
-          * ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE);
-          */
+
       }
 
-      return yDataCustSerie;
+      return yDataCustomTracksSerie;
    }
 
    /**

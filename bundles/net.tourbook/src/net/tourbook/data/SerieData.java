@@ -261,29 +261,29 @@ public class SerieData implements Serializable {
 
       final int maxLen = 10;
 
-      String custTrack = NL;
+      String customTracksDataText = NL;
       if (customTracksDefinition != null && !customTracksDefinition.isEmpty()) {
-         custTrack += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         customTracksDataText += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String customTrackId : customTracksDefinition.keySet()) {
             final CustomTrackDefinition item = customTracksDefinition.get(customTrackId);
-            custTrack += "  Id=\"" + customTrackId + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            customTracksDataText += "  Id=\"" + customTrackId + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
          }
-         custTrack += "  --CUSTOM TRACKS Definition End--  " + NL; //$NON-NLS-1$
+         customTracksDataText += "  --CUSTOM TRACKS Definition End--  " + NL; //$NON-NLS-1$
       }
       if (customTracks != null && !customTracks.isEmpty()) {
-         custTrack += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         customTracksDataText += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String customTrackId : customTracks.keySet()) {
-            custTrack += "  Id:\"" + customTrackId + "\"    " + (customTracks.get(customTrackId) != null ? Arrays.toString(Arrays.copyOf(customTracks.get(customTrackId), //$NON-NLS-1$//$NON-NLS-2$
+            customTracksDataText += "  Id:\"" + customTrackId + "\"    " + (customTracks.get(customTrackId) != null ? Arrays.toString(Arrays.copyOf(customTracks.get(customTrackId), //$NON-NLS-1$//$NON-NLS-2$
                   Math.min(customTracks.get(customTrackId).length, maxLen))) : UI.EMPTY_STRING) + NL;
             if (customTracksStatistics != null && customTracksStatistics.get(customTrackId) != null) {
                final CustomTrackStatisticEntry valE = customTracksStatistics.get(customTrackId);
-               custTrack += "  Id:\"" + customTrackId + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-               custTrack += ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
-               custTrack += ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
-               custTrack += "]" + NL; //$NON-NLS-1$
+               customTracksDataText += "  Id:\"" + customTrackId + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+               customTracksDataText += ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
+               customTracksDataText += ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
+               customTracksDataText += "]" + NL; //$NON-NLS-1$
             }
          }
-         custTrack += "  --END CUSTOM TRACKS--  " + NL; //$NON-NLS-1$
+         customTracksDataText += "  --END CUSTOM TRACKS--  " + NL; //$NON-NLS-1$
       }
 
 // SET_FORMATTING_OFF
@@ -324,7 +324,7 @@ public class SerieData implements Serializable {
 
             + "   visiblePoints_Surfing      " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
 
-            + custTrack
+            + customTracksDataText
 
             ;
    }

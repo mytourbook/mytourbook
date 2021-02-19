@@ -30,8 +30,8 @@ public class CustomTrackDefinition implements Serializable, Comparable<CustomTra
    private String             _unit;
 
    @Override
-   public int compareTo(final CustomTrackDefinition o) {
-      return this.getName().compareTo(o.getName());
+   public int compareTo(final CustomTrackDefinition customTrackDefinitionToCompare) {
+      return this.getName().compareTo(customTrackDefinitionToCompare.getName());
    }
 
    public String getId() {

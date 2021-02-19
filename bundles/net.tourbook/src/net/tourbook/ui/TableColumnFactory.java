@@ -4144,29 +4144,29 @@ public abstract class TableColumnFactory {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
-            //for custom tracks it doesn't work
+            //it is not used for custom tracks
             return null;
          }
 
          @Override
          public TableColumnDefinition createColumnCustomTrack(final ColumnManager columnManager,
                                                             final PixelConverter pixelConverter,
-                                                            final CustomTrackDefinition custTD) {
+                                                            final CustomTrackDefinition customTrackDefinition) {
 
-            final String colId = ColumnManager.CUSTOM_TRACKS_TIME_SLICES_ID + "_" + custTD.getId();
+            final String colId = ColumnManager.CUSTOM_TRACKS_TIME_SLICES_ID + "_" + customTrackDefinition.getId();
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, colId, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Custom_Tracks);
 
-            colDef.setColumnLabel(custTD.getName());
-            String colHead = custTD.getName();
+            colDef.setColumnLabel(customTrackDefinition.getName());
+            String colHead = customTrackDefinition.getName();
             if(colHead.length() > 11) {
-               colHead = custTD.getName().substring(0, 11) + "...";
+               colHead = customTrackDefinition.getName().substring(0, 11) + "...";
             }
 
-            colDef.setColumnHeaderText(colHead + "[" + custTD.getUnit() + "]");
-            colDef.setColumnUnit(custTD.getUnit());
-            colDef.setColumnHeaderToolTipText(custTD.getName());
+            colDef.setColumnHeaderText(colHead + "[" + customTrackDefinition.getUnit() + "]");
+            colDef.setColumnUnit(customTrackDefinition.getUnit());
+            colDef.setColumnHeaderToolTipText(customTrackDefinition.getName());
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
             colDef.setColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));

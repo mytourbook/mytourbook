@@ -521,35 +521,35 @@ public class ColumnManager {
 
    // remove only the custom tracks columns from the overall list of defined column
    public void clearCustomTracksColumns() {
-      final ArrayList<String> columnIds = new ArrayList<String>();
-      final Iterator<ColumnDefinition> itrColDef = _allDefinedColumnDefinitions.iterator();
-      while (itrColDef.hasNext()) {
-         final ColumnDefinition colDef = itrColDef.next();
-         final String colId = colDef.getColumnId();
-         if (colId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-            itrColDef.remove();
+      final ArrayList<String> columnIds = new ArrayList<>();
+      final Iterator<ColumnDefinition> iteratorColumnDefinition = _allDefinedColumnDefinitions.iterator();
+      while (iteratorColumnDefinition.hasNext()) {
+         final ColumnDefinition columnDefinition = iteratorColumnDefinition.next();
+         final String columnId = columnDefinition.getColumnId();
+         if (columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
+            iteratorColumnDefinition.remove();
          }
       }
 
-      final Iterator<ColumnDefinition> itrColDefVisible = _activeProfile.visibleColumnDefinitions.iterator();
-      while (itrColDefVisible.hasNext()) {
-         final ColumnDefinition colDef = itrColDefVisible.next();
-         final String colId = colDef.getColumnId();
-         if (colDef.getColumnId().startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-            itrColDefVisible.remove();
+      final Iterator<ColumnDefinition> iteratorVisibleColumnDefinition = _activeProfile.visibleColumnDefinitions.iterator();
+      while (iteratorVisibleColumnDefinition.hasNext()) {
+         final ColumnDefinition columnDefinition = iteratorVisibleColumnDefinition.next();
+         final String columnId = columnDefinition.getColumnId();
+         if (columnDefinition.getColumnId().startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
+            iteratorVisibleColumnDefinition.remove();
          } else {
-            columnIds.add(colId);
+            columnIds.add(columnId);
          }
       }
 
-      final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
 
-      for (final ColumnDefinition colDef : _activeProfile.visibleColumnDefinitions) {
+      for (final ColumnDefinition columnDefinition : _activeProfile.visibleColumnDefinitions) {
 
          // set column id and width
-         if (!colDef.getColumnId().startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-            visibleIdsAndWidth.add(colDef.getColumnId());
-            visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+         if (!columnDefinition.getColumnId().startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
+            visibleIdsAndWidth.add(columnDefinition.getColumnId());
+            visibleIdsAndWidth.add(Integer.toString(columnDefinition.getColumnWidth()));
          }
       }
 
@@ -1441,8 +1441,8 @@ public class ColumnManager {
        */
       final ArrayList<ColumnDefinition> allColumns = getRearrangedColumns();
 
-      final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<ColumnDefinition>();
-      final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<ColumnDefinition>();
+      final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
+      final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<>();
       final HashSet<String> categorizedNames = new HashSet<>();
 
       for (final ColumnDefinition colDef : allColumns) {
@@ -2214,32 +2214,32 @@ public class ColumnManager {
                   // visible column id's
                   final String xmlColumnIds = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS);
                   if (xmlColumnIds != null) {
-                     final String[] tmpArr = StringToArrayConverter.convertStringToArray(xmlColumnIds);
-                     final ArrayList<String> tmpArrLlist = new ArrayList<>();
-                     for (final String element : tmpArr) {
-                        if (!element.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-                           tmpArrLlist.add(element);
+                     final String[] xmlColumnIdsArray = StringToArrayConverter.convertStringToArray(xmlColumnIds);
+                     final ArrayList<String> xmlColumnIdsArrayList = new ArrayList<>();
+                     for (final String xmlColumnId : xmlColumnIdsArray) {
+                        if (!xmlColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
+                           xmlColumnIdsArrayList.add(xmlColumnId);
                         }
                      }
-                     if (tmpArrLlist.size() > 0) {
-                        currentProfile.setVisibleColumnIds(tmpArrLlist.toArray(new String[tmpArrLlist.size()]));
+                     if (xmlColumnIdsArrayList.size() > 0) {
+                        currentProfile.setVisibleColumnIds(xmlColumnIdsArrayList.toArray(new String[xmlColumnIdsArrayList.size()]));
                      }
                   }
 
                   // visible column id's and width
                   final String xmlColumnIdsAndWidth = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH);
                   if (xmlColumnIdsAndWidth != null) {
-                     final String[] tmpArr = StringToArrayConverter.convertStringToArray(xmlColumnIdsAndWidth);
-                     final ArrayList<String> tmpArrLlist = new ArrayList<>();
-                     for (int j = 0; j < tmpArr.length; j++) {
-                        final String element = tmpArr[j++];
-                        if (!element.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-                           tmpArrLlist.add(element);
-                           tmpArrLlist.add(tmpArr[j]);
+                     final String[] xmlColumnIdsAndWidthArray = StringToArrayConverter.convertStringToArray(xmlColumnIdsAndWidth);
+                     final ArrayList<String> xmlColumnIdsAndWidthArrayList = new ArrayList<>();
+                     for (int j = 0; j < xmlColumnIdsAndWidthArray.length; j++) {
+                        final String xmlColumnIdAndWidth = xmlColumnIdsAndWidthArray[j++];
+                        if (!xmlColumnIdAndWidth.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
+                           xmlColumnIdsAndWidthArrayList.add(xmlColumnIdAndWidth);
+                           xmlColumnIdsAndWidthArrayList.add(xmlColumnIdsAndWidthArray[j]);
                         }
                      }
-                     if (tmpArrLlist.size() > 0) {
-                        currentProfile.visibleColumnIdsAndWidth = tmpArrLlist.toArray(new String[tmpArrLlist.size()]);
+                     if (xmlColumnIdsAndWidthArrayList.size() > 0) {
+                        currentProfile.visibleColumnIdsAndWidth = xmlColumnIdsAndWidthArrayList.toArray(new String[xmlColumnIdsAndWidthArrayList.size()]);
                      }
                   }
 
@@ -2299,7 +2299,7 @@ public class ColumnManager {
       }
 
       // ensure 1 profile is available
-      if (allProfiles.size() == 0) {
+      if (allProfiles.isEmpty()) {
 
          // create default profile
          final ColumnProfile defaultProfile = new ColumnProfile();
@@ -2387,7 +2387,7 @@ public class ColumnManager {
             final int colWidthByPos = dataLayer.getColumnWidthByPosition(createdColumnIndex);
 
             final String columnId = colDef.getColumnId();
-            
+
             if (columnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
                continue;
             }
@@ -2431,7 +2431,6 @@ public class ColumnManager {
       }
    }
 
-   //no state save for CUSTOM TRACKS !!
    private void saveState_Profiles(final XMLMemento xmlMemento) {
 
       for (final ColumnProfile profile : _allProfiles) {
@@ -2460,16 +2459,17 @@ public class ColumnManager {
          final String[] visibleColumnIds = profile.getVisibleColumnIds();
 
          if (visibleColumnIds != null) {
-            //CUSTOM TRACKS visible column must not be saved
-            final ArrayList<String> visibleColumnIdsNoCustArr = new ArrayList<>();
+            //CUSTOM TRACKS visible columns must not be saved
+            final ArrayList<String> visibleColumnIdsNoCustomTracksList = new ArrayList<>();
             for (final String visibleColumnId : visibleColumnIds) {
                if (!visibleColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-                  visibleColumnIdsNoCustArr.add(visibleColumnId);
+                  visibleColumnIdsNoCustomTracksList.add(visibleColumnId);
                }
             }
-            if (visibleColumnIdsNoCustArr.size() > 0) {
-               final String[] visibleColumnIdsNoCust = visibleColumnIdsNoCustArr.toArray(new String[visibleColumnIdsNoCustArr.size()]);
-               xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIdsNoCust));
+            if (visibleColumnIdsNoCustomTracksList.size() > 0) {
+               final String[] visibleColumnIdsNoCustomTracks = visibleColumnIdsNoCustomTracksList.toArray(
+                     new String[visibleColumnIdsNoCustomTracksList.size()]);
+               xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIdsNoCustomTracks));
             }
          }
 
@@ -2479,18 +2479,18 @@ public class ColumnManager {
          final String[] visibleColumnIdsAndWidth = profile.visibleColumnIdsAndWidth;
          if (visibleColumnIdsAndWidth != null) {
             //CUSTOM TRACKS visibleColumnIdsAndWidth must not be saved on disk
-            final ArrayList<String> visibleColumnIdsAndWidthNoCustArr = new ArrayList<>();
+            final ArrayList<String> visibleColumnIdsAndWidthNoCustomTracksList = new ArrayList<>();
             for (int j = 0; j < visibleColumnIdsAndWidth.length; j++) {
                final String visibleColumnId = visibleColumnIdsAndWidth[j++];
                if (!visibleColumnId.startsWith(CUSTOM_TRACKS_TIME_SLICES_ID)) {
-                  visibleColumnIdsAndWidthNoCustArr.add(visibleColumnId);
-                  visibleColumnIdsAndWidthNoCustArr.add(visibleColumnIdsAndWidth[j]);
+                  visibleColumnIdsAndWidthNoCustomTracksList.add(visibleColumnId);
+                  visibleColumnIdsAndWidthNoCustomTracksList.add(visibleColumnIdsAndWidth[j]);
                }
             }
-            if (visibleColumnIdsAndWidthNoCustArr.size() > 0) {
-               final String[] visibleColumnIdsAndWidthNoCust = visibleColumnIdsAndWidthNoCustArr.toArray(new String[visibleColumnIdsAndWidthNoCustArr
+            if (visibleColumnIdsAndWidthNoCustomTracksList.size() > 0) {
+               final String[] visibleColumnIdsAndWidthNoCustomTracks = visibleColumnIdsAndWidthNoCustomTracksList.toArray(new String[visibleColumnIdsAndWidthNoCustomTracksList
                      .size()]);
-               xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH, StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidthNoCust));
+               xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH, StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidthNoCustomTracks));
             }
          }
 
@@ -2795,10 +2795,6 @@ public class ColumnManager {
 
          for (int dataIdx = 0; dataIdx < visibleColumnIdsAndWidth.length; dataIdx++) {
 
-            //CUSTOM TRACKS bug needs check below but bug has been theoretically fixed :-)
-            if (dataIdx >= (visibleColDefs.size() * 2)) {
-               break;
-            }
             final String columnId = visibleColumnIdsAndWidth[dataIdx++];
             final int columnWidth = Integer.valueOf(visibleColumnIdsAndWidth[dataIdx]);
 
@@ -2813,7 +2809,7 @@ public class ColumnManager {
        * When no columns are visible (which is the first time), show only the default columns
        * because every column reduces performance
        */
-      if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ArrayList<String> columnIds = new ArrayList<>();
          int createIndex = 0;
@@ -2834,7 +2830,7 @@ public class ColumnManager {
       /*
        * When no default columns are set, use the first column
        */
-      if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
          firstColumn.setCreateIndex(0);

@@ -297,15 +297,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[][]                      _serieGears;
    private boolean[]                      _serieBreakTime;
    //
-   HashMap<String, float[]>               _customTracks;
-   HashMap<String, CustomTrackDefinition> _customTracksDefinition;
-   Long                                   _tourId_for_CustTracks = null;
-   //
    private short[]                        _swimSerie_StrokeRate;
    // private short[]                 _swimSerie_LengthType;
    private short[]                        _swimSerie_StrokesPerlength;
    private short[]                        _swimSerie_StrokeStyle;
    private int[]                          _swimSerie_Time;
+   //
+   HashMap<String, float[]>               _customTracks;
+   HashMap<String, CustomTrackDefinition> _customTracksDefinition;
+   Long                                   _tourId_for_CustomTracks = null;
    //
    private ColumnDefinition               _timeSlice_ColDef_Altitude;
    private ColumnDefinition               _timeSlice_ColDef_Cadence;
@@ -1641,7 +1641,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _timeSlice_Viewer.setSelection(previousSelection, true);
                }
-               
+
                if (table.isDisposed()) {
                   return;
                }
@@ -1945,7 +1945,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
 
@@ -5350,15 +5350,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
          final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(_customTracksDefinition.values());
          java.util.Collections.sort(listCustomTrackDefinition);
-         
-         for (int index=0; index < listCustomTrackDefinition.size(); index++) {
-            final String custTrkId = listCustomTrackDefinition.get(index).getId();
-            final float[] seriesC = _customTracks.get(custTrkId);
-            CustomTrackDefinition custTrkDefinition = listCustomTrackDefinition.get(index);
-            
+
+         for (final CustomTrackDefinition customTracksDefinition : listCustomTrackDefinition) {
+            final String customTracksDefinitionId = customTracksDefinition.getId();
+            final float[] customTracksSerie = _customTracks.get(customTracksDefinitionId);
             final ColumnDefinition colDef = TableColumnFactory.CUSTOM_TRACKS_TIME_SLICES.createColumnCustomTrack(_timeSlice_ColumnManager,
                   _pc,
-                  custTrkDefinition);
+                  customTracksDefinition);
             colDef.setColumnSelectionListener(_columnSortListener);
             colDef.setCanModifyVisibility(true);
             colDef.setIsColumnChecked(false);
@@ -5366,10 +5364,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             colDef.setLabelProvider(new CellLabelProvider() {
                @Override
                public void update(final ViewerCell cell) {
-                  if (seriesC != null) {
+                  if (customTracksSerie != null) {
                      final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-                     if (timeSlice.serieIndex < seriesC.length) {
-                        cell.setText(Float.toString(seriesC[timeSlice.serieIndex]));
+                     if (timeSlice.serieIndex < customTracksSerie.length) {
+                        cell.setText(Float.toString(customTracksSerie[timeSlice.serieIndex]));
                      } else {
                         cell.setText("Error idx:" + Integer.toString(timeSlice.serieIndex));
                      }
@@ -6138,7 +6136,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // get selected time slices
       final StructuredSelection selection = (StructuredSelection) _timeSlice_Viewer.getSelection();
-      if (selection.size() == 0) {
+      if (selection.isEmpty()) {
          return;
       }
       final Object[] selectedTimeSlices = selection.toArray();
@@ -6527,8 +6525,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * editable
        */
       if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
-         for (final String key : _customTrackTextControls.keySet()) {
-            final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(key);
+         for (final String customTracksId : _customTrackTextControls.keySet()) {
+            final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(customTracksId);
             UIentryDefinition.name.setEnabled(canEdit);
             UIentryDefinition.unit.setEnabled(canEdit);
             UIentryDefinition.id.setEnabled(false);
@@ -6808,9 +6806,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _serieTemperature = _tourData.temperatureSerie;
 
-      _customTracksDefinition = _tourData.getCustomTracksDefinition();
-      _customTracks = _tourData.getCustomTracks();
-
       _swimSerie_StrokeRate = _tourData.swim_Cadence;
 //    _swimSerie_LengthType = _tourData.swim_LengthType;
       _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
@@ -6820,6 +6815,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _swimSlice_StrokeRateEditingSupport.setDataSerie(_swimSerie_StrokeRate);
       _swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_StrokesPerlength);
       _swimSlice_StrokeStyleEditingSupport.setDataSerie(_swimSerie_StrokeStyle);
+
+      _customTracksDefinition = _tourData.getCustomTracksDefinition();
+      _customTracks = _tourData.getCustomTracks();
 
       _timeSlice_AltitudeEditingSupport.setDataSerie(_serieAltitude);
       _timeSlice_TemperatureEditingSupport.setDataSerie(_serieTemperature);
@@ -6857,12 +6855,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       //custom tracks can be loaded only after the time series are loaded here above
       //flag _tourId_for_CustTracks is used to prevent reload of the same custom tracks here
       if (_customTracks != null && _customTracks.size() > 0) {
-         if (_tourId_for_CustTracks == null) {//first time
+         if (_tourId_for_CustomTracks == null) {//first time
             defineColumn_TimeSlice_Custom_Tracks(false);
-            _tourId_for_CustTracks = _tourData.getTourId();
-         } else if (_tourData.getTourId() != _tourId_for_CustTracks) {
+            _tourId_for_CustomTracks = _tourData.getTourId();
+         } else if (_tourData.getTourId() != _tourId_for_CustomTracks) {
             //tour has changed so reload all
-            _tourId_for_CustTracks = _tourData.getTourId();
+            _tourId_for_CustomTracks = _tourData.getTourId();
             //clean previous Cust Tracks definition and load new one
             defineColumn_TimeSlice_Custom_Tracks(true);
          }
@@ -8636,16 +8634,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * CUSTOM TRACKS
           */
          if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
-            final HashMap<String, CustomTrackDefinition> CustTrackDef = new HashMap<>();
-            for (final String key : _customTrackTextControls.keySet()) {
-               final CustomTrackDefinition newCustomDef = new CustomTrackDefinition();
-               final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(key);
-               newCustomDef.setId(UIentryDefinition.id.getText().trim());
-               newCustomDef.setName(UIentryDefinition.name.getText().trim());
-               newCustomDef.setUnit(UIentryDefinition.unit.getText().trim());
-               CustTrackDef.put(key, newCustomDef);
+            final HashMap<String, CustomTrackDefinition> customTracksDefinitionMap = new HashMap<>();
+            for (final String customTracksId : _customTrackTextControls.keySet()) {
+               final CustomTrackDefinition newCustomTrackDefinition = new CustomTrackDefinition();
+               final CustomTrackEditorText UIentryDefinition = _customTrackTextControls.get(customTracksId);
+               newCustomTrackDefinition.setId(UIentryDefinition.id.getText().trim());
+               newCustomTrackDefinition.setName(UIentryDefinition.name.getText().trim());
+               newCustomTrackDefinition.setUnit(UIentryDefinition.unit.getText().trim());
+               customTracksDefinitionMap.put(customTracksId, newCustomTrackDefinition);
             }
-            _tourData.customTracksDefinition = CustTrackDef;
+            _tourData.customTracksDefinition = customTracksDefinitionMap;
          }
 
       } catch (final IllegalArgumentException e) {
@@ -9190,76 +9188,76 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (_customTrackTextControls == null) {
          _customTrackTextControls = new HashMap<>();
       }
-      for (final String key : _customTrackTextControls.keySet()) {
-         final CustomTrackEditorText custTestSet = _customTrackTextControls.get(key);
-         _firstColumnControls.remove(custTestSet.nr);
-         _secondColumnControls.remove(custTestSet.id);
-         custTestSet.id.dispose();
-         custTestSet.nr.dispose();
-         custTestSet.name.dispose();
-         custTestSet.unit.dispose();
+      for (final String customTracksId : _customTrackTextControls.keySet()) {
+         final CustomTrackEditorText customTrackTextSet = _customTrackTextControls.get(customTracksId);
+         _firstColumnControls.remove(customTrackTextSet.nr);
+         _secondColumnControls.remove(customTrackTextSet.id);
+         customTrackTextSet.id.dispose();
+         customTrackTextSet.nr.dispose();
+         customTrackTextSet.name.dispose();
+         customTrackTextSet.unit.dispose();
       }
       _customTrackTextControls.clear();
 
       //add new CUSTOM TRACKS control for this Tour
-      final HashMap<String, CustomTrackDefinition> DefcustTrk = _tourData.getCustomTracksDefinition();
-      final HashMap<String, float[]> CustomTrackSeries = _tourData.getCustomTracks();
-      if (DefcustTrk != null && DefcustTrk.size() > 0) {
-         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(DefcustTrk.values());
+      final HashMap<String, CustomTrackDefinition> customTracksDefinitionMap = _tourData.getCustomTracksDefinition();
+      final HashMap<String, float[]> customTracksSeries = _tourData.getCustomTracks();
+      if (customTracksDefinitionMap != null && customTracksDefinitionMap.size() > 0) {
+         final ArrayList<CustomTrackDefinition> listCustomTrackDefinition = new ArrayList<>(customTracksDefinitionMap.values());
          java.util.Collections.sort(listCustomTrackDefinition);
 
-         for (int idx = 0; idx < listCustomTrackDefinition.size(); idx++) {
-            final CustomTrackDefinition custDef = listCustomTrackDefinition.get(idx);
-            final CustomTrackEditorText custTestSet = new CustomTrackEditorText();
+         for (int indexCustomTrackDefinition = 0; indexCustomTrackDefinition < listCustomTrackDefinition.size(); indexCustomTrackDefinition++) {
+            final CustomTrackDefinition customTrackDefinition = listCustomTrackDefinition.get(indexCustomTrackDefinition);
+            final CustomTrackEditorText customTracksTextSet = new CustomTrackEditorText();
             final Text textNrEntry = _tk.createText(
                   container, //
-                  Integer.toString(idx),
+                  Integer.toString(indexCustomTrackDefinition),
                   SWT.BORDER //
             );
             _firstColumnControls.add(textNrEntry);
 
-            if (CustomTrackSeries.get(listCustomTrackDefinition.get(idx).getId()) == null) {
+            if (customTracksSeries.get(listCustomTrackDefinition.get(indexCustomTrackDefinition).getId()) == null) {
                textNrEntry.setBackground(textNrEntry.getDisplay().getSystemColor(SWT.COLOR_RED));
                textNrEntry.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
-            } else if (CustomTrackSeries.get(listCustomTrackDefinition.get(idx).getId()).length == 0) {
+            } else if (customTracksSeries.get(listCustomTrackDefinition.get(indexCustomTrackDefinition).getId()).length == 0) {
                textNrEntry.setBackground(textNrEntry.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
                textNrEntry.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
             }
-            custTestSet.nr = textNrEntry;
+            customTracksTextSet.nr = textNrEntry;
 
             final Text textIdEntry = _tk.createText(
                   container, //
-                  custDef.getId(),
+                  customTrackDefinition.getId(),
                   SWT.BORDER //
             );
             _secondColumnControls.add(textIdEntry);
-            custTestSet.id = textIdEntry;
-            if (CustomTrackSeries.get(listCustomTrackDefinition.get(idx).getId()) == null) {
-               custTestSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_RED));
-               custTestSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
-            } else if (CustomTrackSeries.get(listCustomTrackDefinition.get(idx).getId()).length == 0) {
-               custTestSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
-               custTestSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            customTracksTextSet.id = textIdEntry;
+            if (customTracksSeries.get(listCustomTrackDefinition.get(indexCustomTrackDefinition).getId()) == null) {
+               customTracksTextSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_RED));
+               customTracksTextSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
+            } else if (customTracksSeries.get(listCustomTrackDefinition.get(indexCustomTrackDefinition).getId()).length == 0) {
+               customTracksTextSet.id.setBackground(textIdEntry.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+               customTracksTextSet.id.setToolTipText(Messages.Tour_Editor_No_Custom_Track_Data_Tooltip);
             }
 
             final Text textNameEntry = _tk.createText(
                   container, //
-                  custDef.getName(),
+                  customTrackDefinition.getName(),
                   SWT.BORDER //
             );
             //_secondColumnControls.add(textNameEntry);
             textNameEntry.addModifyListener(_modifyListener);
-            custTestSet.name = textNameEntry;
+            customTracksTextSet.name = textNameEntry;
 
             final Text textUnitEntry = _tk.createText(
                   container, //
-                  custDef.getUnit(),
+                  customTrackDefinition.getUnit(),
                   SWT.BORDER //
             );
             textUnitEntry.addModifyListener(_modifyListener);
-            custTestSet.unit = textUnitEntry;
+            customTracksTextSet.unit = textUnitEntry;
 
-            _customTrackTextControls.put(listCustomTrackDefinition.get(idx).getId(), custTestSet);
+            _customTrackTextControls.put(listCustomTrackDefinition.get(indexCustomTrackDefinition).getId(), customTracksTextSet);
          }
       }
 
