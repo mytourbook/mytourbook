@@ -378,10 +378,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners          = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError = false;
-   private boolean                               _isSQLDataUpdateError   = false;
+   private boolean                               _isSQLDesignUpdateError     = false;
+   private boolean                               _isSQLDataUpdateError       = false;
 
    /**
     * Database version before a db design update is performed
@@ -397,7 +397,7 @@ public class TourDatabase {
    /**
     * Database version before a db data update is performed
     */
-   private int                                   _dbVersion_BeforeDataUpdate;
+   private int                                   _dbVersion_BeforeDataUpdate = -1;
 
    /**
     * Database version after a db data update is performed
@@ -3093,13 +3093,13 @@ public class TourDatabase {
       exec(stmt, sql);
    }
 
-   private String createLog_DataUpdate(final int fromVersion, final int toVersion, final long startTime) {
+   private String createLog_DataUpdate(final int toVersion, final long startTime) {
 
       final long timeDiff = System.currentTimeMillis() - startTime;
 
       return String.format(
             "Database data update %d -> %d in %s mm:ss", //$NON-NLS-1$
-            fromVersion,
+            toVersion - 1,
             toVersion,
             net.tourbook.common.UI.format_mm_ss(timeDiff / 1000));
    }
@@ -3132,10 +3132,18 @@ public class TourDatabase {
       exec(stmt, sql);
 
       /*
-       * Create 1 record which contains the db design version
+       * Create 1 record which contains the db data version
        */
 
-      sql = "INSERT INTO " + TABLE_DB_VERSION_DATA + " VALUES (" + Integer.toString(TOURBOOK_DB_VERSION) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+???      final int initialVersionNumber = TOURBOOK_DB_VERSION >= 43
+
+            // db is not yet created
+            ? TOURBOOK_DB_VERSION
+
+            // use version before this table was introduced (in 43)
+            : 43 - 1;
+
+      sql = "INSERT INTO " + TABLE_DB_VERSION_DATA + " VALUES (" + Integer.toString(initialVersionNumber) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       execUpdate(stmt, sql);
    }
@@ -4355,9 +4363,6 @@ public class TourDatabase {
 
       try {
 
-         /*
-          * Check or setup sql
-          */
          final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -5372,6 +5377,11 @@ public class TourDatabase {
 
       final int dbDataVersion = 4;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       if (splashManager != null) {
          splashManager.setMessage(Messages.Tour_Database_load_all_tours);
       }
@@ -5403,9 +5413,7 @@ public class TourDatabase {
          saveTour(tourData, false);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private void updateDb_004_To_005(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -5418,13 +5426,20 @@ public class TourDatabase {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, 5));
       }
 
-      final Statement stmt = conn.createStatement();
-      {
+      Statement stmt = null;
+
+      try {
+
+         stmt = conn.createStatement();
+
          createTable_TourTag(stmt);
          createTable_TourTag_Category(stmt);
          createIndex_TourData_005(stmt);
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmt);
       }
-      stmt.close();
 
       logDbUpdate_End(dbVersion);
    }
@@ -5435,12 +5450,15 @@ public class TourDatabase {
 
       final int dbDataVersion = 5;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       TourDatabase.computeAnyValues_ForAllTours(splashManager);
       TourManager.getInstance().removeAllToursFromCache();
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private void updateDb_005_To_006(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -5556,10 +5574,13 @@ public class TourDatabase {
 
       final int dbDataVersion = 9;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       // set app week number/year
       if (updateTourWeek(conn, splashManager)) {
-
-         logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
 
 // After more than 10 years this messagebox is not necessary anymore
 //
@@ -5569,7 +5590,7 @@ public class TourDatabase {
 //          Messages.Tour_Database_Update_TourWeek_Info);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private void updateDb_009_To_010(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -5663,85 +5684,98 @@ public class TourDatabase {
 
       final int dbDataVersion = 11;
 
-      final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
-            + "SELECT" //                          //$NON-NLS-1$
-            //
-            + " StartYear," //                  1  //$NON-NLS-1$
-            + " StartMonth," //                 2  //$NON-NLS-1$
-            + " StartDay," //                   3  //$NON-NLS-1$
-            + " StartHour," //                  4  //$NON-NLS-1$
-            + " StartMinute," //                5  //$NON-NLS-1$
-            + " StartSecond" //                 6  //$NON-NLS-1$
-            //
-            + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
-            + " WHERE TourId=?" //              1  //$NON-NLS-1$
-      );
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+      try {
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-            + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
+               + "SELECT" //                          //$NON-NLS-1$
+               //
+               + " StartYear," //                  1  //$NON-NLS-1$
+               + " StartMonth," //                 2  //$NON-NLS-1$
+               + " StartDay," //                   3  //$NON-NLS-1$
+               + " StartHour," //                  4  //$NON-NLS-1$
+               + " StartMinute," //                5  //$NON-NLS-1$
+               + " StartSecond" //                 6  //$NON-NLS-1$
+               //
+               + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
+               + " WHERE TourId=?" //              1  //$NON-NLS-1$
+         );
 
-            + " SET" //                            //$NON-NLS-1$
-            + " DateTimeCreated=?" //           1  //$NON-NLS-1$
-            + " WHERE tourId=?" //              2  //$NON-NLS-1$
-      );
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-      int tourIdx = 1;
-      long lastUpdateTime = System.currentTimeMillis();
+               + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
 
-      final ArrayList<Long> allTourIds = getAllTourIds();
+               + " SET" //                            //$NON-NLS-1$
+               + " DateTimeCreated=?" //           1  //$NON-NLS-1$
+               + " WHERE tourId=?" //              2  //$NON-NLS-1$
+         );
 
-      // loop: all tours
-      for (final Long tourId : allTourIds) {
+         int tourIdx = 1;
+         long lastUpdateTime = System.currentTimeMillis();
 
-         if (splashManager != null) {
+         final ArrayList<Long> allTourIds = getAllTourIds();
 
-            final long currentTime = System.currentTimeMillis();
-            final float timeDiff = currentTime - lastUpdateTime;
+         // loop: all tours
+         for (final Long tourId : allTourIds) {
 
-            // reduce logging
-            if (timeDiff > DELAY_SPLASH_LOGGING) {
+            if (splashManager != null) {
 
-               lastUpdateTime = currentTime;
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
 
-               splashManager.setMessage(NLS.bind(
-                     Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
-                     new Object[] { tourIdx++, allTourIds.size() }));
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
+                        new Object[] { tourIdx++, allTourIds.size() }));
+               }
+            }
+
+            // get tour date
+            stmtSelect.setLong(1, tourId);
+            final ResultSet result = stmtSelect.executeQuery();
+
+            while (result.next()) {
+
+               // get date from database
+               final short dbYear = result.getShort(1);
+               final short dbMonth = result.getShort(2);
+               final short dbDay = result.getShort(3);
+               final short dbHour = result.getShort(4);
+               final short dbMinute = result.getShort(5);
+               final short dbSecond = result.getShort(6);
+
+               final long dtCreated = (dbYear * 10000000000L)
+                     + (dbMonth * 100000000L)
+                     + (dbDay * 1000000L)
+                     + (dbHour * 10000L)
+                     + (dbMinute * 100L)
+                     + dbSecond;
+
+               // update DateTimeCreated in the database
+               stmtUpdate.setLong(1, dtCreated);
+               stmtUpdate.setLong(2, tourId);
+               stmtUpdate.executeUpdate();
             }
          }
 
-         // get tour date
-         stmtSelect.setLong(1, tourId);
-         final ResultSet result = stmtSelect.executeQuery();
+      } finally {
 
-         while (result.next()) {
-
-            // get date from database
-            final short dbYear = result.getShort(1);
-            final short dbMonth = result.getShort(2);
-            final short dbDay = result.getShort(3);
-            final short dbHour = result.getShort(4);
-            final short dbMinute = result.getShort(5);
-            final short dbSecond = result.getShort(6);
-
-            final long dtCreated = (dbYear * 10000000000L)
-                  + (dbMonth * 100000000L)
-                  + (dbDay * 1000000L)
-                  + (dbHour * 10000L)
-                  + (dbMinute * 100L)
-                  + dbSecond;
-
-            // update DateTimeCreated in the database
-            stmtUpdate.setLong(1, dtCreated);
-            stmtUpdate.setLong(2, tourId);
-            stmtUpdate.executeUpdate();
-         }
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_011_To_012(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -5819,6 +5853,11 @@ public class TourDatabase {
 
       final int dbDataVersion = 13;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       final String sql = "UPDATE " + TABLE_TOUR_DATA + " SET TemperatureScale=1"; //$NON-NLS-1$ //$NON-NLS-2$
 
       System.out.println(sql);
@@ -5826,9 +5865,7 @@ public class TourDatabase {
 
       conn.createStatement().executeUpdate(sql);
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_013_To_014(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -6198,7 +6235,13 @@ public class TourDatabase {
 
       final int dbDataVersion = 20;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
          int tourIdx = 1;
@@ -6242,16 +6285,12 @@ public class TourDatabase {
             }
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
 
          em.close();
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_020_To_021(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -6376,98 +6415,112 @@ public class TourDatabase {
 
       final int dbDataVersion = 22;
 
-      final String renamedTourRecordingTime = getRenamedField_TourRecordingTime(conn);
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
-      final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
 
-            + "SELECT" //                             //$NON-NLS-1$
-            //
-            + " StartYear," //                     1  //$NON-NLS-1$
-            + " StartMonth," //                    2  //$NON-NLS-1$
-            + " StartDay," //                      3  //$NON-NLS-1$
-            + " StartHour," //                     4  //$NON-NLS-1$
-            + " StartMinute," //                   5  //$NON-NLS-1$
-            + " StartSecond," //                   6  //$NON-NLS-1$
-            + " " + renamedTourRecordingTime //    7  //$NON-NLS-1$
-            //
-            + " FROM " + TABLE_TOUR_DATA //           //$NON-NLS-1$
-            + " WHERE TourId=?" //                    //$NON-NLS-1$
-      );
+      try {
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+         final String renamedTourRecordingTime = getRenamedField_TourRecordingTime(conn);
 
-            + "UPDATE " + TABLE_TOUR_DATA //          //$NON-NLS-1$
-            //
-            + " SET" //                               //$NON-NLS-1$
-            //
-            + " TourStartTime=?," //               1  //$NON-NLS-1$
-            + " TourEndTime=?" //                  2  //$NON-NLS-1$
-            //
-            + " WHERE tourId=?"); //               3  //$NON-NLS-1$
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-      int tourIndex = 1;
-      final ArrayList<Long> allTourIds = getAllTourIds();
+               + "SELECT" //                             //$NON-NLS-1$
+               //
+               + " StartYear," //                     1  //$NON-NLS-1$
+               + " StartMonth," //                    2  //$NON-NLS-1$
+               + " StartDay," //                      3  //$NON-NLS-1$
+               + " StartHour," //                     4  //$NON-NLS-1$
+               + " StartMinute," //                   5  //$NON-NLS-1$
+               + " StartSecond," //                   6  //$NON-NLS-1$
+               + " " + renamedTourRecordingTime //    7  //$NON-NLS-1$
+               //
+               + " FROM " + TABLE_TOUR_DATA //           //$NON-NLS-1$
+               + " WHERE TourId=?" //                    //$NON-NLS-1$
+         );
 
-      long lastUpdateTime = System.currentTimeMillis();
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-      // loop: all tours
-      for (final Long tourId : allTourIds) {
+               + "UPDATE " + TABLE_TOUR_DATA //          //$NON-NLS-1$
+               //
+               + " SET" //                               //$NON-NLS-1$
+               //
+               + " TourStartTime=?," //               1  //$NON-NLS-1$
+               + " TourEndTime=?" //                  2  //$NON-NLS-1$
+               //
+               + " WHERE tourId=?"); //               3  //$NON-NLS-1$
 
-         if (splashManager != null) {
+         int tourIndex = 1;
+         final ArrayList<Long> allTourIds = getAllTourIds();
 
-            final long currentTime = System.currentTimeMillis();
-            final float timeDiff = currentTime - lastUpdateTime;
+         long lastUpdateTime = System.currentTimeMillis();
 
-            // reduce logging
-            if (timeDiff > DELAY_SPLASH_LOGGING) {
+         // loop: all tours
+         for (final Long tourId : allTourIds) {
 
-               lastUpdateTime = currentTime;
+            if (splashManager != null) {
 
-               splashManager.setMessage(NLS.bind(
-                     Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
-                     new Object[] { tourIndex++, allTourIds.size() }));
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
+                        new Object[] { tourIndex++, allTourIds.size() }));
+               }
+            }
+
+            // get tour date for 1 tour
+            stmtSelect.setLong(1, tourId);
+            final ResultSet result = stmtSelect.executeQuery();
+
+            while (result.next()) {
+
+               // get date from database
+               final short dbYear = result.getShort(1);
+               final short dbMonth = result.getShort(2);
+               final short dbDay = result.getShort(3);
+               final short dbHour = result.getShort(4);
+               final short dbMinute = result.getShort(5);
+               final short dbSecond = result.getShort(6);
+
+               final long recordingTime = result.getLong(7);
+
+               final ZonedDateTime dtStart = ZonedDateTime.of(
+                     dbYear,
+                     dbMonth,
+                     dbDay,
+                     dbHour,
+                     dbMinute,
+                     dbSecond,
+                     0,
+                     TimeTools.getDefaultTimeZone());
+
+               final ZonedDateTime dtEnd = dtStart.plusSeconds(recordingTime);
+
+               // update tour start/end in the database
+               stmtUpdate.setLong(1, dtStart.toInstant().toEpochMilli());
+               stmtUpdate.setLong(2, dtEnd.toInstant().toEpochMilli());
+               stmtUpdate.setLong(3, tourId);
+               stmtUpdate.executeUpdate();
             }
          }
 
-         // get tour date for 1 tour
-         stmtSelect.setLong(1, tourId);
-         final ResultSet result = stmtSelect.executeQuery();
+      } finally {
 
-         while (result.next()) {
-
-            // get date from database
-            final short dbYear = result.getShort(1);
-            final short dbMonth = result.getShort(2);
-            final short dbDay = result.getShort(3);
-            final short dbHour = result.getShort(4);
-            final short dbMinute = result.getShort(5);
-            final short dbSecond = result.getShort(6);
-
-            final long recordingTime = result.getLong(7);
-
-            final ZonedDateTime dtStart = ZonedDateTime.of(
-                  dbYear,
-                  dbMonth,
-                  dbDay,
-                  dbHour,
-                  dbMinute,
-                  dbSecond,
-                  0,
-                  TimeTools.getDefaultTimeZone());
-
-            final ZonedDateTime dtEnd = dtStart.plusSeconds(recordingTime);
-
-            // update tour start/end in the database
-            stmtUpdate.setLong(1, dtStart.toInstant().toEpochMilli());
-            stmtUpdate.setLong(2, dtEnd.toInstant().toEpochMilli());
-            stmtUpdate.setLong(3, tourId);
-            stmtUpdate.executeUpdate();
-         }
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_022_To_023(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -6571,7 +6624,13 @@ public class TourDatabase {
 
       final int dbDataVersion = 23;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
          int tourIdx = 1;
@@ -6610,16 +6669,12 @@ public class TourDatabase {
             }
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
 
          em.close();
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_023_To_024(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -6734,7 +6789,13 @@ public class TourDatabase {
 
       final int dbDataVersion = 25;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
          int tourIdx = 1;
@@ -6829,35 +6890,15 @@ public class TourDatabase {
 
             }
 
-            // check before tour is saved
-
-            if (progress instanceof IProgressMonitor) {
-
-               final IProgressMonitor progressMonitor = (IProgressMonitor) em;
-
-               if (progressMonitor.isCanceled()) {
-                  xxx return;
-                  xxx ensure version number is set for all returns !!!
-               }
-            }
-
             saveEntity(tourData, tourId, TourData.class);
          }
-
-      } catch (final Exception e) {
-
-         StatusUtil.showStatus(e);
-
-         throw e;
 
       } finally {
 
          em.close();
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    // 25 -> 26    14.14 / 15.3
@@ -6952,97 +6993,110 @@ public class TourDatabase {
 
       final int dbDataVersion = 28;
 
-      // get number of compared tours
-      final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
-
-      final PreparedStatement stmt = conn.prepareStatement(sql);
-      ResultSet result = stmt.executeQuery();
-
-      // get first result
-      result.next();
-
-      // get first value
-      final int numberOfComparedTours = result.getInt(1);
-      if (numberOfComparedTours == 0) {
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
          return;
       }
 
-      final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+      PreparedStatement stmt = null;
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
 
-            + "SELECT" //                             //$NON-NLS-1$
+      try {
 
-            + " comparedId," //                    1  //$NON-NLS-1$
-            + " tourId," //                        2  //$NON-NLS-1$
-            + " startIndex," //                    3  //$NON-NLS-1$
-            + " endIndex" //                       4  //$NON-NLS-1$
+         // get number of compared tours
+         final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
-      );
+         stmt = conn.prepareStatement(sql);
+         ResultSet result = stmt.executeQuery();
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+         // get first result
+         result.next();
 
-            + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
+         // get first value
+         final int numComparedTours = result.getInt(1);
+         if (numComparedTours != 0) {
 
-            + " SET" //                               //$NON-NLS-1$
+            stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-            + " avgPulse=?" //                     1 //$NON-NLS-1$
+                  + "SELECT" //                             //$NON-NLS-1$
 
-            + " WHERE comparedId=?" //             2 //$NON-NLS-1$
-      );
+                  + " comparedId," //                    1  //$NON-NLS-1$
+                  + " tourId," //                        2  //$NON-NLS-1$
+                  + " startIndex," //                    3  //$NON-NLS-1$
+                  + " endIndex" //                       4  //$NON-NLS-1$
 
-      result = stmtSelect.executeQuery();
+                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
 
-      int compTourCounter = 0;
+            stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-      long lastUpdateTime = System.currentTimeMillis();
+                  + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
 
-      while (result.next()) {
+                  + " SET" //                               //$NON-NLS-1$
+                  + " avgPulse=?" //                     1  //$NON-NLS-1$
+                  + " WHERE comparedId=?" //             2  //$NON-NLS-1$
+            );
 
-         if (splashManager != null) {
+            result = stmtSelect.executeQuery();
 
-            final long currentTime = System.currentTimeMillis();
-            final float timeDiff = currentTime - lastUpdateTime;
+            int compTourCounter = 0;
 
-            // reduce logging
-            if (timeDiff > DELAY_SPLASH_LOGGING) {
+            long lastUpdateTime = System.currentTimeMillis();
 
-               lastUpdateTime = currentTime;
+            while (result.next()) {
 
-               splashManager.setMessage(NLS.bind(
-                     Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
-                     new Object[] { ++compTourCounter, numberOfComparedTours }));
+               if (splashManager != null) {
+
+                  final long currentTime = System.currentTimeMillis();
+                  final float timeDiff = currentTime - lastUpdateTime;
+
+                  // reduce logging
+                  if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                     lastUpdateTime = currentTime;
+
+                     splashManager.setMessage(NLS.bind(
+                           Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
+                           new Object[] { ++compTourCounter, numComparedTours }));
+                  }
+               }
+
+               // get date from database
+               final long compareId = result.getLong(1);
+               final long tourId = result.getLong(2);
+               final int startIndex = result.getInt(3);
+               final int endIndex = result.getInt(4);
+
+               final TourData tourData = TourManager.getTour(tourId);
+
+               if (tourData == null) {
+
+                  StatusUtil.log(NLS.bind(
+                        "Cannot get tour {0} from database to update the average pulse in the compared tour {1}.", //$NON-NLS-1$
+                        tourId,
+                        compareId));
+
+               } else {
+
+                  final float avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
+
+                  // update average pulse for the compared tour
+                  stmtUpdate.setFloat(1, avgPulse);
+                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.executeUpdate();
+               }
             }
+
          }
 
-         // get date from database
-         final long compareId = result.getLong(1);
-         final long tourId = result.getLong(2);
-         final int startIndex = result.getInt(3);
-         final int endIndex = result.getInt(4);
+      } finally {
 
-         final TourData tourData = TourManager.getTour(tourId);
-
-         if (tourData == null) {
-
-            StatusUtil.log(NLS.bind(
-                  "Cannot get tour {0} from database to update the average pulse in the compared tour {1}.", //$NON-NLS-1$
-                  tourId,
-                  compareId));
-
-         } else {
-
-            final float avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
-
-            // update average pulse for the compared tour
-            stmtUpdate.setFloat(1, avgPulse);
-            stmtUpdate.setLong(2, compareId);
-            stmtUpdate.executeUpdate();
-         }
+         net.tourbook.common.util.SQL.close(stmt);
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_028_To_029(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7082,86 +7136,100 @@ public class TourDatabase {
 
       final int dbDataVersion = 29;
 
-      final int numTours = getAllTourIds().size();
-
-      final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
-
-            + "SELECT" //                          //$NON-NLS-1$
-
-            + " TourID," //                     1  //$NON-NLS-1$
-            + " TourImportFilePath" //          2  //$NON-NLS-1$
-
-            + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
-      );
-
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
-
-            + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
-
-            + " SET" //                            //$NON-NLS-1$
-
-            + " TourImportFileName=?," //       1  //$NON-NLS-1$
-            + " TourImportFilePath=?" //        2  //$NON-NLS-1$
-
-            + " WHERE TourID=?"); //            3 //$NON-NLS-1$
-
-      int tourIndex = 0;
-      long lastUpdateTime = System.currentTimeMillis();
-
-      final ResultSet result = stmtSelect.executeQuery();
-
-      while (result.next()) {
-
-         if (splashManager != null) {
-
-            final long currentTime = System.currentTimeMillis();
-            final float timeDiff = currentTime - lastUpdateTime;
-
-            // reduce logging
-            if (timeDiff > DELAY_SPLASH_LOGGING) {
-
-               lastUpdateTime = currentTime;
-
-               splashManager.setMessage(NLS.bind(
-                     Messages.Tour_Database_PostUpdate_029_SetImportFileName,
-                     new Object[] { ++tourIndex, numTours }));
-            }
-         }
-
-         // get data from database
-         final long dbTourId = result.getLong(1);
-         final String dbFilePath = result.getString(2);
-
-         // get NIO path
-         final Path filePath = NIO.getPath(dbFilePath);
-         if (filePath != null) {
-
-            // extract file name
-            final Path fileName = filePath.getFileName();
-            if (fileName != null) {
-
-               // extract folder
-               final Path folderPath = filePath.getParent();
-
-               // set file name
-               stmtUpdate.setString(1, fileName.toString());
-
-               //
-               stmtUpdate.setString(2,
-                     folderPath == null
-                           ? UI.EMPTY_STRING
-                           : folderPath.toString());
-
-               stmtUpdate.setLong(3, dbTourId);
-
-               stmtUpdate.executeUpdate();
-            }
-         }
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
+      final int numTours = getAllTourIds().size();
 
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
+      try {
+
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "SELECT" //                          //$NON-NLS-1$
+
+               + " TourID," //                     1  //$NON-NLS-1$
+               + " TourImportFilePath" //          2  //$NON-NLS-1$
+
+               + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
+         );
+
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
+
+               + " SET" //                            //$NON-NLS-1$
+
+               + " TourImportFileName=?," //       1  //$NON-NLS-1$
+               + " TourImportFilePath=?" //        2  //$NON-NLS-1$
+
+               + " WHERE TourID=?"); //            3 //$NON-NLS-1$
+
+         int tourIndex = 0;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ResultSet result = stmtSelect.executeQuery();
+
+         while (result.next()) {
+
+            if (splashManager != null) {
+
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate_029_SetImportFileName,
+                        new Object[] { ++tourIndex, numTours }));
+               }
+            }
+
+            // get data from database
+            final long dbTourId = result.getLong(1);
+            final String dbFilePath = result.getString(2);
+
+            // get NIO path
+            final Path filePath = NIO.getPath(dbFilePath);
+            if (filePath != null) {
+
+               // extract file name
+               final Path fileName = filePath.getFileName();
+               if (fileName != null) {
+
+                  // extract folder
+                  final Path folderPath = filePath.getParent();
+
+                  // set file name
+                  stmtUpdate.setString(1, fileName.toString());
+
+                  //
+                  stmtUpdate.setString(2,
+                        folderPath == null
+                              ? UI.EMPTY_STRING
+                              : folderPath.toString());
+
+                  stmtUpdate.setLong(3, dbTourId);
+
+                  stmtUpdate.executeUpdate();
+               }
+            }
+         }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_029_To_030(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7252,7 +7320,13 @@ public class TourDatabase {
 
       final int dbDataVersion = 32;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
          int tourIdx = 1;
@@ -7300,16 +7374,12 @@ public class TourDatabase {
             }
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
 
          em.close();
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_032_To_033(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7368,16 +7438,21 @@ public class TourDatabase {
 
       final int dbDataVersion = 34;
 
-      final ArrayList<Long> allTours = getAllTourIds();
-
-      final int numTours = allTours.size();
-      int tourIndex = 1;
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
       try {
 
          long lastUpdateTime = startTime;
+
+         final ArrayList<Long> allTours = getAllTourIds();
+
+         final int numTours = allTours.size();
+         int tourIndex = 1;
 
          // loop: all tours
          for (final Long tourId : allTours) {
@@ -7414,15 +7489,11 @@ public class TourDatabase {
                Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
                new Object[] { tourIndex - 1, numTours, 100 }));
 
-      } catch (final Exception e) {
-         StatusUtil.log(e);
       } finally {
          em.close();
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_034_To_035(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7561,18 +7632,25 @@ public class TourDatabase {
 
       final int dbDataVersion = 37;
 
-      final ArrayList<Long> allTours = getAllTourIds();
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
-      final int numTours = allTours.size();
-      int tourIndex = 1;
+      PreparedStatement stmtUpdate = null;
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
       try {
 
+         final ArrayList<Long> allTours = getAllTourIds();
+
+         final int numTours = allTours.size();
+         int tourIndex = 1;
+
          long lastUpdateTime = startTime;
 
-         final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
                + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
 
@@ -7621,15 +7699,14 @@ public class TourDatabase {
                Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
                new Object[] { tourIndex - 1, numTours, 100 }));
 
-      } catch (final Exception e) {
-         StatusUtil.log(e);
       } finally {
+
          em.close();
+
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_037_To_038(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7734,12 +7811,21 @@ public class TourDatabase {
 
       final int dbDataVersion = 40;
 
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      PreparedStatement stmt = null;
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
       try {
 
          // get number of compared tours
          final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
 
-         final PreparedStatement stmt = conn.prepareStatement(sql);
+         stmt = conn.prepareStatement(sql);
          ResultSet result = stmt.executeQuery();
 
          // only the first result is needed
@@ -7747,90 +7833,91 @@ public class TourDatabase {
 
          // get first value
          final int numberOfComparedTours = result.getInt(1);
-         if (numberOfComparedTours == 0) {
-            return;
-         }
+         if (numberOfComparedTours != 0) {
 
-         final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+            stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-               + "SELECT" //                             //$NON-NLS-1$
+                  + "SELECT" //                             //$NON-NLS-1$
 
-               + " comparedId," //                    1  //$NON-NLS-1$
-               + " tourId," //                        2  //$NON-NLS-1$
-               + " startIndex," //                    3  //$NON-NLS-1$
-               + " endIndex" //                       4  //$NON-NLS-1$
+                  + " comparedId," //                    1  //$NON-NLS-1$
+                  + " tourId," //                        2  //$NON-NLS-1$
+                  + " startIndex," //                    3  //$NON-NLS-1$
+                  + " endIndex" //                       4  //$NON-NLS-1$
 
-               + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
-         );
+                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
+            );
 
-         final String renamedField_TourRecordingTime = getRenamedField_TourRecordingTime(conn);
+            final String renamedField_TourRecordingTime = getRenamedField_TourRecordingTime(conn);
 
-         final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+            stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-               + "UPDATE " + TABLE_TOUR_COMPARED //                  //$NON-NLS-1$
+                  + "UPDATE " + TABLE_TOUR_COMPARED //                  //$NON-NLS-1$
 
-               + " SET" //                                           //$NON-NLS-1$
-               + " " + renamedField_TourRecordingTime + "=?" //   1  //$NON-NLS-1$ //$NON-NLS-2$
+                  + " SET" //                                           //$NON-NLS-1$
+                  + " " + renamedField_TourRecordingTime + "=?" //   1  //$NON-NLS-1$ //$NON-NLS-2$
 
-               + " WHERE comparedId=?" //                         2 //$NON-NLS-1$
-         );
+                  + " WHERE comparedId=?" //                         2 //$NON-NLS-1$
+            );
 
-         result = stmtSelect.executeQuery();
+            result = stmtSelect.executeQuery();
 
-         int compTourCounter = 0;
-         long lastUpdateTime = startTime;
+            int compTourCounter = 0;
+            long lastUpdateTime = startTime;
 
-         while (result.next()) {
+            while (result.next()) {
 
-            if (splashManager != null) {
+               if (splashManager != null) {
 
-               ++compTourCounter;
+                  ++compTourCounter;
 
-               final long currentTime = System.currentTimeMillis();
-               final float timeDiff = currentTime - lastUpdateTime;
+                  final long currentTime = System.currentTimeMillis();
+                  final float timeDiff = currentTime - lastUpdateTime;
 
-               // reduce logging
-               if (timeDiff > DELAY_SPLASH_LOGGING) {
+                  // reduce logging
+                  if (timeDiff > DELAY_SPLASH_LOGGING) {
 
-                  lastUpdateTime = currentTime;
+                     lastUpdateTime = currentTime;
 
-                  splashManager.setMessage(NLS.bind(
-                        Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
-                        new Object[] { compTourCounter, numberOfComparedTours }));
+                     splashManager.setMessage(NLS.bind(
+                           Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
+                           new Object[] { compTourCounter, numberOfComparedTours }));
+                  }
                }
-            }
 
-            final long compareId = result.getLong(1);
-            final long tourId = result.getLong(2);
-            final int startIndex = result.getInt(3);
-            final int endIndex = result.getInt(4);
+               final long compareId = result.getLong(1);
+               final long tourId = result.getLong(2);
+               final int startIndex = result.getInt(3);
+               final int endIndex = result.getInt(4);
 
-            final TourData tourData = TourManager.getTour(tourId);
+               final TourData tourData = TourManager.getTour(tourId);
 
-            if (tourData == null) {
+               if (tourData == null) {
 
-               StatusUtil.log(NLS.bind(
-                     "Cannot get tour {0} from database to update the recording time in the compared tour {1}.", //$NON-NLS-1$
-                     tourId,
-                     compareId));
+                  StatusUtil.log(NLS.bind(
+                        "Cannot get tour {0} from database to update the recording time in the compared tour {1}.", //$NON-NLS-1$
+                        tourId,
+                        compareId));
 
-            } else {
+               } else {
 
-               final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
+                  final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
 
-               // update tour recording time for the compared tour
-               stmtUpdate.setInt(1, tourDeviceTime_Elapsed);
-               stmtUpdate.setLong(2, compareId);
-               stmtUpdate.executeUpdate();
+                  // update tour recording time for the compared tour
+                  stmtUpdate.setInt(1, tourDeviceTime_Elapsed);
+                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.executeUpdate();
+               }
             }
          }
 
       } finally {
 
-         updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-         logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+         net.tourbook.common.util.SQL.close(stmt);
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    // 40 -> 41    20.8
@@ -7891,17 +7978,29 @@ public class TourDatabase {
 
       final int dbDataVersion = 42;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
-            + "UPDATE " + TABLE_TOUR_DATA //                      //$NON-NLS-1$
-            + " SET" //                                           //$NON-NLS-1$
-            + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
+      PreparedStatement stmtUpdate = null;
 
-      stmtUpdate.executeUpdate();
+      try {
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
+               + "UPDATE " + TABLE_TOUR_DATA //                      //$NON-NLS-1$
+               + " SET" //                                           //$NON-NLS-1$
+               + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
+
+         stmtUpdate.executeUpdate();
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    private int updateDb_042_To_043(final Connection conn, final SplashManager splashManager) throws SQLException {
@@ -7930,11 +8029,16 @@ public class TourDatabase {
     * @throws SQLException
     * @throws Exception
     */
-   private int updateDb_042_to_043_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_042_to_043_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
       final int dbDataVersion = 43;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       long lastUpdateTime = startTime;
 
@@ -7977,17 +8081,12 @@ public class TourDatabase {
             tourIndex++;
 
             throw new SQLException("TEST;"); //$NON-NLS-1$
-
          }
 
          updateDb_042_To_043_DataUpdate_Concurrent(tourId);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion);
-
-      logDbUpdate(createLog_DataUpdate(dbDataVersion - 1, dbDataVersion, startTime));
-
-      return 43;
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, lastUpdateTime);
    }
 
    /**
@@ -8024,10 +8123,9 @@ public class TourDatabase {
             return;
          }
 
-         EntityManager em = null;
-         try {
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-            em = TourDatabase.getInstance().getEntityManager();
+         try {
 
             // get tour data by tour id
             final TourData tourData = em.find(TourData.class, queueItem_TourId);
@@ -8072,11 +8170,8 @@ public class TourDatabase {
 
          } finally {
 
-            if (em != null) {
-               em.close();
-            }
+            em.close();
          }
-
       });
    }
 
@@ -8098,15 +8193,19 @@ public class TourDatabase {
       _dbVersion_AfterDesignUpdate = newVersion;
    }
 
-   private void updateVersionNumber_20_AfterDataUpdate(final Connection conn, final int dataUpdateVersion) throws SQLException {
+   private void updateVersionNumber_20_AfterDataUpdate(final Connection conn,
+                                                       final int dbDataVersion,
+                                                       final long startTime) throws SQLException {
 
-      final String sql = "UPDATE " + TABLE_DB_VERSION_DATA + " SET VERSION=" + dataUpdateVersion; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sql = "UPDATE " + TABLE_DB_VERSION_DATA + " SET VERSION=" + dbDataVersion; //$NON-NLS-1$ //$NON-NLS-2$
 
       conn.createStatement().executeUpdate(sql);
 
-      logDbUpdate("Database data version is set to: " + dataUpdateVersion); //$NON-NLS-1$
+      logDbUpdate("Database data version is set to: " + dbDataVersion); //$NON-NLS-1$
 
-      _dbVersion_AfterDataUpdate = dataUpdateVersion;
+      _dbVersion_AfterDataUpdate = dbDataVersion;
+
+      logDbUpdate(createLog_DataUpdate(dbDataVersion, startTime));
    }
 
    /**
