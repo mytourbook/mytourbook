@@ -64,6 +64,15 @@ public final class StringUtils {
       return sb.toString();
    }
 
+   /**
+    * Sanitizes a file name string by replacing any illegal characters
+    * with a '-'.
+    *
+    * @param fileName
+    *           The string of a given file name
+    * @return
+    *         The sanitized file name
+    */
    public static String sanitizeFileName(final String fileName) {
 
       if (StringUtils.isNullOrEmpty(fileName)) {

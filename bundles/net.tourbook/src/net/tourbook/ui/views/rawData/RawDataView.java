@@ -386,59 +386,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             .withMillisRemoved();
    }
    //
-   private boolean                _isToolTipInDate;
-   private boolean                _isToolTipInTime;
-   private boolean                _isToolTipInTitle;
-   private boolean                _isToolTipInTags;
+   private boolean                       _isToolTipInDate;
+   private boolean                       _isToolTipInTime;
+   private boolean                       _isToolTipInTitle;
+   private boolean                       _isToolTipInTags;
    //
-   private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
+   private TourDoubleClickState          _tourDoubleClickState       = new TourDoubleClickState();
    //
-   private Thread                 _watchingStoresThread;
-   private Thread                 _watchingFolderThread;
-   private WatchService           _folderWatcher;
-   private AtomicBoolean          _isWatchingStores           = new AtomicBoolean();
-   private AtomicBoolean          _isDeviceStateUpdateDelayed = new AtomicBoolean();
-   private ReentrantLock          WATCH_LOCK                  = new ReentrantLock();
+   private Thread                        _watchingStoresThread;
+   private Thread                        _watchingFolderThread;
+   private WatchService                  _folderWatcher;
+   private AtomicBoolean                 _isWatchingStores           = new AtomicBoolean();
+   private AtomicBoolean                 _isDeviceStateUpdateDelayed = new AtomicBoolean();
+   private ReentrantLock                 WATCH_LOCK                  = new ReentrantLock();
    //
-   private HashMap<Long, Image>   _configImages               = new HashMap<>();
-   private HashMap<Long, Integer> _configImageHash            = new HashMap<>();
+   private HashMap<Long, Image>          _configImages               = new HashMap<>();
+   private HashMap<Long, Integer>        _configImageHash            = new HashMap<>();
    //
-   private boolean                _isBrowserCompleted;
-   private boolean                _isInUIStartup;
-   private boolean                _isInUpdate;
-   private boolean                _isNewUI;
+   private boolean                       _isBrowserCompleted;
+   private boolean                       _isInUIStartup;
+   private boolean                       _isInUpdate;
+   private boolean                       _isNewUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
     * is valid then the device state icon displays the state, otherwise it shows a waiting icon.
     */
-   private boolean                _isDeviceStateValid;
-   private boolean                _isRunDashboardAnimation    = true;
-   private boolean                _isShowWatcherAnimation;
-   private boolean                _isUpdateDeviceState        = true;
+   private boolean                       _isDeviceStateValid;
+   private boolean                       _isRunDashboardAnimation    = true;
+   private boolean                       _isShowWatcherAnimation;
+   private boolean                       _isUpdateDeviceState        = true;
    //
-   private String                 _cssFonts;
-   private String                 _cssFromFile;
+   private String                        _cssFonts;
+   private String                        _cssFromFile;
    //
-   private String                 _imageUrl_Device_TurnOff;
-   private String                 _imageUrl_Device_TurnOn;
-   private String                 _imageUrl_DeviceFolder_OK;
-   private String                 _imageUrl_DeviceFolder_Disabled;
-   private String                 _imageUrl_DeviceFolder_NotAvailable;
-   private String                 _imageUrl_DeviceFolder_NotChecked;
-   private String                 _imageUrl_DeviceFolder_NotSetup;
-   private String                 _imageUrl_ImportFromFile;
-   private String                 _imageUrl_SerialPort_Configured;
-   private String                 _imageUrl_SerialPort_Directly;
-   private String                 _imageUrl_State_AdjustTemperature;
-   private String                 _imageUrl_State_RetrieveWeatherData;
-   private String                 _imageUrl_State_Error;
-   private String                 _imageUrl_State_OK;
-   private String                 _imageUrl_State_MovedFiles;
-   private String                 _imageUrl_State_SaveTour;
-   private String                 _imageUrl_State_TourMarker;
+   private String                        _imageUrl_Device_TurnOff;
+   private String                        _imageUrl_Device_TurnOn;
+   private String                        _imageUrl_DeviceFolder_OK;
+   private String                        _imageUrl_DeviceFolder_Disabled;
+   private String                        _imageUrl_DeviceFolder_NotAvailable;
+   private String                        _imageUrl_DeviceFolder_NotChecked;
+   private String                        _imageUrl_DeviceFolder_NotSetup;
+   private String                        _imageUrl_ImportFromFile;
+   private String                        _imageUrl_SerialPort_Configured;
+   private String                        _imageUrl_SerialPort_Directly;
+   private String                        _imageUrl_State_AdjustTemperature;
+   private String                        _imageUrl_State_RetrieveWeatherData;
+   private String                        _imageUrl_State_Error;
+   private String                        _imageUrl_State_OK;
+   private String                        _imageUrl_State_MovedFiles;
+   private String                        _imageUrl_State_SaveTour;
+   private String                        _imageUrl_State_TourMarker;
    //
-   private PixelConverter         _pc;
+   private PixelConverter                _pc;
+   private List<TourbookCloudDownloader> _cloudDownloadersList       = CloudDownloaderManager.getCloudDownloaderList();
 
    /*
     * resources
@@ -450,28 +451,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /*
     * UI controls
     */
-   private PageBook                      _topPageBook;
-   private Composite                     _topPage_Dashboard;
-   private Composite                     _topPage_ImportViewer;
-   private Composite                     _topPage_OldUI;
-   private Composite                     _topPage_Startup;
+   private PageBook  _topPageBook;
+   private Composite _topPage_Dashboard;
+   private Composite _topPage_ImportViewer;
+   private Composite _topPage_OldUI;
+   private Composite _topPage_Startup;
 
-   private PageBook                      _dashboard_PageBook;
-   private Composite                     _dashboardPage_NoBrowser;
-   private Composite                     _dashboardPage_WithBrowser;
+   private PageBook  _dashboard_PageBook;
+   private Composite _dashboardPage_NoBrowser;
+   private Composite _dashboardPage_WithBrowser;
 
-   private Composite                     _parent;
-   private Composite                     _viewerContainer;
+   private Composite _parent;
+   private Composite _viewerContainer;
 
-   private Text                          _txtNoBrowser;
+   private Text      _txtNoBrowser;
 
-   private Link                          _linkImport;
+   private Link      _linkImport;
 
-   private Browser                       _browser;
+   private Browser   _browser;
 
-   private Menu                          _tableContextMenu;
-
-   private List<TourbookCloudDownloader> _cloudDownloadersList = CloudDownloaderManager.getCloudDownloaderList();
+   private Menu      _tableContextMenu;
 
    private class ImportComparator extends ViewerComparator {
 
@@ -4299,6 +4298,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          onSelectUI_Old();
       } else {
 
+         //We look for the cloud downloader that matches
+         //the action in {@link hrefAction} and execute its
+         //{@link TourbookCloudDownloader#downloadTours} method.
          _cloudDownloadersList.stream()
                .filter(cd -> cd.getId().equals(hrefAction))
                .forEach(TourbookCloudDownloader::downloadTours);
