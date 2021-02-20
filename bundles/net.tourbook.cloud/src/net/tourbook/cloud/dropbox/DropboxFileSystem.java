@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;

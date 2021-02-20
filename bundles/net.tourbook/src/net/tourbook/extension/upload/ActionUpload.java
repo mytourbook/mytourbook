@@ -109,6 +109,59 @@ public class ActionUpload extends Action implements IMenuCreator {
       createActions();
    }
 
+   private void addActionToMenu(final Action action) {
+      final ActionContributionItem item = new ActionContributionItem(action);
+      item.fill(_menu, -1);
+   }
+
+   private void createActions() {
+
+      if (_uploadTourActions.size() > 0) {
+         return;
+      }
+
+      _tourbookCloudUploaders.forEach(tourbookCloudUploader -> _uploadTourActions.add(new ActionUploadTour(tourbookCloudUploader)));
+   }
+
+   @Override
+   public void dispose() {
+
+      if (_menu == null) {
+         return;
+      }
+
+      _menu.dispose();
+      _menu = null;
+   }
+
+   /**
+    * read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
+    */
+   private List<TourbookCloudUploader> getCloudUploaders() {
+
+      if (_tourbookCloudUploaders.isEmpty()) {
+         _tourbookCloudUploaders = readCloudUploaderExtensions("cloudUploader"); //$NON-NLS-1$
+      }
+
+      return _tourbookCloudUploaders;
+   }
+
+   @Override
+   public Menu getMenu(final Control parent) {
+      return null;
+   }
+
+   @Override
+   public Menu getMenu(final Menu parent) {
+
+      dispose();
+      _menu = new Menu(parent);
+
+      _uploadTourActions.forEach(this::addActionToMenu);
+
+      return _menu;
+   }
+
    /**
     * Read and collects all the extensions that implement {@link TourbookCloudUploader}.
     *
@@ -116,7 +169,7 @@ public class ActionUpload extends Action implements IMenuCreator {
     *           The extension point name
     * @return The list of {@link TourbookCloudUploader}.
     */
-   private static List<TourbookCloudUploader> readCloudUploaderExtensions(final String extensionPointName) {
+   private List<TourbookCloudUploader> readCloudUploaderExtensions(final String extensionPointName) {
 
       final List<TourbookCloudUploader> cloudUploadersList = new ArrayList<>();
 
@@ -155,62 +208,11 @@ public class ActionUpload extends Action implements IMenuCreator {
       return cloudUploadersList;
    }
 
-   private void addActionToMenu(final Action action) {
-      final ActionContributionItem item = new ActionContributionItem(action);
-      item.fill(_menu, -1);
-   }
-
-   private void createActions() {
-
-      if (_uploadTourActions.size() > 0) {
-         return;
-      }
-
-      _tourbookCloudUploaders.forEach(tourbookCloudUploader -> _uploadTourActions.add(new ActionUploadTour(tourbookCloudUploader)));
-   }
-
    @Override
-   public void dispose() {
-
-      if (_menu == null) {
-         return;
-      }
-
-      _menu.dispose();
-      _menu = null;
-   }
-
-   /**
-    * read extension points {@link TourbookPlugin#EXT_POINT_EXPORT_TOUR}
-    */
-   private List<TourbookCloudUploader> getCloudUploaders() {
-
-      if (_tourbookCloudUploaders.isEmpty()) {
-         _tourbookCloudUploaders = readCloudUploaderExtensions("cloudUploader"); //$NON-NLS-1$
-      }
+   public void setEnabled(final boolean enabled) {
 
       _uploadTourActions.forEach(actionUploadTour -> actionUploadTour.setEnabled(actionUploadTour.isVendorReady()));
 
-      return _tourbookCloudUploaders;
-   }
-
-   @Override
-   public Menu getMenu(final Control parent) {
-      return null;
-   }
-
-   @Override
-   public Menu getMenu(final Menu parent) {
-
-      dispose();
-      _menu = new Menu(parent);
-
-      _uploadTourActions.forEach(this::addActionToMenu);
-
-      return _menu;
-   }
-
-   public boolean hasUploaders() {
-      return getCloudUploaders().size() > 0;
+      super.setEnabled(enabled);
    }
 }

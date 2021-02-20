@@ -72,8 +72,6 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
             final SuuntoTokens token = new ObjectMapper().readValue(response.body(), SuuntoTokens.class);
 
             return token;
-         } else {
-//            MessageDialog.openError(_shell, "toto", response.body());
          }
       } catch (IOException | InterruptedException e) {
          StatusUtil.log(e);
