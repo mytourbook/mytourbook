@@ -424,14 +424,6 @@ public class GraphColorManager {
             new RGB(0, 134, 147),
             null));
 
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_CUSTOM_TRACKS, //
-            Messages.Graph_Label_Custom_Tracks,
-            new RGB(255, 255, 255),
-            new RGB(0, 200, 240),
-            new RGB(0, 216, 240),
-            new RGB(0, 134, 147),
-            null));
-
       allColorDef.add(new ColorDefinition(PREF_GRAPH_GRADIENT, //
             Messages.Graph_Label_Gradient,
             new RGB(255, 255, 255),
@@ -528,6 +520,18 @@ public class GraphColorManager {
             new RGB(0x86, 0x57, 0xe7),
             new RGB(0x4a, 0x1a, 0xb0),
             new RGB(0x28, 0xe, 0x61),
+            null));
+  
+      /*
+       * Custom Tracks
+       */
+     
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_CUSTOM_TRACKS, //
+            Messages.Graph_Label_Custom_Tracks,
+            new RGB(255, 255, 255),
+            new RGB(0, 200, 240),
+            new RGB(0, 216, 240),
+            new RGB(0, 134, 147),
             null));
 
       /*
