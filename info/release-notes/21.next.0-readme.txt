@@ -108,6 +108,10 @@ Bugfix
     - Serie data could be dropped
     - Entity manager was running in update 3->4, moved it into the 3->4 post update  
 
+* Suunto SML & XML formats (Frederic)
+  - Markers are now imported
+  - Fixed possible NPE
+
 
 Translation    
 ===========
@@ -123,3 +127,4 @@ System
 ======
 
 * Eclipse 2020-12 (maybe)
+* FIT SDK 21.47

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
@@ -63,17 +64,14 @@ import org.json.JSONObject;
 
 public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
-   // SET_FORMATTING_OFF
-   private static final String   ICON_CHECK                    = net.tourbook.cloud.Messages.Icon_Check;
-   private static final String   ICON_HOURGLASS                = net.tourbook.cloud.Messages.Icon_Hourglass;
-   private static final String   LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String   LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
-   // SET_FORMATTING_ON
+   private static final String     ICON__CHECK                   = net.tourbook.cloud.Messages.Icon__Check;
+   private static final String     ICON__HOURGLASS               = net.tourbook.cloud.Messages.Icon__Hourglass;
+   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static HttpClient       _httpClient   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore    = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
-   private static int[]            _numberOfUploadedTours;
+   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
+   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
    public SuuntoRoutesUploader() {
       super("SUUNTO", Messages.VendorName_Suunto_Routes); //$NON-NLS-1$
@@ -81,22 +79,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       _tourExporter.setUseDescription(true);
 
       VelocityService.init();
-   }
-
-   private static void logUploadResult(final RouteUpload routeUpload) {
-
-      if (StringUtils.hasContent(routeUpload.getError())) {
-
-         TourLogManager.logError(NLS.bind(Messages.Log_UploadToursToSuunto_004_UploadError, routeUpload.getTourDate(), routeUpload.getError()));
-
-      } else {
-
-         ++_numberOfUploadedTours[0];
-
-         TourLogManager.addLog(TourLogState.IMPORT_OK,
-               NLS.bind(Messages.Log_UploadToursToSuunto_003_UploadStatus, routeUpload.getTourDate(), routeUpload.getId()));
-
-      }
    }
 
    private RouteUpload convertResponseToUpload(final HttpResponse<String> routeUploadResponse, final String tourDate) {
@@ -148,6 +130,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       _tourExporter.setUseActivityType(useActivityType);
       _tourExporter.setActivityType(activityName);
 
+      if (tourData.timeSerie == null || tourData.timeSerie.length == 0 || tourData.getTourDeviceTime_Elapsed() == 0) {
+         _tourExporter.setIsCamouflageSpeed(true);
+         _tourExporter.setCamouflageSpeed(10);
+      } else {
+         _tourExporter.setIsCamouflageSpeed(false);
+      }
+
       _tourExporter.export(absoluteTourFilePath);
 
       final String tourGpx = FilesUtils.readFileContentString(absoluteTourFilePath);
@@ -168,6 +157,26 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    @Override
    protected boolean isReady() {
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
+   }
+
+   private boolean logUploadResult(final RouteUpload routeUpload) {
+
+      boolean isRouteUploaded = false;
+
+      if (StringUtils.hasContent(routeUpload.getError())) {
+
+         TourLogManager.logError(NLS.bind(Messages.Log_UploadToursToSuunto_004_UploadError, routeUpload.getTourDate(), routeUpload.getError()));
+
+      } else {
+
+         isRouteUploaded = true;
+
+         TourLogManager.addLog(TourLogState.IMPORT_OK,
+               NLS.bind(Messages.Log_UploadToursToSuunto_003_UploadStatus, routeUpload.getTourDate(), routeUpload.getId()));
+
+      }
+
+      return isRouteUploaded;
    }
 
    private CompletableFuture<RouteUpload> sendAsyncRequest(final String tourStartTime, final HttpRequest request) {
@@ -208,7 +217,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return null;
    }
 
-   private void uploadRoutes(final Map<String, String> toursWithGpsSeries) {
+   private int uploadRoutes(final Map<String, String> toursWithGpsSeries) {
 
       final List<CompletableFuture<RouteUpload>> activityUploads = new ArrayList<>();
 
@@ -220,23 +229,37 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          activityUploads.add(uploadRoute(tourStartTime, tourGpx));
       }
 
-      activityUploads.stream().map(CompletableFuture::join).forEach(SuuntoRoutesUploader::logUploadResult);
+      final int[] numberOfUploadedTours = new int[1];
+      activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
+         if (logUploadResult(activityUpload)) {
+            ++numberOfUploadedTours[0];
+         }
+      });
+
+      return numberOfUploadedTours[0];
    }
 
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
 
       final int numberOfTours = selectedTours.size();
-      _numberOfUploadedTours = new int[1];
+      final int[] numberOfUploadedTours = new int[1];
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(NLS.bind(Messages.UploadToursToSuunto_Task, numberOfTours), numberOfTours * 2);
+            monitor.beginTask(NLS.bind(Messages.Dialog_UploadRoutes_Task, numberOfTours), numberOfTours * 2);
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON_HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(Messages.ValidatingSuuntoTokens_SubTask);
+
+            if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
+               TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
+               return;
+            }
+
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours; ++index) {
@@ -257,17 +280,17 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON_CHECK, ICON_HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__HOURGLASS));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
-               uploadRoutes(toursWithGpsSeries);
+               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
             } else {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
             }
 
             monitor.worked(toursWithGpsSeries.size());
 
-            monitor.subTask(NLS.bind(Messages.UploadToursToSuunto_SubTask, ICON_CHECK, ICON_CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__CHECK));
          }
       };
 
@@ -283,8 +306,8 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_SuuntoUpload_Summary,
-               NLS.bind(Messages.Dialog_SuuntoRoutesUpload_Message, _numberOfUploadedTours[0], numberOfTours - _numberOfUploadedTours[0]));
+               Messages.Dialog_UploadRoutes_Title,
+               NLS.bind(Messages.Dialog_UploadRoutes_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
