@@ -20,6 +20,7 @@
   "calories" : 2016,
   "conconiDeflection" : 0,
   "containReferenceTour" : false,
+  "customTracksAvailable" : false,
   "deviceFirmwareVersion" : "2.0.9",
   "deviceName" : "Suunto Ambit2 S",
   "devicePluginName" : "Suunto Ambit2 S",

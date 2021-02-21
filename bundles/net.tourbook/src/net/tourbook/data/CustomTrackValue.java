@@ -13,24 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.data;
 
-public abstract class ComputeChartValue {
+import java.io.Serializable;
 
-   public int             valueIndexLeft;
-   public int             valueIndexRight;
-
-   public ChartDataXSerie xData;
-   public ChartDataYSerie yData;
-
-   public ChartDataModel  chartModel;
-
+public class CustomTrackValue implements Serializable {
    /**
-    * Breaktime in seconds between the left and right value index
+    *
     */
-   public int             breakTime;
+   private static final long serialVersionUID = 1533142327708082208L;
 
-   public String          customTrackId;
-
-   public abstract float compute();
+   public String             id               = net.tourbook.common.UI.EMPTY_STRING; //Reference to CustomTrackDefinition
+   public float              value            = Float.MIN_VALUE;
 }

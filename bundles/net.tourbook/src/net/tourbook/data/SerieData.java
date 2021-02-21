@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import net.tourbook.common.UI;
 
@@ -26,41 +27,41 @@ import net.tourbook.common.UI;
  */
 public class SerieData implements Serializable {
 
-   private static final long   serialVersionUID      = 1L;
+   private static final long                         serialVersionUID      = 1L;
 
-   private static final String NL                    = UI.NEW_LINE1;
-   private static final String DATA_SERIE_FORMAT     = "%5d %s";    //$NON-NLS-1$
+   private static final String                       NL                    = UI.NEW_LINE1;
+   private static final String                       DATA_SERIE_FORMAT     = "%5d %s";    //$NON-NLS-1$
 
-   private static final int    SERIE_MAX_LENGTH      = 100;
+   private static final int                          SERIE_MAX_LENGTH      = 100;
 
    /**
     * This is necessary otherwise the text is wrapped in the text control, it seems that the max
     * length of a line in the text controls is 1024
     */
-   private static final int    VALUE_TEXT_MAX_LENGTH = 990;
+   private static final int                          VALUE_TEXT_MAX_LENGTH = 990;
 
-   public int[]                timeSerie;
+   public int[]                                      timeSerie;
 
-   public float[]              altitudeSerie20;
-   public float[]              cadenceSerie20;
-   public float[]              distanceSerie20;
-   public float[]              powerSerie20;
-   public float[]              pulseSerie20;
-   public float[]              speedSerie20;
-   public float[]              temperatureSerie20;
+   public float[]                                    altitudeSerie20;
+   public float[]                                    cadenceSerie20;
+   public float[]                                    distanceSerie20;
+   public float[]                                    powerSerie20;
+   public float[]                                    pulseSerie20;
+   public float[]                                    speedSerie20;
+   public float[]                                    temperatureSerie20;
 
    /**
     * These data series cannot be removed because they are needed to convert from int to float
     *
     * @since Db version 20
     */
-   public int[]                altitudeSerie;
-   public int[]                cadenceSerie;
-   public int[]                distanceSerie;
-   public int[]                powerSerie;
-   public int[]                pulseSerie;
-   public int[]                speedSerie;
-   public int[]                temperatureSerie;
+   public int[]                                      altitudeSerie;
+   public int[]                                      cadenceSerie;
+   public int[]                                      distanceSerie;
+   public int[]                                      powerSerie;
+   public int[]                                      pulseSerie;
+   public int[]                                      speedSerie;
+   public int[]                                      temperatureSerie;
 
    /**
     * Gears are in this format (left to right)
@@ -92,7 +93,7 @@ public class SerieData implements Serializable {
     *
     * @since Db-version 27
     */
-   public long[]               gears;
+   public long[]                                     gears;
 
    /**
     * These data series cannot be removed because they are needed to convert from old double to new
@@ -100,8 +101,8 @@ public class SerieData implements Serializable {
     *
     * @since Db version 43
     */
-   public double[]             longitude;
-   public double[]             latitude;
+   public double[]                                   longitude;
+   public double[]                                   latitude;
 
    /**
     * Source: https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
@@ -111,8 +112,8 @@ public class SerieData implements Serializable {
     * inches). You are never going to get that level of accuracy out of a GPS system available to
     * the public anyway, so the loss of a single digit of precision will never be noticed.
     */
-   public int[]                longitudeE6;
-   public int[]                latitudeE6;
+   public int[]                                      longitudeE6;
+   public int[]                                      latitudeE6;
 
    /**
     * Pulse times in milliseconds.
@@ -120,58 +121,67 @@ public class SerieData implements Serializable {
     * <b>This data serie has not the same serie length as the other data series because 1 second can
     * have multiple values, depending on the heartrate.</b>
     */
-   public int[]                pulseTimes;
+   public int[]                                      pulseTimes;
 
    /**
     * Contains the time index into {@link TourData#timeSerie} for the pulse time(s) in
     * {@link TourData#pulseTimeSerie}
     */
-   public int[]                pulseTime_TimeIndex;
+   public int[]                                      pulseTime_TimeIndex;
 
    /**
     * Running dynamics data
     *
     * @since Version 18.7
     */
-   public short[]              runDyn_StanceTime;
-   public short[]              runDyn_StanceTimeBalance;
-   public short[]              runDyn_StepLength;
-   public short[]              runDyn_VerticalOscillation;
-   public short[]              runDyn_VerticalRatio;
+   public short[]                                    runDyn_StanceTime;
+   public short[]                                    runDyn_StanceTimeBalance;
+   public short[]                                    runDyn_StepLength;
+   public short[]                                    runDyn_VerticalOscillation;
+   public short[]                                    runDyn_VerticalRatio;
 
    /**
     * Swim data
     *
     * @since Version 18.10
     */
-   public short[]              swim_LengthType;                     // e.g. active, idle
+   public short[]                                    swim_LengthType;                     // e.g. active, idle
 
-   public short[]              swim_Cadence;                        // strokes/min
-   public short[]              swim_Strokes;                        // strokes/length
-   public short[]              swim_StrokeStyle;                    // e.g. freestyle, breaststroke
-   public int[]                swim_Time;                           // relative time to the start time
+   public short[]                                    swim_Cadence;                        // strokes/min
+   public short[]                                    swim_Strokes;                        // strokes/length
+   public short[]                                    swim_StrokeStyle;                    // e.g. freestyle, breaststroke
+   public int[]                                      swim_Time;                           // relative time to the start time
 
    /**
     * Is <code>true</code> when a time slice in a data serie is visible.
     *
     * @since Version 18.12
     */
-   public boolean[]            visiblePoints_Surfing;
+   public boolean[]                                  visiblePoints_Surfing;
 
    /**
     * Containing the start time of each pause (in milliseconds)
     */
-   public long[]               pausedTime_Start;
-   
+   public long[]                                     pausedTime_Start;
+
    /**
     * Containing the end time of each pause (in milliseconds)
     */
-   public long[]               pausedTime_End;
+   public long[]                                     pausedTime_End;
 
    /**
     * This field is never used but it must be kept for old data
     */
-   public int[]                deviceMarker;
+   public int[]                                      deviceMarker;
+
+   /**
+    * Custom Tracks
+    */
+   public HashMap<String, float[]>                   customTracks;
+
+   public HashMap<String, CustomTrackStatisticEntry> customTracksStatistics;
+
+   public HashMap<String, CustomTrackDefinition>     customTracksDefinition;
 
    private String dataSerieValues(final boolean[] dataSerie) {
 
@@ -201,6 +211,38 @@ public class SerieData implements Serializable {
             Arrays.toString(Arrays.copyOf(dataSerie, Math.min(numDataSlices, SERIE_MAX_LENGTH))));
 
       return formattedText.substring(0, Math.min(formattedText.length(), VALUE_TEXT_MAX_LENGTH));
+   }
+
+   private String dataSerieValues(final HashMap<String, float[]> customTracks) {
+      final int maxLen = 10;
+
+      String customTracksDataText = NL;
+      if (customTracksDefinition != null && !customTracksDefinition.isEmpty()) {
+         customTracksDataText += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         for (final String customTrackId : customTracksDefinition.keySet()) {
+            final CustomTrackDefinition item = customTracksDefinition.get(customTrackId);
+            customTracksDataText += "  Id=\"" + customTrackId + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+         }
+         customTracksDataText += "  --CUSTOM TRACKS Definition End--  " + NL; //$NON-NLS-1$
+      }
+      if (customTracks != null && !customTracks.isEmpty()) {
+         customTracksDataText += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         for (final String customTrackId : customTracks.keySet()) {
+            customTracksDataText += "  Id:\"" + customTrackId + "\"    " + (customTracks.get(customTrackId) != null ? Arrays.toString(Arrays.copyOf( //$NON-NLS-1$//$NON-NLS-2$
+                  customTracks.get(customTrackId),
+                  Math.min(customTracks.get(customTrackId).length, maxLen))) : UI.EMPTY_STRING) + NL;
+            if (customTracksStatistics != null && customTracksStatistics.get(customTrackId) != null) {
+               final CustomTrackStatisticEntry valE = customTracksStatistics.get(customTrackId);
+               customTracksDataText += "  Id:\"" + customTrackId + "\"    " + "[Avg=" + String.format("%.2f", valE.value_Avg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+               customTracksDataText += ";Min=" + String.format("%.2f", valE.value_Min); //$NON-NLS-1$ //$NON-NLS-2$
+               customTracksDataText += ";Max=" + String.format("%.2f", valE.value_Max); //$NON-NLS-1$ //$NON-NLS-2$
+               customTracksDataText += "]" + NL; //$NON-NLS-1$
+            }
+         }
+         customTracksDataText += "  --END CUSTOM TRACKS--  " + NL; //$NON-NLS-1$
+      }
+
+      return customTracksDataText;
    }
 
    private String dataSerieValues(final int[] dataSerie) {
@@ -288,6 +330,8 @@ public class SerieData implements Serializable {
             + "   swim_Time                  " + dataSerieValues(swim_Time)                     + NL //$NON-NLS-1$
 
             + "   visiblePoints_Surfing      " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
+
+            + "   Custom_Tracks              " + dataSerieValues(customTracks)                  + NL //$NON-NLS-1$
 
             ;
    }

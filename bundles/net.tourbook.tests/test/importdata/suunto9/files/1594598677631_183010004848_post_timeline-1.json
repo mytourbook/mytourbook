@@ -17,6 +17,7 @@
   "calories" : 0,
   "conconiDeflection" : 0,
   "containReferenceTour" : false,
+  "customTracksAvailable" : false,
   "deviceName" : "Suunto Spartan/9",
   "devicePluginName" : "Suunto Spartan/9",
   "deviceTimeInterval" : -1,

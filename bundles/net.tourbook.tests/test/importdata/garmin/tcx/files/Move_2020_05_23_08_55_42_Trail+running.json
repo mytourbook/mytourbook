@@ -20,6 +20,7 @@
   "calories" : 0,
   "conconiDeflection" : 0,
   "containReferenceTour" : false,
+  "customTracksAvailable" : false,
   "deviceModeName" : "Running",
   "deviceName" : "null Suunto 9 Baro",
   "devicePluginName" : "null Suunto 9 Baro",

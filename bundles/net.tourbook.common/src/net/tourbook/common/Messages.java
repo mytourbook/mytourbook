@@ -120,6 +120,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Cadence_Unit;
    public static String        Graph_Label_Cadence_Unit_Spm;
    public static String        Graph_Label_Cadence_Unit_RpmSpm;
+   public static String        Graph_Label_Custom_Tracks;
    public static String        Graph_Label_Distance;
    public static String        Graph_Label_ElevationGain;
    public static String        Graph_Label_Gears;
