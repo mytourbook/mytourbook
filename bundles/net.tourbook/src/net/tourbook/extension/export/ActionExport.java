@@ -157,7 +157,7 @@ public class ActionExport extends Action implements IMenuCreator {
       for (final IExtension extension : extPoint.getExtensions()) {
          for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-            if (!configElement.getName().equalsIgnoreCase("export")) { //$NON-NLS-1$
+            if (configElement.getName().equalsIgnoreCase("export") == false) { //$NON-NLS-1$
                continue;
             }
             try {
