@@ -10781,9 +10781,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private boolean setupStartingValues_CustomTracks(final TimeData[] timeDataSerie) {
 
+      boolean isAvailable = false;
+
       if (customTracksDefinition == null || customTracksDefinition.isEmpty()) {
-         return false;
+         return isAvailable;
       }
+
+      isAvailable = true;
 
       if (_customTracks == null) {
          _customTracks = new HashMap<>();
@@ -10800,7 +10804,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          _customTracks.put(customTracksDefinitionId, customTracksSerie);
       }
 
-      return true;
+      return isAvailable;
    }
 
    private boolean setupStartingValues_Distance(final TimeData[] timeDataSerie, final boolean isAbsoluteData) {
