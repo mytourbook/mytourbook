@@ -47,6 +47,7 @@ New
 * Compress Database
   This tool can compress the internal sql database. After updating MyTourbook to 21.2, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
 
+
 Improvements
 ============
 
@@ -66,6 +67,9 @@ Improvements
     
 * Tour Blog
   - Set content font size
+
+* Tour Database
+  - Overhauled the database startup to have different design version and data version checking
 
 
 Changes  

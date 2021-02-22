@@ -371,6 +371,7 @@ public class TourDatabase {
    }
 
    private boolean                               _isDbInitialized;
+   private boolean                               _isDbInDataUpdate;
    private boolean                               _isTableChecked;
    private boolean                               _isDataVersionChecked;
    private boolean                               _isDesignVersionChecked;
@@ -378,10 +379,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners          = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError     = false;
-   private boolean                               _isSQLDataUpdateError       = false;
+   private boolean                               _isSQLDesignUpdateError = false;
+   private boolean                               _isSQLDataUpdateError   = false;
 
    /**
     * Database version before a db design update is performed
@@ -394,38 +395,10 @@ public class TourDatabase {
     */
    private int                                   _dbVersion_AfterDesignUpdate;
 
-   /**
-    * Database version before a db data update is performed
-    */
-   private int                                   _dbVersion_BeforeDataUpdate = -1;
-
-   /**
-    * Database version after a db data update is performed
-    */
-   private int                                   _dbVersion_AfterDataUpdate;
-
    private boolean                               _isDerbyEmbedded;
    private boolean                               _isChecked_DbCreated;
    private boolean                               _isChecked_UpgradeDB_Before;
    private boolean                               _isChecked_UpgradeDB_After;
-
-   private boolean                               _isDataUpdate_4;
-   private boolean                               _isDataUpdate_5;
-   private boolean                               _isDataUpdate_9;
-   private boolean                               _isDataUpdate_11;
-   private boolean                               _isDataUpdate_13;
-   private boolean                               _isDataUpdate_20;
-   private boolean                               _isDataUpdate_22;
-   private boolean                               _isDataUpdate_23;
-   private boolean                               _isDataUpdate_25;
-   private boolean                               _isDataUpdate_28;
-   private boolean                               _isDataUpdate_29;
-   private boolean                               _isDataUpdate_32;
-   private boolean                               _isDataUpdate_34;
-   private boolean                               _isDataUpdate_37;
-   private boolean                               _isDataUpdate_40;
-   private boolean                               _isDataUpdate_42;
-   private boolean                               _isDataUpdate_43;
 
    /**
     * SQL utilities.
@@ -3110,7 +3083,7 @@ public class TourDatabase {
     * @param stmt
     * @throws SQLException
     */
-   private void createTable_DbVersion_Data(final Statement stmt) throws SQLException {
+   private void createTable_DbVersion_Data(final Statement stmt, final int initialVersionNumber) throws SQLException {
 
       // ensure table do not exist
       if (isTableAvailable(stmt.getConnection(), TABLE_DB_VERSION_DATA)) {
@@ -3134,14 +3107,6 @@ public class TourDatabase {
       /*
        * Create 1 record which contains the db data version
        */
-
-???      final int initialVersionNumber = TOURBOOK_DB_VERSION >= 43
-
-            // db is not yet created
-            ? TOURBOOK_DB_VERSION
-
-            // use version before this table was introduced (in 43)
-            : 43 - 1;
 
       sql = "INSERT INTO " + TABLE_DB_VERSION_DATA + " VALUES (" + Integer.toString(initialVersionNumber) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -4337,14 +4302,14 @@ public class TourDatabase {
    }
 
    /**
-    * Is checking that the tour sql server is up and running and the tour database design is updated
-    * to the current {@link #TOURBOOK_DB_VERSION}
+    * Is checking that the tour sql server is up and running and the tour database design and data
+    * are updated to the current {@link #TOURBOOK_DB_VERSION}
     *
     * @return <code>true</code> when the tour sql server can be used.
     */
    private boolean sqlStartup_10_IsSqlServerUpAndRunning() {
 
-      if (_isDbInitialized) {
+      if (_isDbInitialized || _isDbInDataUpdate) {
          return true;
       }
 
@@ -4383,12 +4348,21 @@ public class TourDatabase {
 
                sqlStartup_40_CheckTable(splashManager);
 
-               if (sqlStartup_60_IsDesignVersionValid(splashManager) == false) {
+               if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
                   return;
                }
-               if (sqlStartup_62_IsDataVersionValid(splashManager) == false) {
-                  return;
+
+               sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
+
+               sqlStartup_60_SetupEntityManager(splashManager);
+
+               _isDbInDataUpdate = true;
+               {
+                  if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
+                     return;
+                  }
                }
+               _isDbInDataUpdate = false;
 
                if (_dbDesignVersion_Old != _dbDesignVersion_New) {
 
@@ -4399,10 +4373,6 @@ public class TourDatabase {
                         Messages.tour_database_version_info_title,
                         NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
                }
-
-               sqlStartup_80_UpgradedDB_After(splashManager);
-
-               sqlStartup_90_SetupEntityManager(splashManager);
 
                splashManager.setMessage(Messages.App_SplashMessage_Finalize);
 
@@ -4659,7 +4629,7 @@ public class TourDatabase {
             createTable_TourGeoParts(stmt);
 
             createTable_DbVersion_Design(stmt);
-            createTable_DbVersion_Data(stmt);
+            createTable_DbVersion_Data(stmt, TOURBOOK_DB_VERSION);
 
             createTable_TourTag(stmt);
             createTable_TourTag_Category(stmt);
@@ -4678,9 +4648,10 @@ public class TourDatabase {
    /**
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return
+    * @return <code>true</code> when design verion is updated to the last version, returns
+    *         <code>false</code> when an error occurred
     */
-   private boolean sqlStartup_60_IsDesignVersionValid(final SplashManager splashManager) {
+   private boolean sqlStartup_50_IsDesignVersionValid(final SplashManager splashManager) {
 
       if (_isDesignVersionChecked) {
          return true;
@@ -4707,9 +4678,9 @@ public class TourDatabase {
 
          if (_dbVersion_BeforeDesignUpdate < TOURBOOK_DB_VERSION) {
 
-            sqlStartup_70_UpgradedDB_Before(_dbVersion_BeforeDesignUpdate, splashManager);
+            sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(_dbVersion_BeforeDesignUpdate, splashManager);
 
-            if (updateDb__1_Design(conn, _dbVersion_BeforeDesignUpdate, splashManager) == false) {
+            if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
                return false;
             }
 
@@ -4726,6 +4697,8 @@ public class TourDatabase {
                   NLS.bind(Messages.tour_database_version_info_message,
                         _dbVersion_BeforeDesignUpdate,
                         TOURBOOK_DB_VERSION));
+
+            PlatformUI.getWorkbench().close();
          }
 
          _isDesignVersionChecked = true;
@@ -4739,12 +4712,28 @@ public class TourDatabase {
       return _isDesignVersionChecked;
    }
 
+   private synchronized void sqlStartup_60_SetupEntityManager(final SplashManager splashManager) {
+
+      final Map<String, Object> configOverrides = new HashMap<>();
+
+      configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
+      configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
+
+      splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
+
+      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+   }
+
    /**
+    * /**
+    * Is checking the tour database data is updated to the current {@link #TOURBOOK_DB_VERSION}
+    *
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return
+    * @return <code>true</code> when data verion is updated to the last version, returns
+    *         <code>false</code> when an error occurred
     */
-   private boolean sqlStartup_62_IsDataVersionValid(final SplashManager splashManager) {
+   private boolean sqlStartup_70_IsDataVersionValid(final SplashManager splashManager) {
 
       if (_isDataVersionChecked) {
          return true;
@@ -4758,18 +4747,17 @@ public class TourDatabase {
 
          // check if the database contains the correct version
 
-         _dbVersion_BeforeDataUpdate = getDbVersion(conn, TABLE_DB_VERSION_DATA);
-         _dbVersion_AfterDataUpdate = _dbVersion_BeforeDataUpdate;
+         final int dbVersion_BeforeDataUpdate = getDbVersion(conn, TABLE_DB_VERSION_DATA);
 
-         logDbUpdate("Current database data version: " + _dbVersion_BeforeDataUpdate); //$NON-NLS-1$
+         logDbUpdate("Current database data version: " + dbVersion_BeforeDataUpdate); //$NON-NLS-1$
 
-         if (_dbVersion_BeforeDataUpdate < TOURBOOK_DB_VERSION) {
+         if (dbVersion_BeforeDataUpdate < TOURBOOK_DB_VERSION) {
 
-            if (updateDb__2_Data(conn, _dbVersion_BeforeDataUpdate, splashManager) == false) {
+            if (updateDb__2_Data(conn, dbVersion_BeforeDataUpdate, splashManager) == false) {
                return false;
             }
 
-         } else if (_dbVersion_BeforeDataUpdate > TOURBOOK_DB_VERSION) {
+         } else if (dbVersion_BeforeDataUpdate > TOURBOOK_DB_VERSION) {
 
             /*
              * Current db version is HIGHER than the db version which the code is created for,
@@ -4780,8 +4768,10 @@ public class TourDatabase {
                   splashManager.getShell(),
                   Messages.tour_database_version_info_title,
                   NLS.bind(Messages.tour_database_version_info_message,
-                        _dbVersion_BeforeDataUpdate,
+                        dbVersion_BeforeDataUpdate,
                         TOURBOOK_DB_VERSION));
+
+            PlatformUI.getWorkbench().close();
          }
 
          _isDataVersionChecked = true;
@@ -4803,7 +4793,7 @@ public class TourDatabase {
     * @param splashManager
     * @return
     */
-   private void sqlStartup_70_UpgradedDB_Before(final int dbVersionBeforeUpdate, final SplashManager splashManager) {
+   private void sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(final int dbVersionBeforeUpdate, final SplashManager splashManager) {
 
       if (_isChecked_UpgradeDB_Before) {
          return;
@@ -4825,28 +4815,25 @@ public class TourDatabase {
          return;
       }
 
-      logDbUpdate(String.format("DB upgrade BEFORE is needed %d", _dbVersion_BeforeDesignUpdate)); //$NON-NLS-1$
+      logDbUpdate(String.format("DB upgrade BEFORE db design update is needed %d", _dbVersion_BeforeDesignUpdate)); //$NON-NLS-1$
 
       shutdownDatabaseServer();
 
       /*
        * Upgrade database with ";upgrade=true" in the derby url
        */
-      Connection upgradeConn = null;
       try {
 
-         upgradeConn = upgradeDerbyDatabase(splashManager);
+         sqlStartup_UpgradeDerbyDatabase(splashManager);
 
          _isChecked_UpgradeDB_Before = true;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(upgradeConn);
       }
    }
 
-   private void sqlStartup_80_UpgradedDB_After(final SplashManager splashManager) {
+   private void sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(final SplashManager splashManager) {
 
       if (_isChecked_UpgradeDB_After) {
          return;
@@ -4870,7 +4857,7 @@ public class TourDatabase {
 
       // upgrade is needed
 
-      logDbUpdate(String.format("DB upgrade AFTER is needed %d -> %d", //$NON-NLS-1$
+      logDbUpdate(String.format("DB upgrade AFTER db design update is needed %d -> %d", //$NON-NLS-1$
             _dbVersion_BeforeDesignUpdate,
             _dbVersion_AfterDesignUpdate));
 
@@ -4879,36 +4866,42 @@ public class TourDatabase {
       /*
        * Upgrade database
        */
-      Connection conn = null;
       try {
 
-         conn = upgradeDerbyDatabase(splashManager);
+         sqlStartup_UpgradeDerbyDatabase(splashManager);
 
          _isChecked_UpgradeDB_After = true;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
-   private synchronized void sqlStartup_90_SetupEntityManager(final SplashManager splashManager) {
+   /**
+    * Upgrade Derby Database, this is necessary when a new Derby version has a new feature, e.g.
+    * BOOLEAN datatype or Lucene fulltext index is used
+    *
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
+   private void sqlStartup_UpgradeDerbyDatabase(final SplashManager splashManager) throws SQLException {
 
-      final Map<String, Object> configOverrides = new HashMap<>();
+      final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
-      configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
-      configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
+      logDerbyCommand(dbUrl_Upgrade);
 
-      splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
+      splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
 
-      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+      try (Connection conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA)) {
+
+      }
    }
 
    /**
     * This method must be updated when the database version is updated
     */
-   private boolean updateDb__1_Design(final Connection conn, int currentDbVersion, final SplashManager splashManager) {
+   private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
 
       /*
        * Confirm update
@@ -4930,7 +4923,7 @@ public class TourDatabase {
             buttons,
             1).open()) != Window.OK) {
 
-         // no update -> close application
+         // the user want no update -> close application
          PlatformUI.getWorkbench().close();
 
          return false;
@@ -4962,7 +4955,7 @@ public class TourDatabase {
       _dbDesignVersion_New = currentDbVersion;
       _dbDesignVersion_Old = currentDbVersion;
 
-      try {
+      try (Connection conn = getConnection_Simple()) {
 
          // 1 -> 2
          if (currentDbVersion == 1) {
@@ -4980,14 +4973,12 @@ public class TourDatabase {
          if (currentDbVersion == 3) {
             updateDb_003_To_004(conn, splashManager);
             currentDbVersion = _dbDesignVersion_New = 4;
-            _isDataUpdate_4 = true;
          }
 
          // 4 -> 5      8.11
          if (currentDbVersion == 4) {
             updateDb_004_To_005(conn, splashManager);
             currentDbVersion = _dbDesignVersion_New = 5;
-            _isDataUpdate_5 = true;
          }
 
          // 5 -> 6      8.12
@@ -5012,7 +5003,6 @@ public class TourDatabase {
          if (currentDbVersion == 8) {
             updateDb_008_To_009(conn, splashManager);
             currentDbVersion = _dbDesignVersion_New = 9;
-            _isDataUpdate_9 = true;
          }
 
          // 9 -> 10     10.5.0 not released
@@ -5024,7 +5014,6 @@ public class TourDatabase {
          // 10 -> 11    10.7.0 - 11-07-2010
          if (currentDbVersion == 10) {
             currentDbVersion = _dbDesignVersion_New = updateDb_010_To_011(conn, splashManager);
-            _isDataUpdate_11 = true;
          }
 
          // 11 -> 12    10.9.1
@@ -5035,7 +5024,6 @@ public class TourDatabase {
          // 12 -> 13    10.11
          if (currentDbVersion == 12) {
             currentDbVersion = _dbDesignVersion_New = updateDb_012_To_013(conn, splashManager);
-            _isDataUpdate_13 = true;
          }
 
          // 13 -> 14    11.3
@@ -5071,7 +5059,6 @@ public class TourDatabase {
          // 19 -> 20    12.1
          if (currentDbVersion == 19) {
             currentDbVersion = _dbDesignVersion_New = updateDb_019_To_020(conn, splashManager);
-            _isDataUpdate_20 = true;
          }
 
          // 20 -> 21    12.1.1
@@ -5082,13 +5069,11 @@ public class TourDatabase {
          // 21 -> 22    12.12.0
          if (currentDbVersion == 21) {
             currentDbVersion = _dbDesignVersion_New = updateDb_021_To_022(conn, splashManager);
-            _isDataUpdate_22 = true;
          }
 
          // 22 -> 23    13.2.0
          if (currentDbVersion == 22) {
             currentDbVersion = _dbDesignVersion_New = updateDb_022_To_023(conn, splashManager);
-            _isDataUpdate_23 = true;
          }
 
          // 23 -> 24    14.7
@@ -5099,7 +5084,6 @@ public class TourDatabase {
          // 24 -> 25    14.10
          if (currentDbVersion == 24) {
             currentDbVersion = _dbDesignVersion_New = updateDb_024_To_025(conn, splashManager);
-            _isDataUpdate_25 = true;
          }
 
          // 25 -> 26    14.14 / 15.3
@@ -5115,13 +5099,11 @@ public class TourDatabase {
          // 27 -> 28    15.6
          if (currentDbVersion == 27) {
             currentDbVersion = _dbDesignVersion_New = updateDb_027_To_028(conn, splashManager);
-            _isDataUpdate_28 = true;
          }
 
          // 28 -> 29    15.12
          if (currentDbVersion == 28) {
             currentDbVersion = _dbDesignVersion_New = updateDb_028_To_029(conn, splashManager);
-            _isDataUpdate_29 = true;
          }
 
          // 29 -> 30    16.1
@@ -5137,7 +5119,6 @@ public class TourDatabase {
          // 31 -> 32    16.10
          if (currentDbVersion == 31) {
             currentDbVersion = _dbDesignVersion_New = updateDb_031_To_032(conn, splashManager);
-            _isDataUpdate_32 = true;
          }
 
          // 32 -> 33    17.12
@@ -5148,7 +5129,6 @@ public class TourDatabase {
          // 33 -> 34    18.5
          if (currentDbVersion == 33) {
             currentDbVersion = _dbDesignVersion_New = updateDb_033_To_034(conn, splashManager);
-            _isDataUpdate_34 = true;
          }
 
          // 34 -> 35    18.7
@@ -5164,7 +5144,6 @@ public class TourDatabase {
          // 36 -> 37    19.2
          if (currentDbVersion == 36) {
             currentDbVersion = _dbDesignVersion_New = updateDb_036_To_037(conn, splashManager);
-            _isDataUpdate_37 = true;
          }
 
          // 37 -> 38    19.6
@@ -5180,7 +5159,6 @@ public class TourDatabase {
          // 39 -> 40    19.10
          if (currentDbVersion == 39) {
             currentDbVersion = _dbDesignVersion_New = updateDb_039_To_040(conn, splashManager);
-            _isDataUpdate_40 = true;
          }
 
          // 40 -> 41    20.8
@@ -5191,13 +5169,11 @@ public class TourDatabase {
          // 41 -> 42    20.11.1 -> db fields are renamed
          if (currentDbVersion == 41) {
             currentDbVersion = _dbDesignVersion_New = updateDb_041_To_042(conn, splashManager);
-            _isDataUpdate_42 = true;
          }
 
          // 42 -> 43    21.3
          if (currentDbVersion == 42) {
             currentDbVersion = _dbDesignVersion_New = updateDb_042_To_043(conn, splashManager);
-            _isDataUpdate_43 = true;
          }
 
          // update db design version number
@@ -5206,6 +5182,7 @@ public class TourDatabase {
       } catch (final SQLException e) {
 
          UI.showSQLException(e);
+
          _isSQLDesignUpdateError = true;
 
          return false;
@@ -5222,38 +5199,34 @@ public class TourDatabase {
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        * <p>
-       * Do data update AFTER the design version number is updated because the data update uses
+       * Run data update AFTER the design version number is updated because the data update uses
        * connections and entitymanager which is checking the version number.
        * <p>
        * Also the data structure must be updated otherwise the entity manager fails because the
-       * data structure in the program code MUST be the same as in the database.
+       * data structure in the database MUST be the same as in the program code.
        * <p>
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        */
 
       try {
 
-// SET_FORMATTING_OFF
-
-         if (_isDataUpdate_4)  {   updateDb_003_To_004_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_5)  {   updateDb_004_To_005_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_9)  {   updateDb_008_To_009_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_11) {   updateDb_010_To_011_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_13) {   updateDb_012_To_013_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_20) {   updateDb_019_To_020_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_22) {   updateDb_021_To_022_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_23) {   updateDb_022_To_023_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_25) {   updateDb_024_To_025_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_28) {   updateDb_027_To_028_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_29) {   updateDb_028_To_029_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_32) {   updateDb_031_To_032_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_34) {   updateDb_033_To_034_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_37) {   updateDb_036_To_037_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_40) {   updateDb_039_To_040_DataUpdate(conn, splashManager);  }
-         if (_isDataUpdate_42) {   updateDb_041_To_042_DataUpdate(conn);                 }
-         if (_isDataUpdate_43) {   updateDb_042_to_043_DataUpdate(conn, splashManager);  }
-
-// SET_FORMATTING_ON
+         updateDb_003_To_004_DataUpdate(conn, splashManager);
+         updateDb_004_To_005_DataUpdate(conn, splashManager);
+         updateDb_008_To_009_DataUpdate(conn, splashManager);
+         updateDb_010_To_011_DataUpdate(conn, splashManager);
+         updateDb_012_To_013_DataUpdate(conn, splashManager);
+         updateDb_019_To_020_DataUpdate(conn, splashManager);
+         updateDb_021_To_022_DataUpdate(conn, splashManager);
+         updateDb_022_To_023_DataUpdate(conn, splashManager);
+         updateDb_024_To_025_DataUpdate(conn, splashManager);
+         updateDb_027_To_028_DataUpdate(conn, splashManager);
+         updateDb_028_To_029_DataUpdate(conn, splashManager);
+         updateDb_031_To_032_DataUpdate(conn, splashManager);
+         updateDb_033_To_034_DataUpdate(conn, splashManager);
+         updateDb_036_To_037_DataUpdate(conn, splashManager);
+         updateDb_039_To_040_DataUpdate(conn, splashManager);
+         updateDb_041_To_042_DataUpdate(conn);
+         updateDb_042_to_043_DataUpdate(conn, splashManager);
 
       } catch (final SQLException e) {
 
@@ -7948,24 +7921,23 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
+      try (Statement stmt = conn.createStatement()) {
+
 // SET_FORMATTING_OFF
 
-         // Add new columns
-         SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Recorded", DEFAULT_0);                   //$NON-NLS-1$
-         SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Paused",   DEFAULT_0);                   //$NON-NLS-1$
-         SQL.AddCol_Float(stmt,  TABLE_TOUR_DATA,     "bodyFat",                 DEFAULT_0);                   //$NON-NLS-1$
+            // Add new columns
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Recorded", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Paused",   DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddCol_Float(stmt,  TABLE_TOUR_DATA,     "bodyFat",                 DEFAULT_0);                   //$NON-NLS-1$
 
-         SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
-         SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_DRIVING_TIME__FROM,      RENAMED__TOUR_DRIVING_TIME__INTO);
-         SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__BIKER_WEIGHT__FROM,           RENAMED__BIKER_WEIGHT__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_DRIVING_TIME__FROM,      RENAMED__TOUR_DRIVING_TIME__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__BIKER_WEIGHT__FROM,           RENAMED__BIKER_WEIGHT__INTO);
 
-         SQL.RenameCol(stmt,     TABLE_TOUR_COMPARED, RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_COMPARED, RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
 
 // SET_FORMATTING_ON
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 
@@ -8010,11 +7982,10 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         createTable_DbVersion_Data(stmt);
+      try (Statement stmt = conn.createStatement()) {
+
+         createTable_DbVersion_Data(stmt, _dbVersionOnStartup);
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 
@@ -8044,9 +8015,10 @@ public class TourDatabase {
 
       int tourIndex = 1;
       int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
 
       final List<Long> allTourIds = getAllTourIds();
-      final int numTourIds = allTourIds.size();
+      final int numAllTourIds = allTourIds.size();
 
       // loop: all tours
       for (final Long tourId : allTourIds) {
@@ -8060,33 +8032,33 @@ public class TourDatabase {
             if (timeDiff > DELAY_SPLASH_LOGGING
 
                   // update UI for the last tour otherwise it looks like that not all data are converted
-                  || tourIndex == numTourIds) {
+                  || tourIndex == numAllTourIds) {
 
                lastUpdateTime = currentTime;
 
                final long numTourDiff = tourIndex - lastUpdateNumItems;
                lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
 
-               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTourIds * 100.0);
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
                // Update 43: Converting lat/lon -> E6 - {0} of {1}  -  {2} %
                splashManager.setMessage(NLS.bind(
                      Messages.Tour_Database_PostUpdate_043_LatLonE6,
                      new Object[] {
                            numTourDiff,
-                           numTourIds,
+                           sumUpdatedTours,
+                           numAllTourIds,
                            percentValue }));
             }
 
             tourIndex++;
-
-            throw new SQLException("TEST;"); //$NON-NLS-1$
          }
 
          updateDb_042_To_043_DataUpdate_Concurrent(tourId);
       }
 
-      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, lastUpdateTime);
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
    /**
@@ -8201,32 +8173,7 @@ public class TourDatabase {
 
       conn.createStatement().executeUpdate(sql);
 
-      logDbUpdate("Database data version is set to: " + dbDataVersion); //$NON-NLS-1$
-
-      _dbVersion_AfterDataUpdate = dbDataVersion;
-
       logDbUpdate(createLog_DataUpdate(dbDataVersion, startTime));
-   }
-
-   /**
-    * Upgrade Derby Database, this is necessary when a new Derby version has a new feature, e.g.
-    * BOOLEAN datatype or Lucene fulltext index is used
-    *
-    * @param splashManager
-    * @return
-    * @throws SQLException
-    */
-   private Connection upgradeDerbyDatabase(final SplashManager splashManager) throws SQLException {
-
-      final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
-
-      logDerbyCommand(dbUrl_Upgrade);
-
-      splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
-
-      final Connection conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
-
-      return conn;
    }
 
 }
