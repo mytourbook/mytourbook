@@ -68,8 +68,6 @@ public abstract class TableColumnFactory {
    public static final String             BODY_WEIGHT_ID                                     = "BODY_WEIGHT";                                     //$NON-NLS-1$
 
    public static final TableColumnFactory CUSTOM_TRACKS_TIME_SLICES;
-   //CUSTOM_TRACKS_TIME_SLICES_ID also defined in package net.tourbook.common.util;->public class ColumnManager
-   //public static final String           CUSTOM_TRACKS_TIME_SLICES_ID                       = "CUSTOM_TRACKS_TIME_SLICES";                       //$NON-NLS-1$
 
    public static final TableColumnFactory DATA_DP_TOLERANCE;
    public static final String             DATA_DP_TOLERANCE_ID                               = "DATA_DP_TOLERANCE";                               //$NON-NLS-1$

@@ -28,6 +28,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.CustomTrackDefinition;
 import net.tourbook.data.GearData;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
@@ -49,51 +50,94 @@ import org.eclipse.swt.widgets.Display;
  */
 public class FitData {
 
-   private static final Integer    DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
+   private static final Integer                    DEFAULT_MESSAGE_INDEX   = Integer.valueOf(0);
 
-   private IPreferenceStore        _prefStore            = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore                        _prefStore              = Activator.getDefault().getPreferenceStore();
 
-   private boolean                 _isIgnoreLastMarker;
-   private boolean                 _isSetLastMarker;
-   private boolean                 _isFitImportTourType;
-   private String                  _fitImportTourTypeMode;
-   private int                     _lastMarkerTimeSlices;
+   private boolean                                 _isIgnoreLastMarker;
+   private boolean                                 _isSetLastMarker;
+   private boolean                                 _isFitImportTourType;
+   private String                                  _fitImportTourTypeMode;
+   private int                                     _lastMarkerTimeSlices;
 
-   public boolean                  isComputeAveragePower;
+   public boolean                                  isComputeAveragePower;
 
-   private FitDataReader           _fitDataReader;
-   private String                  _importFilePathName;
+   private FitDataReader                           _fitDataReader;
+   private String                                  _importFilePathName;
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private HashMap<Long, TourData>                 _alreadyImportedTours;
+   private HashMap<Long, TourData>                 _newlyImportedTours;
 
-   private TourData                _tourData             = new TourData();
+   private TourData                                _tourData               = new TourData();
 
-   private String                  _deviceId;
-   private String                  _manufacturer;
-   private String                  _garminProduct;
-   private String                  _softwareVersion;
+   private String                                  _deviceId;
+   private String                                  _manufacturer;
+   private String                                  _garminProduct;
+   private String                                  _softwareVersion;
 
-   private String                  _sessionIndex;
-   private ZonedDateTime           _sessionStartTime;
+   private String                                  _sessionIndex;
+   private ZonedDateTime                           _sessionStartTime;
 
-   private String                  _sportName            = UI.EMPTY_STRING;
-   private String                  _profileName          = UI.EMPTY_STRING;
+   private String                                  _sportName              = UI.EMPTY_STRING;
+   private String                                  _profileName            = UI.EMPTY_STRING;
 
-   private final List<TimeData>    _allTimeData          = new ArrayList<>();
+   private final List<TimeData>                    _allTimeData            = new ArrayList<>();
 
-   private final List<GearData>    _allGearData          = new ArrayList<>();
-   private final List<SwimData>    _allSwimData          = new ArrayList<>();
-   private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
-   private List<Long>              _pausedTime_Start     = new ArrayList<>();
-   private final List<Long>        _pausedTime_End       = new ArrayList<>();
+   private final List<GearData>                    _allGearData            = new ArrayList<>();
+   private final List<SwimData>                    _allSwimData            = new ArrayList<>();
+   private final List<TourMarker>                  _allTourMarker          = new ArrayList<>();
+   private List<Long>                              _pausedTime_Start       = new ArrayList<>();
+   private final List<Long>                        _pausedTime_End         = new ArrayList<>();
 
-   private TimeData                _current_TimeData;
-   private TimeData                _lastAdded_TimeData;
-   private TimeData                _previous_TimeData;
+   private final List<CustomTracksFieldDefinition> _customTracksDefinition = new ArrayList<>();
 
-   private TourMarker              _current_TourMarker;
-   private long                    _timeDiffMS;
+   private TimeData                                _current_TimeData;
+
+   private TimeData                                _lastAdded_TimeData;
+   private TimeData                                _previous_TimeData;
+   private TourMarker                              _current_TourMarker;
+
+   private long                                    _timeDiffMS;
+
+   public class CustomTracksFieldDefinition {
+
+      private String _Name;
+
+      private String _Id;
+
+      private String _Unit;
+
+      public CustomTracksFieldDefinition(final String _Name, final String _Id, final String _Unit) {
+         super();
+         this._Name = _Name;
+         this._Id = _Id;
+         this._Unit = _Unit;
+      }
+
+      public String getId() {
+         return _Id;
+      }
+
+      public String getName() {
+         return _Name;
+      }
+
+      public String getUnit() {
+         return _Unit;
+      }
+
+      public void setId(final String id) {
+         _Id = id;
+      }
+
+      public void setName(final String name) {
+         _Name = name;
+      }
+
+      public void setUnit(final String unit) {
+         _Unit = unit;
+      }
+   }
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -176,6 +220,15 @@ public class FitData {
       return newSavedTourType != null;
    }
 
+   public void customTracksDefinitions_add(final String Name, final String Id, final String Unit) {
+      final CustomTracksFieldDefinition newCustomTracksDefinition = new CustomTracksFieldDefinition(Name, Id, Unit);
+      _customTracksDefinition.add(newCustomTracksDefinition);
+   }
+
+   public boolean customTracksDefinitions_containsId(final List<CustomTracksFieldDefinition> customTracksDefinition, final String id) {
+      return customTracksDefinition.stream().filter(o -> o.getId().equals(id)).findFirst().isPresent();
+   }
+
    public void finalizeTour() {
 
       // reset speed at first position
@@ -241,6 +294,20 @@ public class FitData {
 
       _tourData.setTourStartTime(zonedStartTime);
 
+      //setting up customTracksDefinition with call to "tourData.customTracksDefinition.put(...)"
+      //must be set before calling "tourData.createTimeSeries(....)"
+      for (final CustomTracksFieldDefinition developerFieldDefinition : _customTracksDefinition) {
+         final String idNew = developerFieldDefinition.getId();
+         final String nameNew = developerFieldDefinition.getName();
+         final String unitNew = developerFieldDefinition.getUnit();
+
+         final CustomTrackDefinition customTrackDefinition = new CustomTrackDefinition();
+         customTrackDefinition.setId(idNew);
+         customTrackDefinition.setName(nameNew);
+         customTrackDefinition.setUnit(unitNew);
+         _tourData.customTracksDefinition.put(idNew, customTrackDefinition);
+      }
+
       _tourData.createTimeSeries(_allTimeData, false);
 
       _tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
@@ -278,6 +345,7 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type();
+
       }
    }
 
@@ -510,6 +578,10 @@ public class FitData {
             break;
          }
       }
+   }
+
+   public List<CustomTracksFieldDefinition> get_developerFieldDefinition() {
+      return _customTracksDefinition;
    }
 
    public List<TimeData> getAllTimeData() {

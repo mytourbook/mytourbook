@@ -661,6 +661,21 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else {
 
          // create 'normal' tour
+         //setting up customTracksDefinition with call to "tourData.customTracksDefinition.put(...)"
+         //must be set before calling "tourData.createTimeSeries(....)"
+         for (final CustomST3TrackDefinition customST3TrackDefinition : _currentActivity._customTrackDefinitions) {
+            final String idS = customST3TrackDefinition.getId();
+            final String nameS = customST3TrackDefinition.getName();
+            final String unitS = customST3TrackDefinition.getUnit();
+            if (nameS.compareTo(NAME_STRIDELENGTH) == 0) {} else if (nameS.compareTo(NAME_GROUNDCONTACT_TIME_BALANCE) == 0) {} else if (nameS
+                  .compareTo(NAME_VERTICALRATIO) == 0) {} else {
+               final CustomTrackDefinition customTrackDefinition = new CustomTrackDefinition();
+               customTrackDefinition.setId(idS);
+               customTrackDefinition.setName(nameS);
+               customTrackDefinition.setUnit(unitS);
+               tourData.customTracksDefinition.put(idS, customTrackDefinition);
+            }
+         }
 
          tourData.createTimeSeries(_currentActivity._timeSlices, false);
 
@@ -764,20 +779,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          finalizeTour_10_SetTourType(tourData);
          finalizeTour_20_SetTags(tourData);
          finalizeTour_30_CreateMarkers(tourData);
-      }
-
-      for (final CustomST3TrackDefinition customST3TrackDefinition : _currentActivity._customTrackDefinitions) {
-         final String idS = customST3TrackDefinition.getId();
-         final String nameS = customST3TrackDefinition.getName();
-         final String unitS = customST3TrackDefinition.getUnit();
-         if (nameS.compareTo(NAME_STRIDELENGTH) == 0) {} else if (nameS.compareTo(NAME_GROUNDCONTACT_TIME_BALANCE) == 0) {} else if (nameS
-               .compareTo(NAME_VERTICALRATIO) == 0) {} else {
-            final CustomTrackDefinition customTrackDefinition = new CustomTrackDefinition();
-            customTrackDefinition.setId(idS);
-            customTrackDefinition.setName(nameS);
-            customTrackDefinition.setUnit(unitS);
-            tourData.customTracksDefinition.put(idS, customTrackDefinition);
-         }
       }
 
       // cleanup

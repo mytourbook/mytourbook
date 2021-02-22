@@ -1466,13 +1466,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             GRAPH_CONTRIBUTION_ID_SWIM_SWOLF);
 
       /*
-       * CUSTOM TRACKS
+       * Custom Tracks
        */
       createActions_10_GraphActionsCustomTracks();
    }
 
    /**
-    * Create all graph actions for CUSTOM TRACKS
+    * Create all graph actions for Custom Tracks
     */
    private void createActions_10_GraphActionsCustomTracks() {
       if (_tourData != null && _tourData.getCustomTracks() != null && !_tourData.getCustomTracks().isEmpty()) {
@@ -2891,7 +2891,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourChart.STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF_DEFAULT);
 
       /*
-       * CUSTOM TRACKS
+       * Custom Tracks
        */
       if (_tourData != null && _tourData.getCustomTracks() != null && _tourData.getCustomTracks().size() > 0) {
          int numDisplayCustomTracks = 0;
@@ -4996,7 +4996,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             0.1,
             isMinMaxEnabled);
 
-      //CUSTOM TRACKS TODO set Min Max for Custom Tracks
+      //Custom Tracks TODO set Min Max for Custom Tracks
 
       return isChartModified;
    }
@@ -5870,7 +5870,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       // create actions
       /*
-       * create CUSTOM TRACKS actions specific for this Tour.
+       * create Custom Tracks actions specific for this Tour.
        */
       if (_allTourChartActions != null && _currentTourId_for_CustomTracks != null && _currentTourId_for_CustomTracks != newTourData.getTourId()) {
 

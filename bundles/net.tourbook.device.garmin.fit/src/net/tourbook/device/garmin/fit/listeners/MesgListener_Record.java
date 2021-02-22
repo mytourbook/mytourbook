@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,18 @@ import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.common.UI;
+import net.tourbook.data.CustomTrackValue;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
 import net.tourbook.device.garmin.fit.FitData;
+import net.tourbook.device.garmin.fit.FitData.CustomTracksFieldDefinition;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 
@@ -336,6 +341,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          }
       }
 
+      final List<CustomTrackValue> nonStandardDeveloperFields = new ArrayList<>();
+      final List<CustomTracksFieldDefinition> developerFieldDefinitions = fitData.get_developerFieldDefinition();
+
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
          final String fieldName = devField.getName();
@@ -464,9 +472,32 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             break;
 
          default:
+            /*
+             * non-standard developper fields
+             * will be treated as custom tracks data series
+             */
+            final String customFieldName = fieldName;// + UI.SYMBOL_UNDERSCORE + devField.getAppUUID().toString();
+            final String customFieldId = fieldName + UI.SYMBOL_SEMICOLON + devField.getAppUUID().toString();
+            String customFieldUnit = UI.EMPTY_STRING;
+
+            if (devField.getUnits() != null) {
+               customFieldUnit = devField.getUnits();
+            }
+
+            final CustomTrackValue customTrackValue = new CustomTrackValue();
+            customTrackValue.id = customFieldId;
+            customTrackValue.value = devField.getFloatValue();
+            nonStandardDeveloperFields.add(customTrackValue);
+            if (!fitData.customTracksDefinitions_containsId(developerFieldDefinitions, customFieldId)) {
+               fitData.customTracksDefinitions_add(customFieldName, customFieldId, customFieldUnit);
+            }
             break;
          }
 
+      }
+
+      if (nonStandardDeveloperFields.size() > 0) {
+         timeData.customTracks = nonStandardDeveloperFields.toArray(new CustomTrackValue[nonStandardDeveloperFields.size()]);
       }
 
    }

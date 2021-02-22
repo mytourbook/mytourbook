@@ -218,15 +218,15 @@ public class SerieData implements Serializable {
 
       String customTracksDataText = NL;
       if (customTracksDefinition != null && !customTracksDefinition.isEmpty()) {
-         customTracksDataText += "  --CUSTOM TRACKS Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         customTracksDataText += "  --Custom Tracks Definition, number-of-entries=" + Integer.toString(customTracksDefinition.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String customTrackId : customTracksDefinition.keySet()) {
             final CustomTrackDefinition item = customTracksDefinition.get(customTrackId);
             customTracksDataText += "  Id=\"" + customTrackId + "\" ,Name=\"" + item.getName() + "\"" + " ,Unit=\"" + item.getUnit() + "\"" + NL; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
          }
-         customTracksDataText += "  --CUSTOM TRACKS Definition End--  " + NL; //$NON-NLS-1$
+         customTracksDataText += "  --Custom Tracks Definition End--  " + NL; //$NON-NLS-1$
       }
       if (customTracks != null && !customTracks.isEmpty()) {
-         customTracksDataText += "  --CUSTOM TRACKS, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
+         customTracksDataText += "  --Custom Tracks, number-of-entries=" + Integer.toString(customTracks.size()) + "--  " + NL; //$NON-NLS-1$ //$NON-NLS-2$
          for (final String customTrackId : customTracks.keySet()) {
             customTracksDataText += "  Id:\"" + customTrackId + "\"    " + (customTracks.get(customTrackId) != null ? Arrays.toString(Arrays.copyOf( //$NON-NLS-1$//$NON-NLS-2$
                   customTracks.get(customTrackId),
@@ -239,7 +239,7 @@ public class SerieData implements Serializable {
                customTracksDataText += "]" + NL; //$NON-NLS-1$
             }
          }
-         customTracksDataText += "  --END CUSTOM TRACKS--  " + NL; //$NON-NLS-1$
+         customTracksDataText += "  --END Custom Tracks--  " + NL; //$NON-NLS-1$
       }
 
       return customTracksDataText;
@@ -331,7 +331,7 @@ public class SerieData implements Serializable {
 
             + "   visiblePoints_Surfing      " + dataSerieValues(visiblePoints_Surfing)         + NL //$NON-NLS-1$
 
-            + "   Custom_Tracks              " + dataSerieValues(customTracks)                  + NL //$NON-NLS-1$
+            + "   customTracks               " + dataSerieValues(customTracks)                  + NL //$NON-NLS-1$
 
             ;
    }

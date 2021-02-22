@@ -4614,9 +4614,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   /*
-    * CUSTOM TRACKS editor section
-    */
    private void createUI_Section_160_CustomTracks(final Composite parent) {
 
       _sectionCustomTracks = createSection(parent, _tk, Messages.tour_editor_section_custom_tracks, false, true);
@@ -5333,7 +5330,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: CUSTOM TRACKS
+    * column: custom tracks
     *
     * @param reloadT
     */
@@ -6521,7 +6518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTourType.setEnabled(canEdit);
 
       /*
-       * for CUSTOM TRACKS enable only the edition of name and unit, id and number are not to be
+       * for Custom Tracks enable only the edition of name and unit, id and number are not to be
        * editable
        */
       if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
@@ -6850,7 +6847,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tourData.computeComputedValues();
       }
 
-      //CUSTOM TRACKS, remove and then load the new custom track for the new tour
+      //Custom Tracks, remove and then load the new custom track for the new tour
       //if tour changes.
       //custom tracks can be loaded only after the time series are loaded here above
       //flag _tourId_for_CustTracks is used to prevent reload of the same custom tracks here
@@ -7947,7 +7944,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _sectionPersonal.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL, true));
       _sectionTitle.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE, true));
       _sectionWeather.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER, true));
-      //CUSTOM TRACKS state are only saved in memory not on disk for now
+      //Custom Tracks state are only saved in memory not on disk for now
       _sectionCustomTracks.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CUSTOM_TRACKS, true));
    }
 
@@ -8631,7 +8628,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
          /*
-          * CUSTOM TRACKS
+          * Custom Tracks
           */
          if (_customTrackTextControls != null && _customTrackTextControls.size() > 0) {
             final HashMap<String, CustomTrackDefinition> customTracksDefinitionMap = new HashMap<>();
@@ -9181,10 +9178,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
       _comboCadence.setSelection(cadence);
 
-      //CUSTOM TRACKS create edit controls
+      //Custom Tracks create edit controls
       final Composite container = (Composite) _sectionCustomTracks.getClient();
       //GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-      //clear previous CUSTOM TRACKS control of Tour
+      //clear previous Custom Tracks control of Tour
       if (_customTrackTextControls == null) {
          _customTrackTextControls = new HashMap<>();
       }
@@ -9199,7 +9196,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       _customTrackTextControls.clear();
 
-      //add new CUSTOM TRACKS control for this Tour
+      //add new Custom Tracks control for this Tour
       final HashMap<String, CustomTrackDefinition> customTracksDefinitionMap = _tourData.getCustomTracksDefinition();
       final HashMap<String, float[]> customTracksSeries = _tourData.getCustomTracks();
       if (customTracksDefinitionMap != null && customTracksDefinitionMap.size() > 0) {
