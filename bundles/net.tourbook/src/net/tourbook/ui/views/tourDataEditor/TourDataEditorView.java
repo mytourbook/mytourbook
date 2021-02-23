@@ -5341,7 +5341,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _timeSlice_ColumnManager.clearCustomTracksColumns();
 
-            //TODO for swim
+            // TODO for swim
             //_swimSlice_ColumnManager.clearCustColumns();
 
          }

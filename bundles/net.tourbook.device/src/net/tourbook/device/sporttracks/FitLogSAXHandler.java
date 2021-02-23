@@ -270,7 +270,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private float                         _avgPowerRightTorqueEff   = Float.MIN_VALUE;
       private float                         _powerIntensityFactor     = Float.MIN_VALUE;
       private float                         _powerNormalized          = Float.MIN_VALUE;
-      private float                         _powerTSS                 = Float.MIN_VALUE;      //TrainingStress Score
+      private float                         _powerTSS                 = Float.MIN_VALUE;      // TrainingStress Score
    }
 
    private class CustomST3TrackDefinition {
