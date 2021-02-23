@@ -56,15 +56,15 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    //
    private static final String PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_AccessToken_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Authorize_Button;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_CloudAccount_Group;
-   private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_ExpiresAt_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_RefreshToken_Label;
-   private static final String PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_WebPage_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$

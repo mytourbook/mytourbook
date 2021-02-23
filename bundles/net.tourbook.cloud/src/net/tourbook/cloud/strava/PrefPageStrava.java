@@ -51,13 +51,13 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    //
    private static final String PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_AccessToken_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_CloudAccount_Group;
-   private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_ExpiresAt_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_RefreshToken_Label;
-   private static final String PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_WebPage_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
@@ -184,12 +184,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Strava_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_Strava_WebPage + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.PrefPage_AccountInformation_Strava_WebPage_Link);
+                  WEB.openUrl(Messages.PrefPage_AccountInformation_Link_Strava_WebPage);
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);

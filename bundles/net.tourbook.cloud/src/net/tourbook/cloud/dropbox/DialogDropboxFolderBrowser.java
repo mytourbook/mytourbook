@@ -100,7 +100,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      final String title = Messages.Dialog_DropboxFolderChooser_Area_Title;
+      final String title = Messages.Dialog_DropboxBrowser_Title;
 
       shell.setText(title);
    }
@@ -110,7 +110,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       super.create();
 
-      final String text = Messages.Dialog_DropboxFolderChooser_Area_Text;
+      final String text = Messages.Dialog_DropboxBrowser_Text;
 
       setTitle(text);
    }

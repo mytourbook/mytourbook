@@ -63,17 +63,17 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    private static final String     PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_AccessToken_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
    private static final String     PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Authorize_Button;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
    private static final String     PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_CloudAccount_Group;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String     PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_ExpiresAt_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String     PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_RefreshToken_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String     PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_WebPage_Label;
+         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    private static final String     APP_BTN_BROWSE                                = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE              = net.tourbook.Messages.dialog_export_dir_dialog_message;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT                 = net.tourbook.Messages.dialog_export_dir_dialog_text;
@@ -235,8 +235,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
       {
          {
             _labelDownloadFolder = new Label(container, SWT.NONE);
-            _labelDownloadFolder.setText(Messages.PrefPage_Combo_Workouts_Label_FolderPath);
-            _labelDownloadFolder.setToolTipText(Messages.PrefPage_Combo_Workouts_FolderPath_Combo_Tooltip);
+            _labelDownloadFolder.setText(Messages.PrefPage_SuuntoWorkouts_Combo_FolderPath);
+            _labelDownloadFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_Combo_FolderPath_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_labelDownloadFolder);
 
             /*
@@ -244,12 +244,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
              */
             _comboDownloadFolderPath = new Combo(container, SWT.SINGLE | SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboDownloadFolderPath);
-            _comboDownloadFolderPath.setToolTipText(Messages.PrefPage_Combo_Workouts_FolderPath_Combo_Tooltip);
+            _comboDownloadFolderPath.setToolTipText(Messages.PrefPage_SuuntoWorkouts_Combo_FolderPath_Tooltip);
             _comboDownloadFolderPath.setEnabled(false);
 
             _btnSelectFolder = new Button(container, SWT.PUSH);
             _btnSelectFolder.setText(APP_BTN_BROWSE);
-            _btnSelectFolder.setToolTipText(Messages.PrefPage_Combo_Workouts_FolderPath_Combo_Tooltip);
+            _btnSelectFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_Combo_FolderPath_Tooltip);
             _btnSelectFolder.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -264,8 +264,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
              * Checkbox: Use a "since" date filter
              */
             _chkUseDateFilter = new Button(container, SWT.CHECK);
-            _chkUseDateFilter.setText(Messages.PrefPage_Checkbox_Use_SinceDateFilter);
-            _chkUseDateFilter.setToolTipText(Messages.PrefPage_Checkbox_Use_SinceDateFilter_Tooltip);
+            _chkUseDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter);
+            _chkUseDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseDateFilter);
             _chkUseDateFilter.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -275,7 +275,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             });
 
             _dtFilterSince = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-            _dtFilterSince.setToolTipText(Messages.PrefPage_Checkbox_Use_SinceDateFilter_Tooltip);
+            _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_dtFilterSince);
          }
       }

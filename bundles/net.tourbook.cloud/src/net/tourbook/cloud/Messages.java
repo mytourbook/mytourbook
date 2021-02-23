@@ -25,14 +25,14 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
-   public static String        PrefPage_CloudConnectivity_AccessToken_Label;
-   public static String        PrefPage_CloudConnectivity_Authorize_Button;
-   public static String        PrefPage_CloudConnectivity_CloudAccount_Group;
-   public static String        PrefPage_CloudConnectivity_ExpiresAt_Label;
-   public static String        PrefPage_CloudConnectivity_RefreshToken_Label;
+   public static String        PrefPage_CloudConnectivity_Label_AccessToken;
+   public static String        PrefPage_CloudConnectivity_Button_Authorize;
+   public static String        PrefPage_CloudConnectivity_Group_CloudAccount;
+   public static String        PrefPage_CloudConnectivity_Label_ExpiresAt;
+   public static String        PrefPage_CloudConnectivity_Label_RefreshToken;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Message;
    public static String        PrefPage_CloudConnectivity_UnavailablePort_Title;
-   public static String        PrefPage_CloudConnectivity_WebPage_Label;
+   public static String        PrefPage_CloudConnectivity_Label_WebPage;
 
    //DROPBOX
    public static String Image__Dropbox_File;
@@ -43,22 +43,23 @@ public class Messages extends NLS {
    public static String Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;
    public static String Dialog_DropboxBrowser_Button_SelectFolder;
    public static String Dialog_DropboxBrowser_Text_AbsolutePath_Tooltip;
-   public static String Dialog_DropboxFolderChooser_Area_Text;
-   public static String Dialog_DropboxFolderChooser_Area_Title;
+   public static String Dialog_DropboxBrowser_Text;
+   public static String Dialog_DropboxBrowser_Title;
    public static String PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip;
    public static String PrefPage_CloudConnectivity_Dropbox_WebPage_Link;
 
    //SUUNTO
    public static String Image__SuuntoApp_Icon;
 
-   public static String Dialog_UploadRoutes_Message;
-   public static String Dialog_UploadRoutes_SubTask;
-   public static String Dialog_UploadRoutes_Task;
-   public static String Dialog_UploadRoutes_Title;
-   public static String Dialog_DownloadWorkouts_Message;
-   public static String Dialog_DownloadWorkouts_SubTask;
-   public static String Dialog_DownloadWorkouts_Task;
-   public static String Dialog_DownloadWorkouts_Title;
+   public static String Dialog_DownloadWorkoutsFromSuunto_Message;
+   public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
+   public static String Dialog_DownloadWorkoutsFromSuunto_Task;
+   public static String Dialog_DownloadWorkoutsFromSuunto_Title;
+   public static String Dialog_UploadToursToSuunto_Message;
+   public static String Dialog_UploadToursToSuunto_SubTask;
+   public static String Dialog_UploadToursToSuunto_Task;
+   public static String Dialog_UploadToursToSuunto_Title;
+   public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
    public static String Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
@@ -71,30 +72,29 @@ public class Messages extends NLS {
    public static String Log_UploadToursToSuunto_003_UploadStatus;
    public static String Log_UploadToursToSuunto_004_UploadError;
    public static String PrefPage_AccountInformation_SuuntoApp_WebPage_Link;
-   public static String PrefPage_Checkbox_Use_SinceDateFilter;
-   public static String PrefPage_Checkbox_Use_SinceDateFilter_Tooltip;
-   public static String PrefPage_Combo_Workouts_FolderPath_Combo_Tooltip;
-   public static String PrefPage_Combo_Workouts_Label_FolderPath;
+   public static String PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter;
+   public static String PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter_Tooltip;
+   public static String PrefPage_SuuntoWorkouts_Combo_FolderPath;
+   public static String PrefPage_SuuntoWorkouts_Combo_FolderPath_Tooltip;
    public static String Suunto_Workouts_Tooltip;
-   public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
 
    //STRAVA
    public static String Image__Connect_With_Strava;
 
-   public static String Dialog_UploadTours_Message;
-   public static String Dialog_UploadTours_SubTask;
-   public static String Dialog_UploadTours_Task;
-   public static String Dialog_UploadTours_Title;
+   public static String Dialog_UploadToursToStrava_Message;
+   public static String Dialog_UploadToursToStrava_SubTask;
+   public static String Dialog_UploadToursToStrava_Task;
+   public static String Dialog_UploadToursToStrava_Title;
    public static String Log_UploadToursToStrava_001_Start;
    public static String Log_UploadToursToStrava_002_NoTourTitle;
    public static String Log_UploadToursToStrava_003_ActivityLink;
    public static String Log_UploadToursToStrava_003_UploadStatus;
    public static String Log_UploadToursToStrava_004_UploadError;
-   public static String PrefPage_Account_Information_Label_AthleteName;
-   public static String PrefPage_Account_Information_Label_AthleteWebPage;
-   public static String PrefPage_AccountInformation_Strava_WebPage_Link;
+   public static String PrefPage_AccountInformation_Label_AthleteName;
+   public static String PrefPage_AccountInformation_Label_AthleteWebPage;
+   public static String PrefPage_AccountInformation_Link_Strava_WebPage;
    public static String VendorName_Strava;
 
    static {
