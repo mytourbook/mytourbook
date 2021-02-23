@@ -109,7 +109,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
                   updateTokensInformationGroup();
                }
 
-               _server.stopCallBackServer();
+               if (_server != null) {
+                  _server.stopCallBackServer();
+               }
             });
          }
       };
@@ -245,6 +247,10 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     * to their Dropbox account.
     */
    private void onClickAuthorize() {
+
+      if (_server != null) {
+         _server.stopCallBackServer();
+      }
 
       final String codeVerifier = generateCodeVerifier();
       final String codeChallenge = generateCodeChallenge(codeVerifier);

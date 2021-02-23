@@ -127,7 +127,9 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
                   enableControls();
                }
 
-               _server.stopCallBackServer();
+               if (_server != null) {
+                  _server.stopCallBackServer();
+               }
             });
          }
       };
@@ -325,6 +327,10 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
     * to their Suunto account.
     */
    private void onClickAuthorize() {
+
+      if (_server != null) {
+         _server.stopCallBackServer();
+      }
 
       final SuuntoTokensRetrievalHandler tokensRetrievalHandler = new SuuntoTokensRetrievalHandler();
       _server = new LocalHostServer(CALLBACK_PORT, "Suunto", _prefChangeListener); //$NON-NLS-1$
