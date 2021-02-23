@@ -196,7 +196,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelAthleteName = new Label(group, SWT.NONE);
-            _labelAthleteName.setText(Messages.PrefPage_Account_Information_Label_AthleteName);
+            _labelAthleteName.setText(Messages.PrefPage_AccountInformation_Label_AthleteName);
             GridDataFactory.fillDefaults().applyTo(_labelAthleteName);
 
             _labelAthleteName_Value = new Label(group, SWT.NONE);
@@ -204,7 +204,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelAthleteWebPage = new Label(group, SWT.NONE);
-            _labelAthleteWebPage.setText(Messages.PrefPage_Account_Information_Label_AthleteWebPage);
+            _labelAthleteWebPage.setText(Messages.PrefPage_AccountInformation_Label_AthleteWebPage);
             GridDataFactory.fillDefaults().applyTo(_labelAthleteWebPage);
 
             _linkAthleteWebPage = new Link(group, SWT.NONE);

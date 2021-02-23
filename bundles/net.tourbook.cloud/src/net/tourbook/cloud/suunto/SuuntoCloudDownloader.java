@@ -132,7 +132,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(Messages.Dialog_DownloadWorkouts_Task, 2);
+            monitor.beginTask(Messages.Dialog_DownloadWorkoutsFromSuunto_Task, 2);
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
@@ -146,7 +146,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkouts_SubTask,
+            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
                         UI.SYMBOL_HOURGLASS,
                         UI.EMPTY_STRING,
@@ -176,7 +176,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.worked(1);
 
-            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkouts_SubTask,
+            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
                         UI.SYMBOL_CHECK,
                         _numberOfAvailableTours[0],
@@ -201,8 +201,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
-               Messages.Dialog_DownloadWorkouts_Title,
-               NLS.bind(Messages.Dialog_DownloadWorkouts_Message,
+               Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
+               NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
                      numberOfDownloadedTours[0],
                      _numberOfAvailableTours[0] - numberOfDownloadedTours[0]));
 

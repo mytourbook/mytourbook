@@ -55,10 +55,10 @@ public class Messages extends NLS {
    public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
    public static String Dialog_DownloadWorkoutsFromSuunto_Task;
    public static String Dialog_DownloadWorkoutsFromSuunto_Title;
-   public static String Dialog_UploadToursToSuunto_Message;
-   public static String Dialog_UploadToursToSuunto_SubTask;
-   public static String Dialog_UploadToursToSuunto_Task;
-   public static String Dialog_UploadToursToSuunto_Title;
+   public static String Dialog_UploadRoutesToSuunto_Message;
+   public static String Dialog_UploadRoutesToSuunto_SubTask;
+   public static String Dialog_UploadRoutesToSuunto_Task;
+   public static String Dialog_UploadRoutesToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
@@ -73,9 +73,9 @@ public class Messages extends NLS {
    public static String Log_UploadToursToSuunto_004_UploadError;
    public static String PrefPage_AccountInformation_SuuntoApp_WebPage_Link;
    public static String PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter;
-   public static String PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter_Tooltip;
-   public static String PrefPage_SuuntoWorkouts_Combo_FolderPath;
-   public static String PrefPage_SuuntoWorkouts_Combo_FolderPath_Tooltip;
+   public static String PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip;
+   public static String PrefPage_SuuntoWorkouts_Label_FolderPath;
+   public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
    public static String Suunto_Workouts_Tooltip;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
