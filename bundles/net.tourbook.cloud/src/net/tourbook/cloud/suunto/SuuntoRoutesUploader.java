@@ -64,8 +64,6 @@ import org.json.JSONObject;
 
 public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
-   private static final String     ICON__CHECK                   = net.tourbook.cloud.Messages.Icon__Check;
-   private static final String     ICON__HOURGLASS               = net.tourbook.cloud.Messages.Icon__Hourglass;
    private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
@@ -259,7 +257,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, UI.SYMBOL_HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours; ++index) {
@@ -280,7 +278,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_HOURGLASS));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
                numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
@@ -290,7 +288,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.worked(toursWithGpsSeries.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, ICON__CHECK, ICON__CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutes_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_CHECK));
          }
       };
 

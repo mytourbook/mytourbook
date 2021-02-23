@@ -66,8 +66,6 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   private static final String     ICON__CHECK                   = net.tourbook.cloud.Messages.Icon__Check;
-   private static final String     ICON__HOURGLASS               = net.tourbook.cloud.Messages.Icon__Hourglass;
    private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
@@ -150,7 +148,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkouts_SubTask,
                   new Object[] {
-                        ICON__HOURGLASS,
+                        UI.SYMBOL_HOURGLASS,
                         UI.EMPTY_STRING,
                         UI.EMPTY_STRING }));
 
@@ -180,9 +178,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkouts_SubTask,
                   new Object[] {
-                        ICON__CHECK,
+                        UI.SYMBOL_CHECK,
                         _numberOfAvailableTours[0],
-                        ICON__HOURGLASS }));
+                        UI.SYMBOL_HOURGLASS }));
 
             numberOfDownloadedTours[0] = downloadFiles(newWorkouts);
 

@@ -69,8 +69,6 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     ICON__CHECK                   = net.tourbook.cloud.Messages.Icon__Check;
-   private static final String     ICON__HOURGLASS               = net.tourbook.cloud.Messages.Icon__Hourglass;
    private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
@@ -406,7 +404,7 @@ public class StravaUploader extends TourbookCloudUploader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, UI.SYMBOL_HOURGLASS, UI.EMPTY_STRING));
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final List<TourData> manualTours = new ArrayList<>();
@@ -440,13 +438,13 @@ public class StravaUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__CHECK, ICON__HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_HOURGLASS));
 
             numberOfUploadedTours[0] = uploadTours(toursWithTimeSeries, manualTours);
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, ICON__CHECK, ICON__CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadTours_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_CHECK));
          }
 
       };
