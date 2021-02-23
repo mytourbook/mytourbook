@@ -49,16 +49,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   //
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   //SET_FORMATTING_OFF
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
-         net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
-   //
+   //SET_FORMATTING_ON
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
    public static final int         CALLBACK_PORT = 4918;
