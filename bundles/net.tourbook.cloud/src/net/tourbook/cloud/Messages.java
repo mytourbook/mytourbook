@@ -76,7 +76,7 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Label_FolderPath;
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
-   public static String Suunto_Workouts_Tooltip;
+   public static String Suunto_WorkoutsDownloader_Tooltip;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
 
