@@ -84,6 +84,8 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
          outputStream.write(response);
          outputStream.flush();
       } catch (final Exception e) {
+         // This happens randomly
+         // Suppressed: java.io.IOException: insufficient bytes written to stream
          StatusUtil.log(e);
       }
    }

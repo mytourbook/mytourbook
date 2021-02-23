@@ -94,6 +94,7 @@ public class Messages extends NLS {
    public static String Log_UploadToursToStrava_004_UploadError;
    public static String PrefPage_Account_Information_Label_AthleteName;
    public static String PrefPage_Account_Information_Label_AthleteWebPage;
+   public static String Pref_AccountInformation_Strava_WebPage_Link;
    public static String VendorName_Strava;
 
    static {
