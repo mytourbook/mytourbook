@@ -76,8 +76,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$
-            Messages.VendorName_Suunto_Workouts,
-            Messages.Suunto_Workouts_Description,
+            Messages.VendorName_Suunto,
+            Messages.Suunto_Workouts_Tooltip,
             Activator.getImageAbsoluteFilePath(Messages.Image__SuuntoApp_Icon));
    }
 
@@ -134,7 +134,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.beginTask(Messages.Dialog_DownloadWorkouts_Task, 2);
 
-            monitor.subTask(Messages.ValidatingSuuntoTokens_SubTask);
+            monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
@@ -142,7 +142,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             }
 
             if (StringUtils.isNullOrEmpty(getDownloadFolder())) {
-               TourLogManager.logError(Messages.Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder);
+               TourLogManager.logError(Messages.Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder);
                return;
             }
 
@@ -155,7 +155,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
             if (workouts.payload.size() == 0) {
-               TourLogManager.logInfo(Messages.Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound);
+               TourLogManager.logInfo(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
                return;
             }
 
@@ -168,7 +168,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             final int numNewWorkouts = newWorkouts.size();
             if (numNewWorkouts == 0) {
-               TourLogManager.logInfo(Messages.Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist);
+               TourLogManager.logInfo(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist);
                return;
             }
 
@@ -193,7 +193,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          final long start = System.currentTimeMillis();
 
          TourLogManager.showLogView();
-         TourLogManager.logTitle(Messages.Log_DownloadWorkoutsToSuunto_001_Start);
+         TourLogManager.logTitle(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
 
@@ -240,7 +240,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          isTourDownloaded = true;
 
          TourLogManager.addLog(TourLogState.IMPORT_OK,
-               NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_005_DownloadStatus,
+               NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_005_DownloadStatus,
                      workoutDownload.getWorkoutKey(),
                      workoutDownload.getAbsoluteFilePath()));
       } else {
@@ -301,7 +301,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             .thenApply(response -> writeFileToFolder(workoutKey, response))
             .exceptionally(e -> {
                final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutKey);
-               erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_007_Error,
+               erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_007_Error,
                      erroneousDownload.getWorkoutKey(),
                      e.getMessage()));
                erroneousDownload.setSuccessfullyDownloaded(false);
@@ -327,7 +327,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       if (filePath.toFile().exists()) {
 
-         workoutDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsToSuunto_006_FileAlreadyExists,
+         workoutDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists,
                workoutDownload.getWorkoutKey(),
                filePath.toAbsolutePath().toString()));
          return workoutDownload;

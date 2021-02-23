@@ -250,7 +250,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.beginTask(NLS.bind(Messages.Dialog_UploadRoutes_Task, numberOfTours), numberOfTours * 2);
 
-            monitor.subTask(Messages.ValidatingSuuntoTokens_SubTask);
+            monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
 
             if (!SuuntoTokensRetrievalHandler.getValidTokens()) {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);

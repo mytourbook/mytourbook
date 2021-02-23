@@ -59,13 +59,13 @@ public class Messages extends NLS {
    public static String Dialog_DownloadWorkouts_SubTask;
    public static String Dialog_DownloadWorkouts_Task;
    public static String Dialog_DownloadWorkouts_Title;
-   public static String Log_DownloadWorkoutsToSuunto_001_Start;
-   public static String Log_DownloadWorkoutsToSuunto_002_NewWorkoutsNotFound;
-   public static String Log_DownloadWorkoutsToSuunto_003_AllWorkoutsAlreadyExist;
-   public static String Log_DownloadWorkoutsToSuunto_004_NoSpecifiedFolder;
-   public static String Log_DownloadWorkoutsToSuunto_005_DownloadStatus;
-   public static String Log_DownloadWorkoutsToSuunto_006_FileAlreadyExists;
-   public static String Log_DownloadWorkoutsToSuunto_007_Error;
+   public static String Log_DownloadWorkoutsFromSuunto_001_Start;
+   public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
+   public static String Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
+   public static String Log_DownloadWorkoutsFromSuunto_004_NoSpecifiedFolder;
+   public static String Log_DownloadWorkoutsFromSuunto_005_DownloadStatus;
+   public static String Log_DownloadWorkoutsFromSuunto_006_FileAlreadyExists;
+   public static String Log_DownloadWorkoutsFromSuunto_007_Error;
    public static String Log_UploadToursToSuunto_001_Start;
    public static String Log_UploadToursToSuunto_002_NoGpsCoordinate;
    public static String Log_UploadToursToSuunto_003_UploadStatus;
@@ -75,10 +75,10 @@ public class Messages extends NLS {
    public static String PrefPage_Checkbox_Use_SinceDateFilter_Tooltip;
    public static String PrefPage_Combo_Workouts_FolderPath_Combo_Tooltip;
    public static String PrefPage_Combo_Workouts_Label_FolderPath;
-   public static String Suunto_Workouts_Description;
-   public static String ValidatingSuuntoTokens_SubTask;
+   public static String Suunto_Workouts_Tooltip;
+   public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String VendorName_Suunto_Routes;
-   public static String VendorName_Suunto_Workouts;
+   public static String VendorName_Suunto;
 
    //STRAVA
    public static String Image__Connect_With_Strava;
