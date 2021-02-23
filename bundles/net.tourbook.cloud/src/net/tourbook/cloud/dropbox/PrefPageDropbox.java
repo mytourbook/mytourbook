@@ -55,11 +55,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    //SET_FORMATTING_OFF
-   private static final String PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
-   private static final String PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
-   private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
    private static final String PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
@@ -139,7 +139,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
           */
          final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
          setButtonLayoutData(btnAuthorizeConnection);
-         btnAuthorizeConnection.setText(PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON);
+         btnAuthorizeConnection.setText(PREFPAGE_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON);
          btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -156,7 +156,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP);
+      _group.setText(PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {
@@ -177,7 +177,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
-            _labelAccessToken.setText(PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL);
+            _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
             _labelAccessToken_Value = new Label(_group, SWT.WRAP);
@@ -186,7 +186,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelRefreshToken = new Label(_group, SWT.NONE);
-            _labelRefreshToken.setText(PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL);
+            _labelRefreshToken.setText(PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
@@ -194,7 +194,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          }
          {
             _labelExpiresAt = new Label(_group, SWT.NONE);
-            _labelExpiresAt.setText(PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL);
+            _labelExpiresAt.setText(PREFPAGE_CLOUDCONNECTIVITY_EXPIRESAT_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
             _labelExpiresAt_Value = new Label(_group, SWT.NONE);
