@@ -62,17 +62,17 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String     PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL  =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_AccessToken;
-   private static final String     PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON   =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Button_Authorize;
-   private static final String     PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Group_CloudAccount;
-   private static final String     PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
-   private static final String     PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String     PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      =
+   private static final String     PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL      =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    private static final String     APP_BTN_BROWSE                                = net.tourbook.Messages.app_btn_browse;
    private static final String     DIALOG_EXPORT_DIR_DIALOG_MESSAGE              = net.tourbook.Messages.dialog_export_dir_dialog_message;
@@ -164,7 +164,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
           */
          final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
          setButtonLayoutData(btnAuthorizeConnection);
-         btnAuthorizeConnection.setText(PrefPage_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON);
+         btnAuthorizeConnection.setText(PREFPAGE_CLOUDCONNECTIVITY_AUTHORIZE_BUTTON);
          btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -181,12 +181,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
-      _group.setText(PrefPage_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP);
+      _group.setText(PREFPAGE_CLOUDCONNECTIVITY_CLOUDACCOUNT_GROUP);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {
             final Label labelWebPage = new Label(_group, SWT.NONE);
-            labelWebPage.setText(PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL);
+            labelWebPage.setText(PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
@@ -202,7 +202,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
-            _labelAccessToken.setText(PrefPage_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL);
+            _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_ACCESSTOKEN_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
             _labelAccessToken_Value = new Label(_group, SWT.WRAP);
@@ -210,7 +210,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelRefreshToken = new Label(_group, SWT.NONE);
-            _labelRefreshToken.setText(PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL);
+            _labelRefreshToken.setText(PREFPAGE_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
@@ -218,7 +218,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             _labelExpiresAt = new Label(_group, SWT.NONE);
-            _labelExpiresAt.setText(PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL);
+            _labelExpiresAt.setText(PREFPAGE_CLOUDCONNECTIVITY_EXPIRESAT_LABEL);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
             _labelExpiresAt_Value = new Label(_group, SWT.NONE);

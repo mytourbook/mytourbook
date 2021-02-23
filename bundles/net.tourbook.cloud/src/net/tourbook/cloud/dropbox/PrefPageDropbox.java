@@ -64,7 +64,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private static final String PrefPage_CLOUDCONNECTIVITY_EXPIRESAT_LABEL    = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_ExpiresAt;
    private static final String PrefPage_CLOUDCONNECTIVITY_REFRESHTOKEN_LABEL =
          net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_RefreshToken;
-   private static final String PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
+   private static final String PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //
 
    public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
@@ -165,7 +165,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       {
          {
             final Label labelWebPage = new Label(_group, SWT.NONE);
-            labelWebPage.setText(PrefPage_CLOUDCONNECTIVITY_WEBPAGE_LABEL);
+            labelWebPage.setText(PREFPAGE_CLOUDCONNECTIVITY_WEBPAGE_LABEL);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
