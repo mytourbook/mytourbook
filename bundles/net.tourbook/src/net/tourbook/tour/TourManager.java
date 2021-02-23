@@ -4187,7 +4187,7 @@ public class TourManager {
          yDataCustomTracksSerie.setShowYSlider(true);
          yDataCustomTracksSerie.setDisplayedFractionalDigits(1);
          yDataCustomTracksSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CUSTOM_TRACKS + indexCustomTracksSerie);
-         // TODO yDataCustSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(false, false));
+         yDataCustomTracksSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true));
 
          if (useGraphBgStyle) {
             yDataCustomTracksSerie.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
