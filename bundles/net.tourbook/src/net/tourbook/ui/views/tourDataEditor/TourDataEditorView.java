@@ -6202,7 +6202,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      if (isTemperatureValueOffset) {
 
                         //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
-                        // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
+                        // For example : If the user has asked for an offset of 1Â°F, then it could offset the metric temperature to -17.22222 Â°C!!!
 
                         if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
