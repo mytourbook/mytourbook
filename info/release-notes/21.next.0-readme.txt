@@ -6,7 +6,8 @@ TODO's
 
 * Website: Document externalize strings with multiple messages files https://github.com/wolfgang-ch/mytourbook/pull/282#discussion_r553942399
 
-* Website: Describe structure for text key names
+* Website: Describe sleak
+
 
 * Website: Set next version experimental because of the many database modifications
 
