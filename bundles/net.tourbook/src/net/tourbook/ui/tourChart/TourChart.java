@@ -4619,7 +4619,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
             ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
             TourManager.GRAPH_PACE,
-            60,
+            1,
             Double.MIN_VALUE,
             isMinMaxEnabled);
 
