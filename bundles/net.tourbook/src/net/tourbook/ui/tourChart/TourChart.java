@@ -261,7 +261,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS;
 
    /**
-    * 1e-5 is too small for the min value, it do not correct the graph.
+    * 1e-5 is too small for the min value, it does not correct the graph.
     */
    public static final double     MIN_ADJUSTMENT      = 1e-3;
    public static final double     MAX_ADJUSTMENT      = 1e-5;
@@ -1899,8 +1899,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private ChartLabel createLayer_Pause_ChartLabel(final String pauseDuration,
                                                    final double[] xAxisSerie,
-                                                   final int xAxisSerieIndex,
-                                                   final int labelPosition) {
+                                                   final int xAxisSerieIndex) {
 
       final ChartLabel chartLabel = new ChartLabel();
 
@@ -1999,8 +1998,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                         pauseDurationText,
                         xAxisSerie,
-                        tourSerieIndex,
-                        0);
+                        tourSerieIndex);
 
                   cpc.chartLabels.add(chartLabel);
                }
@@ -2045,8 +2043,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
-                  serieIndex,
-                  0);
+                  serieIndex);
 
             cpc.chartLabels.add(chartLabel);
          }
@@ -4574,7 +4571,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
             TourManager.GRAPH_PULSE,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4643,7 +4640,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE,
             TourManager.GRAPH_CADENCE,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4666,7 +4663,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_POWER_MAX_VALUE,
             TourManager.GRAPH_POWER,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4689,7 +4686,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE,
             TourManager.GRAPH_TEMPERATURE,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4712,7 +4709,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_STANCE_TIME,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4735,7 +4732,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
@@ -4804,7 +4801,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
             0,
-            1e-3,
+            MIN_ADJUSTMENT,
             isMinMaxEnabled);
 
       /*
