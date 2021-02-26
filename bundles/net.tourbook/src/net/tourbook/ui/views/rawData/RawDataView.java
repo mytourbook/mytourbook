@@ -1667,6 +1667,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
          final ZonedDateTime modifiedTime = TimeTools.getZonedDateTime(deviceFile.modifiedTime);
 
+         // am/pm contains a space which can break the line
+         final String nbspTime = modifiedTime.format(TimeTools.Formatter_Time_S).replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+         final String nbspFileName = deviceFile.getFileName().replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
          sb.append(HTML_TR);
 
          sb.append("<td width=1 class='column'>"); //$NON-NLS-1$
@@ -1674,7 +1678,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(deviceFile.getFileName());
+         sb.append(nbspFileName);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
@@ -1682,7 +1686,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
-         sb.append(modifiedTime.format(TimeTools.Formatter_Time_S));
+         sb.append(nbspTime);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='right'>"); //$NON-NLS-1$
@@ -1699,8 +1703,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
             }
 
+            final String nbspFilePathName = filePathName.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
             sb.append("<td class='column content'>"); //$NON-NLS-1$
-            sb.append(filePathName);
+            sb.append(nbspFilePathName);
             sb.append(HTML_TD_END);
          }
 
