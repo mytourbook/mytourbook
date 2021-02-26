@@ -153,6 +153,7 @@ public class UI {
    public static final String       SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";  //$NON-NLS-1$
    public static final String       SYMBOL_BOX                    = "\u25a0";   //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                 = "\u2022";   //$NON-NLS-1$
+   public static final String       SYMBOL_CHECK                  = "\u2705";   //$NON-NLS-1$
    public static final String       SYMBOL_DASH                   = "\u2212";   //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                 = "\u00B0";   //$NON-NLS-1$
    public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT   = "\u00AB";   //$NON-NLS-1$
@@ -164,6 +165,7 @@ public class UI {
    public static final String       SYMBOL_FIGURE_DASH            = "\u2012";   //$NON-NLS-1$
    public static final String       SYMBOL_FOOT_NOTE              = "\u20F0";   //$NON-NLS-1$
    public static final String       SYMBOL_FULL_BLOCK             = "\u2588";   //$NON-NLS-1$
+   public static final String       SYMBOL_HOURGLASS              = "\u231B";   //$NON-NLS-1$
    public static final String       SYMBOL_IDENTICAL_TO           = "\u2261";   //$NON-NLS-1$
    public static final String       SYMBOL_INFINITY_MAX           = "\u221E";   //$NON-NLS-1$
    public static final String       SYMBOL_INFINITY_MIN           = "-\u221E";  //$NON-NLS-1$

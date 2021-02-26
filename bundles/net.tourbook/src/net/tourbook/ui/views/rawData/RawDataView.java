@@ -2092,7 +2092,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             createHTML_92_TileAction(
                   sb,
                   cloudDownloader.getName(),
-                  cloudDownloader.getDescription(),
+                  cloudDownloader.getTooltip(),
                   (HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId()),
                   cloudDownloader.getIconUrl());
          }

@@ -66,8 +66,8 @@ public class LocalHostServer {
       if (!PortFinder.available(_callBackPort)) {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(),
-               net.tourbook.cloud.Messages.Pref_CloudConnectivity_UnavailablePort_Title,
-               NLS.bind(net.tourbook.cloud.Messages.Pref_CloudConnectivity_UnavailablePort_Message, _callBackPort, _vendor));
+               net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_UnavailablePort_Title,
+               NLS.bind(net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_UnavailablePort_Message, _callBackPort, _vendor));
          return false;
       }
 
