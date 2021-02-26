@@ -54,6 +54,9 @@ New
 Improvements
 ============
 
+* Easy Import
+  - Prevent that lines are wrapped in the import file list because it do not look very good. This can occur when a space is in a filename or am/pm is displayed
+
 * Fit Import
   - Import R-R intervals
 

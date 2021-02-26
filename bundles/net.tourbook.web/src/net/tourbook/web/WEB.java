@@ -108,6 +108,7 @@ public class WEB {
    private static final String          URL_SQB_CLOSE_REPLACEMENT                = "%5D";                                     //$NON-NLS-1$
 
    public static final String           HTML_ELEMENT_BR                          = "<br>";                                    //$NON-NLS-1$
+   public static final String           NONE_BREAKING_SPACE                      = "&nbsp;";                                  //$NON-NLS-1$
 
    public static final String           RESPONSE_HEADER_ACCEPT_LANGUAGE          = "Accept-Language";                         //$NON-NLS-1$
    private static final String          RESPONSE_HEADER_CONTENT_ENCODING         = "Content-Encoding";                        //$NON-NLS-1$
