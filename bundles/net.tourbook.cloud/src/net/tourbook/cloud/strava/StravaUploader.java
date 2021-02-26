@@ -396,7 +396,9 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(NLS.bind(Messages.Dialog_UploadToursToStrava_Task, numberOfTours, _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
+            monitor.beginTask(NLS.bind(Messages.Dialog_UploadToursToStrava_Task,
+                  numberOfTours,
+                  _prefStore.getString(Preferences.STRAVA_ATHLETEFULLNAME)),
                   numberOfTours * 2);
 
             if (!getValidTokens()) {
@@ -404,7 +406,7 @@ public class StravaUploader extends TourbookCloudUploader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final List<TourData> manualTours = new ArrayList<>();
@@ -438,13 +440,17 @@ public class StravaUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
+                  UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
             numberOfUploadedTours[0] = uploadTours(toursWithTimeSeries, manualTours);
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadToursToStrava_SubTask,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
          }
 
       };

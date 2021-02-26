@@ -257,7 +257,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                return;
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS, UI.EMPTY_STRING));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours; ++index) {
@@ -278,7 +278,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                }
             }
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_HOURGLASS));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
+                  UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
                numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
@@ -288,7 +290,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
             monitor.worked(toursWithGpsSeries.size());
 
-            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_CHECK, UI.SYMBOL_CHECK));
+            monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
+                  UI.SYMBOL_WHITE_HEAVY_CHECK_MARK));
          }
       };
 

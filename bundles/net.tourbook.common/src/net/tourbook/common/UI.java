@@ -175,6 +175,7 @@ public class UI {
    public static final String       SYMBOL_SUN                         = "\u263C";   //$NON-NLS-1$
    public static final String       SYMBOL_TAU                         = "\u03c4";   //$NON-NLS-1$
    public static final String       SYMBOL_TILDE                       = "\u007e";   //$NON-NLS-1$
+   public static final String       SYMBOL_WHITE_HEAVY_CHECK_MARK      = "\u2705";   //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_BACKSLASH                   = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                       = ":";        //$NON-NLS-1$
@@ -196,7 +197,6 @@ public class UI {
    public static final String       SYMBOL_TEMPERATURE_CELCIUS         = "\u00b0C";  //$NON-NLS-1$
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT      = "\u00b0F";  //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                  = "_";        //$NON-NLS-1$
-   public static final String       SYMBOL_WHITE_HEAVY_CHECK_MARK      = "\u2705";   //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE             = "W ";       //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_HTML_BACKSLASH              = "&#92;";    //$NON-NLS-1$

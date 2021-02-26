@@ -148,7 +148,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
-                        UI.SYMBOL_HOURGLASS,
+                        UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND,
                         UI.EMPTY_STRING,
                         UI.EMPTY_STRING }));
 
@@ -178,9 +178,9 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
                   new Object[] {
-                        UI.SYMBOL_CHECK,
+                        UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                         _numberOfAvailableTours[0],
-                        UI.SYMBOL_HOURGLASS }));
+                        UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND }));
 
             numberOfDownloadedTours[0] = downloadFiles(newWorkouts);
 
