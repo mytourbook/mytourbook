@@ -187,12 +187,12 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_SuuntoApp_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.PrefPage_AccountInformation_SuuntoApp_WebPage_Link);
+                  WEB.openUrl(Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage);
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
