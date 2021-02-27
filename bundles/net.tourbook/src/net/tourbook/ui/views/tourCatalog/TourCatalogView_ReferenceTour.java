@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -223,25 +223,30 @@ public class TourCatalogView_ReferenceTour extends TourChartViewPart implements 
             final ChartDataXSerie xData = changedChartDataModel.getXData();
             final TourReference refTour = compareConfig.getRefTour();
 
+            final int refTour_EndValueIndex = refTour.getEndValueIndex();
+            final double[] xValues = xData.getHighValuesDouble()[0];
+            if (refTour_EndValueIndex >= xValues.length) {
+
+               // an ArrayIndexOutOfBoundsException occured but cannot be reproduced
+               return;
+            }
+
             // set marker positions
-            xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour.getEndValueIndex());
+            xData.setSynchMarkerValueIndex(refTour.getStartValueIndex(), refTour_EndValueIndex);
 
             // set the value difference of the synch marker
-            final double[] xValues = xData.getHighValuesDouble()[0];
-            final double refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
-                  - xValues[refTour.getStartValueIndex()];
+            final double refTourXMarkerValue = xValues[refTour_EndValueIndex] - xValues[refTour.getStartValueIndex()];
 
             TourManager.fireEventWithCustomData(
-                  TourEventId.REFERENCE_TOUR_CHANGED, //
+                  TourEventId.REFERENCE_TOUR_CHANGED,
                   new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
                   TourCatalogView_ReferenceTour.this);
 
             // set title
-            changedChartDataModel.setTitle(
-                  NLS.bind(
-                        Messages.tourCatalog_view_label_chart_title_reference_tour,
-                        refTour.getLabel(),
-                        TourManager.getTourTitleDetailed(_tourData)));
+            changedChartDataModel.setTitle(NLS.bind(
+                  Messages.tourCatalog_view_label_chart_title_reference_tour,
+                  refTour.getLabel(),
+                  TourManager.getTourTitleDetailed(_tourData)));
 
          }
       });

@@ -1703,7 +1703,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
             }
 
-            final String nbspFilePathName = filePathName.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+            final String nbspFilePathName = UI.EMPTY_STRING
+
+                  // add additonal space before the text otherwise it is too narrow to the previous column
+                  + WEB.NONE_BREAKING_SPACE
+                  + WEB.NONE_BREAKING_SPACE
+
+                  + filePathName.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
 
             sb.append("<td class='column content'>"); //$NON-NLS-1$
             sb.append(nbspFilePathName);
@@ -2098,7 +2104,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             createHTML_92_TileAction(
                   sb,
                   cloudDownloader.getName(),
-                  cloudDownloader.getDescription(),
+                  cloudDownloader.getTooltip(),
                   (HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId()),
                   cloudDownloader.getIconUrl());
          }
