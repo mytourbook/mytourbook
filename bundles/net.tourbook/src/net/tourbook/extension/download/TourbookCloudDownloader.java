@@ -19,21 +19,17 @@ public abstract class TourbookCloudDownloader {
 
    private String CLOUD_DOWNLOADER_ID;
    private String CLOUD_DOWNLOADER_NAME;
-   private String CLOUD_DOWNLOADER_DESCRIPTION;
+   private String CLOUD_DOWNLOADER_TOOLTIP;
    private String CLOUD_DOWNLOADER_ICON_URL;
 
-   public TourbookCloudDownloader(final String id, final String name, final String description, final String iconUrl) {
+   protected TourbookCloudDownloader(final String id, final String name, final String tooltip, final String iconUrl) {
       CLOUD_DOWNLOADER_ID = id;
       CLOUD_DOWNLOADER_NAME = name;
-      CLOUD_DOWNLOADER_DESCRIPTION = description;
+      CLOUD_DOWNLOADER_TOOLTIP = tooltip;
       CLOUD_DOWNLOADER_ICON_URL = iconUrl;
    }
 
    public abstract void downloadTours();
-
-   public String getDescription() {
-      return CLOUD_DOWNLOADER_DESCRIPTION;
-   }
 
    public String getIconUrl() {
       return CLOUD_DOWNLOADER_ICON_URL;
@@ -45,6 +41,10 @@ public abstract class TourbookCloudDownloader {
 
    public String getName() {
       return CLOUD_DOWNLOADER_NAME;
+   }
+
+   public String getTooltip() {
+      return CLOUD_DOWNLOADER_TOOLTIP;
    }
 
    protected abstract boolean isReady();
