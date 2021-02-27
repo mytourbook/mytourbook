@@ -27,26 +27,19 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -64,7 +57,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -547,27 +539,24 @@ public class ChartComponentGraph extends Canvas {
     */
    private void addListener() {
 
-      addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent event) {
+      addPaintListener(paintEvent -> {
 
-            if (_isChartDragged) {
+         if (_isChartDragged) {
 
-               drawSync_020_MoveCanvas(event.gc);
+            drawSync_020_MoveCanvas(paintEvent.gc);
 
-            } else {
+         } else {
 
 //               final long start = System.nanoTime();
 //               System.out.println();
 //               System.out.println("onPaint\tstart\t");
 //               // TODO remove SYSTEM.OUT.PRINTLN
 
-               drawSync_000_onPaint(event.gc, event.time & 0xFFFFFFFFL);
+            drawSync_000_onPaint(paintEvent.gc);
 
 //               System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //               System.out.println();
 //               // TODO remove SYSTEM.OUT.PRINTLN
-            }
          }
       });
 
@@ -582,12 +571,9 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addMouseMoveListener(new MouseMoveListener() {
-         @Override
-         public void mouseMove(final MouseEvent e) {
-            if (_isGraphVisible) {
-               onMouseMove(e.time & 0xFFFFFFFFL, e.x, e.y);
-            }
+      addMouseMoveListener(mouseEvent -> {
+         if (_isGraphVisible) {
+            onMouseMove(mouseEvent.time & 0xFFFFFFFFL, mouseEvent.x, mouseEvent.y);
          }
       });
 
@@ -633,12 +619,7 @@ public class ChartComponentGraph extends Canvas {
          public void mouseHover(final MouseEvent e) {}
       });
 
-      addListener(SWT.MouseWheel, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onMouseWheel(event, false, false);
-         }
-      });
+      addListener(SWT.MouseWheel, event -> onMouseWheel(event, false, false));
 
       addFocusListener(new FocusListener() {
 
@@ -663,20 +644,17 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.Traverse, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      addListener(SWT.Traverse, event -> {
 
-            switch (event.detail) {
-            case SWT.TRAVERSE_RETURN:
-            case SWT.TRAVERSE_ESCAPE:
-            case SWT.TRAVERSE_TAB_NEXT:
-            case SWT.TRAVERSE_TAB_PREVIOUS:
-            case SWT.TRAVERSE_PAGE_NEXT:
-            case SWT.TRAVERSE_PAGE_PREVIOUS:
-               event.doit = true;
-               break;
-            }
+         switch (event.detail) {
+         case SWT.TRAVERSE_RETURN:
+         case SWT.TRAVERSE_ESCAPE:
+         case SWT.TRAVERSE_TAB_NEXT:
+         case SWT.TRAVERSE_TAB_PREVIOUS:
+         case SWT.TRAVERSE_PAGE_NEXT:
+         case SWT.TRAVERSE_PAGE_PREVIOUS:
+            event.doit = true;
+            break;
          }
       });
 
@@ -694,19 +672,9 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.KeyDown, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onKeyDown(event);
-         }
-      });
+      addListener(SWT.KeyDown, this::onKeyDown);
 
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      addDisposeListener(DisposeEvent -> onDispose());
 
    }
 
@@ -839,12 +807,9 @@ public class ChartComponentGraph extends Canvas {
     * when the chart was modified, recompute all
     */
    private void computeChart() {
-      getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            if (!isDisposed()) {
-               _chartComponents.onResize();
-            }
+      getDisplay().asyncExec(() -> {
+         if (!isDisposed()) {
+            _chartComponents.onResize();
          }
       });
    }
@@ -962,30 +927,27 @@ public class ChartComponentGraph extends Canvas {
 
       menuMgr.setRemoveAllWhenShown(true);
 
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            actionSelectBars();
+         actionSelectBars();
 
-            _hoveredBar_ToolTip.hide();
+         _hoveredBar_ToolTip.hide();
 
-            hideTooltip();
+         hideTooltip();
 
-            // get cursor location relativ to this graph canvas
-            final Point devMouse = toControl(getDisplay().getCursorLocation());
+         // get cursor location relative to this graph canvas
+         final Point devMouse = toControl(getDisplay().getCursorLocation());
 
-            computeSliderForContextMenu(devMouse.x, devMouse.y);
+         computeSliderForContextMenu(devMouse.x, devMouse.y);
 
-            _chart.fillContextMenu(
-                  menuMgr,
-                  _contextLeftSlider,
-                  _contextRightSlider,
-                  _hoveredBarSerieIndex,
-                  _hoveredBarValueIndex,
-                  _devXMouseDown,
-                  _devYMouseDown);
-         }
+         _chart.fillContextMenu(
+               menuManager,
+               _contextLeftSlider,
+               _contextRightSlider,
+               _hoveredBarSerieIndex,
+               _hoveredBarValueIndex,
+               _devXMouseDown,
+               _devYMouseDown);
       });
 
       final Menu contextMenu = menuMgr.createContextMenu(this);
@@ -1435,12 +1397,9 @@ public class ChartComponentGraph extends Canvas {
          // zoomed to the x-slider positions
 
          // zoom into the chart
-         getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!isDisposed()) {
-                  _chart.onExecuteZoomInWithSlider();
-               }
+         getDisplay().asyncExec(() -> {
+            if (!isDisposed()) {
+               _chart.onExecuteZoomInWithSlider();
             }
          });
       }
@@ -4623,7 +4582,7 @@ public class ChartComponentGraph extends Canvas {
     * @param gc
     * @param eventTime
     */
-   private void drawSync_000_onPaint(final GC gc, final long eventTime) {
+   private void drawSync_000_onPaint(final GC gc) {
 
 //      final long startTime = System.nanoTime();
 //      // TODO remove SYSTEM.OUT.PRINTLN
@@ -4665,7 +4624,7 @@ public class ChartComponentGraph extends Canvas {
              */
             if (_chartImage_20_Chart != null) {
 
-               final Image image = drawSync_010_ImageChart(gc, eventTime);
+               final Image image = drawSync_010_ImageChart(gc);
                if (image == null) {
                   return;
                }
@@ -4710,7 +4669,7 @@ public class ChartComponentGraph extends Canvas {
          //  }
 
          drawSync_300_Image30Custom();
-         drawSync_010_ImageChart(gc, eventTime);
+         drawSync_010_ImageChart(gc);
       }
 
 //      final long endTime = System.nanoTime();
@@ -4724,7 +4683,7 @@ public class ChartComponentGraph extends Canvas {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private Image drawSync_010_ImageChart(final GC gc, final long eventTime) {
+   private Image drawSync_010_ImageChart(final GC gc) {
 
       final boolean isOverlayImageVisible = _isXSliderVisible
             || _isYSliderVisible
@@ -4734,7 +4693,7 @@ public class ChartComponentGraph extends Canvas {
 
       if (isOverlayImageVisible) {
 
-         drawSync_400_OverlayImage(eventTime);
+         drawSync_400_OverlayImage();
 
          if (_chartImage_40_Overlay != null) {
 //            System.out.println("gc <- 40\tdrawSync010ImageChart");
@@ -4869,7 +4828,7 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param eventTime
     */
-   private void drawSync_400_OverlayImage(final long eventTime) {
+   private void drawSync_400_OverlayImage() {
 
       if (_chartImage_30_Custom == null) {
          return;
@@ -7645,13 +7604,10 @@ public class ChartComponentGraph extends Canvas {
             /*
              * zoom the chart
              */
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getCurrent().asyncExec(() -> {
 
-                  zoomInWithSlider();
-                  _chartComponents.onResize();
-               }
+               zoomInWithSlider();
+               _chartComponents.onResize();
             });
          }
 
