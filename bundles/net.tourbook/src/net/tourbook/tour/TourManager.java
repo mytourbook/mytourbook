@@ -4248,7 +4248,6 @@ public class TourManager {
                                                 final boolean useGraphBgStyle) {
 
       final float[] paceSerie = tourData.getPaceSerieSeconds();
-
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
 
