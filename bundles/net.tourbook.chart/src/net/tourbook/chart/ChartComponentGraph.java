@@ -2934,8 +2934,13 @@ public class ChartComponentGraph extends Canvas {
                      path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
                   }
 
-                  devY = devY0Inverse - devY1;
+                  if (yData.isYAxisDirection()) {
+                     devY = devY0Inverse - devY1;
+                  }
+                  else {
 
+                  devY = devYTop + ((int) ((graphYBorderTop - graphYBorderBottom) * scaleY));
+                  }
                   path.lineTo(devXf, devY);
 
                   if (isPath2) {
