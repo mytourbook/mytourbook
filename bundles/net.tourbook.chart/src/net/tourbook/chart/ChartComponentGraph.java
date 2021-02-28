@@ -2588,17 +2588,6 @@ public class ChartComponentGraph extends Canvas {
                                                final int graphFillingAlpha,
                                                final double graphValueOffset) {
 
-      //TODO
-
-      /*
-       * // get the y position
-       * int devYPos;
-       * if (axisDirection) {
-       * devYPos = devYBottom - ((int) ((graphYHigh - graphYBottom) * scaleY));
-       * } else {
-       * devYPos = devYTop + ((int) ((graphYLow - graphYBottom) * scaleY));
-       * }
-       */
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
 
