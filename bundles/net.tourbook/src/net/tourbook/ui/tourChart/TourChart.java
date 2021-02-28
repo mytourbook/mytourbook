@@ -4580,7 +4580,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
             ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
             TourManager.GRAPH_PACE,
-            1,
+            60,
             Double.MIN_VALUE,
             isMinMaxEnabled);
 
@@ -4590,7 +4590,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
             ITourbookPreferences.GRAPH_PACE_MAX_VALUE,
             TourManager.GRAPH_PACE,
-            1,
+            60,
             Double.MIN_VALUE,
             isMinMaxEnabled);
 
