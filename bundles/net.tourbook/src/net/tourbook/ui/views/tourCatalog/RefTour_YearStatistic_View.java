@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,11 +24,11 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -38,7 +38,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
-import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
@@ -57,7 +56,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -65,12 +63,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -238,39 +234,33 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
+         if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)) {
 
-               updateUI_YearChart(false);
-            }
+            updateUI_YearChart(false);
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed -> recreate the chart
+            // measurement system has changed -> recreate the chart
 
-               _yearChart.dispose();
-               createUI_30_Chart(_pageChart);
+            _yearChart.dispose();
+            createUI_30_Chart(_pageChart);
 
-               _pageChart.layout();
+            _pageChart.layout();
 
-               updateUI_YearChart(false);
-            }
+            updateUI_YearChart(false);
          }
       };
 
@@ -283,13 +273,10 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            // prevent to listen to a selection which is originated by this year chart
-            if (selection != _currentSelection) {
-               onSelectionChanged(selection);
-            }
+      _postSelectionListener = (workbenchPart, selection) -> {
+         // prevent to listen to a selection which is originated by this year chart
+         if (selection != _currentSelection) {
+            onSelectionChanged(selection);
          }
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -297,21 +284,16 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part,
-                                 final TourEventId propertyId,
-                                 final Object propertyData) {
+      _tourEventListener = (part, tourEventId, propertyData) -> {
 
-            if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
-                  && propertyData instanceof TourPropertyCompareTourChanged) {
+         if (tourEventId == TourEventId.COMPARE_TOUR_CHANGED
+               && propertyData instanceof TourPropertyCompareTourChanged) {
 
-               final TourPropertyCompareTourChanged compareTourProperty =
-                     (TourPropertyCompareTourChanged) propertyData;
+            final TourPropertyCompareTourChanged compareTourProperty =
+                  (TourPropertyCompareTourChanged) propertyData;
 
-               if (compareTourProperty.isDataSaved) {
-                  updateUI_YearChart(false);
-               }
+            if (compareTourProperty.isDataSaved) {
+               updateUI_YearChart(false);
             }
          }
       };
@@ -384,8 +366,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private ChartStatisticSegments createChartSegments() {
 
-      final double segmentStart[] = new double[_numberOfYears];
-      final double segmentEnd[] = new double[_numberOfYears];
+      final double[] segmentStart = new double[_numberOfYears];
+      final double[] segmentEnd = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
       final int firstYear = getFirstYear();
@@ -486,7 +468,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int serieIndex,
                                 int valueIndex) {
 
       if (valueIndex >= _DOYValues.size()) {
@@ -621,37 +602,28 @@ public class RefTour_YearStatistic_View extends ViewPart {
       _yearChart = new Chart(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_yearChart);
 
-      _yearChart.addBarSelectionListener(new IBarSelectionListener() {
-         @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
+      _yearChart.addBarSelectionListener((serieIndex, valueIndex) -> {
 
-            if (_allTours.isEmpty()) {
-               _tourInfoToolTipProvider.setTourId(-1);
-               return;
-            }
-
-            // ensure list size
-            _selectedTourIndex = Math.min(valueIndex, _allTours.size() - 1);
-
-            // select tour in the tour viewer & show tour in compared tour char
-            final TVICatalogComparedTour tourCatalogComparedTour = _allTours.get(_selectedTourIndex);
-            _currentSelection = new StructuredSelection(tourCatalogComparedTour);
-            _postSelectionProvider.setSelection(_currentSelection);
-
-            _tourInfoToolTipProvider.setTourId(tourCatalogComparedTour.getTourId());
+         if (_allTours.isEmpty()) {
+            _tourInfoToolTipProvider.setTourId(-1);
+            return;
          }
+
+         // ensure list size
+         _selectedTourIndex = Math.min(valueIndex, _allTours.size() - 1);
+
+         // select tour in the tour viewer & show tour in compared tour char
+         final TVICatalogComparedTour tourCatalogComparedTour = _allTours.get(_selectedTourIndex);
+         _currentSelection = new StructuredSelection(tourCatalogComparedTour);
+         _postSelectionProvider.setSelection(_currentSelection);
+
+         _tourInfoToolTipProvider.setTourId(tourCatalogComparedTour.getTourId());
       });
 
       // set tour info icon into the left axis
       _tourToolTip = new YearStatisticTourToolTip(_yearChart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
-      _tourToolTip.addHideListener(new IToolTipHideListener() {
-         @Override
-         public void afterHideToolTip(final Event event) {
-            // hide hovered image
-            _yearChart.getToolTipControl().afterHideToolTip(event);
-         }
-      });
+      _tourToolTip.addHideListener(event -> _yearChart.getToolTipControl().afterHideToolTip());
 
       _yearChart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
@@ -1038,7 +1010,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
       final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_DOYValues));
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_DAY);
       xData.setChartSegments(createChartSegments());
       chartModel.setXData(xData);
 
@@ -1096,13 +1068,10 @@ public class RefTour_YearStatistic_View extends ViewPart {
        * Setup UI
        */
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-      });
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
+            (IChartInfoProvider) (toolTipProvider, parent, serieIndex, valueIndex) -> RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider,
+                  parent,
+                  valueIndex));
 
       net.tourbook.ui.UI.updateChartProperties(_yearChart, GRID_PREF_PREFIX);
 

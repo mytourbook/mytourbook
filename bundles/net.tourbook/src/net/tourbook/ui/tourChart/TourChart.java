@@ -58,7 +58,6 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -106,12 +105,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -797,12 +793,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //         }
 //      });
 
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      addDisposeListener(disposeEvent -> onDispose());
 
       addControlListener(this);
       addPrefListeners();
@@ -827,14 +818,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourInfoIconTooltip = new TourToolTip(getToolTipControl());
       _tourInfoIconTooltip.addToolTipProvider(_tourInfoIconTooltipProvider);
 
-      _tourInfoIconTooltip.addHideListener(new IToolTipHideListener() {
-         @Override
-         public void afterHideToolTip(final Event event) {
-
-            // hide hovered image
-            getToolTipControl().afterHideToolTip(event);
-         }
-      });
+      _tourInfoIconTooltip.addHideListener(event -> getToolTipControl().afterHideToolTip());
       setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);
 
       // Setup tooltips
@@ -1105,113 +1089,107 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void addPrefListeners() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            if (_tcc == null) {
-               return;
+         if (_tcc == null) {
+            return;
+         }
+
+         setIsInUpdateUI(true);
+         try {
+
+            final String property = propertyChangeEvent.getProperty();
+
+            boolean isChartModified = false;
+            final boolean keepMinMax = true;
+
+            if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
+                  || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+
+               // zoom preferences has changed
+
+               _tcc.updateZoomOptions();
+
+               isChartModified = true;
+
+            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+               /*
+                * when the chart is computed, the modified colors are read from the preferences
+                */
+               isChartModified = true;
+
+               // dispose old colors
+               disposeColors();
+
+            } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+                  || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+
+                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+                  || property.equals(GRID_HORIZONTAL_DISTANCE)
+                  || property.equals(GRID_VERTICAL_DISTANCE)
+            //
+            ) {
+
+               setupChartConfig();
+
+               isChartModified = true;
+
+            } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+
+               setupSegmenterValueFont();
             }
 
-            setIsInUpdateUI(true);
-            try {
+            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
 
-               final String property = event.getProperty();
-
-               boolean isChartModified = false;
-               final boolean keepMinMax = true;
-
-               if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
-                     || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
-
-                  // zoom preferences has changed
-
-                  _tcc.updateZoomOptions();
-
-                  isChartModified = true;
-
-               } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-                  /*
-                   * when the chart is computed, the modified colors are read from the preferences
-                   */
-                  isChartModified = true;
-
-                  // dispose old colors
-                  disposeColors();
-
-               } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
-                     || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-                     || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
-                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
-                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
-
-                     || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                     || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-                     || property.equals(GRID_HORIZONTAL_DISTANCE)
-                     || property.equals(GRID_VERTICAL_DISTANCE)
-               //
-               ) {
-
-                  setupChartConfig();
-
-                  isChartModified = true;
-
-               } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
-
-                  setupSegmenterValueFont();
-               }
-
-               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
-
-               if (isChartModified) {
-                  updateTourChart(keepMinMax);
-               }
-
-            } finally {
-               setIsInUpdateUI(false);
+            if (isChartModified) {
+               updateTourChart(keepMinMax);
             }
+
+         } finally {
+            setIsInUpdateUI(false);
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            if (_tcc == null) {
-               return;
+         if (_tcc == null) {
+            return;
+         }
+
+         setIsInUpdateUI(true);
+         try {
+
+            final String property = propertyChangeEvent.getProperty();
+
+            boolean isChartModified = false;
+            boolean keepMinMax = true;
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               isChartModified = true;
+               keepMinMax = false;
+
+               _valuePointTooltip.reopen();
+
+               final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
+               tourAction.setImages();
             }
 
-            setIsInUpdateUI(true);
-            try {
+            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
 
-               final String property = event.getProperty();
-
-               boolean isChartModified = false;
-               boolean keepMinMax = true;
-
-               if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-                  // measurement system has changed
-
-                  isChartModified = true;
-                  keepMinMax = false;
-
-                  _valuePointTooltip.reopen();
-
-                  final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
-                  tourAction.setImages();
-               }
-
-               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
-
-               if (isChartModified) {
-                  updateTourChart(keepMinMax);
-               }
-
-            } finally {
-               setIsInUpdateUI(false);
+            if (isChartModified) {
+               updateTourChart(keepMinMax);
             }
+
+         } finally {
+            setIsInUpdateUI(false);
          }
       };
 
@@ -2484,35 +2462,31 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   path1.moveTo(graphXPrev, graphYPrev);
                   path1.lineTo(graphX1, graphY1);
 
-               } else if (pointIndex > 4) {
-
+               } else if (pointIndex > 4 && graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB) {
                   // draw following segments
 
                   // optimize, draw only when changed
-                  if (graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB) {
+                  if (segmentRGB == prevRGB) {
 
-                     if (segmentRGB == prevRGB) {
+                     // use the same color as the previous
 
-                        // use the same color as the previous
-
-                        if (segmentRGB == rgb1) {
-                           path1.lineTo(graphX1, graphY1);
-
-                        } else {
-                           path2.lineTo(graphX1, graphY1);
-                        }
+                     if (segmentRGB == rgb1) {
+                        path1.lineTo(graphX1, graphY1);
 
                      } else {
+                        path2.lineTo(graphX1, graphY1);
+                     }
 
-                        // color has changed, paint into other path
+                  } else {
 
-                        if (segmentRGB == rgb1) {
-                           path1.moveTo(graphXPrev, graphYPrev);
-                           path1.lineTo(graphX1, graphY1);
-                        } else {
-                           path2.moveTo(graphXPrev, graphYPrev);
-                           path2.lineTo(graphX1, graphY1);
-                        }
+                     // color has changed, paint into other path
+
+                     if (segmentRGB == rgb1) {
+                        path1.moveTo(graphXPrev, graphYPrev);
+                        path1.lineTo(graphX1, graphY1);
+                     } else {
+                        path2.moveTo(graphXPrev, graphYPrev);
+                        path2.lineTo(graphX1, graphY1);
                      }
                   }
                }
