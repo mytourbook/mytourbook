@@ -2636,7 +2636,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = graphDrawingData.getScaleX();
       final double scaleY = graphDrawingData.getScaleY();
 
-// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
+// this feature also needs that the y-axis is scaled accordingly -> this not yet implemented
 //
 //      if (_canChartBeOverlapped && _isChartOverlapped) {
 //
@@ -2936,9 +2936,8 @@ public class ChartComponentGraph extends Canvas {
 
                   if (yData.isYAxisDirection()) {
                      devY = devY0Inverse - devY1;
-                  }
-                  else {
-                     devY = devYGraphTop + devY1;
+                  } else {
+                     devY = devY1;
                   }
                   path.lineTo(devXf, devY);
 
@@ -3143,7 +3142,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      // reset clipping that the line is drawn everywere
+      // reset clipping that the line is drawn everywhere
       gc.setClipping((Rectangle) null);
 
       gc.setBackground(colorLine);
