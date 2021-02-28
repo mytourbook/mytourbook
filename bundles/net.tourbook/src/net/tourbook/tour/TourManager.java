@@ -3710,7 +3710,7 @@ public class TourManager {
          case GRAPH_PACE:
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
-               chartDataModel.setCustomData(CUSTOM_DATA_SPEED, yDataPace);
+               chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
             }
             break;
 
@@ -4247,14 +4247,17 @@ public class TourManager {
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
 
-      final float[] speedSerie = tourData.getSpeedSerie();
+//      final float[] speedSerie = tourData.getSpeedSerie();
 //      for (int index = 0; index < speedSerie.length; ++index) {
 //         speedSerie[index] *= 60;
 //      }
-      ChartDataYSerie yDataPace = null;
-      if (speedSerie != null) {
 
-         yDataPace = createChartDataSerieNoZero(speedSerie, chartType);
+      final float[] paceSerie = tourData.getPaceSerieSeconds();
+
+      ChartDataYSerie yDataPace = null;
+      if (paceSerie != null) {
+
+         yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
          yDataPace.setYTitle(GRAPH_LABEL_PACE);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
