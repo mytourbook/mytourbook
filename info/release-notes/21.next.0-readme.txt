@@ -70,6 +70,9 @@ Improvements
 
   - Marker Tooltip (Frederic)
     - Ability to show/hide the following data: Elevation, Distance, Duration, Elevation Gain Difference, Distance Difference, Duration Difference
+
+  - Pace chart (Frederic)
+    - Displaying the pace chart in descending order to show the high speeds at the top of the graph and the low speeds at the bottom of the graph for a more intuitive chart
     
 * Tour Blog
   - Set content font size
