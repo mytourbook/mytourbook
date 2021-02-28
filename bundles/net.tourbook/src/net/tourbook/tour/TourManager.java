@@ -4247,11 +4247,6 @@ public class TourManager {
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
 
-//      final float[] speedSerie = tourData.getSpeedSerie();
-//      for (int index = 0; index < speedSerie.length; ++index) {
-//         speedSerie[index] *= 60;
-//      }
-
       final float[] paceSerie = tourData.getPaceSerieSeconds();
 
       ChartDataYSerie yDataPace = null;
@@ -4273,13 +4268,11 @@ public class TourManager {
 
          setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
          chartDataModel.addXyData(yDataPace);
-//         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 3); //20min/mile
-//         _prefStore.setValue(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 15);//4min/mile
 
          // adjust min/max values when it's defined in the pref store
          setVisibleForcedValues(
                yDataPace,
-               1,
+               60,
                0,
                ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
                ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
