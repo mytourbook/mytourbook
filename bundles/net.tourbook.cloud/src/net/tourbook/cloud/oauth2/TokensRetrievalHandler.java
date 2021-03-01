@@ -72,7 +72,7 @@ public abstract class TokensRetrievalHandler implements HttpHandler {
    private void handleResponse(final HttpExchange httpExchange) throws IOException {
 
       final StringBuilder htmlBuilder = new StringBuilder();
-      htmlBuilder.append("<html><head><meta charset=\"UTF-8\"></head><body><h1>" + Messages.Html_CloseBrowser_Text + "</h1></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+      htmlBuilder.append("<html><head><meta charset=\"UTF-8\"></head><body><h1>" + Messages.Html_Text_CloseBrowser + "</h1></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
 
       final byte[] response = htmlBuilder.toString().getBytes(StandardCharsets.UTF_8);
 

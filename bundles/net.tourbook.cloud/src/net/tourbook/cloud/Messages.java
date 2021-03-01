@@ -21,7 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.cloud.messages";       //$NON-NLS-1$
 
-   public static String        Html_CloseBrowser_Text;
+   public static String        Html_Text_CloseBrowser;
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
