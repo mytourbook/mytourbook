@@ -343,7 +343,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          GridLayoutFactory.fillDefaults()//
                .numColumns(2)
                .applyTo(container);
-//       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
             createUI_12_Actions(container);
@@ -731,7 +731,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       final CLabel icon = new CLabel(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
-//          .indent(16, 0)
+//				.indent(16, 0)
             .applyTo(icon);
       icon.setImage(image);
 
@@ -844,57 +844,57 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-      _iconAltimeter.setImage(                  isMinMaxEnabled ? _imageAltimeter   : _imageAltimeterDisabled);
-      _iconAltitude.setImage(                   isMinMaxEnabled ? _imageAltitude    : _imageAltitudeDisabled);
-      _iconCadence.setImage(                    isMinMaxEnabled ? _imageCadence     : _imageCadenceDisabled);
-      _iconGradient.setImage(                   isMinMaxEnabled ? _imageGradient    : _imageGradientDisabled);
-      _iconPace.setImage(                       isMinMaxEnabled ? _imagePace        : _imagePaceDisabled);
-      _iconPower.setImage(                      isMinMaxEnabled ? _imagePower       : _imagePowerDisabled);
-      _iconPulse.setImage(                      isMinMaxEnabled ? _imagePulse       : _imagePulseDisabled);
-      _iconSpeed.setImage(                      isMinMaxEnabled ? _imageSpeed       : _imageSpeedDisabled);
-      _iconTemperature.setImage(                isMinMaxEnabled ? _imageTemperature                : _imageTemperatureDisabled);
-      _iconRunDyn_StanceTime.setImage(          isMinMaxEnabled ? _imageRunDyn_StanceTime          : _imageRunDyn_StanceTime_Disabled);
-      _iconRunDyn_StanceTimeBalance.setImage(   isMinMaxEnabled ? _imageRunDyn_StanceTimeBalance   : _imageRunDyn_StanceTimeBalance_Disabled);
-      _iconRunDyn_StepLength.setImage(          isMinMaxEnabled ? _imageRunDyn_StepLength          : _imageRunDyn_StepLength_Disabled);
-      _iconRunDyn_VerticalOscillation.setImage( isMinMaxEnabled ? _imageRunDyn_VerticalOscillation : _imageRunDyn_VerticalOscillation_Disabled);
-      _iconRunDyn_VerticalRatio.setImage(       isMinMaxEnabled ? _imageRunDyn_VerticalRatio       : _imageRunDyn_VerticalRatio_Disabled);
-      _iconSwim_Strokes.setImage(               isMinMaxEnabled ? _imageSwim_Strokes               : _imageSwim_Strokes_Disabled);
-      _iconSwim_Swolf.setImage(                 isMinMaxEnabled ? _imageSwim_Swolf                 : _imageSwim_Swolf_Disabled);
+		_iconAltimeter.setImage(						isMinMaxEnabled ? _imageAltimeter 	: _imageAltimeterDisabled);
+		_iconAltitude.setImage(							isMinMaxEnabled ? _imageAltitude 	: _imageAltitudeDisabled);
+		_iconCadence.setImage(							isMinMaxEnabled ? _imageCadence 		: _imageCadenceDisabled);
+		_iconGradient.setImage(							isMinMaxEnabled ? _imageGradient 	: _imageGradientDisabled);
+		_iconPace.setImage(								isMinMaxEnabled ? _imagePace 			: _imagePaceDisabled);
+		_iconPower.setImage(								isMinMaxEnabled ? _imagePower 		: _imagePowerDisabled);
+		_iconPulse.setImage(								isMinMaxEnabled ? _imagePulse 		: _imagePulseDisabled);
+		_iconSpeed.setImage(								isMinMaxEnabled ? _imageSpeed 		: _imageSpeedDisabled);
+		_iconTemperature.setImage(						isMinMaxEnabled ? _imageTemperature 					: _imageTemperatureDisabled);
+		_iconRunDyn_StanceTime.setImage(				isMinMaxEnabled ? _imageRunDyn_StanceTime 			: _imageRunDyn_StanceTime_Disabled);
+		_iconRunDyn_StanceTimeBalance.setImage(	isMinMaxEnabled ? _imageRunDyn_StanceTimeBalance 	: _imageRunDyn_StanceTimeBalance_Disabled);
+		_iconRunDyn_StepLength.setImage(				isMinMaxEnabled ? _imageRunDyn_StepLength 			: _imageRunDyn_StepLength_Disabled);
+		_iconRunDyn_VerticalOscillation.setImage(	isMinMaxEnabled ? _imageRunDyn_VerticalOscillation : _imageRunDyn_VerticalOscillation_Disabled);
+		_iconRunDyn_VerticalRatio.setImage(			isMinMaxEnabled ? _imageRunDyn_VerticalRatio 		: _imageRunDyn_VerticalRatio_Disabled);
+		_iconSwim_Strokes.setImage(					isMinMaxEnabled ? _imageSwim_Strokes					: _imageSwim_Strokes_Disabled);
+		_iconSwim_Swolf.setImage(						isMinMaxEnabled ? _imageSwim_Swolf						: _imageSwim_Swolf_Disabled);
 
-      _spinnerMin_Altimeter.setEnabled(         isMinMaxEnabled && _chkMin_Altimeter.getSelection());
-      _spinnerMax_Altimeter.setEnabled(         isMinMaxEnabled && _chkMax_Altimeter.getSelection());
-      _spinnerMin_Altitude.setEnabled(          isMinMaxEnabled && _chkMin_Altitude.getSelection());
-      _spinnerMax_Altitude.setEnabled(          isMinMaxEnabled && _chkMax_Altitude.getSelection());
-      _spinnerMin_Cadence.setEnabled(           isMinMaxEnabled && _chkMin_Cadence.getSelection());
-      _spinnerMax_Cadence.setEnabled(           isMinMaxEnabled && _chkMax_Cadence.getSelection());
-      _spinnerMin_Gradient.setEnabled(          isMinMaxEnabled && _chkMin_Gradient.getSelection());
-      _spinnerMax_Gradient.setEnabled(          isMinMaxEnabled && _chkMax_Gradient.getSelection());
-      _spinnerMin_Pace.setEnabled(              isMinMaxEnabled && _chkMin_Pace.getSelection());
-      _spinnerMax_Pace.setEnabled(              isMinMaxEnabled && _chkMax_Pace.getSelection());
-      _spinnerMin_Power.setEnabled(             isMinMaxEnabled && _chkMin_Power.getSelection());
-      _spinnerMax_Power.setEnabled(             isMinMaxEnabled && _chkMax_Power.getSelection());
-      _spinnerMin_Pulse.setEnabled(             isMinMaxEnabled && _chkMin_Pulse.getSelection());
-      _spinnerMax_Pulse.setEnabled(             isMinMaxEnabled && _chkMax_Pulse.getSelection());
-      _spinnerMin_Speed.setEnabled(             isMinMaxEnabled && _chkMin_Speed.getSelection());
-      _spinnerMax_Speed.setEnabled(             isMinMaxEnabled && _chkMax_Speed.getSelection());
-      _spinnerMin_Temperature.setEnabled(       isMinMaxEnabled && _chkMin_Temperature.getSelection());
-      _spinnerMax_Temperature.setEnabled(       isMinMaxEnabled && _chkMax_Temperature.getSelection());
+		_spinnerMin_Altimeter.setEnabled(			isMinMaxEnabled && _chkMin_Altimeter.getSelection());
+		_spinnerMax_Altimeter.setEnabled(			isMinMaxEnabled && _chkMax_Altimeter.getSelection());
+		_spinnerMin_Altitude.setEnabled(				isMinMaxEnabled && _chkMin_Altitude.getSelection());
+		_spinnerMax_Altitude.setEnabled(				isMinMaxEnabled && _chkMax_Altitude.getSelection());
+		_spinnerMin_Cadence.setEnabled(				isMinMaxEnabled && _chkMin_Cadence.getSelection());
+		_spinnerMax_Cadence.setEnabled(				isMinMaxEnabled && _chkMax_Cadence.getSelection());
+		_spinnerMin_Gradient.setEnabled(				isMinMaxEnabled && _chkMin_Gradient.getSelection());
+		_spinnerMax_Gradient.setEnabled(				isMinMaxEnabled && _chkMax_Gradient.getSelection());
+		_spinnerMin_Pace.setEnabled(					isMinMaxEnabled && _chkMin_Pace.getSelection());
+		_spinnerMax_Pace.setEnabled(					isMinMaxEnabled && _chkMax_Pace.getSelection());
+		_spinnerMin_Power.setEnabled(					isMinMaxEnabled && _chkMin_Power.getSelection());
+		_spinnerMax_Power.setEnabled(					isMinMaxEnabled && _chkMax_Power.getSelection());
+		_spinnerMin_Pulse.setEnabled(					isMinMaxEnabled && _chkMin_Pulse.getSelection());
+		_spinnerMax_Pulse.setEnabled(					isMinMaxEnabled && _chkMax_Pulse.getSelection());
+		_spinnerMin_Speed.setEnabled(					isMinMaxEnabled && _chkMin_Speed.getSelection());
+		_spinnerMax_Speed.setEnabled(					isMinMaxEnabled && _chkMax_Speed.getSelection());
+		_spinnerMin_Temperature.setEnabled(			isMinMaxEnabled && _chkMin_Temperature.getSelection());
+		_spinnerMax_Temperature.setEnabled(			isMinMaxEnabled && _chkMax_Temperature.getSelection());
 
-      _spinnerMin_RunDyn_StanceTime.setEnabled(          isMinMaxEnabled && _chkMin_RunDyn_StanceTime.getSelection());
-      _spinnerMax_RunDyn_StanceTime.setEnabled(          isMinMaxEnabled && _chkMax_RunDyn_StanceTime.getSelection());
-      _spinnerMin_RunDyn_StanceTimeBalance.setEnabled(   isMinMaxEnabled && _chkMin_RunDyn_StanceTimeBalance.getSelection());
-      _spinnerMax_RunDyn_StanceTimeBalance.setEnabled(   isMinMaxEnabled && _chkMax_RunDyn_StanceTimeBalance.getSelection());
-      _spinnerMin_RunDyn_StepLength.setEnabled(          isMinMaxEnabled && _chkMin_RunDyn_StepLength.getSelection());
-      _spinnerMax_RunDyn_StepLength.setEnabled(          isMinMaxEnabled && _chkMax_RunDyn_StepLength.getSelection());
-      _spinnerMin_RunDyn_VerticalOscillation.setEnabled( isMinMaxEnabled && _chkMin_RunDyn_VerticalOscillation.getSelection());
-      _spinnerMax_RunDyn_VerticalOscillation.setEnabled( isMinMaxEnabled && _chkMax_RunDyn_VerticalOscillation.getSelection());
-      _spinnerMin_RunDyn_VerticalRatio.setEnabled(       isMinMaxEnabled && _chkMin_RunDyn_VerticalRatio.getSelection());
-      _spinnerMax_RunDyn_VerticalRatio.setEnabled(       isMinMaxEnabled && _chkMax_RunDyn_VerticalRatio.getSelection());
+		_spinnerMin_RunDyn_StanceTime.setEnabled(				isMinMaxEnabled && _chkMin_RunDyn_StanceTime.getSelection());
+		_spinnerMax_RunDyn_StanceTime.setEnabled(				isMinMaxEnabled && _chkMax_RunDyn_StanceTime.getSelection());
+		_spinnerMin_RunDyn_StanceTimeBalance.setEnabled(	isMinMaxEnabled && _chkMin_RunDyn_StanceTimeBalance.getSelection());
+		_spinnerMax_RunDyn_StanceTimeBalance.setEnabled(	isMinMaxEnabled && _chkMax_RunDyn_StanceTimeBalance.getSelection());
+		_spinnerMin_RunDyn_StepLength.setEnabled(				isMinMaxEnabled && _chkMin_RunDyn_StepLength.getSelection());
+		_spinnerMax_RunDyn_StepLength.setEnabled(				isMinMaxEnabled && _chkMax_RunDyn_StepLength.getSelection());
+		_spinnerMin_RunDyn_VerticalOscillation.setEnabled(	isMinMaxEnabled && _chkMin_RunDyn_VerticalOscillation.getSelection());
+		_spinnerMax_RunDyn_VerticalOscillation.setEnabled(	isMinMaxEnabled && _chkMax_RunDyn_VerticalOscillation.getSelection());
+		_spinnerMin_RunDyn_VerticalRatio.setEnabled(			isMinMaxEnabled && _chkMin_RunDyn_VerticalRatio.getSelection());
+		_spinnerMax_RunDyn_VerticalRatio.setEnabled(			isMinMaxEnabled && _chkMax_RunDyn_VerticalRatio.getSelection());
 
-      _spinnerMin_Swim_Strokes.setEnabled(               isMinMaxEnabled && _chkMin_Swim_Strokes.getSelection());
-      _spinnerMax_Swim_Strokes.setEnabled(               isMinMaxEnabled && _chkMax_Swim_Strokes.getSelection());
-      _spinnerMin_Swim_Swolf.setEnabled(                 isMinMaxEnabled && _chkMin_Swim_Swolf.getSelection());
-      _spinnerMax_Swim_Swolf.setEnabled(                 isMinMaxEnabled && _chkMax_Swim_Swolf.getSelection());
+		_spinnerMin_Swim_Strokes.setEnabled(					isMinMaxEnabled && _chkMin_Swim_Strokes.getSelection());
+		_spinnerMax_Swim_Strokes.setEnabled(					isMinMaxEnabled && _chkMax_Swim_Strokes.getSelection());
+		_spinnerMin_Swim_Swolf.setEnabled(						isMinMaxEnabled && _chkMin_Swim_Swolf.getSelection());
+		_spinnerMax_Swim_Swolf.setEnabled(						isMinMaxEnabled && _chkMax_Swim_Swolf.getSelection());
 
 // SET_FORMATTING_ON
 
@@ -907,40 +907,40 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-      _imageAltimeter                           = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
-      _imageAltimeterDisabled                   = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled).createImage();
-      _imageAltitude                            = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
-      _imageAltitudeDisabled                    = TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled).createImage();
-      _imageCadence                             = TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
-      _imageCadenceDisabled                     = TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled).createImage();
-      _imageGradient                            = TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient).createImage();
-      _imageGradientDisabled                    = TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled).createImage();
-      _imagePace                                = TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace).createImage();
-      _imagePaceDisabled                        = TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled).createImage();
-      _imagePower                               = TourbookPlugin.getImageDescriptor(Messages.Image__graph_power).createImage();
-      _imagePowerDisabled                       = TourbookPlugin.getImageDescriptor(Messages.Image__graph_power_disabled).createImage();
-      _imagePulse                               = TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
-      _imagePulseDisabled                       = TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled).createImage();
-      _imageSpeed                               = TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
-      _imageSpeedDisabled                       = TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled).createImage();
-      _imageTemperature                         = TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
-      _imageTemperatureDisabled                 = TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
+		_imageAltimeter 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
+		_imageAltimeterDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled).createImage();
+		_imageAltitude 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
+		_imageAltitudeDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled).createImage();
+		_imageCadence 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
+		_imageCadenceDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled).createImage();
+		_imageGradient 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient).createImage();
+		_imageGradientDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled).createImage();
+		_imagePace 											= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace).createImage();
+		_imagePaceDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled).createImage();
+		_imagePower 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power).createImage();
+		_imagePowerDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power_disabled).createImage();
+		_imagePulse 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
+		_imagePulseDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled).createImage();
+		_imageSpeed 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
+		_imageSpeedDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled).createImage();
+		_imageTemperature 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
+		_imageTemperatureDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
 
-      _imageRunDyn_StanceTime                   = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
-      _imageRunDyn_StanceTime_Disabled          = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
-      _imageRunDyn_StanceTimeBalance            = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
-      _imageRunDyn_StanceTimeBalance_Disabled   = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
-      _imageRunDyn_StepLength                   = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
-      _imageRunDyn_StepLength_Disabled          = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
-      _imageRunDyn_VerticalOscillation          = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation).createImage();
-      _imageRunDyn_VerticalOscillation_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
-      _imageRunDyn_VerticalRatio                = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio).createImage();
-      _imageRunDyn_VerticalRatio_Disabled       = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
+		_imageRunDyn_StanceTime							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
+		_imageRunDyn_StanceTime_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
+		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
+		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
+		_imageRunDyn_StepLength							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
+		_imageRunDyn_StepLength_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
+		_imageRunDyn_VerticalOscillation				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation).createImage();
+		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
+		_imageRunDyn_VerticalRatio						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio).createImage();
+		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
 
-      _imageSwim_Strokes                        = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes).createImage();
-      _imageSwim_Strokes_Disabled               = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes_Disabled).createImage();
-      _imageSwim_Swolf                          = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf).createImage();
-      _imageSwim_Swolf_Disabled                 = TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf_Disabled).createImage();
+		_imageSwim_Strokes								= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes).createImage();
+		_imageSwim_Strokes_Disabled					= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes_Disabled).createImage();
+		_imageSwim_Swolf									= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf).createImage();
+		_imageSwim_Swolf_Disabled						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf_Disabled).createImage();
 
 // SET_FORMATTING_ON
    }
@@ -1106,48 +1106,48 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-      /*
-       * Running dynamics
-       */
-      final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		/*
+		 * Running dynamics
+		 */
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-      prefRestoreDefault(_chkMin_RunDyn_StanceTime,               ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_RunDyn_StanceTime,               ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_RunDyn_StanceTime,           ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_RunDyn_StanceTime,           ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+		prefRestoreDefault(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_StanceTime, 	 		 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_RunDyn_StanceTime, 	 		 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-      prefRestoreDefault(_chkMin_RunDyn_StanceTimeBalance,        ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_RunDyn_StanceTimeBalance,        ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_RunDyn_StanceTimeBalance,    ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_RunDyn_StanceTimeBalance,    ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
+		prefRestoreDefault(_chkMin_RunDyn_StanceTimeBalance, 			ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_StanceTimeBalance, 			ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
-      prefRestoreDefault(_chkMin_RunDyn_StepLength,               ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_RunDyn_StepLength,               ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_RunDyn_StepLength,           ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,            measurementDistanceXS);
-      prefRestoreDefault(_spinnerMax_RunDyn_StepLength,           ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,            measurementDistanceXS);
+		prefRestoreDefault(_chkMin_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_StepLength, 	 	 		ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE, 				measurementDistanceXS);
+		prefRestoreDefault(_spinnerMax_RunDyn_StepLength, 	 	 		ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,				measurementDistanceXS);
 
-      prefRestoreDefault(_chkMin_RunDyn_VerticalOscillation,      ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_RunDyn_VerticalOscillation,      ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_RunDyn_VerticalOscillation,  ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,   measurementDistanceXS);
-      prefRestoreDefault(_spinnerMax_RunDyn_VerticalOscillation,  ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,   measurementDistanceXS);
+		prefRestoreDefault(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE, 	measurementDistanceXS);
+		prefRestoreDefault(_spinnerMax_RunDyn_VerticalOscillation, 	ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE, 	measurementDistanceXS);
 
-      prefRestoreDefault(_chkMin_RunDyn_VerticalRatio,            ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_RunDyn_VerticalRatio,            ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_RunDyn_VerticalRatio,        ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_RunDyn_VerticalRatio,        ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
+		prefRestoreDefault(_chkMin_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_RunDyn_VerticalRatio, 			ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
 
-      /*
-       * Swimming
-       */
-      prefRestoreDefault(_chkMin_Swim_Strokes,                    ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_Swim_Strokes,                    ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_Swim_Strokes,                ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_Swim_Strokes,                ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
+		/*
+		 * Swimming
+		 */
+		prefRestoreDefault(_chkMin_Swim_Strokes, 							ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_Swim_Strokes, 							ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
 
-      prefRestoreDefault(_chkMin_Swim_Swolf,                      ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
-      prefRestoreDefault(_chkMax_Swim_Swolf,                      ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_Swim_Swolf,                  ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_Swim_Swolf,                  ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
+		prefRestoreDefault(_chkMin_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
+		prefRestoreDefault(_chkMax_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
+		prefRestoreDefault(_spinnerMin_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
+		prefRestoreDefault(_spinnerMax_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
 
 // SET_FORMATTING_ON
 
@@ -1218,48 +1218,48 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-      /*
-       * Running dynamics
-       */
-      final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		/*
+		 * Running dynamics
+		 */
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-      prefRestoreValue(_chkMin_RunDyn_StanceTime,              ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_RunDyn_StanceTime,              ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_RunDyn_StanceTime,          ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_RunDyn_StanceTime,          ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+		prefRestoreValue(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-      prefRestoreValue(_chkMin_RunDyn_StanceTimeBalance,       ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_RunDyn_StanceTimeBalance,       ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_RunDyn_StanceTimeBalance,   ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_RunDyn_StanceTimeBalance,   ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
+		prefRestoreValue(_chkMin_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
-      prefRestoreValue(_chkMin_RunDyn_StepLength,              ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_RunDyn_StepLength,              ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_RunDyn_StepLength,          ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,            measurementDistanceXS);
-      prefRestoreValue(_spinnerMax_RunDyn_StepLength,          ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,            measurementDistanceXS);
+		prefRestoreValue(_chkMin_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,				measurementDistanceXS);
+		prefRestoreValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,				measurementDistanceXS);
 
-      prefRestoreValue(_chkMin_RunDyn_VerticalOscillation,     ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_RunDyn_VerticalOscillation,     ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,   measurementDistanceXS);
-      prefRestoreValue(_spinnerMax_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,   measurementDistanceXS);
+		prefRestoreValue(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,	measurementDistanceXS);
+		prefRestoreValue(_spinnerMax_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,	measurementDistanceXS);
 
-      prefRestoreValue(_chkMin_RunDyn_VerticalRatio,           ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_RunDyn_VerticalRatio,           ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_RunDyn_VerticalRatio,       ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_RunDyn_VerticalRatio,       ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
+		prefRestoreValue(_chkMin_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_RunDyn_VerticalRatio, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_RunDyn_VerticalRatio, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
 
-      /*
-       * Swimming
-       */
-      prefRestoreValue(_chkMin_Swim_Strokes,                   ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_Swim_Strokes,                   ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_Swim_Strokes,               ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_Swim_Strokes,               ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
+		/*
+		 * Swimming
+		 */
+		prefRestoreValue(_chkMin_Swim_Strokes, 						ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Swim_Strokes, 						ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
 
-      prefRestoreValue(_chkMin_Swim_Swolf,                     ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
-      prefRestoreValue(_chkMax_Swim_Swolf,                     ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_Swim_Swolf,                 ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_Swim_Swolf,                 ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
+		prefRestoreValue(_chkMin_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
+		prefRestoreValue(_chkMax_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
+		prefRestoreValue(_spinnerMin_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
+		prefRestoreValue(_spinnerMax_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
 
 // SET_FORMATTING_ON
 
@@ -1326,49 +1326,49 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-      /*
-       * Running dynamics
-       */
-      final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+		/*
+		 * Running dynamics
+		 */
+		final float measurementDistanceXS = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
-      prefSaveValue(_chkMin_RunDyn_StanceTime,              ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_RunDyn_StanceTime,              ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_RunDyn_StanceTime,          ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
-      prefSaveValue(_spinnerMax_RunDyn_StanceTime,          ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
+		prefSaveValue(_chkMin_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_StanceTime, 					ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MIN_VALUE);
+		prefSaveValue(_spinnerMax_RunDyn_StanceTime, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE);
 
-      prefSaveValue(_chkMin_RunDyn_StanceTimeBalance,       ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_RunDyn_StanceTimeBalance,       ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_RunDyn_StanceTimeBalance,   ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
-      prefSaveValue(_spinnerMax_RunDyn_StanceTimeBalance,   ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
+		prefSaveValue(_chkMin_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_StanceTimeBalance, 		ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MIN_VALUE);
+		prefSaveValue(_spinnerMax_RunDyn_StanceTimeBalance, 	ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE);
 
-      prefSaveValue(_chkMin_RunDyn_StepLength,              ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_RunDyn_StepLength,              ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_RunDyn_StepLength,          ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,            measurementDistanceXS);
-      prefSaveValue(_spinnerMax_RunDyn_StepLength,          ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,            measurementDistanceXS);
+		prefSaveValue(_chkMin_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_StepLength, 					ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MIN_VALUE,				measurementDistanceXS);
+		prefSaveValue(_spinnerMax_RunDyn_StepLength, 	 	 	ITourbookPreferences.GRAPH_RUN_DYN_STEP_LENGTH_MAX_VALUE,				measurementDistanceXS);
 
-      prefSaveValue(_chkMin_RunDyn_VerticalOscillation,     ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_RunDyn_VerticalOscillation,     ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,   measurementDistanceXS);
-      prefSaveValue(_spinnerMax_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,   measurementDistanceXS);
+		prefSaveValue(_chkMin_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_VerticalOscillation, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MIN_VALUE,	measurementDistanceXS);
+		prefSaveValue(_spinnerMax_RunDyn_VerticalOscillation, ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_OSCILLATION_MAX_VALUE,	measurementDistanceXS);
 
-      prefSaveValue(_chkMin_RunDyn_VerticalRatio,           ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_RunDyn_VerticalRatio,           ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_RunDyn_VerticalRatio,       ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
-      prefSaveValue(_spinnerMax_RunDyn_VerticalRatio,       ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
+		prefSaveValue(_chkMin_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_RunDyn_VerticalRatio, 				ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_RunDyn_VerticalRatio, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MIN_VALUE);
+		prefSaveValue(_spinnerMax_RunDyn_VerticalRatio, 		ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE);
 
 
-      /*
-       * Swimming
-       */
-      prefSaveValue(_chkMin_Swim_Strokes,                   ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_Swim_Strokes,                   ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_Swim_Strokes,               ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
-      prefSaveValue(_spinnerMax_Swim_Strokes,               ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
+		/*
+		 * Swimming
+		 */
+		prefSaveValue(_chkMin_Swim_Strokes, 						ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Swim_Strokes, 						ITourbookPreferences.GRAPH_SWIM_STROKES_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Swim_Strokes, 					ITourbookPreferences.GRAPH_SWIM_STROKES_MAX_VALUE);
 
-      prefSaveValue(_chkMin_Swim_Swolf,                     ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
-      prefSaveValue(_chkMax_Swim_Swolf,                     ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_Swim_Swolf,                 ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
-      prefSaveValue(_spinnerMax_Swim_Swolf,                 ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
+		prefSaveValue(_chkMin_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MIN_ENABLED);
+		prefSaveValue(_chkMax_Swim_Swolf, 							ITourbookPreferences.GRAPH_SWIM_SWOLF_IS_MAX_ENABLED);
+		prefSaveValue(_spinnerMin_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MIN_VALUE);
+		prefSaveValue(_spinnerMax_Swim_Swolf, 						ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE);
 
 // SET_FORMATTING_ON
    }
