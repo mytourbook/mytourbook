@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,9 +23,14 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -36,6 +41,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 public class ChartComponentAxis extends Canvas {
 
@@ -86,7 +92,7 @@ public class ChartComponentAxis extends Canvas {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   ChartComponentAxis(final Chart chart, final Composite parent) {
+   ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
       super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
@@ -94,11 +100,26 @@ public class ChartComponentAxis extends Canvas {
 
       _moveMarkerColor = new Color(parent.getDisplay(), 0x8B, 0xC6, 0xFF);
 
-      addDisposeListener(disposeEvent -> onDispose());
+      addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
-      addPaintListener(paintEvent -> onPaint(paintEvent.gc));
+      addPaintListener(new PaintListener() {
+         @Override
+         public void paintControl(final PaintEvent event) {
+            onPaint(event.gc);
+         }
+      });
 
-      addDisposeListener(disposeEvent -> _axisImage = Util.disposeResource(_axisImage));
+      addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _axisImage = Util.disposeResource(_axisImage);
+         }
+      });
 
       addMouseListener(new MouseAdapter() {
          @Override
@@ -108,12 +129,17 @@ public class ChartComponentAxis extends Canvas {
 
          @Override
          public void mouseDown(final MouseEvent e) {
-            onMouseDown();
+            onMouseDown(e);
          }
 
       });
 
-      addMouseMoveListener(this::onMouseMove);
+      addMouseMoveListener(new MouseMoveListener() {
+         @Override
+         public void mouseMove(final MouseEvent e) {
+            onMouseMove(e);
+         }
+      });
 
       addMouseTrackListener(new MouseTrackListener() {
 
@@ -142,10 +168,15 @@ public class ChartComponentAxis extends Canvas {
          }
       });
 
-      addListener(SWT.MouseWheel, this::onMouseWheel);
+      addListener(SWT.MouseWheel, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
+            onMouseWheel(event);
+         }
+      });
    }
 
-   public void afterHideToolTip() {
+   public void afterHideToolTip(final Event event) {
 
       // force redrawing of the axis and hide the hovered image
 
@@ -224,7 +255,7 @@ public class ChartComponentAxis extends Canvas {
    /**
     * The move markers in the tour chart axis shows, how far to the right or left a zoomed chart is
     * moved.
-    *
+    * 
     * @param gc
     * @param rect
     */
@@ -305,7 +336,7 @@ public class ChartComponentAxis extends Canvas {
 
    /**
     * draws unit label and ticks onto the y-axis
-    *
+    * 
     * @param gc
     * @param graphRect
     */
@@ -482,11 +513,11 @@ public class ChartComponentAxis extends Canvas {
       }
    }
 
-   private void onMouseDown() {
+   private void onMouseDown(final MouseEvent event) {
 
       _componentGraph.setFocus();
 
-      _componentGraph.onMouseDownAxis();
+      _componentGraph.onMouseDownAxis(event);
    }
 
    private void onMouseEnter(final MouseEvent event) {
@@ -546,7 +577,7 @@ public class ChartComponentAxis extends Canvas {
 
    /**
     * set a new configuration for the axis, this causes a recreation of the axis
-    *
+    * 
     * @param chartDrawingData
     * @param isLeft
     *           true if the axis is on the left side

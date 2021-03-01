@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,12 +24,14 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
@@ -61,8 +63,14 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -94,29 +102,34 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
    private void addTourPropertyListener() {
 
-      _tourPropertyListener = (workbenchPart, tourEventId, propertyData) -> {
+      _tourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part,
+                                 final TourEventId propertyId,
+                                 final Object propertyData) {
 
-         if (tourEventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+            if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-            // check if a tour was modified
-            final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
-            if (modifiedTours != null) {
+               // check if a tour was modified
+               final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+               if (modifiedTours != null) {
 
-               for (final TourData modifiedTourData : modifiedTours) {
+                  for (final TourData modifiedTourData : modifiedTours) {
 
-                  final long modifiedTourId = modifiedTourData.getTourId();
+                     final long modifiedTourId = modifiedTourData.getTourId();
 
-                  final long[] tourIds = _statisticData_Day.allTourIds;
-                  for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
+                     final long[] tourIds = _statisticData_Day.allTourIds;
+                     for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
 
-                     final long tourId = tourIds[tourIdIndex];
+                        final long tourId = tourIds[tourIdIndex];
 
-                     if (tourId == modifiedTourId) {
+                        if (tourId == modifiedTourId) {
 
-                        // set new tour title
-                        _statisticData_Day.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
+                           // set new tour title
+                           _statisticData_Day.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
 
-                        break;
+                           break;
+                        }
                      }
                   }
                }
@@ -175,45 +188,54 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       // set tour info icon into the left axis
       _tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
-      _tourToolTip.addHideListener(event -> _chart.getToolTipControl().afterHideToolTip());
+      _tourToolTip.addHideListener(new IToolTipHideListener() {
+         @Override
+         public void afterHideToolTip(final Event event) {
+            // hide hovered image
+            _chart.getToolTipControl().afterHideToolTip(event);
+         }
+      });
 
       _chart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
-      _chart.addBarSelectionListener((serieIndex, valueIndex) -> {
-         if (_statisticData_Day.allTypeIds.length > 0) {
+      _chart.addBarSelectionListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, final int valueIndex) {
+            if (_statisticData_Day.allTypeIds.length > 0) {
 
-            _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
-            _tourInfoToolTipProvider.setTourId(_selectedTourId);
+               _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
+               _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-            if (StatisticView.isInUpdateUI()) {
+               if (StatisticView.isInUpdateUI()) {
 
-               /*
-                * Do not fire an event when this is running already in an update event. This
-                * occures when a tour is modified (marker) in the toubook view and the stat view
-                * is opened !!!
-                */
+                  /*
+                   * Do not fire an event when this is running already in an update event. This
+                   * occures when a tour is modified (marker) in the toubook view and the stat view
+                   * is opened !!!
+                   */
 
-               return;
-            }
+                  return;
+               }
 
-            // don't fire an event when preferences are updated
-            if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
-               return;
-            }
+               // don't fire an event when preferences are updated
+               if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
+                  return;
+               }
 
-            final SelectionTourId selection = new SelectionTourId(_selectedTourId);
+               final SelectionTourId selection = new SelectionTourId(_selectedTourId);
 
-            // this view can be inactive -> selection is not fired with the SelectionProvider interface
-            TourManager.fireEventWithCustomData(
-                  TourEventId.TOUR_SELECTION,
-                  selection,
-                  viewSite.getPart());
+               // this view can be inactive -> selection is not fired with the SelectionProvider interface
+               TourManager.fireEventWithCustomData(
+                     TourEventId.TOUR_SELECTION,
+                     selection,
+                     viewSite.getPart());
 
-            // set selection also into the view that when the view is activated, then a tour selection is fired
-            final ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
-            if (selectionProvider instanceof PostSelectionProvider) {
-               ((PostSelectionProvider) selectionProvider).setSelectionNoFireEvent(selection);
+               // set selection also into the view that when the view is activated, then a tour selection is fired
+               final ISelectionProvider selectionProvider = viewSite.getSelectionProvider();
+               if (selectionProvider instanceof PostSelectionProvider) {
+                  ((PostSelectionProvider) selectionProvider).setSelectionNoFireEvent(selection);
+               }
             }
          }
       });
@@ -221,30 +243,36 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       /*
        * open tour with double click on the tour bar
        */
-      _chart.addDoubleClickListener((serieIndex, valueIndex) -> {
+      _chart.addDoubleClickListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, final int valueIndex) {
 
-         _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
-         _tourInfoToolTipProvider.setTourId(_selectedTourId);
+            _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
+            _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-         ActionEditQuick.doAction(StatisticDay.this);
+            ActionEditQuick.doAction(StatisticDay.this);
+         }
       });
 
       /*
        * open tour with Enter key
        */
-      _chart.addTraverseListener(traverseEvent -> {
+      _chart.addTraverseListener(new TraverseListener() {
+         @Override
+         public void keyTraversed(final TraverseEvent event) {
 
-         if (traverseEvent.detail == SWT.TRAVERSE_RETURN) {
-            final ISelection selection = _chart.getSelection();
-            if (selection instanceof SelectionBarChart) {
-               final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+            if (event.detail == SWT.TRAVERSE_RETURN) {
+               final ISelection selection = _chart.getSelection();
+               if (selection instanceof SelectionBarChart) {
+                  final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-               if (barChartSelection.serieIndex != -1) {
+                  if (barChartSelection.serieIndex != -1) {
 
-                  _selectedTourId = _statisticData_Day.allTourIds[barChartSelection.valueIndex];
-                  _tourInfoToolTipProvider.setTourId(_selectedTourId);
+                     _selectedTourId = _statisticData_Day.allTourIds[barChartSelection.valueIndex];
+                     _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-                  ActionEditQuick.doAction(StatisticDay.this);
+                     ActionEditQuick.doAction(StatisticDay.this);
+                  }
                }
             }
          }
@@ -263,6 +291,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
+                                final int serieIndex,
                                 int valueIndex) {
 
       final int[] tourDOYValues = _statisticData_Day.getDoyValues();
@@ -299,7 +328,12 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          _tourInfoUI.setActionsEnabled(true);
       }
 
-      parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
+      parent.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _tourInfoUI.dispose();
+         }
+      });
    }
 
    /**
@@ -308,7 +342,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    void createXDataDay(final ChartDataModel chartModel) {
 
       final ChartDataXSerie xData = new ChartDataXSerie(_statisticData_Day.getDoyValuesDouble());
-      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_DAY);
+      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
 //      xData.setVisibleMaxValue(fCurrentYear);
       xData.setChartSegments(createChartSegments(_statisticData_Day));
 
@@ -439,7 +473,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
@@ -573,7 +607,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    public boolean selectTour(final Long tourId) {
 
       final long[] tourIds = _statisticData_Day.allTourIds;
-      final boolean[] selectedItems = new boolean[tourIds.length];
+      final boolean selectedItems[] = new boolean[tourIds.length];
       boolean isSelected = false;
 
       // find the tour which has the same tourId as the selected tour
@@ -597,13 +631,16 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       return isSelected;
    }
 
-   private void setChartProviders(final ChartDataModel chartModel) {
+   private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
-            (IChartInfoProvider) (toolTipProvider, parent, serieIndex, valueIndex) -> StatisticDay.this.createToolTipUI(toolTipProvider,
-                  parent,
-                  valueIndex));
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticDay.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+      });
 
       // set the menu context provider
       chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_chart, this));
@@ -681,7 +718,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final int yearDays = TimeTools.getNumberOfDaysWithYear(_statSelectedYear);
       chartModel.setChartMinWidth(yearDays);
 
-      setChartProviders(chartModel);
+      setChartProviders(_chart, chartModel);
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);

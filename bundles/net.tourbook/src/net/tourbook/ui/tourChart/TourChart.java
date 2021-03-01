@@ -58,6 +58,7 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -105,9 +106,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -257,7 +261,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS;
 
    /**
-    * 1e-5 is too small for the min value, it does not correct the graph.
+    * 1e-5 is too small for the min value, it do not correct the graph.
     */
    public static final double     MIN_ADJUSTMENT      = 1e-3;
    public static final double     MAX_ADJUSTMENT      = 1e-5;
@@ -793,7 +797,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //         }
 //      });
 
-      addDisposeListener(disposeEvent -> onDispose());
+      addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
       addControlListener(this);
       addPrefListeners();
@@ -818,7 +827,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourInfoIconTooltip = new TourToolTip(getToolTipControl());
       _tourInfoIconTooltip.addToolTipProvider(_tourInfoIconTooltipProvider);
 
-      _tourInfoIconTooltip.addHideListener(event -> getToolTipControl().afterHideToolTip());
+      _tourInfoIconTooltip.addHideListener(new IToolTipHideListener() {
+         @Override
+         public void afterHideToolTip(final Event event) {
+
+            // hide hovered image
+            getToolTipControl().afterHideToolTip(event);
+         }
+      });
       setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);
 
       // Setup tooltips
@@ -1089,107 +1105,113 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void addPrefListeners() {
 
-      _prefChangeListener = propertyChangeEvent -> {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         if (_tcc == null) {
-            return;
-         }
-
-         setIsInUpdateUI(true);
-         try {
-
-            final String property = propertyChangeEvent.getProperty();
-
-            boolean isChartModified = false;
-            final boolean keepMinMax = true;
-
-            if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
-                  || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
-
-               // zoom preferences has changed
-
-               _tcc.updateZoomOptions();
-
-               isChartModified = true;
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-               /*
-                * when the chart is computed, the modified colors are read from the preferences
-                */
-               isChartModified = true;
-
-               // dispose old colors
-               disposeColors();
-
-            } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
-                  || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
-                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
-                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
-
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-                  || property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-            //
-            ) {
-
-               setupChartConfig();
-
-               isChartModified = true;
-
-            } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
-
-               setupSegmenterValueFont();
+            if (_tcc == null) {
+               return;
             }
 
-            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
+            setIsInUpdateUI(true);
+            try {
 
-            if (isChartModified) {
-               updateTourChart(keepMinMax);
+               final String property = event.getProperty();
+
+               boolean isChartModified = false;
+               final boolean keepMinMax = true;
+
+               if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
+                     || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+
+                  // zoom preferences has changed
+
+                  _tcc.updateZoomOptions();
+
+                  isChartModified = true;
+
+               } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+                  /*
+                   * when the chart is computed, the modified colors are read from the preferences
+                   */
+                  isChartModified = true;
+
+                  // dispose old colors
+                  disposeColors();
+
+               } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+                     || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+                     || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+
+                     || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+                     || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+                     || property.equals(GRID_HORIZONTAL_DISTANCE)
+                     || property.equals(GRID_VERTICAL_DISTANCE)
+               //
+               ) {
+
+                  setupChartConfig();
+
+                  isChartModified = true;
+
+               } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+
+                  setupSegmenterValueFont();
+               }
+
+               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
+
+               if (isChartModified) {
+                  updateTourChart(keepMinMax);
+               }
+
+            } finally {
+               setIsInUpdateUI(false);
             }
-
-         } finally {
-            setIsInUpdateUI(false);
          }
       };
 
-      _prefChangeListener_Common = propertyChangeEvent -> {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         if (_tcc == null) {
-            return;
-         }
-
-         setIsInUpdateUI(true);
-         try {
-
-            final String property = propertyChangeEvent.getProperty();
-
-            boolean isChartModified = false;
-            boolean keepMinMax = true;
-
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               isChartModified = true;
-               keepMinMax = false;
-
-               _valuePointTooltip.reopen();
-
-               final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
-               tourAction.setImages();
+            if (_tcc == null) {
+               return;
             }
 
-            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
+            setIsInUpdateUI(true);
+            try {
 
-            if (isChartModified) {
-               updateTourChart(keepMinMax);
+               final String property = event.getProperty();
+
+               boolean isChartModified = false;
+               boolean keepMinMax = true;
+
+               if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+                  // measurement system has changed
+
+                  isChartModified = true;
+                  keepMinMax = false;
+
+                  _valuePointTooltip.reopen();
+
+                  final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
+                  tourAction.setImages();
+               }
+
+               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
+
+               if (isChartModified) {
+                  updateTourChart(keepMinMax);
+               }
+
+            } finally {
+               setIsInUpdateUI(false);
             }
-
-         } finally {
-            setIsInUpdateUI(false);
          }
       };
 
@@ -1877,7 +1899,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    private ChartLabel createLayer_Pause_ChartLabel(final String pauseDuration,
                                                    final double[] xAxisSerie,
-                                                   final int xAxisSerieIndex) {
+                                                   final int xAxisSerieIndex,
+                                                   final int labelPosition) {
 
       final ChartLabel chartLabel = new ChartLabel();
 
@@ -1976,7 +1999,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                         pauseDurationText,
                         xAxisSerie,
-                        tourSerieIndex);
+                        tourSerieIndex,
+                        0);
 
                   cpc.chartLabels.add(chartLabel);
                }
@@ -2021,7 +2045,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
-                  serieIndex);
+                  serieIndex,
+                  0);
 
             cpc.chartLabels.add(chartLabel);
          }
@@ -2462,31 +2487,35 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   path1.moveTo(graphXPrev, graphYPrev);
                   path1.lineTo(graphX1, graphY1);
 
-               } else if (pointIndex > 4 && graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB) {
+               } else if (pointIndex > 4) {
+
                   // draw following segments
 
                   // optimize, draw only when changed
-                  if (segmentRGB == prevRGB) {
+                  if (graphX1 != graphXPrev || graphY1 != graphYPrev || prevRGB != segmentRGB) {
 
-                     // use the same color as the previous
+                     if (segmentRGB == prevRGB) {
 
-                     if (segmentRGB == rgb1) {
-                        path1.lineTo(graphX1, graphY1);
+                        // use the same color as the previous
+
+                        if (segmentRGB == rgb1) {
+                           path1.lineTo(graphX1, graphY1);
+
+                        } else {
+                           path2.lineTo(graphX1, graphY1);
+                        }
 
                      } else {
-                        path2.lineTo(graphX1, graphY1);
-                     }
 
-                  } else {
+                        // color has changed, paint into other path
 
-                     // color has changed, paint into other path
-
-                     if (segmentRGB == rgb1) {
-                        path1.moveTo(graphXPrev, graphYPrev);
-                        path1.lineTo(graphX1, graphY1);
-                     } else {
-                        path2.moveTo(graphXPrev, graphYPrev);
-                        path2.lineTo(graphX1, graphY1);
+                        if (segmentRGB == rgb1) {
+                           path1.moveTo(graphXPrev, graphYPrev);
+                           path1.lineTo(graphX1, graphY1);
+                        } else {
+                           path2.moveTo(graphXPrev, graphYPrev);
+                           path2.lineTo(graphX1, graphY1);
+                        }
                      }
                   }
                }
@@ -4545,7 +4574,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_PULSE_MAX_VALUE,
             TourManager.GRAPH_PULSE,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4614,7 +4643,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_CADENCE_MAX_VALUE,
             TourManager.GRAPH_CADENCE,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4637,7 +4666,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_POWER_MAX_VALUE,
             TourManager.GRAPH_POWER,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4660,7 +4689,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_TEMPERATURE_MAX_VALUE,
             TourManager.GRAPH_TEMPERATURE,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4683,7 +4712,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_STANCE_TIME,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4706,7 +4735,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_STANCE_TIME_BALANCE_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*
@@ -4775,7 +4804,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             ITourbookPreferences.GRAPH_RUN_DYN_VERTICAL_RATIO_MAX_VALUE,
             TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
             0,
-            MIN_ADJUSTMENT,
+            1e-3,
             isMinMaxEnabled);
 
       /*

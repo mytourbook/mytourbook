@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,11 +23,13 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -52,7 +54,12 @@ import net.tourbook.ui.action.ActionEditQuick;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 
 public class StatisticTour_Time extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
@@ -84,8 +91,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
     */
    private ChartStatisticSegments createChartSegments(final TourStatisticData_Time tourDataTime) {
 
-      final double[] segmentStart = new double[_numberOfYears];
-      final double[] segmentEnd = new double[_numberOfYears];
+      final double segmentStart[] = new double[_numberOfYears];
+      final double segmentEnd[] = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
       final int[] allYearDays = tourDataTime.allYear_NumDays;
@@ -128,71 +135,86 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       // set tour info icon into the left axis
       _tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
-      _tourToolTip.addHideListener(event -> _chart.getToolTipControl().afterHideToolTip());
+      _tourToolTip.addHideListener(new IToolTipHideListener() {
+         @Override
+         public void afterHideToolTip(final Event event) {
+            // hide hovered image
+            _chart.getToolTipControl().afterHideToolTip(event);
+         }
+      });
 
       _chart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
-      _chart.addBarSelectionListener((serieIndex, valueIndex) -> {
+      _chart.addBarSelectionListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, int valueIndex) {
 
-         final long[] tourIds = _statisticData_DayTime.allTourIds;
+            final long[] tourIds = _statisticData_DayTime.allTourIds;
 
-         if (tourIds != null && tourIds.length > 0) {
+            if (tourIds != null && tourIds.length > 0) {
 
-            if (valueIndex >= tourIds.length) {
-               valueIndex = tourIds.length - 1;
+               if (valueIndex >= tourIds.length) {
+                  valueIndex = tourIds.length - 1;
+               }
+
+               _selectedTourId = tourIds[valueIndex];
+               _tourInfoToolTipProvider.setTourId(_selectedTourId);
+
+               _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
+
+               // don't fire an event when preferences are updated
+               if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
+                  return;
+               }
+
+               // this view can be inactive -> selection is not fired with the SelectionProvider interface
+               TourManager.fireEventWithCustomData(
+                     TourEventId.TOUR_SELECTION,
+                     new SelectionTourId(_selectedTourId),
+                     viewSite.getPart());
             }
-
-            _selectedTourId = tourIds[valueIndex];
-            _tourInfoToolTipProvider.setTourId(_selectedTourId);
-
-            _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
-
-            // don't fire an event when preferences are updated
-            if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
-               return;
-            }
-
-            // this view can be inactive -> selection is not fired with the SelectionProvider interface
-            TourManager.fireEventWithCustomData(
-                  TourEventId.TOUR_SELECTION,
-                  new SelectionTourId(_selectedTourId),
-                  viewSite.getPart());
          }
       });
 
       /*
        * open tour with double click on the tour bar
        */
-      _chart.addDoubleClickListener((serieIndex, valueIndex) -> {
-         final long[] tourIds = _statisticData_DayTime.allTourIds;
-         if (tourIds.length > 0) {
+      _chart.addDoubleClickListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, final int valueIndex) {
+            final long[] tourIds = _statisticData_DayTime.allTourIds;
+            if (tourIds.length > 0) {
 
-            _selectedTourId = tourIds[valueIndex];
-            _tourInfoToolTipProvider.setTourId(_selectedTourId);
+               _selectedTourId = tourIds[valueIndex];
+               _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-            _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
+               _tourTime_DataProvider.setSelectedTourId(_selectedTourId);
 
-            ActionEditQuick.doAction(StatisticTour_Time.this);
+               ActionEditQuick.doAction(StatisticTour_Time.this);
+            }
          }
       });
 
       /*
        * open tour with Enter key
        */
-      _chart.addTraverseListener(traverseEvent -> {
+      _chart.addTraverseListener(new TraverseListener() {
+         @Override
+         public void keyTraversed(final TraverseEvent event) {
 
-         if (traverseEvent.detail == SWT.TRAVERSE_RETURN) {
-            final ISelection selection = _chart.getSelection();
-            if (selection instanceof SelectionBarChart) {
-               final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+            if (event.detail == SWT.TRAVERSE_RETURN) {
+               final ISelection selection = _chart.getSelection();
+               if (selection instanceof SelectionBarChart) {
+                  final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-               if (barChartSelection.serieIndex != -1) {
+                  if (barChartSelection.serieIndex != -1) {
 
-                  _selectedTourId = _statisticData_DayTime.allTourIds[barChartSelection.valueIndex];
-                  _tourInfoToolTipProvider.setTourId(_selectedTourId);
+                     _selectedTourId = _statisticData_DayTime.allTourIds[barChartSelection.valueIndex];
+                     _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-                  ActionEditQuick.doAction(StatisticTour_Time.this);
+                     ActionEditQuick.doAction(StatisticTour_Time.this);
+                  }
                }
             }
          }
@@ -210,6 +232,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
+                                final int serieIndex,
                                 int valueIndex) {
 
       final int[] tourDOYValues = _statisticData_DayTime.allTourDOYs;
@@ -246,7 +269,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          _tourInfoUI.setActionsEnabled(true);
       }
 
-      parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
+      parent.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _tourInfoUI.dispose();
+         }
+      });
    }
 
    @Override
@@ -342,7 +370,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          return false;
       }
 
-      final boolean[] selectedTours = new boolean[tourIds.length];
+      final boolean selectedTours[] = new boolean[tourIds.length];
 
       boolean isSelected = false;
 
@@ -371,12 +399,15 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       return isSelected;
    }
 
-   private void setChartProviders(final ChartDataModel chartModel) {
+   private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
 
-      final IChartInfoProvider chartInfoProvider = (toolTipProvider, parent, serieIndex, valueIndex) -> StatisticTour_Time.this.createToolTipUI(
-            toolTipProvider,
-            parent,
-            valueIndex);
+      final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
+
+         @Override
+         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+            StatisticTour_Time.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+         }
+      };
 
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
@@ -431,7 +462,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
       chartModel.setChartMinWidth(yearDays);
 
-      setChartProviders(chartModel);
+      setChartProviders(_chart, chartModel);
 
       if (_ifIsSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);

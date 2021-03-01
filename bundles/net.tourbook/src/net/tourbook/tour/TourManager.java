@@ -4246,7 +4246,6 @@ public class TourManager {
                                                 final ChartDataModel chartDataModel,
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
-
       final float[] paceSerie = tourData.getPaceSerieSeconds();
       ChartDataYSerie yDataPace = null;
       if (paceSerie != null) {
@@ -4262,8 +4261,11 @@ public class TourManager {
          yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
          yDataPace.setYAxisDirection(false);
 
-         final int fillMethod = useGraphBgStyle ? ChartDataYSerie.FILL_METHOD_CUSTOM : ChartDataYSerie.FILL_METHOD_FILL_BOTTOM;
-         yDataPace.setGraphFillMethod(fillMethod);
+         if (useGraphBgStyle) {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
 
          setGraphColor(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
          chartDataModel.addXyData(yDataPace);
