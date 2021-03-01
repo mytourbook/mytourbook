@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,14 +24,12 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
-import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -61,14 +59,8 @@ import net.tourbook.ui.action.ActionEditQuick;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticTraining extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -103,34 +95,29 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
    private void addTourPropertyListener() {
 
-      _tourPropertyListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part,
-                                 final TourEventId propertyId,
-                                 final Object propertyData) {
+      _tourPropertyListener = (part, propertyId, propertyData) -> {
 
-            if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+         if (propertyId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-               // check if a tour was modified
-               final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
-               if (modifiedTours != null) {
+            // check if a tour was modified
+            final ArrayList<TourData> modifiedTours = ((TourEvent) propertyData).getModifiedTours();
+            if (modifiedTours != null) {
 
-                  for (final TourData modifiedTourData : modifiedTours) {
+               for (final TourData modifiedTourData : modifiedTours) {
 
-                     final long modifiedTourId = modifiedTourData.getTourId();
+                  final long modifiedTourId = modifiedTourData.getTourId();
 
-                     final long[] tourIds = _statisticData_Training.allTourIds;
-                     for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
+                  final long[] tourIds = _statisticData_Training.allTourIds;
+                  for (int tourIdIndex = 0; tourIdIndex < tourIds.length; tourIdIndex++) {
 
-                        final long tourId = tourIds[tourIdIndex];
+                     final long tourId = tourIds[tourIdIndex];
 
-                        if (tourId == modifiedTourId) {
+                     if (tourId == modifiedTourId) {
 
-                           // set new tour title
-                           _statisticData_Training.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
+                        // set new tour title
+                        _statisticData_Training.allTourTitles.set(tourIdIndex, modifiedTourData.getTourTitle());
 
-                           break;
-                        }
+                        break;
                      }
                   }
                }
@@ -189,83 +176,68 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       // set tour info icon into the left axis
       _tourToolTip = new StatisticTourToolTip(_chart.getToolTipControl());
       _tourToolTip.addToolTipProvider(_tourInfoToolTipProvider);
-      _tourToolTip.addHideListener(new IToolTipHideListener() {
-         @Override
-         public void afterHideToolTip(final Event event) {
-            // hide hovered image
-            _chart.getToolTipControl().afterHideToolTip(event);
-         }
-      });
+      _tourToolTip.addHideListener(event -> _chart.getToolTipControl().afterHideToolTip());
 
       _chart.setTourInfoIconToolTipProvider(_tourInfoToolTipProvider);
       _tourInfoToolTipProvider.setActionsEnabled(true);
 
-      _chart.addBarSelectionListener(new IBarSelectionListener() {
-         @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
-            if (_statisticData_Training.allTypeIds.length > 0) {
+      _chart.addBarSelectionListener((serieIndex, valueIndex) -> {
+         if (_statisticData_Training.allTypeIds.length > 0) {
 
-               _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
-               _tourInfoToolTipProvider.setTourId(_selectedTourId);
+            _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
+            _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-               if (StatisticView.isInUpdateUI()) {
+            if (StatisticView.isInUpdateUI()) {
 
-                  /*
-                   * Do not fire an event when this is running already in an update event. This
-                   * occurs when a tour is modified (marker) in the tourbook view and the stat view
-                   * is opened !!!
-                   */
+               /*
+                * Do not fire an event when this is running already in an update event. This
+                * occurs when a tour is modified (marker) in the tourbook view and the stat view
+                * is opened !!!
+                */
 
-                  return;
-               }
-
-               // don't fire an event when preferences are updated
-               if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
-                  return;
-               }
-
-               // this view can be inactive -> selection is not fired with the SelectionProvider interface
-               TourManager.fireEventWithCustomData(
-                     TourEventId.TOUR_SELECTION,
-                     new SelectionTourId(_selectedTourId),
-                     viewSite.getPart());
+               return;
             }
+
+            // don't fire an event when preferences are updated
+            if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
+               return;
+            }
+
+            // this view can be inactive -> selection is not fired with the SelectionProvider interface
+            TourManager.fireEventWithCustomData(
+                  TourEventId.TOUR_SELECTION,
+                  new SelectionTourId(_selectedTourId),
+                  viewSite.getPart());
          }
       });
 
       /*
        * open tour with double click on the tour bar
        */
-      _chart.addDoubleClickListener(new IBarSelectionListener() {
-         @Override
-         public void selectionChanged(final int serieIndex, final int valueIndex) {
+      _chart.addDoubleClickListener((serieIndex, valueIndex) -> {
 
-            _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
-            _tourInfoToolTipProvider.setTourId(_selectedTourId);
+         _selectedTourId = _statisticData_Training.allTourIds[valueIndex];
+         _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-            ActionEditQuick.doAction(StatisticTraining.this);
-         }
+         ActionEditQuick.doAction(StatisticTraining.this);
       });
 
       /*
        * open tour with Enter key
        */
-      _chart.addTraverseListener(new TraverseListener() {
-         @Override
-         public void keyTraversed(final TraverseEvent event) {
+      _chart.addTraverseListener(traverseEvent -> {
 
-            if (event.detail == SWT.TRAVERSE_RETURN) {
-               final ISelection selection = _chart.getSelection();
-               if (selection instanceof SelectionBarChart) {
-                  final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
+         if (traverseEvent.detail == SWT.TRAVERSE_RETURN) {
+            final ISelection selection = _chart.getSelection();
+            if (selection instanceof SelectionBarChart) {
+               final SelectionBarChart barChartSelection = (SelectionBarChart) selection;
 
-                  if (barChartSelection.serieIndex != -1) {
+               if (barChartSelection.serieIndex != -1) {
 
-                     _selectedTourId = _statisticData_Training.allTourIds[barChartSelection.valueIndex];
-                     _tourInfoToolTipProvider.setTourId(_selectedTourId);
+                  _selectedTourId = _statisticData_Training.allTourIds[barChartSelection.valueIndex];
+                  _tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-                     ActionEditQuick.doAction(StatisticTraining.this);
-                  }
+                  ActionEditQuick.doAction(StatisticTraining.this);
                }
             }
          }
@@ -284,7 +256,6 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int serieIndex,
                                 int valueIndex) {
 
       final int[] tourDOYValues = _statisticData_Training.getDoyValues();
@@ -321,12 +292,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          _tourInfoUI.setActionsEnabled(true);
       }
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _tourInfoUI.dispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
    }
 
    /**
@@ -335,7 +301,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    void createXData_Day(final ChartDataModel chartModel) {
 
       final ChartDataXSerie xData = new ChartDataXSerie(_statisticData_Training.getDoyValuesDouble());
-      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+      xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_DAY);
 //      xData.setVisibleMaxValue(fCurrentYear);
       xData.setChartSegments(createChartSegments(_statisticData_Training));
 
@@ -420,7 +386,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
       yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
-      yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setAllValueColors(0);
       yData.setShowYSlider(true);
       yData.setVisibleMinValue(0);
@@ -623,7 +589,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    public boolean selectTour(final Long tourId) {
 
       final long[] tourIds = _statisticData_Training.allTourIds;
-      final boolean selectedItems[] = new boolean[tourIds.length];
+      final boolean[] selectedItems = new boolean[tourIds.length];
       boolean isSelected = false;
 
       // find the tour which has the same tourId as the selected tour
@@ -647,16 +613,13 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       return isSelected;
    }
 
-   private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+   private void setChartProviders(final ChartDataModel chartModel) {
 
       // set tool tip info
-      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticTraining.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-      });
+      chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
+            (IChartInfoProvider) (toolTipProvider, parent, serieIndex, valueIndex) -> StatisticTraining.this.createToolTipUI(toolTipProvider,
+                  parent,
+                  valueIndex));
 
       // set the menu context provider
       chartModel.setCustomData(ChartDataModel.BAR_CONTEXT_PROVIDER, new TourChartContextProvider(_chart, this));
@@ -769,7 +732,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
       chartModel.setChartMinWidth(yearDays);
 
-      setChartProviders(_chart, chartModel);
+      setChartProviders(chartModel);
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);
