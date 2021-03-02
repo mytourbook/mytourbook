@@ -5227,7 +5227,8 @@ public class ChartComponentGraph extends Canvas {
                devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
                   + drawingData.getGraphYBottom());
             } else {
-               devYValue = drawingData.getGraphYBottom();
+               devYValue = (float) (((double) devYTop - devYSliderLine) / drawingData.getScaleY()
+                     + drawingData.getGraphYBottom());
             }
 
             final String unitLabel = yData.getUnitLabel();
