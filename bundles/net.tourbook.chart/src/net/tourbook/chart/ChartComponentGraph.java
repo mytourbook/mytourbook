@@ -122,7 +122,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * This image contains one single graph without title and x-axis with units.
     * <p>
-    * This image was created to fix clipping bugs which occured when gradient filling was painted
+    * This image was created to fix clipping bugs which occurred when gradient filling was painted
     * with a path.
     */
    private Image                       _chartImage_10_Graphs;
@@ -187,7 +187,7 @@ public class ChartComponentGraph extends Canvas {
    private double                      _zoomRatioCenterKey;
 
    /**
-    * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
+    * when the slider is dragged and the mouse up event occurres, the graph is zoomed to the sliders
     * when set to <code>true</code>
     */
    boolean                             _canAutoZoomToSlider;
@@ -1484,10 +1484,10 @@ public class ChartComponentGraph extends Canvas {
          public void run() {
 
             /*
-             * create the chart image only when a new onPaint event has not occured
+             * create the chart image only when a new onPaint event has not occurred
              */
             if (__runnableBgCounter != _drawAsyncCounter[0]) {
-               // a new onPaint event occured
+               // a new onPaint event occurred
                return;
             }
 
@@ -6140,7 +6140,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * Mouse event occured in the value point tooltip, move the slider and/or hovered line (value
+    * Mouse event occurred in the value point tooltip, move the slider and/or hovered line (value
     * point) accordingly.
     *
     * @param event
@@ -6800,7 +6800,7 @@ public class ChartComponentGraph extends Canvas {
             // mouse mode: zoom chart
 
             /*
-             * set position where the double click occured, this position will be used when the
+             * set position where the double click occurred, this position will be used when the
              * chart is zoomed
              */
             final double xxDevMousePosInChart = _xxDevViewPortLeftBorder + e.x;
@@ -6850,7 +6850,7 @@ public class ChartComponentGraph extends Canvas {
             // right button is pressed
 
 // this was disabled because it is not working on OSX, partly it works,
-// propably depending on the mouse: OSX mouse or Logitech mouse
+// probably depending on the mouse: OSX mouse or Logitech mouse
 //            computeSliderForContextMenu(devXMouse, devYMouse);
          }
          return;
@@ -8043,7 +8043,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * set position where the double click occured, this position will be used when the chart is
+       * set position where the double click occurred, this position will be used when the chart is
        * zoomed
        */
       _zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
@@ -8095,7 +8095,7 @@ public class ChartComponentGraph extends Canvas {
       _chartComponents.onResize();
 
       /*
-       * set position where the double click occured, this position will be used when the chart is
+       * set position where the double click occurred, this position will be used when the chart is
        * zoomed
        */
       _zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
