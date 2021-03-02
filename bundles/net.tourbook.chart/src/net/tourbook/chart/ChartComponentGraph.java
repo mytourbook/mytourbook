@@ -5152,13 +5152,6 @@ public class ChartComponentGraph extends Canvas {
          final int devYTop = drawingData.getDevYBottom() - drawingData.devGraphHeight;
          final int devYBottom = drawingData.getDevYBottom();
 
-//         int height = 0;
-//         if (drawingData.getYData().isYAxisDirection()) {
-//            height = devYTop - devYBottom;
-//         } else {
-//            height = devYBottom;
-//         }
-
          // draw area
          gc.setForeground(colorXMarker);
          gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
