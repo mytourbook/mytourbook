@@ -27,19 +27,26 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -57,6 +64,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -504,7 +512,8 @@ public class ChartComponentGraph extends Canvas {
       addListener();
       createContextMenu();
 
-      setCursorStyle();
+      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+      setCursorStyle(devMouse.y);
    }
 
    /**
@@ -539,24 +548,27 @@ public class ChartComponentGraph extends Canvas {
     */
    private void addListener() {
 
-      addPaintListener(paintEvent -> {
+      addPaintListener(new PaintListener() {
+         @Override
+         public void paintControl(final PaintEvent event) {
 
-         if (_isChartDragged) {
+            if (_isChartDragged) {
 
-            drawSync_020_MoveCanvas(paintEvent.gc);
+               drawSync_020_MoveCanvas(event.gc);
 
-         } else {
+            } else {
 
 //               final long start = System.nanoTime();
 //               System.out.println();
 //               System.out.println("onPaint\tstart\t");
 //               // TODO remove SYSTEM.OUT.PRINTLN
 
-            drawSync_000_onPaint(paintEvent.gc);
+               drawSync_000_onPaint(event.gc, event.time & 0xFFFFFFFFL);
 
 //               System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //               System.out.println();
 //               // TODO remove SYSTEM.OUT.PRINTLN
+            }
          }
       });
 
@@ -567,13 +579,16 @@ public class ChartComponentGraph extends Canvas {
       horizontalBar.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent event) {
-            onScroll();
+            onScroll(event);
          }
       });
 
-      addMouseMoveListener(mouseEvent -> {
-         if (_isGraphVisible) {
-            onMouseMove(mouseEvent.time & 0xFFFFFFFFL, mouseEvent.x, mouseEvent.y);
+      addMouseMoveListener(new MouseMoveListener() {
+         @Override
+         public void mouseMove(final MouseEvent e) {
+            if (_isGraphVisible) {
+               onMouseMove(e.time & 0xFFFFFFFFL, e.x, e.y);
+            }
          }
       });
 
@@ -604,7 +619,7 @@ public class ChartComponentGraph extends Canvas {
          @Override
          public void mouseEnter(final MouseEvent e) {
             if (_isGraphVisible) {
-               onMouseEnter();
+               onMouseEnter(e);
             }
          }
 
@@ -619,7 +634,12 @@ public class ChartComponentGraph extends Canvas {
          public void mouseHover(final MouseEvent e) {}
       });
 
-      addListener(SWT.MouseWheel, event -> onMouseWheel(event, false, false));
+      addListener(SWT.MouseWheel, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
+            onMouseWheel(event, false, false);
+         }
+      });
 
       addFocusListener(new FocusListener() {
 
@@ -644,17 +664,20 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.Traverse, event -> {
+      addListener(SWT.Traverse, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
 
-         switch (event.detail) {
-         case SWT.TRAVERSE_RETURN:
-         case SWT.TRAVERSE_ESCAPE:
-         case SWT.TRAVERSE_TAB_NEXT:
-         case SWT.TRAVERSE_TAB_PREVIOUS:
-         case SWT.TRAVERSE_PAGE_NEXT:
-         case SWT.TRAVERSE_PAGE_PREVIOUS:
-            event.doit = true;
-            break;
+            switch (event.detail) {
+            case SWT.TRAVERSE_RETURN:
+            case SWT.TRAVERSE_ESCAPE:
+            case SWT.TRAVERSE_TAB_NEXT:
+            case SWT.TRAVERSE_TAB_PREVIOUS:
+            case SWT.TRAVERSE_PAGE_NEXT:
+            case SWT.TRAVERSE_PAGE_PREVIOUS:
+               event.doit = true;
+               break;
+            }
          }
       });
 
@@ -672,9 +695,19 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.KeyDown, this::onKeyDown);
+      addListener(SWT.KeyDown, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
+            onKeyDown(event);
+         }
+      });
 
-      addDisposeListener(DisposeEvent -> onDispose());
+      addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
 
    }
 
@@ -807,9 +840,12 @@ public class ChartComponentGraph extends Canvas {
     * when the chart was modified, recompute all
     */
    private void computeChart() {
-      getDisplay().asyncExec(() -> {
-         if (!isDisposed()) {
-            _chartComponents.onResize();
+      getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            if (!isDisposed()) {
+               _chartComponents.onResize();
+            }
          }
       });
    }
@@ -927,27 +963,30 @@ public class ChartComponentGraph extends Canvas {
 
       menuMgr.setRemoveAllWhenShown(true);
 
-      menuMgr.addMenuListener(menuManager -> {
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager menuMgr) {
 
-         actionSelectBars();
+            actionSelectBars();
 
-         _hoveredBar_ToolTip.hide();
+            _hoveredBar_ToolTip.hide();
 
-         hideTooltip();
+            hideTooltip();
 
-         // get cursor location relative to this graph canvas
-         final Point devMouse = toControl(getDisplay().getCursorLocation());
+            // get cursor location relativ to this graph canvas
+            final Point devMouse = toControl(getDisplay().getCursorLocation());
 
-         computeSliderForContextMenu(devMouse.x, devMouse.y);
+            computeSliderForContextMenu(devMouse.x, devMouse.y);
 
-         _chart.fillContextMenu(
-               menuManager,
-               _contextLeftSlider,
-               _contextRightSlider,
-               _hoveredBarSerieIndex,
-               _hoveredBarValueIndex,
-               _devXMouseDown,
-               _devYMouseDown);
+            _chart.fillContextMenu(
+                  menuMgr,
+                  _contextLeftSlider,
+                  _contextRightSlider,
+                  _hoveredBarSerieIndex,
+                  _hoveredBarValueIndex,
+                  _devXMouseDown,
+                  _devYMouseDown);
+         }
       });
 
       final Menu contextMenu = menuMgr.createContextMenu(this);
@@ -1397,9 +1436,12 @@ public class ChartComponentGraph extends Canvas {
          // zoomed to the x-slider positions
 
          // zoom into the chart
-         getDisplay().asyncExec(() -> {
-            if (!isDisposed()) {
-               _chart.onExecuteZoomInWithSlider();
+         getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!isDisposed()) {
+                  _chart.onExecuteZoomInWithSlider();
+               }
             }
          });
       }
@@ -1693,7 +1735,7 @@ public class ChartComponentGraph extends Canvas {
 
          } else if (chartType == ChartType.DOT) {
 
-            drawAsync_570_Dots(gcGraph, graphDrawingData);
+            drawAsync_570_Dots(gcGraph, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.HISTORY) {
 
@@ -1823,7 +1865,7 @@ public class ChartComponentGraph extends Canvas {
                final long graphEnd = graphEndValues.get(graphIndex);
 
                final double devXSegmentStart = (scaleX * graphStart - _xxDevViewPortLeftBorder);
-               final double devXSegmentEnd = (scaleX * graphEnd - _xxDevViewPortLeftBorder) - 1.0;
+               final double devXSegmentEnd = ((scaleX * graphEnd - _xxDevViewPortLeftBorder)) - 1.0;
 
                final double devXSegmentLength = devXSegmentEnd - devXSegmentStart;
                final double devXSegmentCenter = devXSegmentStart + (devXSegmentLength / 2);
@@ -1928,14 +1970,17 @@ public class ChartComponentGraph extends Canvas {
                   }
                }
 
-               if (chartTitleSegmentConfig.isShowSegmentTitle &&
-                     devXTitle > devXTitleEnd) { // ensure that the title do not overlap a previous title
+               if (chartTitleSegmentConfig.isShowSegmentTitle) {
 
-                  // keep position when the title is drawn
-                  devXTitleEnd = devXTitle + titleWidth + titlePadding;
+                  // ensure that the title do not overlap a previous title
+                  if (devXTitle > devXTitleEnd) {
 
-                  gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-                  gc.drawText(segmentTitle, devXTitle, devYTitle, false);
+                     // keep position when the title is drawn
+                     devXTitleEnd = devXTitle + titleWidth + titlePadding;
+
+                     gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+                     gc.drawText(segmentTitle, devXTitle, devYTitle, false);
+                  }
                }
 
                /*
@@ -2431,17 +2476,19 @@ public class ChartComponentGraph extends Canvas {
 
          final ChartTitleSegment chartTitleSegment = chartTitleSegments.get(segmentIndex);
 
-         if (chartTitleSegmentConfig.isShowSegmentSeparator &&
-         // draw segment start line but not for the first segment
-               segmentIndex != 0) {
+         if (chartTitleSegmentConfig.isShowSegmentSeparator) {
 
-            final int devX = chartTitleSegment.devXSegment;
+            // draw segment start line but not for the first segment
+            if (segmentIndex != 0) {
 
-            gcChart.drawLine(//
-                  devX,
-                  0,
-                  devX,
-                  graphDrawingData.getDevYBottom());
+               final int devX = chartTitleSegment.devXSegment;
+
+               gcChart.drawLine(//
+                     devX,
+                     0,
+                     devX,
+                     graphDrawingData.getDevYBottom());
+            }
          }
       }
 
@@ -2594,7 +2641,7 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float[] yValues = yHighValues[0];
+      final float yValues[] = yHighValues[0];
 
       final int graphFillMethod = yData.getGraphFillMethod();
       final boolean[] noFill = xData.getNoLine();
@@ -2625,7 +2672,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = graphDrawingData.getScaleX();
       final double scaleY = graphDrawingData.getScaleY();
 
-// this feature also needs that the y-axis is scaled accordingly -> this not yet implemented
+// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
 //
 //      if (_canChartBeOverlapped && _isChartOverlapped) {
 //
@@ -2928,6 +2975,7 @@ public class ChartComponentGraph extends Canvas {
                   } else {
                      devY = devY1;
                   }
+
                   path.lineTo(devXf, devY);
 
                   if (isPath2) {
@@ -3291,8 +3339,8 @@ public class ChartComponentGraph extends Canvas {
       final int devYChartTop = devYChartBottom - devGraphCanvasHeight;
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float[][] yHighSeries = yData.getHighValuesFloat();
-      final float[][] yLowSeries = yData.getLowValuesFloat();
+      final float yHighSeries[][] = yData.getHighValuesFloat();
+      final float yLowSeries[][] = yData.getLowValuesFloat();
 
       final int serieLength = yHighSeries.length;
       final int valueLength = xValues.length;
@@ -3304,7 +3352,7 @@ public class ChartComponentGraph extends Canvas {
       drawingData.setBarFocusRectangles(barFocusRecangles);
 
       // keep the height for stacked bar charts
-      final int[] devHeightSummary = new int[valueLength];
+      final int devHeightSummary[] = new int[valueLength];
 
       final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
       final int devBarWidth = Math.max(1, devBarWidthOriginal);
@@ -3317,8 +3365,8 @@ public class ChartComponentGraph extends Canvas {
       // loop: all data series
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-         final float[] yHighValues = yHighSeries[serieIndex];
-         float[] yLowValues = null;
+         final float yHighValues[] = yHighSeries[serieIndex];
+         float yLowValues[] = null;
          if (yLowSeries != null) {
             yLowValues = yLowSeries[serieIndex];
          }
@@ -3410,14 +3458,18 @@ public class ChartComponentGraph extends Canvas {
             /*
              * make sure the bars do not overlap
              */
-            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE && devXPosNextBar > 0 && devXPos < devXPosNextBar) {
+            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE) {
+               if (devXPosNextBar > 0) {
+                  if (devXPos < devXPosNextBar) {
 
-               // bars do overlap
+                     // bars do overlap
 
-               final int devDiff = devXPosNextBar - devXPos;
+                     final int devDiff = devXPosNextBar - devXPos;
 
-               devXPosShape = devXPos + devDiff;
-               devShapeBarWidth = devBarWidthPositioned - devDiff;
+                     devXPosShape = devXPos + devDiff;
+                     devShapeBarWidth = devBarWidthPositioned - devDiff;
+                  }
+               }
             }
             devXPosNextBar = devXPos + devBarWidthPositioned;
 
@@ -3541,7 +3593,7 @@ public class ChartComponentGraph extends Canvas {
       gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float[][] yHighSeries = yData.getHighValuesFloat();
+      final float yHighSeries[][] = yData.getHighValuesFloat();
 //      final int yLowSeries[][] = yData.getLowValues();
 
       final int serieLength = yHighSeries.length;
@@ -3555,7 +3607,7 @@ public class ChartComponentGraph extends Canvas {
       // loop: all data series
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-         final float[] yHighValues = yHighSeries[serieIndex];
+         final float yHighValues[] = yHighSeries[serieIndex];
 //         int yLowValues[] = null;
 //         if (yLowSeries != null) {
 //            yLowValues = yLowSeries[serieIndex];
@@ -3681,7 +3733,7 @@ public class ChartComponentGraph extends Canvas {
       for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
 
          final double[] xValues = xSeries[serieIndex];
-         final float[] yHighValues = ySeries[serieIndex];
+         final float yHighValues[] = ySeries[serieIndex];
 
          gc.setBackground(getColor(rgbLine[serieIndex]));
 
@@ -3734,8 +3786,8 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float[] yValues = yHighValues[0];
-      final float[] yValues2 = yHighValues[1];
+      final float yValues[] = yHighValues[0];
+      final float yValues2[] = yHighValues[1];
 
       final int serieSize = xValues.length;
 
@@ -4114,7 +4166,8 @@ public class ChartComponentGraph extends Canvas {
     * @param isTopGraph
     */
    private void drawAsync_570_Dots(final GC gc,
-                                   final GraphDrawingData graphDrawingData) {
+                                   final GraphDrawingData graphDrawingData,
+                                   final boolean isTopGraph) {
 
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -4122,7 +4175,7 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float[] yValues = yHighValues[0];
+      final float yValues[] = yHighValues[0];
 
       final int serieSize = xValues.length;
 
@@ -4574,7 +4627,7 @@ public class ChartComponentGraph extends Canvas {
     * @param gc
     * @param eventTime
     */
-   private void drawSync_000_onPaint(final GC gc) {
+   private void drawSync_000_onPaint(final GC gc, final long eventTime) {
 
 //      final long startTime = System.nanoTime();
 //      // TODO remove SYSTEM.OUT.PRINTLN
@@ -4616,7 +4669,7 @@ public class ChartComponentGraph extends Canvas {
              */
             if (_chartImage_20_Chart != null) {
 
-               final Image image = drawSync_010_ImageChart(gc);
+               final Image image = drawSync_010_ImageChart(gc, eventTime);
                if (image == null) {
                   return;
                }
@@ -4654,14 +4707,14 @@ public class ChartComponentGraph extends Canvas {
          }
 
          // redraw() is done in async painting but NOT after images are painted
-         // if (isPaintedDirectly) {
+         if (isPaintedDirectly) {
 
 //            System.out.println("isPaintedDirectly\t");
 //            // TODO remove SYSTEM.OUT.PRINTLN
-         //  }
+         }
 
          drawSync_300_Image30Custom();
-         drawSync_010_ImageChart(gc);
+         drawSync_010_ImageChart(gc, eventTime);
       }
 
 //      final long endTime = System.nanoTime();
@@ -4675,7 +4728,7 @@ public class ChartComponentGraph extends Canvas {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private Image drawSync_010_ImageChart(final GC gc) {
+   private Image drawSync_010_ImageChart(final GC gc, final long eventTime) {
 
       final boolean isOverlayImageVisible = _isXSliderVisible
             || _isYSliderVisible
@@ -4685,7 +4738,7 @@ public class ChartComponentGraph extends Canvas {
 
       if (isOverlayImageVisible) {
 
-         drawSync_400_OverlayImage();
+         drawSync_400_OverlayImage(eventTime);
 
          if (_chartImage_40_Overlay != null) {
 //            System.out.println("gc <- 40\tdrawSync010ImageChart");
@@ -4820,7 +4873,7 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param eventTime
     */
-   private void drawSync_400_OverlayImage() {
+   private void drawSync_400_OverlayImage(final long eventTime) {
 
       if (_chartImage_30_Custom == null) {
          return;
@@ -4922,7 +4975,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          if (_isOverlayDirty) {
-            drawSync_470_CustomOverlay(gcOverlay);
+            drawSync_470_CustomOverlay(gcOverlay, eventTime);
             _isOverlayDirty = false;
          }
 
@@ -5575,6 +5628,7 @@ public class ChartComponentGraph extends Canvas {
 
          // get the chart data
          final ChartDataYSerie yData = drawingData.getYData();
+         final int serieLayout = yData.getChartLayout();
          final int[][] colorsIndex = yData.getColorsIndex();
 
          // get the colors
@@ -5601,7 +5655,11 @@ public class ChartComponentGraph extends Canvas {
             // get hovered rectangle
             final Rectangle hoveredRectangle = barRectangeleSeries[serieIndex][_hoveredBarValueIndex];
 
-            if (hoveredRectangle == null || serieIndex != _hoveredBarSerieIndex) {
+            if (hoveredRectangle == null) {
+               continue;
+            }
+
+            if (serieIndex != _hoveredBarSerieIndex) {
                continue;
             }
 
@@ -5614,9 +5672,9 @@ public class ChartComponentGraph extends Canvas {
             final Color colorDark = getColor(rgbDarkDef);
             final Color colorLine = getColor(rgbLineDef);
 
-//            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_STACKED) {
-//
-//            }
+            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_STACKED) {
+
+            }
 
             final Rectangle hoveredBarShape = new Rectangle(
                   (hoveredRectangle.x - markerWidth2),
@@ -5800,7 +5858,7 @@ public class ChartComponentGraph extends Canvas {
       gcOverlay.setAlpha(0xff);
    }
 
-   private void drawSync_470_CustomOverlay(final GC gcOverlay) {
+   private void drawSync_470_CustomOverlay(final GC gcOverlay, final long eventTime) {
 
       /*
        * custom overlay must be checked 2x because it is fired 2 times before the photo groups are
@@ -6310,10 +6368,13 @@ public class ChartComponentGraph extends Canvas {
          final boolean canDoHitChecking = !_canChartBeOverlapped
                || (_canChartBeOverlapped && (isStackedChart || isLastOverlappedGraph));
 
-         if (canDoHitChecking && ySlider.getHitRectangle().contains(graphX, devY)) {
+         if (canDoHitChecking) {
 
-            _hitYSlider = ySlider;
-            return ySlider;
+            if (ySlider.getHitRectangle().contains(graphX, devY)) {
+
+               _hitYSlider = ySlider;
+               return ySlider;
+            }
          }
       }
 
@@ -6661,7 +6722,7 @@ public class ChartComponentGraph extends Canvas {
          moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
          redraw();
-         setCursorStyle();
+         setCursorStyle(event.y);
       }
    }
 
@@ -6942,7 +7003,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      setCursorStyle();
+      setCursorStyle(devYMouse);
    }
 
    /**
@@ -6950,7 +7011,7 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param event
     */
-   void onMouseDownAxis() {
+   void onMouseDownAxis(final MouseEvent event) {
 
       hideTooltip();
 
@@ -6963,7 +7024,7 @@ public class ChartComponentGraph extends Canvas {
       }
    }
 
-   private void onMouseEnter() {
+   private void onMouseEnter(final MouseEvent mouseEvent) {
 
       if (_ySliderDragged != null) {
 
@@ -6999,15 +7060,16 @@ public class ChartComponentGraph extends Canvas {
          // stop autoscrolling
          _isAutoScroll = false;
 
-      } else if (_xSliderDragged == null &&
-      // hide the y-slider labels
-            _hitYSlider != null) {
+      } else if (_xSliderDragged == null) {
 
-         _hitYSlider = null;
+         // hide the y-slider labels
+         if (_hitYSlider != null) {
+            _hitYSlider = null;
 
-         _isSliderDirty = true;
+            _isSliderDirty = true;
 
-         isRedraw = true;
+            isRedraw = true;
+         }
       }
 
       if (_mouseOverXSlider != null) {
@@ -7018,7 +7080,7 @@ public class ChartComponentGraph extends Canvas {
          isRedraw = true;
       }
 
-      setCursorStyle();
+      setCursorStyle(event.y);
 
       if (isRedraw) {
          redraw();
@@ -7232,13 +7294,13 @@ public class ChartComponentGraph extends Canvas {
                _isHoveredBarDirty = true;
                isRedraw = true;
 
-               setCursorStyle();
+               setCursorStyle(devYMouse);
 
             } else {
 
                canShowHoveredValueTooltip = true;
 
-               setCursorStyle();
+               setCursorStyle(devYMouse);
             }
          }
       }
@@ -7251,38 +7313,41 @@ public class ChartComponentGraph extends Canvas {
       }
 
       final IHoveredValueTooltipListener hoveredValueTooltipListener = _chart.getHoveredValueTooltipListener();
-      if ((_isHoveredLineVisible || hoveredValueTooltipListener != null) && _hoveredValuePointIndex != -1) {
+      if (_isHoveredLineVisible || hoveredValueTooltipListener != null) {
 
-         final PointLong devHoveredValueDevPosition = getHoveredValue_DevPosition();
+         if (_hoveredValuePointIndex != -1) {
 
-         if (_isHoveredLineVisible) {
+            final PointLong devHoveredValueDevPosition = getHoveredValue_DevPosition();
 
-            if (valuePointToolTip != null) {
+            if (_isHoveredLineVisible) {
 
-               valuePointToolTip.setHoveredData(
-                     _devXMouseMove,
-                     _devYMouseMove,
-                     new HoveredValuePointData(
-                           _hoveredValuePointIndex,
-                           devHoveredValueDevPosition,
-                           _graphZoomRatio));
+               if (valuePointToolTip != null) {
+
+                  valuePointToolTip.setHoveredData(
+                        _devXMouseMove,
+                        _devYMouseMove,
+                        new HoveredValuePointData(
+                              _hoveredValuePointIndex,
+                              devHoveredValueDevPosition,
+                              _graphZoomRatio));
+               }
+
+               /*
+                * This redraw is necessary otherwise a hovered photo displayed as none hovered when
+                * mouse is not hovering a photo
+                */
+               isRedraw = true;
             }
 
-            /*
-             * This redraw is necessary otherwise a hovered photo displayed as none hovered when
-             * mouse is not hovering a photo
-             */
-            isRedraw = true;
-         }
+            if (hoveredValueTooltipListener != null && canShowHoveredValueTooltip) {
 
-         if (hoveredValueTooltipListener != null && canShowHoveredValueTooltip) {
-
-            hoveredValueTooltipListener.hoveredValue(
-                  eventTime,
-                  _devXMouseMove,
-                  _devYMouseMove,
-                  _hoveredValuePointIndex,
-                  devHoveredValueDevPosition);
+               hoveredValueTooltipListener.hoveredValue(
+                     eventTime,
+                     _devXMouseMove,
+                     _devYMouseMove,
+                     _hoveredValuePointIndex,
+                     devHoveredValueDevPosition);
+            }
          }
       }
 
@@ -7321,60 +7386,63 @@ public class ChartComponentGraph extends Canvas {
 
          // get tooltip shell
          final Shell ttShell = valuePointToolTip.getToolTipShell();
-         if (ttShell != null && mouseWidget instanceof Control) {
-            final Control control = (Control) mouseWidget;
+         if (ttShell != null) {
 
-            if (control.getShell() == ttShell) {
+            if (mouseWidget instanceof Control) {
+               final Control control = (Control) mouseWidget;
 
-               /*
-                * this event is from the value point tooltip, the control is the tooltip
-                */
+               if (control.getShell() == ttShell) {
 
-               final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
+                  /*
+                   * this event is from the value point tooltip, the control is the tooltip
+                   */
 
-               final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
-               final Point leftAxisSize = axisLeft.getSize();
+                  final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
 
-               final Rectangle leftAxisRect = new Rectangle(
-                     leftAxisScreen.x,
-                     leftAxisScreen.y,
-                     leftAxisSize.x,
-                     leftAxisSize.y);
+                  final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
+                  final Point leftAxisSize = axisLeft.getSize();
 
-               if (leftAxisRect.contains(screenTTMouse)) {
+                  final Rectangle leftAxisRect = new Rectangle(
+                        leftAxisScreen.x,
+                        leftAxisScreen.y,
+                        leftAxisSize.x,
+                        leftAxisSize.y);
 
-                  // mouse is moved above the left axis
+                  if (leftAxisRect.contains(screenTTMouse)) {
 
-                  final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
-                  devXMouse = devLeftAxis.x;
-                  devYMouse = devLeftAxis.y;
-                  axisComponent = axisLeft;
-                  axisWidth = leftAxisSize.x;
+                     // mouse is moved above the left axis
 
-                  isMouseFromLeftToolTip = true;
+                     final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
+                     devXMouse = devLeftAxis.x;
+                     devYMouse = devLeftAxis.y;
+                     axisComponent = axisLeft;
+                     axisWidth = leftAxisSize.x;
 
-               } else {
+                     isMouseFromLeftToolTip = true;
 
-                  final Point rightAxisScreen = axisRight.toDisplay(0, 0);
-                  final Point rightAxisSize = axisRight.getSize();
+                  } else {
 
-                  final Rectangle rightAxisRect = new Rectangle(
-                        rightAxisScreen.x,
-                        rightAxisScreen.y,
-                        rightAxisSize.x,
-                        rightAxisSize.y);
+                     final Point rightAxisScreen = axisRight.toDisplay(0, 0);
+                     final Point rightAxisSize = axisRight.getSize();
 
-                  if (rightAxisRect.contains(screenTTMouse)) {
+                     final Rectangle rightAxisRect = new Rectangle(
+                           rightAxisScreen.x,
+                           rightAxisScreen.y,
+                           rightAxisSize.x,
+                           rightAxisSize.y);
 
-                     // mouse is moved above the right axis
+                     if (rightAxisRect.contains(screenTTMouse)) {
 
-                     final Point devRightAxis = axisRight.toControl(screenTTMouse);
-                     devXMouse = devRightAxis.x;
-                     devYMouse = devRightAxis.y;
-                     axisComponent = axisRight;
-                     axisWidth = rightAxisSize.x;
+                        // mouse is moved above the right axis
 
-                     isMouseFromRightToolTip = true;
+                        final Point devRightAxis = axisRight.toControl(screenTTMouse);
+                        devXMouse = devRightAxis.x;
+                        devYMouse = devRightAxis.y;
+                        axisComponent = axisRight;
+                        axisWidth = rightAxisSize.x;
+
+                        isMouseFromRightToolTip = true;
+                     }
                   }
                }
             }
@@ -7556,7 +7624,7 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      setCursorStyle();
+      setCursorStyle(devYMouse);
    }
 
    void onMouseWheel(final Event event, final boolean isEventFromAxis, final boolean isLeftAxis) {
@@ -7596,10 +7664,13 @@ public class ChartComponentGraph extends Canvas {
             /*
              * zoom the chart
              */
-            Display.getCurrent().asyncExec(() -> {
+            Display.getCurrent().asyncExec(new Runnable() {
+               @Override
+               public void run() {
 
-               zoomInWithSlider();
-               _chartComponents.onResize();
+                  zoomInWithSlider();
+                  _chartComponents.onResize();
+               }
             });
          }
 
@@ -7686,7 +7757,7 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param event
     */
-   private void onScroll() {
+   private void onScroll(final SelectionEvent event) {
       redraw();
    }
 
@@ -8013,7 +8084,7 @@ public class ChartComponentGraph extends Canvas {
       _zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
    }
 
-   void setCursorStyle() {
+   void setCursorStyle(final int devYMouse) {
 
       final ChartDataModel chartDataModel = _chart.getChartDataModel();
       if (chartDataModel == null) {
@@ -8254,17 +8325,19 @@ public class ChartComponentGraph extends Canvas {
             lineRect = lineFocusRectangles[valueIndex];
 
             // test if the mouse is within a bar focus rectangle
-            if (lineRect != null &&
-            // inline for lineRect.contains
-                  _devXMouseMove >= lineRect.x
-                  && (_devYMouseMove >= lineRect.y)
-                  && _devXMouseMove < (lineRect.x + lineRect.width)
-                  && _devYMouseMove < (lineRect.y + lineRect.height)) {
+            if (lineRect != null) {
 
-               // keep the hovered line index
-               _hoveredValuePointIndex = valueIndex;
+               // inline for lineRect.contains
+               if ((_devXMouseMove >= lineRect.x)
+                     && (_devYMouseMove >= lineRect.y)
+                     && _devXMouseMove < (lineRect.x + lineRect.width)
+                     && _devYMouseMove < (lineRect.y + lineRect.height)) {
 
-               return;
+                  // keep the hovered line index
+                  _hoveredValuePointIndex = valueIndex;
+
+                  return;
+               }
             }
          }
       }
@@ -8769,7 +8842,7 @@ public class ChartComponentGraph extends Canvas {
          final boolean isIgnoreMinMaxZero = yData.isIgnoreMinMaxZero();
 
          final float[][] yValueSeries = yData.getHighValuesFloat();
-         final float[] yValues = yValueSeries[0];
+         final float yValues[] = yValueSeries[0];
 
          // ensure array bounds
          final int yValuesLastIndex = yValues.length - 1;
