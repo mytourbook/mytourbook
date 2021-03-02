@@ -2977,10 +2977,12 @@ public class ChartComponentGraph extends Canvas {
                      path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
                   }
 
+//                  final float devY0Inverse = devGraphHeight + devYGraphBottom;
+//                  final float devY1 = (float) (graphY1 * scaleY);
                   if (yData.isYAxisDirection()) {
                      devY = devY0Inverse - devY1;
                   } else {
-                     devY = devY1;
+                     devY = devY1 + devYGraphTop;
                   }
 
                   path.lineTo(devXf, devY);
@@ -5153,27 +5155,27 @@ public class ChartComponentGraph extends Canvas {
          final int devYTop = drawingData.getDevYBottom() - drawingData.devGraphHeight;
          final int devYBottom = drawingData.getDevYBottom();
 
-         int height = 0;
-         if (drawingData.getYData().isYAxisDirection()) {
-            height = devYTop - devYBottom;
-         } else {
-            height = devYBottom;
-         }
+//         int height = 0;
+//         if (drawingData.getYData().isYAxisDirection()) {
+//            height = devYTop - devYBottom;
+//         } else {
+//            height = devYBottom;
+//         }
 
          // draw area
-//         gc.setForeground(colorXMarker);
-//         gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
-//
-//         gc.setAlpha(0x80);
+         gc.setForeground(colorXMarker);
+         gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 
-//         gc.fillGradientRectangle(//
-//               devXStart,
-//               devYBottom,
-//               devXEnd - devXStart,
-//               height,
-//               true);
+         gc.setAlpha(0x80);
 
-//         gc.setAlpha(0xff);
+         gc.fillGradientRectangle(//
+               devXStart,
+               devYBottom,
+               devXEnd - devXStart,
+               devYTop - devYBottom,
+               true);
+
+         gc.setAlpha(0xff);
       }
 
       colorXMarker.dispose();
