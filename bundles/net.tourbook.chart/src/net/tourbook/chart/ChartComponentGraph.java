@@ -187,7 +187,7 @@ public class ChartComponentGraph extends Canvas {
    private double                      _zoomRatioCenterKey;
 
    /**
-    * when the slider is dragged and the mouse up event occurres, the graph is zoomed to the sliders
+    * when the slider is dragged and the mouse up event occurs, the graph is zoomed to the sliders
     * when set to <code>true</code>
     */
    boolean                             _canAutoZoomToSlider;
