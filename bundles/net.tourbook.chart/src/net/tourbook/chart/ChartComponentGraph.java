@@ -2983,7 +2983,7 @@ public class ChartComponentGraph extends Canvas {
                      devY = devY0Inverse - devY1;
                   } else {
                      //TODO FB
-                     devY = devY1 - graphY_XAxisLine;
+                     devY = devY1 - devY_XAxisLine;
                   }
 
                   path.lineTo(devXf, devY);
