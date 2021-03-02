@@ -1184,8 +1184,15 @@ public class ChartComponentGraph extends Canvas {
          /*
           * get the y position of the marker which marks the y value in the graph
           */
-         int devYGraph = drawingData.getDevYBottom()
-               - (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         int devYGraph = 0;
+
+         if (drawingData.getYData().isYAxisDirection()) {
+            devYGraph = drawingData.getDevYBottom()
+                  - (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         } else {
+            devYGraph = drawingData.getDevYTop()
+                  + (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         }
 
          if (yValue < yData.getVisibleMinValue()) {
             devYGraph = drawingData.getDevYBottom();
@@ -5070,6 +5077,7 @@ public class ChartComponentGraph extends Canvas {
          gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
          // draw a tiny marker on the graph
+         //TODO FB
          gcGraph.setBackground(colorLine);
          gcGraph.fillRectangle(devSliderLinePos - 3, label.devYGraph - 2, 7, 3);
 
@@ -5145,20 +5153,27 @@ public class ChartComponentGraph extends Canvas {
          final int devYTop = drawingData.getDevYBottom() - drawingData.devGraphHeight;
          final int devYBottom = drawingData.getDevYBottom();
 
+         int height = 0;
+         if (drawingData.getYData().isYAxisDirection()) {
+            height = devYTop - devYBottom;
+         } else {
+            height = devYBottom;
+         }
+
          // draw area
-         gc.setForeground(colorXMarker);
-         gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+//         gc.setForeground(colorXMarker);
+//         gc.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+//
+//         gc.setAlpha(0x80);
 
-         gc.setAlpha(0x80);
+//         gc.fillGradientRectangle(//
+//               devXStart,
+//               devYBottom,
+//               devXEnd - devXStart,
+//               height,
+//               true);
 
-         gc.fillGradientRectangle(//
-               devXStart,
-               devYBottom,
-               devXEnd - devXStart,
-               devYTop - devYBottom,
-               true);
-
-         gc.setAlpha(0xff);
+//         gc.setAlpha(0xff);
       }
 
       colorXMarker.dispose();
