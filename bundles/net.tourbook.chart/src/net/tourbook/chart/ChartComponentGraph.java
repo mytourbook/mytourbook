@@ -5222,8 +5222,13 @@ public class ChartComponentGraph extends Canvas {
 
             //TODO FB
             // if inverted
-            final float devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
+            float devYValue = 0;
+            if (drawingData.getYData().isYAxisDirection()) {
+               devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
                   + drawingData.getGraphYBottom());
+            } else {
+               devYValue = drawingData.getGraphYBottom();
+            }
 
             final String unitLabel = yData.getUnitLabel();
 
