@@ -2982,7 +2982,8 @@ public class ChartComponentGraph extends Canvas {
                   if (yData.isYAxisDirection()) {
                      devY = devY0Inverse - devY1;
                   } else {
-                     devY = devY1 + devYGraphTop;
+                     //TODO FB
+                     devY = devY1 - graphY_XAxisLine;
                   }
 
                   path.lineTo(devXf, devY);
@@ -5079,7 +5080,6 @@ public class ChartComponentGraph extends Canvas {
          gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
          // draw a tiny marker on the graph
-         //TODO FB
          gcGraph.setBackground(colorLine);
          gcGraph.fillRectangle(devSliderLinePos - 3, label.devYGraph - 2, 7, 3);
 
