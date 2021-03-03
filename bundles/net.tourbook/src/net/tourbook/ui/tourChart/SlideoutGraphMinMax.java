@@ -273,6 +273,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private CLabel    _iconSwim_Strokes;
    private CLabel    _iconSwim_Swolf;
+   private boolean   _isShowPaceChartInverted;
 
    public SlideoutGraphMinMax(final Control ownerControl, final ToolBar toolBar) {
 
@@ -1072,8 +1073,15 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefRestoreDefault(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefRestoreDefault(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      final String graphPaceMinValue = ITourbookPreferences.GRAPH_PACE_MIN_VALUE;
+      final String graphPaceMaxValue = ITourbookPreferences.GRAPH_PACE_MAX_VALUE;
+      if (_isShowPaceChartInverted) {
+         prefRestoreDefault(_spinnerMin_Pace, graphPaceMaxValue);
+         prefRestoreDefault(_spinnerMax_Pace, graphPaceMinValue);
+      } else {
+         prefRestoreDefault(_spinnerMin_Pace, graphPaceMinValue);
+         prefRestoreDefault(_spinnerMax_Pace, graphPaceMaxValue);
+      }
 
       // min/max cadence
       prefRestoreDefault(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1160,6 +1168,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private void restoreState() {
 
       _parent.setRedraw(false);
+
+      _isShowPaceChartInverted = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_CHART_INVERTED);
 
       _chkEnableMinMax.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
@@ -1417,13 +1427,25 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          final int min = _spinnerMin_Pace.getSelection();
          final int max = _spinnerMax_Pace.getSelection();
 
-         if (min >= max) {
+         if (!_isShowPaceChartInverted) {
+            if (min >= max) {
 
-            if (max == PACE_MAX) {
-               _spinnerMin_Pace.setSelection(max - 1);
-            } else {
-               _spinnerMax_Pace.setSelection(min + 1);
+               if (max == PACE_MAX) {
+                  _spinnerMin_Pace.setSelection(max - 1);
+               } else {
+                  _spinnerMax_Pace.setSelection(min + 1);
+               }
             }
+         } else {
+            if (min <= max) {
+
+               if (max == PACE_MAX) {
+                  _spinnerMin_Pace.setSelection(max - 1);
+               } else {
+                  _spinnerMax_Pace.setSelection(min + 1);
+               }
+            }
+
          }
       }
 
