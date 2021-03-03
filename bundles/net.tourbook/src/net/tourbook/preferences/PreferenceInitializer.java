@@ -265,7 +265,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED, true);
       store.setDefault(ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED, true);
-      //TODO FB invert those values
       store.setDefault(ITourbookPreferences.GRAPH_PACE_MIN_VALUE, 1);
       store.setDefault(ITourbookPreferences.GRAPH_PACE_MAX_VALUE, 6);
 
