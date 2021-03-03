@@ -130,6 +130,9 @@ Bugfix
   - Markers are now imported
   - Fixed possible NPE
 
+* Day time statistics (Frederic)
+  - Fixed a bug where dragging the horizontal sliders dragged the opposite slider. Also, the value of the sliders were inverted.
+
 
 Translation    
 ===========
