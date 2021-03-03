@@ -25,6 +25,11 @@ TODO's
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
 
+* For Frederic: Modified texts
+
+  - Dialog_CustomConfig_Label_UserAgent_Tooltip
+
+
 Issues
 ======
 
