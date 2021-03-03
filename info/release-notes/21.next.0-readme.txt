@@ -4,6 +4,8 @@
 TODO's
 ======
 
+* Website: Info how to run MT on Mac https://sourceforge.net/p/mytourbook/discussion/622811/thread/b3e1a1c532/?limit=25#a96e
+
 * Website: Show screencast mp4 videos, https://www.w3schools.com/html/html5_video.asp
 
 * Website: Document externalize strings with multiple messages files https://github.com/wolfgang-ch/mytourbook/pull/282#discussion_r553942399
@@ -19,9 +21,6 @@ TODO's
 
   I am thinking you could display the logo "Compatible With Strava" on the website in the next release and that would comply with their requirements ?
 
-* Website - Map2: Map providers list in https://osmlab.github.io/editor-layer-index/
-
-* Website - Tour Search: Show tip how to select a tour in the search result https://sourceforge.net/p/mytourbook/discussion/622811/thread/2471c3da16/?limit=100#cce3
 
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 

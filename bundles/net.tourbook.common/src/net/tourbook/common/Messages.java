@@ -247,7 +247,6 @@ public class Messages extends NLS {
    public static String        Period_Format_Milliseconds;
    public static String        Period_Format_Millisecond_Short;
 
-   public static String        Pref_System_Group_MeasurementSystem;
    public static String        Pref_System_Label_Distance;
    public static String        Pref_System_Label_Distance_Info;
    public static String        Pref_System_Label_Elevation;

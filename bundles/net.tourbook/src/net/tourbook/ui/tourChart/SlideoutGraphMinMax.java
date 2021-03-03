@@ -721,6 +721,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       final Button checkbox = new Button(parent, SWT.CHECK);
       GridDataFactory.fillDefaults()//
             .indent(_columnSpacing, 0)
+            .align(SWT.FILL, SWT.CENTER)
             .applyTo(checkbox);
       checkbox.addSelectionListener(_defaultSelectionListener);
 
