@@ -732,8 +732,15 @@ public class ChartComponentGraph extends Canvas {
       final int devYSliderLine1 = slider1.getDevYSliderLine();
       final int devYSliderLine2 = slider2.getDevYSliderLine();
 
-      final double graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
-      final double graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+      double graphValue1 = 0;
+      double graphValue2 = 0;
+      if (drawingData.getYData().isYAxisDirection()) {
+         graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
+         graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+      } else {
+         graphValue1 = (((double) devYSliderLine1 - devYTop) / scaleY + graphYBottom);
+         graphValue2 = (((double) devYSliderLine2 - devYTop) / scaleY + graphYBottom);
+      }
 
       // get value which was adjusted
       if (_ySliderDragged == slider1) {
