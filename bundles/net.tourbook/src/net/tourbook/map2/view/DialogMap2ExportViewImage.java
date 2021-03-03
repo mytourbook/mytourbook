@@ -452,7 +452,13 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private String getFileExtension() {
 
-      return _comboImageFormat.getSelectionIndex() == 0 ? "jpg" : _comboImageFormat.getText().toLowerCase();
+      return _comboImageFormat.getSelectionIndex() == 0
+
+            // JPEG format
+            ? "jpg"//$NON-NLS-1$
+
+            // other formats
+            : _comboImageFormat.getText().toLowerCase();
    }
 
    private int getSwtImageType() {
