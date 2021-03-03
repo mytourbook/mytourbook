@@ -115,7 +115,6 @@ public class Messages extends NLS {
    public static String        Map_Action_Export_Map_View_Image_Tooltip;
 
    public static String        Map_Action_ManageMapProviders;
-   public static String        Map_Action_PhotoFilter_Tooltip;
    public static String        Map_Action_PhotoFilter2_Tooltip;
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;

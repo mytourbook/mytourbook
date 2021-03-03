@@ -736,7 +736,6 @@ public class Messages extends NLS {
 
    public static String        Database_Confirm_update;
    public static String        Database_Confirm_update_title;
-   public static String        Database_Confirm_Update20;
 
    public static String        Database_Monitor_CreateDatabase;
    public static String        Database_Monitor_db_service_task;
@@ -1503,8 +1502,6 @@ public class Messages extends NLS {
 
    public static String        Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
    public static String        Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
-   public static String        Photo_Filter_Label_RatingStars;
-   public static String        Photo_Filter_Label_RatingStars_Tooltip;
    public static String        Photo_Filter_Operator_HasAny;
    public static String        Photo_Filter_Operator_HasAny_Tooltip;
    public static String        Photo_Filter_Operator_IsEqual;
@@ -2593,7 +2590,6 @@ public class Messages extends NLS {
    public static String Tour_Database_Update_ModifyColumn;
    public static String Tour_Database_Update_Subtask;
    public static String Tour_Database_Update_TourWeek;
-   public static String Tour_Database_Update_TourWeek_Info;
    public static String Tour_Database_UpdateDone;
    public static String Tour_Database_UpdateInfo;
 
@@ -3017,7 +3013,6 @@ public class Messages extends NLS {
 
    public static String TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals;
    public static String TourChart_PulseGraph_DeviceBpm_Only;
-   public static String TourChart_PulseGraph_NotAvailable;
    public static String TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm;
    public static String TourChart_PulseGraph_RRIntervals_Only;
 
