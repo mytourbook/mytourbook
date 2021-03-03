@@ -755,7 +755,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       final Spinner spinner = new Spinner(parent, SWT.BORDER);
       GridDataFactory.fillDefaults()//
-            .align(SWT.END, SWT.FILL)
+            .align(SWT.FILL, SWT.FILL)
+//            .grab(true, false)
             .applyTo(spinner);
 
       spinner.setMinimum(minValue);
