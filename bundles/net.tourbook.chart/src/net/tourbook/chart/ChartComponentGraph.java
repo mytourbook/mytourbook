@@ -5220,14 +5220,12 @@ public class ChartComponentGraph extends Canvas {
 
             final StringBuilder labelText = new StringBuilder();
 
-            //TODO FB
-            // if inverted
             float devYValue = 0;
             if (drawingData.getYData().isYAxisDirection()) {
                devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
-                  + drawingData.getGraphYBottom());
+                     + drawingData.getGraphYBottom());
             } else {
-               devYValue = (float) (((double) devYTop - devYSliderLine) / drawingData.getScaleY()
+               devYValue = (float) ((devYSliderLine - (double) devYTop) / drawingData.getScaleY()
                      + drawingData.getGraphYBottom());
             }
 
