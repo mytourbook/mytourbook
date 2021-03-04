@@ -197,6 +197,7 @@ public interface ITourbookPreferences {
     * and right sliders time slices.
     */
    public static final String GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES = "GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES"; //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_PACE_GRAPH_INVERTED     = "GRAPH_IS_SHOW_PACE_GRAPH_INVERTED";     //$NON-NLS-1$
    public static final String GRAPH_MOUSE_MODE                      = "graph.toggle-mouse";                    //$NON-NLS-1$
    public static final String GRAPH_MOVE_SLIDERS_WHEN_ZOOMED        = "graphs.move-sliders-when-zoomed";       //$NON-NLS-1$
    public static final String GRAPH_TRANSPARENCY_FILLING            = "Graph_Transparency_Filling";            //$NON-NLS-1$

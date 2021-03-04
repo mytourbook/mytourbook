@@ -228,6 +228,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // move sliders to border when zoomed
       store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
+      // Show the pace chart inverted: High speeds/low paces at the top of the graph and
+      // the low speeds/high paces at the bottom of the graph
+      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
+
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
       store.setDefault(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, 80);
