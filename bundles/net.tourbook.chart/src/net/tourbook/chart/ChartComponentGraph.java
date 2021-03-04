@@ -2655,7 +2655,7 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float yValues[] = yHighValues[0];
+      final float[] yValues = yHighValues[0];
 
       final int graphFillMethod = yData.getGraphFillMethod();
       final boolean[] noFill = xData.getNoLine();
@@ -3353,8 +3353,8 @@ public class ChartComponentGraph extends Canvas {
       final int devYChartTop = devYChartBottom - devGraphCanvasHeight;
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float yHighSeries[][] = yData.getHighValuesFloat();
-      final float yLowSeries[][] = yData.getLowValuesFloat();
+      final float[][] yHighSeries = yData.getHighValuesFloat();
+      final float[][] yLowSeries = yData.getLowValuesFloat();
 
       final int serieLength = yHighSeries.length;
       final int valueLength = xValues.length;
@@ -3366,7 +3366,7 @@ public class ChartComponentGraph extends Canvas {
       drawingData.setBarFocusRectangles(barFocusRecangles);
 
       // keep the height for stacked bar charts
-      final int devHeightSummary[] = new int[valueLength];
+      final int[] devHeightSummary = new int[valueLength];
 
       final int devBarWidthOriginal = drawingData.getBarRectangleWidth();
       final int devBarWidth = Math.max(1, devBarWidthOriginal);
@@ -3379,8 +3379,8 @@ public class ChartComponentGraph extends Canvas {
       // loop: all data series
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-         final float yHighValues[] = yHighSeries[serieIndex];
-         float yLowValues[] = null;
+         final float[] yHighValues = yHighSeries[serieIndex];
+         float[] yLowValues = null;
          if (yLowSeries != null) {
             yLowValues = yLowSeries[serieIndex];
          }
@@ -3473,16 +3473,14 @@ public class ChartComponentGraph extends Canvas {
              * make sure the bars do not overlap
              */
             if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE) {
-               if (devXPosNextBar > 0) {
-                  if (devXPos < devXPosNextBar) {
+               if (devXPosNextBar > 0 && devXPos < devXPosNextBar) {
 
-                     // bars do overlap
+                  // bars do overlap
 
-                     final int devDiff = devXPosNextBar - devXPos;
+                  final int devDiff = devXPosNextBar - devXPos;
 
-                     devXPosShape = devXPos + devDiff;
-                     devShapeBarWidth = devBarWidthPositioned - devDiff;
-                  }
+                  devXPosShape = devXPos + devDiff;
+                  devShapeBarWidth = devBarWidthPositioned - devDiff;
                }
             }
             devXPosNextBar = devXPos + devBarWidthPositioned;
@@ -3607,7 +3605,7 @@ public class ChartComponentGraph extends Canvas {
       gc.setClipping(0, devYTop, gc.getClipping().width, devYBottom - devYTop);
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float yHighSeries[][] = yData.getHighValuesFloat();
+      final float[][] yHighSeries = yData.getHighValuesFloat();
 //      final int yLowSeries[][] = yData.getLowValues();
 
       final int serieLength = yHighSeries.length;
@@ -3621,7 +3619,7 @@ public class ChartComponentGraph extends Canvas {
       // loop: all data series
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-         final float yHighValues[] = yHighSeries[serieIndex];
+         final float[] yHighValues = yHighSeries[serieIndex];
 //         int yLowValues[] = null;
 //         if (yLowSeries != null) {
 //            yLowValues = yLowSeries[serieIndex];
@@ -3747,7 +3745,7 @@ public class ChartComponentGraph extends Canvas {
       for (int serieIndex = 0; serieIndex < xSeries.length; serieIndex++) {
 
          final double[] xValues = xSeries[serieIndex];
-         final float yHighValues[] = ySeries[serieIndex];
+         final float[] yHighValues = ySeries[serieIndex];
 
          gc.setBackground(getColor(rgbLine[serieIndex]));
 
@@ -3800,8 +3798,8 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float yValues[] = yHighValues[0];
-      final float yValues2[] = yHighValues[1];
+      final float[] yValues = yHighValues[0];
+      final float[] yValues2 = yHighValues[1];
 
       final int serieSize = xValues.length;
 
@@ -4189,7 +4187,7 @@ public class ChartComponentGraph extends Canvas {
       final float[][] yHighValues = yData.getHighValuesFloat();
 
       final double[] xValues = xData.getHighValuesDouble()[0];
-      final float yValues[] = yHighValues[0];
+      final float[] yValues = yHighValues[0];
 
       final int serieSize = xValues.length;
 
@@ -7406,63 +7404,60 @@ public class ChartComponentGraph extends Canvas {
 
          // get tooltip shell
          final Shell ttShell = valuePointToolTip.getToolTipShell();
-         if (ttShell != null) {
+         if (ttShell != null && mouseWidget instanceof Control) {
+            final Control control = (Control) mouseWidget;
 
-            if (mouseWidget instanceof Control) {
-               final Control control = (Control) mouseWidget;
+            if (control.getShell() == ttShell) {
 
-               if (control.getShell() == ttShell) {
+               /*
+                * this event is from the value point tooltip, the control is the tooltip
+                */
 
-                  /*
-                   * this event is from the value point tooltip, the control is the tooltip
-                   */
+               final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
 
-                  final Point screenTTMouse = control.toDisplay(devXMouse, devYMouse);
+               final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
+               final Point leftAxisSize = axisLeft.getSize();
 
-                  final Point leftAxisScreen = axisLeft.toDisplay(0, 0);
-                  final Point leftAxisSize = axisLeft.getSize();
+               final Rectangle leftAxisRect = new Rectangle(
+                     leftAxisScreen.x,
+                     leftAxisScreen.y,
+                     leftAxisSize.x,
+                     leftAxisSize.y);
 
-                  final Rectangle leftAxisRect = new Rectangle(
-                        leftAxisScreen.x,
-                        leftAxisScreen.y,
-                        leftAxisSize.x,
-                        leftAxisSize.y);
+               if (leftAxisRect.contains(screenTTMouse)) {
 
-                  if (leftAxisRect.contains(screenTTMouse)) {
+                  // mouse is moved above the left axis
 
-                     // mouse is moved above the left axis
+                  final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
+                  devXMouse = devLeftAxis.x;
+                  devYMouse = devLeftAxis.y;
+                  axisComponent = axisLeft;
+                  axisWidth = leftAxisSize.x;
 
-                     final Point devLeftAxis = axisLeft.toControl(screenTTMouse);
-                     devXMouse = devLeftAxis.x;
-                     devYMouse = devLeftAxis.y;
-                     axisComponent = axisLeft;
-                     axisWidth = leftAxisSize.x;
+                  isMouseFromLeftToolTip = true;
 
-                     isMouseFromLeftToolTip = true;
+               } else {
 
-                  } else {
+                  final Point rightAxisScreen = axisRight.toDisplay(0, 0);
+                  final Point rightAxisSize = axisRight.getSize();
 
-                     final Point rightAxisScreen = axisRight.toDisplay(0, 0);
-                     final Point rightAxisSize = axisRight.getSize();
+                  final Rectangle rightAxisRect = new Rectangle(
+                        rightAxisScreen.x,
+                        rightAxisScreen.y,
+                        rightAxisSize.x,
+                        rightAxisSize.y);
 
-                     final Rectangle rightAxisRect = new Rectangle(
-                           rightAxisScreen.x,
-                           rightAxisScreen.y,
-                           rightAxisSize.x,
-                           rightAxisSize.y);
+                  if (rightAxisRect.contains(screenTTMouse)) {
 
-                     if (rightAxisRect.contains(screenTTMouse)) {
+                     // mouse is moved above the right axis
 
-                        // mouse is moved above the right axis
+                     final Point devRightAxis = axisRight.toControl(screenTTMouse);
+                     devXMouse = devRightAxis.x;
+                     devYMouse = devRightAxis.y;
+                     axisComponent = axisRight;
+                     axisWidth = rightAxisSize.x;
 
-                        final Point devRightAxis = axisRight.toControl(screenTTMouse);
-                        devXMouse = devRightAxis.x;
-                        devYMouse = devRightAxis.y;
-                        axisComponent = axisRight;
-                        axisWidth = rightAxisSize.x;
-
-                        isMouseFromRightToolTip = true;
-                     }
+                     isMouseFromRightToolTip = true;
                   }
                }
             }
@@ -8862,7 +8857,7 @@ public class ChartComponentGraph extends Canvas {
          final boolean isIgnoreMinMaxZero = yData.isIgnoreMinMaxZero();
 
          final float[][] yValueSeries = yData.getHighValuesFloat();
-         final float yValues[] = yValueSeries[0];
+         final float[] yValues = yValueSeries[0];
 
          // ensure array bounds
          final int yValuesLastIndex = yValues.length - 1;
