@@ -134,7 +134,7 @@ public class SlideoutTourBlogOptions extends ToolbarSlideout {
              * Slideout title
              */
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourBlogOptions_Title);
+            label.setText(Messages.Slideout_TourBlogOptions_Label_Title);
             MTFont.setBannerFont(label);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
