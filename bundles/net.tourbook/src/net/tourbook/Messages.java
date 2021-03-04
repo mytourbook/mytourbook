@@ -1651,7 +1651,7 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Error_one_graph_must_be_selected;
    public static String        Pref_Graphs_grid_horizontal_distance;
    public static String        Pref_Graphs_grid_vertical_distance;
-   public static String        Pref_Graphs_Group_Chart;
+   public static String        Pref_Graphs_Group_Graphs;
    public static String        Pref_Graphs_Group_Grid;
    public static String        Pref_Graphs_Group_mouse_mode;
    public static String        Pref_Graphs_Group_units_for_xaxis;
@@ -2301,8 +2301,8 @@ public class Messages extends NLS {
    public static String Slideout_TourChartGraphBackground_Label_BackgroundStyle;
    public static String Slideout_TourChartGraphBackground_Label_Title;
 
-   public static String Slideout_TourChartOptions_Check_InvertPaceChart;
-   public static String Slideout_TourChartOptions_InvertPaceChart_Tooltip;
+   public static String Slideout_TourChartOptions_Check_InvertPaceGraph;
+   public static String Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip;
    public static String Slideout_TourChartOptions_Label_PulseGraph;
    public static String Slideout_TourChartOptions_Label_Title;
 

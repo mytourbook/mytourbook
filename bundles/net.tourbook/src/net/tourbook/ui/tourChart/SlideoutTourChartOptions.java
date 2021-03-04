@@ -293,41 +293,51 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
             _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
-         {
-            /*
-             * Pulse graph
-             */
-
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourChartOptions_Label_PulseGraph);
-
-            // combo
-            _comboPulseValueGraph = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.FILL, SWT.FILL)
-                  .applyTo(_comboPulseValueGraph);
-            _comboPulseValueGraph.setVisibleItemCount(20);
-            _comboPulseValueGraph.addSelectionListener(_defaultSelectionAdapter);
-            _comboPulseValueGraph.addFocusListener(_keepOpenListener);
-         }
       }
    }
 
    private void createUI_30_Graph(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
-      group.setText(Messages.Pref_Graphs_Group_Chart);
-      GridLayoutFactory.swtDefaults().applyTo(group);
+      group.setText(Messages.Pref_Graphs_Group_Graphs);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(group);
+      GridLayoutFactory.swtDefaults()
+            .numColumns(2)
+            .applyTo(group);
       {
          {
+            /*
+             * Pulse graph
+             */
+
+            // label
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Slideout_TourChartOptions_Label_PulseGraph);
+
+            // combo
+            _comboPulseValueGraph = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboPulseValueGraph.setVisibleItemCount(20);
+            _comboPulseValueGraph.addSelectionListener(_defaultSelectionAdapter);
+            _comboPulseValueGraph.addFocusListener(_keepOpenListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.FILL, SWT.FILL)
+                  .applyTo(_comboPulseValueGraph);
+         }
+         {
+            /*
+             * Pace graph
+             */
             _chkInvertPaceGraph = new Button(group, SWT.CHECK);
-            _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Check_InvertPaceChart);
-            _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_InvertPaceChart_Tooltip);
+            _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Check_InvertPaceGraph);
+            _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip);
             _chkInvertPaceGraph.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkInvertPaceGraph);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkInvertPaceGraph);
          }
       }
    }
