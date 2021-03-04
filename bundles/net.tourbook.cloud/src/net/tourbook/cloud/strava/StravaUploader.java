@@ -461,7 +461,7 @@ public class StravaUploader extends TourbookCloudUploader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(NLS.bind(Messages.Log_UploadToursToStrava_001_Start, numberOfTours));
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 

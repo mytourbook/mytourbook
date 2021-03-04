@@ -195,7 +195,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
