@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,7 @@ public class ActionOpenPrefDialog extends Action {
    private String               _prefPageId;
    private Object               _prefDialogData;
 
-   private Shell                _shell = Display.getCurrent().getActiveShell();
+   private Shell                _shell = Display.getDefault().getActiveShell();
 
    private AdvancedSlideout     _openedAdvancedSlideout;
    private AnimatedToolTipShell _openedTooltip;
@@ -63,20 +63,26 @@ public class ActionOpenPrefDialog extends Action {
     * This tooltip will be closed when the pref dialog is opened.
     *
     * @param openedAdvancedSlideout
+    * @return
     */
-   public void closeThisTooltip(final AdvancedSlideout openedAdvancedSlideout) {
+   public ActionOpenPrefDialog closeThisTooltip(final AdvancedSlideout openedAdvancedSlideout) {
 
       _openedAdvancedSlideout = openedAdvancedSlideout;
+
+      return this;
    }
 
    /**
     * This tooltip will be closed when the pref dialog is opened.
     *
     * @param openedTooltip
+    * @return
     */
-   public void closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
+   public ActionOpenPrefDialog closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
 
       _openedTooltip = openedTooltip;
+
+      return this;
    }
 
    @Override
@@ -90,16 +96,35 @@ public class ActionOpenPrefDialog extends Action {
          _openedAdvancedSlideout.close();
       }
 
-      PreferencesUtil.createPreferenceDialogOn(//
+      PreferencesUtil.createPreferenceDialogOn(
             _shell,
             _prefPageId,
             null,
             _prefDialogData).open();
    }
 
-   public void setPrefData(final Object data) {
+   /**
+    * Set dark mode for the action image
+    *
+    * @param isDarkMode
+    * @return
+    */
+   public ActionOpenPrefDialog setDarkMode(final boolean isDarkMode) {
+
+      if (isDarkMode) {
+         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__Options_Dark));
+      } else {
+         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__options));
+      }
+
+      return this;
+   }
+
+   public ActionOpenPrefDialog setPrefData(final Object data) {
 
       _prefDialogData = data;
+
+      return this;
    }
 
    /**
@@ -107,19 +132,26 @@ public class ActionOpenPrefDialog extends Action {
     *
     * @param pageId
     * @param data
+    * @return
     */
-   public void setPrefData(final String pageId, final Object data) {
+   public ActionOpenPrefDialog setPrefData(final String pageId, final Object data) {
 
       _prefPageId = pageId;
       _prefDialogData = data;
+
+      return this;
    }
 
    /**
     * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed. Is a
     * bit tricky :-)
+    *
+    * @return
     */
-   public void setShell(final Shell shell) {
+   public ActionOpenPrefDialog setShell(final Shell shell) {
 
       _shell = shell;
+
+      return this;
    }
 }

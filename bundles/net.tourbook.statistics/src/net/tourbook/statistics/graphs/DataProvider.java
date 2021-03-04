@@ -65,7 +65,6 @@ public abstract class DataProvider {
     * Date
     */
    static final StatisticValue STAT_VALUE_DATE_DAY             = new StatisticValue(Messages.Statistic_Value_Date_Day_Header1,               null,    null,    VALUE_FORMAT_3D,   3);
-   static final StatisticValue STAT_VALUE_DATE_DOY             = new StatisticValue(Messages.Statistic_Value_Date_DOY_Header1,               null,    null,    VALUE_FORMAT_3D,   3);
    static final StatisticValue STAT_VALUE_DATE_MONTH           = new StatisticValue(Messages.Statistic_Value_Date_Month_Header1,             null,    null,    VALUE_FORMAT_3D,   3);
    static final StatisticValue STAT_VALUE_DATE_YEAR            = new StatisticValue(Messages.Statistic_Value_Date_Year_Header1,              null,    null,    VALUE_FORMAT_4D,   4).withNoSpaceBefore();
 
@@ -112,9 +111,9 @@ public abstract class DataProvider {
    /*
     * Training
     */
-   static final StatisticValue STAT_VALUE_TRAINING_AEROB       = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Aerob_Header1,        null,  VALUE_FORMAT_6_1F,    6);
-   static final StatisticValue STAT_VALUE_TRAINING_ANAEROB     = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Anaerob_Header1,      null,  VALUE_FORMAT_6_1F,    6);
-   static final StatisticValue STAT_VALUE_TRAINING_PERFORMANCE = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Performance_Header1,  null,  VALUE_FORMAT_6_2F,    6);
+   static final StatisticValue STAT_VALUE_TRAINING_AEROB       = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Aerob_Header2,        null,  VALUE_FORMAT_6_1F,    6);
+   static final StatisticValue STAT_VALUE_TRAINING_ANAEROB     = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Anaerob_Header2,      null,  VALUE_FORMAT_6_1F,    6);
+   static final StatisticValue STAT_VALUE_TRAINING_PERFORMANCE = new StatisticValue(Messages.Statistic_Value_Training_Header1,    Messages.Statistic_Value_Training_Performance_Header2,  null,  VALUE_FORMAT_6_2F,    6);
 
    /*
     * Tour

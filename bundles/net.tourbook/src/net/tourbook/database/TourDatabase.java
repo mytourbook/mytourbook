@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -102,9 +106,10 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 42;
+   private static final int TOURBOOK_DB_VERSION = 43;
 
-//   private static final int TOURBOOK_DB_VERSION = 42; // 20.?
+//   private static final int TOURBOOK_DB_VERSION = 43; // 21.3?
+//   private static final int TOURBOOK_DB_VERSION = 42; // 20.11.1
 //   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -138,16 +143,24 @@ public class TourDatabase {
 //   private static final int TOURBOOK_DB_VERSION = 11; // 10.7.0 - 11-07-2010
 //   private static final int TOURBOOK_DB_VERSION = 10; // 10.5.0 not released
 //   private static final int TOURBOOK_DB_VERSION = 9;  // 10.3.0
-//   private static final int TOURBOOK_DB_VERSION = 8;  // 10.2.1 Mod by Kenny
+//   private static final int TOURBOOK_DB_VERSION = 8;  // 10.2.1 Modified by Kenny
 //   private static final int TOURBOOK_DB_VERSION = 7;  // 9.01
 //   private static final int TOURBOOK_DB_VERSION = 6;  // 8.12
 //   private static final int TOURBOOK_DB_VERSION = 5;  // 8.11
 
 //   private static final String SQL_STATE_XJ004_DATABASE_NOT_FOUND         = "XJ004";                                                 //$NON-NLS-1$
 
-   public static boolean       IS_POST_UPDATE_019_to_020                  = false;
+   private static final String NL                                         = UI.NEW_LINE;
+   private static final String TIME_STAMP                                 = net.tourbook.common.UI.timeStamp();
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
+
+   private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
+
+   /**
+    * Milliseconds how log the splash message is delayed before it is updated again.
+    */
+   private static final int    DELAY_SPLASH_LOGGING                       = 1000;
 
    /**
     * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
@@ -155,11 +168,13 @@ public class TourDatabase {
     */
    public static final String  TABLE_SCHEMA                               = "USER";                                                  //$NON-NLS-1$
 
-   private static final String TABLE_DB_VERSION                           = "DBVERSION";                                             //$NON-NLS-1$
+   private static final String TABLE_DB_VERSION_DESIGN                    = "DBVERSION";                                             //$NON-NLS-1$
+   private static final String TABLE_DB_VERSION_DATA                      = "DB_VERSION_DATA";                                       //$NON-NLS-1$
 
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
+   public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON                          = "TOURPERSON";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON_HRZONE                   = "TOURPERSONHRZONE";                                      //$NON-NLS-1$
@@ -169,7 +184,6 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_TAG_CATEGORY                    = "TOURTAGCATEGORY";                                       //$NON-NLS-1$
    public static final String  TABLE_TOUR_TYPE                            = "TOURTYPE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_WAYPOINT                        = "TOURWAYPOINT";                                          //$NON-NLS-1$
-   public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
 
    public static final String  JOINTABLE__TOURDATA__TOURTAG               = TABLE_TOUR_DATA + "_" + TABLE_TOUR_TAG;                  //$NON-NLS-1$
    public static final String  JOINTABLE__TOURTAGCATEGORY_TOURTAG         = TABLE_TOUR_TAG_CATEGORY + "_" + TABLE_TOUR_TAG;          //$NON-NLS-1$
@@ -185,48 +199,60 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, is needed to drop them
-   private final static String                            TABLE_TOUR_CATEGORY             = "TourCategory";                                         //$NON-NLS-1$
-   private final static String                            TABLE_TOURCATEGORY__TOURDATA    = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private final static String TABLE_TOUR_CATEGORY                = "TourCategory";                                         //$NON-NLS-1$
+   private final static String TABLE_TOURCATEGORY__TOURDATA       = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
-   public static final int                                ENTITY_IS_NOT_SAVED             = -1;
+   public static final int     ENTITY_IS_NOT_SAVED                = -1;
    //
-   public static final String                             ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
-   public static final String                             ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
-   public static final String                             ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
-   public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
-   public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_BIKE                     = "BikeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_COMPARED                 = "ComparedID";                                           //$NON-NLS-1$
+   public static final String  ENTITY_ID_HR_ZONE                  = "HrZoneID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_MARKER                   = "MarkerID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PERSON                   = "PersonID";                                             //$NON-NLS-1$
+   public static final String  ENTITY_ID_PHOTO                    = "PhotoID";                                              //$NON-NLS-1$
+   public static final String  ENTITY_ID_REF                      = "RefID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG                      = "TagID";                                                //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG_CATEGORY             = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String  ENTITY_ID_TOUR                     = "TourID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_TYPE                     = "TypeID";                                               //$NON-NLS-1$
+   public static final String  ENTITY_ID_WAY_POINT                = "WayPointID";                                           //$NON-NLS-1$
    //
-   private static final String                            KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String                            KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   public static final String                             KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
-   private static final String                            KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
-   public static final String                             KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
-   private static final String                            KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
+   private static final String KEY_BIKE                           = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
+   private static final String KEY_PERSON                         = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
+   public static final String  KEY_TAG                            = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY                   = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
+   public static final String  KEY_TOUR                           = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
+   private static final String KEY_TYPE                           = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
 
-   private static final String                            DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
-   private static final String                            DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
-   private static final String                            DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
-   private static final String                            DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
+   /**
+    * Renaming existing fields in the tour database causes lots of troubles and additional work to
+    * fix and test it for ALL possible cases -> It is not a good idea to rename fields
+    */
+   private static final String RENAMED__BIKER_WEIGHT__FROM        = "bikerWeight";                                          //$NON-NLS-1$
+   private static final String RENAMED__BIKER_WEIGHT__INTO        = "BodyWeight";                                           //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__FROM   = "tourDrivingTime";                                      //$NON-NLS-1$
+   private static final String RENAMED__TOUR_DRIVING_TIME__INTO   = "TourComputedTime_Moving";                              //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__FROM = "tourRecordingTime";                                    //$NON-NLS-1$
+   private static final String RENAMED__TOUR_RECORDING_TIME__INTO = "TourDeviceTime_Elapsed";                               //$NON-NLS-1$
 
-   private static final String                            PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
+   private static final String DEFAULT_0                          = "0";                                                    //$NON-NLS-1$
+   private static final String DEFAULT_1_0                        = "1.0";                                                  //$NON-NLS-1$
+   private static final String DEFAULT_FALSE                      = "false";                                                //$NON-NLS-1$
+   private static final String DEFAULT_IGNORED                    = "-1";                                                   //$NON-NLS-1$
 
-   private static final String                            DERBY_DATABASE                  = "derby-database";                                       //$NON-NLS-1$
-   private static final String                            DERBY_DB_TOURBOOK               = "tourbook";                                             //$NON-NLS-1$
-   private static String                                  DERBY_DRIVER_CLASS;
-   private static String                                  DERBY_URL;
-   private static final String                            DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";                                         //$NON-NLS-1$
-   private static final String                            DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true";                                       //$NON-NLS-1$
-   private static final String                            DERBY_URL_COMMAND_UPGRADE_TRUE  = ";upgrade=true";                                        //$NON-NLS-1$
+   private static final String PERSISTENCE_UNIT_NAME              = "tourdatabase";                                         //$NON-NLS-1$
+
+   private static final String DERBY_DATABASE                     = "derby-database";                                       //$NON-NLS-1$
+   private static final String DERBY_DB_TOURBOOK                  = "tourbook";                                             //$NON-NLS-1$
+   private static String       DERBY_DRIVER_CLASS;
+   private static String       DERBY_URL;
+   private static final String DERBY_URL_COMMAND_CREATE_TRUE      = ";create=true";                                         //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE    = ";shutdown=true";                                       //$NON-NLS-1$
+   private static final String DERBY_URL_COMMAND_UPGRADE_TRUE     = ";upgrade=true";                                        //$NON-NLS-1$
+   //
    //
    private static volatile TourDatabase                   _instance;
 
@@ -252,7 +278,7 @@ public class TourDatabase {
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>            _tagCollections                 = new HashMap<>();
+   private static HashMap<Long, TagCollection>            _tagCollections = new HashMap<>();
 
    /*
     * Cached distinct fields
@@ -262,25 +288,44 @@ public class TourDatabase {
    private static TreeSet<String>                _dbTourEndPlace;
    private static TreeSet<String>                _dbTourMarkerNames;
 
-   private static final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore         _prefStore          = TourbookPlugin.getPrefStore();
 
-   private final static String                   _databasePath = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
+   private final static String                   _databasePath       = Platform.getInstanceLocation().getURL().getPath() + DERBY_DATABASE;
 
    private static NetworkServerControl           _server;
 
    private static volatile EntityManagerFactory  _emFactory;
    private static volatile ComboPooledDataSource _pooledDataSource;
 
+   private static int                            _dbVersionOnStartup = -1;
+   private static ThreadPoolExecutor             _dbUpdateExecutor;
+   private static ArrayBlockingQueue<Long>       _dbUpdateQueue      = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+
    static {
 
       // set storage location for the database
       System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
-// set derby debug properties
+// set derby debug properties, is helpful when debugging
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
-   }
 
+      final ThreadFactory threadFactory = new ThreadFactory() {
+
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+   }
    private static final Object DB_LOCK = new Object();
 
 //   Derby Limitations
@@ -300,7 +345,7 @@ public class TourDatabase {
    public static final double  DEFAULT_DOUBLE = -1E+300;
 
    private static final String SQL_LONG_MIN_VALUE;
-//   private static final String   SQL_INT_MIN_VALUE;
+   //   private static final String   SQL_INT_MIN_VALUE;
    private static final String SQL_FLOAT_MIN_VALUE;
    private static final String SQL_DOUBLE_MIN_VALUE;
 
@@ -326,23 +371,34 @@ public class TourDatabase {
    }
 
    private boolean                               _isDbInitialized;
+   private boolean                               _isDbInDataUpdate;
    private boolean                               _isTableChecked;
-   private boolean                               _isVersionChecked;
+   private boolean                               _isDataVersionChecked;
+   private boolean                               _isDesignVersionChecked;
 
-   private final ListenerList<IPropertyListener> _propertyListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private int                                   _dbDesignVersion_New;
+   private int                                   _dbDesignVersion_Old;
 
-   private boolean                               _isSQLUpdateError  = false;
+   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
+
+   private boolean                               _isSQLDesignUpdateError = false;
+   private boolean                               _isSQLDataUpdateError   = false;
 
    /**
-    * Database version before a db update is performed
+    * Database version before a db design update is performed
     */
-   private int                                   _dbVersionBeforeUpdate;
-   private int                                   _dbVersionAfterUpdate;
+   private int                                   _dbVersion_BeforeDesignUpdate;
+
+   /**
+    * Database version after a db design update is performed but before optional data updates (data
+    * updates)
+    */
+   private int                                   _dbVersion_AfterDesignUpdate;
 
    private boolean                               _isDerbyEmbedded;
-   private boolean                               _isChecked_DbUpgraded_Before;
-   private boolean                               _isChecked_DbUpgraded_After;
    private boolean                               _isChecked_DbCreated;
+   private boolean                               _isChecked_UpgradeDB_Before;
+   private boolean                               _isChecked_UpgradeDB_After;
 
    /**
     * SQL utilities.
@@ -354,11 +410,14 @@ public class TourDatabase {
                                         final String columnName,
                                         final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                                //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + " BIGINT DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " BIGINT DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       /**
@@ -374,11 +433,14 @@ public class TourDatabase {
                                          final String columnName,
                                          final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                                //$NON-NLS-1$
-               + "   ADD COLUMN " + columnName + " BOOLEAN DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " BOOLEAN DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       private static void AddCol_Double(final Statement stmt,
@@ -386,11 +448,14 @@ public class TourDatabase {
                                         final String columnName,
                                         final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                                //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + " DOUBLE DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " DOUBLE DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       private static void AddCol_Float(final Statement stmt,
@@ -398,11 +463,14 @@ public class TourDatabase {
                                        final String columnName,
                                        final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                       //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + " FLOAT DEFAULT  " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " FLOAT DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       /**
@@ -418,11 +486,14 @@ public class TourDatabase {
                                      final String columnName,
                                      final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                       //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + " INTEGER DEFAULT " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " INTEGER DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       /**
@@ -438,11 +509,14 @@ public class TourDatabase {
                                           final String columnName,
                                           final String defaultValue) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //                                       //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + " SMALLINT DEFAULT " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " SMALLINT DEFAULT " + defaultValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
 
       /**
@@ -452,11 +526,6 @@ public class TourDatabase {
        * @param table
        * @param columnName
        * @param columnWidth
-       * @return Returns this sql statement:
-       *         <p>
-       *         <code>
-       *         "ALTER TABLE " + table + " ADD COLUMN   " + columnName + " " + " VARCHAR(" + columnWidth + ")\n"
-       *         </code>
        * @throws SQLException
        */
       private static void AddCol_VarCar(final Statement stmt,
@@ -464,11 +533,14 @@ public class TourDatabase {
                                         final String columnName,
                                         final int columnWidth) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table //$NON-NLS-1$
-               + "   ADD COLUMN   " + columnName + "   VARCHAR(" + columnWidth + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         if (isColumnAvailable(stmt.getConnection(), table, columnName)) {
 
-         exec(stmt, sql);
+            // column already exist -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "ALTER TABLE " + table + " ADD COLUMN " + columnName + " VARCHAR(" + columnWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       }
 
       private static void AlterCol_VarChar_Width(final Statement stmt,
@@ -476,10 +548,10 @@ public class TourDatabase {
                                                  final String field,
                                                  final int newWidth) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + "ALTER TABLE " + table + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-               + "   ALTER COLUMN " + field + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-               + "   SET DATA TYPE   VARCHAR(" + newWidth + ")\n"; //$NON-NLS-1$ //$NON-NLS-2$
+         final String sql = UI.EMPTY_STRING
+               + "ALTER TABLE " + table + NL //                         //$NON-NLS-1$
+               + "   ALTER COLUMN " + field + NL //                     //$NON-NLS-1$
+               + "   SET DATA TYPE   VARCHAR(" + newWidth + ")"; //     //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
@@ -488,29 +560,31 @@ public class TourDatabase {
                                                  final String tableName,
                                                  final String constraintName) throws SQLException {
 
+         if (isConstraintAvailable(stmt.getConnection(), tableName, constraintName) == false) {
+
+            // constraint is not available -> nothing to do
+
+            return;
+         }
+
          try {
 
             exec(stmt, "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName); //$NON-NLS-1$ //$NON-NLS-2$
 
          } catch (final SQLException e) {
 
-            final String sqlState = e.getSQLState();
-            if (sqlState.equals("42X86")) { //$NON-NLS-1$
-
-               // Caused by: ERROR 42X86: ALTER TABLE failed. There is no constraint 'USER.FK_TOURDATA_TOURTAG_TOURTAG_TAGID' on table '"USER"."TOURDATA_TOURTAG"'.
-
-               /*
-                * Ignore not existing constraints
-                */
-               StatusUtil.log(e);
-
-            } else {
-               throw e;
-            }
+            StatusUtil.log(e);
          }
       }
 
       private static void Cleanup_DropTable(final Statement stmt, final String tableName) throws SQLException {
+
+         if (isTableAvailable(stmt.getConnection(), tableName) == false) {
+
+            // table do NOT exist -> nothing to do
+
+            return;
+         }
 
          try {
 
@@ -518,20 +592,7 @@ public class TourDatabase {
 
          } catch (final SQLException e) {
 
-            final String sqlState = e.getSQLState();
-            if (sqlState.equals("42Y55")) { //$NON-NLS-1$
-
-               // Caused by: ERROR 42Y55: 'DROP TABLE' cannot be performed on 'TOURCATEGORY' because it does not exist.
-
-               /*
-                * This case occurred because table TOURCATEGORY was created until version 1.6 but do
-                * not exist in later versions.
-                */
-               StatusUtil.log(e);
-
-            } else {
-               throw e;
-            }
+            StatusUtil.log(e);
          }
       }
 
@@ -553,11 +614,12 @@ public class TourDatabase {
 
 //       SUBJECT CHAR(64) NOT NULL CONSTRAINT OUT_TRAY_PK PRIMARY KEY,
 
-         return "   " //$NON-NLS-1$
-               + fieldName + " BIGINT NOT NULL " //$NON-NLS-1$
+         return "   " //                                                //$NON-NLS-1$
+
+               + fieldName + " BIGINT NOT NULL " //                     //$NON-NLS-1$
                + generateID
-               + " CONSTRAINT " + fieldName + "_pk PRIMARY KEY" //$NON-NLS-1$ //$NON-NLS-2$
-               + ",\n";//$NON-NLS-1$
+               + " CONSTRAINT " + fieldName + "_pk PRIMARY KEY" //      //$NON-NLS-1$ //$NON-NLS-2$
+               + "," + NL; //                                           //$NON-NLS-1$
       }
 
       /**
@@ -566,12 +628,20 @@ public class TourDatabase {
        * @param indexAndColumnName
        * @throws SQLException
        */
-      private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName)
-            throws SQLException {
+      private static void CreateIndex(final Statement stmt, final String tableName, final String indexAndColumnName) throws SQLException {
 
-         final String sql = "CREATE INDEX " + indexAndColumnName //$NON-NLS-1$
-               + " ON " + tableName //$NON-NLS-1$
-               + " (" + indexAndColumnName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+         if (isIndexAvailable(stmt.getConnection(), tableName, indexAndColumnName)) {
+
+            // index already exist -> nothing to do
+
+            return;
+         }
+
+         final String sql = UI.EMPTY_STRING
+
+               + "CREATE INDEX " + indexAndColumnName //    //$NON-NLS-1$
+               + " ON " + tableName //                      //$NON-NLS-1$
+               + " (" + indexAndColumnName + ")"; //        //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
@@ -579,19 +649,23 @@ public class TourDatabase {
       /**
        * @param stmt
        * @param table
-       * @param columnName
+       * @param oldColumnName
        * @param newColumnName
        * @throws SQLException
        */
       private static void RenameCol(final Statement stmt,
                                     final String table,
-                                    final String columnName,
+                                    final String oldColumnName,
                                     final String newColumnName) throws SQLException {
 
-         final String sql = UI.EMPTY_STRING//
-               + " RENAME COLUMN " + table + "." + columnName + " TO " + newColumnName; //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         if (isColumnAvailable(stmt.getConnection(), table, oldColumnName) == false) {
 
-         exec(stmt, sql);
+            // old column do not exist (is already renamed) -> nothing to do
+
+            return;
+         }
+
+         exec(stmt, "RENAME COLUMN " + table + "." + oldColumnName + " TO " + newColumnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
    }
 
@@ -656,7 +730,7 @@ public class TourDatabase {
 
             // create new tag
 
-            final TourTag savedTag = TourDatabase.saveEntity(//
+            final TourTag savedTag = saveEntity(
                   tourTag,
                   TourDatabase.ENTITY_IS_NOT_SAVED,
                   TourTag.class);
@@ -723,7 +797,7 @@ public class TourDatabase {
 
          // create new tag
 
-         final TourType savedType = TourDatabase.saveEntity(//
+         final TourType savedType = saveEntity(
                tourType,
                TourDatabase.ENTITY_IS_NOT_SAVED,
                TourTag.class);
@@ -1297,8 +1371,7 @@ public class TourDatabase {
 
    private static void exec(final Statement stmt, final String sql) throws SQLException {
 
-      StatusUtil.logInfo(sql);
-      System.out.println();
+      System.out.println(sql);
 
       stmt.execute(sql);
    }
@@ -1312,8 +1385,7 @@ public class TourDatabase {
 
    private static void execUpdate(final Statement stmt, final String sql) throws SQLException {
 
-      StatusUtil.logInfo(sql);
-      System.out.println();
+      System.out.println(sql);
 
       stmt.executeUpdate(sql);
    }
@@ -1412,10 +1484,10 @@ public class TourDatabase {
 
          final String sql = UI.EMPTY_STRING +
 
-               "SELECT tourId" //$NON-NLS-1$
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
-               + " WHERE TourStartTime >= ? AND TourStartTime < ?" //$NON-NLS-1$
-               + " ORDER BY TourStartTime"; //$NON-NLS-1$
+               "SELECT tourId" //                                       //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA //             //$NON-NLS-1$
+               + " WHERE TourStartTime >= ? AND TourStartTime < ?" //   //$NON-NLS-1$
+               + " ORDER BY TourStartTime"; //                          //$NON-NLS-1$
 
          stmt = conn.prepareStatement(sql);
          stmt.setLong(1, dateFromMS);
@@ -1628,6 +1700,13 @@ public class TourDatabase {
    }
 
    /**
+    * @return Database version on app startup before any db update is started
+    */
+   public static int getDbVersionOnStartup() {
+      return _dbVersionOnStartup;
+   }
+
+   /**
     * Getting one row from the database sorted by alphabet and without any double entries.
     *
     * @author Stefan F.
@@ -1748,24 +1827,24 @@ public class TourDatabase {
       /*
        * read tag categories from db
        */
-      Query emQuery = em.createQuery(//
-            //
-            "SELECT ttCategory" //$NON-NLS-1$
-                  + " FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory" //$NON-NLS-1$ //$NON-NLS-2$
-                  + " WHERE ttCategory.isRoot=1" //$NON-NLS-1$
-                  + " ORDER BY ttCategory.name"); //$NON-NLS-1$
+      Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+            + "SELECT ttCategory" //$NON-NLS-1$
+            + " FROM " + TourTagCategory.class.getSimpleName() + " AS ttCategory" //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE ttCategory.isRoot=1" //$NON-NLS-1$
+            + " ORDER BY ttCategory.name"); //$NON-NLS-1$
 
       rootEntry.tourTagCategories = (ArrayList<TourTagCategory>) emQuery.getResultList();
 
       /*
        * read tour tags from db
        */
-      emQuery = em.createQuery(//
-            //
-            "SELECT tourTag" //$NON-NLS-1$
-                  + " FROM " + TourTag.class.getSimpleName() + " AS tourTag " //$NON-NLS-1$ //$NON-NLS-2$
-                  + " WHERE tourTag.isRoot=1" //$NON-NLS-1$
-                  + " ORDER BY tourTag.name"); //$NON-NLS-1$
+      emQuery = em.createQuery(UI.EMPTY_STRING
+
+            + "SELECT tourTag" //$NON-NLS-1$
+            + " FROM " + TourTag.class.getSimpleName() + " AS tourTag " //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE tourTag.isRoot=1" //$NON-NLS-1$
+            + " ORDER BY tourTag.name"); //$NON-NLS-1$
 
       rootEntry.tourTags = (ArrayList<TourTag>) emQuery.getResultList();
 
@@ -1794,7 +1873,7 @@ public class TourDatabase {
          return tagCategory.getNotes();
       } else {
          try {
-            throw new MyTourbookException("tag category id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new MyTourbookException("Tag category id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
          } catch (final MyTourbookException e) {
             e.printStackTrace();
          }
@@ -1928,7 +2007,7 @@ public class TourDatabase {
 
          if (tagIndex++ > 0) {
             if (isVertical) {
-               sb.append(UI.NEW_LINE);
+               sb.append(NL);
             } else {
                sb.append(UI.COMMA_SPACE);
             }
@@ -1998,11 +2077,11 @@ public class TourDatabase {
 
       if (em != null) {
 
-         final Query emQuery = em.createQuery(//
-               //
-               "SELECT tourBike" //$NON-NLS-1$
-                     + " FROM TourBike AS tourBike " //$NON-NLS-1$
-                     + " ORDER  BY tourBike.name"); //$NON-NLS-1$
+         final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+               + "SELECT tourBike" //$NON-NLS-1$
+               + " FROM TourBike AS tourBike " //$NON-NLS-1$
+               + " ORDER  BY tourBike.name"); //$NON-NLS-1$
 
          bikeList = (ArrayList<TourBike>) emQuery.getResultList();
 
@@ -2079,6 +2158,88 @@ public class TourDatabase {
       }
    }
 
+   private static boolean isColumnAvailable(final Connection conn, final String table, final String column) {
+
+      try {
+
+         final DatabaseMetaData meta = conn.getMetaData();
+
+         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, column.toUpperCase());
+
+         while (result.next()) {
+            return true;
+         }
+
+         /*
+          * dump all columns
+          */
+//         final DatabaseMetaData meta = conn.getMetaData();
+//         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, NULL);
+//
+//         while (result.next()) {
+//            System.out.println("  "
+//                  + result.getString("TABLE_SCHEM")
+//                  + ", "
+//                  + result.getString("TABLE_NAME")
+//                  + ", "
+//                  + result.getString("COLUMN_NAME")
+//                  + ", "
+//                  + result.getString("TYPE_NAME")
+//                  + ", "
+//                  + result.getInt("COLUMN_SIZE")
+//                  + ", "
+//                  + result.getString("NULLABLE"));
+//         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
+   /**
+    * @param conn
+    * @param tableName
+    * @param constraintName
+    * @return
+    */
+   private static boolean isConstraintAvailable(final Connection conn, final String tableName, final String constraintName) {
+
+      try (Statement stmt = conn.createStatement()) {
+
+         final String sqlQuery = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                             //$NON-NLS-1$
+               + "   C.CONSTRAINTNAME," + NL //                               //$NON-NLS-1$
+               + "   T.TABLENAME," + NL //                                    //$NON-NLS-1$
+               + "   C.TYPE" + NL //                                          //$NON-NLS-1$
+               + "FROM" + NL //                                               //$NON-NLS-1$
+               + "   SYS.SYSCONSTRAINTS C," + NL //                           //$NON-NLS-1$
+               + "   SYS.SYSSCHEMAS S," + NL //                               //$NON-NLS-1$
+               + "   SYS.SYSTABLES T" + NL //                                 //$NON-NLS-1$
+               + "WHERE" + NL //                                              //$NON-NLS-1$
+               + "   C.SCHEMAID = S.SCHEMAID" + NL //                         //$NON-NLS-1$
+               + "   AND C.TABLEID = T.TABLEID" + NL //                       //$NON-NLS-1$
+
+               // NAMES must be UPPERCASE !!!
+               + "   AND T.TABLENAME  = '" + tableName.toUpperCase() + "'" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
+               + "   AND C.CONSTRAINTNAME ='" + constraintName.toUpperCase() + "'" //       //$NON-NLS-1$ //$NON-NLS-2$
+         ;
+
+         final ResultSet result = stmt.executeQuery(sqlQuery);
+
+         while (result.next()) {
+            return true;
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
    /**
     * Checks if a field exceeds the max length
     *
@@ -2129,8 +2290,7 @@ public class TourDatabase {
                if (MessageDialog.openConfirm(
                      Display.getDefault().getActiveShell(),
                      Messages.Tour_Database_Dialog_ValidateFields_Title,
-                     NLS.bind(
-                           Messages.Tour_Database_Dialog_ValidateFields_Message, //
+                     NLS.bind(Messages.Tour_Database_Dialog_ValidateFields_Message,
                            new Object[] { uiFieldName, field.length(), maxLength }))) {
 
                   returnValue[0] = FIELD_VALIDATION.TRUNCATE;
@@ -2142,6 +2302,125 @@ public class TourDatabase {
       }
 
       return returnValue[0];
+   }
+
+   private static boolean isIndexAvailable(final Connection conn, final String table, final String column) {
+
+      try {
+
+         final String requestedIndexName = column.toUpperCase();
+
+         final DatabaseMetaData meta = conn.getMetaData();
+         final ResultSet result = meta.getIndexInfo(null, TABLE_SCHEMA, table, false, false);
+
+         while (result.next()) {
+
+            final String dbIndexName = result.getString("COLUMN_NAME"); //$NON-NLS-1$
+
+            if (requestedIndexName.equals(dbIndexName.toUpperCase())) {
+
+               return true;
+            }
+
+//            System.out.println("Table Indicies\n");
+//            System.out.println(
+//
+//                  String.format(
+//                        "%-20s",
+//                        columnName
+//
+//                  ) //
+//            );
+         }
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
+   private static boolean isPrimaryKeyAvailable(final Connection conn, final String table, final String key) {
+
+      try {
+
+         /**
+          * Finally found a solution here
+          * https://github.com/splicemachine/spliceengine/blob/master/splice_machine/src/test/java/com/splicemachine/derby/impl/sql/catalog/SqlProcedureColsIT.java
+          * to get the primary keys
+          */
+
+         /**
+          * Table MUST be UPPERCASE, otherwise it is not working !!!
+          */
+         final String tableUpper = table.toUpperCase();
+         final String sql = "CALL SYSIBM.SQLPRIMARYKEYS(NULL, NULL, '" + tableUpper + "', NULL)"; //$NON-NLS-1$ //$NON-NLS-2$
+
+         final Statement stmt = conn.createStatement();
+         final ResultSet rs = stmt.executeQuery(sql);
+
+         final String keyUpper = key.toUpperCase();
+
+         while (rs.next()) {
+
+            final String dbKeyName = rs.getString("PK_NAME"); //$NON-NLS-1$
+
+            if (keyUpper.equals(dbKeyName.toUpperCase())) {
+
+               return true;
+            }
+         }
+
+         stmt.close();
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
+   }
+
+   private static boolean isTableAvailable(final Connection conn, final String table) {
+
+      try {
+
+         final DatabaseMetaData meta = conn.getMetaData();
+         final ResultSet result = meta.getTables(null, TABLE_SCHEMA, table.toUpperCase(), null);
+
+         while (result.next()) {
+            return true;
+         }
+
+//         /*
+//          * dump all columns
+//          */
+//         final DatabaseMetaData meta = conn.getMetaData();
+////         final ResultSet result = meta.getTables(null, null, null, new String[] {"TABLE"});
+//         final ResultSet result = meta.getTables(null, null, null, null);
+//
+//         while (result.next()) {
+//            System.out.println(("   " + result.getString("TABLE_CAT"))
+//                  + (", " + result.getString("TABLE_SCHEM"))
+//                  + (", " + result.getString("TABLE_NAME"))
+//                  + (", " + result.getString("TABLE_TYPE"))
+//                  + (", " + result.getString("REMARKS")));
+//         }
+////            TABLE_CAT String => table catalog (may be null)
+////            TABLE_SCHEM String => table schema (may be null)
+////            TABLE_NAME String => table name
+////            TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
+////            REMARKS String => explanatory comment on the table
+////            TYPE_CAT String => the types catalog (may be null)
+////            TYPE_SCHEM String => the types schema (may be null)
+////            TYPE_NAME String => type name (may be null)
+////            SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null)
+////            REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      return false;
    }
 
    /**
@@ -2197,7 +2476,7 @@ public class TourDatabase {
 
       if (isSaved == false) {
          MessageDialog.openError(
-               Display.getCurrent().getActiveShell(), //
+               Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -2216,7 +2495,8 @@ public class TourDatabase {
     * @param entityClass
     * @return Returns the saved entity
     */
-   public static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
+   @SuppressWarnings("unused")
+   private static <T> T saveEntity(final T entity, final long id, final Class<T> entityClass, final EntityManager em) {
 
       final EntityTransaction ts = em.getTransaction();
 
@@ -2255,7 +2535,7 @@ public class TourDatabase {
 
       if (isSaved == false) {
          MessageDialog.openError(
-               Display.getCurrent().getActiveShell(), //
+               Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
                "Error occurred when saving an entity"); //$NON-NLS-1$
       }
@@ -2476,7 +2756,6 @@ public class TourDatabase {
 //                  (System.nanoTime() - startTime) / 1_000_000.0)
 //
 //      );
-//  remove SYSTEM.OUT.PRINTLN
    }
 
    public static void updateActiveTourTypeList(final TourTypeFilter tourTypeFilter) {
@@ -2585,19 +2864,23 @@ public class TourDatabase {
       final PreparedStatement stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
             + "SELECT" //                       //$NON-NLS-1$
-            + " StartYear," //            // 1  //$NON-NLS-1$
-            + " StartMonth," //           // 2  //$NON-NLS-1$
-            + " StartDay" //              // 3  //$NON-NLS-1$
-            + " FROM " + TABLE_TOUR_DATA //      //$NON-NLS-1$
-            + " WHERE TourId=?"); //             //$NON-NLS-1$
+
+            + " StartYear," //               1  //$NON-NLS-1$
+            + " StartMonth," //              2  //$NON-NLS-1$
+            + " StartDay" //                 3  //$NON-NLS-1$
+
+            + " FROM " + TABLE_TOUR_DATA //     //$NON-NLS-1$
+            + " WHERE TourId=?" //              //$NON-NLS-1$
+      );
 
       final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
             + "UPDATE " + TABLE_TOUR_DATA //    //$NON-NLS-1$
             + " SET" //                         //$NON-NLS-1$
-            + " startWeek=?, " //               //$NON-NLS-1$
+            + " startWeek=?," //                //$NON-NLS-1$
             + " startWeekYear=? " //            //$NON-NLS-1$
-            + " WHERE tourId=?"); //            //$NON-NLS-1$
+            + " WHERE tourId=?" //              //$NON-NLS-1$
+      );
 
       int tourIdx = 1;
 
@@ -2783,30 +3066,83 @@ public class TourDatabase {
       exec(stmt, sql);
    }
 
-//   /**
-//    * Create index for {@link TourData}. *
-//    * <p>
-//    *
-//    * @param stmt
-//    * @throws SQLException
-//    * @since Db version 35
-//    */
-//   private void createIndex_TourData_035(final Statement stmt) throws SQLException {
-//
-//      String sql;
-//
-//      sql = "CREATE INDEX LatitudeMinE6 ON " + TABLE_TOUR_DATA + " (LatitudeMinE6)"; //$NON-NLS-1$ //$NON-NLS-2$
-//      exec(stmt, sql);
-//
-//      sql = "CREATE INDEX LatitudeMaxE6 ON " + TABLE_TOUR_DATA + " (LatitudeMaxE6)"; //$NON-NLS-1$ //$NON-NLS-2$
-//      exec(stmt, sql);
-//
-//      sql = "CREATE INDEX LongitudeMinE6 ON " + TABLE_TOUR_DATA + " (LongitudeMinE6)"; //$NON-NLS-1$ //$NON-NLS-2$
-//      exec(stmt, sql);
-//
-//      sql = "CREATE INDEX LongitudeMaxE6 ON " + TABLE_TOUR_DATA + " (LongitudeMaxE6)"; //$NON-NLS-1$ //$NON-NLS-2$
-//      exec(stmt, sql);
-//   }
+   private String createLog_DataUpdate(final int toVersion, final long startTime) {
+
+      final long timeDiff = System.currentTimeMillis() - startTime;
+
+      return String.format(
+            "Database data update %d -> %d in %s mm:ss", //$NON-NLS-1$
+            toVersion - 1,
+            toVersion,
+            net.tourbook.common.UI.format_mm_ss(timeDiff / 1000));
+   }
+
+   /**
+    * Create table {@link #TABLE_DB_VERSION_DATA}
+    *
+    * @param stmt
+    * @throws SQLException
+    */
+   private void createTable_DbVersion_Data(final Statement stmt, final int initialVersionNumber) throws SQLException {
+
+      // ensure table do not exist
+      if (isTableAvailable(stmt.getConnection(), TABLE_DB_VERSION_DATA)) {
+         return;
+      }
+
+      String sql;
+
+      /*
+       * Create table
+       */
+      sql = UI.EMPTY_STRING
+
+            + "CREATE TABLE " + TABLE_DB_VERSION_DATA //       //$NON-NLS-1$
+            + " (" + NL //                                     //$NON-NLS-1$
+            + "   version INTEGER NOT NULL " + NL //           //$NON-NLS-1$
+            + " )"; //                                         //$NON-NLS-1$
+
+      exec(stmt, sql);
+
+      /*
+       * Create 1 record which contains the db data version
+       */
+
+      sql = "INSERT INTO " + TABLE_DB_VERSION_DATA + " VALUES (" + Integer.toString(initialVersionNumber) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      execUpdate(stmt, sql);
+   }
+
+   /**
+    * Create table {@link #TABLE_DB_VERSION_DESIGN}
+    *
+    * @param stmt
+    * @throws SQLException
+    */
+   private void createTable_DbVersion_Design(final Statement stmt) throws SQLException {
+
+      String sql;
+
+      /*
+       * Create table
+       */
+      sql = UI.EMPTY_STRING
+
+            + "CREATE TABLE " + TABLE_DB_VERSION_DESIGN //     //$NON-NLS-1$
+            + " (" + NL //                                     //$NON-NLS-1$
+            + "   version INTEGER NOT NULL " + NL //           //$NON-NLS-1$
+            + " )"; //                                         //$NON-NLS-1$
+
+      exec(stmt, sql);
+
+      /*
+       * Create 1 record which contains the db design version number
+       */
+
+      sql = "INSERT INTO " + TABLE_DB_VERSION_DESIGN + " VALUES (" + Integer.toString(TOURBOOK_DB_VERSION) + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      execUpdate(stmt, sql);
+   }
 
    /**
     * create table {@link #TABLE_TOUR_BIKE}
@@ -2863,8 +3199,10 @@ public class TourDatabase {
             // version 28 end ---------
             //
             // version 40 start
-            //
-            + "   tourDeviceTime_Elapsed  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
+//
+// RENAMED FIELD - from "tourRecordingTime"
+//
+            + "   tourDeviceTime_Elapsed  INTEGER DEFAULT 0                            \n" //$NON-NLS-1$
             //
             // version 40 end ---------
             //
@@ -2900,14 +3238,14 @@ public class TourDatabase {
             + " TourDistance        INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
 
             // replaced with BIGINT values in version 22
-            //            + " tourRecordingTime    INTEGER NOT NULL,                    \n" //$NON-NLS-1$
-            //            + " tourDrivingTime      INTEGER NOT NULL,                    \n" //$NON-NLS-1$
+            //            + " tourRecordingTime    INTEGER NOT NULL,                   \n" //$NON-NLS-1$
+            //            + " tourDrivingTime      INTEGER NOT NULL,                   \n" //$NON-NLS-1$
 
             + " tourAltUp           INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
             + " tourAltDown         INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
 
-            + " deviceTourType      VARCHAR(" + TourData.DB_LENGTH_DEVICE_TOUR_TYPE + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + " devicePluginId      VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_ID + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " deviceTourType      VARCHAR(" + TourData.DB_LENGTH_DEVICE_TOUR_TYPE + "), \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " devicePluginId      VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_ID + "), \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             + " deviceTravelTime    BIGINT NOT NULL,                                   \n" //$NON-NLS-1$
             + " deviceDistance      INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
@@ -2925,11 +3263,11 @@ public class TourDatabase {
 
             // from markus
             // replaced with FLOAT values in version 21
-            //            + " maxAltitude            INTEGER,                           \n" //$NON-NLS-1$
-            //            + " maxPulse               INTEGER,                           \n" //$NON-NLS-1$
-            //            + " avgPulse               INTEGER,                           \n" //$NON-NLS-1$
-            //            + " avgCadence             INTEGER,                           \n" //$NON-NLS-1$
-            //            + " avgTemperature         INTEGER,                           \n" //$NON-NLS-1$
+            //            + " maxAltitude            INTEGER,                          \n" //$NON-NLS-1$
+            //            + " maxPulse               INTEGER,                          \n" //$NON-NLS-1$
+            //            + " avgPulse               INTEGER,                          \n" //$NON-NLS-1$
+            //            + " avgCadence             INTEGER,                          \n" //$NON-NLS-1$
+            //            + " avgTemperature         INTEGER,                          \n" //$NON-NLS-1$
 
             + " maxSpeed            FLOAT,                                                   \n" //$NON-NLS-1$
             + " tourTitle           VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + "),          \n" //$NON-NLS-1$ //$NON-NLS-2$
@@ -2940,6 +3278,9 @@ public class TourDatabase {
             + " tourStartPlace      VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + "),    \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " tourEndPlace        VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " calories            INTEGER,                                                 \n" //$NON-NLS-1$
+//
+// RENAMED FIELD - bikerWeight
+//
             + " bodyWeight          FLOAT,                                                   \n" //$NON-NLS-1$
             + " " + KEY_BIKE + "    BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2954,7 +3295,7 @@ public class TourDatabase {
 
             // version 6 start
             //
-            + " tourImportFilePath  VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " tourImportFilePath  VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 6 end
 
@@ -3055,8 +3396,11 @@ public class TourDatabase {
             + " TourStartTime          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             + " TourEndTime            BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
 
-            + " TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
-            + " TourComputedTime_Moving BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+//
+// RENAMED FIELDs - from TourRecordingTime, TourDrivingTime
+//
+            + " TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                                 \n" //$NON-NLS-1$
+            + " TourComputedTime_Moving BIGINT DEFAULT 0,                                 \n" //$NON-NLS-1$
             //
             // version 22 end ---------
 
@@ -3083,20 +3427,20 @@ public class TourDatabase {
 
             // version 30 start  -  16.1
             //
-            + " power_Avg                             FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
+            + " power_Avg                             FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
             + " power_Max                             INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             + " power_Normalized                      INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             + " power_FTP                             INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
 
-            + " power_TotalWork                       BIGINT DEFAULT 0,                     \n" //$NON-NLS-1$
-            + " power_TrainingStressScore             FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
-            + " power_IntensityFactor                 FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
+            + " power_TotalWork                       BIGINT DEFAULT 0,                   \n" //$NON-NLS-1$
+            + " power_TrainingStressScore             FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
+            + " power_IntensityFactor                 FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
 
             + " power_PedalLeftRightBalance           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
-            + " power_AvgLeftTorqueEffectiveness      FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
-            + " power_AvgRightTorqueEffectiveness     FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
-            + " power_AvgLeftPedalSmoothness          FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
-            + " power_AvgRightPedalSmoothness         FLOAT DEFAULT 0,                     \n" //$NON-NLS-1$
+            + " power_AvgLeftTorqueEffectiveness      FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
+            + " power_AvgRightTorqueEffectiveness     FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
+            + " power_AvgLeftPedalSmoothness          FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
+            + " power_AvgRightPedalSmoothness         FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
             //
             // version 30 end ---------
 
@@ -3178,7 +3522,7 @@ public class TourDatabase {
 
             // version 40 start  -  19.10
             //
-            + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " power_DataSource   VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "), \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " cadenceZone_SlowTime                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             + " cadenceZone_FastTime                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
@@ -3188,24 +3532,24 @@ public class TourDatabase {
 
             // version 41 start  -  20.8
             //
-            + " maxPace                               FLOAT DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " maxPace                               FLOAT DEFAULT 0,                    \n" //$NON-NLS-1$
             //
             // version 41 end
 
-            // version 42 start  -  20.X
+            // version 42 start  -  20.11.1
             //
-            + " tourDeviceTime_Recorded                       BIGINT,                  \n" //$NON-NLS-1$
-            + " tourDeviceTime_Paused                         BIGINT,                  \n" //$NON-NLS-1$
-            + " bodyFat                                       FLOAT,                   \n" //$NON-NLS-1$
+            + " tourDeviceTime_Recorded                       BIGINT,                     \n" //$NON-NLS-1$
+            + " tourDeviceTime_Paused                         BIGINT,                     \n" //$NON-NLS-1$
+            + " bodyFat                                       FLOAT,                      \n" //$NON-NLS-1$
             //
             // version 42 end
 
             //            // version 35 start  -  18.?
             //            //
-            //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
-            //            + " LatitudeMaxE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
-            //            + " LongitudeMinE6        INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
-            //            + " LongitudeMaxE6        INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
+            //            + " LatitudeMinE6         INTEGER DEFAULT 0,                    \n" //$NON-NLS-1$
+            //            + " LatitudeMaxE6         INTEGER DEFAULT 0,                    \n" //$NON-NLS-1$
+            //            + " LongitudeMinE6        INTEGER DEFAULT 0,                    \n" //$NON-NLS-1$
+            //            + " LongitudeMaxE6        INTEGER DEFAULT 0,                    \n" //$NON-NLS-1$
             //            //
             //            // version 35 end ---------
 
@@ -3217,11 +3561,11 @@ public class TourDatabase {
              * <p>
              * -> the gpsData are put into the serieData object
              */
-            //   + "gpsData                         BLOB,                                    \n" //$NON-NLS-1$
+            //   + "gpsData                           BLOB,                               \n" //$NON-NLS-1$
 
             // version 5 end
 
-            + " serieData              BLOB                                               \n" //$NON-NLS-1$
+            + " serieData                             BLOB                                \n" //$NON-NLS-1$
 
             + ")"); //$NON-NLS-1$
 
@@ -3707,24 +4051,6 @@ public class TourDatabase {
             + ")"); //$NON-NLS-1$
    }
 
-   /**
-    * create table {@link #TABLE_DB_VERSION}
-    *
-    * @param stmt
-    * @throws SQLException
-    */
-   private void createTable_Version(final Statement stmt) throws SQLException {
-
-      /*
-       * CREATE TABLE Version
-       */
-      exec(stmt, "CREATE TABLE " + TABLE_DB_VERSION + " (                                       \n" //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + "   version    INTEGER   NOT NULL                                                 \n" //$NON-NLS-1$
-            //
-            + ")"); //$NON-NLS-1$
-   }
-
    private String createUIServerStateMessage(final int stateCounter) {
 
       final StringBuilder sb = new StringBuilder();
@@ -3746,7 +4072,7 @@ public class TourDatabase {
 
    public Connection getConnection() throws SQLException {
 
-      if (sqlInit_10_IsDbInitialized()) {
+      if (sqlStartup_10_IsSqlServerUpAndRunning()) {
          return getConnection_Pooled();
       } else {
          return null;
@@ -3803,9 +4129,35 @@ public class TourDatabase {
 
       final String dbUrl = DERBY_URL;
 
-      logDriverManager_GetConnection(dbUrl);
+      logDerbyCommand(dbUrl);
 
       return DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
+   }
+
+   private int getDbVersion(final Connection conn, final String table) {
+
+      try (Statement stmt = conn.createStatement()) {
+
+         final ResultSet result = stmt.executeQuery("SELECT * FROM " + table); //$NON-NLS-1$
+
+         if (result.next()) {
+
+            return result.getInt(1);
+
+         } else {
+
+            // this case should not happen
+
+            throw new RuntimeException(String.format("Table '%s' do not contain any records", table));//$NON-NLS-1$
+         }
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+         PlatformUI.getWorkbench().close();
+      }
+
+      return -1;
    }
 
    /**
@@ -3818,7 +4170,7 @@ public class TourDatabase {
       if (_emFactory == null) {
 
          // ensure db is valid BEFORE entity manager is initialized which can shutdown the database
-         if (sqlInit_10_IsDbInitialized() == false) {
+         if (sqlStartup_10_IsSqlServerUpAndRunning() == false) {
             return null;
          }
       }
@@ -3835,180 +4187,38 @@ public class TourDatabase {
       }
    }
 
-   private boolean isColumnAvailable(final Connection conn, final String table, final String column) {
+   private String getRenamedField_TourRecordingTime(final Connection conn) {
 
-      try {
-
-         final DatabaseMetaData meta = conn.getMetaData();
-
-         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, column.toUpperCase());
-
-         while (result.next()) {
-            return true;
-         }
-
-         /*
-          * dump all columns
-          */
-//         final DatabaseMetaData meta = conn.getMetaData();
-//         final ResultSet result = meta.getColumns(null, TABLE_SCHEMA, table, NULL);
-//
-//         while (result.next()) {
-//            System.out.println("  "
-//                  + result.getString("TABLE_SCHEM")
-//                  + ", "
-//                  + result.getString("TABLE_NAME")
-//                  + ", "
-//                  + result.getString("COLUMN_NAME")
-//                  + ", "
-//                  + result.getString("TYPE_NAME")
-//                  + ", "
-//                  + result.getInt("COLUMN_SIZE")
-//                  + ", "
-//                  + result.getString("NULLABLE"));
-//         }
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      return false;
+      return isColumnAvailable(conn, TABLE_TOUR_DATA, RENAMED__TOUR_RECORDING_TIME__FROM)
+            ? RENAMED__TOUR_RECORDING_TIME__FROM
+            : RENAMED__TOUR_RECORDING_TIME__INTO;
    }
 
-   private boolean isIndexAvailable(final Connection conn, final String table, final String column) {
+   private void logDbUpdate(final String info) {
 
-      try {
-
-         final String requestedIndexName = column.toUpperCase();
-
-         final DatabaseMetaData meta = conn.getMetaData();
-         final ResultSet result = meta.getIndexInfo(null, TABLE_SCHEMA, table, false, false);
-
-         while (result.next()) {
-
-            final String dbIndexName = result.getString("COLUMN_NAME"); //$NON-NLS-1$
-
-            if (requestedIndexName.equals(dbIndexName.toUpperCase())) {
-
-               return true;
-            }
-
-//            System.out.println("Table Indicies\n");
-//            System.out.println(
-//
-//                  String.format(
-//                        "%-20s",
-//                        columnName
-//
-//                  ) //
-//            );
-         }
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      return false;
+      System.out.println(TIME_STAMP + "[DB Update] " + info); //$NON-NLS-1$
    }
 
-   private boolean isPrimaryKeyAvailable(final Connection conn, final String table, final String key) {
-
-      try {
-
-         /**
-          * Finally found a solution here
-          * https://github.com/splicemachine/spliceengine/blob/master/splice_machine/src/test/java/com/splicemachine/derby/impl/sql/catalog/SqlProcedureColsIT.java
-          * to get the primary keys
-          */
-
-         /**
-          * Table MUST be UPPERCASE, otherwise it is not working !!!
-          */
-         final String tableUpper = table.toUpperCase();
-         final String sql = "CALL SYSIBM.SQLPRIMARYKEYS(NULL, NULL, '" + tableUpper + "', NULL)"; //$NON-NLS-1$ //$NON-NLS-2$
-
-         final Statement stmt = conn.createStatement();
-         final ResultSet rs = stmt.executeQuery(sql);
-
-         final String keyUpper = key.toUpperCase();
-
-         while (rs.next()) {
-
-            final String dbKeyName = rs.getString("PK_NAME"); //$NON-NLS-1$
-
-            if (keyUpper.equals(dbKeyName.toUpperCase())) {
-
-               return true;
-            }
-         }
-
-         stmt.close();
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      return false;
-   }
-
-   private boolean isTableAvailable(final Connection conn, final String table) {
-
-      try {
-
-         final DatabaseMetaData meta = conn.getMetaData();
-         final ResultSet result = meta.getTables(null, TABLE_SCHEMA, table.toUpperCase(), null);
-
-         while (result.next()) {
-            return true;
-         }
-
-//         /*
-//          * dump all columns
-//          */
-//         final DatabaseMetaData meta = conn.getMetaData();
-////         final ResultSet result = meta.getTables(null, null, null, new String[] {"TABLE"});
-//         final ResultSet result = meta.getTables(null, null, null, null);
-//
-//         while (result.next()) {
-//            System.out.println(("   " + result.getString("TABLE_CAT"))
-//                  + (", " + result.getString("TABLE_SCHEM"))
-//                  + (", " + result.getString("TABLE_NAME"))
-//                  + (", " + result.getString("TABLE_TYPE"))
-//                  + (", " + result.getString("REMARKS")));
-//         }
-////            TABLE_CAT String => table catalog (may be null)
-////            TABLE_SCHEM String => table schema (may be null)
-////            TABLE_NAME String => table name
-////            TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
-////            REMARKS String => explanatory comment on the table
-////            TYPE_CAT String => the types catalog (may be null)
-////            TYPE_SCHEM String => the types schema (may be null)
-////            TYPE_NAME String => type name (may be null)
-////            SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null)
-////            REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
-
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      return false;
-   }
-
-   private void logDb_UpdateEnd(final int dbVersion) {
+   private void logDbUpdate_End(final int dbVersion) {
 
       System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
       System.out.println();
    }
 
-   private void logDb_UpdateStart(final int dbVersion) {
+   private void logDbUpdate_Start(final int dbVersion) {
 
       System.out.println();
       System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
    }
 
-   private void logDriverManager_GetConnection(final String dbUrl) {
+   private void logDerbyCommand(final String dbUrl) {
 
-      Util.logSimpleMessage(getClass(), "Derby command executed: " + dbUrl); //$NON-NLS-1$
+      System.out.println(TIME_STAMP + "[Derby command executed] " + dbUrl); //$NON-NLS-1$
+   }
+
+   private void logDerbyInfo(final String info) {
+
+      System.out.println(TIME_STAMP + "[Derby] " + info); //$NON-NLS-1$
    }
 
    private void modifyColumn_Type(final String table,
@@ -4042,22 +4252,74 @@ public class TourDatabase {
 
       sql = "RENAME COLUMN " + table + UI.SYMBOL_DOT + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$
       exec(stmt, sql);
+
+      System.out.println();
    }
 
    public void removePropertyListener(final IPropertyListener listener) {
       _propertyListeners.remove(listener);
    }
 
-   private boolean sqlInit_10_IsDbInitialized() {
+   private void showTourSaveError(final TourData tourData) {
 
-      if (_isDbInitialized) {
+      MessageDialog.openError(
+            Display.getDefault().getActiveShell(),
+            "Error", //$NON-NLS-1$
+            String.format("Error occurred when saving tour '%s'", TourManager.getTourTitleDetailed(tourData))); //$NON-NLS-1$
+   }
+
+   /**
+    * Shutdown database server
+    */
+   private void shutdownDatabaseServer() {
+
+      Connection conn = null;
+
+      try {
+
+         // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
+
+         final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+
+         logDerbyCommand(dbUrl_ShutDown);
+
+         conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
+
+      } catch (final SQLException e) {
+
+         logDerbyInfo("Derby server is shutdown"); //$NON-NLS-1$
+
+// DO NOT SHOW THIS EXCEPTION, IT IS ALWAYS THROWN AND IS IRRITATING
+//
+//       final String sqlExceptionText = Util.getSQLExceptionText(e);
+//
+//       // log also the stacktrace
+//       StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
+
+      } finally {
+         Util.closeSql(conn);
+      }
+   }
+
+   /**
+    * Is checking that the tour sql server is up and running and the tour database design and data
+    * are updated to the current {@link #TOURBOOK_DB_VERSION}
+    *
+    * @return <code>true</code> when the tour sql server can be used.
+    */
+   private boolean sqlStartup_10_IsSqlServerUpAndRunning() {
+
+      if (_isDbInitialized || _isDbInDataUpdate) {
          return true;
       }
 
       // check if the derby driver can be loaded
       try {
+
          Class.forName(DERBY_DRIVER_CLASS);
+
       } catch (final ClassNotFoundException e) {
+
          StatusUtil.showStatus(e.getMessage(), e);
          return false;
       }
@@ -4066,9 +4328,6 @@ public class TourDatabase {
 
       try {
 
-         /*
-          * Check or setup sql
-          */
          final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -4078,8 +4337,8 @@ public class TourDatabase {
                splashManager.setMessage(Messages.App_SplashMessage_StartingDatabase);
                try {
 
-                  sqlInit_20_CheckServer(splashManager);
-                  sqlInit_30_Check_DbIsCreated();
+                  sqlStartup_20_CheckServer(splashManager);
+                  sqlStartup_30_Check_DbIsCreated();
 
                } catch (final Throwable e) {
 
@@ -4087,15 +4346,33 @@ public class TourDatabase {
                   return;
                }
 
-               sqlInit_40_CheckTable(splashManager);
+               sqlStartup_40_CheckTable(splashManager);
 
-               if (sqlInit_60_IsVersionValid(splashManager) == false) {
+               if (sqlStartup_50_IsDesignVersionValid(splashManager) == false) {
                   return;
                }
 
-               sqlInit_80_Check_DbIsUpgraded_After(splashManager);
+               sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(splashManager);
 
-               sqlInit_90_SetupEntityManager(splashManager);
+               sqlStartup_60_SetupEntityManager(splashManager);
+
+               _isDbInDataUpdate = true;
+               {
+                  if (sqlStartup_70_IsDataVersionValid(splashManager) == false) {
+                     return;
+                  }
+               }
+               _isDbInDataUpdate = false;
+
+               if (_dbDesignVersion_Old != _dbDesignVersion_New) {
+
+                  // display info for the successful update
+
+                  MessageDialog.openInformation(
+                        splashManager.getShell(),
+                        Messages.tour_database_version_info_title,
+                        NLS.bind(Messages.Tour_Database_UpdateInfo, _dbDesignVersion_Old, _dbDesignVersion_New));
+               }
 
                splashManager.setMessage(Messages.App_SplashMessage_Finalize);
 
@@ -4120,7 +4397,7 @@ public class TourDatabase {
     * @throws Throwable
     * @throws MyTourbookException
     */
-   private void sqlInit_20_CheckServer(final SplashManager splashManager) throws Throwable {
+   private void sqlStartup_20_CheckServer(final SplashManager splashManager) throws Throwable {
 
       if (_isDerbyEmbedded) {
          return;
@@ -4133,24 +4410,21 @@ public class TourDatabase {
 
       try {
 
-         sqlInit_22_CheckServer_CreateRunnable(splashManager).run(new NullProgressMonitor());
+         sqlStartup_22_CheckServer_CreateRunnable(splashManager).run(new NullProgressMonitor());
 
-      } catch (final InvocationTargetException e) {
+      } catch (final InvocationTargetException exception) {
 
-         StatusUtil.log(e);
+         StatusUtil.log(exception);
 
          MessageDialog.openError(
                Display.getDefault().getActiveShell(),
                Messages.Tour_Database_CannotConnectToDerbyServer_Title,
-               NLS.bind(
-                     Messages.Tour_Database_CannotConnectToDerbyServer_Message,
-                     e
-                           .getTargetException()
-                           .getMessage()));
+               NLS.bind(Messages.Tour_Database_CannotConnectToDerbyServer_Message,
+                     exception.getTargetException().getMessage()));
 
          PlatformUI.getWorkbench().close();
 
-         throw e.getTargetException();
+         throw exception.getTargetException();
 
       } catch (final InterruptedException e) {
          StatusUtil.log(e);
@@ -4163,7 +4437,7 @@ public class TourDatabase {
     *
     * @param splashManager
     */
-   private IRunnableWithProgress sqlInit_22_CheckServer_CreateRunnable(final SplashManager splashManager) {
+   private IRunnableWithProgress sqlStartup_22_CheckServer_CreateRunnable(final SplashManager splashManager) {
 
       // create runnable for stating the derby server
 
@@ -4187,13 +4461,16 @@ public class TourDatabase {
                 * check if another derby server is already running (this can happen during
                 * development)
                 */
-               StatusUtil.logInfo("checking if derby server is already running before server.start");//$NON-NLS-1$
+
+               logDerbyInfo("Checking if derby server is already running before server.start"); //$NON-NLS-1$
+
                _server.ping();
 
             } catch (final Exception e) {
 
                try {
-                  StatusUtil.logInfo("starting derby server");//$NON-NLS-1$
+
+                  logDerbyInfo("Starting derby server");//$NON-NLS-1$
 
                   _server.start(null);
 
@@ -4201,7 +4478,7 @@ public class TourDatabase {
                   StatusUtil.log(e2);
                }
 
-               StatusUtil.logInfo("checking if derby server is running after server.start");//$NON-NLS-1$
+               logDerbyInfo("Checking if derby server is running after server.start");//$NON-NLS-1$
 
                int pingCounter = 1;
                final int threadSleepTime = 100;
@@ -4216,7 +4493,7 @@ public class TourDatabase {
                      }
                      _server.ping();
 
-                     StatusUtil.logInfo("derby server has started");//$NON-NLS-1$
+                     logDerbyInfo("Derby server has started");//$NON-NLS-1$
 
                      break;
 
@@ -4229,11 +4506,10 @@ public class TourDatabase {
                         throw new InvocationTargetException(e1);
                      }
 
-                     StatusUtil.logInfo(
-                           NLS.bind(
-                                 "...waiting ({0} ms) for derby server startup: {1}", //$NON-NLS-1$
-                                 threadSleepTime,
-                                 pingCounter++));
+                     logDerbyInfo(NLS.bind(
+                           "...waiting ({0} ms) for derby server startup: {1}", //$NON-NLS-1$
+                           threadSleepTime,
+                           pingCounter++));
 
                      try {
                         Thread.sleep(threadSleepTime);
@@ -4254,7 +4530,7 @@ public class TourDatabase {
                   connection.close();
 
                   // log database path
-                  StatusUtil.logInfo("Database path: " + _databasePath); //$NON-NLS-1$
+                  logDerbyInfo("Database path: " + _databasePath); //$NON-NLS-1$
 
                } catch (final SQLException e1) {
                   UI.showSQLException(e1);
@@ -4266,7 +4542,7 @@ public class TourDatabase {
       return runnable;
    }
 
-   private void sqlInit_30_Check_DbIsCreated() {
+   private void sqlStartup_30_Check_DbIsCreated() {
 
       if (_isChecked_DbCreated) {
          return;
@@ -4289,7 +4565,7 @@ public class TourDatabase {
 
          final String dbUrl = DERBY_URL + DERBY_URL_COMMAND_CREATE_TRUE;
 
-         logDriverManager_GetConnection(dbUrl);
+         logDerbyCommand(dbUrl);
 
          conn = DriverManager.getConnection(dbUrl, TABLE_SCHEMA, TABLE_SCHEMA);
 
@@ -4310,7 +4586,7 @@ public class TourDatabase {
     *
     * @param splashManager
     */
-   private void sqlInit_40_CheckTable(final SplashManager splashManager) {
+   private void sqlStartup_40_CheckTable(final SplashManager splashManager) {
 
       if (_isTableChecked) {
          return;
@@ -4352,16 +4628,13 @@ public class TourDatabase {
             createTable_TourBike(stmt);
             createTable_TourGeoParts(stmt);
 
-            createTable_Version(stmt);
+            createTable_DbVersion_Design(stmt);
+            createTable_DbVersion_Data(stmt, TOURBOOK_DB_VERSION);
 
             createTable_TourTag(stmt);
             createTable_TourTag_Category(stmt);
 
             createTable_TourWayPoint(stmt);
-//            createTable_SharedMarker(stmt);
-
-//            createTable_TourSign(stmt);
-//            createTable_TourSignCategory(stmt);
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
@@ -4375,93 +4648,141 @@ public class TourDatabase {
    /**
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return
+    * @return <code>true</code> when design verion is updated to the last version, returns
+    *         <code>false</code> when an error occurred
     */
-   private boolean sqlInit_60_IsVersionValid(final SplashManager splashManager) {
+   private boolean sqlStartup_50_IsDesignVersionValid(final SplashManager splashManager) {
 
-      if (_isVersionChecked) {
+      if (_isDesignVersionChecked) {
          return true;
       }
 
-      if (_isSQLUpdateError) {
+      if (_isSQLDesignUpdateError) {
          return false;
       }
 
-      Connection conn2 = null;
-      Statement stmt1 = null;
-      Statement stmt2 = null;
+      try (Connection conn = getConnection_Simple()) {
 
-      try (Connection conn1 = getConnection_Simple()) {
+         // check if the database contains the correct version
 
-         {
-            String sql = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
+         _dbVersion_BeforeDesignUpdate = getDbVersion(conn, TABLE_DB_VERSION_DESIGN);
+         _dbVersion_AfterDesignUpdate = _dbVersion_BeforeDesignUpdate;
 
-            stmt1 = conn1.createStatement();
-            final ResultSet result = stmt1.executeQuery(sql);
+         if (_dbVersionOnStartup == -1) {
 
-            if (result.next()) {
-
-               // version record was found, check if the database contains the correct version
-
-               _dbVersionBeforeUpdate = result.getInt(1);
-               _dbVersionAfterUpdate = _dbVersionBeforeUpdate;
-
-               StatusUtil.logInfo("Current database version: " + _dbVersionBeforeUpdate); //$NON-NLS-1$
-
-               if (_dbVersionBeforeUpdate < TOURBOOK_DB_VERSION) {
-
-                  conn2 = sqlInit_70_Check_DbIsUpgraded_Before(_dbVersionBeforeUpdate, splashManager);
-
-                  if (updateDbDesign(conn2, _dbVersionBeforeUpdate, splashManager) == false) {
-                     return false;
-                  }
-
-               } else if (_dbVersionBeforeUpdate > TOURBOOK_DB_VERSION) {
-
-                  MessageDialog.openInformation(
-                        splashManager.getShell(),
-                        Messages.tour_database_version_info_title,
-                        NLS.bind(
-                              Messages.tour_database_version_info_message,
-                              _dbVersionBeforeUpdate,
-                              TOURBOOK_DB_VERSION));
-               }
-
-            } else {
-
-               // a version record is not available
-
-               /*
-                * insert the version for the current database design into the database
-                */
-               sql = "INSERT INTO " + TABLE_DB_VERSION //                        //$NON-NLS-1$
-                     + " VALUES (" + Integer.toString(TOURBOOK_DB_VERSION) + ")"; //         //$NON-NLS-1$ //$NON-NLS-2$
-
-               stmt2 = conn1.createStatement();
-               stmt2.executeUpdate(sql);
-            }
+            // keep db version from app startup, _dbVersionBeforeUpdate is updated twice !!!
+            _dbVersionOnStartup = _dbVersion_BeforeDesignUpdate;
          }
 
-         _isVersionChecked = true;
+         logDbUpdate("Current database design version: " + _dbVersion_BeforeDesignUpdate); //$NON-NLS-1$
+
+         if (_dbVersion_BeforeDesignUpdate < TOURBOOK_DB_VERSION) {
+
+            sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(_dbVersion_BeforeDesignUpdate, splashManager);
+
+            if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
+               return false;
+            }
+
+         } else if (_dbVersion_BeforeDesignUpdate > TOURBOOK_DB_VERSION) {
+
+            /*
+             * Current db version is HIGHER than the db version which the code is created for,
+             * this can occure during the development and should not happen by the end users.
+             */
+
+            MessageDialog.openInformation(
+                  splashManager.getShell(),
+                  Messages.tour_database_version_info_title,
+                  NLS.bind(Messages.tour_database_version_info_message,
+                        _dbVersion_BeforeDesignUpdate,
+                        TOURBOOK_DB_VERSION));
+
+            PlatformUI.getWorkbench().close();
+         }
+
+         _isDesignVersionChecked = true;
 
       } catch (final SQLException e) {
 
          UI.showSQLException(e);
          PlatformUI.getWorkbench().close();
-
-      } catch (final Exception e) {
-
-         StatusUtil.showStatus(e);
-         PlatformUI.getWorkbench().close();
-
-      } finally {
-
-         Util.closeSql(conn2);
-         Util.closeSql(stmt1);
-         Util.closeSql(stmt2);
       }
 
-      return _isVersionChecked;
+      return _isDesignVersionChecked;
+   }
+
+   private synchronized void sqlStartup_60_SetupEntityManager(final SplashManager splashManager) {
+
+      final Map<String, Object> configOverrides = new HashMap<>();
+
+      configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
+      configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
+
+      splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
+
+      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+   }
+
+   /**
+    * /**
+    * Is checking the tour database data is updated to the current {@link #TOURBOOK_DB_VERSION}
+    *
+    * @param splashManager
+    *           Progress monitor or <code>null</code> when the monitor is not available
+    * @return <code>true</code> when data verion is updated to the last version, returns
+    *         <code>false</code> when an error occurred
+    */
+   private boolean sqlStartup_70_IsDataVersionValid(final SplashManager splashManager) {
+
+      if (_isDataVersionChecked) {
+         return true;
+      }
+
+      if (_isSQLDataUpdateError) {
+         return false;
+      }
+
+      try (Connection conn = getConnection_Simple()) {
+
+         // check if the database contains the correct version
+
+         final int dbVersion_BeforeDataUpdate = getDbVersion(conn, TABLE_DB_VERSION_DATA);
+
+         logDbUpdate("Current database data version: " + dbVersion_BeforeDataUpdate); //$NON-NLS-1$
+
+         if (dbVersion_BeforeDataUpdate < TOURBOOK_DB_VERSION) {
+
+            if (updateDb__2_Data(conn, dbVersion_BeforeDataUpdate, splashManager) == false) {
+               return false;
+            }
+
+         } else if (dbVersion_BeforeDataUpdate > TOURBOOK_DB_VERSION) {
+
+            /*
+             * Current db version is HIGHER than the db version which the code is created for,
+             * this can occure during the development and should not happen by the end users.
+             */
+
+            MessageDialog.openInformation(
+                  splashManager.getShell(),
+                  Messages.tour_database_version_info_title,
+                  NLS.bind(Messages.tour_database_version_info_message,
+                        dbVersion_BeforeDataUpdate,
+                        TOURBOOK_DB_VERSION));
+
+            PlatformUI.getWorkbench().close();
+         }
+
+         _isDataVersionChecked = true;
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+         PlatformUI.getWorkbench().close();
+      }
+
+      return _isDataVersionChecked;
    }
 
    /**
@@ -4472,17 +4793,10 @@ public class TourDatabase {
     * @param splashManager
     * @return
     */
-   private Connection sqlInit_70_Check_DbIsUpgraded_Before(final int dbVersionBeforeUpdate, final SplashManager splashManager) {
+   private void sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(final int dbVersionBeforeUpdate, final SplashManager splashManager) {
 
-      if (_isChecked_DbUpgraded_Before) {
-
-         Connection conn = null;
-         try {
-            conn = getConnection_Simple();
-         } catch (final SQLException e) {
-            UI.showSQLException(e);
-         }
-         return conn;
+      if (_isChecked_UpgradeDB_Before) {
+         return;
       }
 
       boolean isUpgradeNeeded = false;
@@ -4496,85 +4810,38 @@ public class TourDatabase {
 
       if (isUpgradeNeeded == false) {
 
-         _isChecked_DbUpgraded_Before = true;
+         _isChecked_UpgradeDB_Before = true;
 
-         Connection conn = null;
-         try {
-            conn = getConnection_Simple();
-         } catch (final SQLException e) {
-            UI.showSQLException(e);
-         }
-         return conn;
+         return;
       }
 
-      StatusUtil.logInfo(String.format("DB upgrade BEFORE is needed %d", _dbVersionBeforeUpdate)); //$NON-NLS-1$
+      logDbUpdate(String.format("DB upgrade BEFORE db design update is needed %d", _dbVersion_BeforeDesignUpdate)); //$NON-NLS-1$
 
-      Connection conn = null;
+      shutdownDatabaseServer();
 
       /*
-       * Shutdown db
+       * Upgrade database with ";upgrade=true" in the derby url
        */
       try {
 
-         // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
-         final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
+         sqlStartup_UpgradeDerbyDatabase(splashManager);
 
-         logDriverManager_GetConnection(dbUrl_ShutDown);
-
-         conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
-
-      } catch (final SQLException e) {
-
-         final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-         // log also the stacktrace
-         StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
-
-      } finally {
-         Util.closeSql(conn);
-      }
-
-      /*
-       * Upgrade database
-       */
-      try {
-
-         final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
-
-         logDriverManager_GetConnection(dbUrl_Upgrade);
-
-         splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
-
-         conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
-
-         _isChecked_DbUpgraded_Before = true;
+         _isChecked_UpgradeDB_Before = true;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
-
-      /*
-       * Return simple connection
-       */
-      try {
-         conn = getConnection_Simple();
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-      return conn;
    }
 
-   private void sqlInit_80_Check_DbIsUpgraded_After(final SplashManager splashManager) {
+   private void sqlStartup_UpgradedDb_2_AfterDbDesignUpdate(final SplashManager splashManager) {
 
-      if (_isChecked_DbUpgraded_After) {
+      if (_isChecked_UpgradeDB_After) {
          return;
       }
 
       boolean isUpgradeNeeded = false;
 
-      if (_dbVersionBeforeUpdate < 26 && _dbVersionAfterUpdate >= 26) {
+      if (_dbVersion_BeforeDesignUpdate < 26 && _dbVersion_AfterDesignUpdate >= 26) {
 
          // db version 26: update to derby 10.11.1.1 to implement text search with lucene
 
@@ -4583,79 +4850,61 @@ public class TourDatabase {
 
       if (isUpgradeNeeded == false) {
 
-         _isChecked_DbUpgraded_After = true;
+         _isChecked_UpgradeDB_After = true;
 
          return;
       }
 
-      StatusUtil.logInfo(String.format("DB upgrade AFTER is needed %d -> %d", _dbVersionBeforeUpdate, _dbVersionAfterUpdate)); //$NON-NLS-1$
+      // upgrade is needed
 
-      Connection conn = null;
+      logDbUpdate(String.format("DB upgrade AFTER db design update is needed %d -> %d", //$NON-NLS-1$
+            _dbVersion_BeforeDesignUpdate,
+            _dbVersion_AfterDesignUpdate));
 
-      /*
-       * Shutdown db
-       */
-      try {
-
-         // shutdown database that all connections are closed, THIS WILL ALWAYS CREATE AN EXCEPTION
-         final String dbUrl_ShutDown = DERBY_URL + DERBY_URL_COMMAND_SHUTDOWN_TRUE;
-
-         logDriverManager_GetConnection(dbUrl_ShutDown);
-
-         conn = DriverManager.getConnection(dbUrl_ShutDown, TABLE_SCHEMA, TABLE_SCHEMA);
-
-      } catch (final SQLException e) {
-
-         final String sqlExceptionText = Util.getSQLExceptionText(e);
-
-         // log also the stacktrace
-         StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
-
-      } finally {
-         Util.closeSql(conn);
-      }
+      shutdownDatabaseServer();
 
       /*
        * Upgrade database
        */
       try {
 
-         final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
+         sqlStartup_UpgradeDerbyDatabase(splashManager);
 
-         logDriverManager_GetConnection(dbUrl_Upgrade);
-
-         splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
-
-         conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA);
-
-         _isChecked_DbUpgraded_After = true;
+         _isChecked_UpgradeDB_After = true;
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
-   private synchronized void sqlInit_90_SetupEntityManager(final SplashManager splashManager) {
+   /**
+    * Upgrade Derby Database, this is necessary when a new Derby version has a new feature, e.g.
+    * BOOLEAN datatype or Lucene fulltext index is used
+    *
+    * @param splashManager
+    * @return
+    * @throws SQLException
+    */
+   private void sqlStartup_UpgradeDerbyDatabase(final SplashManager splashManager) throws SQLException {
 
-      final Map<String, Object> configOverrides = new HashMap<>();
+      final String dbUrl_Upgrade = DERBY_URL + DERBY_URL_COMMAND_UPGRADE_TRUE;
 
-      configOverrides.put("hibernate.connection.url", DERBY_URL); //$NON-NLS-1$
-      configOverrides.put("hibernate.connection.driver_class", DERBY_DRIVER_CLASS); //$NON-NLS-1$
+      logDerbyCommand(dbUrl_Upgrade);
 
-      splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
+      splashManager.setMessage(Messages.Database_Monitor_UpgradeDatabase);
 
-      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, configOverrides);
+      try (Connection conn = DriverManager.getConnection(dbUrl_Upgrade, TABLE_SCHEMA, TABLE_SCHEMA)) {
+
+      }
    }
 
    /**
-    * this must be implemented or updated when the database version must be updated
+    * This method must be updated when the database version is updated
     */
-   private boolean updateDbDesign(final Connection conn, int currentDbVersion, final SplashManager splashManager) {
+   private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
 
       /*
-       * confirm update
+       * Confirm update
        */
 
       // define buttons with default to NO
@@ -4665,8 +4914,7 @@ public class TourDatabase {
             splashManager.getShell(),
             Messages.Database_Confirm_update_title,
             null,
-            NLS.bind(
-                  Messages.Database_Confirm_update,
+            NLS.bind(Messages.Database_Confirm_update,
                   new Object[] {
                         currentDbVersion,
                         TOURBOOK_DB_VERSION,
@@ -4675,384 +4923,355 @@ public class TourDatabase {
             buttons,
             1).open()) != Window.OK) {
 
-         // no update -> close application
+         // the user want no update -> close application
          PlatformUI.getWorkbench().close();
 
          return false;
       }
 
       /*
-       * do an additional check because version 20 is restructuring the data series
+       * Do an additional check because version 20 is restructuring the data series
        */
       if (currentDbVersion < 20) {
 
-         if ((new MessageDialog(
-               splashManager.getShell(),
-               Messages.Database_Confirm_update_title,
-               null,
-               NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
-               MessageDialog.QUESTION,
-               buttons,
-               1).open()) != Window.OK) {
-
-            // no update -> close application
-            PlatformUI.getWorkbench().close();
-
-            return false;
-         }
+// After almost 10 years this messagebox is not necessary anymore
+//
+//       if ((new MessageDialog(
+//             Display.getDefault().getActiveShell(),
+//             Messages.Database_Confirm_update_title,
+//             null,
+//             NLS.bind(Messages.Database_Confirm_Update20, _databasePath),
+//             MessageDialog.QUESTION,
+//             buttons,
+//             1).open()) != Window.OK) {
+//
+//          // no update -> close application
+//          PlatformUI.getWorkbench().close();
+//
+//          return false;
+//       }
       }
 
-      int newVersion = currentDbVersion;
-      final int oldVersion = currentDbVersion;
+      _dbDesignVersion_New = currentDbVersion;
+      _dbDesignVersion_Old = currentDbVersion;
 
-      /*
-       * database update
-       */
-      try {
+      try (Connection conn = getConnection_Simple()) {
 
+         // 1 -> 2
          if (currentDbVersion == 1) {
-            updateDbDesign_001_002(conn);
-            currentDbVersion = newVersion = 2;
+            updateDb_001_To_002(conn);
+            currentDbVersion = _dbDesignVersion_New = 2;
          }
 
+         // 2 -> 3
          if (currentDbVersion == 2) {
-            updateDbDesign_002_003(conn);
-            currentDbVersion = newVersion = 3;
+            updateDb_002_To_003(conn);
+            currentDbVersion = _dbDesignVersion_New = 3;
          }
 
+         // 3 -> 4
          if (currentDbVersion == 3) {
-            updateDbDesign_003_004(conn, splashManager);
-            currentDbVersion = newVersion = 4;
+            updateDb_003_To_004(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 4;
          }
 
-         boolean isPostUpdate5 = false;
+         // 4 -> 5      8.11
          if (currentDbVersion == 4) {
-            updateDbDesign_004_005(conn, splashManager);
-            currentDbVersion = newVersion = 5;
-            isPostUpdate5 = true;
+            updateDb_004_To_005(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 5;
          }
 
+         // 5 -> 6      8.12
          if (currentDbVersion == 5) {
-            updateDbDesign_005_006(conn, splashManager);
-            currentDbVersion = newVersion = 6;
+            updateDb_005_To_006(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 6;
          }
 
+         // 6 -> 7      9.01
          if (currentDbVersion == 6) {
-            updateDbDesign_006_007(conn, splashManager);
-            currentDbVersion = newVersion = 7;
+            updateDb_006_To_007(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 7;
          }
 
+         // 7 -> 8      10.2.1 Mod by Kenny
          if (currentDbVersion == 7) {
-            updateDbDesign_007_008(conn, splashManager);
-            currentDbVersion = newVersion = 8;
+            updateDb_007_To_008(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 8;
          }
 
-         boolean isPostUpdate9 = false;
+         // 8 -> 9      10.3.0
          if (currentDbVersion == 8) {
-            updateDbDesign_008_009(conn, splashManager);
-            currentDbVersion = newVersion = 9;
-            isPostUpdate9 = true;
+            updateDb_008_To_009(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 9;
          }
 
+         // 9 -> 10     10.5.0 not released
          if (currentDbVersion == 9) {
-            updateDbDesign_009_010(conn, splashManager);
-            currentDbVersion = newVersion = 10;
+            updateDb_009_To_010(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = 10;
          }
 
-         boolean isPostUpdate11 = false;
+         // 10 -> 11    10.7.0 - 11-07-2010
          if (currentDbVersion == 10) {
-            currentDbVersion = newVersion = updateDbDesign_010_011(conn, splashManager);
-            isPostUpdate11 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_010_To_011(conn, splashManager);
          }
 
+         // 11 -> 12    10.9.1
          if (currentDbVersion == 11) {
-            currentDbVersion = newVersion = updateDbDesign_011_012(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_011_To_012(conn, splashManager);
          }
 
-         boolean isPostUpdate13 = false;
+         // 12 -> 13    10.11
          if (currentDbVersion == 12) {
-            currentDbVersion = newVersion = updateDbDesign_012_013(conn, splashManager);
-            isPostUpdate13 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_012_To_013(conn, splashManager);
          }
 
+         // 13 -> 14    11.3
          if (currentDbVersion == 13) {
-            currentDbVersion = newVersion = updateDbDesign_013_014(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_013_To_014(conn, splashManager);
          }
 
+         // 14 -> 15    11.8
          if (currentDbVersion == 14) {
-            currentDbVersion = newVersion = updateDbDesign_014_015(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_014_To_015(conn, splashManager);
          }
 
+         // 15 -> 16    11.8
          if (currentDbVersion == 15) {
-            currentDbVersion = newVersion = updateDbDesign_015_to_016(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_015_To_016(conn, splashManager);
          }
 
+         // 16 -> 17    11.8
          if (currentDbVersion == 16) {
-            currentDbVersion = newVersion = updateDbDesign_016_to_017(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_016_To_017(conn, splashManager);
          }
 
+         // 17 -> 18    11.8
          if (currentDbVersion == 17) {
-            currentDbVersion = newVersion = updateDbDesign_017_to_018(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_017_To_018(conn, splashManager);
          }
 
+         // 18 -> 19    11.8
          if (currentDbVersion == 18) {
-            currentDbVersion = newVersion = updateDbDesign_018_to_019(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_018_To_019(conn, splashManager);
          }
 
-         boolean isPostUpdate20 = false;
+         // 19 -> 20    12.1
          if (currentDbVersion == 19) {
-            currentDbVersion = newVersion = updateDbDesign_019_to_020(conn, splashManager);
-            isPostUpdate20 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_019_To_020(conn, splashManager);
          }
 
-         /*
-          * 21
-          */
+         // 20 -> 21    12.1.1
          if (currentDbVersion == 20) {
-            currentDbVersion = newVersion = updateDbDesign_020_to_021(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_020_To_021(conn, splashManager);
          }
 
-         /*
-          * 22
-          */
-         boolean isPostUpdate22 = false;
-
+         // 21 -> 22    12.12.0
          if (currentDbVersion == 21) {
-            currentDbVersion = newVersion = updateDbDesign_021_to_022(conn, splashManager);
-            isPostUpdate22 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_021_To_022(conn, splashManager);
          }
 
-         /*
-          * 23
-          */
-         boolean isPostUpdate23 = false;
-
+         // 22 -> 23    13.2.0
          if (currentDbVersion == 22) {
-            currentDbVersion = newVersion = updateDbDesign_022_to_023(conn, splashManager);
-            isPostUpdate23 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_022_To_023(conn, splashManager);
          }
 
-         /*
-          * 24
-          */
+         // 23 -> 24    14.7
          if (currentDbVersion == 23) {
-            currentDbVersion = newVersion = updateDbDesign_023_to_024(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_023_To_024(conn, splashManager);
          }
 
-         // 24 -> 25
-         boolean isPostUpdate25 = false;
-
+         // 24 -> 25    14.10
          if (currentDbVersion == 24) {
-            isPostUpdate25 = true;
-            currentDbVersion = newVersion = updateDbDesign_024_to_025(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_024_To_025(conn, splashManager);
          }
 
-         // 25 -> 26
+         // 25 -> 26    14.14 / 15.3
          if (currentDbVersion == 25) {
-            currentDbVersion = newVersion = updateDbDesign_025_to_026(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_025_To_026(conn, splashManager);
          }
 
-         // 26 -> 27
+         // 26 -> 27    15.3.1
          if (currentDbVersion == 26) {
-            currentDbVersion = newVersion = updateDbDesign_026_to_027(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_026_To_027(conn, splashManager);
          }
 
-         // 27 -> 28
-         boolean isPostUpdate28 = false;
+         // 27 -> 28    15.6
          if (currentDbVersion == 27) {
-            isPostUpdate28 = true;
-            currentDbVersion = newVersion = updateDbDesign_027_to_028(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_027_To_028(conn, splashManager);
          }
 
-         // 28 -> 29
-         boolean isPostUpdate29 = false;
+         // 28 -> 29    15.12
          if (currentDbVersion == 28) {
-            isPostUpdate29 = true;
-            currentDbVersion = newVersion = updateDbDesign_028_to_029(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_028_To_029(conn, splashManager);
          }
 
-         // 29 -> 30
+         // 29 -> 30    16.1
          if (currentDbVersion == 29) {
-            currentDbVersion = newVersion = updateDbDesign_029_to_030(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_029_To_030(conn, splashManager);
          }
 
-         // 30 -> 31
+         // 30 -> 31    16.5
          if (currentDbVersion == 30) {
-            currentDbVersion = newVersion = updateDbDesign_030_to_031(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_030_To_031(conn, splashManager);
          }
 
-         // 31 -> 32
-         boolean isPostUpdate32 = false;
+         // 31 -> 32    16.10
          if (currentDbVersion == 31) {
-            isPostUpdate32 = true;
-            currentDbVersion = newVersion = updateDbDesign_031_to_032(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_031_To_032(conn, splashManager);
          }
 
-         // 32 -> 33
+         // 32 -> 33    17.12
          if (currentDbVersion == 32) {
-            currentDbVersion = newVersion = updateDbDesign_032_to_033(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_032_To_033(conn, splashManager);
          }
 
-         // 33 -> 34
-         boolean isPostUpdate34 = false;
+         // 33 -> 34    18.5
          if (currentDbVersion == 33) {
-            isPostUpdate34 = true;
-            currentDbVersion = newVersion = updateDbDesign_033_to_034(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_033_To_034(conn, splashManager);
          }
 
-         // 34 -> 35
+         // 34 -> 35    18.7
          if (currentDbVersion == 34) {
-            currentDbVersion = newVersion = updateDbDesign_034_to_035(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_034_To_035(conn, splashManager);
          }
 
-         // 35 -> 36
+         // 35 -> 36    18.12
          if (currentDbVersion == 35) {
-            currentDbVersion = newVersion = updateDbDesign_035_to_036(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_035_To_036(conn, splashManager);
          }
 
-         // 36 -> 37
-         boolean isPostUpdate37 = false;
+         // 36 -> 37    19.2
          if (currentDbVersion == 36) {
-            currentDbVersion = newVersion = updateDbDesign_036_to_037(conn, splashManager);
-            isPostUpdate37 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_036_To_037(conn, splashManager);
          }
 
-         // 37 -> 38
+         // 37 -> 38    19.6
          if (currentDbVersion == 37) {
-            currentDbVersion = newVersion = updateDbDesign_037_to_038(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_037_To_038(conn, splashManager);
          }
 
-         // 38 -> 39
+         // 38 -> 39    19.7
          if (currentDbVersion == 38) {
-            currentDbVersion = newVersion = updateDbDesign_038_to_039(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_038_To_039(conn, splashManager);
          }
 
-         // 39 -> 40
-         boolean isPostUpdate40 = false;
+         // 39 -> 40    19.10
          if (currentDbVersion == 39) {
-            currentDbVersion = newVersion = updateDbDesign_039_to_040(conn, splashManager);
-            isPostUpdate40 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_039_To_040(conn, splashManager);
          }
 
-         // 40 -> 41
+         // 40 -> 41    20.8
          if (currentDbVersion == 40) {
-            currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_040_To_041(conn, splashManager);
          }
 
-         // 41 -> 42
-         boolean isPostUpdate42 = false;
+         // 41 -> 42    20.11.1 -> db fields are renamed
          if (currentDbVersion == 41) {
-            currentDbVersion = newVersion = updateDbDesign_041_to_042(conn, splashManager);
-            isPostUpdate42 = true;
+            currentDbVersion = _dbDesignVersion_New = updateDb_041_To_042(conn, splashManager);
          }
 
-         /*
-          * Update version number
-          */
-         updateDbDesign_VersionNumber(conn, newVersion);
+         // 42 -> 43    21.3
+         if (currentDbVersion == 42) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_042_To_043(conn, splashManager);
+         }
 
-         /**
-          * Do post update after the version number is updated because the post update uses
-          * connections and entitymanager which is checking the version number.
-          * <p>
-          * Also the data structure must be updated otherwise the entity manager fails because the
-          * data structure in the program code MUST be the same as in the database.
-          */
-         if (isPostUpdate5) {
-            TourDatabase.computeAnyValues_ForAllTours(splashManager);
-            TourManager.getInstance().removeAllToursFromCache();
-         }
-         if (isPostUpdate9) {
-            updateDbDesign_008_009_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate11) {
-            updateDbDesign_010_011_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate13) {
-            updateDbDesign_012_013_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate20) {
-            updateDbDesign_019_to_020_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate22) {
-            updateDbDesign_021_to_022_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate23) {
-            updateDbDesign_022_to_023_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate25) {
-            updateDbDesign_024_to_025_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate28) {
-            updateDbDesign_027_to_028_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate29) {
-            updateDbDesign_028_to_029_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate32) {
-            updateDbDesign_031_to_032_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate34) {
-            updateDbDesign_033_to_034_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate37) {
-            updateDbDesign_036_to_037_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate40) {
-            updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
-         }
-         if (isPostUpdate42) {
-            updateDbDesign_041_to_042_PostUpdate(conn);
-         }
+         // update db design version number
+         updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
 
       } catch (final SQLException e) {
+
          UI.showSQLException(e);
-         _isSQLUpdateError = true;
+
+         _isSQLDesignUpdateError = true;
+
          return false;
       }
-
-      // display info for the successful update
-      MessageDialog.openInformation(
-            splashManager.getShell(),
-            Messages.tour_database_version_info_title,
-            NLS.bind(Messages.Tour_Database_UpdateInfo, oldVersion, newVersion));
 
       return true;
    }
 
-   private void updateDbDesign_001_002(final Connection conn) throws SQLException {
+   /**
+    * This method may be updated when the database version is updated
+    */
+   private boolean updateDb__2_Data(final Connection conn, final int currentDbVersion, final SplashManager splashManager) {
+
+      /**
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       * <p>
+       * Run data update AFTER the design version number is updated because the data update uses
+       * connections and entitymanager which is checking the version number.
+       * <p>
+       * Also the data structure must be updated otherwise the entity manager fails because the
+       * data structure in the database MUST be the same as in the program code.
+       * <p>
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       */
+
+      try {
+
+         updateDb_003_To_004_DataUpdate(conn, splashManager);
+         updateDb_004_To_005_DataUpdate(conn, splashManager);
+         updateDb_008_To_009_DataUpdate(conn, splashManager);
+         updateDb_010_To_011_DataUpdate(conn, splashManager);
+         updateDb_012_To_013_DataUpdate(conn, splashManager);
+         updateDb_019_To_020_DataUpdate(conn, splashManager);
+         updateDb_021_To_022_DataUpdate(conn, splashManager);
+         updateDb_022_To_023_DataUpdate(conn, splashManager);
+         updateDb_024_To_025_DataUpdate(conn, splashManager);
+         updateDb_027_To_028_DataUpdate(conn, splashManager);
+         updateDb_028_To_029_DataUpdate(conn, splashManager);
+         updateDb_031_To_032_DataUpdate(conn, splashManager);
+         updateDb_033_To_034_DataUpdate(conn, splashManager);
+         updateDb_036_To_037_DataUpdate(conn, splashManager);
+         updateDb_039_To_040_DataUpdate(conn, splashManager);
+         updateDb_041_To_042_DataUpdate(conn);
+         updateDb_042_to_043_DataUpdate(conn, splashManager);
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+         _isSQLDataUpdateError = true;
+
+         return false;
+      }
+
+      return true;
+   }
+
+   private void updateDb_001_To_002(final Connection conn) throws SQLException {
 
       final int dbVersion = 2;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelXOffset   INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelXOffset       INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelYOffset   INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN labelYOffset       INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN markerType      BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_MARKER + " ADD COLUMN markerType         BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_002_003(final Connection conn) throws SQLException {
+   private void updateDb_002_To_003(final Connection conn) throws SQLException {
 
       final int dbVersion = 3;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode         SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceMode           SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
          sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN deviceTimeInterval   SMALLINT DEFAULT -1"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -5060,140 +5279,166 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_003_004(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_003_To_004(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 4;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxAltitude            INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxAltitude        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxPulse               INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxPulse           INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgPulse               INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgPulse           INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgCadence            INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgCadence         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgTemperature         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   avgTemperature     INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxSpeed               FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   maxSpeed           FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourTitle         VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_TOUR_TITLE + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourTitle          VARCHAR(" + TourData.DB_LENGTH_TOUR_TITLE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourDescription   VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_TOUR_DESCRIPTION + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourDescription    VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourStartPlace      VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_TOUR_START_PLACE + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourStartPlace     VARCHAR(" + TourData.DB_LENGTH_TOUR_START_PLACE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourEndPlace      VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_TOUR_END_PLACE + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourEndPlace       VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   calories               INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   calories           INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   bikerWeight            FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   bikerWeight        FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   " + KEY_BIKE + "      BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   " + KEY_BIKE + "   BIGINT"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
          // from wolfgang
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   devicePluginName   VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   devicePluginName   VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
          // from wolfgang
-         sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   deviceModeName      VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_DEVICE_MODE_NAME + ")\n"); //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   deviceModeName     VARCHAR(" + TourData.DB_LENGTH_DEVICE_MODE_NAME + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
       }
 
       stmt.close();
 
-      // Create a EntityManagerFactory here, so we can access TourData with EJB
-      if (splashManager != null) {
-         splashManager.setMessage(Messages.Database_Monitor_persistent_service_task);
+      logDbUpdate_End(dbVersion);
+   }
+
+   private void updateDb_003_To_004_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 4;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
       }
-      _emFactory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 
       if (splashManager != null) {
          splashManager.setMessage(Messages.Tour_Database_load_all_tours);
       }
-      final ArrayList<Long> tourList = getAllTourIds();
+
+      final ArrayList<Long> allTourIds = getAllTourIds();
 
       // loop over all tours and calculate and set new columns
       int tourIdx = 1;
-      for (final Long tourId : tourList) {
+      for (final Long tourId : allTourIds) {
 
          final TourData tourData = getTourFromDb(tourId);
 
          if (splashManager != null) {
+
             final String msg = NLS.bind(
                   Messages.Tour_Database_update_tour,
-                  new Object[] { tourIdx++, tourList.size() });
+                  new Object[] { tourIdx++, allTourIds.size() });
+
             splashManager.setMessage(msg);
          }
 
          tourData.computeComputedValues();
 
          final TourPerson person = tourData.getTourPerson();
+
          tourData.setTourBike(person.getTourBike());
          tourData.setBodyWeight(person.getWeight());
 
          saveTour(tourData, false);
       }
 
-      // cleanup everything as if nothing has happened
-      _emFactory.close();
-      _emFactory = null;
-
-      logDb_UpdateEnd(dbVersion);
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private void updateDbDesign_004_005(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_004_To_005(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 5;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       if (splashManager != null) {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, 5));
       }
 
-      final Statement stmt = conn.createStatement();
-      {
+      Statement stmt = null;
+
+      try {
+
+         stmt = conn.createStatement();
+
          createTable_TourTag(stmt);
          createTable_TourTag_Category(stmt);
          createIndex_TourData_005(stmt);
-      }
-      stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmt);
+      }
+
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_005_006(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_004_To_005_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 5;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      TourDatabase.computeAnyValues_ForAllTours(splashManager);
+      TourManager.getInstance().removeAllToursFromCache();
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   private void updateDb_005_To_006(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 6;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       if (splashManager != null) {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, 6));
@@ -5202,20 +5447,19 @@ public class TourDatabase {
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourImportFilePath   VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + ")\n"; //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   tourImportFilePath   VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_006_007(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_006_To_007(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 7;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       if (splashManager != null) {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, 7));
@@ -5224,31 +5468,31 @@ public class TourDatabase {
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeSourceTourId      BIGINT"; //            //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeSourceTourId       BIGINT"; //            //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeTargetTourId      BIGINT"; //            //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergeTargetTourId       BIGINT"; //            //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedTourTimeOffset   INTEGER DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedTourTimeOffset    INTEGER DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedAltitudeOffset   INTEGER DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN mergedAltitudeOffset    INTEGER DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startSecond            SMALLINT DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN startSecond             SMALLINT DEFAULT 0"; //   //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_007_008(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_007_To_008(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 8;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       if (splashManager != null) {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, 8));
@@ -5257,32 +5501,31 @@ public class TourDatabase {
       String sql;
       final Statement stmt = conn.createStatement();
       {
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherWindDir         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherWindDir        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherWindSpd         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherWindSpd        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   isDistanceFromSensor   SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   isDistanceFromSensor  SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherClouds         VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_WEATHER_CLOUDS + ")\n"; //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   weatherClouds         VARCHAR(" + TourData.DB_LENGTH_WEATHER_CLOUDS + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   restPulse            INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   restPulse             INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_008_009(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_008_To_009(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 9;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       updateMonitor(splashManager, dbVersion);
 
@@ -5294,27 +5537,40 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private void updateDbDesign_008_009_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   // 8 -> 9      10.3.0
+   private void updateDb_008_To_009_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 9;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       // set app week number/year
       if (updateTourWeek(conn, splashManager)) {
 
-         MessageDialog.openInformation(
-               Display.getDefault().getActiveShell(),
-               Messages.Database_Confirm_update_title,
-               Messages.Tour_Database_Update_TourWeek_Info);
+// After more than 10 years this messagebox is not necessary anymore
+//
+//       MessageDialog.openInformation(
+//          Display.getDefault().getActiveShell(),
+//          Messages.Database_Confirm_update_title,
+//          Messages.Tour_Database_Update_TourWeek_Info);
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private void updateDbDesign_009_010(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDb_009_To_010(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 10;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       updateMonitor(splashManager, dbVersion);
 
@@ -5350,24 +5606,25 @@ public class TourDatabase {
           * </pre>
           */
 
-         final String sql = //
-               "ALTER TABLE " + TABLE_TOUR_DATA + "                                             \n" //$NON-NLS-1$ //$NON-NLS-2$
-                     + "   ALTER COLUMN tourDescription                                          \n" //$NON-NLS-1$
-                     + "   SET DATA TYPE   VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + ")         \n"; //$NON-NLS-1$ //$NON-NLS-2$
+         final String sql = UI.EMPTY_STRING
+
+               + "ALTER TABLE " + TABLE_TOUR_DATA + NL //$NON-NLS-1$
+               + "   ALTER COLUMN tourDescription" + NL//$NON-NLS-1$
+               + "   SET DATA TYPE   VARCHAR(" + TourData.DB_LENGTH_TOUR_DESCRIPTION_V10 + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
          exec(stmt, sql);
       }
 
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
    }
 
-   private int updateDbDesign_010_011(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_010_To_011(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int dbVersion = 11;
 
-      logDb_UpdateStart(dbVersion);
+      logDbUpdate_Start(dbVersion);
 
       updateMonitor(splashManager, dbVersion);
 
@@ -5382,7 +5639,7 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(dbVersion);
+      logDbUpdate_End(dbVersion);
 
       return dbVersion;
    }
@@ -5394,117 +5651,146 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_010_011_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_010_To_011_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      final PreparedStatement stmtSelect = conn.prepareStatement( //
-            //
-            "SELECT" //                           //$NON-NLS-1$
-                  //
-                  + " StartYear," //                // 1 //$NON-NLS-1$
-                  + " StartMonth," //             // 2 //$NON-NLS-1$
-                  + " StartDay," //                // 3 //$NON-NLS-1$
-                  + " StartHour," //                // 4 //$NON-NLS-1$
-                  + " StartMinute," //             // 5 //$NON-NLS-1$
-                  + " StartSecond" //             // 6 //$NON-NLS-1$
-                  //
-                  + " FROM " + TABLE_TOUR_DATA //      //$NON-NLS-1$
-                  + " WHERE TourId=?" //            $NON-NLS-1$ //$NON-NLS-1$
-      );
+      final long startTime = System.currentTimeMillis();
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            //
-            "UPDATE " + TABLE_TOUR_DATA //            //$NON-NLS-1$
-            //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " DateTimeCreated=?" //         // 1 //$NON-NLS-1$
-                  //
-                  + " WHERE tourId=?"); //         // 2 //$NON-NLS-1$
+      final int dbDataVersion = 11;
 
-      int tourIdx = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
-
-      // loop: all tours
-      for (final Long tourId : tourList) {
-
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
-                        Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
-                        new Object[] { tourIdx++, tourList.size() }));
-         }
-
-         // get tour date
-         stmtSelect.setLong(1, tourId);
-         final ResultSet result = stmtSelect.executeQuery();
-
-         while (result.next()) {
-
-            // get date from database
-            final short dbYear = result.getShort(1);
-            final short dbMonth = result.getShort(2);
-            final short dbDay = result.getShort(3);
-            final short dbHour = result.getShort(4);
-            final short dbMinute = result.getShort(5);
-            final short dbSecond = result.getShort(6);
-
-            final long dtCreated = (dbYear * 10000000000L)
-                  + (dbMonth * 100000000L)
-                  + (dbDay * 1000000L)
-                  + (dbHour * 10000L)
-                  + (dbMinute * 100L)
-                  + dbSecond;
-
-            // update DateTimeCreated in the database
-            stmtUpdate.setLong(1, dtCreated);
-            stmtUpdate.setLong(2, tourId);
-            stmtUpdate.executeUpdate();
-         }
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
       }
+
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
+      try {
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "SELECT" //                          //$NON-NLS-1$
+               //
+               + " StartYear," //                  1  //$NON-NLS-1$
+               + " StartMonth," //                 2  //$NON-NLS-1$
+               + " StartDay," //                   3  //$NON-NLS-1$
+               + " StartHour," //                  4  //$NON-NLS-1$
+               + " StartMinute," //                5  //$NON-NLS-1$
+               + " StartSecond" //                 6  //$NON-NLS-1$
+               //
+               + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
+               + " WHERE TourId=?" //              1  //$NON-NLS-1$
+         );
+
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
+
+               + " SET" //                            //$NON-NLS-1$
+               + " DateTimeCreated=?" //           1  //$NON-NLS-1$
+               + " WHERE tourId=?" //              2  //$NON-NLS-1$
+         );
+
+         int tourIdx = 1;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
+         // loop: all tours
+         for (final Long tourId : allTourIds) {
+
+            if (splashManager != null) {
+
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
+                        new Object[] { tourIdx++, allTourIds.size() }));
+               }
+            }
+
+            // get tour date
+            stmtSelect.setLong(1, tourId);
+            final ResultSet result = stmtSelect.executeQuery();
+
+            while (result.next()) {
+
+               // get date from database
+               final short dbYear = result.getShort(1);
+               final short dbMonth = result.getShort(2);
+               final short dbDay = result.getShort(3);
+               final short dbHour = result.getShort(4);
+               final short dbMinute = result.getShort(5);
+               final short dbSecond = result.getShort(6);
+
+               final long dtCreated = (dbYear * 10000000000L)
+                     + (dbMonth * 100000000L)
+                     + (dbDay * 1000000L)
+                     + (dbHour * 10000L)
+                     + (dbMinute * 100L)
+                     + dbSecond;
+
+               // update DateTimeCreated in the database
+               stmtUpdate.setLong(1, dtCreated);
+               stmtUpdate.setLong(2, tourId);
+               stmtUpdate.executeUpdate();
+            }
+         }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_011_012(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_011_To_012(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 12;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
       String sql;
       final Statement stmt = conn.createStatement();
       {
-//            + "   IsPulseSensorPresent      INTEGER DEFAULT 0,             \n" //$NON-NLS-1$
-//            + "   IsPowerSensorPresent      INTEGER DEFAULT 0,             \n" //$NON-NLS-1$
+//            + "   IsPulseSensorPresent      INTEGER DEFAULT 0,          \n" //$NON-NLS-1$
+//            + "   IsPowerSensorPresent      INTEGER DEFAULT 0,          \n" //$NON-NLS-1$
 //            + "   DeviceAvgSpeed            FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
 //            + "   DeviceFirmwareVersion   " + varCharKomma(TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION)) //$NON-NLS-1$
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   IsPulseSensorPresent   INTEGER   DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   IsPulseSensorPresent  INTEGER   DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   IsPowerSensorPresent   INTEGER   DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   IsPowerSensorPresent  INTEGER   DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   DeviceAvgSpeed         FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   DeviceAvgSpeed        FLOAT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   DeviceFirmwareVersion   VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + ")\n"; //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   DeviceFirmwareVersion VARCHAR(" + TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_012_013(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_012_To_013(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 13;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5517,13 +5803,12 @@ public class TourDatabase {
          sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   TemperatureScale      INTEGER   DEFAULT 1"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   Weather               VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-               + TourData.DB_LENGTH_WEATHER + ")\n"; //$NON-NLS-1$
+         sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   Weather               VARCHAR(" + TourData.DB_LENGTH_WEATHER + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -5535,8 +5820,16 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_012_013_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_012_To_013_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 13;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final String sql = "UPDATE " + TABLE_TOUR_DATA + " SET TemperatureScale=1"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -5544,13 +5837,15 @@ public class TourDatabase {
       System.out.println();
 
       conn.createStatement().executeUpdate(sql);
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_013_014(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_013_To_014(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 14;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5564,16 +5859,16 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_014_015(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_014_To_015(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 15;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5589,16 +5884,16 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_015_to_016(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_015_To_016(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 16;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5617,30 +5912,30 @@ public class TourDatabase {
 //
 //      TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
 
-         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN Gender            INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN Gender          INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN RestPulse         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN RestPulse       INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN MaxPulse         INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN MaxPulse        INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN HrMaxFormula      INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_PERSON + " ADD COLUMN HrMaxFormula    INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_016_to_017(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_016_To_017(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 17;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       String sql;
       final Statement stmt = conn.createStatement();
@@ -5723,16 +6018,16 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_017_to_018(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_017_To_018(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 18;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5740,7 +6035,7 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
 
-         if (_dbVersionBeforeUpdate > 16) {
+         if (_dbVersion_BeforeDesignUpdate > 16) {
 
             /*
              * db update 16 creates the HR zone db, doing this update causes an sql exception
@@ -5759,10 +6054,10 @@ public class TourDatabase {
 //
 //            TABLE_TOUR_PERSON_HRZONE   TABLE_TOUR_PERSON_HRZONE   TABLE_TOUR_PERSON_HRZONE   TABLE_TOUR_PERSON_HRZONE
 
-            sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorRed      INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+            sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorRed    INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
             exec(stmt, sql);
 
-            sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorGreen   INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+            sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorGreen  INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
             exec(stmt, sql);
 
             sql = "ALTER TABLE " + TABLE_TOUR_PERSON_HRZONE + " ADD COLUMN ColorBlue   INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -5785,16 +6080,16 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_018_to_019(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_018_To_019(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 19;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5816,34 +6111,34 @@ public class TourDatabase {
          sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextRed      SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextGreen   SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextGreen    SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
-         sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextBlue      SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+         sql = "ALTER TABLE " + TABLE_TOUR_TYPE + " ADD COLUMN colorTextBlue     SMALLINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
          exec(stmt, sql);
 
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_019_to_020(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_019_To_020(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 20;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
       {
-         updateDbDesign_019_to_020_10DataSerieBlobSize(conn);
-         updateDbDesign_019_to_020_20AlterColumns(conn);
+         updateDb_019_To_020_10_DataSerieBlobSize(conn);
+         updateDb_019_To_020_20_AlterColumns(conn);
       }
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -5854,7 +6149,7 @@ public class TourDatabase {
     * @param conn
     * @throws SQLException
     */
-   private void updateDbDesign_019_to_020_10DataSerieBlobSize(final Connection conn) throws SQLException {
+   private void updateDb_019_To_020_10_DataSerieBlobSize(final Connection conn) throws SQLException {
 
       final DatabaseMetaData meta = conn.getMetaData();
 
@@ -5886,7 +6181,7 @@ public class TourDatabase {
       }
    }
 
-   private void updateDbDesign_019_to_020_20AlterColumns(final Connection conn) throws SQLException {
+   private void updateDb_019_To_020_20_AlterColumns(final Connection conn) throws SQLException {
 
       String sql;
       final Statement stmt = conn.createStatement();
@@ -5907,32 +6202,46 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_019_to_020_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
-
-      IS_POST_UPDATE_019_to_020 = true;
+   private void updateDb_019_To_020_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
-      int tourIdx = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
+      final int dbDataVersion = 20;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
+         int tourIdx = 1;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
          // loop: all tours
-         for (final Long tourId : tourList) {
+         for (final Long tourId : allTourIds) {
 
             final long currentTime = System.currentTimeMillis();
 
             if (splashManager != null) {
 
-               final float durationInSeconds = (currentTime - startTime) / 1000;
+               final float timeDiff = currentTime - lastUpdateTime;
 
-               splashManager.setMessage(
-                     NLS.bind(//
-                           Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
-                           new Object[] { tourIdx, tourList.size(), (int) durationInSeconds }));
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  final float durationInSeconds = (currentTime - startTime) / 1000;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
+                        new Object[] { tourIdx, allTourIds.size(), (int) durationInSeconds }));
+               }
 
                tourIdx++;
             }
@@ -5940,28 +6249,28 @@ public class TourDatabase {
             final TourData tourData = em.find(TourData.class, tourId);
             if (tourData != null) {
 
-               tourData.updateDatabase_019_to_020();
+               /*
+                * Ensure data series are converted
+                */
+               tourData.convertDataSeries();
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
-
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
-
-         IS_POST_UPDATE_019_to_020 = false;
 
          em.close();
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_020_to_021(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_020_To_021(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 21;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -5970,11 +6279,11 @@ public class TourDatabase {
 //         TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA
 //         // version 21 start
 //         //
-//         + "   maxAltitude               FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
-//         + "   maxPulse               FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
-//         + "   avgPulse               FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
-//         + "   avgCadence               FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
-//         + "   avgTemperature            FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   maxAltitude           FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   maxPulse              FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   avgPulse              FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   avgCadence            FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   avgTemperature        FLOAT DEFAULT 0,            \n" //$NON-NLS-1$
 //         //
 //         // version 21 end ---------
 //         TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA   TOURDATA
@@ -5990,16 +6299,17 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_021_to_022(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 21 -> 22    12.12.0
+   private int updateDb_021_To_022(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 22;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -6017,17 +6327,17 @@ public class TourDatabase {
 //         // version 22 start  -  12.12.0
 //         //
 //         + "   TourStartTime            BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
-//         + "   TourEndTime               BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   TourEndTime              BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
 //
-//         + "   TourRecordingTime          BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
+//         + "   TourRecordingTime        BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
 //         + "   TourDrivingTime          BIGINT DEFAULT 0,            \n" //$NON-NLS-1$
             //
             // version 22 end ---------
 
-            sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourStartTime      BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+            sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourStartTime        BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
             exec(stmt, sql);
 
-            sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime      BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
+            sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN TourEndTime          BIGINT DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
             exec(stmt, sql);
 
             /*
@@ -6036,8 +6346,8 @@ public class TourDatabase {
             int no = 0;
             final int max = 2;
 
-            modifyColumn_Type(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, splashManager, ++no, max); //         //$NON-NLS-1$ //$NON-NLS-2$
-            modifyColumn_Type(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, splashManager, ++no, max); //            //$NON-NLS-1$ //$NON-NLS-2$
+            modifyColumn_Type(TABLE_TOUR_DATA, "TourRecordingTime", "BIGINT DEFAULT 0", stmt, splashManager, ++no, max); //$NON-NLS-1$ //$NON-NLS-2$
+            modifyColumn_Type(TABLE_TOUR_DATA, "TourDrivingTime", "BIGINT DEFAULT 0", stmt, splashManager, ++no, max); //$NON-NLS-1$ //$NON-NLS-2$
 
             createIndex_TourData_022(stmt);
          }
@@ -6050,7 +6360,7 @@ public class TourDatabase {
 //
 //         // Version 22 - begin
 //         //
-//         + "   IsMarkerVisible            INTEGER DEFAULT 0,             \n" //$NON-NLS-1$
+//         + "   IsMarkerVisible          INTEGER DEFAULT 0,             \n" //$NON-NLS-1$
 //         //
 //         // Version 22 - end
 
@@ -6060,7 +6370,7 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6072,91 +6382,125 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_021_to_022_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_021_To_022_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      final PreparedStatement stmtSelect = conn.prepareStatement( //
-            //
-            "SELECT" //                           //$NON-NLS-1$
-                  //
-                  + " StartYear," //                // 1 //$NON-NLS-1$
-                  + " StartMonth," //             // 2 //$NON-NLS-1$
-                  + " StartDay," //                // 3 //$NON-NLS-1$
-                  + " StartHour," //                // 4 //$NON-NLS-1$
-                  + " StartMinute," //             // 5 //$NON-NLS-1$
-                  + " StartSecond," //             // 6 //$NON-NLS-1$
-                  + " tourRecordingTime" //          // 7 //$NON-NLS-1$
-                  //
-                  + " FROM " + TABLE_TOUR_DATA //      //$NON-NLS-1$
-                  + " WHERE TourId=?" //            $NON-NLS-1$ //$NON-NLS-1$
-      );
+      final long startTime = System.currentTimeMillis();
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            //
-            "UPDATE " + TABLE_TOUR_DATA //            //$NON-NLS-1$
-            //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " TourStartTime=?," //         // 1 //$NON-NLS-1$
-                  + " TourEndTime=?" //         // 2 //$NON-NLS-1$
-                  //
-                  + " WHERE tourId=?"); //         // 3 //$NON-NLS-1$
+      final int dbDataVersion = 22;
 
-      int tourIndex = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
-
-      // loop: all tours
-      for (final Long tourId : tourList) {
-
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
-                        Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
-                        new Object[] { tourIndex++, tourList.size() }));
-         }
-
-         // get tour date for 1 tour
-         stmtSelect.setLong(1, tourId);
-         final ResultSet result = stmtSelect.executeQuery();
-
-         while (result.next()) {
-
-            // get date from database
-            final short dbYear = result.getShort(1);
-            final short dbMonth = result.getShort(2);
-            final short dbDay = result.getShort(3);
-            final short dbHour = result.getShort(4);
-            final short dbMinute = result.getShort(5);
-            final short dbSecond = result.getShort(6);
-
-            final long recordingTime = result.getLong(7);
-
-            final ZonedDateTime dtStart = ZonedDateTime.of(
-                  dbYear,
-                  dbMonth,
-                  dbDay,
-                  dbHour,
-                  dbMinute,
-                  dbSecond,
-                  0,
-                  TimeTools.getDefaultTimeZone());
-
-            final ZonedDateTime dtEnd = dtStart.plusSeconds(recordingTime);
-
-            // update tour start/end in the database
-            stmtUpdate.setLong(1, dtStart.toInstant().toEpochMilli());
-            stmtUpdate.setLong(2, dtEnd.toInstant().toEpochMilli());
-            stmtUpdate.setLong(3, tourId);
-            stmtUpdate.executeUpdate();
-         }
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
       }
+
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
+      try {
+
+         final String renamedTourRecordingTime = getRenamedField_TourRecordingTime(conn);
+
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "SELECT" //                             //$NON-NLS-1$
+               //
+               + " StartYear," //                     1  //$NON-NLS-1$
+               + " StartMonth," //                    2  //$NON-NLS-1$
+               + " StartDay," //                      3  //$NON-NLS-1$
+               + " StartHour," //                     4  //$NON-NLS-1$
+               + " StartMinute," //                   5  //$NON-NLS-1$
+               + " StartSecond," //                   6  //$NON-NLS-1$
+               + " " + renamedTourRecordingTime //    7  //$NON-NLS-1$
+               //
+               + " FROM " + TABLE_TOUR_DATA //           //$NON-NLS-1$
+               + " WHERE TourId=?" //                    //$NON-NLS-1$
+         );
+
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "UPDATE " + TABLE_TOUR_DATA //          //$NON-NLS-1$
+               //
+               + " SET" //                               //$NON-NLS-1$
+               //
+               + " TourStartTime=?," //               1  //$NON-NLS-1$
+               + " TourEndTime=?" //                  2  //$NON-NLS-1$
+               //
+               + " WHERE tourId=?"); //               3  //$NON-NLS-1$
+
+         int tourIndex = 1;
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
+         long lastUpdateTime = System.currentTimeMillis();
+
+         // loop: all tours
+         for (final Long tourId : allTourIds) {
+
+            if (splashManager != null) {
+
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
+                        new Object[] { tourIndex++, allTourIds.size() }));
+               }
+            }
+
+            // get tour date for 1 tour
+            stmtSelect.setLong(1, tourId);
+            final ResultSet result = stmtSelect.executeQuery();
+
+            while (result.next()) {
+
+               // get date from database
+               final short dbYear = result.getShort(1);
+               final short dbMonth = result.getShort(2);
+               final short dbDay = result.getShort(3);
+               final short dbHour = result.getShort(4);
+               final short dbMinute = result.getShort(5);
+               final short dbSecond = result.getShort(6);
+
+               final long recordingTime = result.getLong(7);
+
+               final ZonedDateTime dtStart = ZonedDateTime.of(
+                     dbYear,
+                     dbMonth,
+                     dbDay,
+                     dbHour,
+                     dbMinute,
+                     dbSecond,
+                     0,
+                     TimeTools.getDefaultTimeZone());
+
+               final ZonedDateTime dtEnd = dtStart.plusSeconds(recordingTime);
+
+               // update tour start/end in the database
+               stmtUpdate.setLong(1, dtStart.toInstant().toEpochMilli());
+               stmtUpdate.setLong(2, dtEnd.toInstant().toEpochMilli());
+               stmtUpdate.setLong(3, tourId);
+               stmtUpdate.executeUpdate();
+            }
+         }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_022_to_023(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_022_To_023(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 23;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -6190,25 +6534,21 @@ public class TourDatabase {
 //         // version 23 end
 
             final String sqlTourPhoto[] = {
-                  //
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName         VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-                        + TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt         VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-                        + TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePath         VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-                        + TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePathName      VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-                        + TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
-                  //
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageExifTime         BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileName           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileExt            VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePath           VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFilePathName       VARCHAR(" + TourPhoto.DB_LENGTH_FILE_PATH + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageExifTime           BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
                   "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   imageFileLastModified   BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   adjustedTime         BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  //
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   ratingStars            INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  //
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   isGeoFromPhoto         INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   latitude             DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   longitude             DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   adjustedTime            BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   ratingStars             INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   isGeoFromPhoto          INT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   latitude                DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+                  "ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN   longitude               DOUBLE DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
             };
 
             exec(stmt, sqlTourPhoto);
@@ -6229,11 +6569,10 @@ public class TourDatabase {
 //         // version 23 end ---------
 
             final String sqlTourData[] = {
-                  //
-                  "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfTimeSlices      INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfPhotos         INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+
+                  "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfTimeSlices       INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
+                  "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   numberOfPhotos           INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
                   "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN   photoTimeAdjustment      INTEGER DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
-                  //
             };
 
             exec(stmt, sqlTourData);
@@ -6242,7 +6581,7 @@ public class TourDatabase {
 
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6252,24 +6591,43 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_022_to_023_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_022_To_023_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      int tourIdx = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 23;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
+         int tourIdx = 1;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
          // loop: all tours
-         for (final Long tourId : tourList) {
+         for (final Long tourId : allTourIds) {
 
             if (splashManager != null) {
 
-               splashManager.setMessage(
-                     NLS.bind(//
-                           Messages.Tour_Database_PostUpdate023_SetTimeSliceNumbers,
-                           new Object[] { tourIdx, tourList.size() }));
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate023_SetTimeSliceNumbers,
+                        new Object[] { tourIdx, allTourIds.size() }));
+               }
 
                tourIdx++;
             }
@@ -6280,23 +6638,23 @@ public class TourDatabase {
                // compute number of time slices
                tourData.onPrePersist();
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
 
          em.close();
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_023_to_024(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_023_To_024(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 24;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
@@ -6337,7 +6695,7 @@ public class TourDatabase {
                 * Changed TagCategory from @ManyToMany to @ManyToOne because a tag can be associated
                 * only with ONE category and not with multiple.
                 */
-               SQL.Cleanup_DropConstraint(stmt, JOINTABLE__TOURDATA__TOURTAG, "FK_TOURDATA_TOURTAG_TOURTAG_TagID"); //$NON-NLS-1$
+               SQL.Cleanup_DropConstraint(stmt, JOINTABLE__TOURDATA__TOURTAG, "FK_TOURDATA_TOURTAG_TOURTAG_TAGID"); //$NON-NLS-1$
             }
 
             /*
@@ -6361,37 +6719,34 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_024_to_025(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 24 -> 25    14.10
+   private int updateDb_024_To_025(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 25;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 25
-         if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "tourTime") == false) { //$NON-NLS-1$
-
-            // Table: TOURMARKER
-            {
-               // Add new columns
-               SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", SQL_LONG_MIN_VALUE);//$NON-NLS-1$
-               SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", SQL_FLOAT_MIN_VALUE); //$NON-NLS-1$
-               SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-               SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-            }
+         // Table: TOURMARKER
+         {
+            // Add new columns
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", SQL_LONG_MIN_VALUE);//$NON-NLS-1$
+            SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", SQL_FLOAT_MIN_VALUE); //$NON-NLS-1$
+            SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+            SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
          }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6401,26 +6756,45 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   public void updateDbDesign_024_to_025_PostUpdate(final Connection conn, final Object progress)
-         throws SQLException {
+   public void updateDb_024_To_025_DataUpdate(final Connection conn, final Object progress) throws SQLException {
 
-      int tourIdx = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 25;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
+         int tourIdx = 1;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
          // loop: all tours
-         for (final Long tourId : tourList) {
+         for (final Long tourId : allTourIds) {
 
             if (progress instanceof SplashManager) {
 
                final SplashManager splashManager = (SplashManager) progress;
 
-               splashManager.setMessage(
-                     NLS.bind(//
-                           Messages.Tour_Database_PostUpdate025_SetMarkerFields,
-                           new Object[] { tourIdx, tourList.size() }));
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate025_SetMarkerFields,
+                        new Object[] { tourIdx, allTourIds.size() }));
+               }
 
                tourIdx++;
             }
@@ -6476,149 +6850,107 @@ public class TourDatabase {
                    * markers are not affected.
                    */
 
-                  final String message = String
-                        .format(
-                              "Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec", //$NON-NLS-1$
-                              TourManager.getTourDateTimeShort(tourData),
-                              tourMarker.getLabel(),
-                              tourMarker.getSerieIndex(),
-                              serieLength,
-                              tourMarker.getTime());
+                  final String message = String.format(
+                        "Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec", //$NON-NLS-1$
+                        TourManager.getTourDateTimeShort(tourData),
+                        tourMarker.getLabel(),
+                        tourMarker.getSerieIndex(),
+                        serieLength,
+                        tourMarker.getTime());
 
                   StatusUtil.showStatus(message, e);
                }
 
             }
 
-            // check before tour is saved
-
-            if (progress instanceof IProgressMonitor) {
-
-               final IProgressMonitor progressMonitor = (IProgressMonitor) em;
-
-               if (progressMonitor.isCanceled()) {
-                  return;
-               }
-            }
-
-            TourDatabase.saveEntity(tourData, tourId, TourData.class);
+            saveEntity(tourData, tourId, TourData.class);
          }
-
-      } catch (final Exception e) {
-
-         StatusUtil.showStatus(e);
-
-         throw e;
 
       } finally {
 
          em.close();
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_025_to_026(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 25 -> 26    14.14 / 15.3
+   private int updateDb_025_To_026(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 26;
 
-      /**
-       * This version is never used but is not deleted to keep this info.
+      /*
+       * Version 26 is used to upgrade the derby database in
+       * sqlStartup_70_Check_DbIsUpgraded_Before() and sqlStartup_80_Check_DbIsUpgraded_After() to
+       * support fulltext search with apache lucene
        */
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
 
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // check if db is updated to version 26
-//         if (isColumnAvailable(conn, TABLE_TOUR_MARKER, "tourTime") == false) { //$NON-NLS-1$
-//
-//            // Table: TOURMARKER
-//            {
-//               // Add new columns
-//               SQL.AddCol_BigInt(stmt, TABLE_TOUR_MARKER, "tourTime", SQL_LONG_MIN_VALUE);//$NON-NLS-1$
-//               SQL.AddCol_Float(stmt, TABLE_TOUR_MARKER, "altitude", SQL_FLOAT_MIN_VALUE); //$NON-NLS-1$
-//               SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "latitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//               SQL.AddCol_Double(stmt, TABLE_TOUR_MARKER, "longitude", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-//
-//            }
-//         }
-      }
-      stmt.close();
-
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_026_to_027(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 26 -> 27    15.3.1
+   private int updateDb_026_To_027(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 27;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 27
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "frontShiftCount") == false) { //$NON-NLS-1$
-
-            // Table: TABLE_TOUR_DATA
-            {
-               // Add new columns
-               SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "frontShiftCount", DEFAULT_0);//$NON-NLS-1$
-               SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "rearShiftCount", DEFAULT_0); //$NON-NLS-1$
-            }
+         // Table: TABLE_TOUR_DATA
+         {
+            // Add new columns
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "frontShiftCount", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "rearShiftCount", DEFAULT_0); //$NON-NLS-1$
          }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_027_to_028(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_027_To_028(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 28;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 28
-         if (isColumnAvailable(conn, TABLE_TOUR_COMPARED, "AvgPulse") == false) { //$NON-NLS-1$
-
+         /*
+          * Table: TABLE_TOUR_COMPARED
+          */
+         {
             /*
-             * Table: TABLE_TOUR_COMPARED
+             * Add new columns
              */
-            {
-               /*
-                * Add new columns
-                */
-               SQL.AddCol_Float(stmt, TABLE_TOUR_COMPARED, "AvgPulse", DEFAULT_0); //$NON-NLS-1$
-            }
+            SQL.AddCol_Float(stmt, TABLE_TOUR_COMPARED, "AvgPulse", DEFAULT_0); //$NON-NLS-1$
          }
 
-         // check if db is updated to version 28
-         if (isColumnAvailable(conn, TABLE_TOUR_WAYPOINT, "urlText") == false) { //$NON-NLS-1$
-
+         /*
+          * Table: TABLE_TOUR_WAYPOINT
+          */
+         {
             /*
-             * Table: TABLE_TOUR_WAYPOINT
+             * Add new columns
              */
-            {
-               /*
-                * Add new columns
-                */
-               SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
-               SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
-            }
+            SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlText", TourMarker.DB_LENGTH_URL_TEXT); //$NON-NLS-1$
+            SQL.AddCol_VarCar(stmt, TABLE_TOUR_WAYPOINT, "urlAddress", TourMarker.DB_LENGTH_URL_ADDRESS); //$NON-NLS-1$
          }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6628,92 +6960,123 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_027_to_028_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_027_To_028_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      // get number of compared tours
-      final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
+      final long startTime = System.currentTimeMillis();
 
-      final PreparedStatement stmt = conn.prepareStatement(sql);
-      ResultSet result = stmt.executeQuery();
+      final int dbDataVersion = 28;
 
-      // get first result
-      result.next();
-
-      // get first value
-      final int numberOfComparedTours = result.getInt(1);
-      if (numberOfComparedTours == 0) {
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
          return;
       }
 
-      final PreparedStatement stmtSelect = conn.prepareStatement( //
-            //
-            "SELECT" //                           //$NON-NLS-1$
-                  //
-                  + " comparedId," //             // 1 //$NON-NLS-1$
-                  + " tourId," //                // 2 //$NON-NLS-1$
-                  + " startIndex," //             // 3 //$NON-NLS-1$
-                  + " endIndex" //                // 4 //$NON-NLS-1$
-                  //
-                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
-      );
+      PreparedStatement stmt = null;
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            //
-            "UPDATE " + TABLE_TOUR_COMPARED //         //$NON-NLS-1$
-            //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " avgPulse=?" //               // 1 //$NON-NLS-1$
-                  //
-                  + " WHERE comparedId=?"); //      // 2 //$NON-NLS-1$
+      try {
 
-      result = stmtSelect.executeQuery();
+         // get number of compared tours
+         final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
 
-      int compTourCounter = 0;
+         stmt = conn.prepareStatement(sql);
+         ResultSet result = stmt.executeQuery();
 
-      while (result.next()) {
+         // get first result
+         result.next();
 
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
-                        Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
-                        new Object[] { ++compTourCounter, numberOfComparedTours }));
-         }
+         // get first value
+         final int numComparedTours = result.getInt(1);
+         if (numComparedTours != 0) {
 
-         // get date from database
-         final long compareId = result.getLong(1);
-         final long tourId = result.getLong(2);
-         final int startIndex = result.getInt(3);
-         final int endIndex = result.getInt(4);
+            stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-         final TourData tourData = TourManager.getTour(tourId);
+                  + "SELECT" //                             //$NON-NLS-1$
 
-         if (tourData == null) {
+                  + " comparedId," //                    1  //$NON-NLS-1$
+                  + " tourId," //                        2  //$NON-NLS-1$
+                  + " startIndex," //                    3  //$NON-NLS-1$
+                  + " endIndex" //                       4  //$NON-NLS-1$
 
-            StatusUtil.log(
-                  NLS.bind(
+                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
+
+            stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+                  + "UPDATE " + TABLE_TOUR_COMPARED //      //$NON-NLS-1$
+
+                  + " SET" //                               //$NON-NLS-1$
+                  + " avgPulse=?" //                     1  //$NON-NLS-1$
+                  + " WHERE comparedId=?" //             2  //$NON-NLS-1$
+            );
+
+            result = stmtSelect.executeQuery();
+
+            int compTourCounter = 0;
+
+            long lastUpdateTime = System.currentTimeMillis();
+
+            while (result.next()) {
+
+               if (splashManager != null) {
+
+                  final long currentTime = System.currentTimeMillis();
+                  final float timeDiff = currentTime - lastUpdateTime;
+
+                  // reduce logging
+                  if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                     lastUpdateTime = currentTime;
+
+                     splashManager.setMessage(NLS.bind(
+                           Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
+                           new Object[] { ++compTourCounter, numComparedTours }));
+                  }
+               }
+
+               // get date from database
+               final long compareId = result.getLong(1);
+               final long tourId = result.getLong(2);
+               final int startIndex = result.getInt(3);
+               final int endIndex = result.getInt(4);
+
+               final TourData tourData = TourManager.getTour(tourId);
+
+               if (tourData == null) {
+
+                  StatusUtil.log(NLS.bind(
                         "Cannot get tour {0} from database to update the average pulse in the compared tour {1}.", //$NON-NLS-1$
                         tourId,
                         compareId));
 
-         } else {
+               } else {
 
-            final float avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
+                  final float avgPulse = tourData.computeAvg_PulseSegment(startIndex, endIndex);
 
-            // update average pulse for the compared tour
-            stmtUpdate.setFloat(1, avgPulse);
-            stmtUpdate.setLong(2, compareId);
-            stmtUpdate.executeUpdate();
+                  // update average pulse for the compared tour
+                  stmtUpdate.setFloat(1, avgPulse);
+                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.executeUpdate();
+               }
+            }
+
          }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmt);
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_028_to_029(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_028_To_029(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 29;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       try (final Statement stmt = conn.createStatement()) {
@@ -6722,17 +7085,13 @@ public class TourDatabase {
          if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TourImportFileName") == false) { //$NON-NLS-1$
 
             // TABLE_TOUR_DATA: add column TourImportFileName
-            SQL.AddCol_VarCar(
-                  stmt, //
-                  TABLE_TOUR_DATA,
-                  "TourImportFileName", //$NON-NLS-1$
-                  TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME);
+            SQL.AddCol_VarCar(stmt, TABLE_TOUR_DATA, "TourImportFileName", TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME); //$NON-NLS-1$
 
             createIndex_TourData_029(stmt);
          }
       }
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6744,163 +7103,179 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_028_to_029_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_028_To_029_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 29;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final int numTours = getAllTourIds().size();
 
-      final PreparedStatement stmtSelect = conn.prepareStatement(
-            UI.EMPTY_STRING//
-                  //
-                  + "SELECT" //                           //$NON-NLS-1$
-                  //
-                  + " TourID," //                // 1 //$NON-NLS-1$
-                  + " TourImportFilePath" //          // 2 //$NON-NLS-1$
-                  //
-                  + " FROM " + TABLE_TOUR_DATA //      //$NON-NLS-1$
-      );
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(
-            UI.EMPTY_STRING//
-                  //
-                  + "UPDATE " + TABLE_TOUR_DATA //            //$NON-NLS-1$
-                  //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " TourImportFileName=?," //      // 1 //$NON-NLS-1$
-                  + " TourImportFilePath=?" //      // 1 //$NON-NLS-1$
-                  //
-                  + " WHERE TourID=?"); //         // 2 //$NON-NLS-1$
+      try {
 
-      int tourIndex = 0;
+         stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
 
-      final ResultSet result = stmtSelect.executeQuery();
+               + "SELECT" //                          //$NON-NLS-1$
 
-      while (result.next()) {
+               + " TourID," //                     1  //$NON-NLS-1$
+               + " TourImportFilePath" //          2  //$NON-NLS-1$
 
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
+               + " FROM " + TABLE_TOUR_DATA //        //$NON-NLS-1$
+         );
+
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
+
+               + " SET" //                            //$NON-NLS-1$
+
+               + " TourImportFileName=?," //       1  //$NON-NLS-1$
+               + " TourImportFilePath=?" //        2  //$NON-NLS-1$
+
+               + " WHERE TourID=?"); //            3 //$NON-NLS-1$
+
+         int tourIndex = 0;
+         long lastUpdateTime = System.currentTimeMillis();
+
+         final ResultSet result = stmtSelect.executeQuery();
+
+         while (result.next()) {
+
+            if (splashManager != null) {
+
+               final long currentTime = System.currentTimeMillis();
+               final float timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                  lastUpdateTime = currentTime;
+
+                  splashManager.setMessage(NLS.bind(
                         Messages.Tour_Database_PostUpdate_029_SetImportFileName,
                         new Object[] { ++tourIndex, numTours }));
-         }
+               }
+            }
 
-         // get data from database
-         final long dbTourId = result.getLong(1);
-         final String dbFilePath = result.getString(2);
+            // get data from database
+            final long dbTourId = result.getLong(1);
+            final String dbFilePath = result.getString(2);
 
-         // get NIO path
-         final Path filePath = NIO.getPath(dbFilePath);
-         if (filePath != null) {
+            // get NIO path
+            final Path filePath = NIO.getPath(dbFilePath);
+            if (filePath != null) {
 
-            // extract file name
-            final Path fileName = filePath.getFileName();
-            if (fileName != null) {
+               // extract file name
+               final Path fileName = filePath.getFileName();
+               if (fileName != null) {
 
-               // extract folder
-               final Path folderPath = filePath.getParent();
+                  // extract folder
+                  final Path folderPath = filePath.getParent();
 
-               // set file name
-               stmtUpdate.setString(1, fileName.toString());
+                  // set file name
+                  stmtUpdate.setString(1, fileName.toString());
 
-               //
-               stmtUpdate.setString(
-                     2,
-                     folderPath == null //
-                           ? UI.EMPTY_STRING
-                           : folderPath.toString());
+                  //
+                  stmtUpdate.setString(2,
+                        folderPath == null
+                              ? UI.EMPTY_STRING
+                              : folderPath.toString());
 
-               stmtUpdate.setLong(3, dbTourId);
+                  stmtUpdate.setLong(3, dbTourId);
 
-               stmtUpdate.executeUpdate();
+                  stmtUpdate.executeUpdate();
+               }
             }
          }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_029_to_030(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_029_To_030(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 30;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 30
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_Avg") == false) { //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_Avg",                         DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Max",                         DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Normalized",                  DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_FTP",                         DEFAULT_0); //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_Avg",                         DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Max",                         DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_Normalized",                  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_FTP",                         DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "power_TotalWork",                   DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_TrainingStressScore",         DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_IntensityFactor",             DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "power_TotalWork",                   DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_TrainingStressScore",         DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_IntensityFactor",             DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_PedalLeftRightBalance",       DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftTorqueEffectiveness",  DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness",      DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness",     DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Int   (stmt, TABLE_TOUR_DATA, "power_PedalLeftRightBalance",       DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftTorqueEffectiveness",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness",      DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float (stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness",     DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_030_to_031(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_030_To_031(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 31;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 31
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "CadenceMultiplier") == false) { //$NON-NLS-1$
-
-            // Add new columns
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "CadenceMultiplier", DEFAULT_1_0); //$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "IsStrideSensorPresent", DEFAULT_0); //$NON-NLS-1$
-         }
+         // Add new columns
+         SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "CadenceMultiplier", DEFAULT_1_0); //$NON-NLS-1$
+         SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "IsStrideSensorPresent", DEFAULT_0); //$NON-NLS-1$
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_031_to_032(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_031_To_032(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 32;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 32
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneId") == false) { //$NON-NLS-1$
-
-            // TABLE_TOUR_DATA: add column TimeZoneId
-            SQL.AddCol_VarCar(stmt, TABLE_TOUR_DATA, "TimeZoneId", TourData.DB_LENGTH_TIME_ZONE_ID); //$NON-NLS-1$
-         }
+         // TABLE_TOUR_DATA: add column TimeZoneId
+         SQL.AddCol_VarCar(stmt, TABLE_TOUR_DATA, "TimeZoneId", TourData.DB_LENGTH_TIME_ZONE_ID); //$NON-NLS-1$
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -6912,19 +7287,28 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_031_to_032_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
+   private void updateDb_031_To_032_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      int tourIdx = 1;
-      final ArrayList<Long> tourList = getAllTourIds();
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 32;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
 
+         int tourIdx = 1;
          long lastUpdateTime = System.currentTimeMillis();
 
+         final ArrayList<Long> allTourIds = getAllTourIds();
+
          // loop: all tours
-         for (final Long tourId : tourList) {
+         for (final Long tourId : allTourIds) {
 
             if (splashManager != null) {
 
@@ -6932,16 +7316,15 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIdx / allTourIds.size() * 100.0);
 
-                  splashManager.setMessage(
-                        NLS.bind(//
-                              Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
-                              new Object[] { tourIdx, tourList.size(), percent }));
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
+                        new Object[] { tourIdx, allTourIds.size(), percent }));
                }
 
                tourIdx++;
@@ -6960,23 +7343,23 @@ public class TourDatabase {
 
                tourData.setTimeZoneId(zoneId.getId());
 
-               TourDatabase.saveEntity(tourData, tourId, TourData.class);
+               saveEntity(tourData, tourId, TourData.class);
             }
          }
 
-      } catch (final Exception e) {
-         e.printStackTrace();
       } finally {
 
          em.close();
       }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_032_to_033(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_032_To_033(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 33;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       try (final Statement stmt = conn.createStatement()) {
@@ -6988,16 +7371,16 @@ public class TourDatabase {
          }
       }
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_033_to_034(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_033_To_034(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 34;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
@@ -7010,7 +7393,7 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -7022,21 +7405,27 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_033_to_034_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
-
-      final ArrayList<Long> allTours = getAllTourIds();
-
-      final int numTours = allTours.size();
-      int tourIndex = 1;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+   private void updateDb_033_To_034_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 34;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
       try {
 
          long lastUpdateTime = startTime;
+
+         final ArrayList<Long> allTours = getAllTourIds();
+
+         final int numTours = allTours.size();
+         int tourIndex = 1;
 
          // loop: all tours
          for (final Long tourId : allTours) {
@@ -7047,16 +7436,15 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
-                  splashManager.setMessage(
-                        NLS.bind(//
-                              Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
-                              new Object[] { tourIndex, numTours, percent }));
+                  splashManager.setMessage(NLS.bind(
+                        Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
+                        new Object[] { tourIndex, numTours, percent }));
                }
 
                tourIndex++;
@@ -7070,82 +7458,67 @@ public class TourDatabase {
          }
 
          // update UI otherwise < 100% is displayed
-         splashManager.setMessage(
-               NLS.bind(//
-                     Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
-                     new Object[] { tourIndex - 1, numTours, 100 }));
+         splashManager.setMessage(NLS.bind(
+               Messages.Tour_Database_PostUpdate_034_SetTourGeoParts,
+               new Object[] { tourIndex - 1, numTours, 100 }));
 
-      } catch (final Exception e) {
-         StatusUtil.log(e);
       } finally {
          em.close();
       }
 
-      final long timeDiff = System.currentTimeMillis() - startTime;
-
-      StatusUtil.logInfo(
-            String.format(
-                  "Database postupdate 33->34 in %s mm:ss", //$NON-NLS-1$
-                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_034_to_035(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_034_To_035(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 35;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 35
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "runDyn_StanceTime_Min") == false) { //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min",             DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max",             DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg",             DEFAULT_0); //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Min",           DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Max",           DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTime_Avg",           DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min",    DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max",    DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg",    DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Min",    DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Max",    DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StanceTimeBalance_Avg",    DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min",             DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max",             DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg",             DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Min",           DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Max",           DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_StepLength_Avg",           DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Min",    DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Max",    DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg",    DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Min",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Max",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalOscillation_Avg",  DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Min",          DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Max",          DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg",          DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Min",        DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Max",        DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float   (stmt, TABLE_TOUR_DATA, "runDyn_VerticalRatio_Avg",        DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_035_to_036(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_035_To_036(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 36;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 36
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "surfing_NumberOfEvents") == false) { //$NON-NLS-1$
-
 //          // version 36 start  -  18.12
 //          //
 //            + "   surfing_NumberOfEvents                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
@@ -7161,32 +7534,30 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_NumberOfEvents",          DEFAULT_0); //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_NumberOfEvents",          DEFAULT_0); //$NON-NLS-1$
 
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinDistance",             DEFAULT_IGNORED); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop",      DEFAULT_IGNORED); //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_Surfing",        DEFAULT_IGNORED); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinDistance",             DEFAULT_IGNORED); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_StartStop",      DEFAULT_IGNORED); //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinSpeed_Surfing",        DEFAULT_IGNORED); //$NON-NLS-1$
 
-            SQL.AddCol_Boolean (stmt, TABLE_TOUR_DATA, "surfing_IsMinDistance",           DEFAULT_FALSE);   //$NON-NLS-1$
-            SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinTimeDuration",         DEFAULT_IGNORED); //$NON-NLS-1$
+         SQL.AddCol_Boolean (stmt, TABLE_TOUR_DATA, "surfing_IsMinDistance",           DEFAULT_FALSE);   //$NON-NLS-1$
+         SQL.AddCol_SmallInt(stmt, TABLE_TOUR_DATA, "surfing_MinTimeDuration",         DEFAULT_IGNORED); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_036_to_037(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_036_To_037(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 37;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
@@ -7205,7 +7576,7 @@ public class TourDatabase {
             // check if db already contains the constraint
             if (isPrimaryKeyAvailable(conn, TABLE_TOUR_GEO_PARTS, "PK_TourId_GeoPart") == false) { //$NON-NLS-1$
 
-               final String sql = UI.EMPTY_STRING//
+               final String sql = UI.EMPTY_STRING
 
                      + "ALTER TABLE " + TABLE_TOUR_GEO_PARTS //                                 //$NON-NLS-1$
                      + "   ADD CONSTRAINT PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)"; //  //$NON-NLS-1$
@@ -7216,7 +7587,7 @@ public class TourDatabase {
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -7228,31 +7599,37 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_036_to_037_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
-
-      final ArrayList<Long> allTours = getAllTourIds();
-
-      final int numTours = allTours.size();
-      int tourIndex = 1;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+   private void updateDb_036_To_037_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
+      final int dbDataVersion = 37;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      PreparedStatement stmtUpdate = null;
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
       try {
+
+         final ArrayList<Long> allTours = getAllTourIds();
+
+         final int numTours = allTours.size();
+         int tourIndex = 1;
 
          long lastUpdateTime = startTime;
 
-         final PreparedStatement stmtUpdate = conn.prepareStatement( //
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-               "UPDATE " + TABLE_TOUR_DATA //         //$NON-NLS-1$
+               + "UPDATE " + TABLE_TOUR_DATA //       //$NON-NLS-1$
 
-                     + " SET" //                      //$NON-NLS-1$
-
-                     + " HasGeoData=?" //             // 1 //$NON-NLS-1$
-
-                     + " WHERE tourId=?"); //         //$NON-NLS-1$
+               + " SET" //                            //$NON-NLS-1$
+               + " HasGeoData=?" //                1  //$NON-NLS-1$
+               + " WHERE tourId=?"); //            2  //$NON-NLS-1$
 
          // loop: all tours
          for (final Long tourId : allTours) {
@@ -7263,11 +7640,11 @@ public class TourDatabase {
                final float timeDiff = currentTime - lastUpdateTime;
 
                // reduce logging
-               if (timeDiff > 500) {
+               if (timeDiff > DELAY_SPLASH_LOGGING) {
 
                   lastUpdateTime = currentTime;
 
-                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
+                  final String percent = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numTours * 100.0);
 
                   final String message = NLS.bind(Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
                         new Object[] { tourIndex, numTours, percent });
@@ -7291,121 +7668,105 @@ public class TourDatabase {
          }
 
          // update UI otherwise < 100% is displayed
-         splashManager.setMessage(
-               NLS.bind(//
-                     Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
-                     new Object[] { tourIndex - 1, numTours, 100 }));
+         splashManager.setMessage(NLS.bind(
+               Messages.Tour_Database_PostUpdate_037_SetHasGeoData,
+               new Object[] { tourIndex - 1, numTours, 100 }));
 
-      } catch (final Exception e) {
-         StatusUtil.log(e);
       } finally {
+
          em.close();
+
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      final long timeDiff = System.currentTimeMillis() - startTime;
-
-      StatusUtil.logInfo(String.format(
-            "Database postupdate 36 -> 37 in %s mm:ss", //$NON-NLS-1$
-            net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_037_to_038(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_037_To_038(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 38;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 38
-         if (isColumnAvailable(conn, TABLE_TOUR_TAG, "notes") == false) { //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
-            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
+         SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
 
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingPerformance",        DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
+         SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingPerformance",        DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_038_to_039(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_038_To_039(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 39;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 39
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "isWeatherDataFromApi") == false) { //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_Boolean   (stmt, TABLE_TOUR_DATA, "isWeatherDataFromApi",          DEFAULT_FALSE);   //$NON-NLS-1$
-            SQL.AddCol_SmallInt  (stmt, TABLE_TOUR_DATA, "weather_Humidity",              DEFAULT_0);       //$NON-NLS-1$
-            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Precipitation",         DEFAULT_0);       //$NON-NLS-1$
-            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Pressure",              DEFAULT_0);       //$NON-NLS-1$
-            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Min",       DEFAULT_0);       //$NON-NLS-1$
-            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Max",       DEFAULT_0);       //$NON-NLS-1$
-            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_WindChill", DEFAULT_0);       //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_Boolean   (stmt, TABLE_TOUR_DATA, "isWeatherDataFromApi",          DEFAULT_FALSE);   //$NON-NLS-1$
+         SQL.AddCol_SmallInt  (stmt, TABLE_TOUR_DATA, "weather_Humidity",              DEFAULT_0);       //$NON-NLS-1$
+         SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Precipitation",         DEFAULT_0);       //$NON-NLS-1$
+         SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Pressure",              DEFAULT_0);       //$NON-NLS-1$
+         SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Min",       DEFAULT_0);       //$NON-NLS-1$
+         SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Max",       DEFAULT_0);       //$NON-NLS-1$
+         SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_WindChill", DEFAULT_0);       //$NON-NLS-1$
 
 // SET_FORMATTING_ON
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_039_to_040(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_039_To_040(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 40;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 40
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_DataSource") == false) { //$NON-NLS-1$
-
 // SET_FORMATTING_OFF
 
-            // Add new columns
-            SQL.AddCol_VarCar (stmt, TABLE_TOUR_DATA, "power_DataSource",              TourData.DB_LENGTH_POWER_DATA_SOURCE); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime",          DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime",          DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue",   DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "avgAltitudeChange",             DEFAULT_0);                            //$NON-NLS-1$
+         // Add new columns
+         SQL.AddCol_VarCar (stmt, TABLE_TOUR_DATA, "power_DataSource",              TourData.DB_LENGTH_POWER_DATA_SOURCE); //$NON-NLS-1$
+         SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime",          DEFAULT_0);                            //$NON-NLS-1$
+         SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime",          DEFAULT_0);                            //$NON-NLS-1$
+         SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue",   DEFAULT_0);                            //$NON-NLS-1$
+         SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "avgAltitudeChange",             DEFAULT_0);                            //$NON-NLS-1$
 
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_COMPARED, "tourRecordingTime",         DEFAULT_0);                            //$NON-NLS-1$
+         SQL.AddCol_Int    (stmt, TABLE_TOUR_COMPARED, RENAMED__TOUR_RECORDING_TIME__FROM,         DEFAULT_0);
 
-            // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
-            SQL.CreateIndex   (stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
+         // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
+         SQL.CreateIndex   (stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
 
 // SET_FORMATTING_ON
-         }
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
@@ -7417,307 +7778,374 @@ public class TourDatabase {
     * @param splashManager
     * @throws SQLException
     */
-   private void updateDbDesign_039_to_040_PostUpdate(final Connection conn, final SplashManager splashManager)
-         throws SQLException {
-
-      // get number of compared tours
-      final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
-
-      final PreparedStatement stmt = conn.prepareStatement(sql);
-      ResultSet result = stmt.executeQuery();
-
-      // get first result
-      result.next();
-
-      // get first value
-      final int numberOfComparedTours = result.getInt(1);
-      if (numberOfComparedTours == 0) {
-         return;
-      }
+   private void updateDb_039_To_040_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
-      final PreparedStatement stmtSelect = conn.prepareStatement( //
-            //
-            "SELECT" //                           //$NON-NLS-1$
-                  //
-                  + " comparedId," //             // 1 //$NON-NLS-1$
-                  + " tourId," //                 // 2 //$NON-NLS-1$
-                  + " startIndex," //             // 3 //$NON-NLS-1$
-                  + " endIndex" //                // 4 //$NON-NLS-1$
-                  //
+      final int dbDataVersion = 40;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      PreparedStatement stmt = null;
+      PreparedStatement stmtSelect = null;
+      PreparedStatement stmtUpdate = null;
+
+      try {
+
+         // get number of compared tours
+         final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
+
+         stmt = conn.prepareStatement(sql);
+         ResultSet result = stmt.executeQuery();
+
+         // only the first result is needed
+         result.next();
+
+         // get first value
+         final int numberOfComparedTours = result.getInt(1);
+         if (numberOfComparedTours != 0) {
+
+            stmtSelect = conn.prepareStatement(UI.EMPTY_STRING
+
+                  + "SELECT" //                             //$NON-NLS-1$
+
+                  + " comparedId," //                    1  //$NON-NLS-1$
+                  + " tourId," //                        2  //$NON-NLS-1$
+                  + " startIndex," //                    3  //$NON-NLS-1$
+                  + " endIndex" //                       4  //$NON-NLS-1$
+
                   + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
-      );
+            );
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            //
-            "UPDATE " + TABLE_TOUR_COMPARED //    //$NON-NLS-1$
-            //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " tourRecordingTime=?" //     // 1 //$NON-NLS-1$
-                  //
-                  + " WHERE comparedId=?"); //    // 2 //$NON-NLS-1$
+            final String renamedField_TourRecordingTime = getRenamedField_TourRecordingTime(conn);
 
-      result = stmtSelect.executeQuery();
+            stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-      int compTourCounter = 0;
-      long lastUpdateTime = startTime;
+                  + "UPDATE " + TABLE_TOUR_COMPARED //                  //$NON-NLS-1$
 
-      while (result.next()) {
+                  + " SET" //                                           //$NON-NLS-1$
+                  + " " + renamedField_TourRecordingTime + "=?" //   1  //$NON-NLS-1$ //$NON-NLS-2$
 
-         if (splashManager != null) {
+                  + " WHERE comparedId=?" //                         2 //$NON-NLS-1$
+            );
 
-            ++compTourCounter;
+            result = stmtSelect.executeQuery();
 
-            final long currentTime = System.currentTimeMillis();
-            final float timeDiff = currentTime - lastUpdateTime;
+            int compTourCounter = 0;
+            long lastUpdateTime = startTime;
 
-            // reduce logging
-            if (timeDiff > 500) {
+            while (result.next()) {
 
-               lastUpdateTime = currentTime;
+               if (splashManager != null) {
 
-               splashManager.setMessage(
-                     NLS.bind(
+                  ++compTourCounter;
+
+                  final long currentTime = System.currentTimeMillis();
+                  final float timeDiff = currentTime - lastUpdateTime;
+
+                  // reduce logging
+                  if (timeDiff > DELAY_SPLASH_LOGGING) {
+
+                     lastUpdateTime = currentTime;
+
+                     splashManager.setMessage(NLS.bind(
                            Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
                            new Object[] { compTourCounter, numberOfComparedTours }));
-            }
-         }
+                  }
+               }
 
-         final long compareId = result.getLong(1);
-         final long tourId = result.getLong(2);
-         final int startIndex = result.getInt(3);
-         final int endIndex = result.getInt(4);
+               final long compareId = result.getLong(1);
+               final long tourId = result.getLong(2);
+               final int startIndex = result.getInt(3);
+               final int endIndex = result.getInt(4);
 
-         final TourData tourData = TourManager.getTour(tourId);
+               final TourData tourData = TourManager.getTour(tourId);
 
-         if (tourData == null) {
+               if (tourData == null) {
 
-            StatusUtil.log(
-                  NLS.bind(
+                  StatusUtil.log(NLS.bind(
                         "Cannot get tour {0} from database to update the recording time in the compared tour {1}.", //$NON-NLS-1$
                         tourId,
                         compareId));
 
-         } else {
+               } else {
 
-            final int tourRecordingTime = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
+                  final int tourDeviceTime_Elapsed = TourManager.computeTourDeviceTime_Elapsed(tourData, startIndex, endIndex);
 
-            // update tour recording time for the compared tour
-            stmtUpdate.setInt(1, tourRecordingTime);
-            stmtUpdate.setLong(2, compareId);
-            stmtUpdate.executeUpdate();
+                  // update tour recording time for the compared tour
+                  stmtUpdate.setInt(1, tourDeviceTime_Elapsed);
+                  stmtUpdate.setLong(2, compareId);
+                  stmtUpdate.executeUpdate();
+               }
+            }
          }
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmt);
+         net.tourbook.common.util.SQL.close(stmtSelect);
+         net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
-      final long timeDiff = System.currentTimeMillis() - startTime;
-
-      StatusUtil.logInfo(String.format(
-            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
-            net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 40 -> 41    20.8
+   private int updateDb_040_To_041(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 41;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
       final Statement stmt = conn.createStatement();
       {
-         // check if db is updated to version 41
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "maxPace") == false) { //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-
-            // Add new columns
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace",          DEFAULT_0);                            //$NON-NLS-1$
-
-// SET_FORMATTING_ON
-         }
+         // Add new columns
+         SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace", DEFAULT_0); //$NON-NLS-1$
       }
       stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-   private int updateDbDesign_041_to_042(final Connection conn, final SplashManager splashManager) throws SQLException {
+   // 41 -> 42    20.11.1
+   private int updateDb_041_To_042(final Connection conn, final SplashManager splashManager) throws SQLException {
+
       final int newDbVersion = 42;
 
-      logDb_UpdateStart(newDbVersion);
+      logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // check if db is updated to version 42
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourDeviceTime_Recorded") == false) { //$NON-NLS-1$
+      try (Statement stmt = conn.createStatement()) {
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded", DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Paused",   DEFAULT_0);                            //$NON-NLS-1$
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "bodyFat",   DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Recorded", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA,     "tourDeviceTime_Paused",   DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddCol_Float(stmt,  TABLE_TOUR_DATA,     "bodyFat",                 DEFAULT_0);                   //$NON-NLS-1$
 
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving"); //$NON-NLS-1$ //$NON-NLS-2$
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "bikerWeight", "bodyWeight"); //$NON-NLS-1$ //$NON-NLS-2$
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_DRIVING_TIME__FROM,      RENAMED__TOUR_DRIVING_TIME__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__BIKER_WEIGHT__FROM,           RENAMED__BIKER_WEIGHT__INTO);
 
-            SQL.RenameCol(stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", "TourDeviceTime_Elapsed"); //$NON-NLS-1$ //$NON-NLS-2$
+            SQL.RenameCol(stmt,     TABLE_TOUR_COMPARED, RENAMED__TOUR_RECORDING_TIME__FROM,    RENAMED__TOUR_RECORDING_TIME__INTO);
 
 // SET_FORMATTING_ON
-         }
       }
-      stmt.close();
 
-      logDb_UpdateEnd(newDbVersion);
+      logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
-//   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
-//
-//      final int newDbVersion = 35;
-//
-//      logDb_UpdateStart(newDbVersion);
-//      updateMonitor(monitor, newDbVersion);
-//
-//      final Statement stmt = conn.createStatement();
-//      {
-//         // double check if db is already updated
-//         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "LatitudeMinE6") == false) { //$NON-NLS-1$
-//
-//            /*
-//             * Create geo bound fields/index
-//             */
-//            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeMinE6", DEFAULT_0); //$NON-NLS-1$
-//            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LatitudeMaxE6", DEFAULT_0); //$NON-NLS-1$
-//
-//            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeMinE6", DEFAULT_0); //$NON-NLS-1$
-//            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "LongitudeMaxE6", DEFAULT_0); //$NON-NLS-1$
-//
-//            createIndex_TourData_035(stmt);
-//         }
-//      }
-//      stmt.close();
-//
-//      logDb_UpdateEnd(newDbVersion);
-//
-//      return newDbVersion;
-//   }
-
-//   /**
-//    * Set lat/lon min/max values
-//    *
-//    * @param conn
-//    * @param monitor
-//    * @throws SQLException
-//    */
-//   private void updateDbDesign_034_to_035_PostUpdate(final Connection conn, final IProgressMonitor monitor)
-//         throws SQLException {
-//
-//      final ArrayList<Long> allTours = getAllTourIds();
-//
-//      final int numTours = allTours.size();
-//      int tourIndex = 1;
-//
-//      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-//
-//      final long startTime = System.currentTimeMillis();
-//
-//      try {
-//
-//         long lastUpdateTime = startTime;
-//
-//         // loop: all tours
-//         for (final Long tourId : allTours) {
-//
-//            if (monitor != null) {
-//
-//               final long currentTime = System.currentTimeMillis();
-//               final float timeDiff = currentTime - lastUpdateTime;
-//
-//               // reduce logging
-//               if (timeDiff > 200) {
-//
-//                  lastUpdateTime = currentTime;
-//
-//                  final String percent = String.format("%.1f", (float) tourIndex / numTours * 100.0);//$NON-NLS-1$
-//
-//                  monitor.subTask(
-//                        NLS.bind(//
-//                              Messages.Tour_Database_PostUpdate_035_SetGeoMinMax,
-//                              new Object[] { tourIndex, numTours, percent }));
-//               }
-//
-//               tourIndex++;
-//            }
-//
-//            final TourData tourData = em.find(TourData.class, tourId);
-//
-//            if (tourData != null) {
-//
-//               tourData.computeGeo_Bounds();
-//
-//               saveTour(tourData, false);
-//            }
-//         }
-//
-//         // update UI otherwise < 100% is displayed
-//         monitor.subTask(
-//               NLS.bind(//
-//                     Messages.Tour_Database_PostUpdate_035_SetGeoMinMax,
-//                     new Object[] { tourIndex - 1, numTours, 100 }));
-//
-//      } catch (final Exception e) {
-//         StatusUtil.log(e);
-//      } finally {
-//         em.close();
-//      }
-//
-//      final long timeDiff = System.currentTimeMillis() - startTime;
-//
-//      StatusUtil.logInfo(
-//            String.format(
-//                  "Database postupdate 34->35 in %s mm:ss", //$NON-NLS-1$
-//                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
-//   }
-
-   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn)
-         throws SQLException {
+   private void updateDb_041_To_042_DataUpdate(final Connection conn) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement( //
-            //
-            "UPDATE " + TABLE_TOUR_DATA //    //$NON-NLS-1$
-            //
-                  + " SET" //                     //$NON-NLS-1$
-                  //
-                  + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
+      final int dbDataVersion = 42;
 
-      stmtUpdate.executeUpdate();
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
 
-      final long timeDiff = System.currentTimeMillis() - startTime;
+      PreparedStatement stmtUpdate = null;
 
-      StatusUtil.logInfo(String.format(
-            "Database postupdate 41 -> 42 in %s mm:ss", //$NON-NLS-1$
-            net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+      try {
+
+         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+               + "UPDATE " + TABLE_TOUR_DATA //                      //$NON-NLS-1$
+               + " SET" //                                           //$NON-NLS-1$
+               + " tourDeviceTime_Recorded=tourDeviceTime_Elapsed"); //$NON-NLS-1$
+
+         stmtUpdate.executeUpdate();
+
+      } finally {
+
+         net.tourbook.common.util.SQL.close(stmtUpdate);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
    }
 
-   private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
+   private int updateDb_042_To_043(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
+      final int newDbVersion = 43;
 
-      conn.createStatement().executeUpdate(sql);
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
 
-      StatusUtil.logInfo("New database version is set: " + newVersion); //$NON-NLS-1$
+      try (Statement stmt = conn.createStatement()) {
 
-      _dbVersionAfterUpdate = newVersion;
+         createTable_DbVersion_Data(stmt, _dbVersionOnStartup);
+      }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * @param conn
+    * @param splashManager
+    * @return Data update version when the data update is sucessfully run
+    * @throws MyTourbookException
+    * @throws SQLException
+    * @throws Exception
+    */
+   private void updateDb_042_to_043_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 43;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
+
+      // loop: all tours
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+               // Data update 43: Converting lat/lon \u2192 E6 - {0} of {1} - {2} % - {3} \u0394
+               splashManager.setMessage(NLS.bind(
+                     Messages.Tour_Database_PostUpdate_043_LatLonE6,
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
+            }
+
+            tourIndex++;
+         }
+
+         updateDb_042_To_043_DataUpdate_Concurrent(tourId);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourId
+    * @param <T>
+    * @param entity
+    * @param id
+    * @param entityClass
+    */
+   private void updateDb_042_To_043_DataUpdate_Concurrent(final Long tourId) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = em.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            // ignore tours which having no geo data
+            if (tourData.altitudeSerie == null) {
+               return;
+            }
+
+            tourData.updateDatabaseDesign_042_to_043();
+
+            boolean isSaved = false;
+
+            final EntityTransaction ts = em.getTransaction();
+            try {
+
+               ts.begin();
+               {
+                  em.merge(tourData);
+               }
+               ts.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (isSaved == false) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            em.close();
+         }
+      });
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
@@ -7725,6 +8153,28 @@ public class TourDatabase {
       if (splashManager != null) {
          splashManager.setMessage(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
       }
+   }
+
+   private void updateVersionNumber_10_AfterDesignUpdate(final Connection conn, final int newVersion) throws SQLException {
+
+      final String sql = "UPDATE " + TABLE_DB_VERSION_DESIGN + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
+
+      conn.createStatement().executeUpdate(sql);
+
+      logDbUpdate("Database design version is set to: " + newVersion); //$NON-NLS-1$
+
+      _dbVersion_AfterDesignUpdate = newVersion;
+   }
+
+   private void updateVersionNumber_20_AfterDataUpdate(final Connection conn,
+                                                       final int dbDataVersion,
+                                                       final long startTime) throws SQLException {
+
+      final String sql = "UPDATE " + TABLE_DB_VERSION_DATA + " SET VERSION=" + dbDataVersion; //$NON-NLS-1$ //$NON-NLS-2$
+
+      conn.createStatement().executeUpdate(sql);
+
+      logDbUpdate(createLog_DataUpdate(dbDataVersion, startTime));
    }
 
 }

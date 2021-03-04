@@ -85,6 +85,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -110,108 +111,110 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class UI {
 
-   public static final int          SHELL_MARGIN                  = 5;
+   public static final int          SHELL_MARGIN                       = 5;
 
-   public static final char         SPACE                         = ' ';
-   public static final char         NEW_LINE                      = '\n';
-   public static final char         TAB                           = '\t';
+   public static final char         SPACE                              = ' ';
+   public static final char         NEW_LINE                           = '\n';
+   public static final char         TAB                                = '\t';
 
-   public static final char         SYMBOL_BRACKET_LEFT           = '(';
-   public static final char         SYMBOL_BRACKET_RIGHT          = ')';
+   public static final char         SYMBOL_BRACKET_LEFT                = '(';
+   public static final char         SYMBOL_BRACKET_RIGHT               = ')';
 
-   public static final String       COMMA_SPACE                   = ", ";       //$NON-NLS-1$
-   public static final String       DASH                          = "-";        //$NON-NLS-1$
-   public static final String       DASH_WITH_SPACE               = " - ";      //$NON-NLS-1$
-   public static final String       DASH_WITH_DOUBLE_SPACE        = "   -   ";  //$NON-NLS-1$
-   public static final String       DIMENSION                     = " x ";      //$NON-NLS-1$
-   public static final String       EMPTY_STRING                  = "";         //$NON-NLS-1$
-   public static final String       NEW_LINE_TEXT_WIDGET          = "\r\n";     //$NON-NLS-1$
-   public static final String       NEW_LINE1                     = "\n";       //$NON-NLS-1$
-   public static final String       NEW_LINE2                     = "\n\n";     //$NON-NLS-1$
-   public static final String       NEW_LINE3                     = "\n\n\n";   //$NON-NLS-1$
-   public static final String       SLASH_WITH_SPACE              = " / ";      //$NON-NLS-1$
-   public static final String       SPACE1                        = " ";        //$NON-NLS-1$
-   public static final String       SPACE2                        = "  ";       //$NON-NLS-1$
-   public static final String       SPACE3                        = "   ";      //$NON-NLS-1$
-   public static final String       SPACE4                        = "    ";     //$NON-NLS-1$
-   public static final String       ZERO                          = "0";        //$NON-NLS-1$
+   public static final String       COMMA_SPACE                        = ", ";       //$NON-NLS-1$
+   public static final String       DASH                               = "-";        //$NON-NLS-1$
+   public static final String       DASH_WITH_SPACE                    = " - ";      //$NON-NLS-1$
+   public static final String       DASH_WITH_DOUBLE_SPACE             = "   -   ";  //$NON-NLS-1$
+   public static final String       DIMENSION                          = " x ";      //$NON-NLS-1$
+   public static final String       EMPTY_STRING                       = "";         //$NON-NLS-1$
+   public static final String       NEW_LINE_TEXT_WIDGET               = "\r\n";     //$NON-NLS-1$
+   public static final String       NEW_LINE1                          = "\n";       //$NON-NLS-1$
+   public static final String       NEW_LINE2                          = "\n\n";     //$NON-NLS-1$
+   public static final String       NEW_LINE3                          = "\n\n\n";   //$NON-NLS-1$
+   public static final String       SLASH_WITH_SPACE                   = " / ";      //$NON-NLS-1$
+   public static final String       SPACE1                             = " ";        //$NON-NLS-1$
+   public static final String       SPACE2                             = "  ";       //$NON-NLS-1$
+   public static final String       SPACE3                             = "   ";      //$NON-NLS-1$
+   public static final String       SPACE4                             = "    ";     //$NON-NLS-1$
+   public static final String       ZERO                               = "0";        //$NON-NLS-1$
 
-   private static final String      JS_APOSTROPHE                 = "'";        //$NON-NLS-1$
-   private static final String      JS_APOSTROPHE_REPLACEMENT     = "\\'";      //$NON-NLS-1$
-   private static final String      JS_QUOTA_MARK                 = "\"";       //$NON-NLS-1$
-   private static final String      JS_QUOTA_MARK_REPLACEMENT     = "\\\"";     //$NON-NLS-1$
-   private static final String      JS_BACKSLASH_REPLACEMENT      = "\\\\";     //$NON-NLS-1$
-   private static final String      HTML_NEW_LINE                 = "\\n";      //$NON-NLS-1$
+   private static final String      JS_APOSTROPHE                      = "'";        //$NON-NLS-1$
+   private static final String      JS_APOSTROPHE_REPLACEMENT          = "\\'";      //$NON-NLS-1$
+   private static final String      JS_QUOTA_MARK                      = "\"";       //$NON-NLS-1$
+   private static final String      JS_QUOTA_MARK_REPLACEMENT          = "\\\"";     //$NON-NLS-1$
+   private static final String      JS_BACKSLASH_REPLACEMENT           = "\\\\";     //$NON-NLS-1$
+   private static final String      HTML_NEW_LINE                      = "\\n";      //$NON-NLS-1$
 
-   public static final String       SYMBOL_ARROW_UP               = "\u2191";   //$NON-NLS-1$
-   public static final String       SYMBOL_ARROW_DOWN             = "\u2193";   //$NON-NLS-1$
-   public static final String       SYMBOL_ARROW_RIGHT            = "\u2192";   //$NON-NLS-1$
-   public static final String       SYMBOL_ARROW_LEFT_RIGHT       = "\u2194";   //$NON-NLS-1$
-   public static final String       SYMBOL_ARROW_UP_DOWN          = "\u2195";   //$NON-NLS-1$
-   public static final String       SYMBOL_AVERAGE                = "\u00f8";   //$NON-NLS-1$
-   public static final String       SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";  //$NON-NLS-1$
-   public static final String       SYMBOL_BOX                    = "\u25a0";   //$NON-NLS-1$
-   public static final String       SYMBOL_BULLET                 = "\u2022";   //$NON-NLS-1$
-   public static final String       SYMBOL_DASH                   = "\u2212";   //$NON-NLS-1$
-   public static final String       SYMBOL_DEGREE                 = "\u00B0";   //$NON-NLS-1$
-   public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT   = "\u00AB";   //$NON-NLS-1$
-   public static final String       SYMBOL_DBL_ANGLE_QMARK_RIGHT  = "\u00BB";   //$NON-NLS-1$
-   public static final String       SYMBOL_DIFFERENCE             = "\u0394";   //$NON-NLS-1$
-   public static final String       SYMBOL_DIFFERENCE_WITH_SPACE  = "\u0394 ";  //$NON-NLS-1$
-   public static final String       SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";   //$NON-NLS-1$
-   public static final String       SYMBOL_ELLIPSIS               = "\u2026";   //$NON-NLS-1$
-   public static final String       SYMBOL_FIGURE_DASH            = "\u2012";   //$NON-NLS-1$
-   public static final String       SYMBOL_FOOT_NOTE              = "\u20F0";   //$NON-NLS-1$
-   public static final String       SYMBOL_FULL_BLOCK             = "\u2588";   //$NON-NLS-1$
-   public static final String       SYMBOL_IDENTICAL_TO           = "\u2261";   //$NON-NLS-1$
-   public static final String       SYMBOL_INFINITY_MAX           = "\u221E";   //$NON-NLS-1$
-   public static final String       SYMBOL_INFINITY_MIN           = "-\u221E";  //$NON-NLS-1$
-   public static final String       SYMBOL_MIN                    = "\u1D5B";   //$NON-NLS-1$
-   public static final String       SYMBOL_MAX                    = "^";        //$NON-NLS-1$
-   public static final String       SYMBOL_PLUS_MINUS             = "\u00B1";   //$NON-NLS-1$
-   public static final String       SYMBOL_SUM_WITH_SPACE         = "\u2211 ";  //$NON-NLS-1$
-   public static final String       SYMBOL_SUN                    = "\u263C";   //$NON-NLS-1$
-   public static final String       SYMBOL_TAU                    = "\u03c4";   //$NON-NLS-1$
-   public static final String       SYMBOL_TILDE                  = "\u007e";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_UP                    = "\u2191";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_DOWN                  = "\u2193";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_RIGHT                 = "\u2192";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_LEFT_RIGHT            = "\u2194";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_UP_DOWN               = "\u2195";   //$NON-NLS-1$
+   public static final String       SYMBOL_AVERAGE                     = "\u00f8";   //$NON-NLS-1$
+   public static final String       SYMBOL_AVERAGE_WITH_SPACE          = "\u00f8 ";  //$NON-NLS-1$
+   public static final String       SYMBOL_BOX                         = "\u25a0";   //$NON-NLS-1$
+   public static final String       SYMBOL_BULLET                      = "\u2022";   //$NON-NLS-1$
+   public static final String       SYMBOL_DASH                        = "\u2212";   //$NON-NLS-1$
+   public static final String       SYMBOL_DEGREE                      = "\u00B0";   //$NON-NLS-1$
+   public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT        = "\u00AB";   //$NON-NLS-1$
+   public static final String       SYMBOL_DBL_ANGLE_QMARK_RIGHT       = "\u00BB";   //$NON-NLS-1$
+   public static final String       SYMBOL_DIFFERENCE                  = "\u0394";   //$NON-NLS-1$
+   public static final String       SYMBOL_DIFFERENCE_WITH_SPACE       = "\u0394 ";  //$NON-NLS-1$
+   public static final String       SYMBOL_DOUBLE_HORIZONTAL           = "\u2550";   //$NON-NLS-1$
+   public static final String       SYMBOL_ELLIPSIS                    = "\u2026";   //$NON-NLS-1$
+   public static final String       SYMBOL_FIGURE_DASH                 = "\u2012";   //$NON-NLS-1$
+   public static final String       SYMBOL_FOOT_NOTE                   = "\u20F0";   //$NON-NLS-1$
+   public static final String       SYMBOL_FULL_BLOCK                  = "\u2588";   //$NON-NLS-1$
+   public static final String       SYMBOL_HOURGLASS_WITH_FLOWING_SAND = "\u231B";   //$NON-NLS-1$
+   public static final String       SYMBOL_IDENTICAL_TO                = "\u2261";   //$NON-NLS-1$
+   public static final String       SYMBOL_INFINITY_MAX                = "\u221E";   //$NON-NLS-1$
+   public static final String       SYMBOL_INFINITY_MIN                = "-\u221E";  //$NON-NLS-1$
+   public static final String       SYMBOL_MIN                         = "\u1D5B";   //$NON-NLS-1$
+   public static final String       SYMBOL_MAX                         = "^";        //$NON-NLS-1$
+   public static final String       SYMBOL_PLUS_MINUS                  = "\u00B1";   //$NON-NLS-1$
+   public static final String       SYMBOL_SUM_WITH_SPACE              = "\u2211 ";  //$NON-NLS-1$
+   public static final String       SYMBOL_SUN                         = "\u263C";   //$NON-NLS-1$
+   public static final String       SYMBOL_TAU                         = "\u03c4";   //$NON-NLS-1$
+   public static final String       SYMBOL_TILDE                       = "\u007e";   //$NON-NLS-1$
+   public static final String       SYMBOL_WHITE_HEAVY_CHECK_MARK      = "\u2705";   //$NON-NLS-1$
 
-   public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
-   public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
-   public static final String       SYMBOL_COMMA                  = ",";        //$NON-NLS-1$
-   public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$   // this looks ugly "\u2551";
-   public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
-   public static final String       SYMBOL_EXCLAMATION_POINT      = "!";        //$NON-NLS-1$
-   public static final String       SYMBOL_GREATER_THAN           = ">";        //$NON-NLS-1$
-   public static final String       SYMBOL_LESS_THAN              = "<";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
-   public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
-   public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
-   public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
-   public static final String       SYMBOL_PLUS                   = "+";        //$NON-NLS-1$
-   public static final String       SYMBOL_QUESTION_MARK          = "?";        //$NON-NLS-1$
-   public static final char         SYMBOL_SEMICOLON              = ';';
-   public static final String       SYMBOL_STAR                   = "*";        //$NON-NLS-1$
-   public static final String       SYMBOL_TEMPERATURE_CELCIUS    = "\u00b0C";  //$NON-NLS-1$
-   public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT = "\u00b0F";  //$NON-NLS-1$
-   public static final String       SYMBOL_UNDERSCORE             = "_";        //$NON-NLS-1$
-   public static final String       SYMBOL_WIND_WITH_SPACE        = "W ";       //$NON-NLS-1$
+   public static final CharSequence SYMBOL_BACKSLASH                   = "\\";       //$NON-NLS-1$
+   public static final String       SYMBOL_COLON                       = ":";        //$NON-NLS-1$
+   public static final String       SYMBOL_COMMA                       = ",";        //$NON-NLS-1$
+   public static final String       SYMBOL_DOT                         = ".";        //$NON-NLS-1$
+   public static final String       SYMBOL_DOUBLE_VERTICAL             = "||";       //$NON-NLS-1$   // this looks ugly "\u2551";
+   public static final String       SYMBOL_EQUAL                       = "=";        //$NON-NLS-1$
+   public static final String       SYMBOL_EXCLAMATION_POINT           = "!";        //$NON-NLS-1$
+   public static final String       SYMBOL_GREATER_THAN                = ">";        //$NON-NLS-1$
+   public static final String       SYMBOL_LESS_THAN                   = "<";        //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT                  = "·";        //$NON-NLS-1$
+   public static final String       SYMBOL_MNEMONIC                    = "&";        //$NON-NLS-1$
+   public static final String       SYMBOL_NUMBER_SIGN                 = "#";        //$NON-NLS-1$
+   public static final String       SYMBOL_PERCENTAGE                  = "%";        //$NON-NLS-1$
+   public static final String       SYMBOL_PLUS                        = "+";        //$NON-NLS-1$
+   public static final String       SYMBOL_QUESTION_MARK               = "?";        //$NON-NLS-1$
+   public static final char         SYMBOL_SEMICOLON                   = ';';
+   public static final String       SYMBOL_STAR                        = "*";        //$NON-NLS-1$
+   public static final String       SYMBOL_TEMPERATURE_CELCIUS         = "\u00b0C";  //$NON-NLS-1$
+   public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT      = "\u00b0F";  //$NON-NLS-1$
+   public static final String       SYMBOL_UNDERSCORE                  = "_";        //$NON-NLS-1$
+   public static final String       SYMBOL_WIND_WITH_SPACE             = "W ";       //$NON-NLS-1$
 
-   public static final CharSequence SYMBOL_HTML_BACKSLASH         = "&#92;";    //$NON-NLS-1$
+   public static final CharSequence SYMBOL_HTML_BACKSLASH              = "&#92;";    //$NON-NLS-1$
 
-   public static final String       LINK_TAG_END                  = "</a>";     //$NON-NLS-1$
-   public static final String       LINK_TAG_START                = "<a>";      //$NON-NLS-1$
+   public static final String       LINK_TAG_END                       = "</a>";     //$NON-NLS-1$
+   public static final String       LINK_TAG_START                     = "<a>";      //$NON-NLS-1$
 
-   public static final int          FORM_FIRST_COLUMN_INDENT      = 16;
+   public static final int          FORM_FIRST_COLUMN_INDENT           = 16;
 
    /**
     * The ellipsis is the string that is used to represent shortened text.
     *
     * @since 3.0
     */
-   public static final String       ELLIPSIS                      = "...";      //$NON-NLS-1$
-   public static final String       ELLIPSIS_WITH_SPACE           = " ... ";    //$NON-NLS-1$
+   public static final String       ELLIPSIS                           = "...";      //$NON-NLS-1$
+   public static final String       ELLIPSIS_WITH_SPACE                = " ... ";    //$NON-NLS-1$
 
-   private static final char[]      INVALID_FILENAME_CHARS        = new char[] {
+   private static final char[]      INVALID_FILENAME_CHARS             = new char[] {
          '\\',
          '/',
          ':',
@@ -221,7 +224,7 @@ public class UI {
          '<',
          '>',
          '|', };
-   private static final char[]      INVALID_FILEPATH_CHARS        = new char[] {
+   private static final char[]      INVALID_FILEPATH_CHARS             = new char[] {
          '*',
          '?',
          '"',
@@ -455,7 +458,7 @@ public class UI {
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
    public static String       UNIT_LABEL_ELEVATION;
-   public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
+   public static String       UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
@@ -481,7 +484,8 @@ public class UI {
    public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
    public static final String          UNIT_JOULE_KILO            = "kJ";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE_MEGA            = "MJ";                       //$NON-NLS-1$
-   public static final String          UNIT_MBYTES                = "MByte";                    //$NON-NLS-1$
+   public static final String          UNIT_KBYTE                 = "kByte";                    //$NON-NLS-1$
+   public static final String          UNIT_MBYTE                 = "MByte";                    //$NON-NLS-1$
    public static final String          UNIT_METER                 = "m";                        //$NON-NLS-1$
    public static final String          UNIT_MM                    = "mm";                       //$NON-NLS-1$
    public static final String          UNIT_MS                    = "ms";                       //$NON-NLS-1$
@@ -491,7 +495,7 @@ public class UI {
    public static final String          UNIT_POWER_TO_WEIGHT_RATIO = "W/Kg";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
-   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_MBAR         = "mbar";                     //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KNOT            = "knot";                     //$NON-NLS-1$
@@ -951,7 +955,7 @@ public class UI {
     */
    public static float convertPressure_FromMetric(final float weatherPressure) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_PRESSURE_MILLIBAR) {
          return weatherPressure;
       }
 
@@ -964,7 +968,7 @@ public class UI {
     */
    public static float convertPressure_ToMetric(final float weatherPressure) {
 
-      if (UNIT_IS_TEMPERATURE_CELCIUS) {
+      if (UNIT_IS_PRESSURE_MILLIBAR) {
          return weatherPressure;
       }
 
@@ -1035,6 +1039,21 @@ public class UI {
       sourceData.transparentPixel = 0;
 
       return new Cursor(display, sourceData, 0, 0);
+   }
+
+   /**
+    * Creates a {@link Label} with text.
+    *
+    * @param parent
+    * @param text
+    * @return
+    */
+   public static Label createLabel(final Composite parent, final String text) {
+
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(text);
+
+      return label;
    }
 
    public static void createSpacer_Horizontal(final Composite parent, final int columns) {
@@ -2091,10 +2110,19 @@ public class UI {
       }
    }
 
-   public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
+   /**
+    * Set color for all children controls of the parent.
+    *
+    * @param parent
+    * @param foregroundColor
+    *           Foreground color
+    * @param backgroundColor
+    *           Background color
+    */
+   public static void setColorForAllChildren(final Control parent, final Color foregroundColor, final Color backgroundColor) {
 
-      parent.setForeground(fgColor);
-      parent.setBackground(bgColor);
+      parent.setForeground(foregroundColor);
+      parent.setBackground(backgroundColor);
 
       if (parent instanceof Composite) {
 
@@ -2111,7 +2139,7 @@ public class UI {
             //
             ) {
 
-               setColorForAllChildren(child, fgColor, bgColor);
+               setColorForAllChildren(child, foregroundColor, backgroundColor);
             }
          }
       }
@@ -2459,15 +2487,14 @@ public class UI {
          // set imperial measure system
 
          UNIT_IS_PRESSURE_MERCURY         = true;
-
-         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_INHG;
+         UNIT_LABEL_PRESSURE_MBAR_OR_INHG = UNIT_PRESSURE_INHG;
 
       } else {
 
          // default is the metric measure system
 
          UNIT_IS_PRESSURE_MILLIBAR        = true;
-         UNIT_LABEL_PRESSURE_MB_OR_INHG   = UNIT_PRESSURE_MB;
+         UNIT_LABEL_PRESSURE_MBAR_OR_INHG = UNIT_PRESSURE_MBAR;
       }
 
       /*
@@ -2518,14 +2545,14 @@ public class UI {
 
       if (activeSystem.getPace() == Unit_Pace.MINUTES_PER_MILE) {
 
-         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
-
+         UNIT_IS_PACE_MIN_PER_MILE        = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_MILE;
 
       } else {
 
-         UNIT_IS_PACE_MIN_PER_MILE        = true;
+         // default is the metric measure system
 
+         UNIT_IS_PACE_MIN_PER_KILOMETER   = true;
          UNIT_LABEL_PACE                  = UNIT_PACE_MIN_P_KM;
       }
 

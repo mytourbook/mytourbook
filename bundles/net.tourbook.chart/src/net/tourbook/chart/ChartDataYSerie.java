@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     */
    public static final int        BAR_LAYOUT_BESIDE                 = 3;
 
-   public static final String     YDATA_INFO                        = "yDataInfo";                 //$NON-NLS-1$
+   public static final String     YDATA_INFO                        = "yDataInfo";                //$NON-NLS-1$
 
    public static final int        FILL_METHOD_NO                    = 0;
 
@@ -58,7 +58,7 @@ public class ChartDataYSerie extends ChartDataSerie {
     * Slider label format: mm:ss
     */
    public static final int        SLIDER_LABEL_FORMAT_MM_SS         = 1;
-   
+
    /**
     * Contains the values for the chart, highValues contains the upper value, lowValues the lower
     * value. When lowValues is null then the low values is set to 0
@@ -502,12 +502,13 @@ public class ChartDataYSerie extends ChartDataSerie {
          _highValuesFloat = valueSeries;
 
          if (_chartType == ChartType.LINE
+               || _chartType == ChartType.DOT
                || _chartType == ChartType.LINE_WITH_BARS
                || _chartType == ChartType.HORIZONTAL_BAR
                || _chartType == ChartType.XY_SCATTER
                || _chartType == ChartType.HISTORY) {
 
-            setMinMaxValuesLine(valueSeries);
+            setMinMaxValues_Line(valueSeries);
 
          } else {
 
@@ -518,54 +519,7 @@ public class ChartDataYSerie extends ChartDataSerie {
             _visibleMaxValue = _visibleMinValue = firstValue;
 
             if (_chartType == ChartType.BAR) {
-
-               switch (_chartLayout) {
-               case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
-               case ChartDataYSerie.BAR_LAYOUT_BESIDE:
-
-                  // get the min/max highValues for all data
-                  for (final float[] valuesOuter : valueSeries) {
-                     for (final float value : valuesOuter) {
-
-                        if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
-                           continue;
-                        }
-
-                        _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
-                        _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
-                     }
-                  }
-
-                  break;
-
-               case ChartDataYSerie.BAR_LAYOUT_STACKED:
-
-                  final float serieMax[] = new float[valueSeries[0].length];
-
-                  // get the max value for the data which are stacked on each
-                  // other
-                  for (final float[] valuesOuter : valueSeries) {
-                     for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
-
-                        final float outerValue = valuesOuter[valueIndex];
-                        final float outerValueWithMax = serieMax[valueIndex] + outerValue;
-
-                        serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
-                              ? _visibleMaxValue
-                              : outerValueWithMax);
-
-                        _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
-                     }
-                  }
-
-                  // get max for all series
-                  _visibleMaxValue = 0;
-                  for (final float serieValue : serieMax) {
-                     _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
-                  }
-
-                  break;
-               }
+               setMinMaxValues_Bar(valueSeries);
             }
 
             _originalMinValue = _visibleMinValue;
@@ -648,7 +602,60 @@ public class ChartDataYSerie extends ChartDataSerie {
       }
    }
 
-   private void setMinMaxValuesLine(final float[][] valueSeries) {
+   private void setMinMaxValues_Bar(final float[][] valueSeries) {
+      {
+
+         switch (_chartLayout) {
+         case ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE:
+         case ChartDataYSerie.BAR_LAYOUT_BESIDE:
+
+            // get the min/max highValues for all data
+            for (final float[] valuesOuter : valueSeries) {
+               for (final float value : valuesOuter) {
+
+                  if (_isIgnoreMinMaxZero && (value > -FLOAT_ZERO && value < FLOAT_ZERO)) {
+                     continue;
+                  }
+
+                  _visibleMinValue = (_visibleMinValue <= value) ? _visibleMinValue : value;
+                  _visibleMaxValue = (_visibleMaxValue >= value) ? _visibleMaxValue : value;
+               }
+            }
+
+            break;
+
+         case ChartDataYSerie.BAR_LAYOUT_STACKED:
+
+            final float serieMax[] = new float[valueSeries[0].length];
+
+            // get the max value for the data which are stacked on each
+            // other
+            for (final float[] valuesOuter : valueSeries) {
+               for (int valueIndex = 0; valueIndex < valuesOuter.length; valueIndex++) {
+
+                  final float outerValue = valuesOuter[valueIndex];
+                  final float outerValueWithMax = serieMax[valueIndex] + outerValue;
+
+                  serieMax[valueIndex] = (float) ((_visibleMaxValue >= outerValueWithMax)
+                        ? _visibleMaxValue
+                        : outerValueWithMax);
+
+                  _visibleMinValue = (_visibleMinValue <= outerValue) ? _visibleMinValue : outerValue;
+               }
+            }
+
+            // get max for all series
+            _visibleMaxValue = 0;
+            for (final float serieValue : serieMax) {
+               _visibleMaxValue = (_visibleMaxValue >= serieValue) ? _visibleMaxValue : serieValue;
+            }
+
+            break;
+         }
+      }
+   }
+
+   private void setMinMaxValues_Line(final float[][] valueSeries) {
 
       if (valueSeries == null || valueSeries.length == 0 || valueSeries[0] == null || valueSeries[0].length == 0) {
 
@@ -773,7 +780,23 @@ public class ChartDataYSerie extends ChartDataSerie {
 
    @Override
    public String toString() {
-      return "[ChartDataYSerie]";//$NON-NLS-1$
+
+      return "ChartDataYSerie\n" //$NON-NLS-1$
+
+            + "[\n" //$NON-NLS-1$
+
+            + "_originalMinValue =" + _originalMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_originalMaxValue =" + _originalMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "_visibleMinValue  =" + _visibleMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMaxValue  =" + _visibleMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "_isForceMinValue  =" + _isForceMinValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_isForceMaxValue  =" + _isForceMaxValue + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMinValueForced=" + _visibleMinValueForced + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "_visibleMaxValueForced=" + _visibleMaxValueForced //$NON-NLS-1$
+
+            + "\n]"; //$NON-NLS-1$
    }
 
 }

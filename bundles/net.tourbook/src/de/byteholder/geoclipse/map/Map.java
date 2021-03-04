@@ -91,7 +91,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -519,64 +518,64 @@ public class Map extends Canvas {
    /*
     * Download offline images
     */
-   private boolean             _offline_IsSelectingOfflineArea;
-   private boolean             _offline_IsOfflineSelectionStarted;
-   private boolean             _offline_IsPaintOfflineArea;
+   private boolean                   _offline_IsSelectingOfflineArea;
+   private boolean                   _offline_IsOfflineSelectionStarted;
+   private boolean                   _offline_IsPaintOfflineArea;
 
-   private Point               _offline_DevMouse_Start;
-   private Point               _offline_DevMouse_End;
-   private Point               _offline_DevTileStart;
-   private Point               _offline_DevTileEnd;
+   private Point                     _offline_DevMouse_Start;
+   private Point                     _offline_DevMouse_End;
+   private Point                     _offline_DevTileStart;
+   private Point                     _offline_DevTileEnd;
 
-   private Point               _offline_WorldMouse_Start;
-   private Point               _offline_WorldMouse_End;
-   private Point               _offline_WorldMouse_Move;
+   private Point                     _offline_WorldMouse_Start;
+   private Point                     _offline_WorldMouse_End;
+   private Point                     _offline_WorldMouse_Move;
 
-   private IMapContextProvider _mapContextProvider;
+   private IMapContextProvider       _mapContextProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled   = true;
+   private boolean                   _isContextMenuEnabled   = true;
 
-   private DropTarget          _dropTarget;
+   private DropTarget                _dropTarget;
 
-   private boolean             _isRedrawEnabled        = true;
+   private boolean                   _isRedrawEnabled        = true;
 
-   private HoveredAreaContext  _hoveredAreaContext;
+   private HoveredAreaContext        _hoveredAreaContext;
 
-   private int                 _overlayAlpha           = 0xff;
+   private int                       _overlayAlpha           = 0xff;
 
-   private MapGridData         _grid_Data_Hovered;
-   private MapGridData         _grid_Data_Selected;
+   private MapGridData               _grid_Data_Hovered;
+   private MapGridData               _grid_Data_Selected;
 
-   private boolean             _grid_Label_IsHovered;
+   private boolean                   _grid_Label_IsHovered;
 
-   private Rectangle           _grid_Label_Outline;
-   private GeoPosition         _grid_MapGeoCenter;
-   private int                 _grid_MapZoomLevel;
-   private int[]               _grid_AutoScrollCounter = new int[1];
+   private Rectangle                 _grid_Label_Outline;
+   private GeoPosition               _grid_MapGeoCenter;
+   private int                       _grid_MapZoomLevel;
+   private int[]                     _grid_AutoScrollCounter = new int[1];
 
-   private boolean             _grid_IsGridAutoScroll;
+   private boolean                   _grid_IsGridAutoScroll;
+
+   private ActionManageOfflineImages _actionManageOfflineImages;
 
    /**
     * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
     * simple mode
     */
-   private boolean             _isTourPaintMethodEnhanced;
-   private boolean             _isShowTourPaintMethodEnhancedWarning;
+   private boolean                   _isTourPaintMethodEnhanced;
+   private boolean                   _isShowTourPaintMethodEnhancedWarning;
 
-   private boolean             _isFastMapPainting;
-   private boolean             _isFastMapPainting_Active;
-   private boolean             _isInInverseKeyboardPanning;
+   private boolean                   _isFastMapPainting;
+   private boolean                   _isFastMapPainting_Active;
+   private boolean                   _isInInverseKeyboardPanning;
 
-   private int                 _fastMapPainting_skippedValues;
+   private int                       _fastMapPainting_skippedValues;
 
-   private MapTourBreadcrumb   _tourBreadcrumb;
+   private MapTourBreadcrumb         _tourBreadcrumb;
 
-   //
-
-   private Font _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                      _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -619,6 +618,7 @@ public class Map extends Canvas {
       addAllListener();
       addDropTarget();
 
+      createActions();
       createContextMenu();
 
       updateGraphColors();
@@ -1038,6 +1038,11 @@ public class Map extends Canvas {
       return getParent().getSize();
    }
 
+   private void createActions() {
+
+      _actionManageOfflineImages = new ActionManageOfflineImages(Map.this);
+   }
+
    /**
     * create the context menu
     */
@@ -1056,11 +1061,8 @@ public class Map extends Canvas {
             }
 
             if (_mapContextProvider != null) {
-               _mapContextProvider.fillContextMenu(menuMgr);
+               _mapContextProvider.fillContextMenu(menuMgr, _actionManageOfflineImages);
             }
-
-            menuMgr.add(new Separator());
-            menuMgr.add(new ActionManageOfflineImages(Map.this));
          }
       });
 
@@ -5775,6 +5777,10 @@ public class Map extends Canvas {
    public void setMapPosition(final Set<GeoPosition> geoTourPositions,
                               final boolean isAdjustZoomLevel,
                               final int requestedZoomLevelAdjustment) {
+
+      if (_mp == null) {
+         return;
+      }
 
       Rectangle wpTourRect;
       Rectangle wpMapRect;

@@ -71,7 +71,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -103,16 +102,16 @@ public class TourData_View extends ViewPart {
    /*
     * UI controls
     */
-   private PageBook  _pageBook;
+   private PageBook          _pageBook;
 
-   private Composite _pageNoData;
-   private Composite _pageContent;
+   private Composite         _pageNoData;
+   private Composite         _pageContent;
 
    /**
     * With a label, the content can easily be scrolled but cannot be selected
     */
-   private Label     _txtAllFields;
-//   private Text    _txtAllFields;
+//   private Label             _lblAllFields;
+   private Text              _txtAllFields;
 
    private Text              _txtDateTimeCreated;
    private Text              _txtDateTimeModified;
@@ -130,7 +129,7 @@ public class TourData_View extends ViewPart {
    private Text              _txtTimeSlicesCount;
    private Text              _txtTourId;
 
-   private ScrolledComposite _uiContainer;
+   private ScrolledComposite _scrolledContainer;
 
    private Composite         _infoContainer;
 
@@ -459,19 +458,19 @@ public class TourData_View extends ViewPart {
    private void createUI_10_Container(final Composite parent) {
 
       /*
-       * scrolled container
+       * Scrolled container
        */
-      _uiContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-      _uiContainer.setExpandVertical(true);
-      _uiContainer.setExpandHorizontal(true);
-      _uiContainer.addControlListener(new ControlAdapter() {
+      _scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+      _scrolledContainer.setExpandVertical(true);
+      _scrolledContainer.setExpandHorizontal(true);
+      _scrolledContainer.addControlListener(new ControlAdapter() {
          @Override
          public void controlResized(final ControlEvent e) {
             onResize();
          }
       });
       {
-         _infoContainer = new Composite(_uiContainer, SWT.NONE);
+         _infoContainer = new Composite(_scrolledContainer, SWT.NONE);
          _infoContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_infoContainer);
          GridLayoutFactory.swtDefaults().applyTo(_infoContainer);
@@ -482,7 +481,7 @@ public class TourData_View extends ViewPart {
       }
 
       // set content for scrolled composite
-      _uiContainer.setContent(_infoContainer);
+      _scrolledContainer.setContent(_infoContainer);
    }
 
    private void createUI_20_Data(final Composite parent) {
@@ -611,16 +610,10 @@ public class TourData_View extends ViewPart {
       label.setToolTipText(Messages.Tour_Info_Label_AllFields_Tooltip);
       GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
 
-//      _txtAllFields = new Text(parent,
-//            SWT.MULTI
-//                  | SWT.BORDER //
-//                  | SWT.READ_ONLY);
-
-      _txtAllFields = new Label(parent,
-            SWT.READ_ONLY
-//                  | SWT.BORDER
-//                  | SWT.WRAP
-      );
+      _txtAllFields = new Text(parent,
+            SWT.MULTI
+                  | SWT.READ_ONLY
+                  | SWT.BORDER);
 
       _txtAllFields.setFont(net.tourbook.ui.UI.getLogFont());
 
@@ -674,19 +667,9 @@ public class TourData_View extends ViewPart {
 
    private void onResize() {
 
-      // horizontal scroll bar is hidden, only the vertical scrollbar can be displayed
-      int infoContainerWidth = _uiContainer.getBounds().width;
-      final ScrollBar vertBar = _uiContainer.getVerticalBar();
+      final Point minSize = _infoContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-      if (vertBar != null) {
-
-         // vertical bar is displayed
-         infoContainerWidth -= vertBar.getSize().x;
-      }
-
-      final Point minSize = _infoContainer.computeSize(infoContainerWidth, SWT.DEFAULT);
-
-      _uiContainer.setMinSize(minSize);
+      _scrolledContainer.setMinSize(minSize);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -765,14 +748,14 @@ public class TourData_View extends ViewPart {
 
          // scroll to the previous position
 
-         _uiContainer.setOrigin(0, scrollPos);
+         _scrolledContainer.setOrigin(0, scrollPos);
       }
    }
 
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_VIEW_SCROLL_POSITION, _uiContainer.getVerticalBar().getSelection());
+      _state.put(STATE_VIEW_SCROLL_POSITION, _scrolledContainer.getVerticalBar().getSelection());
    }
 
    @Override

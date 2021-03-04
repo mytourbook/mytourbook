@@ -184,15 +184,15 @@ task mt_60_CleanupWinFiles {
          // delete extracted files
          outputDir.deleteDir()
          
-         // move zip into hidden folder
-         hiddenDir.mkdirs()
-         def hiddenFile = file(hiddenDir.absolutePath + '/' + winZipFileName)
-         println '\tmove into\t' + hiddenFile 
-         
-         // delete old file when available
-         hiddenFile.delete()
-         
-         winZipFile.renameTo(hiddenFile)
+//         // move zip into hidden folder
+//         hiddenDir.mkdirs()
+//         def hiddenFile = file(hiddenDir.absolutePath + '/' + winZipFileName)
+//         println '\tmove into\t' + hiddenFile 
+//         
+//         // delete old file when available
+//         hiddenFile.delete()
+//         
+//         winZipFile.renameTo(hiddenFile)
       }
    }
 }

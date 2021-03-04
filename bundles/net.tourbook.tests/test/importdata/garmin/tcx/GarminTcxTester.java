@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import net.tourbook.device.garmin.GarminDeviceDataReader;
 import net.tourbook.device.garmin.GarminSAXHandler;
 import net.tourbook.importdata.DeviceData;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -52,6 +53,12 @@ public class GarminTcxTester {
       deviceDataReader = new GarminDeviceDataReader();
    }
 
+   @AfterEach
+   void tearDown() {
+      newlyImportedTours.clear();
+      alreadyImportedTours.clear();
+   }
+
    /**
     * Regression test
     *
@@ -59,10 +66,34 @@ public class GarminTcxTester {
     * @throws SAXException
     */
    @Test
-   void testFitImportConeyLake() throws SAXException, IOException {
+   void testTcxImportConeyLake() throws SAXException, IOException {
 
       final String filePathWithoutExtension = IMPORT_PATH +
             "Move_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
+      final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
+      final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
+
+      final GarminSAXHandler handler = new GarminSAXHandler(
+            deviceDataReader,
+            importFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours);
+
+      parser.parse(tcxFile, handler);
+
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      Comparison.compareTourDataAgainstControl(tour, "test" + filePathWithoutExtension); //$NON-NLS-1$
+   }
+
+   /**
+    * TCX file with pauses
+    */
+   @Test
+   void testTcxImportLyons() throws SAXException, IOException {
+
+      final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
       final InputStream tcxFile = GarminTcxTester.class.getResourceAsStream(importFilePath);
 

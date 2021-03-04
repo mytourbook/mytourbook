@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,7 +127,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    /**
     * Listener which throws {@link ITileListener} events
     */
-   private final static ListenerList<ITileListener>        _tileListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITileListener>        _tileListeners               = new ListenerList<>(ListenerList.IDENTITY);
 
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
@@ -135,6 +135,8 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private RGB                                             _dimmingColor;
 
    private final Projection                                _projection;
+
+   private String                                          _userAgent                   = UI.EMPTY_STRING;
 
    /**
     * image size in pixel for a square image
@@ -283,7 +285,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     */
-   public MP() {
+   protected MP() {
 
       _projection = new Mercator();
 
@@ -348,7 +350,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       } else {
 
-         mapProvider._imageFormat = new String(_imageFormat);
+         mapProvider._imageFormat = _imageFormat;
 
          mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
                ? new GeoPosition(0.0, 0.0)
@@ -417,26 +419,23 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> {
 
-            final int tileSize = getTileSize();
+         final int tileSize = getTileSize();
 
-            _errorImage = new Image(display, tileSize, tileSize);
+         _errorImage = new Image(display, tileSize, tileSize);
 
-            final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
-            final GC gc = new GC(getErrorImage());
-            {
-               gc.setBackground(bgColor);
-               gc.fillRectangle(0, 0, tileSize, tileSize);
+         final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
+         final GC gc = new GC(getErrorImage());
+         {
+            gc.setBackground(bgColor);
+            gc.fillRectangle(0, 0, tileSize, tileSize);
 
-               gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-               gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
-            }
-            gc.dispose();
-            bgColor.dispose();
+            gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            gc.drawString(Messages.geoclipse_extensions_loading_failed, 5, 5);
          }
+         gc.dispose();
+         bgColor.dispose();
       });
    }
 
@@ -444,26 +443,23 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       final Display display = Display.getDefault();
 
-      display.syncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.syncExec(() -> {
 
-            final int tileSize = getTileSize();
+         final int tileSize = getTileSize();
 
-            _loadingImage = new Image(display, tileSize, tileSize);
+         _loadingImage = new Image(display, tileSize, tileSize);
 
-            final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
-            final GC gc = new GC(getLoadingImage());
-            {
-               gc.setBackground(bgColor);
-               gc.fillRectangle(0, 0, tileSize, tileSize);
+         final Color bgColor = new Color(display, Map.OSM_BACKGROUND_RGB);
+         final GC gc = new GC(getLoadingImage());
+         {
+            gc.setBackground(bgColor);
+            gc.fillRectangle(0, 0, tileSize, tileSize);
 
-               gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-               gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
-            }
-            gc.dispose();
-            bgColor.dispose();
+            gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            gc.drawString(Messages.geoclipse_extensions_loading, 5, 5);
          }
+         gc.dispose();
+         bgColor.dispose();
       });
    }
 
@@ -472,9 +468,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public void disposeAllImages() {
 
-      if (_tileImageCache != null) {
-         _tileImageCache.dispose();
-      }
+      _tileImageCache.dispose();
 
       if (_loadingImage != null) {
          _loadingImage.dispose();
@@ -770,18 +764,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _maxZoomLevel;
    }
 
-   public int getMaxZoomLevel() {
-      return _maxZoomLevel;
-   }
-
    /**
     * @return
     */
    public int getMinimumZoomLevel() {
-      return _minZoomLevel;
-   }
-
-   public int getMinZoomLevel() {
       return _minZoomLevel;
    }
 
@@ -1093,7 +1079,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *         This was necessary to conform to OpenStreetMap policy.
     */
    public String getUserAgent() {
-      return null;
+      return _userAgent;
    }
 
    @Override
@@ -1235,7 +1221,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * @param isFiFo
     * @throws InterruptedException
     */
-   private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) throws InterruptedException {
+   private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) {
 
       tile.setLoading(true);
 
@@ -1523,6 +1509,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public void setUseOfflineImage(final boolean useOfflineImage) {
       _isOfflineImageUsed = useOfflineImage;
+   }
+
+   public void setUserAgent(final String userAgent) {
+      _userAgent = userAgent;
    }
 
    /**

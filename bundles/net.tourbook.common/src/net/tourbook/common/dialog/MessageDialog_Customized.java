@@ -20,6 +20,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Customized {@link MessageDialog} which can be set on top of other windows. This is needed when
+ * the message dialog is opened in a slideout to ensure that it is not hidden.
+ */
 public class MessageDialog_Customized extends MessageDialog {
 
    public MessageDialog_Customized(final Shell parentShell,

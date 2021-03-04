@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,20 +16,13 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.GeoclipseExtensions;
+import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.event.IHoveredTourListener;
-import de.byteholder.geoclipse.map.event.IMapGridListener;
 import de.byteholder.geoclipse.map.event.IMapInfoListener;
 import de.byteholder.geoclipse.map.event.IMapPositionListener;
-import de.byteholder.geoclipse.map.event.IPOIListener;
-import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.ITourSelectionListener;
-import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
-import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
@@ -84,14 +77,13 @@ import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
-import net.tourbook.map2.action.ActionPhotoProperties;
+import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
-import net.tourbook.map2.action.ActionShowPhotos;
 import net.tourbook.map2.action.ActionShowScaleInMap;
 import net.tourbook.map2.action.ActionShowSliderInLegend;
 import net.tourbook.map2.action.ActionShowSliderInMap;
@@ -114,10 +106,12 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
+import net.tourbook.map2.action.Action_ExportMap_SubMenu;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
@@ -136,9 +130,6 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.DialogPhotoProperties;
-import net.tourbook.tour.photo.IPhotoPropertiesListener;
-import net.tourbook.tour.photo.PhotoPropertiesEvent;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.training.TrainingManager;
@@ -163,7 +154,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -183,7 +173,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
@@ -196,7 +185,6 @@ public class Map2View extends ViewPart implements
 
       IMapContextProvider,
       IPhotoEventListener,
-      IPhotoPropertiesListener,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapPositionListener,
@@ -294,6 +282,10 @@ public class Map2View extends ViewPart implements
    static final int              STATE_SLIDER_PATH_SEGMENTS_DEFAULT                    = 200;
    static final RGB              STATE_SLIDER_PATH_COLOR_DEFAULT                       = new RGB(0xff, 0xff, 0x80);
    //
+   private static final String   STATE_IS_PHOTO_FILTER_ACTIVE                          = "STATE_IS_PHOTO_FILTER_ACTIVE";                        //$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STARS                       = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR               = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
+   //
    private static final String   GRAPH_CONTRIBUTION_ID_SLIDEOUT                        = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
    //
    private static final MapGraphId[]         _allGraphContribId       = {
@@ -314,6 +306,8 @@ public class Map2View extends ViewPart implements
    private final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
    private final IPreferenceStore            _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings             _state                   = TourbookPlugin.getState(ID);
+   private final IDialogSettings             _state_MapProvider       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
+   private final IDialogSettings             _state_PhotoFilter       = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider(2, 32);
    private final ITourToolTipProvider        _wayPointToolTipProvider = new WayPointToolTipProvider();
@@ -347,8 +341,8 @@ public class Map2View extends ViewPart implements
    private final ArrayList<Photo>            _filteredPhotos          = new ArrayList<>();
    //
    private boolean                           _isPhotoFilterActive;
-   private int                               _photoFilterRatingStars;
-   private int                               _photoFilterRatingStarOperator;
+   private int                               _photoFilter_RatingStars;
+   private Enum<PhotoRatingStarOperator>     _photoFilter_RatingStar_Operator;
    //
    private boolean                           _isShowTour;
    private boolean                           _isShowPhoto;
@@ -433,15 +427,16 @@ public class Map2View extends ViewPart implements
    private ActionTourColor                   _actionTourColor_RunDyn_StepLength;
    //
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
-   private ActionDimMap                      _actionDimMap;
+   private ActionDimMap                      _actionDimMap_SubMenu;
    private ActionOpenPrefDialog              _actionEditMap2Preferences;
+   private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2_Bookmarks;
    private ActionMap2Color                   _actionMap2_Color;
    private ActionMap2_MapProvider            _actionMap2_MapProvider;
    private ActionMap2_Options                _actionMap2_Options;
+   private ActionMap2_PhotoFilter            _actionMap2_PhotoFilter;
    private ActionMap2_Graphs                 _actionMap2_TourColors;
-   private ActionPhotoProperties             _actionPhotoFilter;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -535,6 +530,7 @@ public class Map2View extends ViewPart implements
       public ActionSearchTourByLocation() {
 
          setText(Messages.Map_Action_SearchTourByLocation);
+         setToolTipText(Messages.Map_Action_SearchTourByLocation_Tooltip);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
       }
 
@@ -542,6 +538,36 @@ public class Map2View extends ViewPart implements
       public void runWithEvent(final Event event) {
 
          _map.actionSearchTourByLocation(event);
+      }
+   }
+
+   private class ActionShowPhotos extends ActionToolbarSlideout {
+
+      public ActionShowPhotos() {
+
+         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap),
+               TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap_Disabled));
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new Slideout_Map2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         actionShowPhotos(getSelection());
       }
    }
 
@@ -586,6 +612,10 @@ public class Map2View extends ViewPart implements
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
+
+         /*
+          * Register other action images
+          */
 
          // image 0: tour
          addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
@@ -849,13 +879,6 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public void actionPhotoProperties(final boolean isFilterActive) {
-
-      _isPhotoFilterActive = isFilterActive;
-
-      updateFilteredPhotos();
-   }
-
    public void actionPOI() {
 
       final boolean isShowPOI = _actionShowPOI.isChecked();
@@ -1003,9 +1026,9 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionShowPhotos() {
+   public void actionShowPhotos(final boolean isSelected) {
 
-      _isShowPhoto = _actionShowPhotos.isChecked();
+      _isShowPhoto = isSelected;
 
       enableActions();
 
@@ -1019,7 +1042,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowSlider() {
 
-      if (_allTourData == null || _allTourData.isEmpty()) {
+      if (_allTourData.isEmpty()) {
          return;
       }
 
@@ -1050,7 +1073,7 @@ public class Map2View extends ViewPart implements
 
    public void actionShowValuePoint() {
 
-      if (_allTourData != null && _allTourData.size() > 0) {
+      if (_allTourData.size() > 0) {
 
          updateUI_HoveredValuePoint();
       }
@@ -1110,89 +1133,61 @@ public class Map2View extends ViewPart implements
 
    private void addMapListener() {
 
-      _map.addMousePositionListener(new IPositionListener() {
-         @Override
-         public void setPosition(final MapPositionEvent event) {
+      _map.addMousePositionListener(mapPositionEvent -> _mapInfoManager.setMapPosition(
+            mapPositionEvent.mapGeoPosition.latitude,
+            mapPositionEvent.mapGeoPosition.longitude,
+            mapPositionEvent.mapZoomLevel));
 
-            _mapInfoManager.setMapPosition(
-                  event.mapGeoPosition.latitude,
-                  event.mapGeoPosition.longitude,
-                  event.mapZoomLevel);
-         }
+      _map.addPOIListener(poiEvent -> {
 
+         _poiPosition = poiEvent.mapGeoPosition;
+         _poiZoomLevel = poiEvent.mapZoomLevel;
+         _poiName = poiEvent.mapPOIText;
+
+         _actionShowPOI.setEnabled(true);
+         _actionShowPOI.setChecked(true);
       });
 
-      _map.addPOIListener(new IPOIListener() {
-         @Override
-         public void setPOI(final MapPOIEvent poiEvent) {
+      _map.addHoveredTourListener(hoveredTourId -> {
 
-            _poiPosition = poiEvent.mapGeoPosition;
-            _poiZoomLevel = poiEvent.mapZoomLevel;
-            _poiName = poiEvent.mapPOIText;
-
-            _actionShowPOI.setEnabled(true);
-            _actionShowPOI.setChecked(true);
-         }
+         _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId.hoveredTourId);
+         _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId.hoveredTourId != Integer.MIN_VALUE);
       });
 
-      _map.addHoveredTourListener(new IHoveredTourListener() {
-         @Override
-         public void setHoveredTourId(final MapHoveredTourEvent hoveredTourId) {
+      _map.addTourSelectionListener((selection, isSelectAlsoInThisView) -> {
 
-            _actionCreateTourMarkerFromMap.setCurrentHoverTourId(hoveredTourId.hoveredTourId);
-            _actionCreateTourMarkerFromMap.setEnabled(hoveredTourId.hoveredTourId != Integer.MIN_VALUE);
-         }
-      });
+         if (isSelectAlsoInThisView) {
 
-      _map.addTourSelectionListener(new ITourSelectionListener() {
+            _map.getDisplay().asyncExec(() -> {
 
-         @Override
-         public void onSelection(final ISelection selection, final boolean isSelectAlsoInThisView) {
+               if (selection instanceof SelectionTourIds) {
 
-            if (isSelectAlsoInThisView) {
+                  // clone tour id's otherwise the original could be removed
+                  final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
 
-               _map.getDisplay().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
+                  final ArrayList<Long> allTourIds = new ArrayList<>();
+                  allTourIds.addAll(selectionTourIds.getTourIds());
 
-                     if (selection instanceof SelectionTourIds) {
-
-                        // clone tour id's otherwise the original could be removed
-                        final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
-
-                        final ArrayList<Long> allTourIds = new ArrayList<>();
-                        allTourIds.addAll(selectionTourIds.getTourIds());
-
-                        onSelectionChanged(new SelectionTourIds(allTourIds), false);
-                     }
-                  }
-               });
-            }
-
-            TourManager.fireEventWithCustomData(
-                  TourEventId.TOUR_SELECTION,
-                  selection,
-                  Map2View.this);
+                  onSelectionChanged(new SelectionTourIds(allTourIds), false);
+               }
+            });
          }
 
+         TourManager.fireEventWithCustomData(
+               TourEventId.TOUR_SELECTION,
+               selection,
+               Map2View.this);
       });
 
-      _map.addMapGridBoxListener(new IMapGridListener() {
+      _map.addMapGridBoxListener((map_ZoomLevel, map_GeoCenter, isGridSelected, mapGridData) -> {
 
-         @Override
-         public void onMapGrid(final int map_ZoomLevel,
-                               final GeoPosition map_GeoCenter,
-                               final boolean isGridSelected,
-                               final MapGridData mapGridData) {
+         if (isGridSelected) {
 
-            if (isGridSelected) {
+            TourGeoFilter_Manager.createAndSetGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
 
-               TourGeoFilter_Manager.createAndSetGeoFilter(map_ZoomLevel, map_GeoCenter, mapGridData);
+         } else {
 
-            } else {
-
-               geoFilter_10_Loader(mapGridData, null);
-            }
+            geoFilter_10_Loader(mapGridData, null);
          }
       });
 
@@ -1208,18 +1203,15 @@ public class Map2View extends ViewPart implements
 
          private void onPartVisible(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == Map2View.this) {
+            if (partRef.getPart(false) == Map2View.this && _isPartVisible == false) {
 
-               if (_isPartVisible == false) {
+               _isPartVisible = true;
 
-                  _isPartVisible = true;
+               if (_selectionWhenHidden != null) {
 
-                  if (_selectionWhenHidden != null) {
+                  onSelectionChanged(_selectionWhenHidden, true);
 
-                     onSelectionChanged(_selectionWhenHidden, true);
-
-                     _selectionWhenHidden = null;
-                  }
+                  _selectionWhenHidden = null;
                }
             }
          }
@@ -1270,97 +1262,91 @@ public class Map2View extends ViewPart implements
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(PREF_SHOW_TILE_INFO)
-                  || property.equals(PREF_SHOW_TILE_BORDER)
-                  || property.equals(PREF_DEBUG_MAP_SHOW_GEO_GRID)) {
+         if (property.equals(PREF_SHOW_TILE_INFO)
+               || property.equals(PREF_SHOW_TILE_BORDER)
+               || property.equals(PREF_DEBUG_MAP_SHOW_GEO_GRID)) {
 
-               // map properties has changed
+            // map properties has changed
 
-               final boolean isShowGeoGrid = _prefStore.getBoolean(PREF_DEBUG_MAP_SHOW_GEO_GRID);
-               final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
-               final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
+            final boolean isShowGeoGrid = _prefStore.getBoolean(PREF_DEBUG_MAP_SHOW_GEO_GRID);
+            final boolean isShowTileInfo = _prefStore.getBoolean(PREF_SHOW_TILE_INFO);
+            final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
-               _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
-               _map.paint();
+            _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
+            _map.paint();
 
-            } else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
+         } else if (property.equals(PREF_DEBUG_MAP_DIM_LEVEL)) {
 
-               float prefDimLevel = _prefStore.getInt(Map2View.PREF_DEBUG_MAP_DIM_LEVEL);
-               prefDimLevel *= 2.55;
-               prefDimLevel -= 255;
+            float prefDimLevel = _prefStore.getInt(Map2View.PREF_DEBUG_MAP_DIM_LEVEL);
+            prefDimLevel *= 2.55;
+            prefDimLevel -= 255;
 
-               final int dimLevel = (int) Math.abs(prefDimLevel);
-               _actionDimMap.setDimLevel(dimLevel);
-               actionDimMap(dimLevel);
+            final int dimLevel = (int) Math.abs(prefDimLevel);
+            _actionDimMap_SubMenu.setDimLevel(dimLevel);
+            actionDimMap(dimLevel);
 
-            } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR)) {
+         } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR)) {
 
-               actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
+            actionDimMap(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR));
 
-            } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
-                  || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
+         } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
+               || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
 
-               final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-               final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
+            final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+            final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
 
-               _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
+            _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
-            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-                  || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
+         } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+               || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
 
-               // update tour and legend
+            // update tour and legend
 
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
+            createLegendImage(_tourPainterConfig.getMapColorProvider());
 
-               _map.updateGraphColors();
+            _map.updateGraphColors();
 
-               _map.disposeOverlayImageCache();
-               _map.paint();
+            _map.disposeOverlayImageCache();
+            _map.paint();
 
-            } else if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
+         } else if (property.equals(IPreferences.SRTM_COLORS_SELECTED_PROFILE_KEY)) {
 
-               final String newValue = event.getNewValue().toString();
-               final Integer prefProfileKey = Integer.valueOf(newValue);
+            final String newValue = propertyChangeEvent.getNewValue().toString();
+            final Integer prefProfileKey = Integer.valueOf(newValue);
 
-               if (prefProfileKey != _selectedProfileKey) {
+            if (prefProfileKey != _selectedProfileKey) {
 
-                  _selectedProfileKey = prefProfileKey;
+               _selectedProfileKey = prefProfileKey;
 
-                  _map.disposeTiles();
-                  _map.paint();
-               }
-
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-
-               // this can occur when tour geo filter color is modified
-
+               _map.disposeTiles();
                _map.paint();
             }
+
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+            // this can occur when tour geo filter color is modified
+
+            _map.paint();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
+            _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
-               createLegendImage(_tourPainterConfig.getMapColorProvider());
+            createLegendImage(_tourPainterConfig.getMapColorProvider());
 
-               _map.paint();
-            }
+            _map.paint();
          }
       };
 
@@ -1373,91 +1359,83 @@ public class Map2View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onSelectionChanged(selection, true);
-         }
-      };
+      _postSelectionListener = (part, selection) -> onSelectionChanged(selection, true);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-            if (part == Map2View.this) {
-               return;
-            }
+         if (part == Map2View.this) {
+            return;
+         }
 
-            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+         if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-               resetMap();
+            resetMap();
 
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
-                  _allTourData.clear();
-                  _allTourData.addAll(modifiedTours);
-
-                  resetMap();
-               }
-
-            } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               if (eventData instanceof SelectionTourMarker) {
-
-                  onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
-               }
-
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData, true);
-
-            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData, true);
-
-            } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
-
-               if (eventData instanceof TourGeoFilter) {
-
-                  // show geo filter
-
-                  _map.tourBreadcrumb().resetTours();
-
-                  final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
-
-                  // show search rectangle
-                  _map.showGeoGrid(tourGeoFilter);
-
-                  // show tours in search rectangle
-                  geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
-
-               } else if (eventData == null) {
-
-                  // hide geo grid
-
-                  hideGeoGrid();
-               }
-
-            } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
-
-               onSelection_HoveredValue((HoveredValueData) eventData);
-
-            } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+               _allTourData.clear();
+               _allTourData.addAll(modifiedTours);
 
                resetMap();
             }
+
+         } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if (eventId == TourEventId.MARKER_SELECTION) {
+
+            if (eventData instanceof SelectionTourMarker) {
+
+               onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
+            }
+
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData, true);
+
+         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData, true);
+
+         } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
+
+            if (eventData instanceof TourGeoFilter) {
+
+               // show geo filter
+
+               _map.tourBreadcrumb().resetTours();
+
+               final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
+
+               // show search rectangle
+               _map.showGeoGrid(tourGeoFilter);
+
+               // show tours in search rectangle
+               geoFilter_10_Loader(tourGeoFilter.mapGridData, tourGeoFilter);
+
+            } else if (eventData == null) {
+
+               // hide geo grid
+
+               hideGeoGrid();
+            }
+
+         } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
+
+            onSelection_HoveredValue((HoveredValueData) eventData);
+
+         } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+            resetMap();
          }
       };
 
@@ -1552,7 +1530,7 @@ public class Map2View extends ViewPart implements
       _openDlgMgr.closeOpenedDialogs(openingDialog);
    }
 
-   private void createActions(final Composite parent) {
+   private void createActions() {
 
       _actionTourColor_Altitude = new ActionTourColor(
             this,
@@ -1616,7 +1594,8 @@ public class Map2View extends ViewPart implements
       // map2 slideouts
       _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
       _actionMap2_Color                   = new ActionMap2Color();
-      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state);
+      _actionMap2_MapProvider             = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2_PhotoFilter             = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
       _actionMap2_Options                 = new ActionMap2_Options();
       _actionMap2_SyncMap                 = new ActionSyncMap();
       _actionMap2_TourColors              = new ActionMap2_Graphs();
@@ -1628,17 +1607,17 @@ public class Map2View extends ViewPart implements
       _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
-      _actionDimMap                       = new ActionDimMap(this);
+      _actionDimMap_SubMenu                       = new ActionDimMap(this);
       _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
-      _actionPhotoFilter                  = new ActionPhotoProperties(this, parent, _state);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
+      _actionExportMap_SubMenu            = new Action_ExportMap_SubMenu(this);
       _actionSearchTourByLocation         = new ActionSearchTourByLocation();
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap              = new ActionShowLegendInMap(this);
-      _actionShowPhotos                   = new ActionShowPhotos(this);
+      _actionShowPhotos                   = new ActionShowPhotos();
       _actionShowScaleInMap               = new ActionShowScaleInMap(this);
       _actionShowSliderInMap              = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend           = new ActionShowSliderInLegend(this);
@@ -1722,8 +1701,7 @@ public class Map2View extends ViewPart implements
       } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
          isDataAvailable = createLegendImage_20_SetProviderValues(
-               (IDiscreteColorProvider) mapColorProvider,
-               legendHeightNoMargin);
+               (IDiscreteColorProvider) mapColorProvider);
       }
 
       final Color transparentColor = new Color(display, rgbTransparent);
@@ -1744,8 +1722,7 @@ public class Map2View extends ViewPart implements
       _mapLegend.setImage(legendImage);
    }
 
-   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider,
-                                                          final int legendHeight) {
+   private boolean createLegendImage_20_SetProviderValues(final IDiscreteColorProvider legendProvider) {
 
       if (_allTourData.isEmpty()) {
          return false;
@@ -1834,7 +1811,7 @@ public class Map2View extends ViewPart implements
          }
       });
 
-      createActions(parent);
+      createActions();
 
       fillActionBars();
 
@@ -1854,29 +1831,26 @@ public class Map2View extends ViewPart implements
       GeoclipseExtensions.registerOverlays(_map);
 
       // initialize map when part is created and the map size is > 0
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            restoreState();
-            enableActions();
+         restoreState();
+         enableActions();
 
-            if (_allTourData.isEmpty()) {
-               // a tour is not displayed, find a tour provider which provides a tour
-               showToursFromTourProvider();
-            } else {
-               _map.paint();
-            }
+         if (_allTourData.isEmpty()) {
+            // a tour is not displayed, find a tour provider which provides a tour
+            showToursFromTourProvider();
+         } else {
+            _map.paint();
+         }
 
-            /*
-             * enable map drawing, this is done very late to disable flickering which is caused by
-             * setting up the map
-             */
-            _map.setPainting(true);
+         /*
+          * enable map drawing, this is done very late to disable flickering which is caused by
+          * setting up the map
+          */
+         _map.setPainting(true);
 
-            if (_mapDimLevel < 30) {
-               showDimWarning();
-            }
+         if (_mapDimLevel < 30) {
+            showDimWarning();
          }
       });
    }
@@ -1985,7 +1959,7 @@ public class Map2View extends ViewPart implements
       /*
        * photo actions
        */
-      _actionPhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
+      _actionMap2_PhotoFilter.setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos.setEnabled(canShowFilteredPhoto);
       _actionShowPhotos.setEnabled(isAllPhotoAvailable);
       _actionSyncMapWith_Photo.setEnabled(canShowFilteredPhoto);
@@ -2082,8 +2056,8 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionPhotoFilter);
       tbm.add(_actionShowPhotos);
+      tbm.add(_actionMap2_PhotoFilter);
       tbm.add(_actionShowAllFilteredPhotos);
 
       tbm.add(new Separator());
@@ -2107,21 +2081,15 @@ public class Map2View extends ViewPart implements
 
       tbm.add(_actionMap2_MapProvider);
       tbm.add(_actionMap2_Options);
-
-      /*
-       * fill view menu
-       */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      fillMapContextMenu(menuMgr);
    }
 
    @Override
-   public void fillContextMenu(final IMenuManager menuMgr) {
-      fillMapContextMenu(menuMgr);
+   public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+
+      fillMapContextMenu(menuMgr, actionManageOfflineImages);
    }
 
-   private void fillMapContextMenu(final IMenuManager menuMgr) {
+   private void fillMapContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
       menuMgr.add(_actionSearchTourByLocation);
       menuMgr.add(new Separator());
@@ -2141,6 +2109,10 @@ public class Map2View extends ViewPart implements
       menuMgr.add(_actionShowStartEndInMap);
       menuMgr.add(_actionShowTourInfoInMap);
 
+      if (isShowTrackColor_InContextMenu()) {
+         menuMgr.add(_actionMap2_Color);
+      }
+
       menuMgr.add(new Separator());
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
@@ -2150,27 +2122,15 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(new Separator());
 
-      // it can happen that color id is not yet set
-      if (_tourColorId != null) {
-
-         // set color before menu is filled, this sets the action image and color id
-         _actionMap2_Color.setColorId(_tourColorId);
-
-         if (_tourColorId != MapGraphId.HrZone) {
-
-            // hr zone has a different color provider and is not yet supported
-
-            menuMgr.add(_actionMap2_Color);
-         }
-      }
-
-      menuMgr.add(_actionEditMap2Preferences);
-      menuMgr.add(_actionDimMap);
+      menuMgr.add(_actionExportMap_SubMenu);
+      menuMgr.add(_actionDimMap_SubMenu);
       menuMgr.add(_actionZoomLevelAdjustment);
+      menuMgr.add(_actionEditMap2Preferences);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionManageMapProvider);
+      menuMgr.add(actionManageOfflineImages);
       menuMgr.add(_actionReloadFailedMapImages);
+      menuMgr.add(_actionManageMapProvider);
    }
 
    private void fillToolbar_TourColors(final IToolBarManager tbm) {
@@ -2348,6 +2308,17 @@ public class Map2View extends ViewPart implements
       return MapColorProvider.getActiveMap2ColorProvider(colorId);
    }
 
+   /**
+    * @return Returns a list with all filtered photos
+    */
+   public ArrayList<Photo> getFilteredPhotos() {
+      return _filteredPhotos;
+   }
+
+   public Composite getMainComposite() {
+      return _parent;
+   }
+
    public Map getMap() {
       return _map;
    }
@@ -2363,6 +2334,22 @@ public class Map2View extends ViewPart implements
       final int mapZoomLevel = _map.getZoom() - 1;
 
       return new MapLocation(mapPosition, mapZoomLevel);
+   }
+
+   public Image getMapViewImage() {
+
+      final Image image = new Image(_parent.getDisplay(),
+            _parent.getSize().x,
+            _parent.getSize().y);
+
+      final GC gc = new GC(image);
+      _parent.print(gc);
+      //This produces the same result
+      //  final GC gc = new GC(_parent);
+      //  gc.copyArea(image, 0, 0);
+      gc.dispose();
+
+      return image;
    }
 
    /**
@@ -2437,6 +2424,13 @@ public class Map2View extends ViewPart implements
       mapPositions.add(new GeoPosition(maxLatitude, maxLongitude));
 
       return mapPositions;
+   }
+
+   /**
+    * @return Returns a list with all available photos.
+    */
+   public ArrayList<Photo> getPhotos() {
+      return _allPhotos;
    }
 
    private Set<GeoPosition> getTourBounds(final ArrayList<TourData> tourDataList) {
@@ -2551,6 +2545,25 @@ public class Map2View extends ViewPart implements
             || _isMapSyncWith_ValuePoint
 
       ;
+   }
+
+   private boolean isShowTrackColor_InContextMenu() {
+
+      // it can happen that color id is not yet set
+      if (_tourColorId != null) {
+
+         // set color before menu is filled, this sets the action image and color id
+         _actionMap2_Color.setColorId(_tourColorId);
+
+         if (_tourColorId != MapGraphId.HrZone) {
+
+            // hr zone has a different color provider and is not yet supported
+
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private void keepMapPosition(final TourData tourData) {
@@ -2921,13 +2934,7 @@ public class Map2View extends ViewPart implements
             paintTours_20_One(tourData, false);
 
             // delay to show the poi otherwise the map is being painted OVER the poi !!!
-            _map.getDisplay().timerExec(500, new Runnable() {
-               @Override
-               public void run() {
-
-                  _map.setPOI(_wayPointToolTipProvider, wp);
-               }
-            });
+            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
 
             enableActions();
          }
@@ -3267,11 +3274,8 @@ public class Map2View extends ViewPart implements
       }
 
       // prevent loading the same tour
-      if (forceRedraw == false) {
-
-         if ((_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
-            return;
-         }
+      if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
+         return;
       }
 
       // force multiple tours to be repainted
@@ -3446,11 +3450,17 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   @Override
-   public void photoPropertyEvent(final PhotoPropertiesEvent event) {
+   public void photoFilter_UpdateFromAction(final boolean isFilterActive) {
 
-      _photoFilterRatingStars = event.filterRatingStars;
-      _photoFilterRatingStarOperator = event.fiterRatingStarOperator;
+      _isPhotoFilterActive = isFilterActive;
+
+      updateFilteredPhotos();
+   }
+
+   public void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
+
+      _photoFilter_RatingStars = filterRatingStars;
+      _photoFilter_RatingStar_Operator = ratingstaroperatorsvalues;
 
       updateFilteredPhotos();
    }
@@ -3573,16 +3583,13 @@ public class Map2View extends ViewPart implements
 
    public void redrawMap() {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-            _map.redraw();
+         if (_parent.isDisposed()) {
+            return;
          }
+
+         _map.redraw();
       });
    }
 
@@ -3605,9 +3612,16 @@ public class Map2View extends ViewPart implements
       _isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
       _actionShowTour.setSelection(_isShowTour);
 
-      // is show photo
+      // photo states
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
-      _actionShowPhotos.setChecked(_isShowPhoto);
+      _actionShowPhotos.setSelection(_isShowPhoto);
+
+      _isPhotoFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+      _actionMap2_PhotoFilter.setSelection(_isPhotoFilterActive);
+
+      _photoFilter_RatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
+      _photoFilter_RatingStar_Operator = Util.getStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, PhotoRatingStarOperator.HAS_ANY);
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
 
       // is show legend
       _isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
@@ -3672,8 +3686,6 @@ public class Map2View extends ViewPart implements
 
       // restore map provider by selecting the last used map factory
       _actionMap2_MapProvider.selectMapProvider(_state.get(STATE_SELECTED_MAP_PROVIDER_ID));
-
-      _actionPhotoFilter.restoreState();
 
       // default position
       _defaultZoom = Util.getStateInt(_state, STATE_DEFAULT_POSITION_ZOOM, 10);
@@ -3762,7 +3774,7 @@ public class Map2View extends ViewPart implements
       }
       final RGB dimColor = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
       _map.setDimLevel(_mapDimLevel, dimColor);
-      _mapDimLevel = _actionDimMap.setDimLevel(_mapDimLevel);
+      _mapDimLevel = _actionDimMap_SubMenu.setDimLevel(_mapDimLevel);
 
       restoreState_Map2_TrackOptions(false);
       restoreState_Map2_Options();
@@ -3830,12 +3842,14 @@ public class Map2View extends ViewPart implements
 
       _filteredPhotos.clear();
 
-      if (_isPhotoFilterActive) {
+      final boolean hasAnyStars = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.HAS_ANY;
 
-         final boolean isNoStar = _photoFilterRatingStars == 0;
-         final boolean isEqual = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_EQUAL;
-         final boolean isMore = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilterRatingStarOperator == DialogPhotoProperties.OPERATOR_IS_LESS_OR_EQUAL;
+      if (_isPhotoFilterActive && !hasAnyStars) {
+
+         final boolean isNoStar = _photoFilter_RatingStars == 0;
+         final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isLess = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
 
          for (final Photo photo : _allPhotos) {
 
@@ -3847,15 +3861,15 @@ public class Map2View extends ViewPart implements
 
                _filteredPhotos.add(photo);
 
-            } else if (isEqual && ratingStars == _photoFilterRatingStars) {
+            } else if (isEqual && ratingStars == _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
 
-            } else if (isMore && ratingStars >= _photoFilterRatingStars) {
+            } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
 
-            } else if (isLess && ratingStars <= _photoFilterRatingStars) {
+            } else if (isLess && ratingStars <= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
             }
@@ -3863,7 +3877,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         // photo filter is not active
+         // photo filter is not active or any stars can be selected -> show all photos
 
          _filteredPhotos.addAll(_allPhotos);
       }
@@ -3872,13 +3886,9 @@ public class Map2View extends ViewPart implements
 
       enableActions(true);
 
-      PhotoManager.firePhotoEvent(
-            this,
-            PhotoEventId.PHOTO_FILTER,
-            new MapFilterData(
-                  _allPhotos.size(),
-                  _filteredPhotos.size()));
-
+      // update UI: photo filter slideout
+      _actionMap2_PhotoFilter.updateUI();
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().updateUI_NumberOfPhotos();
    }
 
    @PersistState
@@ -3929,6 +3939,12 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
+      // photo filter
+      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE, _actionMap2_PhotoFilter.getSelection());
+      _state.put(STATE_PHOTO_FILTER_RATING_STARS, _photoFilter_RatingStars);
+      Util.setStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _photoFilter_RatingStar_Operator);
+      _actionMap2_PhotoFilter.getPhotoFilterSlideout().saveState();
+
       // tour color
       MapGraphId colorId;
 
@@ -3955,8 +3971,6 @@ public class Map2View extends ViewPart implements
          colorId = MapGraphId.Altitude;
       }
       _state.put(STATE_TOUR_COLOR_ID, colorId.name());
-
-      _actionPhotoFilter.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
@@ -4062,23 +4076,20 @@ public class Map2View extends ViewPart implements
 
       if (_prefStore.getBoolean(ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING) == false) {
 
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getCurrent().asyncExec(() -> {
 
-               final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.map_dlg_dim_warning_title, // title
-                     Messages.map_dlg_dim_warning_message, // message
-                     Messages.map_dlg_dim_warning_toggle_message, // toggle message
-                     false, // toggle default state
-                     null,
-                     null);
+            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.map_dlg_dim_warning_title, // title
+                  Messages.map_dlg_dim_warning_message, // message
+                  Messages.map_dlg_dim_warning_toggle_message, // toggle message
+                  false, // toggle default state
+                  null,
+                  null);
 
-               _prefStore.setValue(
-                     ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
-                     dialog.getToggleState());
-            }
+            _prefStore.setValue(
+                  ITourbookPreferences.MAP_VIEW_CONFIRMATION_SHOW_DIM_WARNING,
+                  dialog.getToggleState());
          });
       }
    }
@@ -4090,31 +4101,28 @@ public class Map2View extends ViewPart implements
 
    private void showToursFromTourProvider() {
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_map.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_map.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour is set from a selection provider
-             */
-            if (_allTourData.size() > 0) {
-               return;
-            }
+         /*
+          * check if tour is set from a selection provider
+          */
+         if (_allTourData.size() > 0) {
+            return;
+         }
 
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
-            if (tourDataList != null) {
+         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+         if (tourDataList != null) {
 
-               _allTourData.clear();
-               _allTourData.addAll(tourDataList);
-               _hash_AllTourData = _allTourData.hashCode();
+            _allTourData.clear();
+            _allTourData.addAll(tourDataList);
+            _hash_AllTourData = _allTourData.hashCode();
 
-               paintTours_10_All();
-            }
+            paintTours_10_All();
          }
       });
    }
@@ -4359,6 +4367,13 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
+   }
+
+   public void updateUI_Photos() {
+
+      _map.disposeOverlayImageCache();
+
+      _map.paint();
    }
 
    /**

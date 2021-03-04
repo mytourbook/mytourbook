@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,7 +72,10 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.extension.download.CloudDownloaderManager;
+import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.EasyConfig;
@@ -356,6 +359,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionSaveTourInDatabase       _actionSaveTourWithPerson;
    private ActionSetupImport              _actionSetupImport;
    private ActionSetTourTypeMenu          _actionSetTourType;
+   private ActionUpload                   _actionUploadTour;
    //
    protected TourPerson                   _activePerson;
    protected TourPerson                   _newActivePerson;
@@ -382,59 +386,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             .withMillisRemoved();
    }
    //
-   private boolean                _isToolTipInDate;
-   private boolean                _isToolTipInTime;
-   private boolean                _isToolTipInTitle;
-   private boolean                _isToolTipInTags;
+   private boolean                       _isToolTipInDate;
+   private boolean                       _isToolTipInTime;
+   private boolean                       _isToolTipInTitle;
+   private boolean                       _isToolTipInTags;
    //
-   private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
+   private TourDoubleClickState          _tourDoubleClickState       = new TourDoubleClickState();
    //
-   private Thread                 _watchingStoresThread;
-   private Thread                 _watchingFolderThread;
-   private WatchService           _folderWatcher;
-   private AtomicBoolean          _isWatchingStores           = new AtomicBoolean();
-   private AtomicBoolean          _isDeviceStateUpdateDelayed = new AtomicBoolean();
-   private ReentrantLock          WATCH_LOCK                  = new ReentrantLock();
+   private Thread                        _watchingStoresThread;
+   private Thread                        _watchingFolderThread;
+   private WatchService                  _folderWatcher;
+   private AtomicBoolean                 _isWatchingStores           = new AtomicBoolean();
+   private AtomicBoolean                 _isDeviceStateUpdateDelayed = new AtomicBoolean();
+   private ReentrantLock                 WATCH_LOCK                  = new ReentrantLock();
    //
-   private HashMap<Long, Image>   _configImages               = new HashMap<>();
-   private HashMap<Long, Integer> _configImageHash            = new HashMap<>();
+   private HashMap<Long, Image>          _configImages               = new HashMap<>();
+   private HashMap<Long, Integer>        _configImageHash            = new HashMap<>();
    //
-   private boolean                _isBrowserCompleted;
-   private boolean                _isInUIStartup;
-   private boolean                _isInUpdate;
-   private boolean                _isNewUI;
+   private boolean                       _isBrowserCompleted;
+   private boolean                       _isInUIStartup;
+   private boolean                       _isInUpdate;
+   private boolean                       _isNewUI;
 
    /**
     * When <code>false</code> then the background WatchStores task must set it valid. Only when it
     * is valid then the device state icon displays the state, otherwise it shows a waiting icon.
     */
-   private boolean                _isDeviceStateValid;
-   private boolean                _isRunDashboardAnimation    = true;
-   private boolean                _isShowWatcherAnimation;
-   private boolean                _isUpdateDeviceState        = true;
+   private boolean                       _isDeviceStateValid;
+   private boolean                       _isRunDashboardAnimation    = true;
+   private boolean                       _isShowWatcherAnimation;
+   private boolean                       _isUpdateDeviceState        = true;
    //
-   private String                 _cssFonts;
-   private String                 _cssFromFile;
+   private String                        _cssFonts;
+   private String                        _cssFromFile;
    //
-   private String                 _imageUrl_Device_TurnOff;
-   private String                 _imageUrl_Device_TurnOn;
-   private String                 _imageUrl_DeviceFolder_OK;
-   private String                 _imageUrl_DeviceFolder_Disabled;
-   private String                 _imageUrl_DeviceFolder_NotAvailable;
-   private String                 _imageUrl_DeviceFolder_NotChecked;
-   private String                 _imageUrl_DeviceFolder_NotSetup;
-   private String                 _imageUrl_ImportFromFile;
-   private String                 _imageUrl_SerialPort_Configured;
-   private String                 _imageUrl_SerialPort_Directly;
-   private String                 _imageUrl_State_AdjustTemperature;
-   private String                 _imageUrl_State_RetrieveWeatherData;
-   private String                 _imageUrl_State_Error;
-   private String                 _imageUrl_State_OK;
-   private String                 _imageUrl_State_MovedFiles;
-   private String                 _imageUrl_State_SaveTour;
-   private String                 _imageUrl_State_TourMarker;
+   private String                        _imageUrl_Device_TurnOff;
+   private String                        _imageUrl_Device_TurnOn;
+   private String                        _imageUrl_DeviceFolder_OK;
+   private String                        _imageUrl_DeviceFolder_Disabled;
+   private String                        _imageUrl_DeviceFolder_NotAvailable;
+   private String                        _imageUrl_DeviceFolder_NotChecked;
+   private String                        _imageUrl_DeviceFolder_NotSetup;
+   private String                        _imageUrl_ImportFromFile;
+   private String                        _imageUrl_SerialPort_Configured;
+   private String                        _imageUrl_SerialPort_Directly;
+   private String                        _imageUrl_State_AdjustTemperature;
+   private String                        _imageUrl_State_RetrieveWeatherData;
+   private String                        _imageUrl_State_Error;
+   private String                        _imageUrl_State_OK;
+   private String                        _imageUrl_State_MovedFiles;
+   private String                        _imageUrl_State_SaveTour;
+   private String                        _imageUrl_State_TourMarker;
    //
-   private PixelConverter         _pc;
+   private PixelConverter                _pc;
+   private List<TourbookCloudDownloader> _cloudDownloadersList       = CloudDownloaderManager.getCloudDownloaderList();
 
    /*
     * resources
@@ -1043,6 +1048,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionSaveTourWithPerson = new ActionSaveTourInDatabase(this, true);
       _actionSetupImport = new ActionSetupImport(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
+      _actionUploadTour = new ActionUpload(this);
    }
 
    /**
@@ -1661,6 +1667,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
          final ZonedDateTime modifiedTime = TimeTools.getZonedDateTime(deviceFile.modifiedTime);
 
+         // am/pm contains a space which can break the line
+         final String nbspTime = modifiedTime.format(TimeTools.Formatter_Time_S).replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+         final String nbspFileName = deviceFile.getFileName().replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
          sb.append(HTML_TR);
 
          sb.append("<td width=1 class='column'>"); //$NON-NLS-1$
@@ -1668,7 +1678,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(deviceFile.getFileName());
+         sb.append(nbspFileName);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
@@ -1676,7 +1686,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
-         sb.append(modifiedTime.format(TimeTools.Formatter_Time_S));
+         sb.append(nbspTime);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='right'>"); //$NON-NLS-1$
@@ -1693,8 +1703,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
             }
 
+            final String nbspFilePathName = UI.EMPTY_STRING
+
+                  // add additonal space before the text otherwise it is too narrow to the previous column
+                  + WEB.NONE_BREAKING_SPACE
+                  + WEB.NONE_BREAKING_SPACE
+
+                  + filePathName.replace(UI.SPACE1, WEB.NONE_BREAKING_SPACE);
+
             sb.append("<td class='column content'>"); //$NON-NLS-1$
-            sb.append(filePathName);
+            sb.append(nbspFilePathName);
             sb.append(HTML_TD_END);
          }
 
@@ -2080,6 +2098,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
                (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
                _imageUrl_SerialPort_Directly);
+
+         for (final var cloudDownloader : _cloudDownloadersList) {
+
+            createHTML_92_TileAction(
+                  sb,
+                  cloudDownloader.getName(),
+                  cloudDownloader.getTooltip(),
+                  (HTTP_DUMMY + HREF_TOKEN + cloudDownloader.getId()),
+                  cloudDownloader.getIconUrl());
+         }
 
          createHTML_92_TileAction(
                sb,
@@ -2626,7 +2654,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final Object firstElement = ((IStructuredSelection) _tourViewer.getSelection()).getFirstElement();
 
-            if ((firstElement != null) && (firstElement instanceof TourData)) {
+            if (firstElement instanceof TourData) {
                TourManager.getInstance().tourDoubleClickAction(RawDataView.this, _tourDoubleClickState);
             }
          }
@@ -3419,8 +3447,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
       }
-
-      return;
    }
 
    @Override
@@ -3666,6 +3692,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionRemoveTour.setEnabled(selectedTours > 0);
       _actionExportTour.setEnabled(selectedNotDeleteTours > 0);
       _actionJoinTours.setEnabled(selectedNotDeleteTours > 1);
+      _actionUploadTour.setEnabled(selectedNotDeleteTours > 0);
 
       _actionEditTour.setEnabled(isOneSavedAndNotDeleteTour);
       _actionEditQuick.setEnabled(isOneSavedAndNotDeleteTour);
@@ -3737,6 +3764,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       menuMgr.add(_actionJoinTours);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionUploadTour);
       menuMgr.add(_actionExportTour);
       menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionEditImportPreferences);
@@ -4280,6 +4308,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else if (ACTION_OLD_UI.equals(hrefAction)) {
 
          onSelectUI_Old();
+      } else {
+
+         //We look for the cloud downloader that matches
+         //the action in {@link hrefAction} and execute its
+         //{@link TourbookCloudDownloader#downloadTours} method.
+         _cloudDownloadersList.stream()
+               .filter(cd -> cd.getId().equals(hrefAction))
+               .forEach(TourbookCloudDownloader::downloadTours);
       }
    }
 
@@ -4593,7 +4629,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             // remove tour properties
             tourData.setTourType(null);
             tourData.setTourTitle(UI.EMPTY_STRING);
-            tourData.setTourTags(new HashSet<TourTag>());
+            tourData.setTourTags(new HashSet<>());
 
             /**
              * when a remove tour is saved again, this will cause the exception: <br>

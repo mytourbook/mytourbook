@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -158,6 +158,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private static final String   GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
    private static final String   GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 
+
    public static final String    ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER         = "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";       //$NON-NLS-1$
    public static final String    ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED    = "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";  //$NON-NLS-1$
    public static final String    ACTION_ID_EDIT_CHART_PREFERENCES          = "ACTION_ID_EDIT_CHART_PREFERENCES";        //$NON-NLS-1$
@@ -257,13 +258,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 //SET_FORMATTING_ON
 
-   static {}
+   public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS;
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
-   public static final double MIN_ADJUSTMENT = 1e-3;
-   public static final double MAX_ADJUSTMENT = 1e-5;
+   public static final double     MIN_ADJUSTMENT      = 1e-3;
+   public static final double     MAX_ADJUSTMENT      = 1e-5;
    //
    //
    private final IDialogSettings                            _state;
@@ -1735,6 +1736,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       cmc.isShowHiddenMarker = _tcc.isShowHiddenMarker;
       cmc.isShowMarkerLabel = _tcc.isShowMarkerLabel;
       cmc.isShowMarkerTooltip = _tcc.isShowMarkerTooltip;
+      cmc.isShowTooltipData_Elevation = _tcc.isShowTooltipData_Elevation;
+      cmc.isShowTooltipData_Distance = _tcc.isShowTooltipData_Distance;
+      cmc.isShowTooltipData_Duration = _tcc.isShowTooltipData_Duration;
+      cmc.isShowTooltipData_ElevationGainDifference = _tcc.isShowTooltipData_ElevationGainDifference;
+      cmc.isShowTooltipData_DistanceDifference = _tcc.isShowTooltipData_DistanceDifference;
+      cmc.isShowTooltipData_DurationDifference = _tcc.isShowTooltipData_DurationDifference;
       cmc.isShowMarkerPoint = _tcc.isShowMarkerPoint;
       cmc.isShowOnlyWithDescription = _tcc.isShowOnlyWithDescription;
       cmc.isShowSignImage = _tcc.isShowSignImage;
@@ -1857,7 +1864,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final boolean isDescription = tourMarker.getDescription().length() > 0;
       final boolean isUrlAddress = tourMarker.getUrlAddress().length() > 0;
       final boolean isUrlText = tourMarker.getUrlText().length() > 0;
-      if (isDescription | isUrlAddress | isUrlText) {
+      if (isDescription || isUrlAddress || isUrlText) {
          markerLabel += UI.SPACE2 + UI.SYMBOL_FOOT_NOTE;
       }
 
@@ -1957,7 +1964,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final ArrayList<List<Long>> allTourPauses = _tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = _tourData.multiTourPauses;
          String pauseDurationText;
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
@@ -2068,7 +2075,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          final ArrayList<PhotoCategory> chartPhotoGroups = new ArrayList<>();
 
          /*
-          * get saved photos
+          * Get saved photos
           */
          final ArrayList<Photo> srcTourPhotos = _tourData.getGalleryPhotos();
          if (srcTourPhotos != null && srcTourPhotos.size() > 0) {
@@ -2081,7 +2088,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          /*
-          * get link photos, they are painted below saved photos that the mouse hit area is larger
+          * Get link photos, they are painted below saved photos that the mouse hit area is larger
           */
          final TourPhotoLink tourPhotoLink = _tourData.tourPhotoLink;
          if (tourPhotoLink != null) {
@@ -2104,7 +2111,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
 
          /*
-          * at least 1 photo is available
+          * At least 1 photo is available
           */
 
          /*
@@ -2983,10 +2990,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartLabel hoveredMarkerLabel = getHoveredMarkerLabel();
 
-      if (hoveredMarkerLabel != null) {
-         if (hoveredMarkerLabel.data instanceof TourMarker) {
-            tourMarker = (TourMarker) hoveredMarkerLabel.data;
-         }
+      if (hoveredMarkerLabel != null && hoveredMarkerLabel.data instanceof TourMarker) {
+         tourMarker = (TourMarker) hoveredMarkerLabel.data;
       }
 
       _lastHoveredTourMarker = tourMarker;
@@ -4882,37 +4887,29 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void setupChartConfig() {
 
-      graphAntialiasing = _prefStore.getBoolean(//
-            ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+      graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
-      isShowSegmentAlternateColor = _prefStore.getBoolean(//
-            ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
+      isShowSegmentAlternateColor = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
       segmentAlternateColor = PreferenceConverter.getColor(
-            _prefStore, //
+            _prefStore,
             ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
 
-      graphTransparencyLine = _prefStore.getInt(//
-            ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
-      graphTransparencyFilling = _prefStore.getInt(//
-            ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+      graphTransparencyLine = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE);
+      graphTransparencyFilling = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
-      isShowHorizontalGridLines = Util.getPrefixPrefBoolean(
-            _prefStore,
+      isShowHorizontalGridLines = Util.getPrefixPrefBoolean(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 
-      isShowVerticalGridLines = Util.getPrefixPrefBoolean(
-            _prefStore,
+      isShowVerticalGridLines = Util.getPrefixPrefBoolean(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-      gridVerticalDistance = Util.getPrefixPrefInt(//
-            _prefStore,
+      gridVerticalDistance = Util.getPrefixPrefInt(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 
-      gridHorizontalDistance = Util.getPrefixPrefInt(//
-            _prefStore,
+      gridHorizontalDistance = Util.getPrefixPrefInt(_prefStore,
             GRID_PREF_PREFIX,
             ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
    }
@@ -5710,6 +5707,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourInfoIconTooltipProvider.setTourData(_tourData);
       _valuePointTooltip.setTourData(_tourData);
       _tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours() == false);
+
+      // when a tour is saved after a photo was removed, update the photo gallery to see the removed photo
+      if (_photoTooltip != null && _photoTooltip.getPhotoGallery() != null) {
+         _photoTooltip.getPhotoGallery().refreshUI();
+      }
    }
 
    /**

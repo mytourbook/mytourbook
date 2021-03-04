@@ -1997,11 +1997,16 @@ public abstract class GalleryMT20 extends Canvas {
 
       } else {
 
-         // select next/previous image
-         if (mouseEvent.count < 0) {
-            selectItem_Next(false);
-         } else {
-            selectItem_Previous(false);
+         if (_isHorizontal) {
+
+            // when gallerie is vertical then scrolling to work very well
+
+            // select next/previous image
+            if (mouseEvent.count < 0) {
+               selectItem_Next(false);
+            } else {
+               selectItem_Previous(false);
+            }
          }
       }
 

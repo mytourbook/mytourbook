@@ -19,6 +19,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -141,7 +142,7 @@ public class ConconiView extends ViewPart {
    private Composite             _page_NoTour;
    private Composite             _page_ConconiTest;
 
-   private ArrayList<TourData>   _conconiTours;
+   private List<TourData>        _conconiTours;
 
    private Chart                 _chartConconiTest;
    private ChartLayerConconiTest _conconiLayer;
@@ -289,7 +290,7 @@ public class ConconiView extends ViewPart {
     *           tour will be marked
     * @return
     */
-   private ChartDataModel createChartDataModelConconiTest(final ArrayList<TourData> conconiTours, TourData markedTour) {
+   private ChartDataModel createChartDataModelConconiTest(final List<TourData> conconiTours, TourData markedTour) {
 
       // reset data
       _conconiDataForSelectedTour = null;
@@ -1040,7 +1041,7 @@ public class ConconiView extends ViewPart {
       updateChart_22(tourDataList);
    }
 
-   private void updateChart_22(final ArrayList<TourData> tourDataList) {
+   private void updateChart_22(final List<TourData> tourDataList) {
 
       /*
        * tour editor is not opened because it can cause a recursive attempt to active a part in the
@@ -1061,8 +1062,6 @@ public class ConconiView extends ViewPart {
       updateChart_30_NewTour(null);
 
       _pageBook.showPage(_page_ConconiTest);
-
-      return;
    }
 
    /**

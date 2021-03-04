@@ -41,6 +41,7 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Event;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_FileCreator;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_FileId;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Hr;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Hrv;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Lap;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Length;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
@@ -434,7 +435,7 @@ public class FitDataReader extends TourbookDevice {
 //
 //               || fieldName.equals("") //                                                                //$NON-NLS-1$
 //               || fieldName.equals("unknown") //                                                         //$NON-NLS-1$
-         //
+
          ) {
             continue;
          }
@@ -567,6 +568,7 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_FileCreator(fitData));
          fitBroadcaster.addListener(new MesgListener_FileId(fitData));
          fitBroadcaster.addListener(new MesgListener_Hr(fitData));
+         fitBroadcaster.addListener(new MesgListener_Hrv(fitData));
          fitBroadcaster.addListener(new MesgListener_Lap(fitData));
          fitBroadcaster.addListener(new MesgListener_Length(fitData));
          fitBroadcaster.addListener(new MesgListener_Record(fitData));

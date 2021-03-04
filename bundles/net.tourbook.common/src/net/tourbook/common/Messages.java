@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,9 +105,6 @@ public class Messages extends NLS {
    public static String        Color_Chooser_Link_CustomColors_Tooltip;
    public static String        Color_Chooser_SelectedColor_Tooltip;
 
-   public static String        Dialog_MeasurementSystem_Title;
-   public static String        Dialog_MeasurementSystem_Label_SelectSystem;
-
    public static String        Font_Editor_Label_FontSize;
 
    public static String        Format_hh;
@@ -124,6 +121,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Cadence_Unit_Spm;
    public static String        Graph_Label_Cadence_Unit_RpmSpm;
    public static String        Graph_Label_Distance;
+   public static String        Graph_Label_ElevationGain;
    public static String        Graph_Label_Gears;
    public static String        Graph_Label_Gradient;
    public static String        Graph_Label_Gradient_Unit;
@@ -184,6 +182,7 @@ public class Messages extends NLS {
    public static String        Image__MapProvider_Transparent;
    public static String        Image__MapProvider_Transparent_Hill;
    public static String        Image__options;
+   public static String        Image__Options_Dark;
    public static String        Image__Pin_Themed;
    public static String        Image__TourOptions;
    public static String        Image__TourOptions_Disabled;
@@ -207,6 +206,8 @@ public class Messages extends NLS {
    public static String        Map3_PropertyTooltip_Action_Close_Tooltip;
    public static String        Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
 
+   public static String        Measurement_System_Dialog_Title;
+   public static String        Measurement_System_Dialog_Label_SelectSystem;
    public static String        Measurement_System_Profile_Imperial;
    public static String        Measurement_System_Profile_Metric;
    public static String        Measurement_System_Profile_Nautic;
@@ -246,7 +247,6 @@ public class Messages extends NLS {
    public static String        Period_Format_Milliseconds;
    public static String        Period_Format_Millisecond_Short;
 
-   public static String        Pref_System_Group_MeasurementSystem;
    public static String        Pref_System_Label_Distance;
    public static String        Pref_System_Label_Distance_Info;
    public static String        Pref_System_Label_Elevation;
@@ -269,8 +269,6 @@ public class Messages extends NLS {
    public static String        Pref_System_Label_Weight_Info;
    public static String        Pref_System_Option_BodyWeight_Kilogram;
    public static String        Pref_System_Option_BodyWeight_Pound;
-   public static String        Pref_System_Option_DayTime_24_Hours;
-   public static String        Pref_System_Option_DayTime_AM_PM;
    public static String        Pref_System_Option_Distance_Kilometer;
    public static String        Pref_System_Option_Distance_Mile;
    public static String        Pref_System_Option_Distance_NauticMile;

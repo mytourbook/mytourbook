@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -75,8 +76,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
    static {
 
-      TOOLTIP_POSITIONS = new String[] { //
-            //
+      TOOLTIP_POSITIONS = new String[] {
+
             Messages.Tour_Marker_TooltipPosition_Left, //            0
             Messages.Tour_Marker_TooltipPosition_Right, //           1
             Messages.Tour_Marker_TooltipPosition_Top, //             2
@@ -144,14 +145,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    /*
     * UI controls
     */
-   private Composite                _shellContainer;
-   private Composite                _ttContainer;
-
-   /**
-    * Contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the different section to the same width.
-    */
-   private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
+   private Composite _shellContainer;
+   private Composite _ttContainer;
 
    private class ActionOpenMarkerDialogInTooltip extends ActionOpenMarkerDialog {
 
@@ -223,8 +218,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       _tourData = _tourChart.getTourData();
 
       createActions();
-
-      _firstColumnControls.clear();
 
       final Composite container = createUI(shell);
 
@@ -362,6 +355,13 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
    private void createUI_70_Values(final Composite parent) {
 
+      final boolean isShowElevation = _cmc.isShowTooltipData_Elevation;
+      final boolean isShowElevation_Diff = _cmc.isShowTooltipData_ElevationGainDifference;
+      final boolean isShowDistance = _cmc.isShowTooltipData_Distance;
+      final boolean isShowDistance_Diff = _cmc.isShowTooltipData_DistanceDifference;
+      final boolean isShowDuration = _cmc.isShowTooltipData_Duration;
+      final boolean isShowDuration_Diff = _cmc.isShowTooltipData_DurationDifference;
+
       int valueIndex;
       if (_tourData.isMultipleTours()) {
          valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
@@ -369,120 +369,211 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          valueIndex = _hoveredTourMarker.getSerieIndex();
       }
 
+      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      TourMarker previousTourMarker = null;
+      if (index > 0) {
+         previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
+      }
+
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(3, 0)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(3)
+      GridLayoutFactory.fillDefaults()
+            .numColumns(5)
             .spacing(5, 1)
             .applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
       {
-         {
-            /*
-             * Altitude
-             */
-            final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
-            if (isAvailableAltitude) {
+         /*
+          * Elevation
+          */
+         if (isShowElevation || isShowElevation_Diff) {
 
-               final float value = _tourData.getAltitudeSmoothedSerie(false)[valueIndex];
+            UI.createLabel(container, GRAPH_LABEL_ALTITUDE);
 
-               createUI_72_ValueField(
-                     container,
-                     GRAPH_LABEL_ALTITUDE,
-                     UI.UNIT_LABEL_ELEVATION,
-                     FormatManager.formatElevation(value));
+            if (isShowElevation) {
+               final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
+               if (isAvailableAltitude) {
+
+                  final float value = _tourData.getAltitudeSmoothedSerie(false)[valueIndex];
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatElevation(value),
+                        UI.UNIT_LABEL_ELEVATION);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
+               }
+            } else {
+               UI.createSpacer_Horizontal(container, 2);
+            }
+
+            if (isShowElevation_Diff) {
+
+               final int startIndex = previousTourMarker != null ? previousTourMarker.getSerieIndex() : 0;
+               final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(startIndex, _hoveredTourMarker.getSerieIndex());
+
+               if (elevationGainLoss != null) {
+
+                  final float value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatElevation(value),
+                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
+               }
+            } else {
+               UI.createSpacer_Horizontal(container, 2);
             }
          }
 
-         {
-            /*
-             * Distance
-             */
-            float distance = Float.MIN_VALUE;
+         /*
+          * Distance
+          */
+         if (isShowDistance || isShowDistance_Diff) {
 
-            if (_cmc.isShowAbsoluteValues) {
+            UI.createLabel(container, GRAPH_LABEL_DISTANCE);
 
-               // absolute distance
+            if (isShowDistance) {
 
-               if (_tourData.distanceSerie != null) {
-                  distance = _tourData.distanceSerie[valueIndex];
+               float distance = Float.MIN_VALUE;
+
+               if (_cmc.isShowAbsoluteValues) {
+
+                  // absolute distance
+
+                  if (_tourData.distanceSerie != null) {
+                     distance = _tourData.distanceSerie[valueIndex];
+                  }
+
+               } else {
+
+                  // relative distance
+
+                  final float markerDistance = _hoveredTourMarker.getDistance();
+                  if (markerDistance != 1) {
+                     distance = markerDistance;
+                  }
                }
 
+               if (distance != Float.MIN_VALUE) {
+
+                  final double value = distance / 1000 / UI.UNIT_VALUE_DISTANCE;
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatDistance(value),
+                        UI.UNIT_LABEL_DISTANCE);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
+               }
             } else {
-
-               // relative distance
-
-               final float markerDistance = _hoveredTourMarker.getDistance();
-               if (markerDistance != 1) {
-                  distance = markerDistance;
-               }
+               UI.createSpacer_Horizontal(container, 2);
             }
 
-            if (distance != Float.MIN_VALUE) {
+            if (isShowDistance_Diff) {
 
-               final double value = distance //
-                     / 1000
-                     / UI.UNIT_VALUE_DISTANCE;
+               float distance = _hoveredTourMarker.getDistance();
 
-               createUI_72_ValueField(
-                     container,
-                     GRAPH_LABEL_DISTANCE,
-                     UI.UNIT_LABEL_DISTANCE,
-                     FormatManager.formatDistance(value));
+               if (previousTourMarker != null) {
+                  distance -= previousTourMarker.getDistance();
+               }
+
+               if (distance != Float.MIN_VALUE) {
+
+                  final double value = distance / 1000 / UI.UNIT_VALUE_DISTANCE;
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatDistance(value),
+                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_DISTANCE);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
+               }
+            } else {
+               UI.createSpacer_Horizontal(container, 2);
             }
          }
 
-         {
-            /*
-             * Duration
-             */
-            int timeValue = Integer.MIN_VALUE;
+         /*
+          * Duration
+          */
+         if (isShowDuration || isShowDuration_Diff) {
 
-            if (_cmc.isShowAbsoluteValues) {
+            UI.createLabel(container, GRAPH_LABEL_TIME);
 
-               // absolute time
+            if (isShowDuration) {
 
-               if (_tourData.timeSerie != null) {
-                  timeValue = _tourData.timeSerie[valueIndex];
+               int timeValue = Integer.MIN_VALUE;
+
+               if (_cmc.isShowAbsoluteValues) {
+
+                  // absolute time
+
+                  if (_tourData.timeSerie != null) {
+                     timeValue = _tourData.timeSerie[valueIndex];
+                  }
+
+               } else {
+
+                  // relative time
+
+                  timeValue = _hoveredTourMarker.getTime();
+               }
+
+               if (timeValue != Integer.MIN_VALUE) {
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatElapsedTime(timeValue),
+                        UI.UNIT_LABEL_TIME);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
                }
 
             } else {
-
-               // relative time
-
-               timeValue = _hoveredTourMarker.getTime();
+               UI.createSpacer_Horizontal(container, 2);
             }
 
-            if (timeValue != Integer.MIN_VALUE) {
+            if (isShowDuration_Diff) {
 
-               createUI_72_ValueField(
-                     container,
-                     GRAPH_LABEL_TIME,
-                     UI.UNIT_LABEL_TIME,
-                     FormatManager.formatElapsedTime(timeValue));
+               int timeValue = _hoveredTourMarker.getTime();
+
+               if (previousTourMarker != null) {
+                  timeValue -= previousTourMarker.getTime();
+               }
+
+               if (timeValue != Integer.MIN_VALUE) {
+
+                  createUI_72_ValueField(
+                        container,
+                        FormatManager.formatElapsedTime(timeValue),
+                        UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_TIME);
+               } else {
+                  UI.createSpacer_Horizontal(container, 2);
+               }
+
+            } else {
+               UI.createSpacer_Horizontal(container, 2);
             }
          }
       }
-
    }
 
    private void createUI_72_ValueField(final Composite parent,
-                                       final String fieldName,
-                                       final String unit,
-                                       final String valueText) {
+                                       final String valueText,
+                                       final String unit) {
 
-      Label label = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(label);
-      _firstColumnControls.add(label);
-
-      label.setText(fieldName);
+      Label label;
 
       // Value
       label = new Label(parent, SWT.TRAIL);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.FILL)
             .indent(10, 0)
             .applyTo(label);
@@ -537,7 +628,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
          linkUrl.setText(linkText);
 
-         setUrlWidth(linkUrl, linkText);
+         setUrlWidth(linkUrl);
       }
    }
 
@@ -838,8 +929,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
    protected void onDispose() {
 
       _colorCache.dispose();
-
-      _firstColumnControls.clear();
    }
 
    @Override
@@ -926,7 +1015,9 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
       final Display display = container.getDisplay();
 
-      UI.setBackgroundColorForAllChildren(container, display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+      UI.setColorForAllChildren(container,
+            display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
+            display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
    }
 
    void setIsShowMarkerActions(final boolean isShowMarkerActions) {
@@ -983,7 +1074,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       txtControl.setText(text);
    }
 
-   private void setUrlWidth(final Control control, final String text) {
+   private void setUrlWidth(final Control control) {
 
       final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.HashMap;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -1732,6 +1733,10 @@ public class ChartComponentGraph extends Canvas {
 
             drawAsync_560_HorizontalBar(gcGraph, graphDrawingData, isLastGraph);
 
+         } else if (chartType == ChartType.DOT) {
+
+            drawAsync_570_Dots(gcGraph, graphDrawingData, isLastGraph);
+
          } else if (chartType == ChartType.HISTORY) {
 
             drawAsync_600_History(gcGraph, graphDrawingData);
@@ -3205,13 +3210,19 @@ public class ChartComponentGraph extends Canvas {
       path.dispose();
 
       /*
-       * draw path2 above the other graph, this is currently used to draw the srtm graph
+       * Draw path2 above the other graph, this is currently used to draw the srtm or pulse by time
+       * graph
        */
       if (path2 != null) {
 
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         // this color is not yet user defined
+         final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+         final Color path2Color = new Color(complimentColor);
+
+         gc.setForeground(path2Color);
          gc.drawPath(path2);
 
+         path2Color.dispose();
          path2.dispose();
       }
 
@@ -4138,6 +4149,290 @@ public class ChartComponentGraph extends Canvas {
       colorBgDark.dispose();
       colorBgBright.dispose();
       colorText.dispose();
+
+      gc.setAlpha(0xFF);
+      gc.setAntialias(SWT.OFF);
+   }
+
+   /**
+    * Is used for drawing gear values.
+    *
+    * @param gc
+    * @param graphDrawingData
+    * @param isTopGraph
+    */
+   private void drawAsync_570_Dots(final GC gc,
+                                   final GraphDrawingData graphDrawingData,
+                                   final boolean isTopGraph) {
+
+      final ChartDataXSerie xData = graphDrawingData.getXData();
+      final ChartDataYSerie yData = graphDrawingData.getYData();
+
+      final float[][] yHighValues = yData.getHighValuesFloat();
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final float yValues[] = yHighValues[0];
+
+      final int serieSize = xValues.length;
+
+      // create line hovered positions
+      _lineFocusRectangles.add(new RectangleLong[serieSize]);
+      _lineDevPositions.add(new PointLong[serieSize]);
+      _isHoveredLineVisible = true;
+
+      // check array bounds
+      final int yValueLength = yValues.length;
+
+      // get top/bottom border values of the graph
+      final float graphYBorderBottom = graphDrawingData.getGraphYBottom();
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devChartHeight = getDevVisibleGraphHeight();
+
+      final double scaleX = graphDrawingData.getScaleX();
+      final double scaleY = graphDrawingData.getScaleY();
+
+      // get the horizontal offset for the graph
+      float graphValueOffset;
+      if (_chartComponents._synchConfigSrc == null) {
+         // a zoom marker is not set, draw it normally
+         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+      } else {
+         // adjust the start position to the zoom marker position
+         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
+      }
+
+      final Display display = getDisplay();
+
+      final int devGraphHeight = graphDrawingData.devGraphHeight;
+      final float devYGraphBottom = (float) (scaleY * graphYBorderBottom);
+
+      final RectangleLong[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
+      final PointLong[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
+      RectangleLong prevLineRect = null;
+
+      final float devY0Inverse = devGraphHeight + devYGraphBottom;
+
+      final double graphXStart = xValues[0] - graphValueOffset;
+      final float graphYStart = yValues[0];
+
+      float graphYPrev = graphYStart;
+
+      double devXPrev = (scaleX * graphXStart);
+      float devYPrev = (float) (scaleY * graphYPrev);
+
+      final Rectangle chartRectangle = gc.getClipping();
+      final int devXVisibleWidth = chartRectangle.width;
+
+      boolean isDrawFirstPoint = true;
+
+      final int numValues = xValues.length;
+      final int lastIndex = numValues - 1;
+
+      int valueIndexFirstPoint = 0;
+      int prevValueIndex = 0;
+
+      /*
+       * Set the hovered index only ONCE because when autoscrolling is done to the right side this
+       * can cause that the last value is used for the hovered index instead of the previous before
+       * the last
+       */
+      boolean isHoveredIndexSet = false;
+
+      final int dotSize = 3;
+      final int dotSize2 = dotSize / 2;
+
+      // get color
+      final RGB[] rgbLine = yData.getRgbLine();
+      final Color colorLine = new Color(display, rgbLine[0]);
+
+      gc.setAntialias(_chart.graphAntialiasing);
+      gc.setBackground(colorLine);
+
+      boolean isPrevInvalid = true;
+
+      /*
+       * draw the lines into the paths
+       */
+      for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
+
+         // check array bounds
+         if (valueIndex >= yValueLength) {
+            break;
+         }
+
+         final float graphY = yValues[valueIndex];
+
+         if (graphY != graphY) {
+
+            // value is NaN
+
+            isPrevInvalid = true;
+            isDrawFirstPoint = true;
+
+            continue;
+         }
+
+         final double graphX = xValues[valueIndex] - graphValueOffset;
+         final double devX = graphX * scaleX;
+
+         final float devY = (float) (graphY * scaleY);
+
+         // check if position is horizontal visible
+         if (devX < 0 || isPrevInvalid) {
+
+            // keep current position which is used as the starting point for painting
+
+            isPrevInvalid = false;
+
+            graphYPrev = graphY;
+
+            devXPrev = devX;
+            devYPrev = devY;
+            prevValueIndex = valueIndex;
+
+            valueIndexFirstPoint = valueIndex;
+
+            continue;
+         }
+
+         /*
+          * draw first point
+          */
+         if (isDrawFirstPoint) {
+
+            // move to the first point
+
+            isDrawFirstPoint = false;
+
+            // set first point before devX==0 that the first line is not visible but correctly painted
+            final double devXFirstPoint = devXPrev;
+
+            final float devYValue = devY0Inverse - devYPrev;
+
+            /*
+             * set line hover positions for the first point
+             */
+            final long devXRect = (long) devXFirstPoint;
+
+            final RectangleLong currentRect = new RectangleLong(devXRect, 0, 1, devChartHeight);
+            final PointLong currentPoint = new PointLong(devXRect, (long) (devYTop + devYValue));
+
+            lineDevPositions[valueIndexFirstPoint] = currentPoint;
+            lineFocusRectangles[valueIndexFirstPoint] = currentRect;
+
+            prevLineRect = currentRect;
+         }
+
+         /*
+          * draw dot when value has changed
+          */
+         {
+            final float devYValue = devY0Inverse - devY;
+
+            if ((int) devX != (int) devXPrev) {
+
+               // x has changed
+
+               gc.fillArc(
+
+                     (int) devX - dotSize2,
+                     (int) devYValue - dotSize2,
+                     dotSize,
+                     dotSize,
+                     0,
+                     360);
+            }
+
+            /*
+             * set line hover positions
+             */
+            final double devXDiff = (devX - devXPrev) / 2;
+            final double devXDiffWidth = devXDiff < 1 ? 1 : (devXDiff + 0.5);
+            final double devXRect = devX - devXDiffWidth;
+
+            // add the right part of the rectangle width into the previous rectangle
+            prevLineRect.width += devXDiffWidth + 1;
+
+            // check if hovered line is hit
+            if (isHoveredIndexSet == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+
+               _hoveredValuePointIndex = prevValueIndex;
+               isHoveredIndexSet = true;
+            }
+
+            final RectangleLong currentRect = new RectangleLong(
+                  (long) devXRect,
+                  0,
+                  (long) (devXDiffWidth + 1),
+                  devChartHeight);
+
+            final PointLong currentPoint = new PointLong((long) devX, (long) (devYTop + devYValue));
+
+            lineDevPositions[valueIndex] = currentPoint;
+            lineFocusRectangles[valueIndex] = currentRect;
+
+            prevLineRect = currentRect;
+         }
+
+         /*
+          * draw last dot
+          */
+         if (valueIndex == lastIndex || //
+
+         // check if last visible position + 1 is reached
+               devX > devXVisibleWidth) {
+
+            /*
+             * this is the last point for a filled graph
+             */
+
+            final float devYValue = devY0Inverse - devY;
+
+            gc.fillArc(
+
+                  (int) devX - dotSize2,
+                  (int) devYValue - dotSize2,
+                  dotSize,
+                  dotSize,
+                  0,
+                  360);
+
+            /*
+             * set line rectangle
+             */
+            final double devXDiff = (devX - devXPrev) / 2;
+            final long devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+            final long devXRect = (long) (devX - devXDiffWidth);
+
+            // set right part of the rectangle width into the previous rectangle
+            prevLineRect.width += devXDiffWidth;
+
+            // check if hovered value is hit
+            if (isHoveredIndexSet == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+               _hoveredValuePointIndex = valueIndex;
+               isHoveredIndexSet = true;
+            }
+
+            final RectangleLong lastRect = new RectangleLong(devXRect, 0, devXDiffWidth + 1, devChartHeight);
+            final PointLong lastPoint = new PointLong((long) devX, devYTop + (long) devYValue);
+
+            lineDevPositions[valueIndex] = lastPoint;
+            lineFocusRectangles[valueIndex] = lastRect;
+
+            if (isHoveredIndexSet == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
+               _hoveredValuePointIndex = valueIndex;
+            }
+
+            break;
+         }
+
+         devXPrev = devX;
+         devYPrev = devY;
+         prevValueIndex = valueIndex;
+      }
+
+      // dispose resources
+      colorLine.dispose();
 
       gc.setAlpha(0xFF);
       gc.setAntialias(SWT.OFF);

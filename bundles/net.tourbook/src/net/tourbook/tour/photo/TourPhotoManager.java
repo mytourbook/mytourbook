@@ -341,7 +341,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    }
 
    /**
-    * create pseudo tours for photos which are not contained in a tour and remove all tours which
+    * Create pseudo tours for photos which are not contained in a tour and remove all tours which
     * do not contain any photos
     *
     * @param allPhotos
@@ -488,7 +488,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
 
       /*
-       * set tour GPS into photo
+       * Set tour GPS into photo
        */
       final List<TourPhotoLink> tourPhotoLinksWithGps = new ArrayList<>();
 

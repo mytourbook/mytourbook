@@ -1579,16 +1579,19 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       // select map provider in the viewer
       final MP currentMP = _map2View.getMap().getMapProvider();
 
-      /*
-       * Ensure that the map provider is also visible in the viewer
-       */
-      // update model
-      currentMP.setIsVisibleInUI(true);
+      if (currentMP != null) {
 
-      // update UI
-      _mpViewer.refresh();
+         /*
+          * Ensure that the map provider is also visible in the viewer
+          */
+         // update model
+         currentMP.setIsVisibleInUI(true);
 
-      _mpViewer.setSelection(new StructuredSelection(currentMP), true);
+         // update UI
+         _mpViewer.refresh();
+
+         _mpViewer.setSelection(new StructuredSelection(currentMP), true);
+      }
 
       updateUI_HideUnhideMapProviders();
    }

@@ -74,7 +74,7 @@ public class DialogSelectMeasurementSystem extends Dialog {
 
       super.configureShell(shell);
 
-      shell.setText(Messages.Dialog_MeasurementSystem_Title);
+      shell.setText(Messages.Measurement_System_Dialog_Title);
    }
 
    @Override
@@ -109,8 +109,7 @@ public class DialogSelectMeasurementSystem extends Dialog {
             // label: measurement system
 
             final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.Dialog_MeasurementSystem_Label_SelectSystem);
-//            App_Dialog_FirstStartupSystem_Label_SelectSystem=Select a measurement system, the system and the individual parts can be changed afterwards in the settings
+            label.setText(Messages.Measurement_System_Dialog_Label_SelectSystem);
 
             GridDataFactory.fillDefaults()
                   .hint(convertWidthInCharsToPixels(40), SWT.DEFAULT)
