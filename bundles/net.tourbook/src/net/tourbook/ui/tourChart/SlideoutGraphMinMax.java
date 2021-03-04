@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -273,6 +273,9 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private CLabel    _iconSwim_Strokes;
    private CLabel    _iconSwim_Swolf;
+   private boolean   _isShowPaceChartInverted;
+   private String    _graphPaceMinValue = ITourbookPreferences.GRAPH_PACE_MIN_VALUE;
+   private String    _graphPaceMaxValue = ITourbookPreferences.GRAPH_PACE_MAX_VALUE;
 
    public SlideoutGraphMinMax(final Control ownerControl, final ToolBar toolBar) {
 
@@ -752,7 +755,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       final Spinner spinner = new Spinner(parent, SWT.BORDER);
       GridDataFactory.fillDefaults()//
-            .align(SWT.END, SWT.FILL)
+            .align(SWT.FILL, SWT.FILL)
+//            .grab(true, false)
             .applyTo(spinner);
 
       spinner.setMinimum(minValue);
@@ -1072,8 +1076,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefRestoreDefault(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefRestoreDefault(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefRestoreDefault(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefRestoreDefault(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefRestoreDefault(_spinnerMin_Pace, _graphPaceMaxValue);
+         prefRestoreDefault(_spinnerMax_Pace, _graphPaceMinValue);
+      } else {
+         prefRestoreDefault(_spinnerMin_Pace, _graphPaceMinValue);
+         prefRestoreDefault(_spinnerMax_Pace, _graphPaceMaxValue);
+      }
 
       // min/max cadence
       prefRestoreDefault(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1161,6 +1170,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       _parent.setRedraw(false);
 
+      _isShowPaceChartInverted = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_CHART_INVERTED);
+
       _chkEnableMinMax.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
       // min/max altitude
@@ -1184,8 +1195,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefRestoreValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefRestoreValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefRestoreValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefRestoreValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefRestoreValue(_spinnerMin_Pace, _graphPaceMaxValue);
+         prefRestoreValue(_spinnerMax_Pace, _graphPaceMinValue);
+      } else {
+         prefRestoreValue(_spinnerMin_Pace, _graphPaceMinValue);
+         prefRestoreValue(_spinnerMax_Pace, _graphPaceMaxValue);
+      }
 
       // min/max cadence
       prefRestoreValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1292,8 +1308,13 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       // min/max pace
       prefSaveValue(_chkMin_Pace, ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED);
       prefSaveValue(_chkMax_Pace, ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED);
-      prefSaveValue(_spinnerMin_Pace, ITourbookPreferences.GRAPH_PACE_MIN_VALUE);
-      prefSaveValue(_spinnerMax_Pace, ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      if (_isShowPaceChartInverted) {
+         prefSaveValue(_spinnerMin_Pace, _graphPaceMaxValue);
+         prefSaveValue(_spinnerMax_Pace, _graphPaceMinValue);
+      } else {
+         prefSaveValue(_spinnerMin_Pace, _graphPaceMinValue);
+         prefSaveValue(_spinnerMax_Pace, _graphPaceMaxValue);
+      }
 
       // min/max cadence
       prefSaveValue(_chkMin_Cadence, ITourbookPreferences.GRAPH_CADENCE_IS_MIN_ENABLED);
@@ -1417,12 +1438,23 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          final int min = _spinnerMin_Pace.getSelection();
          final int max = _spinnerMax_Pace.getSelection();
 
-         if (min >= max) {
+         if (_isShowPaceChartInverted) {
+            if (min <= max) {
 
-            if (max == PACE_MAX) {
-               _spinnerMin_Pace.setSelection(max - 1);
-            } else {
-               _spinnerMax_Pace.setSelection(min + 1);
+               if (max == PACE_MAX) {
+                  _spinnerMax_Pace.setSelection(max + 1);
+               } else {
+                  _spinnerMin_Pace.setSelection(min + 1);
+               }
+            }
+         } else {
+            if (min >= max) {
+
+               if (max == PACE_MAX) {
+                  _spinnerMin_Pace.setSelection(max - 1);
+               } else {
+                  _spinnerMax_Pace.setSelection(min + 1);
+               }
             }
          }
       }

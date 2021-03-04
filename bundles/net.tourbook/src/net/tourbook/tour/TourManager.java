@@ -4259,6 +4259,7 @@ public class TourManager {
          yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
          yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
          yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
+         yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_CHART_INVERTED));
 
          if (useGraphBgStyle) {
             yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);

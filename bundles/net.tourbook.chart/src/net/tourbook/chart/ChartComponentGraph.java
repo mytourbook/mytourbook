@@ -122,7 +122,7 @@ public class ChartComponentGraph extends Canvas {
    /**
     * This image contains one single graph without title and x-axis with units.
     * <p>
-    * This image was created to fix clipping bugs which occured when gradient filling was painted
+    * This image was created to fix clipping bugs which occurred when gradient filling was painted
     * with a path.
     */
    private Image                       _chartImage_10_Graphs;
@@ -187,7 +187,7 @@ public class ChartComponentGraph extends Canvas {
    private double                      _zoomRatioCenterKey;
 
    /**
-    * when the slider is dragged and the mouse up event occures, the graph is zoomed to the sliders
+    * when the slider is dragged and the mouse up event occurs, the graph is zoomed to the sliders
     * when set to <code>true</code>
     */
    boolean                             _canAutoZoomToSlider;
@@ -732,8 +732,15 @@ public class ChartComponentGraph extends Canvas {
       final int devYSliderLine1 = slider1.getDevYSliderLine();
       final int devYSliderLine2 = slider2.getDevYSliderLine();
 
-      final double graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
-      final double graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+      double graphValue1 = 0;
+      double graphValue2 = 0;
+      if (drawingData.getYData().isYAxisDirection()) {
+         graphValue1 = (((double) devYBottom - devYSliderLine1) / scaleY + graphYBottom);
+         graphValue2 = (((double) devYBottom - devYSliderLine2) / scaleY + graphYBottom);
+      } else {
+         graphValue1 = (((double) devYSliderLine1 - devYTop) / scaleY + graphYBottom);
+         graphValue2 = (((double) devYSliderLine2 - devYTop) / scaleY + graphYBottom);
+      }
 
       // get value which was adjusted
       if (_ySliderDragged == slider1) {
@@ -1184,8 +1191,15 @@ public class ChartComponentGraph extends Canvas {
          /*
           * get the y position of the marker which marks the y value in the graph
           */
-         int devYGraph = drawingData.getDevYBottom()
-               - (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         int devYGraph = 0;
+
+         if (drawingData.getYData().isYAxisDirection()) {
+            devYGraph = drawingData.getDevYBottom()
+                  - (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         } else {
+            devYGraph = drawingData.getDevYTop()
+                  + (int) ((yValue - drawingData.getGraphYBottom()) * drawingData.getScaleY());
+         }
 
          if (yValue < yData.getVisibleMinValue()) {
             devYGraph = drawingData.getDevYBottom();
@@ -1477,10 +1491,10 @@ public class ChartComponentGraph extends Canvas {
          public void run() {
 
             /*
-             * create the chart image only when a new onPaint event has not occured
+             * create the chart image only when a new onPaint event has not occurred
              */
             if (__runnableBgCounter != _drawAsyncCounter[0]) {
-               // a new onPaint event occured
+               // a new onPaint event occurred
                return;
             }
 
@@ -2970,7 +2984,11 @@ public class ChartComponentGraph extends Canvas {
                      path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
                   }
 
-                  devY = devY0Inverse - devY1;
+                  if (yData.isYAxisDirection()) {
+                     devY = devY0Inverse - devY1;
+                  } else {
+                     devY = devY1 - devY_XAxisLine;
+                  }
 
                   path.lineTo(devXf, devY);
 
@@ -3175,7 +3193,7 @@ public class ChartComponentGraph extends Canvas {
          }
       }
 
-      // reset clipping that the line is drawn everywere
+      // reset clipping that the line is drawn everywhere
       gc.setClipping((Rectangle) null);
 
       gc.setBackground(colorLine);
@@ -5209,8 +5227,14 @@ public class ChartComponentGraph extends Canvas {
 
             final StringBuilder labelText = new StringBuilder();
 
-            final float devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
-                  + drawingData.getGraphYBottom());
+            float devYValue = 0;
+            if (drawingData.getYData().isYAxisDirection()) {
+               devYValue = (float) (((double) devYBottom - devYSliderLine) / drawingData.getScaleY()
+                     + drawingData.getGraphYBottom());
+            } else {
+               devYValue = (float) ((devYSliderLine - (double) devYTop) / drawingData.getScaleY()
+                     + drawingData.getGraphYBottom());
+            }
 
             final String unitLabel = yData.getUnitLabel();
 
@@ -6119,7 +6143,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * Mouse event occured in the value point tooltip, move the slider and/or hovered line (value
+    * Mouse event occurred in the value point tooltip, move the slider and/or hovered line (value
     * point) accordingly.
     *
     * @param event
@@ -6779,7 +6803,7 @@ public class ChartComponentGraph extends Canvas {
             // mouse mode: zoom chart
 
             /*
-             * set position where the double click occured, this position will be used when the
+             * set position where the double click occurred, this position will be used when the
              * chart is zoomed
              */
             final double xxDevMousePosInChart = _xxDevViewPortLeftBorder + e.x;
@@ -6829,7 +6853,7 @@ public class ChartComponentGraph extends Canvas {
             // right button is pressed
 
 // this was disabled because it is not working on OSX, partly it works,
-// propably depending on the mouse: OSX mouse or Logitech mouse
+// probably depending on the mouse: OSX mouse or Logitech mouse
 //            computeSliderForContextMenu(devXMouse, devYMouse);
          }
          return;
@@ -8022,7 +8046,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * set position where the double click occured, this position will be used when the chart is
+       * set position where the double click occurred, this position will be used when the chart is
        * zoomed
        */
       _zoomRatioCenter = (double) xxDevSliderLinePos / _xxDevGraphWidth;
@@ -8074,7 +8098,7 @@ public class ChartComponentGraph extends Canvas {
       _chartComponents.onResize();
 
       /*
-       * set position where the double click occured, this position will be used when the chart is
+       * set position where the double click occurred, this position will be used when the chart is
        * zoomed
        */
       _zoomRatioCenter = (double) xxDevNewPosition / _xxDevGraphWidth;
