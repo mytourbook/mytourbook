@@ -215,11 +215,15 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return null;
    }
 
-   private int uploadRoutes(final Map<String, String> toursWithGpsSeries) {
+   private int uploadRoutes(final Map<String, String> toursWithGpsSeries, final IProgressMonitor monitor) {
 
       final List<CompletableFuture<RouteUpload>> activityUploads = new ArrayList<>();
 
       for (final Map.Entry<String, String> tourToUpload : toursWithGpsSeries.entrySet()) {
+
+         if (monitor.isCanceled()) {
+            return 0;
+         }
 
          final String tourStartTime = tourToUpload.getKey();
          final String tourGpx = tourToUpload.getValue();
@@ -229,7 +233,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       final int[] numberOfUploadedTours = new int[1];
       activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
-         if (logUploadResult(activityUpload)) {
+         if (monitor.isCanceled()) {
+            return;
+         } else if (logUploadResult(activityUpload)) {
             ++numberOfUploadedTours[0];
          }
       });
@@ -283,7 +289,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
-               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
+               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries, monitor);
             } else {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
             }

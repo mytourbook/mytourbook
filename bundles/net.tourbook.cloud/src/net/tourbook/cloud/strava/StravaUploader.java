@@ -444,7 +444,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
-            numberOfUploadedTours[0] = uploadTours(toursWithTimeSeries, manualTours);
+            numberOfUploadedTours[0] = uploadTours(toursWithTimeSeries, manualTours, monitor);
 
             monitor.worked(toursWithTimeSeries.size() + manualTours.size());
 
@@ -476,11 +476,15 @@ public class StravaUploader extends TourbookCloudUploader {
       }
    }
 
-   private int uploadTours(final Map<String, TourData> toursWithTimeSeries, final List<TourData> manualTours) {
+   private int uploadTours(final Map<String, TourData> toursWithTimeSeries, final List<TourData> manualTours, final IProgressMonitor monitor) {
 
       final List<CompletableFuture<ActivityUpload>> activityUploads = new ArrayList<>();
 
       for (final Map.Entry<String, TourData> tourToUpload : toursWithTimeSeries.entrySet()) {
+
+         if (monitor.isCanceled()) {
+            return 0;
+         }
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
          final TourData tourData = tourToUpload.getValue();
@@ -492,7 +496,9 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final int[] numberOfUploadedTours = new int[1];
       activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
-         if (logUploadResult(activityUpload)) {
+         if (monitor.isCanceled()) {
+            return;
+         } else if (logUploadResult(activityUpload)) {
             ++numberOfUploadedTours[0];
          }
       });
