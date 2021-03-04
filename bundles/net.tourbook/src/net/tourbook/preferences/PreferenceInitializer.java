@@ -230,7 +230,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // Show the pace chart inverted: High speeds/low paces at the top of the graph and
       // the low speeds/high paces at the bottom of the graph
-      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_CHART_INVERTED, true);
+      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);

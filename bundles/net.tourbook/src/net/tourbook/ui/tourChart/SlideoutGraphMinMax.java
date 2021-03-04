@@ -1169,7 +1169,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       _parent.setRedraw(false);
 
-      _isShowPaceChartInverted = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_CHART_INVERTED);
+      _isShowPaceChartInverted = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED);
 
       _chkEnableMinMax.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED));
 
