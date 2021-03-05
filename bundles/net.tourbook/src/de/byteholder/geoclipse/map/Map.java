@@ -157,7 +157,7 @@ public class Map extends Canvas {
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int              MAP_MAX_ZOOM_LEVEL                    = 19;
+   public static final int              MAP_MAX_ZOOM_LEVEL                    = 333;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
