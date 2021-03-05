@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -384,8 +384,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private ChartStatisticSegments createChartSegments() {
 
-      final double segmentStart[] = new double[_numberOfYears];
-      final double segmentEnd[] = new double[_numberOfYears];
+      final double[] segmentStart = new double[_numberOfYears];
+      final double[] segmentEnd = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
       final int firstYear = getFirstYear();
@@ -486,7 +486,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int serieIndex,
                                 int valueIndex) {
 
       if (valueIndex >= _DOYValues.size()) {
@@ -649,7 +648,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
          @Override
          public void afterHideToolTip(final Event event) {
             // hide hovered image
-            _yearChart.getToolTipControl().afterHideToolTip(event);
+            _yearChart.getToolTipControl().afterHideToolTip();
          }
       });
 
@@ -1100,7 +1099,7 @@ public class RefTour_YearStatistic_View extends ViewPart {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            RefTour_YearStatistic_View.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 

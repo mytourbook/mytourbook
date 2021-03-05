@@ -825,7 +825,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          public void afterHideToolTip(final Event event) {
 
             // hide hovered image
-            getToolTipControl().afterHideToolTip(event);
+            getToolTipControl().afterHideToolTip();
          }
       });
       setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);
