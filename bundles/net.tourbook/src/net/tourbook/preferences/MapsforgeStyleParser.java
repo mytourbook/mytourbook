@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2021 Wolfgang Schramm and Contributors
- * Copyright (C) 2019, 2020 Thomas Theussing
+ * Copyright (C) 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
