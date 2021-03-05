@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * Copyright (C) 2019 Thomas Theussing
+ * Copyright (C) 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,48 +16,36 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25View;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.marker.MarkerConfig;
 
 /**
  * Map 2.5D photo properties slideout.
  */
 public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
-   private SelectionAdapter   _defaultSelectionListener;
+//   private SelectionAdapter _defaultSelectionListener;
 
-   private SelectionAdapter   _layerSelectionListener;
-   
-   private FocusListener      _keepOpenListener;
-   private PixelConverter     _pc;
-   
-   private Map25View          _map25View;
+   private SelectionAdapter _layerSelectionListener;
+
+//   private FocusListener    _keepOpenListener;
+//   private PixelConverter   _pc;
+
+   private Map25View _map25View;
 
    /*
     * UI controls
@@ -65,11 +53,10 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    private Composite _parent;
 
    //private Button    _chkIsShowPhoto;
-   private Button    _chkIsShowPhotoTitle;
-   private Button    _chkIsPhotoClustered;
+   private Button _chkIsShowPhotoTitle;
+   private Button _chkIsPhotoClustered;
 
-   private Button    _chkUseDraggedKeyboardNavigation;
-
+//   private Button _chkUseDraggedKeyboardNavigation;
 
    /**
     * @param ownerControl
@@ -77,8 +64,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
     * @param map25View
     */
    public SlideoutMap25_PhotoOptions(final Control ownerControl,
-                                   final ToolBar toolBar,
-                                   final Map25View map25View) {
+                                     final ToolBar toolBar,
+                                     final Map25View map25View) {
 
       super(ownerControl, toolBar);
 
@@ -119,7 +106,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
             createUI_10_Title(container);
 
             createUI_50_Layer(container);
-            createUI_80_Other(container);
+            createUI_80_Other();//container);
          }
       }
 
@@ -151,7 +138,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
             .applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
-         
+
 //         {
 //            /*
 //             * Photo
@@ -160,7 +147,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 //            _chkIsShowPhoto.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo");
 //            _chkIsShowPhoto.setToolTipText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Tooltip");
 //            _chkIsShowPhoto.addSelectionListener(_layerSelectionListener);
-//         }       
+//         }
          {
             /*
              * Photo Clustering
@@ -180,11 +167,10 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
             _chkIsShowPhotoTitle.addSelectionListener(_layerSelectionListener);
          }
 
-
       }
    }
 
-   private void createUI_80_Other(final Composite parent) {
+   private void createUI_80_Other() {//final Composite parent) {
 
 //      final Composite container = new Composite(parent, SWT.NONE);
 //      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -194,11 +180,11 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 //            .applyTo(container);
 //      {
 //         {
-            /*
-             * Keyboard navigation
-             */
+      /*
+       * Keyboard navigation
+       */
 
-            // checkbox
+      // checkbox
 //            _chkUseDraggedKeyboardNavigation = new Button(container, SWT.CHECK);
 //            _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation);
 //            _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip);
@@ -210,81 +196,76 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 //                  .applyTo(_chkUseDraggedKeyboardNavigation);
 //         }
 //      }
-      
+
    }
 
    private void enableActions() {
       Map25App.debugPrint("slideout: enableActions"); //$NON-NLS-1$
-     // final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
+      // final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
 
-     // _spinnerHillshadingOpacity.setEnabled(isHillShading);
+      // _spinnerHillshadingOpacity.setEnabled(isHillShading);
 
       // force UI update otherwise the slideout UI update is done after the map is updated
       _parent.update();
    }
 
    private void initUI(final Composite parent) {
-      Map25App.debugPrint("slideout: initUI");  //$NON-NLS-1$
+      Map25App.debugPrint("slideout: initUI"); //$NON-NLS-1$
       _parent = parent;
 
-      _pc = new PixelConverter(parent);
+//      _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+//      _defaultSelectionListener = new SelectionAdapter() {
+//         @Override
+//         public void widgetSelected(final SelectionEvent e) {
+//            onChangeUI();
+//         }
+//      };
 
-
-
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
+//      _keepOpenListener = new FocusListener() {
+//
+//         @Override
+//         public void focusGained(final FocusEvent e) {
+//
+//            /*
+//             * This will fix the problem that when the list of a combobox is displayed, then the
+//             * slideout will disappear :-(((
+//             */
+//            setIsAnotherDialogOpened(true);
+//         }
+//
+//         @Override
+//         public void focusLost(final FocusEvent e) {
+//            setIsAnotherDialogOpened(false);
+//         }
+//      };
 
       _layerSelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             onModify_Layer();
-           _map25View.getMapApp();
-         Map25App.debugPrint("slideout: widget selected");  //$NON-NLS-1$
+            _map25View.getMapApp();
+            Map25App.debugPrint("slideout: widget selected"); //$NON-NLS-1$
          }
       };
 
-
    }
 
-   private void onChangeUI() {
-      Map25App.debugPrint("slideout: onChangeUI");  //$NON-NLS-1$
-      saveState();
-
-      enableActions();
-   }
-
-
+//   private void onChangeUI() {
+//      Map25App.debugPrint("slideout: onChangeUI"); //$NON-NLS-1$
+//      saveState();
+//
+//      enableActions();
+//   }
 
    private void onModify_Layer() {
-      Map25App.debugPrint("slideout: onModify_Layer");  //$NON-NLS-1$
+      Map25App.debugPrint("slideout: onModify_Layer"); //$NON-NLS-1$
       final Map25App mapApp = _map25View.getMapApp();
 
-     // mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());
+      // mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());
 
       mapApp.setIsPhotoClustered(_chkIsPhotoClustered.getSelection());
-      
+
       mapApp.setIsPhotoShowTitle(_chkIsShowPhotoTitle.getSelection());
 
       enableActions();
@@ -297,20 +278,20 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
       final Map25App mapApp = _map25View.getMapApp();
 
-     //_chkIsShowPhoto.setSelection(mapApp.getLayer_Photo().isEnabled());
+      //_chkIsShowPhoto.setSelection(mapApp.getLayer_Photo().isEnabled());
 
       _chkIsPhotoClustered.setSelection(mapApp.getIsPhotoClustered());
 
-      _chkIsShowPhotoTitle.setSelection(mapApp.getIsPhotoShowTitle());   
-      
+      _chkIsShowPhotoTitle.setSelection(mapApp.getIsPhotoShowTitle());
+
    }
 
-   private void saveState() {
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-    //  config.isShowPhoto = _chkIsShowPhoto.getSelection();
-      config.isShowPhotoTitle = _chkIsShowPhotoTitle.getSelection();
-      config.isPhotoClustered = _chkIsPhotoClustered.getSelection();
-      //Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
-   }
+//   private void saveState() {
+//      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+//      //  config.isShowPhoto = _chkIsShowPhoto.getSelection();
+//      config.isShowPhotoTitle = _chkIsShowPhotoTitle.getSelection();
+//      config.isPhotoClustered = _chkIsPhotoClustered.getSelection();
+//      //Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
+//   }
 
 }
