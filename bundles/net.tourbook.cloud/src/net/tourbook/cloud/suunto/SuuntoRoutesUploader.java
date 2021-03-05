@@ -266,7 +266,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
-            for (int index = 0; index < numberOfTours; ++index) {
+            for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
 
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);

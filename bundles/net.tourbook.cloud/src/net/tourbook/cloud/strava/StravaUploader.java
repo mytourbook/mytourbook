@@ -410,7 +410,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final List<TourData> manualTours = new ArrayList<>();
-            for (int index = 0; index < numberOfTours; ++index) {
+            for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
 
                final TourData tourData = selectedTours.get(index);
 
