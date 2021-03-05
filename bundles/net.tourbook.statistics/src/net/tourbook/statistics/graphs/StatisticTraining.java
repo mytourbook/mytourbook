@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -193,7 +193,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          @Override
          public void afterHideToolTip(final Event event) {
             // hide hovered image
-            _chart.getToolTipControl().afterHideToolTip(event);
+            _chart.getToolTipControl().afterHideToolTip();
          }
       });
 
@@ -623,7 +623,7 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
    public boolean selectTour(final Long tourId) {
 
       final long[] tourIds = _statisticData_Training.allTourIds;
-      final boolean selectedItems[] = new boolean[tourIds.length];
+      final boolean[] selectedItems = new boolean[tourIds.length];
       boolean isSelected = false;
 
       // find the tour which has the same tourId as the selected tour

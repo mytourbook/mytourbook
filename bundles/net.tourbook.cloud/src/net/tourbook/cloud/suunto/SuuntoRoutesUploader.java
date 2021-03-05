@@ -215,11 +215,15 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
       return null;
    }
 
-   private int uploadRoutes(final Map<String, String> toursWithGpsSeries) {
+   private int uploadRoutes(final Map<String, String> toursWithGpsSeries, final IProgressMonitor monitor) {
 
       final List<CompletableFuture<RouteUpload>> activityUploads = new ArrayList<>();
 
       for (final Map.Entry<String, String> tourToUpload : toursWithGpsSeries.entrySet()) {
+
+         if (monitor.isCanceled()) {
+            return 0;
+         }
 
          final String tourStartTime = tourToUpload.getKey();
          final String tourGpx = tourToUpload.getValue();
@@ -229,7 +233,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       final int[] numberOfUploadedTours = new int[1];
       activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
-         if (logUploadResult(activityUpload)) {
+         if (monitor.isCanceled()) {
+            return;
+         } else if (logUploadResult(activityUpload)) {
             ++numberOfUploadedTours[0];
          }
       });
@@ -260,7 +266,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
             final Map<String, String> toursWithGpsSeries = new HashMap<>();
-            for (int index = 0; index < numberOfTours; ++index) {
+            for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
 
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
@@ -283,7 +289,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
             if (SuuntoTokensRetrievalHandler.getValidTokens()) {
-               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries);
+               numberOfUploadedTours[0] = uploadRoutes(toursWithGpsSeries, monitor);
             } else {
                TourLogManager.logError(LOG_CLOUDACTION_INVALIDTOKENS);
             }
@@ -302,7 +308,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(NLS.bind(Messages.Log_UploadRoutesToSuunto_001_Start, numberOfTours));
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 

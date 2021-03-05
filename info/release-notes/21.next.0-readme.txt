@@ -25,11 +25,6 @@ TODO's
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
 
-* For Frederic: Modified texts
-
-  - Dialog_CustomConfig_Label_UserAgent_Tooltip
-
-
 Issues
 ======
 
@@ -74,8 +69,8 @@ Improvements
   - Marker Tooltip (Frederic)
     - Ability to show/hide the following data: Elevation, Distance, Duration, Elevation Gain Difference, Distance Difference, Duration Difference
 
-  - Pace chart (Frederic)
-    - Added a checkbox to select the pace graph display type. When checked (default behavior), it will display the pace chart in descending order to show the low paces (high speeds) at the top of the graph and the high paces (low speeds) at the bottom of the graph for a more intuitive chart. When unchecked, the opposite will be displayed.
+  - Pace graph (Frederic)
+    - Added a checkbox to select the pace graph display type. When checked (default behavior), it will display the pace graph in descending order to show the low paces (high speeds) at the top of the graph and the high paces (low speeds) at the bottom of the graph for a more intuitive chart. When unchecked, the opposite will be displayed.
     
 * Tour Blog
   - Set content font size

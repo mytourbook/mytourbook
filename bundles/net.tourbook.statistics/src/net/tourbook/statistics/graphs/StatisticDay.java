@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -192,7 +192,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
          @Override
          public void afterHideToolTip(final Event event) {
             // hide hovered image
-            _chart.getToolTipControl().afterHideToolTip(event);
+            _chart.getToolTipControl().afterHideToolTip();
          }
       });
 
@@ -291,7 +291,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
     */
    private void createToolTipUI(final IToolTipProvider toolTipProvider,
                                 final Composite parent,
-                                final int serieIndex,
                                 int valueIndex) {
 
       final int[] tourDOYValues = _statisticData_Day.getDoyValues();
@@ -607,7 +606,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    public boolean selectTour(final Long tourId) {
 
       final long[] tourIds = _statisticData_Day.allTourIds;
-      final boolean selectedItems[] = new boolean[tourIds.length];
+      final boolean[] selectedItems = new boolean[tourIds.length];
       boolean isSelected = false;
 
       // find the tour which has the same tourId as the selected tour
@@ -631,14 +630,14 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       return isSelected;
    }
 
-   private void setChartProviders(final Chart chartWidget, final ChartDataModel chartModel) {
+   private void setChartProviders(final ChartDataModel chartModel) {
 
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
          public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            StatisticDay.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+            StatisticDay.this.createToolTipUI(toolTipProvider, parent, valueIndex);
          }
       });
 
@@ -718,7 +717,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       final int yearDays = TimeTools.getNumberOfDaysWithYear(_statSelectedYear);
       chartModel.setChartMinWidth(yearDays);
 
-      setChartProviders(_chart, chartModel);
+      setChartProviders(chartModel);
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);

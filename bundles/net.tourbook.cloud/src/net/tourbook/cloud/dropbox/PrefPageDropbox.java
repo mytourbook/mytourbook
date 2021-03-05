@@ -152,7 +152,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void createUI_20_TokensInformation(final Composite parent) {
 
-      final PixelConverter pc = new PixelConverter(parent);
+      final int textWidth = new PixelConverter(parent).convertWidthInCharsToPixels(60);
 
       _group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_group);
@@ -178,11 +178,12 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          {
             _labelAccessToken = new Label(_group, SWT.NONE);
             _labelAccessToken.setText(PREFPAGE_CLOUDCONNECTIVITY_LABEL_ACCESSTOKEN);
+            _labelAccessToken.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
             _labelAccessToken_Value = new Label(_group, SWT.WRAP);
             _labelAccessToken_Value.setToolTipText(Messages.PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip);
-            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelAccessToken_Value);
+            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_labelAccessToken_Value);
          }
          {
             _labelRefreshToken = new Label(_group, SWT.NONE);
@@ -190,7 +191,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _labelRefreshToken_Value = new Label(_group, SWT.WRAP);
-            GridDataFactory.fillDefaults().hint(pc.convertWidthInCharsToPixels(60), SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
+            GridDataFactory.fillDefaults().hint(textWidth, SWT.DEFAULT).applyTo(_labelRefreshToken_Value);
          }
          {
             _labelExpiresAt = new Label(_group, SWT.NONE);
@@ -314,7 +315,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       if (isOK) {
          _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, _labelAccessToken_Value.getText());
          _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, _labelRefreshToken_Value.getText());
+
          if (StringUtils.isNullOrEmpty(_labelExpiresAt_Value.getText())) {
+
             _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME, UI.EMPTY_STRING);
             _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN_EXPIRES_IN, UI.EMPTY_STRING);
          }
