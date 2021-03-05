@@ -90,7 +90,6 @@ public class MapsforgeStyleParser {
     * @param xmlFile
     * @return
     */
-   @SuppressWarnings({ "unchecked", "null" })
    public List<MapsforgeThemeStyle> readXML(final String xmlFile) {
 
       final List<MapsforgeThemeStyle> items = new ArrayList<>();
