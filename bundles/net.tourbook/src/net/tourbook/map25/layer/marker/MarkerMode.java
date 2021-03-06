@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2019 Wolfgang Schramm and Contributors
- * Copyright 2019, 2021 Thomas Theussing
+ * Copyright 2019, 2020 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@
 package net.tourbook.map25.layer.marker;
 
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
 
 /**
  * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} depends on this.
@@ -29,9 +30,11 @@ public enum MarkerMode {
     */
    DEMO,
 
+
    /**
     * show only real existing markers
     */
    NORMAL,
+
 
 }

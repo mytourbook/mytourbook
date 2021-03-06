@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2019, 2020 Wolfgang Schramm and Contributors
- * Copyright (C) 2019, 2021 Thomas Theussing
+ * Copyright (C) 2019, 2020 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,7 @@ public class MapsforgeStyleParser {
     *
     * @param args
     */
-   public static void main(final String[] args) {
+   public static void main(final String args[]) {
 
       final MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
       //List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
@@ -90,6 +90,7 @@ public class MapsforgeStyleParser {
     * @param xmlFile
     * @return
     */
+   @SuppressWarnings({ "unchecked", "null" })
    public List<MapsforgeThemeStyle> readXML(final String xmlFile) {
 
       final List<MapsforgeThemeStyle> items = new ArrayList<>();
@@ -129,28 +130,32 @@ public class MapsforgeStyleParser {
                      if (attribute.getName().toString().equals(ID)) {
                         item.setXmlLayer(attribute.getValue());
                      }
-                     if (attribute.getName().toString().equals(VISIBLE) && attribute.getValue().equals("true")) { //$NON-NLS-1$
-                        //item.setXmlLayer(attribute.getValue());
-                        Style = true;
+                     if (attribute.getName().toString().equals(VISIBLE)) {
+                        if (attribute.getValue().equals("true")) { //$NON-NLS-1$
+                           //item.setXmlLayer(attribute.getValue());
+                           Style = true;
+                        }
                      }
                   }
                }
-               if (event.isStartElement() && event.asStartElement().getName().getLocalPart().equals(NAME)) {
-                  final Iterator<Attribute> name_attributes = startElement.getAttributes();
-                  while (name_attributes.hasNext()) { //in the same line as <layer>
-                     final Attribute name_attribute = name_attributes.next();
-                     if (name_attribute.getName().toString().equals(LANG)) {
-                        na_language = name_attribute.getValue();
+               if (event.isStartElement()) {
+                  if (event.asStartElement().getName().getLocalPart().equals(NAME)) {
+                     final Iterator<Attribute> name_attributes = startElement.getAttributes();
+                     while (name_attributes.hasNext()) { //in the same line as <layer>
+                        final Attribute name_attribute = name_attributes.next();
+                        if (name_attribute.getName().toString().equals(LANG)) {
+                           na_language = name_attribute.getValue();
+                        }
+                        if (name_attribute.getName().toString().equals(VALUE)) {
+                           na_value = name_attribute.getValue();
+                        }
                      }
-                     if (name_attribute.getName().toString().equals(VALUE)) {
-                        na_value = name_attribute.getValue();
+                     if (Style) {
+                        item.setName(na_language, na_value);
                      }
+                     event = eventReader.nextEvent();
+                     continue;
                   }
-                  if (Style) {
-                     item.setName(na_language, na_value);
-                  }
-                  event = eventReader.nextEvent();
-                  continue;
                }
             }
             // If we reach the end of an item element, we add it to the list
