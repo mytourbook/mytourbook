@@ -22,6 +22,9 @@ TODO's
   I am thinking you could display the logo "Compatible With Strava" on the website in the next release and that would comply with their requirements ?
 
 
+* Website: Update Eclipse IDE for developers, see Thomas mail - https://mytourbook.sourceforge.io/mytourbook/index.php/development/dev-ide/development-env-installation
+
+
 * Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
 
 
