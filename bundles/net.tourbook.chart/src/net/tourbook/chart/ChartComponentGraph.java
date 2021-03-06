@@ -684,7 +684,7 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.KeyDown, event -> onKeyDown(event));
+      addListener(SWT.KeyDown, this::onKeyDown);
 
       addDisposeListener(disposeEvent -> onDispose());
 
@@ -3445,8 +3445,9 @@ public class ChartComponentGraph extends Canvas {
             /*
              * make sure the bars do not overlap
              */
-            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE) {
-               if (devXPosNextBar > 0 && devXPos < devXPosNextBar) {
+            if (serieLayout != ChartDataYSerie.BAR_LAYOUT_SINGLE_SERIE && devXPosNextBar > 0) {
+
+               if (devXPos < devXPosNextBar) {
 
                   // bars do overlap
 
