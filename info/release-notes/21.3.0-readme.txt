@@ -38,18 +38,14 @@ New
 ===
 
 * Suunto App Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/299
-  - Ability to download tours (FIT format)
-  - Ability to upload tours as routes to be used for navigation
+  - Download tours (FIT format)
+  - Upload tours as routes to be used for navigation
 
 * Strava Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/273
-  - Ability to upload tours to a Strava account.
-
-* 2D Map (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/289
- - Added the possibility to configure a "User-Agent" for a custom map provider
- - Added the possibility to export the current map view to an image file (jpeg, png or bmp) or to the clipboard
+  - Upload tours to a Strava account
 
 * Compress Database
-  This tool can compress the internal sql database. After updating MyTourbook to 21.2, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
+  This tool can compress the internal sql database. After updating MyTourbook to 21.3, the latitude/longitude values are saved with half of the previous size. This reduced the diskspace by e.g. 110 MByte when the database was compressed after the migration.
 
 
 Improvements
@@ -65,15 +61,24 @@ Improvements
   - Added the speed and power values in the TCX exports
 
 * Tour Chart
-  - Show heartbeat values
-    - Beat values from device
-    - R-R intervals
+  - Show heartbeat values as
+    - Beat values from device (less accurate)
+    - R-R intervals (saved in milliseconds)
 
   - Marker Tooltip (Frederic)
-    - Ability to show/hide the following data: Elevation, Distance, Duration, Elevation Gain Difference, Distance Difference, Duration Difference
+    - Show/hide 
+      Elevation, Elevation Gain Difference 
+      Distance, Distance Difference
+      Duration, Duration Difference
 
   - Pace graph (Frederic)
-    - Added a checkbox to select the pace graph display type. When checked (default behavior), it will display the pace graph in descending order to show the low paces (high speeds) at the top of the graph and the high paces (low speeds) at the bottom of the graph for a more intuitive chart. When unchecked, the opposite will be displayed.
+    - Added checkbox to select the pace graph display type. 
+      When checked (default behavior), it will display the pace graph in descending order to show the low paces (high speeds) at the top of the graph and the high paces (low speeds) at the bottom of the graph for a more intuitive chart. 
+      When unchecked, the opposite will be displayed.
+
+* 2D Map (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/289
+ - Export map view to an image file (jpeg, png or bmp) or to the clipboard
+ - Set a "User-Agent" for a custom map provider
     
 * Tour Blog
   - Set content font size
@@ -85,16 +90,15 @@ Improvements
 Changes  
 =======
 
+* 2D Map
+  - Minor reordering of the context menu actions
+
+* Latitude/longitude values are saved in E6 format
+  This reduces the precision in the worst case (at the equator) to 0.11132m which is less than the accuracy of the GPS system, see https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
+
 * Dropbox Integration (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/277
   - Switched to the new PKCE OAuth2 flow (The Implicit grant flow previously used is now considered deprecated by Dropbox: "[Legacy. We recommend the PKCE flow.]")
   - Because Dropbox doesn't support Web Views, the authorization is now done in the user's default browser. See the PR link for the details about the new authorization steps
-
-* 2D Map
-  - Reordered context menu actions a little bit
-
-* Latitude/longitude values are saved in E6 format
-  This reduces the precision in the worst case (at the equator) to 0.11132m which is less than the accuracy of the GPS system
-  https://stackoverflow.com/questions/6059691/android-google-map-accuracy-issue
     
 
 Bugfix
@@ -108,28 +112,28 @@ Bugfix
 * TCX Import (Frederic)
   - The pause import for some TCX formats could lead to multiple erroneous pauses
 
-* Pause Re-Import (Frederic)
-  - In some scenarii, the pause re-import could be imcomplete if the tour originally contained pauses and the new file doesn't contain any
-
 * TCX Export (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/287
   - Fixed the TCX Course Export format as it was not properly formatted before and was preventing from importing TCX Courses in Garmin Connect
+
+* Suunto SML & XML Import (Frederic)
+  - Markers are now imported
+  - Fixed possible NPE
+
+* Pause Re-Import (Frederic)
+  - In some scenarii, the pause re-import could be incomplete if the tour originally contained pauses and the new file doesn't contain any
+
+* Day Time Statistics (Frederic)
+  - Fixed a bug where dragging the horizontal sliders dragged the opposite slider. Also, the value of the sliders were inverted.
 
 * Dialog Adjust Elevation
   - Show dialog tour chart with a better default size when opened the first time 
   
 * Tour Database Update
   Fixed 3 different issues when updating tour database from the very first public version 3.
-  Depending on the version being updated, these issues occurred or not
+  These issues occurred, depending on the version which is being updated 
     - Column renaming could fail
     - Serie data could be dropped
     - Entity manager was running in update 3->4, moved it into the 3->4 post update  
-
-* Suunto SML & XML formats (Frederic)
-  - Markers are now imported
-  - Fixed possible NPE
-
-* Day time statistics (Frederic)
-  - Fixed a bug where dragging the horizontal sliders dragged the opposite slider. Also, the value of the sliders were inverted.
 
 
 Translation    
@@ -145,5 +149,5 @@ Translation
 System   
 ======
 
-* Eclipse 2020-12 (maybe)
+* Eclipse 2020-9
 * FIT SDK 21.47
