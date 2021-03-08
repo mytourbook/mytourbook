@@ -162,7 +162,10 @@ public class SplashManager {
 
    public void close() {
 
-      splashShell.close();
+      if (!splashShell.isDisposed()) {
+         splashShell.close();
+      }
+
       splashShell = null;
       textLabel = null;
       textRect = null;

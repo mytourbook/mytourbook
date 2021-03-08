@@ -70,8 +70,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
          PulseGraph.DEVICE_BPM_ONLY,
-         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
          PulseGraph.RR_INTERVALS_ONLY,
+         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
 
    };
 
@@ -82,8 +82,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
+         Messages.TourChart_PulseGraph_RRIntervals_Only,
          Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
-         Messages.TourChart_PulseGraph_RRIntervals_Only
    };
 
    private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
