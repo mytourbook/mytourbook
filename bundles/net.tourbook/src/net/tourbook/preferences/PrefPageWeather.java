@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -50,7 +53,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID         = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
+   public static final String     ID         = "net.tourbook.preferences.PrefPageWeather";                           //$NON-NLS-1$
+
+   private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -61,8 +66,6 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    private Button _chkWeatherRetrieval;
 
    private Label  _labelApiKey;
-
-   private Link   _linkApiSignup;
 
    private Text   _textApiKey;
 
@@ -128,10 +131,10 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
              */
 
             // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
-            _linkApiSignup = new Link(container, SWT.PUSH);
-            _linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
-            _linkApiSignup.setEnabled(true);
-            _linkApiSignup.addListener(SWT.Selection, new Listener() {
+            final Link linkApiSignup = new Link(container, SWT.PUSH);
+            linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
+            linkApiSignup.setEnabled(true);
+            linkApiSignup.addListener(SWT.Selection, new Listener() {
                @Override
                public void handleEvent(final Event event) {
                   WEB.openUrl(Messages.External_Link_Weather_ApiSignup);
@@ -140,7 +143,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(defaultHIndent, 0)
-                  .applyTo(_linkApiSignup);
+                  .applyTo(linkApiSignup);
          }
          {
             /*
@@ -179,11 +182,6 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
    }
 
-   @Override
-   public boolean okToLeave() {
-      return super.okToLeave();
-   }
-
    /**
     * This method ensures the connection to the API can be made successfully.
     */
@@ -195,28 +193,29 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
             try {
 
-               final URL url = new URL(HistoricalWeatherRetriever.getApiUrl() + _textApiKey.getText());
-               final HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-               urlConn.connect();
+               final HttpRequest request = HttpRequest.newBuilder(URI.create(HistoricalWeatherRetriever.getApiUrl() + _textApiKey.getText())).GET()
+                     .build();
 
-               final int response = urlConn.getResponseCode();
-               final String responseMessage = urlConn.getResponseMessage();
+               final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 
-               final String message = response == HttpURLConnection.HTTP_OK
+               final int statusCode = response.statusCode();
+               final String responseMessage = response.body();
+
+               final String message = statusCode == HttpURLConnection.HTTP_OK
                      ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, HistoricalWeatherRetriever.getBaseApiUrl())
                      : NLS.bind(
                            Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
                            new Object[] {
                                  HistoricalWeatherRetriever.getBaseApiUrl(),
-                                 Integer.toString(response),
-                                 responseMessage == null ? UI.EMPTY_STRING : responseMessage });
+                                 statusCode,
+                                 responseMessage });
 
                MessageDialog.openInformation(
                      Display.getCurrent().getActiveShell(),
                      Messages.Pref_Weather_CheckHTTPConnection_Message,
                      message);
 
-            } catch (final IOException e) {
+            } catch (final IOException | InterruptedException e) {
                e.printStackTrace();
             }
          }

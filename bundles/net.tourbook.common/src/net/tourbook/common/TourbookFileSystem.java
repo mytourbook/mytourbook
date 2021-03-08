@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ public abstract class TourbookFileSystem {
    private String   FILE_SYSTEM_ID;
    protected String FILE_SYSTEM_FOLDER;
 
-   public TourbookFileSystem(final String fileSystemId) {
+   protected TourbookFileSystem(final String fileSystemId) {
       FILE_SYSTEM_ID = fileSystemId;
    }
 

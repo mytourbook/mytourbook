@@ -36,6 +36,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -45,8 +46,6 @@ import net.tourbook.common.color.MapUnits;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map3.view.Map3Manager;
-
-import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
  * Part of this code is copied from: gov.nasa.worldwindx.examples.analytics.AnalyticSurfaceLegend
@@ -142,7 +141,7 @@ public class TourLegendLayer extends RenderableLayer {
       }
    }
 
-   public TourLegendLayer(final IDialogSettings state) {
+   public TourLegendLayer() {
 
       _legendImage = new ScreenImage();
 
@@ -191,7 +190,7 @@ public class TourLegendLayer extends RenderableLayer {
                                                                           final double minValue,
                                                                           final double maxValue,
                                                                           final Iterable<? extends LabelAttributes> labels) {
-      final ArrayList<Renderable> list = new ArrayList<Renderable>();
+      final ArrayList<Renderable> list = new ArrayList<>();
 
       if (labels != null) {
          for (final LabelAttributes attr : labels) {
@@ -400,7 +399,7 @@ public class TourLegendLayer extends RenderableLayer {
 
    /**
     * Creates a new legend image.
-    * 
+    *
     * @param isTourAvailable
     * @param isUpdateMinMax
     * @param mapColorProvider
@@ -480,13 +479,12 @@ public class TourLegendLayer extends RenderableLayer {
       _legendImageLocation = new Point(devXCenter, devYCenter);
       _legendImage.setScreenLocation(_legendImageLocation);
 
-      final ArrayList<TourLegendLabel> legendLabels = TourMapPainter.getMapLegendLabels(
-            legendWidth,
+      final List<TourLegendLabel> legendLabels = TourMapPainter.getMapLegendLabels(
             legendHeight,
             gradientColorProvider,
             ColorProviderConfig.MAP3_TOUR);
 
-      final ArrayList<LabelAttributes> labelAttributes = new ArrayList<TourLegendLayer.LabelAttributes>();
+      final ArrayList<LabelAttributes> labelAttributes = new ArrayList<>();
 
       for (final TourLegendLabel mapLegendLabel : legendLabels) {
 

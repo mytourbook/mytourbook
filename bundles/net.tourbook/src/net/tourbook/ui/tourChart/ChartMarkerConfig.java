@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,27 +21,33 @@ import org.eclipse.swt.graphics.RGB;
 
 public class ChartMarkerConfig {
 
-	public boolean						isDrawMarkerWithDefaultColor;
-	public boolean						isShowAbsoluteValues;
-	public boolean						isShowHiddenMarker;
-	public boolean						isShowLabelTempPos;
-	public boolean						isShowMarkerLabel;
-	public boolean						isShowMarkerPoint;
-	public boolean						isShowMarkerTooltip;
-	public boolean						isShowOnlyWithDescription;
-	public boolean						isShowSignImage;
+   public boolean                     isDrawMarkerWithDefaultColor;
+   public boolean                     isShowAbsoluteValues;
+   public boolean                     isShowHiddenMarker;
+   public boolean                     isShowLabelTempPos;
+   public boolean                     isShowMarkerLabel;
+   public boolean                     isShowMarkerPoint;
+   public boolean                     isShowMarkerTooltip;
+   public boolean                     isShowOnlyWithDescription;
+   public boolean                     isShowSignImage;
+   public boolean                     isShowTooltipData_Distance;
+   public boolean                     isShowTooltipData_DistanceDifference;
+   public boolean                     isShowTooltipData_Duration;
+   public boolean                     isShowTooltipData_DurationDifference;
+   public boolean                     isShowTooltipData_Elevation;
+   public boolean                     isShowTooltipData_ElevationGainDifference;
 
-	public int							markerHoverSize;
-	public int							markerLabelOffset;
-	public int							markerLabelTempPos;
-	public int							markerPointSize;
-	public int							markerSignImageSize;
-	public int							markerTooltipPosition;
+   public int                         markerHoverSize;
+   public int                         markerLabelOffset;
+   public int                         markerLabelTempPos;
+   public int                         markerPointSize;
+   public int                         markerSignImageSize;
+   public int                         markerTooltipPosition;
 
-	public RGB							markerColorDefault;
-	public RGB							markerColorDevice;
-	public RGB							markerColorHidden;
+   public RGB                         markerColorDefault;
+   public RGB                         markerColorDevice;
+   public RGB                         markerColorHidden;
 
-	public final ArrayList<ChartLabel>	chartLabels	= new ArrayList<ChartLabel>();
+   public final ArrayList<ChartLabel> chartLabels = new ArrayList<>();
 
 }

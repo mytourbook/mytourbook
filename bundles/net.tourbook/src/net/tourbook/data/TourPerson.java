@@ -368,7 +368,7 @@ public class TourPerson implements Comparable<Object> {
                                          final ZonedDateTime birthDay,
                                          final ZonedDateTime dateTime) {
 
-      if (hrZones == null || hrZones.size() == 0) {
+      if (hrZones == null || hrZones.isEmpty()) {
          return null;
       }
 

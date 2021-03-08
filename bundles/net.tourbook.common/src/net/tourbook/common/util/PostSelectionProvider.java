@@ -105,6 +105,16 @@ public class PostSelectionProvider implements IPostSelectionProvider {
       _currentSelection = null;
    }
 
+   /**
+    * Fire selection when a selection is currently set in this provider
+    */
+   public void fireSelection() {
+
+      if (_currentSelection != null) {
+         fireSelection(_currentSelection);
+      }
+   }
+
    @Override
    public ISelection getSelection() {
       return _currentSelection;
@@ -120,6 +130,20 @@ public class PostSelectionProvider implements IPostSelectionProvider {
 
    @Override
    public void setSelection(final ISelection selection) {
+
+      setSelection(selection, true);
+   }
+
+   /**
+    * Sets the current selection for this selection provider.
+    *
+    * @param selection
+    *           The new selection
+    * @param isRemoveSelection
+    *           When <code>true</code> then the selection will be removed after it is fired. When it
+    *           is removed then activating a part will not fire this selection again.
+    */
+   public void setSelection(final ISelection selection, final boolean isRemoveSelection) {
 
       if (selection == null) {
          return;
@@ -147,7 +171,10 @@ public class PostSelectionProvider implements IPostSelectionProvider {
        * <p>
        * This may be a drastic change but the future tests will tell if it works, may be not 100%.
        */
-      _currentSelection = null;
+      if (isRemoveSelection) {
+
+         _currentSelection = null;
+      }
    }
 
    public void setSelectionNoFireEvent(final ISelection selection) {

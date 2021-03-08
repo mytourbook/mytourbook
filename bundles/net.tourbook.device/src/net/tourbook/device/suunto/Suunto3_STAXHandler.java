@@ -19,8 +19,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -110,50 +110,50 @@ public class Suunto3_STAXHandler {
       // is the actual recorded local time.
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
+   private Map<Long, TourData> _alreadyImportedTours;
+   private Map<Long, TourData> _newlyImportedTours;
+   private TourbookDevice      _device;
+   private String              _importFilePath;
    //
-   private TimeData                _sampleData;
+   private TimeData            _sampleData;
 
-   private ArrayList<TimeData>     _sampleList       = new ArrayList<>();
-   private TimeData                _gpsData;
+   private ArrayList<TimeData> _sampleList       = new ArrayList<>();
+   private TimeData            _gpsData;
 
-   private ArrayList<TimeData>     _gpsList          = new ArrayList<>();
-   private TimeData                _markerData;
+   private ArrayList<TimeData> _gpsList          = new ArrayList<>();
+   private TimeData            _markerData;
 
-   private ArrayList<TimeData>     _markerList       = new ArrayList<>();
+   private ArrayList<TimeData> _markerList       = new ArrayList<>();
 
-   private List<Long>              _pausedTime_Start = new ArrayList<>();
-   private List<Long>              _pausedTime_End   = new ArrayList<>();
+   private List<Long>          _pausedTime_Start = new ArrayList<>();
+   private List<Long>          _pausedTime_End   = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private String                  _currentSampleType;
-   private long                    _currentUtcTime;
-   private long                    _currentTime;
+   private boolean             _isImported;
+   private String              _currentSampleType;
+   private long                _currentUtcTime;
+   private long                _currentTime;
 
-   private long                    _prevSampleTime;
+   private long                _prevSampleTime;
 
-   private boolean                 _isInEvents;
+   private boolean             _isInEvents;
 
-   private float                   _tourPeakTrainingEffect;
-   private float                   _tourPerformanceLevel;
+   private float               _tourPeakTrainingEffect;
+   private float               _tourPerformanceLevel;
 
-   private int                     _tourCalories;
+   private int                 _tourCalories;
 
    /**
     * This time is used when a time is not available.
     */
-   private long                    _tourStartTime;
-   private String                  _tourDeviceSW;
+   private long                _tourStartTime;
+   private String              _tourDeviceSW;
 
-   private String                  _tourDeviceName;
+   private String              _tourDeviceName;
 
    public Suunto3_STAXHandler(final TourbookDevice deviceDataReader,
                               final String importFilePath,
-                              final HashMap<Long, TourData> alreadyImportedTours,
-                              final HashMap<Long, TourData> newlyImportedTours) throws XMLStreamException {
+                              final Map<Long, TourData> alreadyImportedTours,
+                              final Map<Long, TourData> newlyImportedTours) throws XMLStreamException {
 
       _device = deviceDataReader;
       _importFilePath = importFilePath;
@@ -254,7 +254,7 @@ public class Suunto3_STAXHandler {
    private void finalizeTour() {
 
       // check if data are available
-      if (_sampleList.size() == 0) {
+      if (_sampleList.isEmpty()) {
          return;
       }
 
@@ -316,15 +316,12 @@ public class Suunto3_STAXHandler {
 
    private void openError(final Exception e) {
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            final String message = e.getMessage();
-            MessageDialog.openError(Display.getCurrent().getActiveShell(),
-                  "Error", //$NON-NLS-1$
-                  message);
-            System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-         }
+      Display.getDefault().syncExec(() -> {
+         final String message = e.getMessage();
+         MessageDialog.openError(Display.getCurrent().getActiveShell(),
+               "Error", //$NON-NLS-1$
+               message);
+         System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
       });
    }
 
@@ -573,11 +570,6 @@ public class Suunto3_STAXHandler {
                _sampleData.pulse = hr * 60.0f;
                break;
 
-            case TAG_SAMPLE_LAP:
-               // set a marker
-               _markerData.marker = 1;
-               break;
-
             case TAG_SAMPLE_LATITUDE:
                data = ((Characters) eventReader.nextEvent()).getData();
                _gpsData.latitude = Util.parseDouble(data) * RADIANT_TO_DEGREE;
@@ -667,6 +659,11 @@ public class Suunto3_STAXHandler {
                parseXML_37_Pause(eventReader);
                break;
 
+            case TAG_SAMPLE_LAP:
+               // set a marker
+               _markerData.marker = 1;
+               break;
+
             }
          }
 
@@ -706,7 +703,7 @@ public class Suunto3_STAXHandler {
 
                } else if (data.equalsIgnoreCase(Boolean.FALSE.toString())) {
 
-                  if (_pausedTime_Start.size() == 0) {
+                  if (_pausedTime_Start.isEmpty()) {
                      return;
                   }
 
@@ -740,7 +737,7 @@ public class Suunto3_STAXHandler {
     */
    private void setData_GPS() {
 
-      if (_gpsList.size() == 0) {
+      if (_gpsList.isEmpty()) {
          return;
       }
 
@@ -828,13 +825,7 @@ public class Suunto3_STAXHandler {
 
          final long sampleTime = sampleData.absoluteTime;
 
-         if (sampleTime < markerTime) {
-
-            continue;
-
-         } else {
-
-            // markerTime >= sampleTime
+         if (sampleTime >= markerTime) {
 
             sampleData.marker = 1;
             sampleData.markerLabel = Integer.toString(markerIndex + 1);

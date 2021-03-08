@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -34,175 +34,173 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class DialogMap3Layer extends AnimatedToolTipShell {
 
-	private static final int	SHELL_MARGIN		= 0;
+   private static final int   SHELL_MARGIN    = 0;
 
-	public static final Double	DEFAULT_OPACITY		= new Double(1.0);
+   public static final Double DEFAULT_OPACITY = new Double(1.0);
 
-	// initialize with default values which are (should) never be used
-	private Rectangle			_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+   // initialize with default values which are (should) never be used
+   private Rectangle       _toolTipItemBounds = new Rectangle(0, 0, 50, 50);
 
-	private final WaitTimer		_waitTimer			= new WaitTimer();
+   private final WaitTimer _waitTimer         = new WaitTimer();
 
-	private boolean				_canOpenToolTip;
-	private boolean				_isWaitTimerStarted;
+   private boolean         _canOpenToolTip;
+   private boolean         _isWaitTimerStarted;
 
-	private Map3LayerUI			_layerUI;
+   /*
+    * UI controls
+    */
+   private Composite _shellContainer;
 
-	/*
-	 * UI controls
-	 */
-	private Composite			_shellContainer;
+   private final class WaitTimer implements Runnable {
+      @Override
+      public void run() {
+         open_Runnable();
+      }
+   }
 
-	private final class WaitTimer implements Runnable {
-		@Override
-		public void run() {
-			open_Runnable();
-		}
-	}
+   public DialogMap3Layer(final Control ownerControl, final ToolBar toolBar) {
 
-	public DialogMap3Layer(final Control ownerControl, final ToolBar toolBar) {
+      super(ownerControl);
 
-		super(ownerControl);
+      addListener(ownerControl, toolBar);
 
-		addListener(ownerControl, toolBar);
+      setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
+      setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
+      setIsKeepShellOpenWhenMoved(false);
+      setFadeInSteps(1);
+      setFadeOutSteps(10);
+      setFadeOutDelaySteps(1);
+   }
 
-		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-		setIsKeepShellOpenWhenMoved(false);
-		setFadeInSteps(1);
-		setFadeOutSteps(10);
-		setFadeOutDelaySteps(1);
-	}
+   private void addListener(final Control ownerControl, final ToolBar toolBar) {
 
-	private void addListener(final Control ownerControl, final ToolBar toolBar) {
+      toolBar.addMouseTrackListener(new MouseTrackAdapter() {
+         @Override
+         public void mouseExit(final MouseEvent e) {
 
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-			@Override
-			public void mouseExit(final MouseEvent e) {
+            // prevent to open the tooltip
+            _canOpenToolTip = false;
+         }
+      });
+   }
 
-				// prevent to open the tooltip
-				_canOpenToolTip = false;
-			}
-		});
-	}
+   @Override
+   protected boolean canShowToolTip() {
+      return true;
+   }
 
-	@Override
-	protected boolean canShowToolTip() {
-		return true;
-	}
+   @Override
+   protected boolean closeShellAfterHidden() {
 
-	@Override
-	protected boolean closeShellAfterHidden() {
+      /*
+       * Close the tooltip that the state is saved.
+       */
 
-		/*
-		 * Close the tooltip that the state is saved.
-		 */
+      return true;
+   }
 
-		return true;
-	}
-
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+   @Override
+   protected Composite createToolTipContentArea(final Composite parent) {
 
 //		Map3Manager.setMap3LayerDialog(this);
 
-		return createUI(parent);
-	}
+      return createUI(parent);
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.margins(SHELL_MARGIN, SHELL_MARGIN)
-				.spacing(0, 0)
-				.applyTo(_shellContainer);
-		{
-			_layerUI = new Map3LayerUI(_shellContainer);
-		}
+      _shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()//
+            .margins(SHELL_MARGIN, SHELL_MARGIN)
+            .spacing(0, 0)
+            .applyTo(_shellContainer);
+      {
+         new Map3LayerUI(_shellContainer);
+      }
 
-		return _shellContainer;
-	}
+      return _shellContainer;
+   }
 
-	public Shell getShell() {
+   public Shell getShell() {
 
-		if (_shellContainer == null) {
-			return null;
-		}
+      if (_shellContainer == null) {
+         return null;
+      }
 
-		return _shellContainer.getShell();
-	}
+      return _shellContainer.getShell();
+   }
 
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
+   @Override
+   public Point getToolTipLocation(final Point tipSize) {
 
 //		final int tipWidth = tipSize.x;
 //
 //		final int itemWidth = _toolTipItemBounds.width;
-		final int itemHeight = _toolTipItemBounds.height;
+      final int itemHeight = _toolTipItemBounds.height;
 
-		// center horizontally
-		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
-		final int devY = _toolTipItemBounds.y + itemHeight + 0;
+      // center horizontally
+      final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
+      final int devY = _toolTipItemBounds.y + itemHeight + 0;
 
-		return new Point(devX, devY);
-	}
+      return new Point(devX, devY);
+   }
 
-	@Override
-	protected Rectangle noHideOnMouseMove() {
+   @Override
+   protected Rectangle noHideOnMouseMove() {
 
-		return _toolTipItemBounds;
-	}
+      return _toolTipItemBounds;
+   }
 
-	/**
-	 * @param toolTipItemBounds
-	 * @param isOpenDelayed
-	 */
-	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
+   /**
+    * @param toolTipItemBounds
+    * @param isOpenDelayed
+    */
+   public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
 
-		if (isToolTipVisible()) {
+      if (isToolTipVisible()) {
 
-			return;
-		}
+         return;
+      }
 
-		if (isOpenDelayed == false) {
+      if (isOpenDelayed == false) {
 
-			if (toolTipItemBounds != null) {
+         if (toolTipItemBounds != null) {
 
-				_toolTipItemBounds = toolTipItemBounds;
+            _toolTipItemBounds = toolTipItemBounds;
 
-				showToolTip();
-			}
+            showToolTip();
+         }
 
-		} else {
+      } else {
 
-			if (toolTipItemBounds == null) {
+         if (toolTipItemBounds == null) {
 
-				// item is not hovered any more
+            // item is not hovered any more
 
-				_canOpenToolTip = false;
+            _canOpenToolTip = false;
 
-				return;
-			}
+            return;
+         }
 
-			_toolTipItemBounds = toolTipItemBounds;
-			_canOpenToolTip = true;
+         _toolTipItemBounds = toolTipItemBounds;
+         _canOpenToolTip = true;
 
-			if (_isWaitTimerStarted == false) {
+         if (_isWaitTimerStarted == false) {
 
-				_isWaitTimerStarted = true;
+            _isWaitTimerStarted = true;
 
-				Display.getCurrent().timerExec(50, _waitTimer);
-			}
-		}
-	}
+            Display.getCurrent().timerExec(50, _waitTimer);
+         }
+      }
+   }
 
-	private void open_Runnable() {
+   private void open_Runnable() {
 
-		_isWaitTimerStarted = false;
+      _isWaitTimerStarted = false;
 
-		if (_canOpenToolTip) {
-			showToolTip();
-		}
-	}
+      if (_canOpenToolTip) {
+         showToolTip();
+      }
+   }
 
 }

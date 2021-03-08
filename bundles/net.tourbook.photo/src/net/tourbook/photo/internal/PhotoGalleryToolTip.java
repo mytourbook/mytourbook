@@ -284,7 +284,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 			createUI_MetadataLine2(container, //
 					Messages.Photo_ToolTip_Size,
-					_nfMByte.format(_photo.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTES,
+					_nfMByte.format(_photo.imageFileSize / 1024.0 / 1024.0) + UI.SPACE2 + UI.UNIT_MBYTE,
 					imageDirection);
 
 			if (isTitle) {

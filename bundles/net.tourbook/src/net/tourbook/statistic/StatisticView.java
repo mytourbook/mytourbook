@@ -30,6 +30,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -95,12 +96,13 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private static boolean               _isInUpdateUI;
 
    private final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore       _prefStoreCommon         = CommonActivator.getPrefStore();
+   private final IPreferenceStore       _prefStore_Common        = CommonActivator.getPrefStore();
    private final IDialogSettings        _state                   = TourbookPlugin.getState("TourStatisticsView"); //$NON-NLS-1$
+
 
    private IPartListener2               _partListener;
    private IPropertyChangeListener      _prefChangeListener;
-   private IPropertyChangeListener      _prefChangeListenerCommon;
+   private IPropertyChangeListener      _prefChangeListener_Common;
    private ITourEventListener           _tourEventListener;
    private ISelectionListener           _postSelectionListener;
 
@@ -266,25 +268,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
             } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
                refreshStatisticProvider();
-
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               UI.updateUnits();
-
-               updateStatistic();
             }
          }
       };
 
-      // register the listener
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
-
       /*
        * Common preferences
        */
-      _prefChangeListenerCommon = new IPropertyChangeListener() {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
@@ -293,12 +284,19 @@ public class StatisticView extends ViewPart implements ITourProvider {
             if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
                updateStatistic();
+
+            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               updateStatistic();
             }
          }
       };
 
       // register the listener
-      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void addSelectionListener() {
@@ -385,6 +383,9 @@ public class StatisticView extends ViewPart implements ITourProvider {
       addPrefListener();
       addSelectionListener();
       addTourEventListener();
+
+      // this part is a selection provider which can be used in a statistic, e.g. StatisticDay
+      getSite().setSelectionProvider(new PostSelectionProvider(ID));
 
       /*
        * Start async that the workspace is fully initialized with all data filters
@@ -533,7 +534,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       super.dispose();
    }
@@ -870,7 +871,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    void restoreState() {
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return;
       }
 
@@ -913,7 +914,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private void saveState() {
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return;
       }
 
@@ -974,7 +975,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       }
 
       final ArrayList<TourbookStatistic> allAvailableStatistics = getAvailableStatistics();
-      if (allAvailableStatistics.size() == 0) {
+      if (allAvailableStatistics.isEmpty()) {
          return false;
       }
 

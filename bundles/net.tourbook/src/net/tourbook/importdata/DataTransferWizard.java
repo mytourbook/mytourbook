@@ -136,7 +136,7 @@ public class DataTransferWizard extends Wizard {
          e.printStackTrace();
       }
 
-      if (_receivedFiles.size() == 0 || _importDevice.isImportCanceled()) {
+      if (_receivedFiles.isEmpty() || _importDevice.isImportCanceled()) {
          // data has not been received or the user canceled the import
          return true;
       }

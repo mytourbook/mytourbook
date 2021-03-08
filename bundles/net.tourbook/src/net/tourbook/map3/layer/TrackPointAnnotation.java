@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map3.layer;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.geom.LatLon;
@@ -27,9 +30,6 @@ import gov.nasa.worldwind.util.OGLStackHandler;
 import gov.nasa.worldwind.util.OGLUtil;
 
 import java.awt.Color;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
 
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;

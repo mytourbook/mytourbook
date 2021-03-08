@@ -66,25 +66,14 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             .grab(true, false)
             .span(2, 1)
             .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-      {
-         createUI_10_Left(group);
-         createUI_20_Right(group);
-      }
-   }
-
-   private void createUI_10_Left(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
          {
             /*
              * Show distance
              */
-            _chkShowDistance = new Button(container, SWT.CHECK);
+            _chkShowDistance = new Button(group, SWT.CHECK);
             _chkShowDistance.setText(Messages.Pref_Statistic_Checkbox_Distance);
             _chkShowDistance.addSelectionListener(_defaultSelectionListener);
          }
@@ -92,7 +81,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show altitude
              */
-            _chkShowAltitude = new Button(container, SWT.CHECK);
+            _chkShowAltitude = new Button(group, SWT.CHECK);
             _chkShowAltitude.setText(Messages.Pref_Statistic_Checkbox_Altitude);
             _chkShowAltitude.addSelectionListener(_defaultSelectionListener);
          }
@@ -100,14 +89,14 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show time
              */
-            _chkShowDuration = new Button(container, SWT.CHECK);
+            _chkShowDuration = new Button(group, SWT.CHECK);
             _chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
             _chkShowDuration.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Moving, elapsed + break time
              */
-            final Composite timeContainer = new Composite(container, SWT.NONE);
+            final Composite timeContainer = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(16, 0)
@@ -156,20 +145,11 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
                }
             }
          }
-      }
-   }
-
-   private void createUI_20_Right(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
          {
             /*
              * Show avg speed
              */
-            _chkShowAvgSpeed = new Button(container, SWT.CHECK);
+            _chkShowAvgSpeed = new Button(group, SWT.CHECK);
             _chkShowAvgSpeed.setText(Messages.Pref_Statistic_Checkbox_AvgSpeed);
             _chkShowAvgSpeed.addSelectionListener(_defaultSelectionListener);
          }
@@ -177,7 +157,7 @@ public class ChartOptions_DaySummary implements IStatisticOptions {
             /*
              * Show avg pace
              */
-            _chkShowAvgPace = new Button(container, SWT.CHECK);
+            _chkShowAvgPace = new Button(group, SWT.CHECK);
             _chkShowAvgPace.setText(Messages.Pref_Statistic_Checkbox_AvgPace);
             _chkShowAvgPace.addSelectionListener(_defaultSelectionListener);
          }

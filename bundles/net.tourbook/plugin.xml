@@ -10,6 +10,8 @@
    <extension-point id="net.tourbook.statisticYear"   name="Year Statistic"               schema="schema/net.tourbook.statisticYear.exsd"/>
    <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
    <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
+   <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
+   <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
 
    <extension
          id="application"
@@ -282,13 +284,6 @@
          />
         
          <page
-            name="%preference_page_tourEditor"
-            id="net.tourbook.preferences.PrefPageTourEditor"
-            class="net.tourbook.preferences.PrefPageAppearanceTourEditor"
-            category    ="net.tourbook.preferences.PrefPageAppearance"
-         />
-         
-         <page
             name="%preference_page_Chart_Colors"
             id="net.tourbook.preferences.PrefPageChartColors"
             class="net.tourbook.preferences.PrefPageAppearanceColors"
@@ -313,12 +308,12 @@
       />
       
        <!--
-         Cloud Connectivity
+         Cloud
       -->
       <page
-         class="net.tourbook.preferences.PrefPageCloudConnectivity"
-         id="net.tourbook.preferences.PrefPageCloudConnectivity"
-         name="%preference_page_cloud_connectivity"
+         class="net.tourbook.preferences.PrefPageCloud"
+         id="net.tourbook.preferences.PrefPageCloud"
+         name="%preference_page_cloud"
       />
       
       
@@ -636,7 +631,7 @@
 
          <!-- Tour Info -->
          <command
-            commandId   ="command.net.tourbook.views.TourInfoView"
+            commandId   ="command.net.tourbook.views.TourInfo_View"
             icon        ="icons/tour-info.png"
             label       ="%View_Name_TourInfo"
             mnemonic    ="%View_Name_TourInfo_Mnemonic"/>
@@ -669,6 +664,13 @@
             label       ="%View_Name_Waypoint"
             mnemonic    ="%View_Name_Waypoint_Mnemonic"
          />
+
+         <!-- Tour Data -->
+         <command
+            commandId   ="command.net.tourbook.views.TourData_View"
+            icon        ="icons/tour-data.png"
+            label       ="%View_Name_TourData"
+            mnemonic    ="%View_Name_TourData_Mnemonic"/>
 
       </menuContribution>
 
@@ -858,20 +860,16 @@
          <!-- Database Consistency Check -->
          <command
             commandId   ="net.tourbook.command.dbTool.consistencyCheck"
-            label      ="%command_dbtool_consistency_check"
-            mnemonic   ="%command_dbtool_consistency_check_mnemonic"
-            style      ="push"/>
+            label       ="%command_dbtool_consistency_check"
+            mnemonic    ="%command_dbtool_consistency_check_mnemonic"
+            style       ="push"/>
 
-         <!-- Compress Database 
-         
-THIS IS NOT YET FULLY IMPLEMENTED
-
+         <!-- Database Size Info -->
          <command
-            commandId   ="net.tourbook.command.dbTool.CompressDB"
-            label      ="%Command_DbTool_Compress_Database"
-            mnemonic   ="%Command_DbTool_Compress_Database_Mnemonic"
-            style      ="push"/>
-         -->
+            commandId   ="net.tourbook.command.DbTool.CompressDatabase"
+            label       ="%Command_DbTool_CompressDatabase"
+            mnemonic    ="%Command_DbTool_CompressDatabase_Mnemonic"
+            style       ="push"/>
 
       </menuContribution>
 
@@ -1251,8 +1249,14 @@ THIS IS NOT YET FULLY IMPLEMENTED
       />
 
       <command
-         id             ="command.net.tourbook.views.TourInfoView"
-         name           ="%View_Name_TourBlog"
+         id             ="command.net.tourbook.views.TourData_View"
+         name           ="%View_Name_TourData"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourData"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourInfo_View"
+         name           ="%View_Name_TourInfo"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourInfo"
       />
 
@@ -1382,19 +1386,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
          name           ="%command_dbtool_consistency_check"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"/>
-
-<!-- 
-
-   THIS IS NOT YET FULLY IMPLEMENTED
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_ConsistencyCheck"/>
 
       <command
-         id            ="net.tourbook.command.dbTool.CompressDB"
-         name         ="%Command_DbTool_Compress_Database"
-         defaultHandler   ="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
+         id             ="net.tourbook.command.DbTool.CompressDatabase"
+         name           ="%Command_DbTool_CompressDatabase"
+         defaultHandler ="net.tourbook.ui.action.ActionHandler_Database_Compress"
       />
-
--->
 
       <command
          id             ="net.tourbook.command.OpenHomePage"
@@ -1671,9 +1669,9 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            class       ="net.tourbook.ui.views.TourInfoView"
+            class       ="net.tourbook.ui.views.TourInfo_View"
             icon        ="icons/tour-info.png"
-            id          ="net.tourbook.ui.views.TourInfoView"
+            id          ="net.tourbook.ui.views.TourInfo_View"
             name        ="%View_Name_TourInfo"/>
 
          <view
@@ -1683,14 +1681,21 @@ THIS IS NOT YET FULLY IMPLEMENTED
             id          ="net.tourbook.views.TourWaypointView"
             name        ="%View_Name_Waypoint"/>
 
-         <!--
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            class       ="net.tourbook.ui.views.signImages.TourSignView"
-            icon        ="icons/sign-image.png"
-            id          ="net.tourbook.ui.views.signImages.TourSignView"
-            name        ="%View_Name_SignImage">
-         </view>
+            class       ="net.tourbook.ui.views.TourData_View"
+            icon        ="icons/tour-data.png"
+            id          ="net.tourbook.ui.views.TourData_View"
+            name        ="%View_Name_TourData"/>
+
+         <!--
+            <view
+               category    ="net.tourbook.category.Tour_Properties"
+               class       ="net.tourbook.ui.views.signImages.TourSignView"
+               icon        ="icons/sign-image.png"
+               id          ="net.tourbook.ui.views.signImages.TourSignView"
+               name        ="%View_Name_SignImage">
+            </view>
          -->
 
 
@@ -1800,7 +1805,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
          <view
             category    ="net.tourbook.category.compareTours"
-            class       ="net.tourbook.ui.views.tourCatalog.YearStatisticView"
+            class       ="net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View"
             icon        ="icons/tour-map-statistic.png"
             id          ="net.tourbook.views.tourCatalog.yearStatisticView"
             name        ="%view_name_tourCatalog_statistics"/>

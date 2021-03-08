@@ -50,7 +50,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
    private static final String      STATE_HR_ZONE_WEEK_BAR_ORDERING_START = "STATE_HR_ZONE_WEEK_BAR_ORDERING_START"; //$NON-NLS-1$
 
-   private TourData_WeekHrZones     _tourWeekData;
+   private TourStatisticData_WeekHrZones     _tourWeekData;
    private DataProvider_HrZone_Week _tourWeek_DataProvider                = new DataProvider_HrZone_Week();
 
    private TourPerson               _appPerson;
@@ -424,7 +424,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
          return;
       }
 
-      if (statContext.appPerson.getHrZonesSorted().size() == 0) {
+      if (statContext.appPerson.getHrZonesSorted().isEmpty()) {
          _chart.setErrorMessage(NLS.bind(
                Messages.Statistic_HrZone_Error_NoHrZoneInPerson,
                statContext.appPerson.getName()));
@@ -438,7 +438,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
       _appPerson = statContext.appPerson;
       _appTourTypeFilter = statContext.appTourTypeFilter;
-      _statYoungestYear = statContext.statFirstYear;
+      _statYoungestYear = statContext.statSelectedYear;
       _statNumberOfYears = statContext.statNumberOfYears;
 
       _tourWeekData = _tourWeek_DataProvider.getWeekData(

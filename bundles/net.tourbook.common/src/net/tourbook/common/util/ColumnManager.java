@@ -2236,7 +2236,7 @@ public class ColumnManager {
       }
 
       // ensure 1 profile is available
-      if (allProfiles.size() == 0) {
+      if (allProfiles.isEmpty()) {
 
          // create default profile
          final ColumnProfile defaultProfile = new ColumnProfile();
@@ -2715,7 +2715,7 @@ public class ColumnManager {
        * When no columns are visible (which is the first time), show only the default columns
        * because every column reduces performance
        */
-      if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ArrayList<String> columnIds = new ArrayList<>();
          int createIndex = 0;
@@ -2736,7 +2736,7 @@ public class ColumnManager {
       /*
        * When no default columns are set, use the first column
        */
-      if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
+      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
 
          final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
          firstColumn.setCreateIndex(0);

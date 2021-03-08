@@ -22,15 +22,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.SearchView;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -100,19 +102,19 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourFilter extends AdvancedSlideout {
 
-   private static final String     HIDE_ALLOWED_DATE_TIME = "DateTime";                   //$NON-NLS-1$
+   private static final String     HIDE_ALLOWED_DATE_TIME = "DateTime";                    //$NON-NLS-1$
 
-   static final String             FIELD_NO               = "fieldNo";                    //$NON-NLS-1$
+   static final String             FIELD_NO               = "fieldNo";                     //$NON-NLS-1$
 
-   private static final String     STATE_IS_LIVE_UPDATE   = "STATE_IS_LIVE_UPDATE";       //$NON-NLS-1$
-   private static final String     STATE_SASH_WIDTH       = "STATE_SASH_WIDTH";           //$NON-NLS-1$
+   private static final String     STATE_IS_LIVE_UPDATE   = "STATE_IS_LIVE_UPDATE";        //$NON-NLS-1$
+   private static final String     STATE_SASH_WIDTH       = "STATE_SASH_WIDTH";            //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore             = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common      = CommonActivator.getPrefStore();
    private final IDialogSettings   _state;
 
    private ModifyListener          _defaultModifyListener;
    private FocusListener           _keepOpenListener;
-   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListener_Common;
 
    private SelectionAdapter        _fieldSelectionListener_DateTime;
 
@@ -245,16 +247,29 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       /*
        * Confirm deletion
        */
-      boolean isDeleteProfile;
+      boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         isDeleteProfile = MessageDialog.openConfirm(
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
 
-               Display.getCurrent().getActiveShell(),
+               getToolTipShell(),
+
                Messages.Slideout_TourFilter_Confirm_DeleteProperty_Title,
-               NLS.bind(
-                     Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message,
-                     filterProperty.fieldConfig.name));
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message, filterProperty.fieldConfig.name),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
       }
       setIsKeepOpenInternally(false);
 
@@ -300,17 +315,19 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void addPrefListener(final Composite parent) {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
             final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
                updateUI_Properties();
             }
          }
       };
+
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
 
       parent.addDisposeListener(new DisposeListener() {
          @Override
@@ -318,8 +335,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             onDisposeSlideout();
          }
       });
-
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
    @Override
@@ -1528,7 +1543,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       boolean isPropertyAvailable = false;
 
       if (isProfileSelected) {
-         isPropertyAvailable = _selectedProfile.filterProperties.size() > 0;
+         isPropertyAvailable = !_selectedProfile.filterProperties.isEmpty();
       }
 
       _btnActivateAll_No.setEnabled(isProfileSelected && isPropertyAvailable);
@@ -1654,7 +1669,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
    private void onDisposeSlideout() {
 
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
    }
 
    private void onField_Select_DateTime(final SelectionEvent event) {
@@ -1857,13 +1872,29 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       /*
        * Confirm deletion
        */
-      boolean isDeleteProfile;
+      boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         isDeleteProfile = MessageDialog.openConfirm(
-               Display.getCurrent().getActiveShell(),
+         MessageDialog_Customized dialog = new MessageDialog_Customized(
+
+               getToolTipShell(),
+
                Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
-               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
+               null, // no title image
+
+               NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name),
+               MessageDialog.CONFIRM,
+
+               0, // default index
+
+               Messages.App_Action_DeleteProfile,
+               Messages.App_Action_Cancel);
+
+         dialog = dialog.withStyleOnTop();
+
+         if (dialog.open() == IDialogConstants.OK_ID) {
+            isDeleteProfile = true;
+         }
       }
       setIsKeepOpenInternally(false);
 

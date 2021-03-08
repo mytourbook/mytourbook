@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.graphics.Color;
@@ -54,7 +56,9 @@ import org.eclipse.ui.part.ViewPart;
 public class TourLogView extends ViewPart {
 
    public static final String  ID                               = "net.tourbook.tour.TourLogView";                 //$NON-NLS-1$
-   //
+
+   private static final char   NL                               = UI.NEW_LINE;
+
    private static final String STATE_COPY                       = "COPY";                                          //$NON-NLS-1$
    private static final String STATE_DELETE                     = "DELETE";                                        //$NON-NLS-1$
    private static final String STATE_ERROR                      = "ERROR";                                         //$NON-NLS-1$
@@ -62,25 +66,25 @@ public class TourLogView extends ViewPart {
    private static final String STATE_INFO                       = "INFO";                                          //$NON-NLS-1$
    private static final String STATE_OK                         = "OK";                                            //$NON-NLS-1$
    private static final String STATE_SAVE                       = "SAVE";                                          //$NON-NLS-1$
-   //
+
    public static final String  CSS_LOG_INFO                     = "info";                                          //$NON-NLS-1$
    private static final String CSS_LOG_ITEM                     = "logItem";                                       //$NON-NLS-1$
    private static final String CSS_LOG_SUB_ITEM                 = "subItem";                                       //$NON-NLS-1$
    public static final String  CSS_LOG_TITLE                    = "title";                                         //$NON-NLS-1$
-   //
+
    private static final String DOM_ID_LOG                       = "logs";                                          //$NON-NLS-1$
    private static final String WEB_RESOURCE_TOUR_IMPORT_LOG_CSS = "tour-import-log.css";                           //$NON-NLS-1$
-   //
+
    private IPartListener2      _partListener;
-   //
+
    private Action              _actionReset;
-   //
+
    private boolean             _isNewUI;
    private boolean             _isBrowserCompleted;
 
    private String              _cssFromFile;
    private String              _noBrowserLog                    = UI.EMPTY_STRING;
-   //
+
    private String              _imageUrl_StateCopy              = getIconUrl(Messages.Image__State_Copy);
    private String              _imageUrl_StateDeleteDevice      = getIconUrl(Messages.Image__State_Deleted_Device);
    private String              _imageUrl_StateDeleteBackup      = getIconUrl(Messages.Image__State_Deleted_Backup);
@@ -129,88 +133,111 @@ public class TourLogView extends ViewPart {
       }
 
       // Run always async that the flow is not blocked.
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            String jsText = UI.replaceJS_BackSlash(tourLog.message);
-            jsText = UI.replaceJS_Apostrophe(jsText);
-            final String message = jsText;
+         String jsText = UI.replaceJS_BackSlash(tourLog.message);
+         jsText = UI.replaceJS_Apostrophe(jsText);
+         final String message = jsText;
 
-            final String subItem = tourLog.isSubLogItem
-                  ? CSS_LOG_SUB_ITEM
-                  : UI.EMPTY_STRING;
+         final String subItem = tourLog.isSubLogItem
+               ? CSS_LOG_SUB_ITEM
+               : UI.EMPTY_STRING;
 
-            final String css = tourLog.css == null
-                  ? CSS_LOG_ITEM
-                  : tourLog.css;
+         final String css = tourLog.css == null
+               ? CSS_LOG_ITEM
+               : tourLog.css;
 
-            final String stateWithBrowser[] = { UI.EMPTY_STRING };
-            final String stateNoBrowser[] = { UI.EMPTY_STRING };
+         final String[] stateWithBrowser = { UI.EMPTY_STRING };
+         final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
-            setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
+         setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
 
-            final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
+         final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
 
-            final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
+         final boolean isBrowserAvailable1 = _browser != null && _browser.isDisposed() == false;
 
-            if (isBrowserAvailable) {
+         if (isBrowserAvailable1) {
 
-               final String[] messageSplitted = message.split(WEB.HTML_ELEMENT_BR);
+            final String[] messageSplitted = message.split(WEB.HTML_ELEMENT_BR);
 
-               String tdContent;
-               if (messageSplitted.length == 1) {
+// SET_FORMATTING_OFF
 
-                  tdContent = "td.appendChild(document.createTextNode('" + message + "'));\n"; //$NON-NLS-1$ //$NON-NLS-2$
+            String tdContent;
+            if (messageSplitted.length == 1) {
 
-               } else {
-
-                  tdContent = UI.EMPTY_STRING
-                        //
-                        + "var span = document.createElement('SPAN');\n" //$NON-NLS-1$
-                        + ("span.innerHTML='" + message + "';\n") //$NON-NLS-1$ //$NON-NLS-2$
-                        + "td.appendChild(span);\n"; //$NON-NLS-1$
-               }
-
-               final String js = UI.EMPTY_STRING//
-
-                     + "var tr = document.createElement('TR');\n" //$NON-NLS-1$
-                     + "tr.className='row';\n" //$NON-NLS-1$
-
-               // time
-                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
-                     + "td.appendChild(document.createTextNode('" + tourLog.time + "'));\n" //$NON-NLS-1$ //$NON-NLS-2$
-                     + "tr.appendChild(td);\n" //$NON-NLS-1$
-
-               // state (icon)
-                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
-                     + "td.className='column icon';\n" //$NON-NLS-1$
-                     + stateWithBrowser[0]
-                     + "tr.appendChild(td);\n" //$NON-NLS-1$
-
-               // message
-                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
-                     + "td.className='column " + subItem + UI.SPACE1 + css + "';\n" //$NON-NLS-1$ //$NON-NLS-2$
-                     + tdContent
-
-                     + "tr.appendChild(td);\n" //$NON-NLS-1$
-
-                     + "var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n" //$NON-NLS-1$ //$NON-NLS-2$
-                     + "logTable.tBodies[0].appendChild(tr);\n" //$NON-NLS-1$
-
-               // scroll to the bottom -> this do not work
-//                   + ("debugger;\n") //$NON-NLS-1$
-                     + "var html = document.documentElement;\n" //$NON-NLS-1$
-                     + "var scrollHeight = html.scrollHeight;\n" //$NON-NLS-1$
-                     + "html.scrollTop = scrollHeight;\n" //$NON-NLS-1$
-               ;
-
-               _browser.execute(js);
+               tdContent = "td.appendChild(document.createTextNode('" + message + "'));"     + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
             } else {
 
-               addLog_NoBrowser(noBrowserText);
+               tdContent = UI.EMPTY_STRING
+
+                     + "var span = document.createElement('SPAN');"                          + NL //$NON-NLS-1$
+                     + "span.innerHTML='" + message + "';"                                   + NL //$NON-NLS-1$ //$NON-NLS-2$
+                     + "td.appendChild(span);"                                               + NL  //$NON-NLS-1$
+               ;
             }
+
+            final String js = UI.EMPTY_STRING
+
+                  + "var tr = document.createElement('TR');"                                 + NL //$NON-NLS-1$
+                  + "tr.className='row';"                                                    + NL //$NON-NLS-1$
+
+                  // time
+                  + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
+                  + "td.appendChild(document.createTextNode('" + tourLog.time + "'));"       + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
+
+                  // state (icon)
+                  + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
+                  + "td.className='column icon';"                                            + NL //$NON-NLS-1$
+                  + stateWithBrowser[0]
+                  + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
+
+                  // message
+                  + "var td = document.createElement('TD');"                                 + NL //$NON-NLS-1$
+                  + "td.className='column " + subItem + UI.SPACE1 + css + "';"               + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + tdContent
+
+                  + "tr.appendChild(td);"                                                    + NL //$NON-NLS-1$
+
+                  + "var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");"        + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "var htmlSectionElement = logTable.tBodies[0]"                           + NL //$NON-NLS-1$
+
+                  // reduce number of log rows to reduce cpu cycles, when too many rows,
+                  // time can be > 100ms for the js code, this code is now not more than 10ms
+                  + "var allRows = htmlSectionElement.rows"                                  + NL //$NON-NLS-1$
+                  + "var numRows = allRows.length"                                           + NL //$NON-NLS-1$
+                  + "if (numRows > 1000) {"                                                  + NL //$NON-NLS-1$
+
+                  // delete top row
+                  + "   htmlSectionElement.deleteRow(0)"                                     + NL //$NON-NLS-1$
+                  + "}"                                                                      + NL //$NON-NLS-1$
+
+                  + "htmlSectionElement.appendChild(tr);"                                    + NL //$NON-NLS-1$
+
+                  // scroll to the bottom -> debugger do not work
+//                   + ("debugger;\n") //$NON-NLS-1$
+                  + "var html = document.documentElement;"                                   + NL //$NON-NLS-1$
+                  + "var scrollHeight = html.scrollHeight;"                                  + NL //$NON-NLS-1$
+                  + "html.scrollTop = scrollHeight;"                                         + NL //$NON-NLS-1$
+            ;
+
+// SET_FORMATTING_ON
+
+//            final long start = System.nanoTime();
+
+            _browser.execute(js);
+
+            // log log text to the console
+            System.out.println("[TourLog] " + noBrowserText);//$NON-NLS-1$
+
+//            System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//                  + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//            // TODO remove SYSTEM.OUT.PRINTLN
+
+         } else {
+
+            addLog_NoBrowser(noBrowserText);
          }
       });
    }
@@ -291,11 +318,11 @@ public class TourLogView extends ViewPart {
 
    private String createHTML() {
 
-      final String html = UI.EMPTY_STRING //
-            + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
-            + ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+      final String html = UI.EMPTY_STRING
+            + "<!DOCTYPE html>" + NL // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+            + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>" + NL //$NON-NLS-1$
+            + "<head>" + NL + createHTML_10_Head() + NL + "</head>" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "<body>" + NL + createHTML_20_Body() + NL + "</body>" + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "</html>"; //$NON-NLS-1$
 
       return html;
@@ -304,10 +331,10 @@ public class TourLogView extends ViewPart {
    private String createHTML_10_Head() {
 
       final String html = UI.EMPTY_STRING//
-            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
-            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
+            + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />" + NL //$NON-NLS-1$
+            + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />" + NL //$NON-NLS-1$
             + _cssFromFile
-            + "\n"; //$NON-NLS-1$
+            + NL;
 
       return html;
    }
@@ -316,23 +343,30 @@ public class TourLogView extends ViewPart {
 
       final StringBuilder sb = new StringBuilder();
 
-      sb.append("<table id='" + DOM_ID_LOG + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("</tbody></table>\n"); //$NON-NLS-1$
+      sb.append("<table id='" + DOM_ID_LOG + "'><tbody>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("</tbody></table>" + NL); //$NON-NLS-1$
 
       return sb.toString();
    }
 
    private String createNoBrowserText(final TourLog tourLog, final String stateNoBrowser) {
 
-      final String subIndent = tourLog.isSubLogItem ? UI.SPACE4 : UI.EMPTY_STRING;
+      final String subIndent = tourLog.isSubLogItem ? UI.SPACE3 : UI.EMPTY_STRING;
 
-      return tourLog.time + UI.SPACE3 + stateNoBrowser + subIndent + UI.SPACE3 + tourLog.message;
+      return String.format("%s %-5s %s   %s", //$NON-NLS-1$
+
+            tourLog.time,
+            stateNoBrowser,
+            subIndent,
+            tourLog.message
+
+      );
    }
 
    @Override
    public void createPartControl(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
@@ -395,8 +429,17 @@ public class TourLogView extends ViewPart {
                @Override
                public void completed(final ProgressEvent event) {
 
-                  onBrowser_Completed(event);
+                  onBrowser_Completed();
                }
+            });
+
+            _browser.addLocationListener(new LocationAdapter() {
+               @Override
+               public void changing(final LocationEvent event) {
+
+                  onLocation_Changing(event);
+               }
+
             });
          }
 
@@ -437,7 +480,17 @@ public class TourLogView extends ViewPart {
       tbm.add(_actionReset);
    }
 
-   private void initUI(final Composite parent) {
+   private boolean httpAction(final String location) {
+
+      if (location.toLowerCase().startsWith("http://") || //$NON-NLS-1$
+            location.toLowerCase().startsWith("https://")) { //$NON-NLS-1$
+         WEB.openUrl(location);
+         return true;
+      }
+      return false;
+   }
+
+   private void initUI() {
 
       /*
        * Webpage css
@@ -448,9 +501,9 @@ public class TourLogView extends ViewPart {
          final String css = Util.readContentFromFile(webFile.getAbsolutePath());
 
          _cssFromFile = UI.EMPTY_STRING//
-               + "<style>\n" //$NON-NLS-1$
+               + "<style>" + NL //$NON-NLS-1$
                + css
-               + "</style>\n"; //$NON-NLS-1$
+               + "</style>" + NL; //$NON-NLS-1$
 
       } catch (IOException | URISyntaxException e) {
          TourLogManager.logEx(e);
@@ -465,10 +518,10 @@ public class TourLogView extends ViewPart {
 
    private String js_SetStyleBgImage(final String imageUrl) {
 
-      return "td.style.backgroundImage=\"url('" + imageUrl + "')\";\n"; //$NON-NLS-1$ //$NON-NLS-2$
+      return "td.style.backgroundImage=\"url('" + imageUrl + "')\";" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   private void onBrowser_Completed(final ProgressEvent event) {
+   private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
 
@@ -480,6 +533,16 @@ public class TourLogView extends ViewPart {
       for (final TourLog importLog : importLogs) {
          addLog(importLog);
       }
+   }
+
+   private void onLocation_Changing(final LocationEvent event) {
+
+      if (httpAction(event.location)) {
+
+         // keep current page when an action is performed, OTHERWISE the current page will disappear or is replaced :-(
+         event.doit = false;
+      }
+
    }
 
    private void restoreState() {
@@ -525,6 +588,7 @@ public class TourLogView extends ViewPart {
          break;
 
       case EASY_IMPORT_DELETE_BACKUP:
+      case TOUR_DELETED:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
@@ -532,11 +596,6 @@ public class TourLogView extends ViewPart {
       case EASY_IMPORT_DELETE_DEVICE:
          stateNoBrowser[0] = STATE_DELETE;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-         break;
-
-      case TOUR_DELETED:
-         stateNoBrowser[0] = STATE_DELETE;
-         stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
          break;
 
       case TOUR_SAVED:
@@ -580,8 +639,8 @@ public class TourLogView extends ViewPart {
           */
          for (final TourLog tourLog : TourLogManager.getLogs()) {
 
-            final String stateWithBrowser[] = { UI.EMPTY_STRING };
-            final String stateNoBrowser[] = { UI.EMPTY_STRING };
+            final String[] stateWithBrowser = { UI.EMPTY_STRING };
+            final String[] stateNoBrowser = { UI.EMPTY_STRING };
 
             setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);

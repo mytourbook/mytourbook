@@ -28,7 +28,9 @@ public class ActionTourChartPauses extends Action {
 
    public ActionTourChartPauses(final TourChart tourChart) {
 
-      super(Messages.Tour_Action_Show_Tour_Pauses, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
+
+      setToolTipText(Messages.Tour_Action_ShowTourPauses_Tooltip);
 
       _tourChart = tourChart;
 

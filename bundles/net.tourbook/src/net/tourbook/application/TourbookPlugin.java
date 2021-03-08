@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -237,7 +237,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
       // log version that this info is easier accessable
       final Version version = TourbookPlugin.getDefault().getVersion();
-      StatusUtil.logInfo("AppVersion: " + version.toString());//$NON-NLS-1$
+
+      /**
+       * StatusUtil will force to load net.tourbook.common plugin which forces to load
+       * net.tourbook.common.UI which is initializing the measurement system.
+       */
+      StatusUtil.logInfo("[AppVersion] " + version.toString());//$NON-NLS-1$
    }
 
    @Override

@@ -167,8 +167,8 @@ public class SplineGraph extends Canvas {
 			/*
 			 * limit horizontal movement to min/max when it's set
 			 */
-			final double graphXMin = _splineData.graphXMinValues[_pointHitIndex];
-			final double graphXMax = _splineData.graphXMaxValues[_pointHitIndex];
+			final double graphXMin = _splineData.posX_GraphMinValues[_pointHitIndex];
+			final double graphXMax = _splineData.posX_GraphMaxValues[_pointHitIndex];
 
 			if (Double.isNaN(graphXMin) == false) {
 				if (graphPointX < graphXMin) {
@@ -180,8 +180,8 @@ public class SplineGraph extends Canvas {
 					graphPointX = graphXMax;
 				}
 			}
-			final double[] xPointValues = _splineData.graphXValues;
-			final double[] yPointValues = _splineData.graphYValues;
+			final double[] xPointValues = _splineData.posX_GraphValues;
+			final double[] yPointValues = _splineData.posY_GraphValues;
 
 			// update spline points
 			xPointValues[_pointHitIndex] = graphPointX;
@@ -235,8 +235,8 @@ public class SplineGraph extends Canvas {
 			return;
 		}
 
-		final double[] graphPointsX = _splineData.graphXValues;
-		final double[] graphPointsY = _splineData.graphYValues;
+		final double[] graphPointsX = _splineData.posX_GraphValues;
+		final double[] graphPointsY = _splineData.posY_GraphValues;
 		final boolean[] isPointMovable = _splineData.isPointMovable;
 
 

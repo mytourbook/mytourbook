@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,11 +114,14 @@ public class Messages extends NLS {
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;
+   public static String        Graph_Label_Athlete_Body_Fat;
+   public static String        Graph_Label_Athlete_Body_Weight;
    public static String        Graph_Label_Cadence;
    public static String        Graph_Label_Cadence_Unit;
    public static String        Graph_Label_Cadence_Unit_Spm;
    public static String        Graph_Label_Cadence_Unit_RpmSpm;
    public static String        Graph_Label_Distance;
+   public static String        Graph_Label_ElevationGain;
    public static String        Graph_Label_Gears;
    public static String        Graph_Label_Gradient;
    public static String        Graph_Label_Gradient_Unit;
@@ -139,6 +142,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_Tour_Compare;
    public static String        Graph_Label_Tour_Compare_Unit;
    public static String        Graph_Label_Geo_Compare_Unit;
+   public static String        Graph_Label_Prefix_AthleteData;
    public static String        Graph_Label_Prefix_RunningDynamics;
    public static String        Graph_Label_Prefix_Swimming;
    public static String        Graph_Label_Prefix_Training;
@@ -178,6 +182,7 @@ public class Messages extends NLS {
    public static String        Image__MapProvider_Transparent;
    public static String        Image__MapProvider_Transparent_Hill;
    public static String        Image__options;
+   public static String        Image__Options_Dark;
    public static String        Image__Pin_Themed;
    public static String        Image__TourOptions;
    public static String        Image__TourOptions_Disabled;
@@ -200,6 +205,16 @@ public class Messages extends NLS {
 
    public static String        Map3_PropertyTooltip_Action_Close_Tooltip;
    public static String        Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip;
+
+   public static String        Measurement_System_Dialog_Title;
+   public static String        Measurement_System_Dialog_Label_SelectSystem;
+   public static String        Measurement_System_Profile_Imperial;
+   public static String        Measurement_System_Profile_Metric;
+   public static String        Measurement_System_Profile_Nautic;
+   public static String        Measurement_System_Profile_Other1;
+   public static String        Measurement_System_Profile_Other2;
+   public static String        Measurement_System_Profile_Other3;
+   public static String        Measurement_System_Tooltip;
 
    public static String        Period_Format_Space;
    public static String        Period_Format_Comma;
@@ -231,6 +246,46 @@ public class Messages extends NLS {
    public static String        Period_Format_Millisecond;
    public static String        Period_Format_Milliseconds;
    public static String        Period_Format_Millisecond_Short;
+
+   public static String        Pref_System_Label_Distance;
+   public static String        Pref_System_Label_Distance_Info;
+   public static String        Pref_System_Label_Elevation;
+   public static String        Pref_System_Label_Elevation_Info;
+   public static String        Pref_System_Label_Height;
+   public static String        Pref_System_Label_Height_Info;
+   public static String        Pref_System_Label_Length;
+   public static String        Pref_System_Label_Length_Info;
+   public static String        Pref_System_Label_Length_Small;
+   public static String        Pref_System_Label_Length_Small_Info;
+   public static String        Pref_System_Label_Pace;
+   public static String        Pref_System_Label_Pace_Info;
+   public static String        Pref_System_Label_Pressure_Atmosphere;
+   public static String        Pref_System_Label_Pressure_Atmosphere_Info;
+   public static String        Pref_System_Label_System;
+   public static String        Pref_System_Label_Temperature;
+   public static String        Pref_System_Label_UsingInfo;
+   public static String        Pref_System_Label_UsingInfo_Tooltip;
+   public static String        Pref_System_Label_Weight;
+   public static String        Pref_System_Label_Weight_Info;
+   public static String        Pref_System_Option_BodyWeight_Kilogram;
+   public static String        Pref_System_Option_BodyWeight_Pound;
+   public static String        Pref_System_Option_Distance_Kilometer;
+   public static String        Pref_System_Option_Distance_Mile;
+   public static String        Pref_System_Option_Distance_NauticMile;
+   public static String        Pref_System_Option_Elevation_Foot;
+   public static String        Pref_System_Option_Elevation_Meter;
+   public static String        Pref_System_Option_Height_Inch;
+   public static String        Pref_System_Option_Height_Meter;
+   public static String        Pref_System_Option_Length_Meter;
+   public static String        Pref_System_Option_Length_Yard;
+   public static String        Pref_System_Option_Pace_MinutesPerKilometer;
+   public static String        Pref_System_Option_Pace_MinutesPerMile;
+   public static String        Pref_System_Option_Pressure_Atmosphere_InchOfMercury;
+   public static String        Pref_System_Option_Pressure_Atmosphere_Millibar;
+   public static String        Pref_System_Option_SmallLength_Inch;
+   public static String        Pref_System_Option_SmallLength_Millimeter;
+   public static String        Pref_System_Option_Temperature_Celcius;
+   public static String        Pref_System_Option_Temperature_Fahrenheit;
 
    public static String        Weather_Clounds_Clouds;
    public static String        Weather_Clounds_Clouny;

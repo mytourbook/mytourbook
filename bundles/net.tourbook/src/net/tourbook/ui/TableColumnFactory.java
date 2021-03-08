@@ -106,6 +106,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MOTION_DISTANCE;
    public static final String             MOTION_DISTANCE_ID                                 = "MOTION_DISTANCE";                                 //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE_DELTA;
+   public static final String             MOTION_DISTANCE_DELTA_ID                           = "MOTION_DISTANCE_DELTA_ID";                        //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE_DIFF;
    public static final TableColumnFactory MOTION_DISTANCE_TOTAL;
    public static final TableColumnFactory MOTION_LATITUDE;
@@ -329,8 +330,8 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
             colDef.setColumnLabel(Messages.ColumnFactory_altitude_label);
-            colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTITUDE);
-            colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+            colDef.setColumnHeaderText(UI.UNIT_LABEL_ELEVATION);
+            colDef.setColumnUnit(UI.UNIT_LABEL_ELEVATION);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
@@ -346,7 +347,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_AVG_CHANGE_ID, SWT.TRAIL);
 
-            final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
+            final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -368,7 +369,7 @@ public abstract class TableColumnFactory {
                                                    final PixelConverter pixelConverter) {
 
             final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SYMBOL_DOUBLE_VERTICAL;
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_DIFF_SEGMENT_BORDER", SWT.TRAIL); //$NON-NLS-1$
@@ -397,7 +398,7 @@ public abstract class TableColumnFactory {
                                                    final PixelConverter pixelConverter) {
 
             final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SYMBOL_DOUBLE_HORIZONTAL;
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_DIFF_SEGMENT_COMPUTED", SWT.TRAIL); //$NON-NLS-1$
@@ -427,7 +428,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_DOWN", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION
                   + Messages.ColumnFactory_hour
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_DOWN;
@@ -453,7 +454,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_UP", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION
                   + Messages.ColumnFactory_hour
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_UP;
@@ -479,7 +480,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_SEGMENT_DOWN", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -502,7 +503,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_ELEVATION_SEGMENT_UP", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -574,7 +575,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_MAX_ID, SWT.TRAIL);
 
-            final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_ALTITUDE;
+            final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_ELEVATION;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -598,7 +599,7 @@ public abstract class TableColumnFactory {
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_SUMMARIZED_BORDER_DOWN_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_DOWN;
 
@@ -624,7 +625,7 @@ public abstract class TableColumnFactory {
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_SUMMARIZED_BORDER_UP_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_UP;
 
@@ -648,7 +649,7 @@ public abstract class TableColumnFactory {
                                                    final PixelConverter pixelConverter) {
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SYMBOL_DOUBLE_HORIZONTAL
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_DOWN;
@@ -675,7 +676,7 @@ public abstract class TableColumnFactory {
                                                    final PixelConverter pixelConverter) {
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
-                  + UI.UNIT_LABEL_ALTITUDE
+                  + UI.UNIT_LABEL_ELEVATION
                   + UI.SYMBOL_DOUBLE_HORIZONTAL
                   + UI.SPACE
                   + UI.SYMBOL_ARROW_UP;
@@ -1106,7 +1107,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MARKER_ALTITUDE_ELEVATION_GAIN_DELTA", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -1129,7 +1130,7 @@ public abstract class TableColumnFactory {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MARKER_ALTITUDE_ELEVATION_LOSS_DELTA", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -1357,7 +1358,7 @@ public abstract class TableColumnFactory {
             final String deltaDistance = UI.SYMBOL_DIFFERENCE_WITH_SPACE
                   + net.tourbook.common.UI.UNIT_LABEL_DISTANCE;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MOTION_DISTANCE_DELTA", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MOTION_DISTANCE_DELTA_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
 
@@ -1367,6 +1368,11 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_3,
+                  columnManager);
 
             return colDef;
          }
@@ -2266,7 +2272,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2305,7 +2311,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2344,7 +2350,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2383,7 +2389,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2422,7 +2428,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -2461,7 +2467,7 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -3165,7 +3171,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
-            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -3773,8 +3779,8 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
             colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Altitude_Label);
-            colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTITUDE);
-            colDef.setColumnUnit(UI.UNIT_LABEL_ALTITUDE);
+            colDef.setColumnHeaderText(UI.UNIT_LABEL_ELEVATION);
+            colDef.setColumnUnit(UI.UNIT_LABEL_ELEVATION);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Waypoint_Altitude_Label);
 
             colDef.setDefaultColumnWidth(pixelWidth);

@@ -93,7 +93,7 @@ public class TourMapPainter extends MapPainter {
    private static final int                MARKER_MARGIN     = 2;
    private static final int                MARKER_POLE       = 16;
 
-   final static IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
+   static final IPreferenceStore           _prefStore        = TourbookPlugin.getPrefStore();
 
    private static IPropertyChangeListener  _prefChangeListener;
 
@@ -124,7 +124,7 @@ public class TourMapPainter extends MapPainter {
    private static Rectangle                _twpImageBounds;
    private static TourPainterConfiguration _tourPaintConfig;
 
-   private final static NumberFormat       _nf1              = NumberFormat.getNumberInstance();
+   private static final NumberFormat       _nf1              = NumberFormat.getNumberInstance();
 
    /*
     * UI resources
@@ -136,7 +136,7 @@ public class TourMapPainter extends MapPainter {
     */
    private static Image               _twpImage;
 
-   private final static ColorCacheSWT _colorCache = new ColorCacheSWT();
+   private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
 
    private float[]                    _dataSerie;
    private IMapColorProvider          _legendProvider;
@@ -729,10 +729,9 @@ public class TourMapPainter extends MapPainter {
       _colorCache.dispose();
    }
 
-   public static ArrayList<TourLegendLabel> getMapLegendLabels(final int legendWidth,
-                                                               final int legendHeight,
-                                                               final IGradientColorProvider colorProvider,
-                                                               final ColorProviderConfig config) {
+   public static List<TourLegendLabel> getMapLegendLabels(final int legendHeight,
+                                                          final IGradientColorProvider colorProvider,
+                                                          final ColorProviderConfig config) {
 
       final ArrayList<TourLegendLabel> legendLabels = new ArrayList<>();
 
@@ -931,7 +930,7 @@ public class TourMapPainter extends MapPainter {
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
-      if (tourDataList.size() == 0 && photoList.size() == 0) {
+      if (tourDataList.isEmpty() && photoList.isEmpty()) {
          return false;
       }
 
@@ -1355,9 +1354,10 @@ public class TourMapPainter extends MapPainter {
          int tourSerieIndex = 0;
          int numberOfPauses = 0;
          long tourStartTime = 0;
-         final ArrayList<List<Long>> allTourPauses = tourData.multiTourPauses;
+         final List<List<Long>> allTourPauses = tourData.multiTourPauses;
          int currentTourPauseIndex = 0;
          int pauseCounter = 0;
+         final int[] timeSerie = tourData.timeSerie;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
             tourStartTime = multipleTourStartTime[tourIndex];
@@ -1369,16 +1369,16 @@ public class TourMapPainter extends MapPainter {
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
 
-               final long pauseDuration = Math.round((float) (pausedTime_End - pausedTime_Start) / 1000);
+               final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
 
                long previousTourElapsedTime = 0;
                if (tourIndex > 0) {
-                  previousTourElapsedTime = tourData.timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000;
+                  previousTourElapsedTime = timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
                }
 
-               for (; tourSerieIndex < tourData.timeSerie.length; ++tourSerieIndex) {
+               for (; tourSerieIndex < timeSerie.length; ++tourSerieIndex) {
 
-                  final long currentTime = tourData.timeSerie[tourSerieIndex] * 1000 + tourStartTime - previousTourElapsedTime;
+                  final long currentTime = timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
 
                   if (currentTime >= pausedTime_Start) {
                      break;
@@ -1421,16 +1421,17 @@ public class TourMapPainter extends MapPainter {
          int pauseCounter = 0;
          int serieIndex = 0;
 
+         final int[] timeSerie = tourData.timeSerie;
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
             final long startTime = pausedTime_Start[index];
             final long endTime = pausedTime_End[index];
 
-            for (int timeSerieIndex = serieIndex; timeSerieIndex < tourData.timeSerie.length; ++timeSerieIndex) {
+            for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
 
-               final long currentTime = tourData.timeSerie[timeSerieIndex] * 1000 + tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourData.getTourStartTimeMS();
 
-               if (currentTime == startTime || currentTime > startTime) {
+               if (currentTime >= startTime) {
                   serieIndex = timeSerieIndex;
                   break;
                }
@@ -1444,7 +1445,7 @@ public class TourMapPainter extends MapPainter {
                continue;
             }
 
-            final long pauseDuration = Math.round((float) (endTime - startTime) / 1000);
+            final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
             // draw tour pause
             if (drawTourPauses(
@@ -1613,7 +1614,7 @@ public class TourMapPainter extends MapPainter {
        * world positions are cached to optimize performance when multiple tours are selected
        */
       final String projectionId = mp.getProjection().getId();
-      Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+      Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
 
       if ((tourWorldPixelPosAll == null)) {
 
@@ -1780,25 +1781,22 @@ public class TourMapPainter extends MapPainter {
 
                // current position is outside the tile
 
-               if (isVisibleDataPoint) {
+               if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
 
-                  if (serieIndex == lastInsideIndex + 1) {
+                  /*
+                   * this position is the first which is outside of the tile, draw a line from
+                   * the last inside to the first outside position
+                   */
 
-                     /*
-                      * this position is the first which is outside of the tile, draw a line from
-                      * the last inside to the first outside position
-                      */
-
-                     drawTour_20_Line(
-                           gcTile,
-                           devFrom_WithOffsetX,
-                           devFrom_WithOffsetY,
-                           devTo_WithOffsetX,
-                           devTo_WithOffsetY,
-                           color,
-                           tile,
-                           tourId);
-                  }
+                  drawTour_20_Line(
+                        gcTile,
+                        devFrom_WithOffsetX,
+                        devFrom_WithOffsetY,
+                        devTo_WithOffsetX,
+                        devTo_WithOffsetY,
+                        color,
+                        tile,
+                        tourId);
                }
 
                // keep positions
@@ -2019,8 +2017,8 @@ public class TourMapPainter extends MapPainter {
     * create an image for the tour marker
     *
     * @param device
+    * @param markerLabel
     * @param markerBounds
-    * @param tourMarker
     * @return
     */
    private Image drawTourMarkerImage(final Device device, final String markerLabel, final Rectangle markerBounds) {
@@ -2096,6 +2094,78 @@ public class TourMapPainter extends MapPainter {
    }
 
    /**
+    * create an image for the tour pause
+    *
+    * @param device
+    * @param pauseDuration
+    * @param pauseBounds
+    * @return
+    */
+   private Image drawTourPauseImage(final Device device, final String pauseDurationText, final Rectangle pauseBounds) {
+
+      final int bannerWidth = pauseBounds.x;
+      final int bannerHeight = pauseBounds.y;
+      final int bannerWidth2 = bannerWidth / 2;
+
+      final int markerImageWidth = pauseBounds.width;
+      final int markerImageHeight = pauseBounds.height;
+
+      final int arcSize = 5;
+
+      final RGB rgbTransparent = Map.getTransparentRGB();
+
+      final ImageData markerImageData = new ImageData(//
+            markerImageWidth,
+            markerImageHeight,
+            24,
+            new PaletteData(0xff, 0xff00, 0xff0000));
+
+      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
+
+      final Image markerImage = new Image(device, markerImageData);
+      final Rectangle markerImageBounds = markerImage.getBounds();
+
+      final Color transparentColor = new Color(device, rgbTransparent);
+      final Color bannerColor = new Color(device, 0xFF, 0xFF, 0xFF);
+      final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
+
+      final GC gc = new GC(markerImage);
+
+      {
+         // fill transparent color
+         gc.setBackground(transparentColor);
+         gc.fillRectangle(markerImageBounds);
+
+         gc.setBackground(bannerColor);
+         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
+
+         // draw banner border
+         gc.setForeground(bannerBorderColor);
+         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
+
+         // draw text
+         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
+
+         // draw pole
+         gc.setForeground(bannerBorderColor);
+         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
+         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
+
+         gc.setForeground(bannerColor);
+         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
+      }
+
+      gc.dispose();
+
+      bannerColor.dispose();
+      bannerBorderColor.dispose();
+      transparentColor.dispose();
+
+      return markerImage;
+   }
+
+   /**
     * @param gcTile
     * @param map
     * @param tile
@@ -2150,7 +2220,7 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
+         final Image tourMarkerImage = drawTourPauseImage(gcTile.getDevice(), pauseDurationText, pauseBounds);
          {
             devX = devMarkerPosX - pauseBounds.width / 2;
             devY = devMarkerPosY - pauseBounds.height;
@@ -2490,7 +2560,7 @@ public class TourMapPainter extends MapPainter {
       final ArrayList<TourData> tourDataList = _tourPaintConfig.getTourData();
       final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
 
-      if (tourDataList.size() == 0 && photoList.size() == 0) {
+      if (tourDataList.isEmpty() && photoList.isEmpty()) {
          return false;
       }
 
@@ -2510,36 +2580,29 @@ public class TourMapPainter extends MapPainter {
       final int tileWorldPixelTop = tile.getY() * tileSize;
       final int tileWorldPixelBottom = tileWorldPixelTop + tileSize;
 
-      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0) {
+      if (_tourPaintConfig.isTourVisible && tourDataList.size() > 0 && isPaintingNeeded_Tours(
+            tourDataList,
+            mp,
+            mapZoomLevel,
+            projectionId,
+            tileWorldPixelLeft,
+            tileWorldPixelRight,
+            tileWorldPixelTop,
+            tileWorldPixelBottom)) {
 
-         if (isPaintingNeeded_Tours(
-               tourDataList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelRight,
-               tileWorldPixelTop,
-               tileWorldPixelBottom)) {
-
-            return true;
-         }
+         return true;
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
+      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0 &&
+            isPaintingNeeded_Photos(
+                  photoList,
+                  mp,
+                  mapZoomLevel,
+                  projectionId,
+                  tileWorldPixelLeft,
+                  tileWorldPixelTop)) {
 
-         if (isPaintingNeeded_Photos(
-               photoList,
-               mp,
-               mapZoomLevel,
-               projectionId,
-               tileWorldPixelLeft,
-               tileWorldPixelRight,
-               tileWorldPixelTop,
-               tileWorldPixelBottom)) {
-
-            return true;
-         }
+         return true;
       }
 
       return false;
@@ -2550,9 +2613,7 @@ public class TourMapPainter extends MapPainter {
                                            final int mapZoomLevel,
                                            final String projectionId,
                                            final int tileWorldPixelLeft,
-                                           final int tileWorldPixelRight,
-                                           final int tileWorldPixelTop,
-                                           final int tileWorldPixelBottom) {
+                                           final int tileWorldPixelTop) {
       /*
        * check photos
        */
@@ -2611,7 +2672,7 @@ public class TourMapPainter extends MapPainter {
             /*
              * world positions are cached to optimize performance when multiple tours are selected
              */
-            Point tourWorldPixelPosAll[] = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
+            Point[] tourWorldPixelPosAll = tourData.getWorldPositionForTour(projectionId, mapZoomLevel);
             if ((tourWorldPixelPosAll == null)) {
 
                // world pixels are not yet cached, create them now

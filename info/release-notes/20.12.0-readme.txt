@@ -1,0 +1,108 @@
+20.12.0                                                21. December 2020
+
+
+20.12 requires Java 11
+======================
+MyTourbook 20.12 requires Java 11, a recommended Java VM is AdoptOpenJDK 
+which is tested with MyTourbook for more than one year.
+
+AdoptOpenJDK can be downloaded very easily, no annoying user registration 
+and it can be configured during the installation.
+
+
+
+New   
+===
+
+* Measurement System
+  - Select measurement system for each unit separately FR 187
+
+* Tour Info View
+  - The tour info, which is displayed in a tooltip, can now also be 
+    displayed in a separate view FR 167
+  - The old "Tour Info" view is now renamed into "Tour Data" view
+
+ 
+Improvements   
+============
+
+* 2D Map
+  - Draw value point from the tour chart FR 162
+  - Sync map location with value point in the tour chart
+  - Photo filter slideout can now moved and pinned
+
+* Statistic Values View
+  - Show values with the selected measurement system
+  - Show value labels with the selected language
+
+* Tour Photos View
+  - Save/remove individual photos FR 116
+  - Time adjustment can now be done for each photo/camera in a tour
+  - Select next/previous photo with the mousewheel when gallery is horizontal
+
+* Tour Photo Tooltip
+  - Size and position of the photo tooltip are now preserved, this was a 
+    long annoying behavior to not keep it
+
+* Geo Compare View (Frederic)
+  - When the measurement unit is changed, the values are now immediately updated
+
+ 
+Changes  
+=======
+
+* 2D Map
+  - The actions to synchronize the map are now available in a new slideout
+  - Photo image size is moved into the new photo options slideout
+
+* Dialog Adjust Elevation
+  - The elevation of the rightmost spline point is now set to the SRTM value 
+    when the adjustment type is "Approach elevation with SRTM data"
+
+* Tour Editor
+  - Number of visible lines for the tour description is moved from the 
+    preference page "Appearance/Tour Editor" into the slideout 
+    "Tour Editor Options" and can now easily adjusted between 1...100 ISSUE
+
+ 
+Bugfix   
+======
+
+* Tourbook View (flat)
+  - When the tour filter is modified then reordered column positions are reset
+
+* Calendar View
+  - The calendar week did not start always with the first day of week, 
+    it depended on the selected tour date
+
+* Tour Chart
+  - Multiple tours with default cadence of spm have displayed doubled cadence values ISSUE
+
+* Tour Marker View (Frederic)
+  - The time difference, average pace and average speed between markers 
+    could be wrong in the case of multiple selected tours
+
+* Printing Tour to PDF (Frederic)
+  - Printing a tour to a PDF file when using Java11 was resulting in an exceptions
+
+
+Translation    
+===========
+
+- Czech 20.11 (Lukas)
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+- Eclipse 2020-06
+- WorldWind 2.2.0
+
+ 
+Development    
+===========
+  - Updated documentation for the SQL client setup

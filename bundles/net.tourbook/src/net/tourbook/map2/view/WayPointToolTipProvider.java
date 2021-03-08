@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,19 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
+import net.tourbook.common.UI;
+import net.tourbook.common.util.HoveredAreaContext;
+import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.TourToolTip;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.ui.IMapToolTipProvider;
+import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -32,17 +43,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-
-import net.tourbook.common.UI;
-import net.tourbook.common.util.HoveredAreaContext;
-import net.tourbook.common.util.ITourToolTipProvider;
-import net.tourbook.common.util.TourToolTip;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.ui.IMapToolTipProvider;
-import net.tourbook.ui.Messages;
-
-import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.mapprovider.MP;
 
 public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
 
@@ -147,11 +147,11 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
             final float wpAltitude = _hoveredWayPoint.getAltitude();
             if (wpAltitude != Float.MIN_VALUE) {
 
-               final float altitude = wpAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               final float altitude = wpAltitude / UI.UNIT_VALUE_ELEVATION;
 
                createUIItem(container,
                      Messages.Tooltip_WayPoint_Label_Altitude, //
-                     _nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ALTITUDE);
+                     _nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
             }
 
          }

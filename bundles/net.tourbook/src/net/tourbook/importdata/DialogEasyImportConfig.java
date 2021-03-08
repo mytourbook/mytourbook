@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -134,14 +133,14 @@ import org.joda.time.PeriodType;
  */
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
-   private static final String          ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
+   public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
    private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                        //$NON-NLS-1$
    //
    private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS";    //$NON-NLS-1$
-   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
+   public static final String           STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS";    //$NON-NLS-1$
    private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";       //$NON-NLS-1$
    private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";            //$NON-NLS-1$
    //
@@ -1355,10 +1354,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                .applyTo(_comboIC_DeviceType);
 
          _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
-         final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
-         for (final String fileSystemsId : fileSystemsIds) {
-            _comboIC_DeviceType.add(fileSystemsId);
-         }
+         FileSystemManager.getFileSystemsIds().forEach(_comboIC_DeviceType::add);
          _comboIC_DeviceType.addModifyListener(deviceTypeListener);
       }
 
@@ -3478,7 +3474,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
     */
    private double getMarkerDistanceValue(final ImportLauncher importLauncher) {
 
-      return importLauncher.lastMarkerDistance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      return importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
    }
 
    public EasyConfig getModifiedConfig() {
@@ -3491,7 +3487,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private int getSelectedLastMarkerDistance() {
 
       final float lastMarkerDistance = _spinnerIL_LastMarkerDistance.getSelection()
-            * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE
+            * UI.UNIT_VALUE_DISTANCE
             * 100;
 
       return (int) lastMarkerDistance;
@@ -4511,7 +4507,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final SpeedTourType speedTourType = new SpeedTourType();
 
-               speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * UI.UNIT_VALUE_DISTANCE;
                speedTourType.cadenceMultiplier = comboCadence.getSelectedCadence();
 
                final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
@@ -4702,7 +4698,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   final ComboViewerCadence comboCadence = _comboTT_Cadence[speedTTIndex];
 
                   // update UI
-                  final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+                  final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
                   spinnerAvgSpeed.setSelection((int) avgSpeed);
 
                   if (tourTypeId == TourDatabase.ENTITY_IS_NOT_SAVED) {

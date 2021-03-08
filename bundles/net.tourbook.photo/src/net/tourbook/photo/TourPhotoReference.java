@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,17 +15,14 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-/**
- */
 public class TourPhotoReference {
 
-	public long	tourId;
-	public long	photoId;
+   public long tourId;
+   public long photoId;
 
-	public TourPhotoReference(final long tourId, final long photoId) {
+   public TourPhotoReference(final long tourId, final long photoId) {
 
-		this.photoId = photoId;
-		this.tourId = tourId;
-	}
-
+      this.photoId = photoId;
+      this.tourId = tourId;
+   }
 }

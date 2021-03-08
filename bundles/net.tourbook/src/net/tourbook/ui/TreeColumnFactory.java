@@ -153,7 +153,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ALTITUDE_AVG_CHANGE", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
+            final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ELEVATION + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -175,7 +175,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ALTITUDE_DOWN", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -197,7 +197,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ALTITUDE_MAX", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_ALTITUDE;
+            final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_ELEVATION;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -219,7 +219,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ALTITUDE_UP", SWT.TRAIL); //$NON-NLS-1$
 
-            final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+            final String unitLabel = UI.UNIT_LABEL_ELEVATION + UI.SPACE + UI.SYMBOL_ARROW_UP;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
 
@@ -1153,7 +1153,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -1192,7 +1192,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -1231,7 +1231,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -1270,7 +1270,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -1309,7 +1309,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 
@@ -1348,7 +1348,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
 
-            if (UI.UNIT_IS_METRIC == false) {
+            if (UI.UNIT_IS_DISTANCE_KILOMETER == false) {
 
                // imperial has 1 more digit
 

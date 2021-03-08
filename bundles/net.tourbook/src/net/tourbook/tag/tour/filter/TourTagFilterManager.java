@@ -202,7 +202,7 @@ public class TourTagFilterManager {
          return false;
       }
 
-      if (_isTourTagFilterEnabled == false || _selectedProfile.tagFilterIds.size() == 0) {
+      if (_isTourTagFilterEnabled == false || _selectedProfile.tagFilterIds.isEmpty()) {
 
          // tour tag filter is not enabled
 

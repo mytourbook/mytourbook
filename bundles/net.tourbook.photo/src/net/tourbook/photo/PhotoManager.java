@@ -28,9 +28,9 @@ public class PhotoManager {
 
    private final static IPreferenceStore                  _prefStoreCommon     = CommonActivator.getPrefStore();
 
-   private static PhotoManager                            _instance;
-
    private static final ListenerList<IPhotoEventListener> _photoEventListeners = new ListenerList<>(ListenerList.IDENTITY);
+
+   private static PicDirView                              _picDirView;
 
    static {
 
@@ -70,18 +70,21 @@ public class PhotoManager {
       }
    }
 
-   public static PhotoManager getInstance() {
-
-      if (_instance == null) {
-         _instance = new PhotoManager();
-      }
-
-      return _instance;
-   }
-
    public static void removePhotoEventListener(final IPhotoEventListener listener) {
+
       if (listener != null) {
          _photoEventListeners.remove(listener);
+      }
+   }
+
+   public static void setPicDirView(final PicDirView picDirView) {
+      _picDirView = picDirView;
+   }
+
+   public static void updatePicDirGallery() {
+
+      if (_picDirView != null) {
+         _picDirView.refreshUI();
       }
    }
 

@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -44,12 +45,12 @@ import org.json.JSONObject;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-   private HashMap<TourData, ArrayList<TimeData>> _processedActivities         = new HashMap<>();
+   private HashMap<TourData, List<TimeData>> _processedActivities         = new HashMap<>();
 
-   private HashMap<String, String>                _childrenActivitiesToProcess = new HashMap<>();
+   private HashMap<String, String>           _childrenActivitiesToProcess = new HashMap<>();
 
-   private HashMap<Long, TourData>                _newlyImportedTours          = new HashMap<>();
-   private HashMap<Long, TourData>                _alreadyImportedTours        = new HashMap<>();
+   private HashMap<Long, TourData>           _newlyImportedTours          = new HashMap<>();
+   private HashMap<Long, TourData>           _alreadyImportedTours        = new HashMap<>();
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -76,6 +77,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * Note: It seems that the Suunto 9 watch creates multiple files for a given activity
     * when this activity exceeds 10h. This is from my own experience and not any official
     * documentation.
+    * 09/29/2020: I confirm that the Suunto 9 creates a file for every 10h of activity.
+    * This week-end, I did a single activity that lasted 23h and in the end the watch created 3
+    * files.
     *
     * @param filePath
     *           The absolute path of a given activity.
@@ -88,7 +92,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
    private void concatenateChildrenActivities(final String filePath,
                                               int currentFileNumber,
                                               final TourData currentActivity,
-                                              final ArrayList<TimeData> sampleListToReUse) {
+                                              final List<TimeData> sampleListToReUse) {
 
       final SuuntoJsonProcessor suuntoJsonProcessor = new SuuntoJsonProcessor();
 
@@ -263,7 +267,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       _alreadyImportedTours = alreadyImportedTours;
 
       // When a new import is started, we need to clean the previous saved activities
-      if (newlyImportedTours.size() == 0 && alreadyImportedTours.size() == 0) {
+      if (newlyImportedTours.isEmpty() && alreadyImportedTours.isEmpty()) {
          cleanUpActivities();
       }
 
@@ -298,7 +302,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
       String fileName = FilenameUtils.removeExtension(filePath);
 
-      if (fileName.substring(fileName.length() - 5, fileName.length()) == ".json") { //$NON-NLS-1$
+      if (fileName.substring(fileName.length() - 5, fileName.length()).equals(".json")) { //$NON-NLS-1$
          fileName = FilenameUtils.removeExtension(fileName);
       }
 
@@ -337,8 +341,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          // current one. Example : If the current is xxx-3, we find xxx-2)
          // then we import it reusing the parent activity AND we check that there is no children waiting to be imported
          // If nothing is found, we store it for (hopefully) future use.
-         Map.Entry<TourData, ArrayList<TimeData>> parentEntry = null;
-         for (final Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
+         Map.Entry<TourData, List<TimeData>> parentEntry = null;
+         for (final Map.Entry<TourData, List<TimeData>> entry : _processedActivities.entrySet()) {
             final TourData key = entry.getKey();
 
             final String parentFileName = GetFileNameWithoutNumber(
@@ -366,10 +370,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             //We remove the parent activity to replace it with the
             //updated one (parent activity concatenated with the current
             //one).
-            final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+            final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
             while (it.hasNext()) {
-               final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-               if (entry.getKey().getTourId() == parentEntry.getKey().getTourId()) {
+               final Map.Entry<TourData, List<TimeData>> entry = it.next();
+               if (entry.getKey().getTourId().equals(parentEntry.getKey().getTourId())) {
                   it.remove();
                }
             }
@@ -406,10 +410,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     *           The absolute path of a given activity.
     */
    private void removeProcessedActivity(final String filePath) {
-      final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
+      final Iterator<Entry<TourData, List<TimeData>>> it = _processedActivities.entrySet().iterator();
       while (it.hasNext()) {
-         final Map.Entry<TourData, ArrayList<TimeData>> entry = it.next();
-         if (entry.getKey().getImportFilePath() == filePath) {
+         final Map.Entry<TourData, List<TimeData>> entry = it.next();
+         if (entry.getKey().getImportFilePath().equals(filePath)) {
             it.remove();
             return;
          }
@@ -425,36 +429,23 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private void TryFinalizeTour(final TourData tourData) {
 
+      final long tourId = tourData.getTourId();
+
+      // check if the tour is already imported
+      if (_alreadyImportedTours.containsKey(tourId)) {
+         return;
+      }
+
+      // add new tour to other tours
+      _newlyImportedTours.put(tourId, tourData);
+
       tourData.setDeviceId(deviceId);
+      tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
 
-      long tourId;
-      try {
-
-         tourId = tourData.getTourId();
-
-      } catch (final NullPointerException e) {
-         StatusUtil.log(e);
-         tourId = -1;
-      }
-
-      if (tourId != -1) {
-         // check if the tour is already imported
-         if (_alreadyImportedTours.containsKey(tourId)) {
-            _alreadyImportedTours.remove(tourId);
-         }
-
-         // add new tour to other tours
-         if (_newlyImportedTours.containsKey(tourId)) {
-            _newlyImportedTours.remove(tourId);
-         }
-         _newlyImportedTours.put(tourId, tourData);
-
-         tourData.setDeviceName(SuuntoJsonProcessor.DeviceName);
-
-         tourData.computeAltitudeUpDown();
-         tourData.computeTourMovingTime();
-         tourData.computeComputedValues();
-      }
+      // create additional data
+      tourData.computeAltitudeUpDown();
+      tourData.computeTourMovingTime();
+      tourData.computeComputedValues();
    }
 
    @Override

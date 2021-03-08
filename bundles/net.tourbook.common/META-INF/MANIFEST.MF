@@ -2,19 +2,21 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Commons
 Bundle-SymbolicName: net.tourbook.common;singleton:=true
-Bundle-Version: 20.8.0.qualifier
+Bundle-Version: 21.3.0.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common,
  net.tourbook.common.action,
  net.tourbook.common.color,
+ net.tourbook.common.dialog,
  net.tourbook.common.e4,
  net.tourbook.common.font,
  net.tourbook.common.form,
  net.tourbook.common.formatter,
  net.tourbook.common.graphics,
  net.tourbook.common.map,
+ net.tourbook.common.measurement_system,
  net.tourbook.common.preferences,
  net.tourbook.common.swimming,
  net.tourbook.common.time,
@@ -36,7 +38,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.nebula.widgets.nattable.core,
  net.tourbook.ext.jars,
  net.tourbook.ext.worldwind
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
  javax.inject;version="1.0.0",

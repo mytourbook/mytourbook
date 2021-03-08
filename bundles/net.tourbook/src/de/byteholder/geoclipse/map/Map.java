@@ -91,7 +91,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -147,6 +146,7 @@ public class Map extends Canvas {
 
    private static final String          TOUR_TOOLTIP_LABEL_DISTANCE           = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME        = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
+   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME      = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
    private static final IDialogSettings _geoFilterState                       = TourGeoFilter_Manager.getState();
    /**
@@ -379,19 +379,19 @@ public class Map extends Canvas {
    private String                                     _overlayKey;
 
    /**
-    * this painter is called when the map is painted in the onPaint event
+    * This painter is called when the map is painted in the onPaint event
     */
    private IDirectPainter                             _directMapPainter;
 
    private final DirectPainterContext                 _directMapPainterContext  = new DirectPainterContext();
 
    /**
-    * when <code>true</code> the overlays are painted
+    * When <code>true</code> the overlays are painted
     */
    private boolean                                    _isDrawOverlays;
 
    /**
-    * contains a legend which is painted in the map
+    * Contains a legend which is painted in the map
     */
    private MapLegend                                  _mapLegend;
 
@@ -518,64 +518,64 @@ public class Map extends Canvas {
    /*
     * Download offline images
     */
-   private boolean             _offline_IsSelectingOfflineArea;
-   private boolean             _offline_IsOfflineSelectionStarted;
-   private boolean             _offline_IsPaintOfflineArea;
+   private boolean                   _offline_IsSelectingOfflineArea;
+   private boolean                   _offline_IsOfflineSelectionStarted;
+   private boolean                   _offline_IsPaintOfflineArea;
 
-   private Point               _offline_DevMouse_Start;
-   private Point               _offline_DevMouse_End;
-   private Point               _offline_DevTileStart;
-   private Point               _offline_DevTileEnd;
+   private Point                     _offline_DevMouse_Start;
+   private Point                     _offline_DevMouse_End;
+   private Point                     _offline_DevTileStart;
+   private Point                     _offline_DevTileEnd;
 
-   private Point               _offline_WorldMouse_Start;
-   private Point               _offline_WorldMouse_End;
-   private Point               _offline_WorldMouse_Move;
+   private Point                     _offline_WorldMouse_Start;
+   private Point                     _offline_WorldMouse_End;
+   private Point                     _offline_WorldMouse_Move;
 
-   private IMapContextProvider _mapContextProvider;
+   private IMapContextProvider       _mapContextProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
     */
-   private boolean             _isContextMenuEnabled   = true;
+   private boolean                   _isContextMenuEnabled   = true;
 
-   private DropTarget          _dropTarget;
+   private DropTarget                _dropTarget;
 
-   private boolean             _isRedrawEnabled        = true;
+   private boolean                   _isRedrawEnabled        = true;
 
-   private HoveredAreaContext  _hoveredAreaContext;
+   private HoveredAreaContext        _hoveredAreaContext;
 
-   private int                 _overlayAlpha           = 0xff;
+   private int                       _overlayAlpha           = 0xff;
 
-   private MapGridData         _grid_Data_Hovered;
-   private MapGridData         _grid_Data_Selected;
+   private MapGridData               _grid_Data_Hovered;
+   private MapGridData               _grid_Data_Selected;
 
-   private boolean             _grid_Label_IsHovered;
+   private boolean                   _grid_Label_IsHovered;
 
-   private Rectangle           _grid_Label_Outline;
-   private GeoPosition         _grid_MapGeoCenter;
-   private int                 _grid_MapZoomLevel;
-   private int[]               _grid_AutoScrollCounter = new int[1];
+   private Rectangle                 _grid_Label_Outline;
+   private GeoPosition               _grid_MapGeoCenter;
+   private int                       _grid_MapZoomLevel;
+   private int[]                     _grid_AutoScrollCounter = new int[1];
 
-   private boolean             _grid_IsGridAutoScroll;
+   private boolean                   _grid_IsGridAutoScroll;
+
+   private ActionManageOfflineImages _actionManageOfflineImages;
 
    /**
     * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
     * simple mode
     */
-   private boolean             _isTourPaintMethodEnhanced;
-   private boolean             _isShowTourPaintMethodEnhancedWarning;
+   private boolean                   _isTourPaintMethodEnhanced;
+   private boolean                   _isShowTourPaintMethodEnhancedWarning;
 
-   private boolean             _isFastMapPainting;
-   private boolean             _isFastMapPainting_Active;
-   private boolean             _isInInverseKeyboardPanning;
+   private boolean                   _isFastMapPainting;
+   private boolean                   _isFastMapPainting_Active;
+   private boolean                   _isInInverseKeyboardPanning;
 
-   private int                 _fastMapPainting_skippedValues;
+   private int                       _fastMapPainting_skippedValues;
 
-   private MapTourBreadcrumb   _tourBreadcrumb;
+   private MapTourBreadcrumb         _tourBreadcrumb;
 
-   //
-
-   private Font _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                      _boldFont               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /**
     * This observer is called in the {@link Tile} when a tile image is set into the tile
@@ -618,6 +618,7 @@ public class Map extends Canvas {
       addAllListener();
       addDropTarget();
 
+      createActions();
       createContextMenu();
 
       updateGraphColors();
@@ -820,7 +821,7 @@ public class Map extends Canvas {
       addTraverseListener(new TraverseListener() {
          @Override
          public void keyTraversed(final TraverseEvent e) {
-            // enable travers keys
+            // enable traverse keys
             e.doit = true;
          }
       });
@@ -1037,6 +1038,11 @@ public class Map extends Canvas {
       return getParent().getSize();
    }
 
+   private void createActions() {
+
+      _actionManageOfflineImages = new ActionManageOfflineImages(Map.this);
+   }
+
    /**
     * create the context menu
     */
@@ -1055,11 +1061,8 @@ public class Map extends Canvas {
             }
 
             if (_mapContextProvider != null) {
-               _mapContextProvider.fillContextMenu(menuMgr);
+               _mapContextProvider.fillContextMenu(menuMgr, _actionManageOfflineImages);
             }
-
-            menuMgr.add(new Separator());
-            menuMgr.add(new ActionManageOfflineImages(Map.this));
          }
       });
 
@@ -2271,7 +2274,7 @@ public class Map extends Canvas {
       }
 
       final ArrayList<Rectangle> allPainted_HoveredRectangleList = hoveredTile.allPainted_HoverRectangle;
-      if (allPainted_HoveredRectangleList.size() == 0) {
+      if (allPainted_HoveredRectangleList.isEmpty()) {
 
          // nothing is painted in this tile
          return false;
@@ -3130,8 +3133,8 @@ public class Map extends Canvas {
          if (_hoveredAreaContext != null) {
             final Image hoveredImage = _hoveredAreaContext.hoveredImage;
             if (hoveredImage != null) {
-               gc.drawImage( //
-                     hoveredImage,
+
+               gc.drawImage(hoveredImage,
                      _hoveredAreaContext.hoveredTopLeftX,
                      _hoveredAreaContext.hoveredTopLeftY);
             }
@@ -3944,13 +3947,18 @@ public class Map extends Canvas {
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
-      final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      final long recordedTime = tourData.getTourDeviceTime_Recorded();
+      final String textRecordedTime = String.format(VALUE_FORMAT_2,
+            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            FormatManager.formatRecordedTime(recordedTime));
+
+      final float distance = tourData.getTourDistance() / UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,
             TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
-      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime;
+      final String valueText = textDistance + UI.DASH_WITH_DOUBLE_SPACE + textMovingTime + UI.DASH_WITH_DOUBLE_SPACE + textRecordedTime;
 
       final Point dateTimeSize = gc.textExtent(tourDateTime);
       final Point valueSize = gc.textExtent(valueText);
@@ -5770,6 +5778,10 @@ public class Map extends Canvas {
                               final boolean isAdjustZoomLevel,
                               final int requestedZoomLevelAdjustment) {
 
+      if (_mp == null) {
+         return;
+      }
+
       Rectangle wpTourRect;
       Rectangle wpMapRect;
 
@@ -6359,7 +6371,7 @@ public class Map extends Canvas {
       final PoiToolTip poiTT = getPoi();
       final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
 
-      poiTT.show(//
+      poiTT.show(
             poiDisplayPosition.x,
             poiDisplayPosition.y,
             _poiImageBounds.width,

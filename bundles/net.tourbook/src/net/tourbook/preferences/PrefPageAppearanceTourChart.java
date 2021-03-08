@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -472,7 +472,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
              * label: grid distance
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Pref_Graphs_grid_distance);
+            label.setText(Messages.Pref_Graphs_Label_GridDistance);
+            label.setToolTipText(Messages.Pref_Graphs_Label_GridDistance_Tooltip);
             GridDataFactory.fillDefaults()//
                   .span(3, 1)
                   .applyTo(label);
@@ -705,7 +706,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       boolean enableDown = validSelection;
 
       if (validSelection) {
-         final int indices[] = table.getSelectionIndices();
+         final int[] indices = table.getSelectionIndices();
          final int max = table.getItemCount();
          enableUp = indices[0] != 0;
          enableDown = indices[indices.length - 1] < max - 1;
@@ -854,12 +855,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private void moveSelectionDown() {
 
       final Table table = _graphCheckboxList.getTable();
-      final int indices[] = table.getSelectionIndices();
+      final int[] indices = table.getSelectionIndices();
       if (indices.length < 1) {
          return;
       }
 
-      final int newSelection[] = new int[indices.length];
+      final int[] newSelection = new int[indices.length];
       final int max = table.getItemCount() - 1;
 
       for (int i = indices.length - 1; i >= 0; i--) {
@@ -878,8 +879,8 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private void moveSelectionUp() {
 
       final Table table = _graphCheckboxList.getTable();
-      final int indices[] = table.getSelectionIndices();
-      final int newSelection[] = new int[indices.length];
+      final int[] indices = table.getSelectionIndices();
+      final int[] newSelection = new int[indices.length];
 
       for (int i = 0; i < indices.length; i++) {
          final int index = indices[i];

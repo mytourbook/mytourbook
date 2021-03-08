@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -57,6 +58,7 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.SWTPopupOverAWT;
@@ -64,6 +66,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
@@ -181,6 +184,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private static final WorldWindowGLCanvas	_wwCanvas						= Map3Manager.getWWCanvas();
 
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore				_prefStore_Common			= CommonActivator.getPrefStore();
 	private final IDialogSettings					_state						= TourbookPlugin.getState(getClass().getCanonicalName());
 
 // SET_FORMATTING_ON
@@ -218,10 +222,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenTour                 _actionOpenTour;
    private ActionPrint                    _actionPrintTour;
+   private ActionUpload                   _actionUploadTour;
    //
    private IPartListener2                 _partListener;
    private ISelectionListener             _postSelectionListener;
    private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
    private ITourEventListener             _tourEventListener;
    //
    private MouseAdapter                   _wwMouseListener;
@@ -635,8 +641,17 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
                // update map colors
 
                setColorProvider(_graphId);
+            }
+         }
+      };
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+
+            final String property = event.getProperty();
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
                _actionShowTourInMap.updateMeasurementSystem();
             }
@@ -644,6 +659,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.addPropertyChangeListener(_prefChangeListener_Common);
    }
 
    /**
@@ -879,6 +895,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
+      _actionUploadTour = new ActionUpload(this);
    }
 
    /**
@@ -988,7 +1005,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
                _lastHiddenSelection = null;
 
-            } else if (_allTours.size() == 0) {
+            } else if (_allTours.isEmpty()) {
 
                // a tour is not displayed, find a tour provider which provides a tour
                showToursFromTourProvider();
@@ -1013,9 +1030,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          if (altitudeSerie != null) {
 
             final float altitudeMetric = altitudeSerie[positionIndex];
-            final float altitude = altitudeMetric / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            final float altitude = altitudeMetric / UI.UNIT_VALUE_ELEVATION;
 
-            graphValueText = String.format(SLIDER_TEXT_ALTITUDE, altitude, UI.UNIT_LABEL_ALTITUDE);
+            graphValueText = String.format(SLIDER_TEXT_ALTITUDE, altitude, UI.UNIT_LABEL_ELEVATION);
          }
          break;
 
@@ -1133,6 +1150,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       Map3Manager.setMap3View(null);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
@@ -1226,6 +1244,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenTour.setEnabled(isTourSelected);
       _actionExportTour.setEnabled(isTourSelected);
       _actionPrintTour.setEnabled(isTourSelected);
+      _actionUploadTour.setEnabled(isTourSelected);
    }
 
    private void fillActionBars() {
@@ -1310,6 +1329,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 //		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       (new Separator()).fill(menu, -1);
+      fillMenuItem(menu, _actionUploadTour);
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
 
@@ -1457,7 +1477,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       if (selectedTrack == null) {
 
-         if (_allTours.size() == 0) {
+         if (_allTours.isEmpty()) {
 
             return null;
 
@@ -1702,7 +1722,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // paint all selected tours
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.size() == 0) {
+         if (tourIds.isEmpty()) {
 
             clearView();
 

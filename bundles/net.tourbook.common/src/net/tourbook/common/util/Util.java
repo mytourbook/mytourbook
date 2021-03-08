@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
@@ -78,10 +80,11 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+   // public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_MIO_105             = "10500"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_NMEA                = "32481"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_HRM           = "63193"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_PDD           = "76913"; //$NON-NLS-1$
@@ -104,17 +107,24 @@ public class Util {
    /*
     * default xml attributes
     */
-   public static final String ATTR_ROOT_DATETIME          = "Created";          //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";     //$NON-NLS-1$
-   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier"; //$NON-NLS-1$
+   public static final String ATTR_ROOT_DATETIME          = "Created";                                 //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MINOR     = "VersionMinor";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_MICRO     = "VersionMicro";                            //$NON-NLS-1$
+   public static final String ATTR_ROOT_VERSION_QUALIFIER = "VersionQualifier";                        //$NON-NLS-1$
 
-   public static final String ATTR_COLOR_RED              = "red";              //$NON-NLS-1$
-   public static final String ATTR_COLOR_GREEN            = "green";            //$NON-NLS-1$
-   public static final String ATTR_COLOR_BLUE             = "blue";             //$NON-NLS-1$
+   public static final String ATTR_COLOR_RED              = "red";                                     //$NON-NLS-1$
+   public static final String ATTR_COLOR_GREEN            = "green";                                   //$NON-NLS-1$
+   public static final String ATTR_COLOR_BLUE             = "blue";                                    //$NON-NLS-1$
 
-   public static final String CSV_FILE_EXTENSION          = "csv";              //$NON-NLS-1$
+   public static final String CSV_FILE_EXTENSION          = "csv";                                     //$NON-NLS-1$
+
+   private static final char  NL                          = UI.NEW_LINE;
+
+   /**
+    * Number of processors available to the Java virtual machine.
+    */
+   public static final int    NUMBER_OF_PROCESSORS        = Runtime.getRuntime().availableProcessors();
 
    public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
@@ -311,6 +321,22 @@ public class Util {
       return buf.toString();
    }
 
+   /**
+    * Concatenate two int arrays into one
+    *
+    * @param firstValues
+    * @param secondValues
+    * @return
+    */
+   public static int[] concatInt(final int[] firstValues, final int[] secondValues) {
+
+      final int[] concatenatedValues = Arrays.copyOf(firstValues, firstValues.length + secondValues.length);
+
+      System.arraycopy(secondValues, 0, concatenatedValues, firstValues.length, secondValues.length);
+
+      return concatenatedValues;
+   }
+
    public static float[][] convertDoubleToFloat(final double[][] doubleSeries) {
 
       final float[][] floatSeries = new float[doubleSeries.length][];
@@ -405,7 +431,7 @@ public class Util {
          return UI.EMPTY_STRING;
       }
 
-      if (allTexts.size() == 0) {
+      if (allTexts.isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
@@ -908,12 +934,13 @@ public class Util {
 
    public static String getSQLExceptionText(final SQLException e) {
 
-      final String text = UI.EMPTY_STRING//
+      final String text = UI.EMPTY_STRING
 
-            + ("SQLException" + UI.NEW_LINE2) //$NON-NLS-1$
-            + ("SQLState: " + (e).getSQLState() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("ErrorCode: " + (e).getErrorCode() + UI.NEW_LINE) //$NON-NLS-1$
-            + ("Message: " + (e).getMessage() + UI.NEW_LINE); //$NON-NLS-1$
+            + "SQLException" + NL //$NON-NLS-1$
+            + NL
+            + "SQLState: " + e.getSQLState() + NL //$NON-NLS-1$
+            + "ErrorCode: " + e.getErrorCode() + NL //$NON-NLS-1$
+            + "Message: " + e.getMessage() + NL; //$NON-NLS-1$
 
       return text;
    }
@@ -998,6 +1025,30 @@ public class Util {
       return comboIndex;
    }
 
+   public static LocalDate getStateDate(final IDialogSettings state,
+                                        final String stateKey,
+                                        final LocalDate defaultValue,
+                                        final DateTime dateTimeControl) {
+
+      final String value = state.get(stateKey);
+      LocalDate parsedValue;
+
+      try {
+
+         parsedValue = LocalDate.parse(value);
+
+      } catch (final Exception e) {
+
+         parsedValue = defaultValue;
+      }
+
+      dateTimeControl.setYear(parsedValue.getYear());
+      dateTimeControl.setMonth(parsedValue.getMonthValue() - 1);
+      dateTimeControl.setDay(parsedValue.getDayOfMonth());
+
+      return parsedValue;
+   }
+
    /**
     * @param state
     * @param key
@@ -1065,7 +1116,7 @@ public class Util {
       }
 
       final String[] allStateValues = state.getArray(key);
-      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.size() == 0) {
+      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.isEmpty()) {
          return allDefaultValues;
       }
 
@@ -1757,6 +1808,15 @@ public class Util {
       return file.isDirectory();
    }
 
+   public static void logSimpleMessage(final Class<?> clazz,
+                                       final String message) {
+
+      System.out.println(String.format("%s [%s] %s", //$NON-NLS-1$
+            UI.timeStampNano(),
+            clazz.getSimpleName(),
+            message));
+   }
+
    public static void logSystemProperty_IsEnabled(final Class<?> clazz, final String propertyName, final String propertyDescription) {
 
       System.out.println(UI.timeStampNano()
@@ -1967,7 +2027,7 @@ public class Util {
          try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
-               sb.append(line).append(UI.NEW_LINE);
+               sb.append(line).append(NL);
             }
          } finally {
             inputStream.close();
@@ -2415,6 +2475,16 @@ public class Util {
       stateValues[2] = Integer.toString(rgb.blue);
 
       state.put(stateKey, stateValues);
+   }
+
+   public static void setStateDate(final IDialogSettings state, final String stateKey, final DateTime dateTime) {
+
+      final LocalDate localDate = LocalDate.of(
+            dateTime.getYear(),
+            dateTime.getMonth() + 1,
+            dateTime.getDay());
+
+      state.put(stateKey, localDate.toString());
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,

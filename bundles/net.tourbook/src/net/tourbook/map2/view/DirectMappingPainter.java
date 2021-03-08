@@ -1,19 +1,26 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map2.view;
+
+import de.byteholder.geoclipse.map.DirectPainterContext;
+import de.byteholder.geoclipse.map.IDirectPainter;
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.MapPainter;
+import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.List;
 
@@ -31,36 +38,34 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-import de.byteholder.geoclipse.map.DirectPainterContext;
-import de.byteholder.geoclipse.map.IDirectPainter;
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.MapPainter;
-import de.byteholder.geoclipse.mapprovider.MP;
-
 public class DirectMappingPainter implements IDirectPainter {
 
-   private Map                _map;
-   private TourData           _tourData;
+   private Map                    _map;
+   private TourData               _tourData;
 
-   private int                _leftSliderValueIndex;
-   private int                _rightSliderValueIndex;
+   private int                    _leftSliderValueIndex;
+   private int                    _rightSliderValueIndex;
+   private int                    _valuePointIndex;
 
-   private boolean               _isTourVisible;
-   private boolean               _isShowSliderInMap;
-   private boolean               _isShowSliderInLegend;
-   private SliderPathPaintingData   _sliderPathPaintingData;
+   private boolean                _isTourVisible;
+   private boolean                _isShowSliderInMap;
+   private boolean                _isShowSliderInLegend;
+   private boolean                _isShowValuePoint;
 
-   private final Image           _imageLeftSlider;
-   private final Image           _imageRightSlider;
+   private SliderPathPaintingData _sliderPathPaintingData;
+
+   private final Image            _imageLeftSlider;
+   private final Image            _imageRightSlider;
+   private final Image            _imageValuePoint;
 
    /**
-    * 
+    *
     */
    public DirectMappingPainter() {
 
       _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
       _imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
+      _imageValuePoint = TourbookPlugin.getImageDescriptor(Messages.Image_Map_ValuePoint).createImage();
    }
 
    /**
@@ -78,6 +83,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       disposeImage(_imageLeftSlider);
       disposeImage(_imageRightSlider);
+      disposeImage(_imageValuePoint);
    }
 
    private void disposeImage(final Image image) {
@@ -91,11 +97,13 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param painterContext
     * @param sliderValueIndex
     * @param markerImage
+    * @param isYPosCenter
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawSliderMarker(   final DirectPainterContext painterContext,
-                              int sliderValueIndex,
-                              final Image markerImage) {
+   private boolean drawMarker(final DirectPainterContext painterContext,
+                              final int sliderValueIndex,
+                              final Image markerImage,
+                              final boolean isYPosCenter) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -104,13 +112,13 @@ public class DirectMappingPainter implements IDirectPainter {
       final double[] longitudeSerie = _tourData.longitudeSerie;
 
       // force array bounds
-      sliderValueIndex = Math.min(Math.max(sliderValueIndex, 0), latitudeSerie.length - 1);
+      final int sliderValueIndexAdjusted = Math.min(Math.max(sliderValueIndex, 0), latitudeSerie.length - 1);
 
       // get world position for the slider coordinates
 
       final java.awt.Point worldPixelMarkerAWT = mp.geoToPixel(new GeoPosition(
-            latitudeSerie[sliderValueIndex],
-            longitudeSerie[sliderValueIndex]), zoomLevel);
+            latitudeSerie[sliderValueIndexAdjusted],
+            longitudeSerie[sliderValueIndexAdjusted]), zoomLevel);
 
       // convert awt to swt point
       final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
@@ -129,8 +137,17 @@ public class DirectMappingPainter implements IDirectPainter {
          final int markerWidth2 = markerWidth / 2;
          final int markerHeight = bounds.height;
 
-         // draw marker for the slider
-         painterContext.gc.drawImage(markerImage, devMarkerPosX - markerWidth2, devMarkerPosY - markerHeight);
+         final int devX = devMarkerPosX - markerWidth2;
+         final int devY = isYPosCenter
+
+               // set y centered
+               ? devMarkerPosY - markerHeight / 2
+
+               // set y bottom
+               : devMarkerPosY - markerHeight;
+
+         // draw marker for the slider/value point
+         painterContext.gc.drawImage(markerImage, devX, devY);
 
          return true;
       }
@@ -391,7 +408,7 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       final List<MapPainter> allMapPainter = _map.getMapPainter();
-      if (allMapPainter == null || allMapPainter.size() == 0) {
+      if (allMapPainter == null || allMapPainter.isEmpty()) {
          return;
       }
 
@@ -462,9 +479,12 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       if (_isShowSliderInMap) {
+         drawMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
+         drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
+      }
 
-         drawSliderMarker(painterContext, _rightSliderValueIndex, _imageRightSlider);
-         drawSliderMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider);
+      if (_isShowValuePoint) {
+         drawMarker(painterContext, _valuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {
@@ -475,7 +495,7 @@ public class DirectMappingPainter implements IDirectPainter {
    /**
     * @param map
     * @param isTourVisible
-    *            <code>true</code> when tour is visible
+    *           <code>true</code> when tour is visible
     * @param tourData
     * @param leftSliderValuesIndex
     * @param rightSliderValuesIndex
@@ -484,21 +504,31 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param sliderRelationPaintingData
     */
    public void setPaintContext(final Map map,
-                        final boolean isTourVisible,
-                        final TourData tourData,
-                        final int leftSliderValuesIndex,
-                        final int rightSliderValuesIndex,
-                        final boolean isShowSliderInMap,
-                        final boolean isShowSliderInLegend,
-                        final SliderPathPaintingData sliderRelationPaintingData) {
+                               final boolean isTourVisible,
+                               final TourData tourData,
+
+                               final int leftSliderValuesIndex,
+                               final int rightSliderValuesIndex,
+                               final int valuePointIndex,
+
+                               final boolean isShowSliderInMap,
+                               final boolean isShowSliderInLegend,
+                               final boolean isShowValuePoint,
+
+                               final SliderPathPaintingData sliderRelationPaintingData) {
 
       _map = map;
       _isTourVisible = isTourVisible;
       _tourData = tourData;
+
       _leftSliderValueIndex = leftSliderValuesIndex;
       _rightSliderValueIndex = rightSliderValuesIndex;
+      _valuePointIndex = valuePointIndex;
+
       _isShowSliderInMap = isShowSliderInMap;
       _isShowSliderInLegend = isShowSliderInLegend;
+      _isShowValuePoint = isShowValuePoint;
+
       _sliderPathPaintingData = sliderRelationPaintingData;
    }
 

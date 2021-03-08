@@ -180,7 +180,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       colRecordedTime = result.getLong(startIndex + 11);
 
       final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-      long time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
+      final long time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
       // prevent divide by 0
       colAvgSpeed = (time == 0 ? 0 : 3.6f * colDistance / time);
       colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
@@ -205,10 +205,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          colAvgCadence = UI.scrambleNumbers(colAvgCadence);
          colAvgTemperature = UI.scrambleNumbers(colAvgTemperature);
 
-         time = isPaceAndSpeedFromRecordedTime ? colRecordedTime : colMovingTime;
-         // prevent divide by 0
-         colAvgSpeed = (time == 0 ? 0 : 3.6f * colDistance / time);
-         colAvgPace = colDistance == 0 ? 0 : time * 1000f / colDistance;
+         colAvgSpeed = UI.scrambleNumbers(colAvgSpeed);
+         colAvgPace = UI.scrambleNumbers(colAvgPace);
       }
    }
 
