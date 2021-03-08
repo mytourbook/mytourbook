@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,8 +91,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
     */
    private ChartStatisticSegments createChartSegments(final TourStatisticData_Time tourDataTime) {
 
-      final double segmentStart[] = new double[_numberOfYears];
-      final double segmentEnd[] = new double[_numberOfYears];
+      final double[] segmentStart = new double[_numberOfYears];
+      final double[] segmentEnd = new double[_numberOfYears];
       final String[] segmentTitle = new String[_numberOfYears];
 
       final int[] allYearDays = tourDataTime.allYear_NumDays;
@@ -139,7 +139,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          @Override
          public void afterHideToolTip(final Event event) {
             // hide hovered image
-            _chart.getToolTipControl().afterHideToolTip(event);
+            _chart.getToolTipControl().afterHideToolTip();
          }
       });
 
@@ -370,7 +370,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
          return false;
       }
 
-      final boolean selectedTours[] = new boolean[tourIds.length];
+      final boolean[] selectedTours = new boolean[tourIds.length];
 
       boolean isSelected = false;
 

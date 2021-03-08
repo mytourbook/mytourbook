@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1315,12 +1315,7 @@ public class Chart extends ViewForm {
          return;
       }
 
-      getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            _synchedChart.setSynchConfig(_chartComponents._synchConfigOut);
-         }
-      });
+      getDisplay().asyncExec(() -> _synchedChart.setSynchConfig(_chartComponents._synchConfigOut));
    }
 
    /**
@@ -1353,8 +1348,7 @@ public class Chart extends ViewForm {
                            final boolean isShowAllData) {
 
       if (chartDataModel == null || //
-            (chartDataModel != null //
-                  && chartDataModel.getYData().isEmpty() //
+            (chartDataModel.getYData().isEmpty() //
 
                   // history do not have Y values
                   && chartDataModel.getChartType() != ChartType.HISTORY) //

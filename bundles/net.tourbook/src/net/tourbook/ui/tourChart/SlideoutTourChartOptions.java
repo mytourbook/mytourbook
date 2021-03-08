@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -69,8 +70,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
          PulseGraph.DEVICE_BPM_ONLY,
-         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
          PulseGraph.RR_INTERVALS_ONLY,
+         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
 
    };
 
@@ -81,8 +82,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
+         Messages.TourChart_PulseGraph_RRIntervals_Only,
          Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
-         Messages.TourChart_PulseGraph_RRIntervals_Only
    };
 
    private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
@@ -92,6 +93,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private TourChart _tourChart;
 
+   private Button    _chkInvertPaceGraph;
    private Button    _chkShowBreaktimeValues;
    private Button    _chkShowSrtmData;
    private Button    _chkShowStartTimeOnXAxis;
@@ -167,6 +169,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             createUI_10_Title(container);
             createUI_12_Actions(container);
             createUI_20_Controls(container);
+            createUI_30_Graph(container);
 
             _gridUI.createUI(container);
          }
@@ -290,24 +293,51 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
             _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
+      }
+   }
+
+   private void createUI_30_Graph(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Graphs_Group_Graphs);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(group);
+      GridLayoutFactory.swtDefaults()
+            .numColumns(2)
+            .applyTo(group);
+      {
          {
             /*
              * Pulse graph
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Slideout_TourChartOptions_Label_PulseGraph);
 
             // combo
-            _comboPulseValueGraph = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboPulseValueGraph = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboPulseValueGraph.setVisibleItemCount(20);
+            _comboPulseValueGraph.addSelectionListener(_defaultSelectionAdapter);
+            _comboPulseValueGraph.addFocusListener(_keepOpenListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.FILL)
                   .applyTo(_comboPulseValueGraph);
-            _comboPulseValueGraph.setVisibleItemCount(20);
-            _comboPulseValueGraph.addSelectionListener(_defaultSelectionAdapter);
-            _comboPulseValueGraph.addFocusListener(_keepOpenListener);
+         }
+         {
+            /*
+             * Pace graph
+             */
+            _chkInvertPaceGraph = new Button(group, SWT.CHECK);
+            _chkInvertPaceGraph.setText(Messages.Slideout_TourChartOptions_Check_InvertPaceGraph);
+            _chkInvertPaceGraph.setToolTipText(Messages.Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip);
+            _chkInvertPaceGraph.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkInvertPaceGraph);
          }
       }
    }
@@ -366,6 +396,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
       final boolean isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES);
       final boolean isShowBreaktimeValues = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      final boolean isShowPaceGraphInverted = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED);
       final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
       final boolean isSrtmDataVisible = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
       final boolean isTourStartTime = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
@@ -379,6 +410,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       tcc.xAxisTime = xAxisStartTime;
       tcc.pulseGraph = TourChart.PULSE_GRAPH_DEFAULT;
 
+      _chkInvertPaceGraph.setSelection(isShowPaceGraphInverted);
       _chkShowBreaktimeValues.setSelection(isShowBreaktimeValues);
       _chkShowSrtmData.setSelection(isSrtmDataVisible);
       _chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
@@ -407,6 +439,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final boolean canShowTimeOnXAxis = tcc.isShowTimeOnXAxis;
       final boolean canShowSRTMData = tcc.canShowSRTMData;
 
+      _chkInvertPaceGraph.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
+
       _chkShowBreaktimeValues.setSelection(tcc.isShowBreaktimeValues);
 
       _chkShowSrtmData.setEnabled(canShowSRTMData);
@@ -429,6 +463,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
       final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
       final boolean isShowBreaktimeValues = _chkShowBreaktimeValues.getSelection();
+      final boolean isShowPaceGraphInverted = _chkInvertPaceGraph.getSelection();
       final boolean isSrtmDataVisible = _chkShowSrtmData.getSelection();
       final boolean isTourStartTime = _chkShowStartTimeOnXAxis.getSelection();
 
@@ -443,6 +478,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
        */
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, isShowBreaktimeValues);
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, isShowPaceGraphInverted);
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
 

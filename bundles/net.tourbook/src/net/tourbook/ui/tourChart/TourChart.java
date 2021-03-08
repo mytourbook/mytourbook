@@ -110,8 +110,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -797,12 +795,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //         }
 //      });
 
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      addDisposeListener(disposeEvent -> onDispose());
 
       addControlListener(this);
       addPrefListeners();
@@ -832,7 +825,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          public void afterHideToolTip(final Event event) {
 
             // hide hovered image
-            getToolTipControl().afterHideToolTip(event);
+            getToolTipControl().afterHideToolTip();
          }
       });
       setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);

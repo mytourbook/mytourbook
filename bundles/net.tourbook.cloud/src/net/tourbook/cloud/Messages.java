@@ -21,7 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.cloud.messages";       //$NON-NLS-1$
 
-   public static String        Html_CloseBrowser_Text;
+   public static String        Html_Text_CloseBrowser;
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
@@ -60,6 +60,7 @@ public class Messages extends NLS {
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
+   public static String Import_Data_HTML_SuuntoWorkoutsDownloader_Tooltip;
    public static String Log_DownloadWorkoutsFromSuunto_001_Start;
    public static String Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
    public static String Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
@@ -76,7 +77,6 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Label_FolderPath;
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
-   public static String Suunto_WorkoutsDownloader_Tooltip;
    public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
 

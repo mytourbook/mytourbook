@@ -288,7 +288,7 @@ public class UI {
       if (display != null) {
 
          // Look at all the shells and pick the first one that is a workbench window.
-         final Shell shells[] = display.getShells();
+         final Shell[] shells = display.getShells();
          for (final Shell shell : shells) {
 
             final Object data = shell.getData();

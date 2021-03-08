@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -123,7 +123,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       /*
        * convert all diff values into positive values
        */
-      float diffValues[] = null;
+      float[] diffValues = null;
       double scaleValueDiff = _scaleY;
       if (isDiffValues) {
 

@@ -77,7 +77,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       super("SUUNTO", //$NON-NLS-1$
             Messages.VendorName_Suunto,
-            Messages.Suunto_WorkoutsDownloader_Tooltip,
+            Messages.Import_Data_HTML_SuuntoWorkoutsDownloader_Tooltip,
             Activator.getImageAbsoluteFilePath(Messages.Image__SuuntoApp_Icon));
    }
 
@@ -92,15 +92,23 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       return sendAsyncRequest(workoutKey, request);
    }
 
-   private int downloadFiles(final List<Payload> newWorkouts) {
+   private int downloadFiles(final List<Payload> newWorkouts, final IProgressMonitor monitor) {
 
       final List<CompletableFuture<WorkoutDownload>> workoutDownloads = new ArrayList<>();
 
-      newWorkouts.stream().forEach(newWorkout -> workoutDownloads.add(downloadFile(newWorkout.workoutKey)));
+      newWorkouts.stream().forEach(newWorkout -> {
+         if (monitor.isCanceled()) {
+            return;
+         } else {
+            workoutDownloads.add(downloadFile(newWorkout.workoutKey));
+         }
+      });
 
       final int[] numberOfDownloadedTours = new int[1];
-      workoutDownloads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
-         if (logDownloadResult(activityUpload)) {
+      workoutDownloads.stream().map(CompletableFuture::join).forEach(workoutDownload -> {
+         if (monitor.isCanceled()) {
+            return;
+         } else if (logDownloadResult(workoutDownload)) {
             ++numberOfDownloadedTours[0];
          }
       });
@@ -182,7 +190,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         _numberOfAvailableTours[0],
                         UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND }));
 
-            numberOfDownloadedTours[0] = downloadFiles(newWorkouts);
+            numberOfDownloadedTours[0] = downloadFiles(newWorkouts, monitor);
 
             monitor.worked(1);
          }
@@ -195,7 +203,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          TourLogManager.showLogView();
          TourLogManager.logTitle(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
          TourLogManager.logTitle(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
