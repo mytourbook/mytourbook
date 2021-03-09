@@ -505,7 +505,7 @@ public class TourExporter {
 
       final int[] timeSerie = _tourData.timeSerie;
 
-      if ((timeSerie == null)) {
+      if (timeSerie == null) {
          return null;
       }
 
