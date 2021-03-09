@@ -112,6 +112,9 @@ public class TourExporter {
    }
 
    private String       _activityType;
+   /**
+    * The speed is in meters/second
+    */
    private float        _camouflageSpeed;
    private String       _courseName;
    private final String _formatTemplate;
