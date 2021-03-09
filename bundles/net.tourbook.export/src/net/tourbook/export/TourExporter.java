@@ -870,6 +870,7 @@ public class TourExporter {
    }
 
    public boolean export(final String exportFileName) {
+
       final ArrayList<GarminTrack> tracks = new ArrayList<>();
       final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
       final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
@@ -938,6 +939,7 @@ public class TourExporter {
    }
 
    public TourExporter useTourData(final TourData tourData) {
+
       _tourData = tourData;
 
       return this;
