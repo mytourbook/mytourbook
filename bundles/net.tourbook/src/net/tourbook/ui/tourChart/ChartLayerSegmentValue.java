@@ -381,11 +381,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
                      segmenterSegment.paintedLabel = validRect;
 
                      // keep area to detect hovered segments, enlarge it with the hover border to easier hit the label
-//							final Rectangle hoveredRect = new Rectangle(//
-//									(validRect.x + borderWidth),
-//									(validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
-//									(validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
-//									(validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
+//                     final Rectangle hoveredRect = new Rectangle(//
+//                           (validRect.x + borderWidth),
+//                           (validRect.y + borderHeight - SegmenterSegment.EXPANDED_HOVER_SIZE2),
+//                           (validRect.width - borderWidth2 + SegmenterSegment.EXPANDED_HOVER_SIZE),
+//                           (validRect.height - borderHeight2 + SegmenterSegment.EXPANDED_HOVER_SIZE));
 
                      final Rectangle hoveredRect = new Rectangle(
                            (validRect.x),
@@ -395,11 +395,11 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
                      segmenterSegment.hoveredLabelRect = hoveredRect;
 
-//								/*
-//								 * Debugging
-//								 */
-//								gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-//								gc.drawRectangle(hoveredRect);
+//                     /*
+//                      * Debugging
+//                      */
+//                     gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+//                     gc.drawRectangle(hoveredRect);
                   }
                }
             }
