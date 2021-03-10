@@ -130,7 +130,8 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       if (tourData.timeSerie == null || tourData.timeSerie.length == 0 || tourData.getTourDeviceTime_Elapsed() == 0) {
          _tourExporter.setIsCamouflageSpeed(true);
-         _tourExporter.setCamouflageSpeed(10);
+         // 0.5 m/s => 1.8 km/h
+         _tourExporter.setCamouflageSpeed(0.5f);
       } else {
          _tourExporter.setIsCamouflageSpeed(false);
       }

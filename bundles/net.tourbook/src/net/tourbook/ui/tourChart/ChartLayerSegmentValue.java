@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,16 +21,6 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
-
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartMouseEvent;
@@ -40,6 +30,16 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
+
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This layer displays the average values for a segment.
@@ -214,7 +214,13 @@ public class ChartLayerSegmentValue implements IChartLayer {
 
             final float graphYValue = segmentValues[segmentIndex] * valueDivisor;
             final int devYGraph = (int) (scaleY * (graphYValue - graphYBottom));
-            final int devYSegment = devYBottom - devYGraph;
+
+            int devYSegment = 0;
+            if (yData.isYAxisDirection()) {
+               devYSegment = devYBottom - devYGraph;
+            } else {
+               devYSegment = devYTop + devYGraph;
+            }
 
             boolean isShowValueText = true;
 
@@ -439,7 +445,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
                 * This algorithm is highly complicated because of the complex start values but now
                 * it seams to work.
                 */
-               for (; tourIndex < multipleTourStartIndex.length;) {
+               while (tourIndex < multipleTourStartIndex.length) {
 
                   if (nextTourStartIndex == 0) {
 

@@ -1687,7 +1687,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          if (chartTitleSegmentConfig.isShowSegmentSeparator) {
-            drawAsync_240_TourSements(gcGraph, graphDrawingData);
+            drawAsync_240_TourSegments(gcGraph, graphDrawingData);
          }
 
          if (isDrawGraphTitle) {
@@ -2445,7 +2445,7 @@ public class ChartComponentGraph extends Canvas {
       }
    }
 
-   private void drawAsync_240_TourSements(final GC gcChart, final GraphDrawingData graphDrawingData) {
+   private void drawAsync_240_TourSegments(final GC gcChart, final GraphDrawingData graphDrawingData) {
 
       final ArrayList<ChartTitleSegment> chartTitleSegments = _chartDrawingData.chartTitleSegments;
 
