@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -638,15 +638,24 @@ public class MessageManager implements IMessageManager {
    }
 
    private void update(final ArrayList<IMessage> mergedList) {
+
       pruneControlDecorators();
-      if (scrolledForm.getHead().getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
+
+      final Composite head = scrolledForm.getHead();
+      if (head.isDisposed()) {
+         return;
+      }
+
+      if (head.getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
          scrolledForm.setMessage(null, IMessageProvider.NONE);
          return;
       }
+
       final ArrayList<IMessage> peers = createPeers(mergedList);
       final int maxType = peers.get(0).getMessageType();
       String messageText;
       final IMessage[] array = peers.toArray(new IMessage[peers.size()]);
+
       if (peers.size() == 1 && ((Message) peers.get(0)).prefix == null) {
          // a single message
          final IMessage message = peers.get(0);
