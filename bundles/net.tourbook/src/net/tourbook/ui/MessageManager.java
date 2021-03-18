@@ -57,24 +57,32 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 public class MessageManager implements IMessageManager {
 
-   private static final DefaultPrefixProvider   DEFAULT_PREFIX_PROVIDER       = new DefaultPrefixProvider();
+   private static final DefaultPrefixProvider DEFAULT_PREFIX_PROVIDER = new DefaultPrefixProvider();
 
-   private static FieldDecoration               standardError                 = FieldDecorationRegistry.getDefault()
-         .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-   private static FieldDecoration               standardWarning               = FieldDecorationRegistry.getDefault()
-         .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
-   private static FieldDecoration               standardInformation           = FieldDecorationRegistry.getDefault()
-         .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
-   private static final String[]                SINGLE_MESSAGE_SUMMARY_KEYS   = {
-         Messages.message_manager_sMessageSummary,
-         Messages.message_manager_sMessageSummary,
-         Messages.message_manager_sWarningSummary,
-         Messages.message_manager_sErrorSummary };
-   private static final String[]                MULTIPLE_MESSAGE_SUMMARY_KEYS = {
-         Messages.message_manager_pMessageSummary,
-         Messages.message_manager_pMessageSummary,
-         Messages.message_manager_pWarningSummary,
-         Messages.message_manager_pErrorSummary };
+// SET_FORMATTING_OFF
+
+   private static FieldDecoration   standardError        = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
+   private static FieldDecoration   standardWarning      = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
+   private static FieldDecoration   standardInformation  = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
+
+// SET_FORMATTING_ON
+
+   private static final String[]                SINGLE_MESSAGE_SUMMARY_KEYS   =
+         {
+               Messages.message_manager_sMessageSummary,
+               Messages.message_manager_sMessageSummary,
+               Messages.message_manager_sWarningSummary,
+               Messages.message_manager_sErrorSummary
+
+         };
+   private static final String[]                MULTIPLE_MESSAGE_SUMMARY_KEYS =
+         {
+               Messages.message_manager_pMessageSummary,
+               Messages.message_manager_pMessageSummary,
+               Messages.message_manager_pWarningSummary,
+               Messages.message_manager_pErrorSummary
+
+         };
    private ArrayList<IMessage>                  messages                      = new ArrayList<>();
 
    private Hashtable<Control, ControlDecorator> decorators                    = new Hashtable<>();
@@ -86,6 +94,7 @@ public class MessageManager implements IMessageManager {
    private int                                  decorationPosition            = SWT.LEFT | SWT.BOTTOM;
 
    class ControlDecorator {
+
       private ControlDecoration   decoration;
       private ArrayList<IMessage> controlMessages = new ArrayList<>();
       private String              prefix;
