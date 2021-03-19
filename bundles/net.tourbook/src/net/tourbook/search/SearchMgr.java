@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.IconRequestMgr;
 import net.tourbook.application.TourbookPlugin;
@@ -70,7 +71,7 @@ public class SearchMgr implements XHRHandler {
    private static final String  SEARCH_APP_ACTION_EDIT_MARKER          = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
    private static final String  SEARCH_APP_ACTION_EDIT_TOUR            = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = Images.Image_Action_TourWayPoint;
 
    final static IDialogSettings state                                  = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
 

@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -545,8 +546,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowPhotos() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap),
-               TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Image_Action_ShowPhotosInMap),
+               TourbookPlugin.getImageDescriptor(Images.Image_Action_ShowPhotosInMap_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
@@ -575,8 +576,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image__Tour),
-               TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Image__Tour),
+               TourbookPlugin.getImageDescriptor(Images.Image__Tour_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.map_action_show_tour_in_map;
@@ -607,8 +608,8 @@ public class Map2View extends ViewPart implements
 
       public ActionSyncMap() {
 
-         super(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap),
-               TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncMap_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Image_Action_SyncMap),
+               TourbookPlugin.getImageDescriptor(Images.Image_Action_SyncMap_Disabled));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
@@ -618,22 +619,22 @@ public class Map2View extends ViewPart implements
           */
 
          // image 0: tour
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_tour));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_tour));
 
          // image 1: value point
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_ValuePoint));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Image_Action_SyncWith_ValuePoint));
 
          // image 2: one slider
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_slider));
 
          // image 3: centered sliders
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_SyncWith_Slider_Centered));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Image_Action_SyncWith_Slider_Centered));
 
          // image 4: other map
          addOtherEnabledImage(TourbookPlugin.getImageDescriptor(IMAGE_SYNC_MAP_WITH_OTHER_MAP));
 
          // image 5: photo
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Messages.Image_Action_Map_SyncPhotoWithMap));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Image_Action_Map_SyncPhotoWithMap));
       }
 
       @Override
@@ -1578,8 +1579,8 @@ public class Map2View extends ViewPart implements
             this,
             MapGraphId.HrZone,
             Messages.Tour_Action_ShowHrZones_Tooltip,
-            Messages.Image__PulseZones,
-            Messages.Image__PulseZones_Disabled);
+            Images.Image__PulseZones,
+            Images.Image__PulseZones_Disabled);
 
 // SET_FORMATTING_OFF
 
