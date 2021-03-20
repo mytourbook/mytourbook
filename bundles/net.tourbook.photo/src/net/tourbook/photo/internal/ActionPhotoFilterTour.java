@@ -15,29 +15,29 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-
+import net.tourbook.photo.Images;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionPhotoFilterTour extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionPhotoFilterTour(final PhotoGallery photoGallery) {
+   public ActionPhotoFilterTour(final PhotoGallery photoGallery) {
 
-		super(Messages.Photo_Gallery_Action_PhotoFilter_Tour, AS_CHECK_BOX);
+      super(Messages.Photo_Gallery_Action_PhotoFilter_Tour, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_Tour_Tooltip);
+      setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_Tour_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterTour));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterTourDisabled));
+      setImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoFilterTour));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoFilterTourDisabled));
 
-		_photoGallery = photoGallery;
-	}
+      _photoGallery = photoGallery;
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionImageFilterTour(this);
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionImageFilterTour(this);
+   }
 }

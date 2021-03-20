@@ -17,7 +17,6 @@ package net.tourbook.photo;
 
 import net.tourbook.common.UI;
 import net.tourbook.photo.internal.Activator;
-import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -67,22 +66,22 @@ public class PhotoUI {
 
 // SET_FORMATTING_OFF
 
-      imageRegistry.put(INVALID_PHOTO_IMAGE,                      Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImage));
-      imageRegistry.put(INVALID_PHOTO_IMAGE_HOVERED,              Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImageHovered));
+      imageRegistry.put(INVALID_PHOTO_IMAGE,                      Activator.getImageDescriptor(Images.Image__PhotoInvalidPhotoImage));
+      imageRegistry.put(INVALID_PHOTO_IMAGE_HOVERED,              Activator.getImageDescriptor(Images.Image__PhotoInvalidPhotoImageHovered));
 
-      imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF,                Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
-      imageRegistry.put(PHOTO_ANNOTATION_GPS_TOUR,                Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+      imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF,                Activator.getImageDescriptor(Images.Image__PhotoAnnotationExifGPS));
+      imageRegistry.put(PHOTO_ANNOTATION_GPS_TOUR,                Activator.getImageDescriptor(Images.Image__PhotoAnnotationTourGPS));
 
-      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,           Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
-      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,   Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
+      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,           Activator.getImageDescriptor(Images.Image__PhotoAnnotationSavedInTour));
+      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,   Activator.getImageDescriptor(Images.Image__PhotoAnnotationSavedInTourHovered));
 
-      imageRegistry.put(PHOTO_RATING_STAR,                        Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
-      imageRegistry.put(PHOTO_RATING_STAR_AND_HOVERED,            Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
-      imageRegistry.put(PHOTO_RATING_STAR_DISABLED,               Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
-      imageRegistry.put(PHOTO_RATING_STAR_DELETE,                 Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
-      imageRegistry.put(PHOTO_RATING_STAR_HOVERED,                Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
-      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED,            Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
-      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,    Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
+      imageRegistry.put(PHOTO_RATING_STAR,                        Activator.getImageDescriptor(Images.Image__PhotoRatingStar));
+      imageRegistry.put(PHOTO_RATING_STAR_AND_HOVERED,            Activator.getImageDescriptor(Images.Image__PhotoRatingStarAndHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_DISABLED,               Activator.getImageDescriptor(Images.Image__PhotoRatingStarDisabled));
+      imageRegistry.put(PHOTO_RATING_STAR_DELETE,                 Activator.getImageDescriptor(Images.Image__PhotoRatingStarDelete));
+      imageRegistry.put(PHOTO_RATING_STAR_HOVERED,                Activator.getImageDescriptor(Images.Image__PhotoRatingStarHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED,            Activator.getImageDescriptor(Images.Image__PhotoRatingStarNotHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,    Activator.getImageDescriptor(Images.Image__PhotoRatingStarNotHoveredButSet));
 
 // SET_FORMATTING_ON
    }

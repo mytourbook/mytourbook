@@ -74,6 +74,12 @@ public class Images {
    public static final String Image_Map_WayPoint                             = "waypoint-large.png";
    public static final String Image_Map_WayPoint_Hovered                     = "waypoint-large-hovered.png";
 
+   public static final String Image_Map3_DirectionArrow                      = "map3-direction-arrow.png";
+   public static final String Image_Map3_DirectionArrow_Disabled             = "map3-direction-arrow-disabled.png";
+   public static final String Image_Map3_Map3PropertiesView                  = "map3-properties.png";
+   public static final String Image_Map3_OpenGL_Version                      = "map3-opengl-version.png";
+   public static final String Image_Map3_StatisticsView                      = "map3-statistics.png";
+
    public static final String Image_POI_Anchor                               = "anchor.png";
    public static final String Image_POI_Car                                  = "car.png";
    public static final String Image_POI_Cart                                 = "cart.png";
@@ -82,6 +88,9 @@ public class Images {
    public static final String Image_POI_InMap                                = "poi-in-map.png";
    public static final String Image_POI_Soccer                               = "sport_soccer.png";
    public static final String Image_POI_Star                                 = "star.png";
+
+   public static final String Image_ToolTip_TourInfo                         = "tour-info.png";
+   public static final String Image_ToolTip_TourInfo_Hovered                 = "tour-info-hovered.png";
 
    public static final String Image_ViewIcon_Map                             = "map.png";
    public static final String Image_ViewIcon_Placeholder16                   = "placeholder16.png";
