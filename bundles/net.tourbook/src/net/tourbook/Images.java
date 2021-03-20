@@ -33,27 +33,22 @@ public class Images {
 //   Image_Map_TourEndMarker              = map-marker-end_it.png
 //   Image_Map_TourStartMarker            = map-marker-start_it.png
 
+   public static final String Image__PulseZones                              = "pulse-zones.png";
+   public static final String Image__PulseZones_Disabled                     = "pulse-zones-disabled.png";
    public static final String Image__Refresh                                 = "refresh.png";
+   public static final String Image__Tour                                    = "tour-chart.png";
+   public static final String Image__Tour_Disabled                           = "tour-chart-disabled.png";
 
-   public static final String Image_Action_SetFavoritePosition               = "map-set-favorite-position.png";
-   public static final String Image_Action_ShowFavoritePosition              = "map-show-favorite-position.png";
-   public static final String Image_Action_ZoomIn                            = "zoom-in.png";
-   public static final String Image_Action_ZoomIn_Disabled                   = "zoom-in-disabled.png";
-   public static final String Image_Action_ZoomOut                           = "zoom-out.png";
-   public static final String Image_Action_ZoomOutToMinZoom                  = "zoom-fit-graph.gif";
-   public static final String Image_Action_ZoomOutToMinZoom_Disabled         = "zoom-fit-graph-disabled.gif";
-   public static final String Image_Action_ZoomOut_Disabled                  = "zoom-out-disabled.png";
-   public static final String Image_Action_ZoomShowEntireLayer               = "map-show-entire-layer.png";
-
-   public static final String Image_ViewIcon_Map                             = "map.png";
-   public static final String Image_ViewIcon_Placeholder16                   = "placeholder16.png";
+   public static final String Image__floppy_disk                             = "floppy_disc2.png";
 
    public static final String Image_Action_Map_SyncPhotoWithMap              = "photo-sync-map-with-photo.png";
    public static final String Image_Action_Map_SyncPhotoWithMap_Disabled     = "photo-sync-map-with-photo-disabled.png";
    public static final String Image_Action_POI                               = "show-poi.png";
    public static final String Image_Action_POI_Disabled                      = "show-poi-disabled.png";
+   public static final String Image_Action_SetFavoritePosition               = "map-set-favorite-position.png";
    public static final String Image_Action_ShowAllPhotosInMap                = "photo-show-all-photos.png";
    public static final String Image_Action_ShowAllPhotosInMap_Disabled       = "photo-show-all-photos-disabled.png";
+   public static final String Image_Action_ShowFavoritePosition              = "map-show-favorite-position.png";
    public static final String Image_Action_ShowPhotosInMap                   = "photo-photos.png";
    public static final String Image_Action_ShowPhotosInMap_Disabled          = "photo-photos-disabled.png";
    public static final String Image_Action_ShowValuePoint                    = "map-marker-value-point-action.png";
@@ -67,16 +62,29 @@ public class Images {
    public static final String Image_Action_TourWayPoint_Disabled             = "tour-waypoint-disabled.png";
    public static final String Image_Action_Zoom_CenterTour                   = "zoom-center-tour.png";
    public static final String Image_Action_Zoom_ShowEntireMap                = "zoom-show-entire-map.png";
+   public static final String Image_Action_ZoomIn                            = "zoom-in.png";
+   public static final String Image_Action_ZoomIn_Disabled                   = "zoom-in-disabled.png";
+   public static final String Image_Action_ZoomOut                           = "zoom-out.png";
+   public static final String Image_Action_ZoomOutToMinZoom                  = "zoom-fit-graph.gif";
+   public static final String Image_Action_ZoomOutToMinZoom_Disabled         = "zoom-fit-graph-disabled.gif";
+   public static final String Image_Action_ZoomOut_Disabled                  = "zoom-out-disabled.png";
+   public static final String Image_Action_ZoomShowEntireLayer               = "map-show-entire-layer.png";
 
    public static final String Image_Map_ValuePoint                           = "map-marker-value-point.png";
    public static final String Image_Map_WayPoint                             = "waypoint-large.png";
    public static final String Image_Map_WayPoint_Hovered                     = "waypoint-large-hovered.png";
 
-   public static final String Image__PulseZones                              = "pulse-zones.png";
-   public static final String Image__PulseZones_Disabled                     = "pulse-zones-disabled.png";
-   public static final String Image__Tour                                    = "tour-chart.png";
-   public static final String Image__Tour_Disabled                           = "tour-chart-disabled.png";
-   public static final String Image__floppy_disk                             = "floppy_disc2.png";
+   public static final String Image_POI_Anchor                               = "anchor.png";
+   public static final String Image_POI_Car                                  = "car.png";
+   public static final String Image_POI_Cart                                 = "cart.png";
+   public static final String Image_POI_Flag                                 = "flag_green.png";
+   public static final String Image_POI_House                                = "house.png";
+   public static final String Image_POI_InMap                                = "poi-in-map.png";
+   public static final String Image_POI_Soccer                               = "sport_soccer.png";
+   public static final String Image_POI_Star                                 = "star.png";
+
+   public static final String Image_ViewIcon_Map                             = "map.png";
+   public static final String Image_ViewIcon_Placeholder16                   = "placeholder16.png";
 
    public static final String image_action_change_tile_factory               = "change-map-provider.png";
    public static final String image_action_reload_map                        = "refresh.png";
