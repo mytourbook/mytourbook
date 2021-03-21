@@ -91,8 +91,8 @@ public class ExportGpxTester {
       _tourExporter.setIsExportWithBarometer(true);
       _tourExporter.setIsCamouflageSpeed(true);
       _tourExporter.setCamouflageSpeed(15 / 3.6f); // 15km/h
-      _tour.setBodyWeight(77.7f);
-      _tour.setCalories(1282000);
+      _tour.setBodyWeight(77.7f); //77.7kg
+      _tour.setCalories(1282000); //1282 kcal / 1282000 calories
 
       executeTest(controlTourFileName);
    }

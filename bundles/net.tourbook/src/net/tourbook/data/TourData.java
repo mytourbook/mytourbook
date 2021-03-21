@@ -9638,7 +9638,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * @param bodyWeight
-    *           Sets the body weight.
+    *           Sets the body weight in kilograms.
     */
    public void setBodyWeight(final float bodyWeight) {
       this.bodyWeight = bodyWeight;
