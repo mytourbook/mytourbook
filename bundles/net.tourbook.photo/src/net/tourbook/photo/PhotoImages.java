@@ -18,7 +18,7 @@ package net.tourbook.photo;
 /**
  * Contains image constants which do not need to be translated
  */
-public class Images {
+public class PhotoImages {
 
    public static final String Image__Backward_Nav                         = "backward_nav.gif";
    public static final String Image__Forward_Nav                          = "forward_nav.gif";
@@ -60,5 +60,5 @@ public class Images {
    public static final String Image__delete                               = "delete.png";
    public static final String Image__refresh                              = "refresh.png";
 
-   private Images() {}
+   private PhotoImages() {}
 }

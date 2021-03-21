@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -29,7 +29,7 @@ public class ActionClearNavigationHistory extends Action {
 
       _picDirImages = picDirImages;
 
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__delete));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__delete));
    }
 
    @Override

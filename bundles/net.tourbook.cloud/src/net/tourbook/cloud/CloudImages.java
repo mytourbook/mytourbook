@@ -18,7 +18,7 @@ package net.tourbook.cloud;
 /**
  * Contains image constants which do not need to be translated
  */
-public class Images {
+public class CloudImages {
 
    public static final String Image_Cloud_Connect_With_Strava  = "btn_strava_connectwith_light.png";
    public static final String Image_Cloud_Dropbox_File         = "dropbox-file.png";
@@ -27,5 +27,5 @@ public class Images {
    public static final String Image_Cloud_Dropbox_Parentfolder = "dropbox-parentfolder.png";
    public static final String Image_Cloud_SuuntoApp_Icon       = "SuuntoAppIcon.png";
 
-   private Images() {}
+   private CloudImages() {}
 }

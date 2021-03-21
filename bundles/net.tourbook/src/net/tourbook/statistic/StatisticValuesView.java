@@ -18,6 +18,7 @@ package net.tourbook.statistic;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -49,9 +50,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
-
-   private static final String                IMAGE_TOUR_OPTIONS             = net.tourbook.common.Messages.Image__TourOptions;
-   private static final String                IMAGE_TOUR_OPTIONS_DISABLED    = net.tourbook.common.Messages.Image__TourOptions_Disabled;
 
    public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView";            //$NON-NLS-1$
 
@@ -280,8 +278,8 @@ public class StatisticValuesView extends ViewPart {
    private void createActions() {
 
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
-      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS));
-      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS_DISABLED));
+      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__TourOptions));
+      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__TourOptions_Disabled));
 
       _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();

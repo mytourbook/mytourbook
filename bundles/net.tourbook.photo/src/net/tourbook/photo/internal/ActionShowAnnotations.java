@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -32,8 +32,8 @@ public class ActionShowAnnotations extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__Photo_Action_ShowAnnotation));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(Images.Image__Photo_Action_ShowAnnotation_Disabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Photo_Action_ShowAnnotation));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Photo_Action_ShowAnnotation_Disabled));
 	}
 
 	@Override

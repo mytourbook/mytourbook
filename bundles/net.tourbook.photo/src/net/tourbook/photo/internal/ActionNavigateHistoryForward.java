@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.jface.action.Action;
@@ -29,7 +29,7 @@ public class ActionNavigateHistoryForward extends Action {
    public ActionNavigateHistoryForward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
       setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__Forward_Nav));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Forward_Nav));
 
       setActionDefinitionId(ACTION_ID);
 

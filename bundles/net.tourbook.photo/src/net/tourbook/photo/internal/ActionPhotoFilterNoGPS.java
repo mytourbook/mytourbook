@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -30,8 +30,8 @@ public class ActionPhotoFilterNoGPS extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoFilterNoGPS));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoFilterNoGPSDisabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoFilterNoGPS));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoFilterNoGPSDisabled));
 
       _photoGallery = photoGallery;
    }

@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Images;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
@@ -166,7 +166,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    @Override
    public ImageDescriptor getFileSystemImageDescriptor() {
-      return Activator.getImageDescriptor(Images.Image_Cloud_Dropbox_Logo);
+      return Activator.getImageDescriptor(CloudImages.Image_Cloud_Dropbox_Logo);
    }
 
    /**

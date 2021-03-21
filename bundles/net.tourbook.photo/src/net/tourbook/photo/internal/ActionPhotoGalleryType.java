@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -31,7 +31,7 @@ public class ActionPhotoGalleryType extends Action {
       _photoGallery = photoGallery;
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__PotoGalleryThumbnail));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PotoGalleryThumbnail));
    }
 
    @Override

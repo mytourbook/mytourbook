@@ -27,8 +27,9 @@ public class ActionPartNext extends Action {
 
       setText(Messages.Action_next_month);
       setToolTipText(Messages.Action_next_month_tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(Messages.Image_arrow_right));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image_arrow_right_disabled));
+
+      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_arrow_right));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_arrow_right_disabled));
    }
 
    @Override

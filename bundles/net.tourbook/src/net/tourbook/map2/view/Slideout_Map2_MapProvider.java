@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeTools;
@@ -112,11 +113,6 @@ import org.eclipse.swt.widgets.Widget;
  * 2D Map provider slideout
  */
 public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
-
-// SET_FORMATTING_OFF
-
-   private static final String IMAGE_APP_NO                                   = net.tourbook.common.Messages.Image__App_No;
-   private static final String IMAGE_APP_YES                                  = net.tourbook.common.Messages.Image__App_Yes;
 
    private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
@@ -1301,8 +1297,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _pc = new PixelConverter(parent);
 
-      _imageYes = CommonActivator.getImageDescriptor(IMAGE_APP_YES).createImage();
-      _imageNo = CommonActivator.getImageDescriptor(IMAGE_APP_NO).createImage();
+      _imageYes = CommonActivator.getImageDescriptor(CommonImages.Image__App_Yes).createImage();
+      _imageNo = CommonActivator.getImageDescriptor(CommonImages.Image__App_No).createImage();
 
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }

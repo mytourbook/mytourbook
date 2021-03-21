@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
@@ -295,7 +295,7 @@ public class FullScreenImageViewer {
 
       _shell.setLayout(new FillLayout());
 
-      _shellImage = new Image[] { Activator.getImageDescriptor(Images.Image__PhotoFullsizeShellImage128).createImage() };
+      _shellImage = new Image[] { Activator.getImageDescriptor(PhotoImages.Image__PhotoFullsizeShellImage128).createImage() };
       _shell.setImages(_shellImage);
       {
          createUI_10_Canvas(_shell);

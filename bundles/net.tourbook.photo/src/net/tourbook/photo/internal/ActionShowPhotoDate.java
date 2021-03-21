@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -32,7 +32,7 @@ public class ActionShowPhotoDate extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoInfoDate));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoInfoDate));
 	}
 
 	@Override

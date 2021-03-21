@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Images;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -93,7 +93,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       _accessToken = accessToken;
       _workingDirectory = workingDirectory;
 
-      setDefaultImage(Activator.getImageDescriptor(Images.Image_Cloud_Dropbox_Logo).createImage());
+      setDefaultImage(Activator.getImageDescriptor(CloudImages.Image_Cloud_Dropbox_Logo).createImage());
    }
 
    @Override
@@ -184,7 +184,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
           */
          _buttonParentFolder = new Button(container, SWT.LEFT);
          _buttonParentFolder.setToolTipText(Messages.Dialog_DropboxBrowser_Button_ParentFolder_Tooltip);
-         _buttonParentFolder.setImage(Activator.getImageDescriptor(Images.Image_Cloud_Dropbox_Parentfolder).createImage());
+         _buttonParentFolder.setImage(Activator.getImageDescriptor(CloudImages.Image_Cloud_Dropbox_Parentfolder).createImage());
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_buttonParentFolder);
          _buttonParentFolder.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -232,10 +232,10 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
             if (entry instanceof FolderMetadata) {
 
-               imageName = Images.Image_Cloud_Dropbox_Folder;
+               imageName = CloudImages.Image_Cloud_Dropbox_Folder;
             } else if (entry instanceof FileMetadata) {
 
-               imageName = Images.Image_Cloud_Dropbox_File;
+               imageName = CloudImages.Image_Cloud_Dropbox_File;
             }
 
             final Image entryImage = StringUtils.hasContent(imageName) ? Activator.getImageDescriptor(imageName).createImage() : null;

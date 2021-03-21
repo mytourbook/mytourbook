@@ -29,7 +29,7 @@ public class Messages extends NLS {
    public static String        graph_label_heartbeat_unit;
 
    /*
-    * These images are translatable, any other images are constants and NOT translated
+    * These image names are translatable, any other images are constants and NOT translated
     */
    public static String        Image_Action_ShowSliderInMap;
    public static String        Image_Action_ShowSliderInMap_Left;

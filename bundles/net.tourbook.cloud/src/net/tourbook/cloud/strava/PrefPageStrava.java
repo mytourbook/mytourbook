@@ -18,7 +18,7 @@ package net.tourbook.cloud.strava;
 import java.net.URISyntaxException;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.Images;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.LocalHostServer;
@@ -156,7 +156,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          // No variations or modifications are acceptable."
 
          final Button buttonConnect = new Button(container, SWT.NONE);
-         final Image imageConnect = Activator.getImageDescriptor(Images.Image_Cloud_Connect_With_Strava).createImage();
+         final Image imageConnect = Activator.getImageDescriptor(CloudImages.Image_Cloud_Connect_With_Strava).createImage();
          buttonConnect.setImage(imageConnect);
          buttonConnect.addSelectionListener(new SelectionAdapter() {
 

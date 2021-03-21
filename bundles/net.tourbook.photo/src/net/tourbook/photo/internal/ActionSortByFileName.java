@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.Images;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -32,7 +32,7 @@ public class ActionSortByFileName extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(Images.Image__PhotoSortByName));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoSortByName));
 	}
 
 	@Override

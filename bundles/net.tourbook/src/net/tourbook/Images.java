@@ -33,6 +33,15 @@ public class Images {
 //   Image_Map_TourEndMarker              = map-marker-end_it.png
 //   Image_Map_TourStartMarker            = map-marker-start_it.png
 
+   public static final String App_Image_Cancel                               = "cancel.png";
+   public static final String App_Image_Cancel_Disabled                      = "cancel_disabled.png";
+   public static final String App_Image_RefreshAll                           = "refresh-all.png";
+   public static final String App_Image_RefreshAll_Disabled                  = "refresh-all_disabled.png";
+   public static final String App_Image_RefreshNotAssessed                   = "refresh-not-assessed.png";
+   public static final String App_Image_RefreshNotAssessed_Disabled          = "refresh-not-assessed_disabled.png";
+   public static final String App_Image_RefreshSelected                      = "refresh-selected.png";
+   public static final String App_Image_RefreshSelected_Disabled             = "refresh-selected_disabled.png";
+
    public static final String Image__PulseZones                              = "pulse-zones.png";
    public static final String Image__PulseZones_Disabled                     = "pulse-zones-disabled.png";
    public static final String Image__Refresh                                 = "refresh.png";
