@@ -27,6 +27,7 @@ import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -196,7 +197,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
          super(text, prefPageId);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Dark));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__MapOptions_Dark));
       }
    }
 
@@ -469,8 +470,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowDown_Dark));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowDown_Dark_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -484,8 +485,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowUp_Dark));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowUp_Dark_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }

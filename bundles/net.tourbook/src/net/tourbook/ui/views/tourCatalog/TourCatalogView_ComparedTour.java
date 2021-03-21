@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -146,8 +147,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Previous));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Navigate_Previous));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
       }
 
       @Override
@@ -164,8 +165,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Next));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Navigate_Next));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
       }
 
       @Override
@@ -182,8 +183,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_save_marker);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
 
          setEnabled(false);
       }
@@ -202,8 +203,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__undo_edit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__undo_edit_disabled));
 
          setEnabled(false);
       }

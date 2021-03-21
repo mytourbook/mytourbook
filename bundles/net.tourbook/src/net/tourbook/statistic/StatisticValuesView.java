@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -108,8 +109,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Copy_Disabled));
       }
 
       @Override
@@ -126,8 +127,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_GroupValues_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__GroupValues));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__GroupValues_Disabled));
       }
 
       @Override
@@ -145,8 +146,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__CSVFormat));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__CSVFormat_Disabled));
       }
 
       @Override
@@ -170,8 +171,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowSequenceNumbers_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_SequenceNumber));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_SequenceNumber_Disabled));
       }
 
       @Override
@@ -189,8 +190,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowZeroValued_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ZeroValues));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ZeroValues_Disabled));
       }
 
       @Override

@@ -17,6 +17,7 @@ package net.tourbook.ui.views.tagging;
 
 import java.util.HashMap;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -99,8 +100,8 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__quick_edit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_disabled));
       }
 
       @Override

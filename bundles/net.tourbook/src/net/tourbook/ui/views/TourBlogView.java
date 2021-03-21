@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
@@ -861,9 +862,9 @@ public class TourBlogView extends ViewPart {
          /*
           * set image urls
           */
-         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
-         _actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Remove);
-         _actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Eye);
+         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Images.Image__quick_edit);
+         _actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.Image__Remove);
+         _actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.Image__Eye);
 
       } catch (final IOException | URISyntaxException e) {
          StatusUtil.showStatus(e);
