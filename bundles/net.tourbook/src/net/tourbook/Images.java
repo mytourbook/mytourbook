@@ -356,5 +356,7 @@ public class Images {
    public static final String Image__undo_tour_type_filter_system                = "tour-type-filter-system.png";
    public static final String Image__view_compare_wizard                         = "tour-map-compare-wizard.png";
 
+   public static final String image__merge_tours                                 = "merge-tours.png";
+
    private Images() {}
 }

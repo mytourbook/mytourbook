@@ -236,11 +236,11 @@ public class SearchMgr implements XHRHandler {
       /*
        * set image urls
        */
-      _iconUrl_Tour = getIconUrl(Messages.Image__Tour);
-      _iconUrl_Marker = getIconUrl(Messages.Image__TourMarker);
+      _iconUrl_Tour = getIconUrl(Images.Image__Tour);
+      _iconUrl_Marker = getIconUrl(Images.Image__TourMarker);
       _iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
 
-      _actionUrl_EditImage = getIconUrl(Messages.Image__quick_edit);
+      _actionUrl_EditImage = getIconUrl(Images.Image__quick_edit);
 
       // initialize search options
       setInternalSearchOptions();

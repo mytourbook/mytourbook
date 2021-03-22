@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -287,9 +286,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       public ActionMap25_Options() {
 
-         super(
-               TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions),
-               TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Image__MapOptions),
+               TourbookPlugin.getImageDescriptor(Images.Image__MapOptions_Disabled));
       }
 
       @Override

@@ -18,6 +18,7 @@ package net.tourbook.ui.views.rawData;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
@@ -88,11 +89,11 @@ public class ActionSaveTourInDatabase extends Action {
 
       _rawDataView = viewPart;
 
-      setImageDescriptor(isWithPerson //
-            ? TourbookPlugin.getImageDescriptor(Messages.Image__save_tour)
-            : TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
+      setImageDescriptor(isWithPerson
+            ? TourbookPlugin.getImageDescriptor(Images.Image__save_tour)
+            : TourbookPlugin.getImageDescriptor(Images.Image__database_other_person));
 
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_tour_disabled));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_tour_disabled));
 
       // setToolTipText("Save tour(s) in the database so it can be viewed in
       // other views");

@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -2226,40 +2227,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _images = new ImageRegistry();
 
+// SET_FORMATTING_OFF
+
       /*
        * Database
        */
-      _images.put(IMAGE_DATABASE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__database));
-      _images.put(IMAGE_DATABASE_OTHER_PERSON, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
-      _images.put(IMAGE_ASSIGN_MERGED_TOUR, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour));
-      _images.put(IMAGE_ICON_PLACEHOLDER, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder));
-      _images.put(IMAGE_DELETE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      _images.put(IMAGE_DATABASE,               TourbookPlugin.getImageDescriptor(Images.Image__database));
+      _images.put(IMAGE_DATABASE_OTHER_PERSON,  TourbookPlugin.getImageDescriptor(Images.Image__database_other_person));
+      _images.put(IMAGE_ASSIGN_MERGED_TOUR,     TourbookPlugin.getImageDescriptor(Images.Image__assignMergedTour));
+      _images.put(IMAGE_ICON_PLACEHOLDER,       TourbookPlugin.getImageDescriptor(Images.Image__icon_placeholder));
+      _images.put(IMAGE_DELETE,                 TourbookPlugin.getImageDescriptor(Images.Image__delete));
 
       /*
        * Import state
        */
-      _images.put(IMAGE_STATE_DELETE, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__State_DeletedTour_View));
-      _images.put(IMAGE_STATE_MOVED, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__State_MovedTour_View));
+      _images.put(IMAGE_STATE_DELETE,           TourbookPlugin.getImageDescriptor(Images.Image__State_DeletedTour_View));
+      _images.put(IMAGE_STATE_MOVED,            TourbookPlugin.getImageDescriptor(Images.Image__State_MovedTour_View));
 
       /*
        * Data transfer
        */
-      _images.put(IMAGE_DATA_TRANSFER, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
-      _images.put(IMAGE_DATA_TRANSFER_DIRECT, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_FILES, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
-      _images.put(IMAGE_NEW_UI, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_DashboardUI));
+      _images.put(IMAGE_DATA_TRANSFER,          TourbookPlugin.getImageDescriptor(Images.Image__RawData_Transfer));
+      _images.put(IMAGE_DATA_TRANSFER_DIRECT,   TourbookPlugin.getImageDescriptor(Images.Image__RawData_TransferDirect));
+      _images.put(IMAGE_IMPORT_FROM_FILES,      TourbookPlugin.getImageDescriptor(Images.Image__RawData_Import));
+      _images.put(IMAGE_NEW_UI,                 TourbookPlugin.getImageDescriptor(Images.Image__RawData_DashboardUI));
 
+// SET_FORMATTING_ON
    }
 
    private void createResources_Web() {
@@ -2313,26 +2306,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Image urls
           */
-         _imageUrl_ImportFromFile = getIconUrl(Messages.Image__RawData_Import);
-         _imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
-         _imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);
+         _imageUrl_ImportFromFile = getIconUrl(Images.Image__RawData_Import);
+         _imageUrl_SerialPort_Configured = getIconUrl(Images.Image__RawData_Transfer);
+         _imageUrl_SerialPort_Directly = getIconUrl(Images.Image__RawData_TransferDirect);
 
-         _imageUrl_State_AdjustTemperature = getIconUrl(Messages.Image__State_AdjustTemperature);
-         _imageUrl_State_RetrieveWeatherData = getIconUrl(Messages.Image__State_RetrieveWeatherData);
-         _imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
-         _imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
-         _imageUrl_State_MovedFiles = getIconUrl(Messages.Image__State_MovedTour);
-         _imageUrl_State_SaveTour = getIconUrl(Messages.Image__State_SaveTour);
-         _imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
+         _imageUrl_State_AdjustTemperature = getIconUrl(Images.Image__State_AdjustTemperature);
+         _imageUrl_State_RetrieveWeatherData = getIconUrl(Images.Image__State_RetrieveWeatherData);
+         _imageUrl_State_Error = getIconUrl(Images.Image__State_Error);
+         _imageUrl_State_OK = getIconUrl(Images.Image__State_OK);
+         _imageUrl_State_MovedFiles = getIconUrl(Images.Image__State_MovedTour);
+         _imageUrl_State_SaveTour = getIconUrl(Images.Image__State_SaveTour);
+         _imageUrl_State_TourMarker = getIconUrl(Images.Image__State_TourMarker);
 
-         _imageUrl_Device_TurnOff = getIconUrl(Messages.Image__RawData_Device_TurnOff);
-         _imageUrl_Device_TurnOn = getIconUrl(Messages.Image__RawData_Device_TurnOn);
+         _imageUrl_Device_TurnOff = getIconUrl(Images.Image__RawData_Device_TurnOff);
+         _imageUrl_Device_TurnOn = getIconUrl(Images.Image__RawData_Device_TurnOn);
 
-         _imageUrl_DeviceFolder_OK = getIconUrl(Messages.Image__RawData_DeviceFolder);
-         _imageUrl_DeviceFolder_Disabled = getIconUrl(Messages.Image__RawData_DeviceFolderDisabled);
-         _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
-         _imageUrl_DeviceFolder_NotChecked = getIconUrl(Messages.Image__RawData_DeviceFolder_NotChecked);
-         _imageUrl_DeviceFolder_NotSetup = getIconUrl(Messages.Image__RawData_DeviceFolder_NotSetup);
+         _imageUrl_DeviceFolder_OK = getIconUrl(Images.Image__RawData_DeviceFolder);
+         _imageUrl_DeviceFolder_Disabled = getIconUrl(Images.Image__RawData_DeviceFolderDisabled);
+         _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Images.Image__RawData_DeviceFolder_NotDefined);
+         _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.Image__RawData_DeviceFolder_NotChecked);
+         _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.Image__RawData_DeviceFolder_NotSetup);
 
       } catch (final IOException | URISyntaxException e) {
          TourLogManager.logEx(e);

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -314,8 +315,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 
@@ -911,40 +911,40 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
 // SET_FORMATTING_OFF
 
-		_imageAltimeter 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter).createImage();
-		_imageAltimeterDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altimeter_disabled).createImage();
-		_imageAltitude 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude).createImage();
-		_imageAltitudeDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled).createImage();
-		_imageCadence 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence).createImage();
-		_imageCadenceDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_cadence_disabled).createImage();
-		_imageGradient 									= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient).createImage();
-		_imageGradientDisabled 							= TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled).createImage();
-		_imagePace 											= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace).createImage();
-		_imagePaceDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled).createImage();
-		_imagePower 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power).createImage();
-		_imagePowerDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_power_disabled).createImage();
-		_imagePulse 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat).createImage();
-		_imagePulseDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled).createImage();
-		_imageSpeed 										= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed).createImage();
-		_imageSpeedDisabled 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled).createImage();
-		_imageTemperature 								= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature).createImage();
-		_imageTemperatureDisabled 						= TourbookPlugin.getImageDescriptor(Messages.Image__graph_temperature_disabled).createImage();
+		_imageAltimeter 									= TourbookPlugin.getImageDescriptor(Images.Image__graph_altimeter).createImage();
+		_imageAltimeterDisabled 						= TourbookPlugin.getImageDescriptor(Images.Image__graph_altimeter_disabled).createImage();
+		_imageAltitude 									= TourbookPlugin.getImageDescriptor(Images.Image__graph_altitude).createImage();
+		_imageAltitudeDisabled 							= TourbookPlugin.getImageDescriptor(Images.Image__graph_altitude_disabled).createImage();
+		_imageCadence 										= TourbookPlugin.getImageDescriptor(Images.Image__graph_cadence).createImage();
+		_imageCadenceDisabled 							= TourbookPlugin.getImageDescriptor(Images.Image__graph_cadence_disabled).createImage();
+		_imageGradient 									= TourbookPlugin.getImageDescriptor(Images.Image__graph_gradient).createImage();
+		_imageGradientDisabled 							= TourbookPlugin.getImageDescriptor(Images.Image__graph_gradient_disabled).createImage();
+		_imagePace 											= TourbookPlugin.getImageDescriptor(Images.Image__graph_pace).createImage();
+		_imagePaceDisabled 								= TourbookPlugin.getImageDescriptor(Images.Image__graph_pace_disabled).createImage();
+		_imagePower 										= TourbookPlugin.getImageDescriptor(Images.Image__graph_power).createImage();
+		_imagePowerDisabled 								= TourbookPlugin.getImageDescriptor(Images.Image__graph_power_disabled).createImage();
+		_imagePulse 										= TourbookPlugin.getImageDescriptor(Images.Image__graph_heartbeat).createImage();
+		_imagePulseDisabled 								= TourbookPlugin.getImageDescriptor(Images.Image__graph_heartbeat_disabled).createImage();
+		_imageSpeed 										= TourbookPlugin.getImageDescriptor(Images.Image__graph_speed).createImage();
+		_imageSpeedDisabled 								= TourbookPlugin.getImageDescriptor(Images.Image__graph_speed_disabled).createImage();
+		_imageTemperature 								= TourbookPlugin.getImageDescriptor(Images.Image__graph_temperature).createImage();
+		_imageTemperatureDisabled 						= TourbookPlugin.getImageDescriptor(Images.Image__graph_temperature_disabled).createImage();
 
-		_imageRunDyn_StanceTime							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime).createImage();
-		_imageRunDyn_StanceTime_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
-		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance).createImage();
-		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
-		_imageRunDyn_StepLength							= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength).createImage();
-		_imageRunDyn_StepLength_Disabled				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_StepLength_Disabled).createImage();
-		_imageRunDyn_VerticalOscillation				= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation).createImage();
-		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
-		_imageRunDyn_VerticalRatio						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio).createImage();
-		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
+		_imageRunDyn_StanceTime							= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StanceTime).createImage();
+		_imageRunDyn_StanceTime_Disabled				= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StanceTime_Disabled).createImage();
+		_imageRunDyn_StanceTimeBalance				= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StanceTimeBalance).createImage();
+		_imageRunDyn_StanceTimeBalance_Disabled	= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StanceTimeBalance_Disabled).createImage();
+		_imageRunDyn_StepLength							= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StepLength).createImage();
+		_imageRunDyn_StepLength_Disabled				= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_StepLength_Disabled).createImage();
+		_imageRunDyn_VerticalOscillation				= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_VerticalOscillation).createImage();
+		_imageRunDyn_VerticalOscillation_Disabled	= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_VerticalOscillation_Disabled).createImage();
+		_imageRunDyn_VerticalRatio						= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_VerticalRatio).createImage();
+		_imageRunDyn_VerticalRatio_Disabled			= TourbookPlugin.getImageDescriptor(Images.Image__Graph_RunDyn_VerticalRatio_Disabled).createImage();
 
-		_imageSwim_Strokes								= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes).createImage();
-		_imageSwim_Strokes_Disabled					= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Strokes_Disabled).createImage();
-		_imageSwim_Swolf									= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf).createImage();
-		_imageSwim_Swolf_Disabled						= TourbookPlugin.getImageDescriptor(Messages.Image__Graph_Swim_Swolf_Disabled).createImage();
+		_imageSwim_Strokes								= TourbookPlugin.getImageDescriptor(Images.Image__Graph_Swim_Strokes).createImage();
+		_imageSwim_Strokes_Disabled					= TourbookPlugin.getImageDescriptor(Images.Image__Graph_Swim_Strokes_Disabled).createImage();
+		_imageSwim_Swolf									= TourbookPlugin.getImageDescriptor(Images.Image__Graph_Swim_Swolf).createImage();
+		_imageSwim_Swolf_Disabled						= TourbookPlugin.getImageDescriptor(Images.Image__Graph_Swim_Swolf_Disabled).createImage();
 
 // SET_FORMATTING_ON
    }
