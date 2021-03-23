@@ -32,7 +32,7 @@ public class ActionShowValuePoint extends Action {
 
       _map2View = map2View;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_ShowValuePoint));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ShowValuePoint));
 	}
 
 	@Override

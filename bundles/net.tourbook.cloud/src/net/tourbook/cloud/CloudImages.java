@@ -20,12 +20,12 @@ package net.tourbook.cloud;
  */
 public class CloudImages {
 
-   public static final String Image_Cloud_Connect_With_Strava  = "btn_strava_connectwith_light.png";
-   public static final String Image_Cloud_Dropbox_File         = "dropbox-file.png";
-   public static final String Image_Cloud_Dropbox_Folder       = "dropbox-folder.png";
-   public static final String Image_Cloud_Dropbox_Logo         = "dropbox-logo.png";
-   public static final String Image_Cloud_Dropbox_Parentfolder = "dropbox-parentfolder.png";
-   public static final String Image_Cloud_SuuntoApp_Icon       = "SuuntoAppIcon.png";
+   public static final String Cloud_Connect_With_Strava  = "btn_strava_connectwith_light.png";
+   public static final String Cloud_Dropbox_File         = "dropbox-file.png";
+   public static final String Cloud_Dropbox_Folder       = "dropbox-folder.png";
+   public static final String Cloud_Dropbox_Logo         = "dropbox-logo.png";
+   public static final String Cloud_Dropbox_Parentfolder = "dropbox-parentfolder.png";
+   public static final String Cloud_SuuntoApp_Icon       = "SuuntoAppIcon.png";
 
    private CloudImages() {}
 }

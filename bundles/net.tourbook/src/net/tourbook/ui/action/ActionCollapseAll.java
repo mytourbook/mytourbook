@@ -38,7 +38,7 @@ public class ActionCollapseAll extends Action {
 
       setText(Messages.App_Action_CollapseAll);
       setToolTipText(Messages.App_Action_CollapseAll_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__collapse_all));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CollapseAll));
    }
 
    @Override

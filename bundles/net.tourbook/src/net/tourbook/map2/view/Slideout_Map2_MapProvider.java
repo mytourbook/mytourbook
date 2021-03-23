@@ -197,7 +197,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
          super(text, prefPageId);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__MapOptions_Dark));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapOptions_Dark));
       }
    }
 
@@ -470,8 +470,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowDown_Dark));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowDown_Dark_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -485,8 +485,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowUp_Dark));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowUp_Dark_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }
@@ -1298,8 +1298,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _pc = new PixelConverter(parent);
 
-      _imageYes = CommonActivator.getImageDescriptor(CommonImages.Image__App_Yes).createImage();
-      _imageNo = CommonActivator.getImageDescriptor(CommonImages.Image__App_No).createImage();
+      _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+      _imageNo = CommonActivator.getImageDescriptor(CommonImages.App_No).createImage();
 
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }

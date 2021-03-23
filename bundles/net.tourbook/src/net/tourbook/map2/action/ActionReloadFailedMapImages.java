@@ -34,7 +34,7 @@ public class ActionReloadFailedMapImages extends Action {
 
 		setText(Messages.map_action_reload_map);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image_action_reload_map));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh));
 	}
 
 	@Override

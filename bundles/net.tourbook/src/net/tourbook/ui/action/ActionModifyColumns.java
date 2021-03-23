@@ -32,7 +32,7 @@ public class ActionModifyColumns extends Action {
 		_tourViewer = tourViewer;
 
 		setText(Messages.Action_App_CustomizeColumnsAndProfiles);
-      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__CustomizeProfilesColumns));
+      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
 	}
 
 	@Override

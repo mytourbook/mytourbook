@@ -34,8 +34,8 @@ public class ActionZoomOutToMinZoom extends Action {
 
 		setToolTipText(Messages.Map_Action_ZoomOutToMinZoom_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_ZoomOutToMinZoom));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_ZoomOutToMinZoom_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ZoomOutToMinZoom));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ZoomOutToMinZoom_Disabled));
 	}
 
 	@Override

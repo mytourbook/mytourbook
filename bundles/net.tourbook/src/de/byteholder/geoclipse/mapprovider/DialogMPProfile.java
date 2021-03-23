@@ -437,9 +437,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private void createResources() {
 
-      _imageMap = TourbookPlugin.getImageDescriptor(Images.Image_ViewIcon_Map).createImage();
-      _imagePlaceholder = TourbookPlugin.getImageDescriptor(Images.Image_ViewIcon_Placeholder16).createImage();
-      _imageLayer = TourbookPlugin.getImageDescriptor(Images.Image_Action_ZoomShowEntireLayer).createImage();
+      _imageMap = TourbookPlugin.getImageDescriptor(Images.ViewIcon_Map).createImage();
+      _imagePlaceholder = TourbookPlugin.getImageDescriptor(Images.ViewIcon_Placeholder16).createImage();
+      _imageLayer = TourbookPlugin.getImageDescriptor(Images.Action_ZoomShowEntireLayer).createImage();
    }
 
    private void createUI(final Composite parent) {

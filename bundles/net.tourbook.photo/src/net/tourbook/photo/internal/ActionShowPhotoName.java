@@ -32,7 +32,7 @@ public class ActionShowPhotoName extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoInfoName));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoInfoName));
 	}
 
 	@Override

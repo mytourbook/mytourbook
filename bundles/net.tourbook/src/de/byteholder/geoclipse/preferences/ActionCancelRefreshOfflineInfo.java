@@ -28,8 +28,8 @@ public class ActionCancelRefreshOfflineInfo extends Action {
 
 		setToolTipText(Messages.Pref_Map_Button_CancelTileInfo_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Image_Cancel));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Image_Cancel_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel_Disabled));
 
 		fPrefPageMapFactories = prefPageMapFactories;
 	}

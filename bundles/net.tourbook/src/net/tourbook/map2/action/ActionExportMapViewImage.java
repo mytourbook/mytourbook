@@ -32,7 +32,7 @@ public class ActionExportMapViewImage extends Action {
 
       super(Messages.Map_Action_Export_Map_View_Image, AS_PUSH_BUTTON);
       setToolTipText(Messages.Map_Action_Export_Map_View_Image_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__floppy_disk));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_File));
 
       _map2View = mapView;
    }

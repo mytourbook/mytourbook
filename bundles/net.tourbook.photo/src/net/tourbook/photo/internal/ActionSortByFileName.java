@@ -32,7 +32,7 @@ public class ActionSortByFileName extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoSortByName));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoSortByName));
 	}
 
 	@Override

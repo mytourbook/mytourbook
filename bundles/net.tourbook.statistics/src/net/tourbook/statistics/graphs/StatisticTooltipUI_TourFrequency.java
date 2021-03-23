@@ -142,7 +142,7 @@ public class StatisticTooltipUI_TourFrequency {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__App_Close));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

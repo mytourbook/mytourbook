@@ -31,7 +31,7 @@ public class ActionEditHrZones extends Action {
 
       setToolTipText(Messages.Training_Action_EditHrZones_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__options));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
 
       _trainingView = trainingView;
    }

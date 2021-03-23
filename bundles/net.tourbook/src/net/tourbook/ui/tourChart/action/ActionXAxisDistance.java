@@ -52,18 +52,18 @@ public class ActionXAxisDistance extends Action {
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         imagePath = Images.Image__show_distance_on_x_axis_imperial;
-         disabledImagePath = Images.Image__show_distance_on_x_axis_imperial_disabled;
+         imagePath = Images.XAxis_ShowDistance_Imperial;
+         disabledImagePath = Images.XAxis_ShowDistance_Imperial_Disabled;
 
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
-         imagePath = Images.Image__show_distance_on_x_axis_NauticMile;
-         disabledImagePath = Images.Image__show_distance_on_x_axis_NauticMile_disabled;
+         imagePath = Images.XAxis_ShowDistance_NauticMile;
+         disabledImagePath = Images.XAxis_ShowDistance_NauticMile_disabled;
 
       } else {
 
-         imagePath = Images.Image__show_distance_on_x_axis;
-         disabledImagePath = Images.Image__show_distance_on_x_axis_disabled;
+         imagePath = Images.XAxis_ShowDistance;
+         disabledImagePath = Images.XAxis_ShowDistance_Disabled;
       }
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));

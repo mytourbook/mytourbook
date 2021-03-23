@@ -48,7 +48,7 @@ import org.eclipse.swt.graphics.Image;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "wayPointId")
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
-   private static final String        IMAGE_MAP_WAY_POINT_HOVERED = Images.Image_Map_WayPoint_Hovered;
+   private static final String        IMAGE_MAP_WAY_POINT_HOVERED = Images.Map_WayPoint_Hovered;
 
    public static final int            DB_LENGTH_NAME              = 1024;
    public static final int            DB_LENGTH_DESCRIPTION       = 4096;

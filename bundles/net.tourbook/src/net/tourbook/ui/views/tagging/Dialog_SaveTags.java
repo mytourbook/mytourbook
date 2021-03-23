@@ -45,7 +45,7 @@ public class Dialog_SaveTags extends WizardDialog {
 
       super(parentShell, wizard);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.Image__SaveTags).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.SaveTags).createImage());
    }
 
    @Override

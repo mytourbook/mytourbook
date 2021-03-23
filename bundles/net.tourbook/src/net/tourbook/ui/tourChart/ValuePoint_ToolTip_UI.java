@@ -227,7 +227,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__tour_options));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
       }
 
       @Override

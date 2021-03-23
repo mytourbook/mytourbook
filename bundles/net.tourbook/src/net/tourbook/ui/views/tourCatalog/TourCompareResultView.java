@@ -165,7 +165,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    /*
     * UI resources
     */
-   private Image _dbImage = TourbookPlugin.getImageDescriptor(Images.Image__database).createImage(true);
+   private Image _dbImage = TourbookPlugin.getImageDescriptor(Images.Saved_Tour).createImage(true);
 
    /*
     * UI controls

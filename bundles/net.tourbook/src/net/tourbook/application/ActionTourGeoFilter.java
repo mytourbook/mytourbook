@@ -36,7 +36,7 @@ import org.eclipse.ui.IViewPart;
 
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.Image__TourGeoFilter);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.TourGeoFilter);
 
    private Slideout_TourGeoFilter       _slideoutTourGeoFilter;
 

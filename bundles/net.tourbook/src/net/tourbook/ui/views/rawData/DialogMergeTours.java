@@ -208,9 +208,9 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.image__merge_tours).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage());
 
-      _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.Image__icon_placeholder).createImage();
+      _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
 
       _sourceTour = mergeSourceTour;
       _targetTour = mergeTargetTour;
@@ -1087,7 +1087,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             TourManager.GRAPH_PULSE,
             Messages.merge_tour_source_graph_heartbeat,
             Messages.merge_tour_source_graph_heartbeat_tooltip,
-            Images.Image__graph_heartbeat,
+            Images.Graph_Heartbeat,
             _sourceTour.pulseSerie != null);
 
       /*
@@ -1098,7 +1098,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             TourManager.GRAPH_TEMPERATURE,
             Messages.merge_tour_source_graph_temperature,
             Messages.merge_tour_source_graph_temperature_tooltip,
-            Images.Image__graph_temperature,
+            Images.Graph_Temperature,
             _sourceTour.temperatureSerie != null);
 
       /*
@@ -1109,7 +1109,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             TourManager.GRAPH_CADENCE,
             Messages.merge_tour_source_graph_cadence,
             Messages.merge_tour_source_graph_cadence_tooltip,
-            Images.Image__graph_cadence,
+            Images.Graph_Cadence,
             _sourceTour.getCadenceSerie() != null);
 
       /*
@@ -1120,7 +1120,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
             TourManager.GRAPH_ALTITUDE,
             Messages.merge_tour_source_graph_altitude,
             Messages.merge_tour_source_graph_altitude_tooltip,
-            Images.Image__graph_altitude,
+            Images.Graph_Elevation,
             _sourceTour.altitudeSerie != null);
 
       /*

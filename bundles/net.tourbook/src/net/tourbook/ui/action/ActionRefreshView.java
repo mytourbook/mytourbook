@@ -35,7 +35,7 @@ public class ActionRefreshView extends Action {
       setText(Messages.App_Action_RefreshView);
       setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__refresh));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh));
    }
 
    @Override

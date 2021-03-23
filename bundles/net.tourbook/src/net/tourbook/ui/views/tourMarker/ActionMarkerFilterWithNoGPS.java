@@ -30,8 +30,8 @@ public class ActionMarkerFilterWithNoGPS extends Action {
       super(null, AS_CHECK_BOX);
 
       setToolTipText(Messages.Action_MarkerFilter_WithoutGPS_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__MarkerFilter_WithoutGPS));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__MarkerFilter_WithoutGPS_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS_Disabled));
 
       _tourMarkerAllView = tourMarkerAllView;
    }

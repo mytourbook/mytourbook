@@ -35,7 +35,7 @@ public class ActionOpenTour extends Action {
       fTourProvider = tourProvider;
 
       setText(Messages.app_action_open_tour);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__tour_viewer));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourViewer));
    }
 
    @Override

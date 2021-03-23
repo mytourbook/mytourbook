@@ -35,8 +35,8 @@ public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
    public ActionTourDataFilter() {
 
-      super(TourbookPlugin.getImageDescriptor(Images.Image__TourFilter),
-            TourbookPlugin.getImageDescriptor(Images.Image__TourFilter_Disabled));
+      super(TourbookPlugin.getImageDescriptor(Images.TourFilter),
+            TourbookPlugin.getImageDescriptor(Images.TourFilter_Disabled));
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;

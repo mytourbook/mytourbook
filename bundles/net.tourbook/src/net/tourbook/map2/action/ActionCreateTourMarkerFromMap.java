@@ -44,7 +44,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_new));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
    }
 
    @Override

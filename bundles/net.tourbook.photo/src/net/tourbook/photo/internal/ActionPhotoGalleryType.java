@@ -31,7 +31,7 @@ public class ActionPhotoGalleryType extends Action {
       _photoGallery = photoGallery;
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PotoGalleryThumbnail));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PotoGalleryThumbnail));
    }
 
    @Override

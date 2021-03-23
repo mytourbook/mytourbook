@@ -32,8 +32,8 @@ public class ActionShowPhotoTooltip extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoTooltip_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoTooltip));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoTooltip_Disabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoTooltip));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoTooltip_Disabled));
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class Slideout_YearStatisticOptions extends ToolbarSlideout {
 		};
 
 		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
 	}
 
 	@Override

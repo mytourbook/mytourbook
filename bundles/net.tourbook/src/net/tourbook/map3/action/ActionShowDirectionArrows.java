@@ -32,8 +32,8 @@ public class ActionShowDirectionArrows extends Action {
 
 		_mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Map3_DirectionArrow));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Map3_DirectionArrow_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Map3_DirectionArrow));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Map3_DirectionArrow_Disabled));
 	}
 
 	@Override

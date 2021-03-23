@@ -189,7 +189,7 @@ public class ActionOpenGLVersions extends Action {
 
       super(Messages.Map3_Action_ShowOpenGLVersion_Tooltip, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Map3_OpenGL_Version));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Map3_OpenGL_Version));
    }
 
    private Control createUI(final Composite parent) {

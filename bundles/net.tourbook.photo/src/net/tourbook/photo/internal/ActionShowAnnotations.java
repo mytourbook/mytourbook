@@ -32,8 +32,8 @@ public class ActionShowAnnotations extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Photo_Action_ShowAnnotation));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Photo_Action_ShowAnnotation_Disabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Photo_Action_ShowAnnotation));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Photo_Action_ShowAnnotation_Disabled));
 	}
 
 	@Override

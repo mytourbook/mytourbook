@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.image_action_change_tile_factory);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapProvider);
 
    private IDialogSettings              _state;
 

@@ -30,8 +30,8 @@ public class ActionPhotoFilterNoGPS extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_NoGPS_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoFilterNoGPS));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoFilterNoGPSDisabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilterNoGPS));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilterNoGPSDisabled));
 
       _photoGallery = photoGallery;
    }

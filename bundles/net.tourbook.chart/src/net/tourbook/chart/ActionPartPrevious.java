@@ -28,8 +28,8 @@ public class ActionPartPrevious extends Action {
       setText(Messages.Action_previous_month);
       setToolTipText(Messages.Action_previous_month_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_arrow_left));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_arrow_left_disabled));
+      setImageDescriptor(Activator.getImageDescriptor(ChartImages.arrow_left));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.arrow_left_disabled));
    }
 
    @Override

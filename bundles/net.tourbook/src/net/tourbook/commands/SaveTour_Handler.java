@@ -37,10 +37,10 @@ import org.eclipse.ui.menus.UIElement;
 
 public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
 
-   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Images.Image__SaveTour);
-   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Images.Image__SaveTour_Disabled);
-   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Images.Image__SaveTags);
-   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Images.Image__SaveTags_Disabled);
+   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Images.SaveTour);
+   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Images.SaveTour_Disabled);
+   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Images.SaveTags);
+   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Images.SaveTags_Disabled);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {

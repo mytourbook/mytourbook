@@ -32,7 +32,7 @@ public class ActionSynchChartScale extends Action {
 
       _statView = statView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__synch_statistics));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
       setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
    }
 

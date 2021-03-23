@@ -34,8 +34,8 @@ public class ActionShowTourMarker extends Action {
 
       setText(Messages.map_action_show_tour_marker);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled));
    }
 
    @Override

@@ -29,7 +29,7 @@ public class ActionNavigateHistoryForward extends Action {
    public ActionNavigateHistoryForward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
       setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryForward_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Forward_Nav));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Forward_Nav));
 
       setActionDefinitionId(ACTION_ID);
 

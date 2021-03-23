@@ -86,13 +86,13 @@ public class TourLogView extends ViewPart {
    private String              _cssFromFile;
    private String              _noBrowserLog                    = UI.EMPTY_STRING;
 
-   private String              _imageUrl_StateCopy              = getIconUrl(Images.Image__State_Copy);
-   private String              _imageUrl_StateDeleteDevice      = getIconUrl(Images.Image__State_Deleted_Device);
-   private String              _imageUrl_StateDeleteBackup      = getIconUrl(Images.Image__State_Deleted_Backup);
-   private String              _imageUrl_StateError             = getIconUrl(Images.Image__State_Error);
-   private String              _imageUrl_StateInfo              = getIconUrl(Images.Image__State_Info);
-   private String              _imageUrl_StateOK                = getIconUrl(Images.Image__State_OK);
-   private String              _imageUrl_StateSave              = getIconUrl(Images.Image__State_Save);
+   private String              _imageUrl_StateCopy              = getIconUrl(Images.State_Copy);
+   private String              _imageUrl_StateDeleteDevice      = getIconUrl(Images.State_Deleted_Device);
+   private String              _imageUrl_StateDeleteBackup      = getIconUrl(Images.State_Deleted_Backup);
+   private String              _imageUrl_StateError             = getIconUrl(Images.State_Error);
+   private String              _imageUrl_StateInfo              = getIconUrl(Images.State_Info);
+   private String              _imageUrl_StateOK                = getIconUrl(Images.State_OK);
+   private String              _imageUrl_StateSave              = getIconUrl(Images.State_Save);
 
    /*
     * UI controls
@@ -109,7 +109,7 @@ public class TourLogView extends ViewPart {
       public ActionReset() {
 
          setText(Messages.Tour_Log_Action_Clear_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__remove_all));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RemoveAll));
       }
 
       @Override

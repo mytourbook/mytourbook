@@ -36,8 +36,8 @@ public class ActionDeleteVertex extends Action {
       setText(Messages.Map3Color_Dialog_Action_RemoveVertex_Tooltip);
       setToolTipText(Messages.Map3Color_Dialog_Action_RemoveVertex_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Trash));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Trash_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
    }
 
    @Override

@@ -30,7 +30,7 @@ public class ActionManageMap25Providers extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__options));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
    }
 
    @Override

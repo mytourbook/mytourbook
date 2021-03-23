@@ -36,7 +36,7 @@ public class ActionSelectGraphs extends Action {
    public ActionSelectGraphs(final ITourProvider tourProvider) {
 
       setText(Messages.app_action_quick_edit);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__quick_edit));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit));
 
       fTourProvider = tourProvider;
    }

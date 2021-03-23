@@ -34,7 +34,7 @@ public class ActionDeleteMarker extends Action {
 
       _tourMarkerUpdater = tourMarkerUpdater;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
    }
 
    @Override

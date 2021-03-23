@@ -166,7 +166,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    @Override
    public ImageDescriptor getFileSystemImageDescriptor() {
-      return Activator.getImageDescriptor(CloudImages.Image_Cloud_Dropbox_Logo);
+      return Activator.getImageDescriptor(CloudImages.Cloud_Dropbox_Logo);
    }
 
    /**

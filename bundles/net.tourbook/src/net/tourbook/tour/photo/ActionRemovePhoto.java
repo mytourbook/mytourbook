@@ -34,7 +34,7 @@ class ActionRemovePhoto extends Action {
 
       _photoGallery = photoGallery;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
    }
 
    public boolean isInModifyTour() {

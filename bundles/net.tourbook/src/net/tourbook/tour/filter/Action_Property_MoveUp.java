@@ -35,7 +35,7 @@ public class Action_Property_MoveUp extends Action {
       _filterProperty = filterProperty;
 
       setToolTipText(Messages.Slideout_TourFilter_Action_MovePropertyUp_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__ArrowUp_Dark));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark));
    }
 
    @Override

@@ -145,7 +145,7 @@ public class DialogModifyColumns extends TrayDialog {
 
          super(null, AS_CHECK_BOX);
 
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__ColumnCategory));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.ColumnCategory));
          setToolTipText(Messages.ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip);
       }
 

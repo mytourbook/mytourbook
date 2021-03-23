@@ -30,7 +30,7 @@ public class ActionTourPhotos extends Action {
 
       super(Messages.Tour_Action_TourPhotos, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__PhotoPhotos));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       _tourChart = tourChart;
    }

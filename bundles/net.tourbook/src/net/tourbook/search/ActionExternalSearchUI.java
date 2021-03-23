@@ -31,8 +31,8 @@ public class ActionExternalSearchUI extends Action {
 
       setToolTipText(Messages.Search_View_Action_ExternalSearchUI_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__SearchExternal));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__SearchExternal_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchExternal));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchExternal_Disabled));
 
       _searchView = searchView;
    }

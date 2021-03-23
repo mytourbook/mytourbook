@@ -136,7 +136,7 @@ public class TagMenuManager {
 
          super(Messages.Action_Tag_SetTags, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourTags));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourTags));
       }
 
       @Override

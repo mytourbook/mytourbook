@@ -33,7 +33,7 @@ public class ActionXAxisTime extends Action {
       fTourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_show_time_on_x_axis_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__show_time_on_x_axis));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.XAxis_ShowTime));
 
       setChecked(tourChart.getTourChartConfig().isShowTimeOnXAxis);
    }

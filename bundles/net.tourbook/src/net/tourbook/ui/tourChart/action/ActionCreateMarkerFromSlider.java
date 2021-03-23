@@ -47,8 +47,8 @@ public class ActionCreateMarkerFromSlider extends Action {
 
       super(text);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_new));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_new_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New_Disabled));
 
       _chartContextProvider = chartContextProvider;
       _isLeftSlider = isLeftSlider;

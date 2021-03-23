@@ -32,7 +32,7 @@ class ActionToggleReadEditMode extends Action {
       fTourPropertiesView = tourPropertiesView;
 
       setToolTipText(Messages.app_action_read_edit_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__quick_edit));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit));
 
       setEnabled(false);
    }

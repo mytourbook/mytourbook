@@ -147,8 +147,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Navigate_Previous));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Navigate_Previous));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
       }
 
       @Override
@@ -165,8 +165,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Navigate_Next));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Navigate_Next));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
       }
 
       @Override
@@ -183,8 +183,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_save_marker);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
 
          setEnabled(false);
       }
@@ -203,8 +203,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__undo_edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__undo_edit_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit_Disabled));
 
          setEnabled(false);
       }

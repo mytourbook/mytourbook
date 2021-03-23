@@ -30,7 +30,7 @@ public class ActionGraphOverlapped extends Action {
 
 		super(Messages.Tour_Action_GraphOverlapped, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Graph_Overlapped));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Graph_Overlapped));
 
 		_tourChart = tourChart;
 	}

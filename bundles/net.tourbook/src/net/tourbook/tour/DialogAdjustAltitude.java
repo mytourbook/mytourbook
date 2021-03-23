@@ -246,7 +246,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isCreateDummyAltitude = isCreateDummyAltitude;
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.Image__edit_adjust_altitude).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);

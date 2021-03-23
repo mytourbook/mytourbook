@@ -66,8 +66,8 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
       _map25View = map25View;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_disabled).createImage();
+      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
 
       parent.addDisposeListener(new DisposeListener() {
 

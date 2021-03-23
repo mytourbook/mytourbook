@@ -31,8 +31,8 @@ public class ActionSetupImport extends Action {
 
       setToolTipText(Messages.Import_Data_Action_SetupEasyImport_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__tour_options));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__tour_options_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions_Disabled));
    }
 
    @Override

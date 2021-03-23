@@ -29,8 +29,8 @@ class ActionDeleteTimeSlicesKeepTime extends Action {
 
       super(Messages.action_tour_editor_delete_time_slices_keep_time, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       fTourPropertiesView = tourPropertiesView;
    }

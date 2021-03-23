@@ -30,7 +30,7 @@ public class ActionOpenTourLogView extends Action {
       setText(Messages.Import_Data_Action_OpenLogView);
       setToolTipText(Messages.Import_Data_Action_OpenLogView_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourLog));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourLog));
    }
 
    @Override

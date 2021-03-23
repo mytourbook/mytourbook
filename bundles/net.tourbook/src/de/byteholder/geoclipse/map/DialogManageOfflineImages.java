@@ -230,7 +230,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       final Composite container = (Composite) super.createDialogArea(parent);
 
-      _imageRefresh = TourbookPlugin.getImageDescriptor(Images.Image__Refresh).createImage();
+      _imageRefresh = TourbookPlugin.getImageDescriptor(Images.App_Refresh).createImage();
 
       // create ui
       createUI(container);

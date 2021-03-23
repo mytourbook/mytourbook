@@ -32,7 +32,7 @@ public class ActionLinkTour extends Action {
       _tourCatalogView = view;
 
       setToolTipText(Messages.tourCatalog_view_action_link);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__link));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Synced));
    }
 
    @Override

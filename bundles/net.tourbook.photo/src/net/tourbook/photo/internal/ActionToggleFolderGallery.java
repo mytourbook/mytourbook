@@ -30,7 +30,7 @@ public class ActionToggleFolderGallery extends Action {
 		_picDirImages = picDirImages;
 
 		setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoFolderGallery_OnlyPhotos));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFolderGallery_OnlyPhotos));
 	}
 
 	@Override

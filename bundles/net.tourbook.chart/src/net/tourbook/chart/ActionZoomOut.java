@@ -28,8 +28,8 @@ public class ActionZoomOut extends Action {
       setText(Messages.Action_zoom_out);
       setToolTipText(Messages.Action_zoom_out_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_zoom_out));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Image_zoom_out_disabled));
+      setImageDescriptor(Activator.getImageDescriptor(ChartImages.zoom_out));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.zoom_out_disabled));
    }
 
    @Override

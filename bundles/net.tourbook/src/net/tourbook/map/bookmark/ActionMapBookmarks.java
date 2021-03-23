@@ -36,8 +36,8 @@ public class ActionMapBookmarks extends ActionToolbarSlideout {
    public ActionMapBookmarks(final Composite ownerControl,
                              final IMapBookmarks mapBookmarks) {
 
-      super(TourbookPlugin.getImageDescriptor(Images.Image__MapBookmark),
-            TourbookPlugin.getImageDescriptor(Images.Image__MapBookmark_Disabled));
+      super(TourbookPlugin.getImageDescriptor(Images.MapBookmark),
+            TourbookPlugin.getImageDescriptor(Images.MapBookmark_Disabled));
 
       _ownerControl = ownerControl;
       _mapBookmarks = mapBookmarks;

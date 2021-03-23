@@ -39,7 +39,7 @@ public class ActionManageMapProviders extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__options));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
 
       _map2View = map2View;
    }

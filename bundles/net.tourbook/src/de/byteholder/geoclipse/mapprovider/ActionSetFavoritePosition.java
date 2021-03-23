@@ -31,7 +31,7 @@ public class ActionSetFavoritePosition extends Action {
 		_dlgMapConfig = dialogMapConfiguration;
 
 		setToolTipText(Messages.Map_Action_SetFavoritePosition_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_SetFavoritePosition));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_SetFavoritePosition));
 	}
 
 	@Override

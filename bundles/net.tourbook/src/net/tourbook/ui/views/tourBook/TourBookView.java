@@ -362,7 +362,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       public ActionLinkWithOtherViews() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__SyncViews), null);
+         super(TourbookPlugin.getImageDescriptor(Images.SyncViews), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Calendar_View_Action_LinkWithOtherViews;
@@ -2914,19 +2914,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
 
-         viewLayoutImage = Images.Image__TourBook_NatTable;
+         viewLayoutImage = Images.TourBook_NatTable;
 
          _isLayoutNatTable = true;
 
       } else if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
 
-         viewLayoutImage = Images.Image__TourBook_Month;
+         viewLayoutImage = Images.TourBook_Month;
 
          _isLayoutNatTable = false;
 
       } else if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
 
-         viewLayoutImage = Images.Image__TourBook_Week;
+         viewLayoutImage = Images.TourBook_Week;
 
          _isLayoutNatTable = false;
       }
@@ -3283,7 +3283,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _viewLayout = TourBookViewLayout.CATEGORY_MONTH;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourBook_Month));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Month));
 
       _isLayoutNatTable = false;
    }
@@ -3292,7 +3292,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _viewLayout = TourBookViewLayout.CATEGORY_WEEK;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourBook_Week));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Week));
 
       _isLayoutNatTable = false;
    }
@@ -3301,7 +3301,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _viewLayout = TourBookViewLayout.NAT_TABLE;
 
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourBook_NatTable));
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_NatTable));
 
       _isLayoutNatTable = true;
    }

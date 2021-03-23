@@ -156,7 +156,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          // No variations or modifications are acceptable."
 
          final Button buttonConnect = new Button(container, SWT.NONE);
-         final Image imageConnect = Activator.getImageDescriptor(CloudImages.Image_Cloud_Connect_With_Strava).createImage();
+         final Image imageConnect = Activator.getImageDescriptor(CloudImages.Cloud_Connect_With_Strava).createImage();
          buttonConnect.setImage(imageConnect);
          buttonConnect.addSelectionListener(new SelectionAdapter() {
 

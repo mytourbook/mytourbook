@@ -183,9 +183,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    /*
     * Image resources
     */
-   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Image__tag).createImage();
-   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.Image__tag_root).createImage();
-   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Image__tag_category).createImage();
+   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
+   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.TagRoot).createImage();
+   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.TagCategory).createImage();
 
    /*
     * UI controls
@@ -224,8 +224,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Action_Tag_Restore_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__RestoreTags));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__RestoreTags_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RestoreTags));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.RestoreTags_Disabled));
       }
 
       @Override
@@ -244,8 +244,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Action_Tag_Save_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__SaveTags));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__SaveTags_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SaveTags));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SaveTags_Disabled));
       }
 
       @Override
@@ -276,8 +276,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagsChecked));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagsChecked_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagsChecked));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagsChecked_Disabled));
       }
 
       @Override
@@ -292,7 +292,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagLayout_Flat));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
       }
 
       @Override
@@ -1959,16 +1959,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          // hierarchy is displayed -> show icon/tooltip for flat view
 
          _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
-         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagLayout_Flat));
-         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagLayout_Flat_Disabled));
+         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat));
+         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Flat_Disabled));
 
       } else {
 
          // flat view is displayed -> show icon/tooltip for hierarchy view
 
          _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
-         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagLayout_Hierarchical));
-         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TagLayout_Hierarchical_Disabled));
+         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical));
+         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 

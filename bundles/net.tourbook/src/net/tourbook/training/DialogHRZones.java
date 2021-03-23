@@ -62,7 +62,7 @@ public class DialogHRZones extends TitleAreaDialog {
    private final IDialogSettings       _state      = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
    private TourPerson                  _person;
 
-   private Image                       _imageTrash = TourbookPlugin.getImageDescriptor(Images.Image__App_Trash).createImage();
+   private Image                       _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
    private ArrayList<TourPersonHRZone> _hrZones;
    private boolean                     _isUpdateUI;

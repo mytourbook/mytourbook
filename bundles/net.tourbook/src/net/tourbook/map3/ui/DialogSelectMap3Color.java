@@ -267,7 +267,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionAddColor();
          }
       };
-      _actionAddColor.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Add));
+      _actionAddColor.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
       _actionAddColor.setToolTipText(Messages.Map3SelectColor_Dialog_Action_AddColor_Tooltip);
 
       /*
@@ -291,7 +291,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditAllColors();
          }
       };
-      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__Options_Bright));
+      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Options_Bright));
       _actionEditAllColors.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditAllColors);
    }
 

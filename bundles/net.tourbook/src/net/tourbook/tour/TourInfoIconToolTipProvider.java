@@ -100,11 +100,11 @@ public class TourInfoIconToolTipProvider implements ITourToolTipProvider, IInfoT
 
       final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
 
-      imageRegistry.put(Images.Image_ToolTip_TourInfo, TourbookPlugin.getImageDescriptor(Images.Image_ToolTip_TourInfo));
-      imageRegistry.put(Images.Image_ToolTip_TourInfo_Hovered, TourbookPlugin.getImageDescriptor(Images.Image_ToolTip_TourInfo_Hovered));
+      imageRegistry.put(Images.ToolTip_TourInfo, TourbookPlugin.getImageDescriptor(Images.ToolTip_TourInfo));
+      imageRegistry.put(Images.ToolTip_TourInfo_Hovered, TourbookPlugin.getImageDescriptor(Images.ToolTip_TourInfo_Hovered));
 
-      _tourInfoImage = imageRegistry.get(Images.Image_ToolTip_TourInfo);
-      _tourInfoImageHovered = imageRegistry.get(Images.Image_ToolTip_TourInfo_Hovered);
+      _tourInfoImage = imageRegistry.get(Images.ToolTip_TourInfo);
+      _tourInfoImageHovered = imageRegistry.get(Images.ToolTip_TourInfo_Hovered);
 
       _tourInfoImageSize = _tourInfoImage.getBounds();
    }

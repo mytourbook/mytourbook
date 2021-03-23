@@ -143,9 +143,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    /*
     * Image resources
     */
-   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Image__tag).createImage();
-   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.Image__tag_root).createImage();
-   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Image__tag_category).createImage();
+   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
+   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.TagRoot).createImage();
+   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.TagCategory).createImage();
 
    /*
     * UI controls
@@ -163,8 +163,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -179,8 +179,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override

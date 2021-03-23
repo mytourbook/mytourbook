@@ -29,7 +29,7 @@ public class ActionNavigateHistoryBackward extends Action {
    public ActionNavigateHistoryBackward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
       setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__Backward_Nav));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Backward_Nav));
 
       setActionDefinitionId(ACTION_ID);
 

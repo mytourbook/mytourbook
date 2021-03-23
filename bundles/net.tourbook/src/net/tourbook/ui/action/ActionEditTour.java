@@ -35,8 +35,8 @@ public class ActionEditTour extends Action {
 
       setText(Messages.App_Action_edit_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
 
       setEnabled(false);
 

@@ -35,8 +35,8 @@ public class ActionShowPOI extends Action {
 		setText(Messages.Map_Action_POI);
 		setToolTipText(Messages.Map_Action_POI_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_POI));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_POI_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_POI));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_POI_Disabled));
 	}
 
 	@Override

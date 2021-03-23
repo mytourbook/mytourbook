@@ -71,7 +71,7 @@ public class SearchMgr implements XHRHandler {
    private static final String  SEARCH_APP_ACTION_EDIT_MARKER          = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
    private static final String  SEARCH_APP_ACTION_EDIT_TOUR            = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = Images.Image_Action_TourWayPoint;
+   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = Images.Action_TourWayPoint;
 
    final static IDialogSettings state                                  = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
 
@@ -236,11 +236,11 @@ public class SearchMgr implements XHRHandler {
       /*
        * set image urls
        */
-      _iconUrl_Tour = getIconUrl(Images.Image__Tour);
-      _iconUrl_Marker = getIconUrl(Images.Image__TourMarker);
+      _iconUrl_Tour = getIconUrl(Images.Tour);
+      _iconUrl_Marker = getIconUrl(Images.TourMarker);
       _iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
 
-      _actionUrl_EditImage = getIconUrl(Images.Image__quick_edit);
+      _actionUrl_EditImage = getIconUrl(Images.App_QuickEdit);
 
       // initialize search options
       setInternalSearchOptions();

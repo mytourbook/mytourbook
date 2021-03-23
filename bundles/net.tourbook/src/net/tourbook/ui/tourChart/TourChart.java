@@ -317,8 +317,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private TourMarker                                       _selectedTourMarker;
 
    //
-   private ImageDescriptor               _imagePhoto                     = TourbookPlugin.getImageDescriptor(Images.Image__PhotoPhotos);
-   private ImageDescriptor               _imagePhotoTooltip              = TourbookPlugin.getImageDescriptor(Images.Image__PhotoImage);
+   private ImageDescriptor               _imagePhoto                     = TourbookPlugin.getImageDescriptor(Images.PhotoPhotos);
+   private ImageDescriptor               _imagePhotoTooltip              = TourbookPlugin.getImageDescriptor(Images.PhotoImage);
 
    private IFillPainter                  _customBackgroundPainter;
 
@@ -389,8 +389,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public Action_AllGraphs() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__Graph),
-               TourbookPlugin.getImageDescriptor(Images.Image__Graph_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Graph),
+               TourbookPlugin.getImageDescriptor(Images.Graph_Disabled));
 
          setId(GRAPH_CONTRIBUTION_ID_SLIDEOUT);
       }
@@ -411,8 +411,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public Action_GraphBackground_Slideout() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__Graph_Background),
-               TourbookPlugin.getImageDescriptor(Images.Image__Graph_Background_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Graph_Background),
+               TourbookPlugin.getImageDescriptor(Images.Graph_Background_Disabled));
       }
 
       @Override
@@ -445,8 +445,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public Action_TourChart_Smoothing() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__Smoothing),
-               TourbookPlugin.getImageDescriptor(Images.Image__Smoothing_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.Smoothing),
+               TourbookPlugin.getImageDescriptor(Images.Smoothing_Disabled));
       }
 
       @Override
@@ -467,8 +467,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          super(Messages.Tour_Action_GeoCompare_Tooltip, AS_CHECK_BOX);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__GeoParts));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__GeoParts_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GeoParts));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GeoParts_Disabled));
       }
 
       @Override
@@ -496,8 +496,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       public ActionGraphMinMax() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__GraphMinMax),
-               TourbookPlugin.getImageDescriptor(Images.Image__GraphMinMax_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.GraphMinMax),
+               TourbookPlugin.getImageDescriptor(Images.GraphMinMax_Disabled));
       }
 
       @Override
@@ -1299,88 +1299,88 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_ALTITUDE,
             GRAPH_LABEL_ALTITUDE,
             Messages.Tour_Action_graph_altitude_tooltip,
-            Images.Image__graph_altitude,
-            Images.Image__graph_altitude_disabled,
+            Images.Graph_Elevation,
+            Images.Graph_Elevation_Disabled,
             GRAPH_CONTRIBUTION_ID_ALTITUDE);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SPEED,
             GRAPH_LABEL_SPEED,
             Messages.Tour_Action_graph_speed_tooltip,
-            Images.Image__graph_speed,
-            Images.Image__graph_speed_disabled,
+            Images.Graph_Speed,
+            Images.Graph_Speed_Disabled,
             GRAPH_CONTRIBUTION_ID_SPEED);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PACE,
             GRAPH_LABEL_PACE,
             Messages.Tour_Action_graph_pace_tooltip,
-            Images.Image__graph_pace,
-            Images.Image__graph_pace_disabled,
+            Images.Graph_Pace,
+            Images.Graph_Pace_Disabled,
             GRAPH_CONTRIBUTION_ID_PACE);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_POWER,
             GRAPH_LABEL_POWER,
             Messages.Tour_Action_graph_power_tooltip,
-            Images.Image__graph_power,
-            Images.Image__graph_power_disabled,
+            Images.Graph_Power,
+            Images.Graph_Power_Disabled,
             GRAPH_CONTRIBUTION_ID_POWER);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_ALTIMETER,
             GRAPH_LABEL_ALTIMETER,
             Messages.Tour_Action_graph_altimeter_tooltip,
-            Images.Image__graph_altimeter,
-            Images.Image__graph_altimeter_disabled,
+            Images.Graph_Altimeter,
+            Images.Graph_Altimeter_Disabled,
             GRAPH_CONTRIBUTION_ID_ALTIMETER);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PULSE,
             GRAPH_LABEL_HEARTBEAT,
             Messages.Tour_Action_graph_heartbeat_tooltip,
-            Images.Image__graph_heartbeat,
-            Images.Image__graph_heartbeat_disabled,
+            Images.Graph_Heartbeat,
+            Images.Graph_Heartbeat_Disabled,
             GRAPH_CONTRIBUTION_ID_PULSE);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_TEMPERATURE,
             GRAPH_LABEL_TEMPERATURE,
             Messages.Tour_Action_graph_temperature_tooltip,
-            Images.Image__graph_temperature,
-            Images.Image__graph_temperature_disabled,
+            Images.Graph_Temperature,
+            Images.Graph_Temperature_Disabled,
             GRAPH_CONTRIBUTION_ID_TEMPERATURE);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_CADENCE,
             GRAPH_LABEL_CADENCE,
             Messages.Tour_Action_graph_cadence_tooltip,
-            Images.Image__graph_cadence,
-            Images.Image__graph_cadence_disabled,
+            Images.Graph_Cadence,
+            Images.Graph_Cadence_Disabled,
             GRAPH_CONTRIBUTION_ID_CADENCE);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GEARS,
             GRAPH_LABEL_GEARS,
             Messages.Tour_Action_GraphGears,
-            Images.Image__Graph_Gears,
-            Images.Image__Graph_Gears_disabled,
+            Images.Graph_Gears,
+            Images.Graph_Gears_disabled,
             GRAPH_CONTRIBUTION_ID_GEARS);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GRADIENT,
             GRAPH_LABEL_GRADIENT,
             Messages.Tour_Action_graph_gradient_tooltip,
-            Images.Image__graph_gradient,
-            Images.Image__graph_gradient_disabled,
+            Images.Graph_Gradient,
+            Images.Graph_Gradient_Disabled,
             GRAPH_CONTRIBUTION_ID_GRADIENT);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_TOUR_COMPARE,
             GRAPH_LABEL_TOUR_COMPARE,
             Messages.Tour_Action_graph_tour_compare_tooltip,
-            Images.Image__graph_tour_compare,
-            Images.Image__graph_tour_compare_disabled,
+            Images.Graph_TourCompare,
+            Images.Graph_TourCompare_Disabled,
             GRAPH_CONTRIBUTION_ID_TOUR_COMPARE);
 
       /*
@@ -1390,40 +1390,40 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_RUN_DYN_STANCE_TIME,
             GRAPH_LABEL_RUN_DYN_STANCE_TIME,
             Messages.Tour_Action_RunDyn_StanceTime_Tooltip,
-            Images.Image__Graph_RunDyn_StanceTime,
-            Images.Image__Graph_RunDyn_StanceTime_Disabled,
+            Images.Graph_RunDyn_StanceTime,
+            Images.Graph_RunDyn_StanceTime_Disabled,
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
             GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
             Messages.Tour_Action_RunDyn_StanceTimeBalance_Tooltip,
-            Images.Image__Graph_RunDyn_StanceTimeBalance,
-            Images.Image__Graph_RunDyn_StanceTimeBalance_Disabled,
+            Images.Graph_RunDyn_StanceTimeBalance,
+            Images.Graph_RunDyn_StanceTimeBalance_Disabled,
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STANCE_TIME_BALANCED);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
             GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
-            Images.Image__Graph_RunDyn_StepLength,
-            Images.Image__Graph_RunDyn_StepLength_Disabled,
+            Images.Graph_RunDyn_StepLength,
+            Images.Graph_RunDyn_StepLength_Disabled,
             GRAPH_CONTRIBUTION_ID_RUN_DYN_STEP_LENGTH);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
             GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
             Messages.Tour_Action_RunDyn_VerticalOscillation_Tooltip,
-            Images.Image__Graph_RunDyn_VerticalOscillation,
-            Images.Image__Graph_RunDyn_VerticalOscillation_Disabled,
+            Images.Graph_RunDyn_VerticalOscillation,
+            Images.Graph_RunDyn_VerticalOscillation_Disabled,
             GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_OSCILLATION);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
             GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
             Messages.Tour_Action_RunDyn_VerticalRatio_Tooltip,
-            Images.Image__Graph_RunDyn_VerticalRatio,
-            Images.Image__Graph_RunDyn_VerticalRatio_Disabled,
+            Images.Graph_RunDyn_VerticalRatio,
+            Images.Graph_RunDyn_VerticalRatio_Disabled,
             GRAPH_CONTRIBUTION_ID_RUN_DYN_VERTICAL_RATIO);
 
       /*
@@ -1433,16 +1433,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             TourManager.GRAPH_SWIM_STROKES,
             GRAPH_LABEL_SWIM_STROKES,
             Messages.Tour_Action_Swim_Strokes_Tooltip,
-            Images.Image__Graph_Swim_Strokes,
-            Images.Image__Graph_Swim_Strokes_Disabled,
+            Images.Graph_Swim_Strokes,
+            Images.Graph_Swim_Strokes_Disabled,
             GRAPH_CONTRIBUTION_ID_SWIM_STROKES);
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SWIM_SWOLF,
             GRAPH_LABEL_SWIM_SWOLF,
             Messages.Tour_Action_Swim_Swolf_Tooltip,
-            Images.Image__Graph_Swim_Swolf,
-            Images.Image__Graph_Swim_Swolf_Disabled,
+            Images.Graph_Swim_Swolf,
+            Images.Graph_Swim_Swolf_Disabled,
             GRAPH_CONTRIBUTION_ID_SWIM_SWOLF);
    }
 

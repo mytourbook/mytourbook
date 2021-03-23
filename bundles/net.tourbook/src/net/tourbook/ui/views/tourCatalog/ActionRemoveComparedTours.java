@@ -44,8 +44,8 @@ public class ActionRemoveComparedTours extends Action {
 
       fTourView = view;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       setText(Messages.tourCatalog_view_action_delete_tours);
 

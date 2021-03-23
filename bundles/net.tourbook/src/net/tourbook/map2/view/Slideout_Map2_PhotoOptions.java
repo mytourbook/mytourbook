@@ -107,7 +107,7 @@ public class Slideout_Map2_PhotoOptions extends ToolbarSlideout {
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_RestoreDefault_Dark));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault_Dark));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
       _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPageMap2Appearance.ID)

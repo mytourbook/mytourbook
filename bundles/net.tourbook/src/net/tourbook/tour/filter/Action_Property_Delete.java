@@ -36,8 +36,8 @@ public class Action_Property_Delete extends Action {
 
       setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProperty_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Trash_Themed));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Trash_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
    }
 
    @Override

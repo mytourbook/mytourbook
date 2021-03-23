@@ -34,8 +34,8 @@ public class ActionSyncMapWith_Tour extends Action {
 
 		setToolTipText(Messages.map_action_synch_with_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_tour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_tour_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.synch_with_tour));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.synch_with_tour_disabled));
 	}
 
 	@Override

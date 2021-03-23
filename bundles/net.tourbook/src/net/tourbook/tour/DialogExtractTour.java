@@ -244,7 +244,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataEditor = tourDataEditor;
       _tourDataSource = tourData;
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.Image__MyTourbook16).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage());
 
       _canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 

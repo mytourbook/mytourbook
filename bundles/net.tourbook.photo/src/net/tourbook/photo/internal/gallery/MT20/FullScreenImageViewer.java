@@ -295,7 +295,7 @@ public class FullScreenImageViewer {
 
       _shell.setLayout(new FillLayout());
 
-      _shellImage = new Image[] { Activator.getImageDescriptor(PhotoImages.Image__PhotoFullsizeShellImage128).createImage() };
+      _shellImage = new Image[] { Activator.getImageDescriptor(PhotoImages.PhotoFullsizeShellImage128).createImage() };
       _shell.setImages(_shellImage);
       {
          createUI_10_Canvas(_shell);

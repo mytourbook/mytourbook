@@ -34,7 +34,7 @@ public class ActionAddVertices extends Action {
 
       setToolTipText(Messages.Map3Color_Dialog_Action_AddVertices_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Add_2x));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add_2x));
    }
 
    @Override

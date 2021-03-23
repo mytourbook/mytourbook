@@ -83,7 +83,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__App_Close_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close_Themed));
       }
 
       @Override
@@ -99,7 +99,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Slideout_Dialog_Action_PinSlideoutLocation_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__Pin_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Pin_Themed));
       }
 
       @Override
@@ -115,7 +115,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__BookOpen_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.BookOpen_Themed));
       }
 
       @Override

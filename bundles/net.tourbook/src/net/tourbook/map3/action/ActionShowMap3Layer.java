@@ -65,7 +65,7 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 
       _parent = parent;
 
-      _actionImage = TourbookPlugin.getImageDescriptor(Images.Image__MapOptions).createImage();
+      _actionImage = TourbookPlugin.getImageDescriptor(Images.MapOptions).createImage();
    }
 
    @Override

@@ -36,7 +36,7 @@ public class ActionCreateSplinePoint extends Action {
       fDialogAdjustAltitude = dialogAdjustAltitude;
 
       setText(Messages.adjust_altitude_action_create_spline_point);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__spline_point));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SplinePoint));
    }
 
    @Override

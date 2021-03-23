@@ -29,7 +29,7 @@ public class ActionRefreshFolder extends Action {
 
 		_picDirFolder = picDirFolder;
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__refresh));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.refresh));
 	}
 
 	@Override

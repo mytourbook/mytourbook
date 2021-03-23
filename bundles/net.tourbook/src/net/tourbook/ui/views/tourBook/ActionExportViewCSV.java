@@ -36,8 +36,8 @@ class ActionExportViewCSV extends Action {
 
       setText(Messages.Tour_Book_Action_ExportViewCSV);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__CSVFormat));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__CSVFormat_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
    }
 
    @Override

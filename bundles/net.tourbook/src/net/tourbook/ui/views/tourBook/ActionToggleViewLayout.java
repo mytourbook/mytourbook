@@ -34,7 +34,7 @@ class ActionToggleViewLayout extends Action {
       super(null, AS_PUSH_BUTTON);
 
       setToolTipText(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__TourBook_Month));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_Month));
 
       _tourBookView = tourBookView;
    }

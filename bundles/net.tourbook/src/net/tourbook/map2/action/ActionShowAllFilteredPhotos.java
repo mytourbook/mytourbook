@@ -34,8 +34,8 @@ public class ActionShowAllFilteredPhotos extends Action {
 
       setToolTipText(Messages.Map_Action_ShowAllFilteredPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_ShowAllPhotosInMap));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image_Action_ShowAllPhotosInMap_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ShowAllPhotosInMap));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ShowAllPhotosInMap_Disabled));
    }
 
    @Override

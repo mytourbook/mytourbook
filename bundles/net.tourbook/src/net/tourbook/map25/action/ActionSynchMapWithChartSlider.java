@@ -34,8 +34,8 @@ public class ActionSynchMapWithChartSlider extends Action {
 
 		setToolTipText(Messages.map_action_synch_with_slider);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_slider));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image_action_synch_with_slider_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.synch_with_slider));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.synch_with_slider_disabled));
 	}
 
 	@Override

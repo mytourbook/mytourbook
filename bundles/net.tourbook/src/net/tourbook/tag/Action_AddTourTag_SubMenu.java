@@ -80,7 +80,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenCancel);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Cancel));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
       }
 
       @Override
@@ -131,7 +131,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenOK);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_OK));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_OK));
       }
 
       @Override
@@ -461,7 +461,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
           */
          _actionOK.setEnabled(isModifiedTags);
          _actionOK.setImageDescriptor(isModifiedTags
-               ? TourbookPlugin.getImageDescriptor(Images.Image__App_OK)
+               ? TourbookPlugin.getImageDescriptor(Images.App_OK)
                : null);
       }
    }

@@ -32,8 +32,8 @@ class ActionSaveComparedTours extends Action {
       setText(Messages.Compare_Result_Action_save_checked_tours);
       setToolTipText(Messages.Compare_Result_Action_save_checked_tours_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__save_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
    }
 
    @Override

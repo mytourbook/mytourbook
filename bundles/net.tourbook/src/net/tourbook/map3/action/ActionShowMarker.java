@@ -30,8 +30,8 @@ public class ActionShowMarker extends Action {
 
       super(Messages.Map3_Action_ShowMarker, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled));
 
       _mapView = mapView;
    }

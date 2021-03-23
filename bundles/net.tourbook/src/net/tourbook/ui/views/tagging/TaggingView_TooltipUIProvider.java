@@ -83,7 +83,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Image__App_Close));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -100,8 +100,8 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__quick_edit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
       }
 
       @Override

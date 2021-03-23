@@ -41,7 +41,7 @@ public class ActionTourCompareWizard extends Action {
       fRefTourProvider = refTourProvider;
 
       setText(Messages.action_tourCatalog_open_compare_wizard);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__view_compare_wizard));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourCatalog_CompareWizard));
    }
 
    @Override

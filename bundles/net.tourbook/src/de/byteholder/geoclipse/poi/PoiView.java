@@ -349,15 +349,15 @@ public class PoiView extends ViewPart implements Observer {
 		final TourbookPlugin activator = TourbookPlugin.getDefault();
 		final ImageRegistry imageRegistry = activator.getImageRegistry();
 
-      if (imageRegistry.get(Images.Image_POI_Anchor) == null) {
+      if (imageRegistry.get(Images.POI_Anchor) == null) {
 
-         imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Images.Image_POI_Anchor));
-         imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Images.Image_POI_Car));
-         imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Images.Image_POI_Cart));
-         imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Images.Image_POI_Flag));
-         imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Images.Image_POI_House));
-         imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.Image_POI_Soccer));
-         imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.Image_POI_Star));
+         imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Images.POI_Anchor));
+         imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Images.POI_Car));
+         imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Images.POI_Cart));
+         imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Images.POI_Flag));
+         imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Images.POI_House));
+         imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
+         imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.POI_Star));
 		}
 	}
 

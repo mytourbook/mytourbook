@@ -39,7 +39,7 @@ public class ActionMergeTour extends Action {
    public ActionMergeTour(final ITourProvider tourProvider) {
 
       setText(Messages.app_action_merge_tour);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.image__merge_tours));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MergeTours));
 
       _tourProvider = tourProvider;
    }

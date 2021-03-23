@@ -323,7 +323,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage());
 
       _tourData = tourData;
 
@@ -1456,7 +1456,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _imagePaste = TourbookPlugin.getImageDescriptor(Images.Image__App_Edit_Paste).createImage();
+      _imagePaste = TourbookPlugin.getImageDescriptor(Images.App_Edit_Paste).createImage();
 
       restoreState_Viewer();
    }

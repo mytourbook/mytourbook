@@ -38,7 +38,7 @@ public class ActionCreateTourMarker extends Action {
    public ActionCreateTourMarker(final TourDataEditorView tourDataEditorView) {
 
       super(Messages.tourCatalog_view_action_create_marker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__edit_tour_marker_new));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
 
       _tourDataEditor = tourDataEditorView;
    }

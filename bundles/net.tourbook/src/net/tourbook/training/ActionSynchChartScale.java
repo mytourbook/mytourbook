@@ -34,8 +34,8 @@ public class ActionSynchChartScale extends Action {
 
       setToolTipText(Messages.Training_View_Action_SynchChartScale);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__synch_statistics));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__synch_statistics_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
    }
 
    @Override

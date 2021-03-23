@@ -131,7 +131,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.Image__quick_edit).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit).createImage());
 
       _tourData = tourData;
 

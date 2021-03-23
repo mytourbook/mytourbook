@@ -120,15 +120,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 // SET_FORMATTING_OFF
 
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Image__Tour;
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Image__Tour_Disabled;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.Image_Action_ShowPhotosInMap;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.Image_Action_ShowAllPhotosInMap_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.Image_Action_SyncWith_Slider_Centered_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = Images.Image_Action_SyncWith_Slider_Centered;
-   private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = Images.image_action_change_tile_factory;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = Images.image_action_synch_with_slider_disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.image_action_synch_with_slider;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Tour;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Tour_Disabled;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.Action_ShowPhotosInMap;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.Action_ShowAllPhotosInMap_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.Action_SyncWith_Slider_Centered_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = Images.Action_SyncWith_Slider_Centered;
+   private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = Images.MapProvider;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = Images.synch_with_slider_disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.synch_with_slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    //private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "map_actionshow photos in map"; //must be externalyzed
 
@@ -286,8 +286,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       public ActionMap25_Options() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Image__MapOptions),
-               TourbookPlugin.getImageDescriptor(Images.Image__MapOptions_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.MapOptions),
+               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
       }
 
       @Override

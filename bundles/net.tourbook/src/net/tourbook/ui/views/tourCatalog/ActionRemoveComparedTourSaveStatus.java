@@ -31,8 +31,8 @@ public class ActionRemoveComparedTourSaveStatus extends Action {
 
       setText(Messages.Compare_Result_Action_remove_save_result);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
 
       setEnabled(false);
    }

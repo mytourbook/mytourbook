@@ -893,7 +893,7 @@ public class TourMapPainter extends MapPainter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _twpImage = TourbookPlugin.getImageDescriptor(Images.Image_Map_WayPoint).createImage();
+      _twpImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
       _twpImageBounds = _twpImage.getBounds();
 
       _isImageAvailable = true;

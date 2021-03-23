@@ -280,8 +280,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(null, AS_CHECK_BOX);
 
          setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Filter));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Filter_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Filter));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Filter_Disabled));
       }
 
       @Override
@@ -315,7 +315,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(null, AS_CHECK_BOX);
 
          setToolTipText(Messages.GeoCompare_View_Action_OnOff_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Turn_On));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_On));
       }
 
       @Override
@@ -327,9 +327,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // switch icon
          if (isSelected) {
-            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Turn_On));
+            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_On));
          } else {
-            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Image__App_Turn_Off));
+            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_Off));
          }
       }
    }

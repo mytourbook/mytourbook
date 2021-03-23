@@ -626,8 +626,8 @@ public class Map extends Canvas {
       _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 
-      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.Image__SearchToursByLocation));
-      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.Image__SearchToursByLocation_Scroll));
+      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchToursByLocation));
+      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchToursByLocation_Scroll));
 
       _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
       _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
@@ -638,7 +638,7 @@ public class Map extends Canvas {
       SYS_COLOR_WHITE = _display.getSystemColor(SWT.COLOR_WHITE);
       SYS_COLOR_YELLOW = _display.getSystemColor(SWT.COLOR_YELLOW);
 
-      _poiImage = TourbookPlugin.getImageDescriptor(Images.Image_POI_InMap).createImage();
+      _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
 
       _tourBreadcrumb = new MapTourBreadcrumb();

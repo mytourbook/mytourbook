@@ -56,7 +56,7 @@ public class ActionTourMarkerFilter extends ContributionItem {
       _tourMarkerAllView = tourMarkerAllView;
       _parent = parent;
 
-      _actionImage = TourbookPlugin.getImageDescriptor(Images.Image__tour_options).createImage();
+      _actionImage = TourbookPlugin.getImageDescriptor(Images.TourOptions).createImage();
    }
 
    @Override

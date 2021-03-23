@@ -32,7 +32,7 @@ public class ActionShowPhotoRatingStars extends Action {
 		_photoGallery = photoGallery;
 
 		setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.Image__PhotoRatingStar));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoRatingStar));
 	}
 
 	@Override
