@@ -259,8 +259,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          setToolTipText(Messages.Slideout_TourTagFilter_Action_CheckAllTags_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Checkbox_Checked));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Checkbox_Checked_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked_Disabled));
       }
 
       @Override
@@ -277,8 +277,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          setToolTipText(Messages.Slideout_TourTagFilter_Action_UncheckAllTags_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Checkbox_Uncheck));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Checkbox_Uncheck_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck_Disabled));
       }
 
       @Override
@@ -1546,8 +1546,8 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       _pc = new PixelConverter(parent);
 
       _imgTag = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
-      _imgTagRoot = TourbookPlugin.getImageDescriptor(Images.TagRoot).createImage();
-      _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.TagCategory).createImage();
+      _imgTagRoot = TourbookPlugin.getImageDescriptor(Images.Tag_Root).createImage();
+      _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Tag_Category).createImage();
 
       parent.addDisposeListener(new DisposeListener() {
          @Override

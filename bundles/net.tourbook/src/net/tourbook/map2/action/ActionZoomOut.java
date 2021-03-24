@@ -34,8 +34,8 @@ public class ActionZoomOut extends Action {
 
 		setToolTipText(Messages.map_action_zoom_out);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.zoom_out));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.zoom_out_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_Disabled));
 	}
 
 	@Override

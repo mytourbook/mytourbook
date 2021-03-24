@@ -144,8 +144,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
     * Image resources
     */
    private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
-   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.TagRoot).createImage();
-   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.TagCategory).createImage();
+   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.Tag_Root).createImage();
+   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Tag_Category).createImage();
 
    /*
     * UI controls

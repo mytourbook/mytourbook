@@ -99,7 +99,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Slideout_Dialog_Action_PinSlideoutLocation_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Pin_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Pin_Themed));
       }
 
       @Override

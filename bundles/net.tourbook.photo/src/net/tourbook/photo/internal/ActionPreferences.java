@@ -27,7 +27,7 @@ public class ActionPreferences extends Action {
 	public ActionPreferences() {
 
 		setText(Messages.Pic_Dir_Action_Preferences);
-      setImageDescriptor(Activator.getImageDescriptor(CommonImages.options));
+      setImageDescriptor(Activator.getImageDescriptor(CommonImages.App_Options));
 	}
 
 	@Override

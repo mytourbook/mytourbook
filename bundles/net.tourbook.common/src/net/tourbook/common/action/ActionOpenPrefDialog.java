@@ -42,7 +42,7 @@ public class ActionOpenPrefDialog extends Action {
    public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
       setText(text);
-      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.options));
+      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options));
 
       _prefPageId = prefPageId;
    }
@@ -112,9 +112,9 @@ public class ActionOpenPrefDialog extends Action {
    public ActionOpenPrefDialog setDarkMode(final boolean isDarkMode) {
 
       if (isDarkMode) {
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.Options_Dark));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options_Dark));
       } else {
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.options));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options));
       }
 
       return this;

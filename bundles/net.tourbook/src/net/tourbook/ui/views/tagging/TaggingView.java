@@ -236,9 +236,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /*
     * UI resources
     */
-   private final Image _imgTagCategory = TourbookPlugin.getImage(Images.TagCategory);
+   private final Image _imgTagCategory = TourbookPlugin.getImage(Images.Tag_Category);
    private final Image _imgTag         = TourbookPlugin.getImage(Images.Tag);
-   private final Image _imgTagRoot     = TourbookPlugin.getImage(Images.TagRoot);
+   private final Image _imgTagRoot     = TourbookPlugin.getImage(Images.Tag_Root);
 
    /*
     * UI controls

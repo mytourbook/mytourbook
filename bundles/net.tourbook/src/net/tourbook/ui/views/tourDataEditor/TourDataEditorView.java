@@ -663,8 +663,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          super(Messages.TourEditor_Action_RemoveSwimStyle);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Remove));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Remove_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
       }
 
       @Override

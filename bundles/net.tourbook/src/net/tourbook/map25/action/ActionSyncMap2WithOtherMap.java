@@ -34,8 +34,8 @@ public class ActionSyncMap2WithOtherMap extends Action {
 
       setToolTipText(Messages.Map_Action_SynchWithOtherMap);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncMapWithOtherMap));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncMapWithOtherMap_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_OtherMap));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_OtherMap_Disabled));
    }
 
    @Override

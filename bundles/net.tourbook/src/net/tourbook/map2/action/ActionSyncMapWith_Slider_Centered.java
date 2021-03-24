@@ -34,8 +34,8 @@ public class ActionSyncMapWith_Slider_Centered extends Action {
 
       setToolTipText(Messages.Map_Action_SynchWithSlider_Centered);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_SyncWith_Slider_Centered));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_SyncWith_Slider_Centered_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider_Centered));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider_Centered_Disabled));
    }
 
    @Override

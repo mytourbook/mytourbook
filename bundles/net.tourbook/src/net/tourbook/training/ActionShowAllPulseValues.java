@@ -31,7 +31,7 @@ public class ActionShowAllPulseValues extends Action {
       super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
       setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZoomFitGraph));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_FitGraph));
 
       _trainingView = trainingView;
    }

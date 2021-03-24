@@ -349,7 +349,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Today));
+         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Today));
       }
    }
 

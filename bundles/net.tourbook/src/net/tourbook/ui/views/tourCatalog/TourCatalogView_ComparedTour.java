@@ -147,7 +147,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Navigate_Previous));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Navigate_Previous));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
       }
 
@@ -165,7 +165,7 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Navigate_Next));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Navigate_Next));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
       }
 

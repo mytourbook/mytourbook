@@ -28,8 +28,8 @@ public class ActionRefreshOfflineInfoNotAssessed extends Action {
 
 		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoNotAssessed_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RefreshNotAssessed));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RefreshNotAssessed_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_NotAssessed));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_NotAssessed_Disabled));
 
 		_prefPageMapFactories = prefPageMapFactories;
 	}

@@ -34,8 +34,8 @@ public class ActionShowWayPoints extends Action {
 
 		setText(Messages.Map_Action_ShowWayPoints);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_TourWayPoint));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_TourWayPoint_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourWayPoint));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourWayPoint_Disabled));
 	}
 
 	@Override

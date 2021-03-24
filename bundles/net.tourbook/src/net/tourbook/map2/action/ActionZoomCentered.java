@@ -33,7 +33,7 @@ public class ActionZoomCentered extends Action {
 		_mapView = mapView;
 
 		setToolTipText(Messages.map_action_zoom_centered);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_Zoom_CenterTour));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_CenterTour));
 	}
 
 	@Override

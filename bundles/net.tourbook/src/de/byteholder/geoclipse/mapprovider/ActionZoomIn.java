@@ -34,8 +34,8 @@ public class ActionZoomIn extends Action {
 
 		setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ZoomIn));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ZoomIn_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In_Disabled));
 	}
 
 	@Override

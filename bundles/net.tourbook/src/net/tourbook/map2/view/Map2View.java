@@ -527,8 +527,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowPhotos() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Action_ShowPhotosInMap),
-               TourbookPlugin.getImageDescriptor(Images.Action_ShowPhotosInMap_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap),
+               TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
@@ -589,8 +589,8 @@ public class Map2View extends ViewPart implements
 
       public ActionSyncMap() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.Action_SyncMap),
-               TourbookPlugin.getImageDescriptor(Images.Action_SyncMap_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.SyncMap),
+               TourbookPlugin.getImageDescriptor(Images.SyncMap_Disabled));
 
          isToggleAction = true;
          isShowSlideoutAlways = true;
@@ -600,22 +600,22 @@ public class Map2View extends ViewPart implements
           */
 
          // image 0: tour
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.synch_with_tour));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_Tour));
 
          // image 1: value point
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Action_SyncWith_ValuePoint));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_ValuePoint));
 
          // image 2: one slider
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.synch_with_slider));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider));
 
          // image 3: centered sliders
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Action_SyncWith_Slider_Centered));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider_Centered));
 
          // image 4: other map
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncMapWithOtherMap));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_OtherMap));
 
          // image 5: photo
-         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.Action_Map_SyncPhotoWithMap));
+         addOtherEnabledImage(TourbookPlugin.getImageDescriptor(Images.SyncWith_Photo));
       }
 
       @Override

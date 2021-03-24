@@ -33,8 +33,8 @@ public class ActionFilterTourWithoutSavedPhotos extends Action {
 
       setToolTipText(Messages.Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Photo_FilterNotSavedPhotos));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Photo_FilterNotSavedPhotos_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_NotSavedPhotos));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_NotSavedPhotos_Disabled));
    }
 
    @Override

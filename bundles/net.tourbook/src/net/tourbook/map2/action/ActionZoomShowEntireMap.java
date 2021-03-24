@@ -33,7 +33,7 @@ public class ActionZoomShowEntireMap extends Action {
 		_mapView = mapView;
 
 		setToolTipText(Messages.map_action_zoom_show_all);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_Zoom_ShowEntireMap));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_ShowEntireMap));
 	}
 
 	@Override

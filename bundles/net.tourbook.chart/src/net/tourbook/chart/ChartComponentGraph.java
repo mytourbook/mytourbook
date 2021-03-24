@@ -476,9 +476,9 @@ public class ChartComponentGraph extends Canvas {
       _cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
       _cursorArrow = new Cursor(getDisplay(), SWT.CURSOR_ARROW);
 
-      _cursorModeSlider = createCursorFromImage(ChartImages.cursor_mode_slider);
-      _cursorModeZoom = createCursorFromImage(ChartImages.cursor_mode_zoom);
-      _cursorModeZoomMove = createCursorFromImage(ChartImages.cursor_mode_zoom_move);
+      _cursorModeSlider = createCursorFromImage(ChartImages.CursorMode_Slider);
+      _cursorModeZoom = createCursorFromImage(ChartImages.CursorMode_Zoom);
+      _cursorModeZoomMove = createCursorFromImage(ChartImages.CursorMode_ZoomMove);
       _cursorDragXSlider_ModeZoom = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
       _cursorDragXSlider_ModeSlider = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
       _cursorHoverXSlider = createCursorFromImage(ChartImages.Cursor_Hover_XSlider);

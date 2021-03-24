@@ -33,8 +33,8 @@ public class ActionFilterTourWithPhotos extends Action {
 
       setToolTipText(Messages.Action_PhotosAndTours_FilterPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Photo_FilterTourWithPhotos));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Photo_FilterTourWithPhotos_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_TourWithPhotos));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_TourWithPhotos_Disabled));
    }
 
    @Override

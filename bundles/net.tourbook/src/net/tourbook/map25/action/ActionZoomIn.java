@@ -33,8 +33,8 @@ public class ActionZoomIn extends Action {
 		_map25View = map25View;
 
 		setToolTipText(Messages.map_action_zoom_in);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.zoom_in));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.zoom_in_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_In_Disabled));
 	}
 
 	@Override

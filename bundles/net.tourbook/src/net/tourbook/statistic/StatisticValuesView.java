@@ -109,8 +109,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Copy_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy_Disabled));
       }
 
       @Override

@@ -35,8 +35,8 @@ public class ActionShowPhotos extends Action {
 
 		setToolTipText(Messages.Map_Action_ShowPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ShowPhotosInMap));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ShowAllPhotosInMap_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
 	}
 
 	@Override

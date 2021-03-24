@@ -27,8 +27,8 @@ public class ActionZoomToSlider extends Action {
 
       setText(Messages.Action_zoom_to_slider);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.zoom_in));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.zoom_in_disabled));
+      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_In));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_In_Disabled));
    }
 
    @Override

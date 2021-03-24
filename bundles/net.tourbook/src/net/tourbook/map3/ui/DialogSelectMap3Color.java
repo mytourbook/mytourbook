@@ -291,7 +291,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditAllColors();
          }
       };
-      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Options_Bright));
+      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options_Bright));
       _actionEditAllColors.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditAllColors);
    }
 

@@ -715,12 +715,12 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
       if (_isVerticalGallery) {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGalleryHorizontal));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGalleryVertical));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 

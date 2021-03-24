@@ -122,13 +122,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Tour;
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Tour_Disabled;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.Action_ShowPhotosInMap;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.Action_ShowAllPhotosInMap_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.Action_SyncWith_Slider_Centered_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = Images.Action_SyncWith_Slider_Centered;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.ShowPhotos_InMap;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.ShowAllPhotos_InMap_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.SyncWith_Slider_Centered_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = Images.SyncWith_Slider_Centered;
    private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = Images.MapProvider;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = Images.synch_with_slider_disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.synch_with_slider;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = Images.SyncWith_Slider_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.SyncWith_Slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    //private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "map_actionshow photos in map"; //must be externalyzed
 

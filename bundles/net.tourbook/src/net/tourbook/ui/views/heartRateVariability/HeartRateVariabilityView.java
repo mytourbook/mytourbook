@@ -182,7 +182,7 @@ public class HeartRateVariabilityView extends ViewPart {
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setToolTipText(Messages.HRV_View_Action_ShowAllValues);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZoomFitGraph));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_FitGraph));
       }
 
       @Override

@@ -31,7 +31,7 @@ public class ActionZoomShowEntireLayer extends Action {
 		_dlgWms = dialogWmsConfiguration;
 
 		setToolTipText(Messages.Map_Action_ZoomShowEntireLayer_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Action_ZoomShowEntireLayer));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_ShowEntireLayer));
 	}
 
 	@Override

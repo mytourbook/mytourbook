@@ -28,8 +28,8 @@ public class ActionRefreshOfflineInfoSelected extends Action {
 
 		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoSelected_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RefreshSelected));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RefreshSelected_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_Selected));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh_Selected_Disabled));
 
 		_prefPageMapFactories = prefPageMapFactories;
 	}

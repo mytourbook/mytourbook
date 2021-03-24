@@ -71,7 +71,7 @@ public class SearchMgr implements XHRHandler {
    private static final String  SEARCH_APP_ACTION_EDIT_MARKER          = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
    private static final String  SEARCH_APP_ACTION_EDIT_TOUR            = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = Images.Action_TourWayPoint;
+   private static final String  IMAGE_ACTION_TOUR_WAY_POINT            = Images.TourWayPoint;
 
    final static IDialogSettings state                                  = TourbookPlugin.getState("net.tourbook.search.SearchMgr"); //$NON-NLS-1$
 
