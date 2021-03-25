@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map25.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -41,12 +42,9 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap25_ShowMarker extends ContributionItem implements IOpeningDialog {
 
-   private static final String         IMAGE_EDIT_TOUR_MARKER          = Messages.Image__edit_tour_marker;
-   private static final String         IMAGE_EDIT_TOUR_MARKER_DISABLED = Messages.Image__edit_tour_marker_disabled;
+   private IDialogSettings             _state    = TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker"); //$NON-NLS-1$
 
-   private IDialogSettings             _state                          = TourbookPlugin.getState("net.tourbook.map25.action.ActionTourMapMarker"); //$NON-NLS-1$
-
-   private final String                _dialogId                       = getClass().getCanonicalName();
+   private final String                _dialogId = getClass().getCanonicalName();
 
    private Map25View                   _map25View;
 
@@ -68,8 +66,8 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
       _map25View = map25View;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_DISABLED).createImage();
+      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
+      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
 
       parent.addDisposeListener(new DisposeListener() {
 

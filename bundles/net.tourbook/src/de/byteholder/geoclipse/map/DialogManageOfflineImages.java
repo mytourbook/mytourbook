@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 
@@ -229,7 +230,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
 
       final Composite container = (Composite) super.createDialogArea(parent);
 
-      _imageRefresh = TourbookPlugin.getImageDescriptor(Messages.Image__Refresh).createImage();
+      _imageRefresh = TourbookPlugin.getImageDescriptor(Images.App_Refresh).createImage();
 
       // create ui
       createUI(container);

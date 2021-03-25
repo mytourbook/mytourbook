@@ -476,21 +476,21 @@ public class ChartComponentGraph extends Canvas {
       _cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
       _cursorArrow = new Cursor(getDisplay(), SWT.CURSOR_ARROW);
 
-      _cursorModeSlider = createCursorFromImage(Messages.Image_cursor_mode_slider);
-      _cursorModeZoom = createCursorFromImage(Messages.Image_cursor_mode_zoom);
-      _cursorModeZoomMove = createCursorFromImage(Messages.Image_cursor_mode_zoom_move);
-      _cursorDragXSlider_ModeZoom = createCursorFromImage(Messages.Image_Cursor_DragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider = createCursorFromImage(Messages.Image_Cursor_DragXSlider_ModeSlider);
-      _cursorHoverXSlider = createCursorFromImage(Messages.Image_Cursor_Hover_XSlider);
+      _cursorModeSlider = createCursorFromImage(ChartImages.CursorMode_Slider);
+      _cursorModeZoom = createCursorFromImage(ChartImages.CursorMode_Zoom);
+      _cursorModeZoomMove = createCursorFromImage(ChartImages.CursorMode_ZoomMove);
+      _cursorDragXSlider_ModeZoom = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider = createCursorFromImage(ChartImages.Cursor_DragXSlider_ModeSlider);
+      _cursorHoverXSlider = createCursorFromImage(ChartImages.Cursor_Hover_XSlider);
 
-      _cursorMove1x = createCursorFromImage(Messages.Image_Cursor_Move1x);
-      _cursorMove2x = createCursorFromImage(Messages.Image_Cursor_Move2x);
-      _cursorMove3x = createCursorFromImage(Messages.Image_Cursor_Move3x);
-      _cursorMove4x = createCursorFromImage(Messages.Image_Cursor_Move4x);
-      _cursorMove5x = createCursorFromImage(Messages.Image_Cursor_Move5x);
+      _cursorMove1x = createCursorFromImage(ChartImages.Cursor_Move1x);
+      _cursorMove2x = createCursorFromImage(ChartImages.Cursor_Move2x);
+      _cursorMove3x = createCursorFromImage(ChartImages.Cursor_Move3x);
+      _cursorMove4x = createCursorFromImage(ChartImages.Cursor_Move4x);
+      _cursorMove5x = createCursorFromImage(ChartImages.Cursor_Move5x);
 
-      _cursorXSliderLeft = createCursorFromImage(Messages.Image_Cursor_X_Slider_Left);
-      _cursorXSliderRight = createCursorFromImage(Messages.Image_Cursor_X_Slider_Right);
+      _cursorXSliderLeft = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
+      _cursorXSliderRight = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
 
       _gridColor = new Color(getDisplay(), _gridRGB);
       _gridColorMajor = new Color(getDisplay(), _gridRGBMajor);

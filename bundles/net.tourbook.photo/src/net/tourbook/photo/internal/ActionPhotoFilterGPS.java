@@ -15,28 +15,29 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionPhotoFilterGPS extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionPhotoFilterGPS(final PhotoGallery photoGallery) {
+   public ActionPhotoFilterGPS(final PhotoGallery photoGallery) {
 
-		super(Messages.Photo_Gallery_Action_PhotoFilter_GPS, AS_CHECK_BOX);
+      super(Messages.Photo_Gallery_Action_PhotoFilter_GPS, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_GPS_Tooltip);
+      setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_GPS_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterGPS));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFilterGPSDisabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_GPS));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_GPS_Disabled));
 
-		_photoGallery = photoGallery;
-	}
+      _photoGallery = photoGallery;
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionImageFilterGPS(this);
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionImageFilterGPS(this);
+   }
 }

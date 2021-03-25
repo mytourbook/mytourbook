@@ -19,10 +19,16 @@
 
 package de.byteholder.geoclipse.poi;
 
+import de.byteholder.gpx.PointOfInterest;
+import de.byteholder.gpx.Waypoint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
+import net.tourbook.Images;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -56,11 +62,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 
-import net.tourbook.application.TourbookPlugin;
-
-import de.byteholder.gpx.PointOfInterest;
-import de.byteholder.gpx.Waypoint;
-
 /**
  * @author Michael Kanis
  * @author Veit Edunjobi
@@ -93,7 +94,7 @@ public class PoiView extends ViewPart implements Observer {
 	 * UI controls
 	 */
 	private Button						_btnSearch;
-	
+
 	private Combo						_cboSearchQuery;
 	private ComboViewer				_queryViewer;
 
@@ -348,15 +349,15 @@ public class PoiView extends ViewPart implements Observer {
 		final TourbookPlugin activator = TourbookPlugin.getDefault();
 		final ImageRegistry imageRegistry = activator.getImageRegistry();
 
-		if (imageRegistry.get(Messages.Image_POI_Anchor) == null) {
+      if (imageRegistry.get(Images.POI_Anchor) == null) {
 
-			imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Anchor));
-			imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Car));
-			imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Cart));
-			imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Flag));
-			imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Messages.Image_POI_House));
-			imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Soccer));
-			imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Messages.Image_POI_Star));
+         imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Images.POI_Anchor));
+         imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Images.POI_Car));
+         imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Images.POI_Cart));
+         imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Images.POI_Flag));
+         imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Images.POI_House));
+         imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
+         imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.POI_Star));
 		}
 	}
 

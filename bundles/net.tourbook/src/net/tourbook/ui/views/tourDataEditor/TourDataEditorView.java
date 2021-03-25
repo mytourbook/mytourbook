@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -662,8 +663,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          super(Messages.TourEditor_Action_RemoveSwimStyle);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Remove));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Remove_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Remove_Disabled));
       }
 
       @Override

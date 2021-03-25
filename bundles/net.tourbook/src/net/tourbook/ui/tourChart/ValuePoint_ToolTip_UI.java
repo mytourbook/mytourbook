@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
@@ -226,7 +227,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__tour_options));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
       }
 
       @Override

@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -49,9 +51,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class StatisticValuesView extends ViewPart {
-
-   private static final String                IMAGE_TOUR_OPTIONS             = net.tourbook.common.Messages.Image__TourOptions;
-   private static final String                IMAGE_TOUR_OPTIONS_DISABLED    = net.tourbook.common.Messages.Image__TourOptions_Disabled;
 
    public static final String                 ID                             = "net.tourbook.statistic.StatisticValuesView";            //$NON-NLS-1$
 
@@ -110,8 +109,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy_Disabled));
       }
 
       @Override
@@ -128,8 +127,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_GroupValues_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__GroupValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GroupValues));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.GroupValues_Disabled));
       }
 
       @Override
@@ -147,8 +146,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CSVFormat_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
       }
 
       @Override
@@ -172,8 +171,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowSequenceNumbers_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_SequenceNumber_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_SequenceNumber));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_SequenceNumber_Disabled));
       }
 
       @Override
@@ -191,8 +190,8 @@ public class StatisticValuesView extends ViewPart {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_ShowZeroValued_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZeroValues_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZeroValues));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ZeroValues_Disabled));
       }
 
       @Override
@@ -280,8 +279,8 @@ public class StatisticValuesView extends ViewPart {
    private void createActions() {
 
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.Tour_StatisticValues_Action_OpenPreferences_Tooltip, PrefPageAppearance.ID, ID);
-      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS));
-      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_TOUR_OPTIONS_DISABLED));
+      _action_PrefDialog.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions));
+      _action_PrefDialog.setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
 
       _action_CopyIntoClipboard = new Action_CopyStatValuesIntoClipboard();
       _action_ShowCSVFormat = new Action_ShowCSVFormat();

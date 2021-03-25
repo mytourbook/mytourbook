@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
@@ -892,7 +893,7 @@ public class TourMapPainter extends MapPainter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _twpImage = TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage();
+      _twpImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
       _twpImageBounds = _twpImage.getBounds();
 
       _isImageAvailable = true;

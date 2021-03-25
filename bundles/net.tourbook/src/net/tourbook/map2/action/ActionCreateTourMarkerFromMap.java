@@ -19,6 +19,7 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -34,10 +35,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionCreateTourMarkerFromMap extends Action {
 
-   private static final String IMAGE_EDIT_TOUR_MARKER_NEW = net.tourbook.Messages.Image__edit_tour_marker_new;
-
-   private Map2View            _mapView;
-   private long                _currentHoverTourId;
+   private Map2View _mapView;
+   private long     _currentHoverTourId;
 
    public ActionCreateTourMarkerFromMap(final Map2View mapView) {
 
@@ -45,7 +44,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_NEW));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
    }
 
    @Override

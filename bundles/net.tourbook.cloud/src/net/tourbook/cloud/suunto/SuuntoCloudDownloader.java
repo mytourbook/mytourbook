@@ -40,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
@@ -78,7 +79,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       super("SUUNTO", //$NON-NLS-1$
             Messages.VendorName_Suunto,
             Messages.Import_Data_HTML_SuuntoWorkoutsDownloader_Tooltip,
-            Activator.getImageAbsoluteFilePath(Messages.Image__SuuntoApp_Icon));
+            Activator.getImageAbsoluteFilePath(CloudImages.Cloud_Suunto));
    }
 
    private CompletableFuture<WorkoutDownload> downloadFile(final String workoutKey) {

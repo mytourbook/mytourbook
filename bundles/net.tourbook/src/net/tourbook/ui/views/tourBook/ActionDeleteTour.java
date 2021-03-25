@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -72,8 +73,8 @@ public class ActionDeleteTour extends Action {
 
       setText(Messages.Tour_Book_Action_delete_selected_tours);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
    }
 
    private void deleteTours(final ArrayList<Long> selectedTourIDs,
@@ -156,7 +157,7 @@ public class ActionDeleteTour extends Action {
       }
 
       // loop: selected tours
-      for (Object treeItem : selection) {
+      for (final Object treeItem : selection) {
 
          if (monitor != null) {
 

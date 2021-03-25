@@ -17,6 +17,7 @@ package net.tourbook.map2.view;
 
 import java.util.LinkedHashMap;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -97,7 +98,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 

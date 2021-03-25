@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.time.ZonedDateTime;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -138,7 +139,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage());
 
       _tourData = tourData;
 

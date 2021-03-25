@@ -126,21 +126,6 @@ public class Messages extends NLS {
    public static String        Dialog_WmsConfig_Label_ImageSize;
    public static String        Dialog_WmsConfig_Label_Layers;
 
-   public static String        Image__Refresh;
-
-   public static String        Image_Action_SetFavoritePosition;
-   public static String        Image_Action_ShowFavoritePosition;
-   public static String        Image_Action_ZoomIn;
-   public static String        Image_Action_ZoomIn_Disabled;
-   public static String        Image_Action_ZoomOut;
-   public static String        Image_Action_ZoomOut_Disabled;
-   public static String        Image_Action_ZoomOutToMinZoom;
-   public static String        Image_Action_ZoomOutToMinZoom_Disabled;
-   public static String        Image_Action_ZoomShowEntireLayer;
-
-   public static String        Image_ViewIcon_Map;
-   public static String        Image_ViewIcon_Placeholder16;
-
    public static String        Import_Error_Dialog_Title;
 
    public static String        Map_Action_ZoomIn_Tooltip;

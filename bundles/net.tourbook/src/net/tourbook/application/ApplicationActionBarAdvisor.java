@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -329,7 +330,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionPreferences = ActionFactory.PREFERENCES.create(window);
       _actionPreferences.setText(Messages.App_Action_open_preferences);
-      _actionPreferences.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
+      _actionPreferences.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
       register(_actionPreferences);
 
       _actionOtherViews = new ActionOtherViews(window);

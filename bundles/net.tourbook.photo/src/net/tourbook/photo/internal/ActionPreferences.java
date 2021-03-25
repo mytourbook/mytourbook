@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.common.CommonImages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoDirectory;
 
 import org.eclipse.jface.action.Action;
@@ -26,7 +27,7 @@ public class ActionPreferences extends Action {
 	public ActionPreferences() {
 
 		setText(Messages.Pic_Dir_Action_Preferences);
-		setImageDescriptor(Activator.getImageDescriptor(net.tourbook.common.Messages.Image__options));
+      setImageDescriptor(Activator.getImageDescriptor(CommonImages.App_Options));
 	}
 
 	@Override

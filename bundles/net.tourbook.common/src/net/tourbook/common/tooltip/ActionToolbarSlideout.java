@@ -18,7 +18,7 @@ package net.tourbook.common.tooltip;
 import java.util.ArrayList;
 
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
@@ -80,8 +80,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    public ActionToolbarSlideout() {
 
-      _imageEnabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions).createImage();
-      _imageDisabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
+      _imageEnabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions).createImage();
+      _imageDisabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 
    public ActionToolbarSlideout(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {

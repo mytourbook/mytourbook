@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -131,7 +132,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
           * an image must be set in the constructor, otherwise the button is small when only ONE
           * action is in the toolbar
           */
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
       }
 
       @Override
@@ -764,12 +765,12 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       if (_isVerticalGallery) {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 }

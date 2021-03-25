@@ -20,12 +20,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -143,9 +143,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    /*
     * Image resources
     */
-   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Messages.Image__tag).createImage();
-   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Messages.Image__tag_root).createImage();
-   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage();
+   private Image _imgTag         = TourbookPlugin.getImageDescriptor(Images.Tag).createImage();
+   private Image _imgTagRoot     = TourbookPlugin.getImageDescriptor(Images.Tag_Root).createImage();
+   private Image _imgTagCategory = TourbookPlugin.getImageDescriptor(Images.Tag_Category).createImage();
 
    /*
     * UI controls
@@ -163,8 +163,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -179,8 +179,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
       }
 
       @Override
@@ -770,9 +770,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       int numCategorys = 0;
       int numOtherItems = 0;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
-
-         final Object treeItem = iter.next();
+      for (Object treeItem : selection) {
 
          if (treeItem instanceof TVIPrefTag) {
             numTags++;

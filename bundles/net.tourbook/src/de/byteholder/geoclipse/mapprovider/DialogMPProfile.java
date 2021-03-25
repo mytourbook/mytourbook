@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.Util;
@@ -436,9 +437,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private void createResources() {
 
-      _imageMap = TourbookPlugin.getImageDescriptor(Messages.Image_ViewIcon_Map).createImage();
-      _imagePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image_ViewIcon_Placeholder16).createImage();
-      _imageLayer = TourbookPlugin.getImageDescriptor(Messages.Image_Action_ZoomShowEntireLayer).createImage();
+      _imageMap = TourbookPlugin.getImageDescriptor(Images.Map).createImage();
+      _imagePlaceholder = TourbookPlugin.getImageDescriptor(Images.App_Placeholder16).createImage();
+      _imageLayer = TourbookPlugin.getImageDescriptor(Images.Zoom_ShowEntireLayer).createImage();
    }
 
    private void createUI(final Composite parent) {

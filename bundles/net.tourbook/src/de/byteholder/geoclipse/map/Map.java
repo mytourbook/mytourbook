@@ -57,6 +57,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
@@ -140,40 +141,36 @@ import org.eclipse.swt.widgets.Listener;
 
 public class Map extends Canvas {
 
-   private static final String          IMAGE_POI_IN_MAP                      = de.byteholder.geoclipse.poi.Messages.Image_POI_InMap;
-   private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION        = net.tourbook.Messages.Image__SearchToursByLocation;
-   private static final String          IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL = net.tourbook.Messages.Image__SearchToursByLocation_Scroll;
+   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE      = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
+   private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME   = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
+   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
 
-   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE           = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
-   private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME        = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
-   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME      = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
-
-   private static final IDialogSettings _geoFilterState                       = TourGeoFilter_Manager.getState();
+   private static final IDialogSettings _geoFilterState                  = TourGeoFilter_Manager.getState();
    /**
     * Min zoomlevels which the maps supports
     */
-   public static final int              MAP_MIN_ZOOM_LEVEL                    = 0;
+   public static final int              MAP_MIN_ZOOM_LEVEL               = 0;
 
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int              MAP_MAX_ZOOM_LEVEL                    = 19;
+   public static final int              MAP_MAX_ZOOM_LEVEL               = 19;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
     */
-   public static final int              UI_MIN_ZOOM_LEVEL                     = MAP_MIN_ZOOM_LEVEL + 1;
+   public static final int              UI_MIN_ZOOM_LEVEL                = MAP_MIN_ZOOM_LEVEL + 1;
 
-   public static final int              UI_MAX_ZOOM_LEVEL                     = MAP_MAX_ZOOM_LEVEL + 1;
+   public static final int              UI_MAX_ZOOM_LEVEL                = MAP_MAX_ZOOM_LEVEL + 1;
 
-   public static final int              EXPANDED_HOVER_SIZE                   = 20;
-   public static final int              EXPANDED_HOVER_SIZE2                  = EXPANDED_HOVER_SIZE / 2;
+   public static final int              EXPANDED_HOVER_SIZE              = 20;
+   public static final int              EXPANDED_HOVER_SIZE2             = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                           = "E";                                                      //$NON-NLS-1$
-   private static final String          DIRECTION_N                           = "N";                                                      //$NON-NLS-1$
+   private static final String          DIRECTION_E                      = "E";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_N                      = "N";                                                     //$NON-NLS-1$
 
-   private static final String          VALUE_FORMAT_2                        = "%s %s";                                                  //$NON-NLS-1$
-   private static final String          VALUE_FORMAT_3                        = "%s %s %s";                                               //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_2                   = "%s %s";                                                 //$NON-NLS-1$
+   private static final String          VALUE_FORMAT_3                   = "%s %s %s";                                              //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -629,8 +626,8 @@ public class Map extends Canvas {
       _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 
-      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION));
-      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(IMAGE_SEARCH_TOURS_BY_LOCATION_SCROLL));
+      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
+      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
 
       _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
       _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);
@@ -641,7 +638,7 @@ public class Map extends Canvas {
       SYS_COLOR_WHITE = _display.getSystemColor(SWT.COLOR_WHITE);
       SYS_COLOR_YELLOW = _display.getSystemColor(SWT.COLOR_YELLOW);
 
-      _poiImage = TourbookPlugin.getImageDescriptor(IMAGE_POI_IN_MAP).createImage();
+      _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
 
       _tourBreadcrumb = new MapTourBreadcrumb();

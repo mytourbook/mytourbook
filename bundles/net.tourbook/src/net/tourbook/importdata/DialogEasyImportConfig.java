@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.FileSystemManager;
@@ -384,7 +385,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          super(null, AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
       }
 
       @Override
@@ -403,8 +404,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Trash_Disabled));
       }
 
       @Override
@@ -460,8 +461,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Sort_Disabled));
       }
 
       @Override
@@ -609,7 +610,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_Options).createImage());
 
       cloneEasyConfig(easyConfig);
    }
@@ -751,8 +752,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 
@@ -1334,7 +1334,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
              * File System image
              */
             _lblIC_FileSystemImage = new Label(importContainer, SWT.NONE);
-            _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+            _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
             _lblIC_FileSystemImage.setImage(_imageFileSystem);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
@@ -4196,7 +4196,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       //We update the file system icon
       Util.disposeResource(_imageFileSystem);
       if (isDeviceLocal) {
-         _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+         _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
       } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {
          final ImageDescriptor fileSystemImageDescriptor = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText())
                .getFileSystemImageDescriptor();

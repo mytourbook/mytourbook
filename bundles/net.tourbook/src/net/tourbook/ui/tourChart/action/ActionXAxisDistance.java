@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -51,18 +52,18 @@ public class ActionXAxisDistance extends Action {
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
-         imagePath = Messages.Image__show_distance_on_x_axis_imperial;
-         disabledImagePath = Messages.Image__show_distance_on_x_axis_imperial_disabled;
+         imagePath = Images.XAxis_ShowDistance_Imperial;
+         disabledImagePath = Images.XAxis_ShowDistance_Imperial_Disabled;
 
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
-         imagePath = Messages.Image__show_distance_on_x_axis_NauticMile;
-         disabledImagePath = Messages.Image__show_distance_on_x_axis_NauticMile_disabled;
+         imagePath = Images.XAxis_ShowDistance_NauticMile;
+         disabledImagePath = Images.XAxis_ShowDistance_NauticMile_Disabled;
 
       } else {
 
-         imagePath = Messages.Image__show_distance_on_x_axis;
-         disabledImagePath = Messages.Image__show_distance_on_x_axis_disabled;
+         imagePath = Images.XAxis_ShowDistance;
+         disabledImagePath = Images.XAxis_ShowDistance_Disabled;
       }
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));

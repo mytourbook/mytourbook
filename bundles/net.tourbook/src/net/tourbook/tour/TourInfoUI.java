@@ -23,6 +23,7 @@ import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
@@ -68,7 +69,6 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String           IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
    private static final String           APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
 
    private static final int              SHELL_MARGIN             = 5;
@@ -278,7 +278,7 @@ public class TourInfoUI {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

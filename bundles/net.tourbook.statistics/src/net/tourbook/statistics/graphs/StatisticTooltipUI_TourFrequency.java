@@ -17,6 +17,7 @@ package net.tourbook.statistics.graphs;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
@@ -53,8 +54,6 @@ import org.eclipse.swt.widgets.ToolBar;
 public class StatisticTooltipUI_TourFrequency {
 
    private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-   private static final String IMAGE_APP_CLOSE          = net.tourbook.common.Messages.Image__App_Close;
-
    private static final String NUMBERS_UNIT             = net.tourbook.statistics.Messages.NUMBERS_UNIT;
 
    // Dashes:  – — …
@@ -143,7 +142,7 @@ public class StatisticTooltipUI_TourFrequency {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
-         setImageDescriptor(CommonActivator.getImageDescriptor(IMAGE_APP_CLOSE));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
