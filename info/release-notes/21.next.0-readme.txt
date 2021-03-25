@@ -33,7 +33,9 @@ Changes
 Bugfix
 ======
 
-* 
+* Compress Database
+  Fxed SQL exception when the tour database size is too large to fit into an integer value
+
 
 
 Translation    
