@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 /*
  * 2007-04-29
  * - completely removed DesignTime; this can be re-added later if needed
@@ -154,7 +169,7 @@ public class Map extends Canvas {
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int              MAP_MAX_ZOOM_LEVEL               = 19;
+   public static final int              MAP_MAX_ZOOM_LEVEL               = 22;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
