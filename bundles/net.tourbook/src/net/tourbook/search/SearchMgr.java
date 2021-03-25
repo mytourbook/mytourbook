@@ -240,7 +240,7 @@ public class SearchMgr implements XHRHandler {
       _iconUrl_Marker = getIconUrl(Images.TourMarker);
       _iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
 
-      _actionUrl_EditImage = getIconUrl(Images.App_QuickEdit);
+      _actionUrl_EditImage = getIconUrl(Images.App_Edit);
 
       // initialize search options
       setInternalSearchOptions();

@@ -32,7 +32,7 @@ public class ActionSortByFileDate extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_SortByDate_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoSortByDate));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoSort_ByDate));
 	}
 
 	@Override

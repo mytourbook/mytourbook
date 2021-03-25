@@ -35,7 +35,7 @@ public class ActionTourChartPauses extends Action {
       _tourChart = tourChart;
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_disabled));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
    }
 
    @Override

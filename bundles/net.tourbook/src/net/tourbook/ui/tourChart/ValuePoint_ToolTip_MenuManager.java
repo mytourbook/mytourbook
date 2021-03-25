@@ -397,7 +397,7 @@ public class ValuePoint_ToolTip_MenuManager {
             VALUE_ID_GEARS,
             Messages.Tooltip_ValuePoint_Action_Value_Gears,
             Images.Graph_Gears,
-            Images.Graph_Gears_disabled);
+            Images.Graph_Gears_Disabled);
 
       _actionValue_Gradient = new ActionValueItem(
             VALUE_ID_GRADIENT,

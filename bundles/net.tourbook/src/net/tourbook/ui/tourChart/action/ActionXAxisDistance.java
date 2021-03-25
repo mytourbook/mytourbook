@@ -58,7 +58,7 @@ public class ActionXAxisDistance extends Action {
       } else if (UI.UNIT_IS_DISTANCE_NAUTICAL_MILE) {
 
          imagePath = Images.XAxis_ShowDistance_NauticMile;
-         disabledImagePath = Images.XAxis_ShowDistance_NauticMile_disabled;
+         disabledImagePath = Images.XAxis_ShowDistance_NauticMile_Disabled;
 
       } else {
 

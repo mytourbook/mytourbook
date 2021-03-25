@@ -618,7 +618,7 @@ public class UI {
       IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_Disabled));
 
       IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
-      IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_Empty16));
+      IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
 
       // weather images
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getImageDescriptor(CommonImages.Weather_Sunny));

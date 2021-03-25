@@ -1456,7 +1456,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _imagePaste = TourbookPlugin.getImageDescriptor(Images.App_Edit_Paste).createImage();
+      _imagePaste = TourbookPlugin.getImageDescriptor(Images.App_Paste).createImage();
 
       restoreState_Viewer();
    }

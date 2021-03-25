@@ -1364,7 +1364,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             GRAPH_LABEL_GEARS,
             Messages.Tour_Action_GraphGears,
             Images.Graph_Gears,
-            Images.Graph_Gears_disabled,
+            Images.Graph_Gears_Disabled,
             GRAPH_CONTRIBUTION_ID_GEARS);
 
       createActions_12_GraphAction(

@@ -626,8 +626,8 @@ public class Map extends Canvas {
       _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
       _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
 
-      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchToursByLocation));
-      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchToursByLocation_Scroll));
+      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
+      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
 
       _transparentColor = new Color(_display, MAP_TRANSPARENT_RGB);
       _defaultBackgroundColor = new Color(_display, MAP_DEFAULT_BACKGROUND_RGB);

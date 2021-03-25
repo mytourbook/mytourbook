@@ -2322,7 +2322,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_Device_TurnOn = getIconUrl(Images.RawData_Device_TurnOn);
 
          _imageUrl_DeviceFolder_OK = getIconUrl(Images.RawData_DeviceFolder);
-         _imageUrl_DeviceFolder_Disabled = getIconUrl(Images.RawData_DeviceFolderDisabled);
+         _imageUrl_DeviceFolder_Disabled = getIconUrl(Images.RawData_DeviceFolder_Disabled);
          _imageUrl_DeviceFolder_NotAvailable = getIconUrl(Images.RawData_DeviceFolder_NotDefined);
          _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);

@@ -32,7 +32,7 @@ public class ActionShowPhotoDate extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoInfoFileDate_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoInfoDate));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoInfo_Date));
 	}
 
 	@Override

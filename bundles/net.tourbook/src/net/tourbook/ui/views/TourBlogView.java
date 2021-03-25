@@ -862,7 +862,7 @@ public class TourBlogView extends ViewPart {
          /*
           * set image urls
           */
-         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Images.App_QuickEdit);
+         _actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Images.App_Edit);
          _actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.App_Remove);
          _actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Images.Eye);
 

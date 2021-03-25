@@ -100,7 +100,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          setToolTipText(Messages.Action_Tag_Edit_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Edit));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
       }
 

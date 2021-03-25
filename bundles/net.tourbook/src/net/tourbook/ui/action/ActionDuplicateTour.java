@@ -38,7 +38,7 @@ public class ActionDuplicateTour extends Action {
       setText(Messages.Tour_Action_DuplicateTour);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate_disabled));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate_Disabled));
 
       _tourProvider = tourProvider;
    }

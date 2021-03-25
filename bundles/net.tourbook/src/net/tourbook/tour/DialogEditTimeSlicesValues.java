@@ -139,7 +139,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_QuickEdit).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage());
 
       _tourData = tourData;
 

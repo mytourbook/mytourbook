@@ -29,7 +29,7 @@ public class ActionClearNavigationHistory extends Action {
 
       _picDirImages = picDirImages;
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.delete));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Delete));
    }
 
    @Override

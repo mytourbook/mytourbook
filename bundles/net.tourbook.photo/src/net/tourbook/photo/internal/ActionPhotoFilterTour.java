@@ -30,8 +30,8 @@ public class ActionPhotoFilterTour extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_Tour_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilterTour));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilterTourDisabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_Tour));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFilter_Tour_Disabled));
 
       _photoGallery = photoGallery;
    }
