@@ -18,6 +18,7 @@ package net.tourbook.database;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.CallableStatement;
@@ -91,8 +92,8 @@ public class DialogCompressDatabase extends Dialog {
    private List<String>                 _allConglomerateNames;
 
    private TIntArrayList                _allIndexFlags;
-   private TIntArrayList                _allUsedSpaces_BeforeCompress;
-   private TIntArrayList                _allUsedSpaces_AfterCompress;
+   private TLongArrayList               _allUsedSpaces_BeforeCompress;
+   private TLongArrayList               _allUsedSpaces_AfterCompress;
 
    private String                       _logText = UI.EMPTY_STRING;
 
@@ -197,13 +198,13 @@ public class DialogCompressDatabase extends Dialog {
       return ui;
    }
 
-   private String createLog_BeforeCompressed(final TIntArrayList allUsedSpaces,
+   private String createLog_BeforeCompressed(final TLongArrayList allUsedSpaces,
                                              final ArrayList<String> allNames,
-                                             final TIntArrayList allSpaceSavings,
-                                             final TIntArrayList allAllocatedPages,
-                                             final TIntArrayList allFreePages,
-                                             final TIntArrayList allUnfilledPages,
-                                             final TIntArrayList allPageSize) {
+                                             final TLongArrayList allSpaceSavings,
+                                             final TLongArrayList allAllocatedPages,
+                                             final TLongArrayList allFreePages,
+                                             final TLongArrayList allUnfilledPages,
+                                             final TLongArrayList allPageSize) {
       // get width of the largest table/index name
       int maxWidth_Name = 0;
       for (final String name : allNames) {
@@ -239,8 +240,8 @@ public class DialogCompressDatabase extends Dialog {
 
   // SET_FORMATTING_ON
 
-      //ISINDEX|CONGLOMERATENAME               |USEDSPACE|ESTIMSPACESAVING|NUMALLOCATEDPAGES|NUMFREEPAGES|NUMUNFILLEDPAGES|PAGESIZE|
-      //-------|-------------------------------|---------|----------------|-----------------|------------|----------------|--------|
+//   ISINDEX|CONGLOMERATENAME               |USEDSPACE|ESTIMSPACESAVING|NUMALLOCATEDPAGES|NUMFREEPAGES|NUMUNFILLEDPAGES|PAGESIZE|
+//   -------|-------------------------------|---------|----------------|-----------------|------------|----------------|--------|
 //         0|DBVERSION                      |     4096|               0|                1|           0|               0|    4096|
 //         0|TOURBIKE                       |     4096|               0|                1|           0|               0|    4096|
 //         0|TOURCOMPARED                   |   491520|               0|              120|           0|               0|    4096|
@@ -300,8 +301,8 @@ public class DialogCompressDatabase extends Dialog {
       for (int rowIndex = 0; rowIndex < allNames.size(); rowIndex++) {
 
          final String name = allNames.get(rowIndex);
-         final int usedSpace = allUsedSpaces.get(rowIndex);
-         final int spaceSavings = allSpaceSavings.get(rowIndex);
+         final long usedSpace = allUsedSpaces.get(rowIndex);
+         final long spaceSavings = allSpaceSavings.get(rowIndex);
 
          sumUsedSpaces += usedSpace;
          sumSpaceSavings += spaceSavings;
@@ -442,8 +443,8 @@ public class DialogCompressDatabase extends Dialog {
       for (int rowIndex = 0; rowIndex < _allConglomerateNames.size(); rowIndex++) {
 
          final String name = _allConglomerateNames.get(rowIndex);
-         final int usedSpace_BeforeCompress = _allUsedSpaces_BeforeCompress.get(rowIndex);
-         final int usedSpace_AfterCompress = _allUsedSpaces_AfterCompress.get(rowIndex);
+         final long usedSpace_BeforeCompress = _allUsedSpaces_BeforeCompress.get(rowIndex);
+         final long usedSpace_AfterCompress = _allUsedSpaces_AfterCompress.get(rowIndex);
 
          sumBefore += usedSpace_BeforeCompress;
          sumAfter += usedSpace_AfterCompress;
@@ -507,7 +508,7 @@ public class DialogCompressDatabase extends Dialog {
 
    private String getDatabaseSize(final List<String> allConglomerateNames,
                                   final List<String> allTableNames,
-                                  final TIntArrayList allUsedSpaces) {
+                                  final TLongArrayList allUsedSpaces) {
 
       final String[] returnData = new String[1];
 
@@ -550,12 +551,12 @@ public class DialogCompressDatabase extends Dialog {
 
                final ArrayList<String> allNames = new ArrayList<>();
 
-               final TIntArrayList allSpaceSavings = new TIntArrayList();
+               final TLongArrayList allSpaceSavings = new TLongArrayList();
 
-               final TIntArrayList allAllocatedPages = new TIntArrayList();
-               final TIntArrayList allFreePages = new TIntArrayList();
-               final TIntArrayList allUnfilledPages = new TIntArrayList();
-               final TIntArrayList allPageSize = new TIntArrayList();
+               final TLongArrayList allAllocatedPages = new TLongArrayList();
+               final TLongArrayList allFreePages = new TLongArrayList();
+               final TLongArrayList allUnfilledPages = new TLongArrayList();
+               final TLongArrayList allPageSize = new TLongArrayList();
 
                final ResultSet result = conn.prepareStatement(sql).executeQuery();
 
@@ -564,13 +565,13 @@ public class DialogCompressDatabase extends Dialog {
                   final String name = result.getString(1);
                   allNames.add(name);
 
-                  allUsedSpaces.add(result.getInt(2));
-                  allSpaceSavings.add(result.getInt(3));
+                  allUsedSpaces.add(result.getLong(2));
+                  allSpaceSavings.add(result.getLong(3));
                   final int dbIndexFlag = result.getInt(4);
-                  allAllocatedPages.add(result.getInt(5));
-                  allFreePages.add(result.getInt(6));
-                  allUnfilledPages.add(result.getInt(7));
-                  allPageSize.add(result.getInt(8));
+                  allAllocatedPages.add(result.getLong(5));
+                  allFreePages.add(result.getLong(6));
+                  allUnfilledPages.add(result.getLong(7));
+                  allPageSize.add(result.getLong(8));
 
                   // keep state if it is a table or index
                   if (isSetIndexFlag[0]) {
@@ -728,7 +729,7 @@ public class DialogCompressDatabase extends Dialog {
 
                   _dialogShell.getDisplay().asyncExec(() -> {
 
-                     _allUsedSpaces_AfterCompress = new TIntArrayList();
+                     _allUsedSpaces_AfterCompress = new TLongArrayList();
 
                      appendLogText(Messages.App_Db_Compress_LogHeader_After);
                      appendLogText(getDatabaseSize(null, null, _allUsedSpaces_AfterCompress));
@@ -761,7 +762,7 @@ public class DialogCompressDatabase extends Dialog {
       _allConglomerateNames = new ArrayList<>();
       _allTableNames = new ArrayList<>();
 
-      _allUsedSpaces_BeforeCompress = new TIntArrayList();
+      _allUsedSpaces_BeforeCompress = new TLongArrayList();
 
       appendLogText(Messages.App_Db_Compress_LogHeader_Before);
       appendLogText(getDatabaseSize(_allConglomerateNames, _allTableNames, _allUsedSpaces_BeforeCompress));
