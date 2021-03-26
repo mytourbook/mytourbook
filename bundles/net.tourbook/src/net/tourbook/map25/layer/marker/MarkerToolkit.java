@@ -23,6 +23,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map.bookmark.MapBookmark;
+import net.tourbook.map25.Map25ConfigManager;
+
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
@@ -30,18 +35,14 @@ import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
 import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerInterface;
 //import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map.bookmark.MapBookmark;
-import net.tourbook.map25.Map25ConfigManager;
-
-public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
+public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
    //ItemizedLayer<MarkerItem> mMarkerLayer;
    protected int _fgColor = 0xFF000000;   // 100 percent black. AARRGGBB
    protected int _bgColor = 0x80FF69B4;   // 50 percent pink. AARRGGBB
@@ -382,7 +383,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     * @return true, when clicked
     */
    @Override
-   public boolean onItemLongPress(final int index, final MarkerItem item) {
+   public boolean onItemLongPress(final int index, final MarkerInterface mi) {
+      final MarkerItem item = (MarkerItem) mi;
+
       // TODO Auto-generated method stub
 
       debugPrint(
@@ -391,8 +394,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("\tonItemLongpress") //$NON-NLS-1$
             + ("\tMapbookmark") //$NON-NLS-1$
-            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-            + ("\tDescription:" + item.description) //$NON-NLS-1$
+                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+                  + ("\tDescription:" + item.description) //$NON-NLS-1$
             + ("\tindex:" + index) //$NON-NLS-1$
       //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -421,7 +424,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     * @return true, when clicked
     */
    @Override
-   public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
+   public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
+      final MarkerItem item = (MarkerItem) mi;
       // TODO Auto-generated method stub
 
       debugPrint(

@@ -69,6 +69,7 @@ import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -104,7 +105,7 @@ import org.oscim.utils.Parameters;
 
 import okhttp3.Cache;
 
-public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerItem> {
+public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
    private static final String     STATE_MAP_POS_X                   = "STATE_MAP_POS_X";                  //$NON-NLS-1$
    private static final String     STATE_MAP_POS_Y                   = "STATE_MAP_POS_Y";                  //$NON-NLS-1$
@@ -128,92 +129,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static LwjglApplication _lwjglApp;
 
    public static DebugMode         debugMode                         = DebugMode.OFF;                      // before releasing, set this to OFF
-   private Boolean                 _mf_IsThemeFromFile               = null;
-
-   private Boolean                 _firstRun                         = true;
-
-   private String                  _mf_prefered_language             = "en";                               //$NON-NLS-1$
-   private Map25Provider           _selectedMapProvider;
-
-   private TileManager             _tileManager;
-
-   /*
-    * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
-    * _l = mMap.setBaseMap(tileSource); returns VectorTileLayer
-    */
-   private OsmTileLayerMT _layer_BaseMap; //extends extends VectorTileLayer
-   //private VectorTileLayer      _layer_BaseMap;
-   //private VectorTileLayer     _l;
-   private BuildingLayer             _layer_Building;
-   private S3DBLayer                 _layer_S3DB_Building;
-   private TileSource                _hillshadingSource         = null;
-   private TileSource                _satelliteSource           = null;
-   private MapFileTileSource         _tileSourceOffline;
-
-   private MultiMapFileTileSource    _tileSourceOfflineMM;
-   private int                       _tileSourceOfflineMapCount = 0;
-
-   private String                    _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
-
-   /**
-    * The opacity can be set in the layer but not read. This will keep the state of the hillshading
-    * opacity.
-    */
-   private int                       _layer_HillShading_Opacity;
-
-   private LabelLayerMT              _layer_Label;
-   private MarkerLayer               _layer_Marker;
-   private BitmapTileLayer           _layer_HillShading;
-   private BitmapTileLayer           _layer_Satellite;
-   private MapScaleBarLayer          _layer_ScaleBar;
-   private SliderLocation_Layer      _layer_SliderLocation;
-   private SliderPath_Layer          _layer_SliderPath;
-   private TileGridLayerMT           _layer_TileInfo;
-   private TourLayer                 _layer_Tour;
-
-   private OkHttpFactoryMT           _httpFactory;
-
-   private long                      _lastRenderTime;
-   private String                    _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
-   private String                    _last_mf_theme_styleID     = UI.EMPTY_STRING;
-   private Boolean                   _last_is_mf_Map            = true;
-   private String                    _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
-   private Boolean                   _last_mf_IsThemeFromFile;
-
-   private IRenderTheme              _mf_IRenderTheme;
-   private float                     _mf_TextScale              = 0.75f;
-   private float                     _online_TextScale          = 0.50f;
-   private float                     _mf_UserScale              = 2.50f;
-   private float                     _online_UserScale          = 2.0f;
-
-   private ItemizedLayer<MarkerItem> _layer_MapBookmark;
-   private MarkerToolkit             _markertoolkit;
-   private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
-
-   private ItemizedLayer<MarkerItem> _layer_Photo;
-   private boolean                   _isPhotoClustered          = true;
-   private boolean                   _isPhotoShowTitle          = true;
-
-   public PhotoToolkit               _phototoolkit;
-   public List<MarkerItem>           _selectedPhotosPts;
-
-   /**
-    * Is <code>true</code> when a tour marker is hit.
-    */
-   private boolean                   _isMapItemHit;
-
-   /**
-    * Is <code>true</code> when maps is a mapsforgemap.
-    */
-   private boolean                   _isOfflineMap              = true;
-
-   protected XmlRenderThemeStyleMenu _renderThemeStyleMenu;
-
-   public Map25App(final IDialogSettings state) {
-
-      _state = state;
-   }
-
    public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas canvas) {
 
       init();
@@ -253,7 +168,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       return cfg;
    }
-
    public static void init() {
 
       // load native library
@@ -269,6 +183,93 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 
       DateTimeAdapter.init(new DateTime());
+   }
+
+   private Boolean                 _mf_IsThemeFromFile               = null;
+
+   private Boolean                 _firstRun                         = true;
+   private String                  _mf_prefered_language             = "en";                               //$NON-NLS-1$
+   private Map25Provider           _selectedMapProvider;
+   private TileManager             _tileManager;
+   /*
+    * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
+    * _l = mMap.setBaseMap(tileSource); returns VectorTileLayer
+    */
+   private OsmTileLayerMT _layer_BaseMap; //extends extends VectorTileLayer
+   //private VectorTileLayer      _layer_BaseMap;
+   //private VectorTileLayer     _l;
+   private BuildingLayer             _layer_Building;
+
+   private S3DBLayer                 _layer_S3DB_Building;
+   private TileSource                _hillshadingSource         = null;
+
+   private TileSource                _satelliteSource           = null;
+
+   private MapFileTileSource         _tileSourceOffline;
+
+   private MultiMapFileTileSource    _tileSourceOfflineMM;
+   private int                       _tileSourceOfflineMapCount = 0;
+   private String                    _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
+   /**
+    * The opacity can be set in the layer but not read. This will keep the state of the hillshading
+    * opacity.
+    */
+   private int                       _layer_HillShading_Opacity;
+   private LabelLayerMT              _layer_Label;
+   private MarkerLayer               _layer_Marker;
+   private BitmapTileLayer           _layer_HillShading;
+   private BitmapTileLayer           _layer_Satellite;
+   private MapScaleBarLayer          _layer_ScaleBar;
+
+   private SliderLocation_Layer      _layer_SliderLocation;
+
+   private SliderPath_Layer          _layer_SliderPath;
+   private TileGridLayerMT           _layer_TileInfo;
+   private TourLayer                 _layer_Tour;
+   private OkHttpFactoryMT           _httpFactory;
+   private long                      _lastRenderTime;
+   private String                    _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
+
+   private String                    _last_mf_theme_styleID     = UI.EMPTY_STRING;
+   private Boolean                   _last_is_mf_Map            = true;
+   private String                    _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
+   private Boolean                   _last_mf_IsThemeFromFile;
+   private IRenderTheme              _mf_IRenderTheme;
+
+   private float                     _mf_TextScale              = 0.75f;
+   private float                     _online_TextScale          = 0.50f;
+   private float                     _mf_UserScale              = 2.50f;
+
+   private float                     _online_UserScale          = 2.0f;
+   private ItemizedLayer             _layer_MapBookmark;
+   private MarkerToolkit             _markertoolkit;
+
+   private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private ItemizedLayer             _layer_Photo;
+
+   private boolean                   _isPhotoClustered          = true;
+
+   private boolean                   _isPhotoShowTitle          = true;
+
+   public PhotoToolkit               _phototoolkit;
+
+   public List<MarkerItem>           _selectedPhotosPts;
+
+   /**
+    * Is <code>true</code> when a tour marker is hit.
+    */
+   private boolean                   _isMapItemHit;
+
+   /**
+    * Is <code>true</code> when maps is a mapsforgemap.
+    */
+   private boolean                   _isOfflineMap              = true;
+
+   protected XmlRenderThemeStyleMenu _renderThemeStyleMenu;
+
+   public Map25App(final IDialogSettings state) {
+
+      _state = state;
    }
 
    /**
@@ -568,11 +569,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_Label;
    }
 
-   public ItemizedLayer<MarkerItem> getLayer_MapBookmark() {
+   public ItemizedLayer getLayer_MapBookmark() {
       return _layer_MapBookmark;
    }
 
-   public ItemizedLayer<MarkerItem> getLayer_Photo() {
+   public ItemizedLayer getLayer_Photo() {
       return _layer_Photo;
    }
 
@@ -789,16 +790,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+
+
+
+   @Override
+   public boolean onItemLongPress(final int index, final MapMarker item) {
+      // TODO Auto-generated method stub
+      return false;
+   }
+
    /**
-    * longpress on a tourmarker
+    * longpress on a mapbookmark
+    * this method is moved to net.tourbook.map25.layer.marker.MarkerToolkit !!
     *
     * @param index
-    * @param MapMarker
+    * @param MarkerItem
     * @return true, when clicked
     */
    @Override
-   public boolean onItemLongPress(final int index, final MapMarker item) {
-
+   public boolean onItemLongPress(final int index, final MarkerInterface mi) {
+      final MarkerItem markerItem = (MarkerItem) mi;
+      System.out.println("Marker tap " + markerItem.getTitle());
       System.out.println(
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") // //$NON-NLS-1$ //$NON-NLS-2$
                   + ("\tonItemLongPress (Tourmarker)") //$NON-NLS-1$
@@ -812,20 +824,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //
 // return true;
 
-      return false;
-   }
-
-   /**
-    * longpress on a mapbookmark
-    * this method is moved to net.tourbook.map25.layer.marker.MarkerToolkit !!
-    *
-    * @param index
-    * @param MarkerItem
-    * @return true, when clicked
-    */
-   @Override
-   public boolean onItemLongPress(final int index, final MarkerItem item) {
-      // TODO Auto-generated method stub
       return false;
    }
 
@@ -864,7 +862,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * @return true, when clicked
     */
    @Override
-   public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
+   public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
       // TODO Auto-generated method stub
       return false;
    }
@@ -1019,7 +1017,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (mapProvider.tileEncoding == TileEncoding.VTM) {
             final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
             _layer_BaseMap.setTileSource(tileSource);
-            _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+            _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
             if (onlineOfflineStatusHasChanged) {
                setupMap(mapProvider, tileSource);
             }
@@ -1027,7 +1025,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          } else {
             final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(mapProvider, _httpFactory);
             _layer_BaseMap.setTileSource(tileSource);
-            _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
+            _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
             if (onlineOfflineStatusHasChanged) {
                setupMap(mapProvider, tileSource);
             }
@@ -1035,7 +1033,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 //			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 //			_layer_BaseMap.setTileSource(tileSource);
-//			_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+//			_layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
 
          if (onlineOfflineStatusHasChanged) {
             //setupMap(mapProvider, tileSource);
@@ -1175,7 +1173,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
                   debugPrint(" map25: " + "############# setMapProvider: Theme loader started"); //$NON-NLS-1$ //$NON-NLS-2$
                   this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
                   debugPrint(" map25: " + "############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$ //$NON-NLS-2$
-                  _layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
+                  _layer_BaseMap.setTheme(_mf_IRenderTheme);
                   ////mMap.setTheme(_mf_IRenderTheme);
                   loadTheme(mapProvider.mf_ThemeStyle); //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
                   debugPrint(" map25: " + "############# setMapProvider: ...activaded"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1274,7 +1272,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _layer_BaseMap.setTileSource(tileSource);
 
-      _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
+      _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
 
       // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
@@ -1309,9 +1307,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          mMap.setTheme(VtmThemes.OSMARENDER); // ThemeLoader.load(_mf_themeFilePath));
       } else {
 
-         //_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
+         //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
          this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath); // because of changes in loadtheme
-         _layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
+         _layer_BaseMap.setTheme(_mf_IRenderTheme);
          mMap.setTheme(ThemeLoader.load(_mf_themeFilePath)); //neccercary?seem so
          ////loadTheme(mapProvider.mf_ThemeStyle); //neccercary?
       }
@@ -1339,7 +1337,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _layer_BaseMap.setTileSource(tileSource);
 
-      //_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+      //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
 
 // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
@@ -1416,7 +1414,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_S3DB_Building.setEnabled(true);
          _layer_S3DB_Building.setColored(true);
          debugPrint(" map25: " + "################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$ //$NON-NLS-2$
-         //_layer_BaseMap.setRenderTheme(_mf_IRenderTheme); //again??
+         //_layer_BaseMap.setTheme(_mf_IRenderTheme); //again??
          //layers.remove(_layer_Building);
          layers.add(_layer_S3DB_Building);
       } else {
@@ -1436,10 +1434,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       //Photos
       _phototoolkit = new PhotoToolkit();
       if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+         //_layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
       } else {
          //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-         _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, _phototoolkit);
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
       }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);
@@ -1450,9 +1449,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
       if (config.isMarkerClustered) {
          //_layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
-         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
       } else {
-         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
       }
       final List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
       _layer_MapBookmark.addItems(pts);
