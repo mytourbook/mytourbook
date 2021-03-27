@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -229,7 +229,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final int              COLUMN_SPACING                            = 20;
    //
    private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                  = "tourDistance";                                         //$NON-NLS-1$
    private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
    private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
    private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
@@ -257,19 +257,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
    static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
    //
-   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
    private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
    private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
    private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
    private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
    //
    private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    //
    private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
    private static final boolean          IS_OSX                                    = UI.IS_OSX;
@@ -289,6 +289,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[]                 _seriePace;
    private float[]                 _seriePower;
    private float[]                 _seriePulse;
+   private float[]                 _seriePulse_RR;
    private double[]                _serieLatitude;
    private double[]                _serieLongitude;
    private float[][]               _serieGears;
@@ -3513,7 +3514,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _txtDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtDistance.addModifyListener(_verifyFloatValue);
-            _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
+            _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOUR_DISTANCE);
             _txtDistance.addKeyListener(new KeyListener() {
                @Override
                public void keyPressed(final KeyEvent e) {
@@ -4936,7 +4937,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_TimeSlice_Altitude_Altitude();
       defineColumn_TimeSlice_Altitude_Gradient();
 
-      defineColumn_TimeSlice_Body_Pulse();
+      defineColumn_TimeSlice_Body_Heartbeat_Device();
+      defineColumn_TimeSlice_Body_Heartbeat_RR();
 
       defineColumn_TimeSlice_Tour_Marker();
 
@@ -5232,15 +5234,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: pulse
+    * Column: Device heartbeat
     */
-   private void defineColumn_TimeSlice_Body_Pulse() {
+   private void defineColumn_TimeSlice_Body_Heartbeat_Device() {
 
       ColumnDefinition colDef;
 
       _timeSlice_ColDef_Pulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
 
-      colDef.disableValueFormatter();
+//      colDef.disableValueFormatter();
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -5250,6 +5252,35 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             if (_seriePulse != null) {
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
                cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: R-R heartbeat
+    */
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR.createColumn(_timeSlice_ColumnManager, _pc);
+
+//      colDef.disableValueFormatter();
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               final float value = _seriePulse_RR[timeSlice.serieIndex];
+
+               colDef.printDetailValue(cell, value);
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -6650,6 +6681,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieCadence = _tourData.getCadenceSerie();
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
+      _seriePulse_RR = _tourData.getPulse_RRIntervals();
 
       _serieLatitude = _tourData.latitudeSerie;
       _serieLongitude = _tourData.longitudeSerie;

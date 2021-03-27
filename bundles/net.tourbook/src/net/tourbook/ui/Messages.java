@@ -308,6 +308,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
    public static String        ColumnFactory_Power_TrainingStressScore_Label;
    public static String        ColumnFactory_Power_TrainingStressScore_Tooltip;
+   public static String        ColumnFactory_Pulse_RR;
+   public static String        ColumnFactory_Pulse_RR_Label;
+   public static String        ColumnFactory_Pulse_RR_Tooltip;
    public static String        ColumnFactory_restpulse_label;
    public static String        ColumnFactory_restpulse;
    public static String        ColumnFactory_restpulse_tooltip;

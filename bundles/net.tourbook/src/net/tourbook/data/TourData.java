@@ -1025,7 +1025,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int[]                  pulseTimeSerie;
 
    /**
-    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}
+    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}.
+    * An time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
     */
    @Transient
    public int[]                  pulseTime_TimeIndex;
@@ -7964,7 +7965,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[] getPulse_RRIntervals() {
 
       if (pulseSerie_FromTime != null) {
-         return pulseSerie_FromTime;
+//         return pulseSerie_FromTime;
       }
 
       /**
@@ -7995,12 +7996,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int timeIndex = 0; timeIndex < numTimeSlices - 1; timeIndex++) {
 
+         if (timeIndex == 2117) {
+            int a = 0;
+            a++;
+         }
+
          final int time2Time_Index = pulseTime_TimeIndex[timeIndex];
          final int time2Time_NextIndex = pulseTime_TimeIndex[timeIndex + 1];
 
+         if (timeIndex > 0 && (time2Time_Index < 0 || time2Time_NextIndex < 0)) {
+
+            // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
+
+            pulseSerie_FromTime[timeIndex] = pulseSerie_FromTime[timeIndex - 1];
+
+            continue;
+         }
+
          if (time2Time_Index < 0 || time2Time_NextIndex < 0) {
 
-            // time index can be -1 when a values is not available
             continue;
          }
 
