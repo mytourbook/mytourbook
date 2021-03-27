@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * Copyright (C) 2018, 2019, 2020 Thomas Theussing
+ * Copyright (C) 2005, 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2019, 2020, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -250,6 +250,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private boolean                   _isPhotoClustered          = true;
 
    private boolean                   _isPhotoShowTitle          = true;
+
+   private boolean                   _isPhotoShowScaled         = false;
 
    public PhotoToolkit               _phototoolkit;
 
@@ -543,6 +545,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public boolean getIsPhotoClustered() {
       return _isPhotoClustered;
+   }
+
+   public boolean getIsPhotoShowScaled() {
+      return _isPhotoShowScaled;
    }
 
    public boolean getIsPhotoShowTitle() {
@@ -977,6 +983,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setIsPhotoClustered(final boolean state) {
       this._isPhotoClustered = state;
+   }
+
+   public void setIsPhotoShowScaled(final boolean state) {
+      this._isPhotoShowScaled = state;
+      debugPrint(" map25: " + "############# setIsPhotoShowScaled: " + state); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public void setIsPhotoShowTitle(final boolean state) {
@@ -1557,7 +1568,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // using settings from MapBookmarks must be changed later with own config
       //"STATE_IS_LAYER_PHOTO_VISIBLE"
       //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
-      //if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.
       if (config.isMarkerClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.
          //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
          layers.remove(_layer_Photo);
@@ -1572,9 +1582,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo.removeAllItems();
       }
 
-      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle()); //hopefully done in map25view "paintToursAndUpdate"
+      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle(), getIsPhotoShowScaled()); //hopefully done in map25view "paintToursAndUpdate"
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-// deactivating temporary next line
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
 

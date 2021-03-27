@@ -2,7 +2,7 @@
  * Copyright (C) 2019 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019, 2020 Thomas Theussing
+ * Copyright 2019, 2020, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software

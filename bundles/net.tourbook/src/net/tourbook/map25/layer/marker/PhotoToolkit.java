@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019, 2020 Wolfgang Schramm and Contributors
- * Copyright 2019, 2020 Thomas Theussing
+ * Copyright 2019, 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2020, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,6 +100,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    public boolean               _isMarkerClusteredLast;
 
+   public boolean               _isPhotoShowScaled;
+
 //   private int  _imageSize;
 //   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
 //   private IDialogSettings       _state;
@@ -110,7 +112,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
-      //debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
+      debugPrint(" ***************************** PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -152,8 +154,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return bitmapPhoto;
    }
 
-   public List<MarkerInterface> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle) {
+   public List<MarkerInterface> createPhotoItemList(final ArrayList<Photo> galleryPhotos,
+                                                    final boolean showPhotoTitle,
+                                                    final boolean showPhotoScaled) {
 
+      _isPhotoShowScaled = showPhotoScaled;
       debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
 
       final List<MarkerInterface> pts = new ArrayList<>();
@@ -283,9 +288,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-         //debugPrint("??? entering getPhotoImage"); //$NON-NLS-1$
          // image is not yet loaded
-
          // check if image is in the cache
          photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
@@ -297,6 +300,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
 
             PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+         }
+
+         debugPrint(" ??????????? PhotoToolkit getPhotoImage: scaled:" + _isPhotoShowScaled);
+         if (!_isPhotoShowScaled) {
+            debugPrint(" ??????????? PhotoToolkit getPhotoImage: returned unscaled image");
+            return photoImage;
          }
 
          if (photoImage != null) {
@@ -341,7 +350,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
       final MarkerItem photoItem = (MarkerItem) mi;
       // TODO Auto-generated method stub
-      //debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + arg0 + " " + arg1);
       debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get( //$NON-NLS-1$
             index).imageFilePathName
             + " " + photoItem.getTitle()); //$NON-NLS-1$

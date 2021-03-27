@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018, 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018, 2019, 2020, 2021 Wolfgang Schramm and Contributors
  *
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -235,6 +235,7 @@ private class ActionMap25_MapProvider extends ActionToolbarSlideout {
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE               = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";                     //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_PHOTO_SCALED                      = "STATE_IS_LAYER_PHOTO_SCALED";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
@@ -1141,7 +1142,6 @@ private Bitmap                        _bitmapStar;
    }
 
    void onMapPosition(final GeoPoint mapGeoPoint, final int zoomLevel) {
-
       updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
    }
 
@@ -1180,8 +1180,6 @@ private Bitmap                        _bitmapStar;
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
-         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
-
          paintTour(tourData);
          paintPhotoSelection(selection);
 
@@ -1189,8 +1187,6 @@ private Bitmap                        _bitmapStar;
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
          paintPhotoSelection(selection);
@@ -1394,8 +1390,6 @@ private Bitmap                        _bitmapStar;
 
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);
-               /* playing with photos next lines */
-               //Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
             }
          }
       }
@@ -1404,18 +1398,8 @@ private Bitmap                        _bitmapStar;
 
       paintPhotos(allPhotos);
 
-      //int allNewPhotoHash = allPhotos.hashCode();
-      //allNewPhotoHash = 1;
-      //if (allNewPhotoHash != _hash_AllPhotos) {
-      //   createPhotoItemList(allPhotos);
-      //}else {
-      //_mapApp.debugPrint("* Map25View: paintphotoselection same hash, skipping ");
-      //}
 
-      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
-
-      //PhotoToolkit phototoolkit = new PhotoToolkit();
-      //_photo_pts = phototoolkit.createPhotoItemList(allPhotos);
+      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle(), _mapApp.getIsPhotoShowScaled());
 
       _allPhotos = allPhotos;
 
@@ -1578,8 +1562,9 @@ private Bitmap                        _bitmapStar;
        */
       paintPhotos(_allPhotos);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
-
-      final List<MarkerInterface> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
+      final List<MarkerInterface> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos,
+            _mapApp.getIsPhotoShowTitle(),
+            _mapApp.getIsPhotoShowScaled());
 
       _mapApp.setPhotoSelection(photoItems);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
@@ -1663,6 +1648,7 @@ private Bitmap                        _bitmapStar;
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
       _mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
       _mapApp.setIsPhotoShowTitle(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
+      _mapApp.setIsPhotoShowScaled(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
 
       _mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
@@ -1694,6 +1680,7 @@ private Bitmap                        _bitmapStar;
 
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, _mapApp.getIsPhotoShowTitle());
+      _state.put(STATE_IS_LAYER_PHOTO_SCALED, _mapApp.getIsPhotoShowScaled());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
 
