@@ -2063,6 +2063,7 @@ public class Messages extends NLS {
 
    public static String Slideout_TourEditor_Label_LatLonDigits;
    public static String Slideout_TourEditor_Label_LatLonDigits_Tooltip;
+   public static String Slideout_TourEditor_Label_Title;
    public static String Slideout_TourFilter_Action_ActivateAll;
    public static String Slideout_TourFilter_Action_ActivateAll_Tooltip;
    public static String Slideout_TourFilter_Action_AddProfile;
