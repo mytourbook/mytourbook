@@ -1505,9 +1505,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          layers.remove(_layer_MapBookmark);
          if (config.isMarkerClustered) {
-            _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
          } else {
-            _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, _markertoolkit);
+            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
          }
          layers.add(layer_index_MapBookmarkLayer, _layer_MapBookmark);
          //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark); //$NON-NLS-1$
@@ -1563,9 +1563,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          layers.remove(_layer_Photo);
          //if (config.isPhotoClustered) {
          if (config.isMarkerClustered) {
-            _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
+            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
          } else {
-            _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, _phototoolkit);
+            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
          }
          layers.add(layer_index_PhotoLayer, _layer_Photo);
       } else {
