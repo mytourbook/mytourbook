@@ -189,7 +189,7 @@ private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP            
    //
    private ISelection                    _lastHiddenSelection;
    private ISelection                    _selectionWhenHidden;
-private int                           _lastSelectionHash;
+   private int                           _lastSelectionHash;
    //
    private ActionMapBookmarks            _actionMapBookmarks;
    private ActionMap25_MapProvider       _actionMapProvider;
