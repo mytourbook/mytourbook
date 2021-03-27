@@ -253,7 +253,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public PhotoToolkit               _phototoolkit;
 
-   public List<MarkerItem>           _selectedPhotosPts;
+   public List<MarkerInterface>      _selectedPhotosPts;
 
    /**
     * Is <code>true</code> when a tour marker is hit.
@@ -1211,7 +1211,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "############# setMapProvider leaving: layers now: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
-   public void setPhotoSelection(final List<MarkerItem> _photoItems) {
+   public void setPhotoSelection(final List<MarkerInterface> _photoItems) {
       debugPrint("MapApp25: setPhotoSelection size input: " + _photoItems.size()); //$NON-NLS-1$
       this._selectedPhotosPts = _photoItems;
    }
@@ -1575,7 +1575,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle()); //hopefully done in map25view "paintToursAndUpdate"
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 // deactivating temporary next line
-//      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
+      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;

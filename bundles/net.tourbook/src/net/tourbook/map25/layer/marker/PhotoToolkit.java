@@ -64,27 +64,6 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private Bitmap _bitmapCluster;
-   //private boolean _isBillboard;
-
-   public MarkerSymbol          _symbol;               //marker symbol, circle or star
-   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
-   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
-
-   private ArrayList<Photo>     _allPhotos;
-
-   public MarkerRendererFactory _markerRendererFactory;
-
-   public boolean               _isMarkerClusteredLast;
-
-   Display                      _display;
-
-//   private int  _imageSize;
-//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
-//   private IDialogSettings       _state;
-
-   private Map25App             _mapApp;
-   
    private class LoadCallbackImage implements ILoadCallBack {
 
       private Map25App _mapApp;
@@ -107,6 +86,27 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       }
    }
+
+   private Bitmap _bitmapCluster;
+   //private boolean _isBillboard;
+   public MarkerSymbol          _symbol;               //marker symbol, circle or star
+   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
+
+   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
+
+   private ArrayList<Photo>     _allPhotos;
+
+   public MarkerRendererFactory _markerRendererFactory;
+
+   public boolean               _isMarkerClusteredLast;
+
+//   private int  _imageSize;
+//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
+//   private IDialogSettings       _state;
+
+   Display                      _display;
+
+   private Map25App             _mapApp;
 
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
@@ -152,11 +152,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return bitmapPhoto;
    }
 
-   public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle) {
+   public List<MarkerInterface> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle) {
 
       debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
 
-      final List<MarkerItem> pts = new ArrayList<>();
+      final List<MarkerInterface> pts = new ArrayList<>();
 
       if (galleryPhotos == null) {
          debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
@@ -337,6 +337,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return scaledThumbImage;
    }
 
+   @Override
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
       final MarkerItem photoItem = (MarkerItem) mi;
       // TODO Auto-generated method stub
@@ -347,6 +348,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return false;
    }
 
+   @Override
    public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
       final MarkerItem photoItem = (MarkerItem) mi;
       // TODO Auto-generated method stub

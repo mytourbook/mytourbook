@@ -108,6 +108,7 @@ import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -310,7 +311,7 @@ private IPartListener2                _partListener;
    private List<MarkerItem>              _photoItems     = new ArrayList<>();
 
    private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
-   private List<MarkerItem>              _photo_pts      = new ArrayList<>();
+   private List<MarkerInterface>         _photo_pts      = new ArrayList<>();
    private boolean                       _isPhotoFilterActive;
    private int                           _photoFilterRatingStars;
    private int                           _photoFilterRatingStarOperator;
@@ -1364,12 +1365,13 @@ private Bitmap                        _bitmapStar;
     */
    public ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
       Map25App.debugPrint("* Map25View: paintphotoselection: entering"); //$NON-NLS-1$
+      if (_mapApp._phototoolkit == null) {
+         //phototoolkit is not yet ready
+         return null;
+      }
       //_isLinkPhotoDisplayed = false;
       selection.toString();
       final ArrayList<Photo> allPhotos = new ArrayList<>();
-      if (allPhotos.isEmpty()) {
-         return null;
-      }
       if (selection instanceof TourPhotoLinkSelection) {
 
          //   _isLinkPhotoDisplayed = true;
@@ -1577,7 +1579,7 @@ private Bitmap                        _bitmapStar;
       paintPhotos(_allPhotos);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
 
-      final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
+      final List<MarkerInterface> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
 
       _mapApp.setPhotoSelection(photoItems);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
