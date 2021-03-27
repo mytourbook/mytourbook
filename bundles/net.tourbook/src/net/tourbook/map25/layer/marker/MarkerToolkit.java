@@ -80,7 +80,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       loadConfig();
       //_mapApp.debugPrint("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
-
       _fillPainter.setStyle(Paint.Style.FILL);
       _linePainter.setStyle(Paint.Style.STROKE);
       _linePainter.setStrokeWidth(4);

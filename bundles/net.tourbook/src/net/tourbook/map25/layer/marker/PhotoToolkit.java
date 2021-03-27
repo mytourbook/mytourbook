@@ -64,6 +64,29 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
+   private Bitmap _bitmapCluster;
+
+   //private boolean _isBillboard;
+   public MarkerSymbol          _symbol;               //marker symbol, circle or star
+   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
+   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
+
+   private ArrayList<Photo>     _allPhotos;
+
+   public MarkerRendererFactory _markerRendererFactory;
+
+   public boolean               _isMarkerClusteredLast;
+
+   public boolean               _isPhotoShowScaled;
+
+   Display                      _display;
+
+//   private int  _imageSize;
+//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
+//   private IDialogSettings       _state;
+
+   private Map25App             _mapApp;
+
    private class LoadCallbackImage implements ILoadCallBack {
 
       private Map25App _mapApp;
@@ -76,39 +99,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
-
-//         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
-         //updatePhotos(); has only updateUI...
          _mapApp.updateUI_PhotoLayer();
-//         if (isUpdateUI == false) {
-//            return;
-//         }
 
       }
    }
-
-   private Bitmap _bitmapCluster;
-   //private boolean _isBillboard;
-   public MarkerSymbol          _symbol;               //marker symbol, circle or star
-   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
-
-   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
-
-   private ArrayList<Photo>     _allPhotos;
-
-   public MarkerRendererFactory _markerRendererFactory;
-
-   public boolean               _isMarkerClusteredLast;
-
-   public boolean               _isPhotoShowScaled;
-
-//   private int  _imageSize;
-//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
-//   private IDialogSettings       _state;
-
-   Display                      _display;
-
-   private Map25App             _mapApp;
 
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);

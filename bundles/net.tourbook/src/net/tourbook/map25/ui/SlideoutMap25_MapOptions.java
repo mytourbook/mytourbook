@@ -425,7 +425,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       _chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
-      //satellite maps
+
       _chkShowLayer_Satellite.setSelection(mapApp.getLayer_Satellite().isEnabled());
 
       _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());

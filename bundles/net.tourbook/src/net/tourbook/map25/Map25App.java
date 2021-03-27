@@ -14,6 +14,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.map25;
 
 import com.badlogic.gdx.Gdx;
@@ -129,6 +130,94 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static LwjglApplication _lwjglApp;
 
    public static DebugMode         debugMode                         = DebugMode.ON;                       // before releasing, set this to OFF
+   private Boolean                 _mf_IsThemeFromFile               = null;
+
+   private Boolean                 _firstRun                         = true;
+
+   private String                  _mf_prefered_language             = "en";                               //$NON-NLS-1$
+   private Map25Provider           _selectedMapProvider;
+
+   private TileManager             _tileManager;
+
+   /*
+    * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
+    * _l = mMap.setBaseMap(tileSource); returns VectorTileLayer
+    */
+   private OsmTileLayerMT _layer_BaseMap; //extends extends VectorTileLayer
+   //private VectorTileLayer      _layer_BaseMap;
+   //private VectorTileLayer     _l;
+   private BuildingLayer             _layer_Building;
+   private S3DBLayer                 _layer_S3DB_Building;
+   private TileSource                _hillshadingSource         = null;
+   private TileSource                _satelliteSource           = null;
+   private MapFileTileSource         _tileSourceOffline;
+
+   private MultiMapFileTileSource    _tileSourceOfflineMM;
+   private int                       _tileSourceOfflineMapCount = 0;
+
+   private String                    _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
+
+   /**
+    * The opacity can be set in the layer but not read. This will keep the state of the hillshading
+    * opacity.
+    */
+   private int                       _layer_HillShading_Opacity;
+
+   private LabelLayerMT              _layer_Label;
+   private MarkerLayer               _layer_Marker;
+   private BitmapTileLayer           _layer_HillShading;
+   private BitmapTileLayer           _layer_Satellite;
+   private MapScaleBarLayer          _layer_ScaleBar;
+   private SliderLocation_Layer      _layer_SliderLocation;
+   private SliderPath_Layer          _layer_SliderPath;
+   private TileGridLayerMT           _layer_TileInfo;
+   private TourLayer                 _layer_Tour;
+
+   private OkHttpFactoryMT           _httpFactory;
+
+   private long                      _lastRenderTime;
+   private String                    _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
+   private String                    _last_mf_theme_styleID     = UI.EMPTY_STRING;
+   private Boolean                   _last_is_mf_Map            = true;
+   private String                    _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
+   private Boolean                   _last_mf_IsThemeFromFile;
+
+   private IRenderTheme              _mf_IRenderTheme;
+   private float                     _mf_TextScale              = 0.75f;
+   private float                     _online_TextScale          = 0.50f;
+   private float                     _mf_UserScale              = 2.50f;
+   private float                     _online_UserScale          = 2.0f;
+
+   private ItemizedLayer             _layer_MapBookmark;
+   private MarkerToolkit             _markertoolkit;
+   private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+
+   private ItemizedLayer             _layer_Photo;
+   private boolean                   _isPhotoClustered          = true;
+   private boolean                   _isPhotoShowTitle          = true;
+
+   private boolean                   _isPhotoShowScaled         = false;
+   public PhotoToolkit               _phototoolkit;
+
+   public List<MarkerInterface>      _selectedPhotosPts;
+
+   /**
+    * Is <code>true</code> when a tour marker is hit.
+    */
+   private boolean                   _isMapItemHit;
+
+   /**
+    * Is <code>true</code> when maps is a mapsforgemap.
+    */
+   private boolean                   _isOfflineMap              = true;
+
+   protected XmlRenderThemeStyleMenu _renderThemeStyleMenu;
+
+   public Map25App(final IDialogSettings state) {
+
+      _state = state;
+   }
+
    public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas canvas) {
 
       init();
@@ -168,6 +257,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       return cfg;
    }
+
    public static void init() {
 
       // load native library
@@ -183,95 +273,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 
       DateTimeAdapter.init(new DateTime());
-   }
-
-   private Boolean                 _mf_IsThemeFromFile               = null;
-
-   private Boolean                 _firstRun                         = true;
-   private String                  _mf_prefered_language             = "en";                               //$NON-NLS-1$
-   private Map25Provider           _selectedMapProvider;
-   private TileManager             _tileManager;
-   /*
-    * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
-    * _l = mMap.setBaseMap(tileSource); returns VectorTileLayer
-    */
-   private OsmTileLayerMT _layer_BaseMap; //extends extends VectorTileLayer
-   //private VectorTileLayer      _layer_BaseMap;
-   //private VectorTileLayer     _l;
-   private BuildingLayer             _layer_Building;
-
-   private S3DBLayer                 _layer_S3DB_Building;
-   private TileSource                _hillshadingSource         = null;
-
-   private TileSource                _satelliteSource           = null;
-
-   private MapFileTileSource         _tileSourceOffline;
-
-   private MultiMapFileTileSource    _tileSourceOfflineMM;
-   private int                       _tileSourceOfflineMapCount = 0;
-   private String                    _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
-   /**
-    * The opacity can be set in the layer but not read. This will keep the state of the hillshading
-    * opacity.
-    */
-   private int                       _layer_HillShading_Opacity;
-   private LabelLayerMT              _layer_Label;
-   private MarkerLayer               _layer_Marker;
-   private BitmapTileLayer           _layer_HillShading;
-   private BitmapTileLayer           _layer_Satellite;
-   private MapScaleBarLayer          _layer_ScaleBar;
-
-   private SliderLocation_Layer      _layer_SliderLocation;
-
-   private SliderPath_Layer          _layer_SliderPath;
-   private TileGridLayerMT           _layer_TileInfo;
-   private TourLayer                 _layer_Tour;
-   private OkHttpFactoryMT           _httpFactory;
-   private long                      _lastRenderTime;
-   private String                    _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
-
-   private String                    _last_mf_theme_styleID     = UI.EMPTY_STRING;
-   private Boolean                   _last_is_mf_Map            = true;
-   private String                    _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
-   private Boolean                   _last_mf_IsThemeFromFile;
-   private IRenderTheme              _mf_IRenderTheme;
-
-   private float                     _mf_TextScale              = 0.75f;
-   private float                     _online_TextScale          = 0.50f;
-   private float                     _mf_UserScale              = 2.50f;
-
-   private float                     _online_UserScale          = 2.0f;
-   private ItemizedLayer             _layer_MapBookmark;
-   private MarkerToolkit             _markertoolkit;
-
-   private MarkerMode                _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
-   private ItemizedLayer             _layer_Photo;
-
-   private boolean                   _isPhotoClustered          = true;
-
-   private boolean                   _isPhotoShowTitle          = true;
-
-   private boolean                   _isPhotoShowScaled         = false;
-
-   public PhotoToolkit               _phototoolkit;
-
-   public List<MarkerInterface>      _selectedPhotosPts;
-
-   /**
-    * Is <code>true</code> when a tour marker is hit.
-    */
-   private boolean                   _isMapItemHit;
-
-   /**
-    * Is <code>true</code> when maps is a mapsforgemap.
-    */
-   private boolean                   _isOfflineMap              = true;
-
-   protected XmlRenderThemeStyleMenu _renderThemeStyleMenu;
-
-   public Map25App(final IDialogSettings state) {
-
-      _state = state;
    }
 
    /**
