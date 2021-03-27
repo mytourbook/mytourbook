@@ -128,7 +128,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static Map25View        _map25View;
    private static LwjglApplication _lwjglApp;
 
-   public static DebugMode         debugMode                         = DebugMode.OFF;                      // before releasing, set this to OFF
+   public static DebugMode         debugMode                         = DebugMode.ON;                       // before releasing, set this to OFF
    public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas canvas) {
 
       init();
@@ -1453,7 +1453,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       } else {
          _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
       }
-      final List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(false);
       layers.add(_layer_MapBookmark);
@@ -1515,7 +1515,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_MapBookmark.removeAllItems();
       }
       //_layer_Bookmark.removeAllItems();
-      final List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
       //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): #MapBookmartks: " + pts.size()); //$NON-NLS-1$
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(isShowMapBookmarkLayer);
@@ -1574,7 +1574,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle()); //hopefully done in map25view "paintToursAndUpdate"
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
+// deactivating temporary next line
+//      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;

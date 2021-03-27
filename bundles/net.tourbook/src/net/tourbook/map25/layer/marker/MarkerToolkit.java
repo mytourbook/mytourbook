@@ -260,11 +260,11 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return paintedBitmap;
    }
 
-   public List<MarkerItem> createMarkerItemList(final MarkerMode MarkerMode){
+   public List<MarkerInterface> createMarkerItemList(final MarkerMode MarkerMode) {
       loadConfig();
       createPoiBitmap(MarkerShape.STAR);
       _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
-      final List<MarkerItem> pts = new ArrayList<>();
+      final List<MarkerInterface> pts = new ArrayList<>();
 
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
          //debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
