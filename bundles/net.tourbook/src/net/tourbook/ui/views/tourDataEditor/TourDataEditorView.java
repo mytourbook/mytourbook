@@ -289,7 +289,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[]                 _seriePace;
    private float[]                 _seriePower;
    private float[]                 _seriePulse;
-   private float[]                 _seriePulse_RR;
+   private float[]                 _seriePulse_RR_Bpm;
+   private int[]                   _seriePulse_RR_Times;
+   private int[]                   _seriePulse_RR_Index;
    private double[]                _serieLatitude;
    private double[]                _serieLongitude;
    private float[][]               _serieGears;
@@ -5195,13 +5197,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_serieAltitude != null) {
-               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
+
+            if (_seriePulse_RR_Index != null) {
+
+               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+               cell.setText(Integer.toString(_seriePulse_RR_Index[serieIndex]));
 
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
+
+//            if (_serieAltitude != null) {
+//
+//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+//               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
+//
+//            } else {
+//               cell.setText(UI.EMPTY_STRING);
+//            }
          }
       });
 
@@ -5219,16 +5233,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void update(final ViewerCell cell) {
 
-            if (_serieGradient != null) {
+            if (_seriePulse_RR_Index != null) {
 
-               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               final float value = _serieGradient[timeSlice.serieIndex];
-
-               colDef.printDetailValue(cell, value);
+               setRRTimes(cell);
 
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
+
+//            if (_serieGradient != null) {
+//
+//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+//               final float value = _serieGradient[timeSlice.serieIndex];
+//
+//               colDef.printDetailValue(cell, value);
+//
+//            } else {
+//               cell.setText(UI.EMPTY_STRING);
+//            }
          }
       });
    }
@@ -5274,10 +5296,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void update(final ViewerCell cell) {
 
-            if (_seriePulse_RR != null) {
+            if (_seriePulse_RR_Bpm != null) {
 
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               final float value = _seriePulse_RR[timeSlice.serieIndex];
+               final float value = _seriePulse_RR_Bpm[timeSlice.serieIndex];
 
                colDef.printDetailValue(cell, value);
 
@@ -6681,7 +6703,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieCadence = _tourData.getCadenceSerie();
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
-      _seriePulse_RR = _tourData.getPulse_RRIntervals();
+      _seriePulse_RR_Bpm = _tourData.getPulse_RRIntervals();
+      _seriePulse_RR_Times = _tourData.pulseTimeSerie;
+      _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
 
       _serieLatitude = _tourData.latitudeSerie;
       _serieLongitude = _tourData.longitudeSerie;
@@ -8160,6 +8184,57 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionToggleRowSelectMode.setChecked(enabled);
 
       actionToggleRowSelectMode();
+   }
+
+   private void setRRTimes(final ViewerCell cell) {
+
+      final int numTimeSlices = _serieTime.length;
+      final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+      if (serieIndex > 0 && serieIndex < numTimeSlices - 1) {
+
+         final int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
+         final int rrIndex_Next = _seriePulse_RR_Index[serieIndex + 1];
+
+         final StringBuilder sb = new StringBuilder();
+
+         if (rrIndex_Current >= 0 && rrIndex_Next >= 0) {
+
+//            sb.append("T: ");
+
+            final int rrIndexDiff = rrIndex_Next - 1 - rrIndex_Current;
+            if (rrIndexDiff > 2) {
+               sb.append(rrIndexDiff + " ::  ");
+            }
+
+            for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {
+
+               final int rrValue = _seriePulse_RR_Times[rrIndex];
+
+               sb.append(rrValue + UI.SPACE1);
+            }
+
+         } else if (rrIndex_Current >= 0) {
+
+            final int rrValue = _seriePulse_RR_Times[rrIndex_Current];
+
+            sb.append("S: " + rrValue);
+
+         } else if (rrIndex_Current < 0) {
+
+            sb.append("C: " + rrIndex_Current);
+
+         } else if (rrIndex_Next < 0) {
+
+            sb.append("N: " + rrIndex_Next);
+
+         }
+
+         cell.setText(sb.toString());
+
+      } else {
+         cell.setText(UI.EMPTY_STRING);
+      }
    }
 
    /**

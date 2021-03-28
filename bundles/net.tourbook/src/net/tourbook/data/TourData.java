@@ -1026,7 +1026,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}.
-    * An time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
+    * A time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
     */
    @Transient
    public int[]                  pulseTime_TimeIndex;
@@ -3382,14 +3382,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
                this,
                btConfig.breakTimeMethodId,
                btConfig.breakMinSliceSpeed);
 
       } else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
+         breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
                this,
                btConfig.breakTimeMethodId,
                btConfig.breakMinAvgSpeed);
@@ -6525,6 +6525,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final TimeData timeData = allTimeData[timeIndex];
          final int[] timeSlice_AllPulseTimes = timeData.pulseTime;
 
+         if (timeIndex == 5400) {
+            int a = 0;
+            a++;
+         }
+
          if (timeSlice_AllPulseTimes != null) {
 
             int addedPulseTimeIndex = -1;
@@ -7994,21 +7999,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       pulseSerie_FromTime = new float[numTimeSlices];
 
-      for (int timeIndex = 0; timeIndex < numTimeSlices - 1; timeIndex++) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
 
-         if (timeIndex == 2117) {
+         if (serieIndex == 5400) {
             int a = 0;
             a++;
          }
 
-         final int time2Time_Index = pulseTime_TimeIndex[timeIndex];
-         final int time2Time_NextIndex = pulseTime_TimeIndex[timeIndex + 1];
+         final int time2Time_Index = pulseTime_TimeIndex[serieIndex];
+         final int time2Time_NextIndex = pulseTime_TimeIndex[serieIndex + 1];
 
-         if (timeIndex > 0 && (time2Time_Index < 0 || time2Time_NextIndex < 0)) {
+         if (serieIndex > 0 && (time2Time_Index < 0 || time2Time_NextIndex < 0)) {
 
             // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
 
-            pulseSerie_FromTime[timeIndex] = pulseSerie_FromTime[timeIndex - 1];
+            pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
 
             continue;
          }
@@ -8018,60 +8023,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             continue;
          }
 
-         final int pulseTimeMS_First = pulseTimeSerie[time2Time_Index];
-         final int pulseTimeMS_Last = pulseTimeSerie[time2Time_NextIndex];
-
          final int numPulseTimes = time2Time_NextIndex - time2Time_Index;
 
          if (numPulseTimes == 0) {
 
             // there is only 1 pulse time
 
-            final float pulseFromPulseTime = 60.0f / (pulseTimeMS_First / 1000.0f);
+            final int pulseTimeMS = pulseTimeSerie[time2Time_Index];
+            final float pulseFromPulseTime = 60.0f / (pulseTimeMS / 1000.0f);
 
-            pulseSerie_FromTime[timeIndex] = pulseFromPulseTime;
+            pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
 
          } else {
 
-            final PulseTimeAlgorithm pulseTimeAlgoithm = PulseTimeAlgorithm.AVERAGE;
+            long sumPulseTimeMS = 0;
 
-            switch (pulseTimeAlgoithm) {
-
-            case MAX:
-
-               break;
-
-            case MIN:
-
-               break;
-
-            case FIRST:
-
-               pulseSerie_FromTime[timeIndex] = 60.0f / (pulseTimeMS_First / 1000.0f);
-
-               break;
-
-            case LAST:
-
-               pulseSerie_FromTime[timeIndex] = 60.0f / (pulseTimeMS_Last / 1000.0f);
-
-               break;
-
-            case AVERAGE:
-            default:
-
-               long sumPulseTimeMS = 0;
-
-               for (int avgSerieIndex = time2Time_Index; avgSerieIndex < time2Time_NextIndex; avgSerieIndex++) {
-                  sumPulseTimeMS += pulseTimeSerie[avgSerieIndex];
-               }
-
-               final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
-               final float pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
-
-               pulseSerie_FromTime[timeIndex] = pulseFromPulseTime;
-               break;
+            for (int avgSerieIndex = time2Time_Index; avgSerieIndex < time2Time_NextIndex; avgSerieIndex++) {
+               sumPulseTimeMS += pulseTimeSerie[avgSerieIndex];
             }
+
+            final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
+            final float pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
+
+            pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
          }
       }
 
