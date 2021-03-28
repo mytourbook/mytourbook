@@ -38,6 +38,9 @@ Bugfix
 * Tour Import View (Frederic)
   - The kcal column was displaying values in calories units instead of kcalories
 
+* Chart Tooltip (Frederic)
+  - Displaying the hour from 0 when a new day starts
+
 
 Translation    
 ===========
