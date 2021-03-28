@@ -1706,7 +1706,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
-         _lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay() + (long) timeSerie[valueIndex]));
+         _lblTimeOfDay.setText(UI.format_hhh_mm_ss(
+               (_tourData.getStartTimeOfDay() + (long) timeSerie[valueIndex]) % 86400));
       }
 
       if (_isVisible_And_Available_TimeSlice) {
