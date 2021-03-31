@@ -4936,8 +4936,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_TimeSlice_Motion_DistanceDiff();
       defineColumn_TimeSlice_Motion_SpeedDiff();
 
-      defineColumn_TimeSlice_Altitude_Altitude();
-      defineColumn_TimeSlice_Altitude_Gradient();
+      defineColumn_TimeSlice_Elevation_Elevation();
+      defineColumn_TimeSlice_Elevation_Gradient();
 
       defineColumn_TimeSlice_Body_Heartbeat_Device();
       defineColumn_TimeSlice_Body_Heartbeat_RR();
@@ -5183,79 +5183,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: altitude
-    */
-   private void defineColumn_TimeSlice_Altitude_Altitude() {
-
-      ColumnDefinition colDef;
-
-      _timeSlice_ColDef_Altitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            if (_seriePulse_RR_Index != null) {
-
-               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-
-               cell.setText(Integer.toString(_seriePulse_RR_Index[serieIndex]));
-
-            } else {
-               cell.setText(UI.EMPTY_STRING);
-            }
-
-//            if (_serieAltitude != null) {
-//
-//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-//               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
-//
-//            } else {
-//               cell.setText(UI.EMPTY_STRING);
-//            }
-         }
-      });
-
-   }
-
-   /**
-    * column: gradient
-    */
-   private void defineColumn_TimeSlice_Altitude_Gradient() {
-
-      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_timeSlice_ColumnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            if (_seriePulse_RR_Index != null) {
-
-               setRRTimes(cell);
-
-            } else {
-               cell.setText(UI.EMPTY_STRING);
-            }
-
-//            if (_serieGradient != null) {
-//
-//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-//               final float value = _serieGradient[timeSlice.serieIndex];
-//
-//               colDef.printDetailValue(cell, value);
-//
-//            } else {
-//               cell.setText(UI.EMPTY_STRING);
-//            }
-         }
-      });
-   }
-
-   /**
     * Column: Device heartbeat
     */
    private void defineColumn_TimeSlice_Body_Heartbeat_Device() {
@@ -5364,6 +5291,82 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             if (isBgSet == false) {
                cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
             }
+         }
+      });
+   }
+
+   /**
+    * column: altitude
+    */
+   private void defineColumn_TimeSlice_Elevation_Elevation() {
+
+      ColumnDefinition colDef;
+
+      _timeSlice_ColDef_Altitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setColumnHeaderText("RR Index");
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR_Index != null) {
+
+               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+               cell.setText(Integer.toString(_seriePulse_RR_Index[serieIndex]));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+
+//            if (_serieAltitude != null) {
+//
+//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+//               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
+//
+//            } else {
+//               cell.setText(UI.EMPTY_STRING);
+//            }
+         }
+      });
+
+   }
+
+   /**
+    * column: gradient
+    */
+   private void defineColumn_TimeSlice_Elevation_Gradient() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setColumnHeaderText("RR Times");
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR_Index != null) {
+
+               setRRTimes(cell);
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+
+//            if (_serieGradient != null) {
+//
+//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+//               final float value = _serieGradient[timeSlice.serieIndex];
+//
+//               colDef.printDetailValue(cell, value);
+//
+//            } else {
+//               cell.setText(UI.EMPTY_STRING);
+//            }
          }
       });
    }
@@ -6704,7 +6707,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
       _seriePulse_RR_Bpm = _tourData.getPulse_RRIntervals();
-      _seriePulse_RR_Times = _tourData.pulseTimeSerie;
+      _seriePulse_RR_Times = _tourData.pulseTime_Milliseconds;
       _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
 
       _serieLatitude = _tourData.latitudeSerie;
@@ -8202,9 +8205,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
 //            sb.append("T: ");
 
-            final int rrIndexDiff = rrIndex_Next - 1 - rrIndex_Current;
-            if (rrIndexDiff > 2) {
-               sb.append(rrIndexDiff + " ::  ");
+            final int numRR = rrIndex_Next - 1 - rrIndex_Current;
+            if (numRR > 2) {
+               sb.append(numRR + " ∑  ");
             }
 
             for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {

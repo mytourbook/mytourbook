@@ -162,9 +162,6 @@ public class TourManager {
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
@@ -172,6 +169,10 @@ public class TourManager {
    public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
+
+   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
    //
    public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
@@ -4176,7 +4177,41 @@ public class TourManager {
       case RR_INTERVALS_ONLY:
 
          if (isPulseTimeSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.SECOND_X_AXIS);
+
+            double sumRRTimeSec = 0;
+
+            final int[] pulseTime_Milliseconds = tourData.pulseTime_Milliseconds;
+            final int[] pulseTime_TimeIndex = tourData.pulseTime_TimeIndex;
+
+            final boolean isPulseTimeAtStart = pulseTime_TimeIndex[0] != -1;
+            final int pulseTimeOffset = isPulseTimeAtStart ? 0 : 1;
+
+            // it is possible that the first pulse time slice is not at the start of a tour -> set additional start slice
+            final int numPulseTimeSlices = pulseTime_Milliseconds.length + pulseTimeOffset;
+
+            final double[] xData_PulseTime = new double[numPulseTimeSlices];
+            final float[] yData_PulseTime = new float[numPulseTimeSlices];
+
+            for (int pulseTimeIndex = 0; pulseTimeIndex < pulseTime_Milliseconds.length; pulseTimeIndex++) {
+
+               final double rrTimeMS = pulseTime_Milliseconds[pulseTimeIndex];
+               final double rrTimeSec = rrTimeMS / 1000.0;
+
+               sumRRTimeSec += rrTimeSec;
+
+               final float pulseFromPulseTime = (float) (60.0f / rrTimeSec);
+
+               final int dataIndex = isPulseTimeAtStart ? pulseTimeIndex : pulseTimeIndex + 1;
+
+               xData_PulseTime[dataIndex] = sumRRTimeSec;
+               yData_PulseTime[dataIndex] = pulseFromPulseTime;
+
+            }
+
+            chartDataModel.setVariableXYData(xData_PulseTime, yData_PulseTime);
+
          }
          break;
 

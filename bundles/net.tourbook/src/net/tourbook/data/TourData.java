@@ -1010,7 +1010,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               _pulseSerie_Smoothed;
 
    /**
-    * Pulse values computed from the pulse times in {@link #pulseTimeSerie}
+    * Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}
     */
    @Transient
    public float[]                pulseSerie_FromTime;
@@ -1022,10 +1022,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * have multiple values, depending on the heartrate.</b>
     */
    @Transient
-   public int[]                  pulseTimeSerie;
+   public int[]                  pulseTime_Milliseconds;
 
    /**
-    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTimeSerie}.
+    * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTime_Milliseconds}.
     * A time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
     */
    @Transient
@@ -1396,7 +1396,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private HrZoneContext      _hrZoneContext;
 
    /**
-    * Copy of {@link #timeSerie} with floating type, this is used for the chart x-axis.
+    * Copy of {@link #timeSerie} with double type, this is used for the chart x-axis to support history tours
     */
    @Transient
    private double[]            timeSerieDouble;
@@ -6517,7 +6517,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       Arrays.fill(allPulseTime_TimeIndex, -1);
 
-//      final int sumPulseTime = 0;
       int pulseTimesIndex = 0;
 
       for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
@@ -6525,16 +6524,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final TimeData timeData = allTimeData[timeIndex];
          final int[] timeSlice_AllPulseTimes = timeData.pulseTime;
 
-         if (timeIndex == 5400) {
-            int a = 0;
-            a++;
-         }
+//         if (timeIndex == 5400) {
+//            int a = 0;
+//            a++;
+//         }
 
          if (timeSlice_AllPulseTimes != null) {
 
-            int addedPulseTimeIndex = -1;
+            boolean isTimeIndexSet = false;
 
+            // loop: all pulse times within one time slice
             for (final int pulseTimeMS : timeSlice_AllPulseTimes) {
+
                if (pulseTimeMS != 0) {
 
                   if (pulseTimeMS == 65535) {
@@ -6545,40 +6546,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
                      allPulseTimes.add(pulseTimeMS);
 
-                     if (addedPulseTimeIndex < 0) {
+                     if (!isTimeIndexSet) {
 
                         // set index only for the first pulse time
-                        addedPulseTimeIndex = timeIndex;
+                        isTimeIndexSet = true;
 
                         allPulseTime_TimeIndex[timeIndex] = pulseTimesIndex;
                      }
 
                      pulseTimesIndex++;
-
-//                     sumPulseTime += pulseTimeMS;
-//                     final int relativeTime = timeSerie[timeIndex];
-//
-//                     final float pulseFromDevice = pulseSerie[timeIndex];
-//                     final double pulseTimeSeconds = pulseTimeMS / 1000.0;
-//                     final double pulseFromPulseTime = 60.0 / pulseTimeSeconds;
-//
-//                     final String pulseFlag = pulseTimeMS > 1000
-//                           ? String.format("> 1000 ms  %6.3f", pulseTimeSeconds / 2)
-//                           : "";
-//
-//                     System.out.println((String.format("%5d  %6.0f sum    %6.3f       %5.1f  %5.1f       %s",
-//
-//                           relativeTime,
-//                           sumPulseTime / 1000.0,
-//                           pulseTimeSeconds,
-//
-//                           pulseFromDevice,
-//                           pulseFromPulseTime,
-//                           pulseFlag
-//
-//                     )));
-                     // xTODO remove SYSTEM.OUT.PRINTLN
-
                   }
                }
             }
@@ -6587,7 +6563,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (allPulseTimes.size() > 0) {
 
-         pulseTimeSerie = allPulseTimes.toArray();
+         pulseTime_Milliseconds = allPulseTimes.toArray();
          pulseTime_TimeIndex = allPulseTime_TimeIndex;
       }
    }
@@ -7970,7 +7946,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[] getPulse_RRIntervals() {
 
       if (pulseSerie_FromTime != null) {
-//         return pulseSerie_FromTime;
+         return pulseSerie_FromTime;
       }
 
       /**
@@ -7987,7 +7963,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
 
       // ensure that needed data are available
-      if (pulseTimeSerie == null || pulseTime_TimeIndex == null) {
+      if (pulseTime_Milliseconds == null || pulseTime_TimeIndex == null) {
          return null;
       }
 
@@ -8006,10 +7982,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             a++;
          }
 
-         final int time2Time_Index = pulseTime_TimeIndex[serieIndex];
-         final int time2Time_NextIndex = pulseTime_TimeIndex[serieIndex + 1];
+         final int timeIndex = pulseTime_TimeIndex[serieIndex];
+         final int timeIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
 
-         if (serieIndex > 0 && (time2Time_Index < 0 || time2Time_NextIndex < 0)) {
+         if (serieIndex > 0 && (timeIndex < 0 || timeIndex_Next < 0)) {
 
             // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
 
@@ -8018,18 +7994,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             continue;
          }
 
-         if (time2Time_Index < 0 || time2Time_NextIndex < 0) {
+         if (timeIndex < 0 || timeIndex_Next < 0) {
 
             continue;
          }
 
-         final int numPulseTimes = time2Time_NextIndex - time2Time_Index;
+         final int numPulseTimes = timeIndex_Next - timeIndex;
 
          if (numPulseTimes == 0) {
 
             // there is only 1 pulse time
 
-            final int pulseTimeMS = pulseTimeSerie[time2Time_Index];
+            final int pulseTimeMS = pulseTime_Milliseconds[timeIndex];
             final float pulseFromPulseTime = 60.0f / (pulseTimeMS / 1000.0f);
 
             pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
@@ -8038,8 +8014,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             long sumPulseTimeMS = 0;
 
-            for (int avgSerieIndex = time2Time_Index; avgSerieIndex < time2Time_NextIndex; avgSerieIndex++) {
-               sumPulseTimeMS += pulseTimeSerie[avgSerieIndex];
+            for (int avgSerieIndex = timeIndex; avgSerieIndex < timeIndex_Next; avgSerieIndex++) {
+               sumPulseTimeMS += pulseTime_Milliseconds[avgSerieIndex];
             }
 
             final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
@@ -9408,7 +9384,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       gearSerie            = serieData.gears;
 
-      pulseTimeSerie       = serieData.pulseTimes;
+      pulseTime_Milliseconds       = serieData.pulseTimes;
       pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
@@ -9485,7 +9461,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       serieData.gears         = gearSerie;
 
-      serieData.pulseTimes    = pulseTimeSerie;
+      serieData.pulseTimes          = pulseTime_Milliseconds;
       serieData.pulseTime_TimeIndex = pulseTime_TimeIndex;
 
       // running dynamics

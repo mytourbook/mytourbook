@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,7 @@ public class ChartDataModel {
    private ChartDataXSerie            _xData2nd                 = null;
 
    /**
-    * title for the chart, will be positioned on top of the chart
+    * Title for the chart, will be positioned on top of the chart
     */
    private String                     _title;
 
@@ -52,7 +52,7 @@ public class ChartDataModel {
    private ArrayList<ChartDataSerie>  _xyData                   = new ArrayList<>();
 
    /**
-    * storage for custom data
+    * Storage for custom data
     */
    private HashMap<String, Object>    _customData               = new HashMap<>();
 
@@ -66,13 +66,13 @@ public class ChartDataModel {
    private boolean                    _isGraphOverlapped;
 
    /**
-    * minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
+    * Minimum width for the chart, this can be overwritten for e.g. to show in a year chart for
     * each day at least one pixel
     */
    private int                        _chartMinWidth            = ChartComponents.CHART_MIN_WIDTH;
 
    /**
-    * this error message is displayed when data for the chart are not available
+    * This error message is displayed when data for the chart are not available
     */
    private String                     _errorMessage;
 
@@ -216,6 +216,11 @@ public class ChartDataModel {
 
    public void setTitle(final String title) {
       _title = title;
+   }
+
+   public void setVariableXYData(final double[] variableXValues, final float[] variableYValues) {
+      // TODO Auto-generated method stub
+
    }
 
    public void setXData(final ChartDataXSerie data) {

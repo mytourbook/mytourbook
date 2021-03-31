@@ -1724,9 +1724,13 @@ public class ChartComponentGraph extends Canvas {
 
             drawAsync_570_Dots(gcGraph, graphDrawingData);
 
+         } else if (chartType == ChartType.SECOND_X_AXIS) {
+
+            drawAsync_700_2ndXAxis(gcGraph, graphDrawingData, isLastGraph);
+
          } else if (chartType == ChartType.HISTORY) {
 
-            drawAsync_600_History(gcGraph, graphDrawingData);
+            drawAsync_900_History(gcGraph, graphDrawingData);
          }
 
          // draw only the x-axis, this is drawn lately because the graph can overwrite it
@@ -2102,10 +2106,9 @@ public class ChartComponentGraph extends Canvas {
       final String unitLabel = graphDrawingData.getXData().getUnitLabel();
       final int devUnitLabelWidth = gcChart.textExtent(unitLabel).x;
 
-      gcChart.setForeground(
-            isHistory //
-                  ? display.getSystemColor(SWT.COLOR_BLACK)
-                  : display.getSystemColor(SWT.COLOR_DARK_GRAY));
+      gcChart.setForeground(isHistory
+            ? display.getSystemColor(SWT.COLOR_BLACK)
+            : display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
       gcGraph.setForeground(_gridColor);
 
@@ -2630,16 +2633,17 @@ public class ChartComponentGraph extends Canvas {
       final double[] xValues = xData.getHighValuesDouble()[0];
       final float[] yValues = yHighValues[0];
 
+      // check array bounds
+      final int numXValues = xValues.length;
+      if (startIndex >= numXValues) {
+         return;
+      }
+
+      final int numYValues = yValues.length;
+
       final int graphFillMethod = yData.getGraphFillMethod();
       final boolean[] noFill = xData.getNoLine();
       final boolean[] lineGaps = yData.getLineGaps();
-
-      // check array bounds
-      final int xValueLength = xValues.length;
-      if (startIndex >= xValueLength) {
-         return;
-      }
-      final int yValueLength = yValues.length;
 
       /*
        * 2nd path is currently used to draw the SRTM altitude line
@@ -2703,18 +2707,18 @@ public class ChartComponentGraph extends Canvas {
 //            || graphFillMethod == ChartDataYSerie.FILL_METHOD_NO
       ) {
 
-         graphY_XAxisLine = graphYBorderBottom > 0 //
+         graphY_XAxisLine = graphYBorderBottom > 0
                ? graphYBorderBottom
-               : graphYBorderTop < 0 //
+               : graphYBorderTop < 0
                      ? graphYBorderTop
                      : graphYBorderBottom;
 
       } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
 
          graphY_XAxisLine = graphYBorderBottom > 0
-               ? graphYBorderBottom //
+               ? graphYBorderBottom
                : graphYBorderTop < 0
-                     ? graphYBorderTop //
+                     ? graphYBorderTop
                      : 0;
       }
       final float devY_XAxisLine = (float) (scaleY * graphY_XAxisLine);
@@ -2760,7 +2764,7 @@ public class ChartComponentGraph extends Canvas {
       for (; valueIndex < endIndex; valueIndex++) {
 
          // check array bounds
-         if (valueIndex >= yValueLength) {
+         if (valueIndex >= numYValues) {
             break;
          }
 
@@ -3003,7 +3007,7 @@ public class ChartComponentGraph extends Canvas {
          /*
           * draw last point
           */
-         if (valueIndex == lastIndex || //
+         if (valueIndex == lastIndex ||
 
          // check if last visible position + 1 is reached
                devX > devXVisibleWidth) {
@@ -3088,7 +3092,7 @@ public class ChartComponentGraph extends Canvas {
       final Color colorBgDark = new Color(display, rgbBgDark);
       final Color colorBgBright = new Color(display, rgbBgBright);
 
-      final double graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffset;
+      final double graphWidth = xValues[Math.min(numXValues - 1, endIndex)] - graphValueOffset;
 
       /**
        * force a max width because the fill will not be drawn on Linux
@@ -3127,7 +3131,7 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgDark);
          gc.setBackground(colorBgBright);
 
-         gc.fillGradientRectangle(//
+         gc.fillGradientRectangle(
                0,
                (int) devY0,
                devGraphWidth,
@@ -3140,7 +3144,7 @@ public class ChartComponentGraph extends Canvas {
          gc.setForeground(colorBgBright);
          gc.setBackground(colorBgDark);
 
-         gc.fillGradientRectangle(//
+         gc.fillGradientRectangle(
                0,
                devGraphHeight, // start from the graph bottom
                devGraphWidth,
@@ -3156,7 +3160,7 @@ public class ChartComponentGraph extends Canvas {
             gc.setForeground(colorBgDark);
             gc.setBackground(colorBgBright);
 
-            customFillPainter.draw(//
+            customFillPainter.draw(
                   gc,
                   graphDrawingData,
                   _chart,
@@ -4426,7 +4430,637 @@ public class ChartComponentGraph extends Canvas {
       gc.setAntialias(SWT.OFF);
    }
 
-   private void drawAsync_600_History(final GC gcGraph, final GraphDrawingData graphDrawingData) {
+   private void drawAsync_700_2ndXAxis(final GC gc,
+                                       final GraphDrawingData graphDrawingData,
+                                       final boolean isTopGraph) {
+
+      final ChartDataXSerie xData = graphDrawingData.getXData();
+      final ChartDataYSerie yData = graphDrawingData.getYData();
+
+      final int serieSize = xData.getHighValuesDouble()[0].length;
+      final double scaleX = graphDrawingData.getScaleX();
+
+      final RGB rgbFg = yData.getRgbLine()[0];
+      final RGB rgbBgDark = yData.getRgbDark()[0];
+      final RGB rgbBgBright = yData.getRgbBright()[0];
+
+      // get the horizontal offset for the graph
+      float graphValueOffset;
+      if (_chartComponents._synchConfigSrc == null) {
+         // a zoom marker is not set, draw it normally
+         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+      } else {
+         // adjust the start position to the zoom marker position
+         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
+      }
+
+      // synch marker is not displayed
+
+      final int graphLineAlpha = getAlphaLine();
+      final int graphFillingAlpha = getAlphaFill(isTopGraph);
+
+      final float[][] yHighValues = yData.getHighValuesFloat();
+
+      final double[] xValues = xData.getHighValuesDouble()[0];
+      final float[] yValues = yHighValues[0];
+
+      final int graphFillMethod = yData.getGraphFillMethod();
+      final boolean[] noFill = xData.getNoLine();
+      final boolean[] lineGaps = yData.getLineGaps();
+
+      final int startIndex = 0;
+      final int endIndex = serieSize;
+
+      // check array bounds
+      final int xValueLength = xValues.length;
+      if (startIndex >= xValueLength) {
+         return;
+      }
+      final int yValueLength = yValues.length;
+
+      /*
+       * 2nd path is currently used to draw the SRTM altitude line
+       */
+      final boolean isPath2 = yHighValues.length > 1;
+      float[] yValues2 = null;
+      if (isPath2) {
+         yValues2 = yHighValues[1];
+      }
+
+//      yData.getCustomData(TourManager.CUSTOM_DATA_RR_INTERVALS);
+
+      // get top/bottom border values of the graph
+      final float graphYBorderTop = graphDrawingData.getGraphYTop();
+      final float graphYBorderBottom = graphDrawingData.getGraphYBottom();
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devChartHeight = getDevVisibleGraphHeight();
+
+//      final double scaleX = graphDrawingData.getScaleX();
+      final double scaleY = graphDrawingData.getScaleY();
+
+// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
+//
+//      if (_canChartBeOverlapped && _isChartOverlapped) {
+//
+//         // reduce scale for overlapped graphs
+//
+//         if (!isTopGraph) {
+//
+//            scaleY *= 0.6;
+//         }
+//      }
+
+      final Display display = getDisplay();
+
+      // path is scaled in device pixel
+      final Path path = new Path(display);
+      final Path path2 = isPath2 ? new Path(display) : null;
+
+      final boolean isShowSkippedValues = _chartDrawingData.chartDataModel.isNoLinesValuesDisplayed();
+      final ArrayList<Point> skippedValues = new ArrayList<>();
+
+      final int devGraphHeight = graphDrawingData.devGraphHeight;
+      final float devYGraphTop = (float) (scaleY * graphYBorderTop);
+      final float devYGraphBottom = (float) (scaleY * graphYBorderBottom);
+
+      final RectangleLong[] lineFocusRectangles = _lineFocusRectangles.get(_lineFocusRectangles.size() - 1);
+      final PointLong[] lineDevPositions = _lineDevPositions.get(_lineDevPositions.size() - 1);
+      RectangleLong prevLineRect = null;
+
+      /*
+       *
+       */
+      final float devY0Inverse = devGraphHeight + devYGraphBottom;
+
+      /*
+       * x-axis line with y==0
+       */
+      float graphY_XAxisLine = 0;
+
+      if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
+            || graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM
+//            || graphFillMethod == ChartDataYSerie.FILL_METHOD_NO
+      ) {
+
+         graphY_XAxisLine = graphYBorderBottom > 0
+               ? graphYBorderBottom
+               : graphYBorderTop < 0
+                     ? graphYBorderTop
+                     : graphYBorderBottom;
+
+      } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+         graphY_XAxisLine = graphYBorderBottom > 0
+               ? graphYBorderBottom
+               : graphYBorderTop < 0
+                     ? graphYBorderTop
+                     : 0;
+      }
+      final float devY_XAxisLine = (float) (scaleY * graphY_XAxisLine);
+
+      final double graphXStart = xValues[startIndex] - graphValueOffset;
+      final float graphYStart = yValues[startIndex];
+
+      float graphY1Prev = graphYStart;
+
+      double devXPrev = (scaleX * graphXStart);
+      float devY1Prev = (float) (scaleY * graphY1Prev);
+
+      double devXPrevNoLine = 0;
+      boolean isNoLine = false;
+      boolean isLineGap = false;
+
+      final Rectangle chartRectangle = gc.getClipping();
+      final int devXVisibleWidth = chartRectangle.width;
+
+      boolean isDrawFirstPoint = true;
+
+      final int lastIndex = endIndex - 1;
+
+      int valueIndexFirstPoint = startIndex;
+      int valueIndexLastPoint = startIndex;
+      int prevValueIndex = startIndex;
+
+      /*
+       * Set the hovered index only ONCE because when autoscrolling is done to the right side this
+       * can cause that the last value is used for the hovered index instead of the previous before
+       * the last
+       */
+      boolean isSetHoveredIndex = false;
+
+      final long[] devXPositions = new long[endIndex];
+      final float devY0 = devY0Inverse - devY_XAxisLine;
+
+      /*
+       * draw the lines into the paths
+       */
+      int valueIndex = startIndex;
+      double devX = 999;
+      for (; valueIndex < endIndex; valueIndex++) {
+
+         // check array bounds
+         if (valueIndex >= yValueLength) {
+            break;
+         }
+
+         final double graphX = xValues[valueIndex] - graphValueOffset;
+         devX = graphX * scaleX;
+         final float devXf = (float) devX;
+
+         final float graphY1 = yValues[valueIndex];
+         final float devY1 = (float) (graphY1 * scaleY);
+
+         float graphY2 = 0;
+         float devY2 = 0;
+
+         if (isPath2) {
+            graphY2 = yValues2[valueIndex];
+            devY2 = (float) (graphY2 * scaleY);
+         }
+
+         final long devX_long = (long) devX;
+         devXPositions[valueIndex] = devX_long;
+
+         // check if position is horizontal visible
+         if (devX < 0) {
+
+            // keep current position which is used as the painting starting point
+
+            graphY1Prev = graphY1;
+
+            devXPrev = devX;
+            devY1Prev = devY1;
+
+            valueIndexFirstPoint = valueIndex;
+            prevValueIndex = valueIndex;
+
+            continue;
+         }
+
+         /*
+          * draw first point
+          */
+         if (isDrawFirstPoint) {
+
+            // move to the first point
+
+            isDrawFirstPoint = false;
+
+            // set first point before devX==0 that the first line is not visible but correctly painted
+            final double devXFirstPoint = devXPrev;
+            float devXFirstPointF = (float) devXPrev;
+
+            if (devXFirstPointF <= 0.0f) {
+               /*
+                * Hide the first line from the bottom to the first value point by setting the
+                * position into the hidden area.
+                */
+               devXFirstPointF -= 1f;
+            }
+
+            float devYStart = 0;
+
+            if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
+                  || graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM
+                  || graphFillMethod == ChartDataYSerie.FILL_METHOD_NO) {
+
+               // start from the bottom of the graph
+
+               devYStart = devGraphHeight;
+
+            } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+               // start from the x-axis, y=0
+
+               devYStart = devY0;
+            }
+
+            final float devY = devY0Inverse - devY1Prev;
+
+            path.moveTo((int) devXFirstPointF, (int) devYStart);
+            path.lineTo((int) devXFirstPointF, (int) devY);
+
+            if (isPath2) {
+               path2.moveTo(devXFirstPointF, devY0Inverse - devY2);
+               path2.lineTo(devXFirstPointF, devY0Inverse - devY2);
+            }
+
+            /*
+             * set line hover positions for the first point
+             */
+            final long devXRect = (long) devXFirstPoint;
+
+            final RectangleLong currentRect = new RectangleLong(devXRect, 0, 1, devChartHeight);
+            final PointLong currentPoint = new PointLong(devXRect, (long) (devYTop + devY));
+
+            lineDevPositions[valueIndexFirstPoint] = currentPoint;
+            lineFocusRectangles[valueIndexFirstPoint] = currentRect;
+
+            prevLineRect = currentRect;
+         }
+
+         /*
+          * Draw line to current point
+          */
+         final long devXPrev_long = (long) devXPrev;
+
+         if (devX_long != devXPrev_long
+
+               // draw line when is has the same x position but y is larger/smaller than previous value
+               || (devX_long == devXPrev_long && (devY1 >= 0 ? devY1 > devY1Prev : devY1 < devY1Prev))
+
+               || graphY1 == 0
+               || (isPath2 && graphY2 == 0)) {
+
+            // optimization: draw only ONE line for the current x-position
+            // but draw to the 0 line otherwise it's possible that a triangle is painted
+
+            float devY = 0;
+
+            if (lineGaps != null && lineGaps[valueIndex]) {
+
+               isLineGap = true;
+
+               // keep correct position that the hovered line dev position is painted at the correct position
+               devY = devY0Inverse - devY1;
+
+            } else if (noFill != null && noFill[valueIndex]) {
+
+               /*
+                * draw NO line, but draw a line at the bottom or the x-axis with y=0
+                */
+
+               if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
+                     || graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM
+                     || graphFillMethod == ChartDataYSerie.FILL_METHOD_NO) {
+
+                  // start from the bottom of the graph
+
+                  devY = devGraphHeight;
+
+               } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+                  // start from the x-axis, y=0
+
+                  devY = devY0;
+               }
+
+               /*
+                * Don't draw "fill" line when graph is not filled
+                */
+               if (graphFillMethod != ChartDataYSerie.FILL_METHOD_NO) {
+
+                  path.lineTo((int) devXPrev, (int) devY);
+                  path.lineTo((int) devXf, (int) devY);
+               }
+
+               /*
+                * keep positions, because skipped values will be painted as a dot outside of the
+                * path, but don't draw on the graph bottom or x-axis
+                */
+               if (isShowSkippedValues) {
+
+                  final int devYSkipped = (int) (devY0Inverse - devY1);
+                  if (devYSkipped != devY0 && graphY1 != 0) {
+                     skippedValues.add(new Point((int) devX, devYSkipped));
+                  }
+               }
+
+               isNoLine = true;
+               devXPrevNoLine = devX;
+
+               // keep correct position that the hovered line dev position is painted at the correct position
+               devY = devY0Inverse - devY1;
+
+            } else {
+
+               /*
+                * draw line to the current point
+                */
+
+               if (isLineGap) {
+
+                  isLineGap = false;
+
+                  devY = devY0Inverse - devY1;
+
+                  path.moveTo(devXf, devY);
+
+               } else {
+
+                  // check if a NO line was painted
+                  if (isNoLine) {
+
+                     isNoLine = false;
+
+                     path.lineTo((int) devXPrevNoLine, (int) (devY0Inverse - devY1Prev));
+                  }
+
+                  if (yData.isYAxisDirection()) {
+                     devY = devY0Inverse - devY1;
+                  } else {
+                     devY = devY1 - devY_XAxisLine;
+                  }
+
+                  path.lineTo(devXf, devY);
+
+                  if (isPath2) {
+                     path2.lineTo(devXf, devY0Inverse - devY2);
+                  }
+               }
+            }
+
+            /*
+             * set line hover positions
+             */
+            final double devXDiff = (devX - devXPrev) / 2;
+            final double devXDiffWidth = devXDiff < 1 ? 1 : (devXDiff + 0.5);
+            final double devXRect = devX - devXDiffWidth;
+
+            // add the right part of the rectangle width into the previous rectangle
+            prevLineRect.width += devXDiffWidth + 1;
+
+            // check if hovered line is hit, this check is an inline for .contains(...)
+            if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+               _hoveredValuePointIndex = prevValueIndex;
+               isSetHoveredIndex = true;
+            }
+
+            final RectangleLong currentRect = new RectangleLong(
+                  (long) devXRect,
+                  0,
+                  (long) (devXDiffWidth + 1),
+                  devChartHeight);
+            final PointLong currentPoint = new PointLong(devX_long, (long) (devYTop + devY));
+
+            lineDevPositions[valueIndex] = currentPoint;
+            lineFocusRectangles[valueIndex] = currentRect;
+
+            prevLineRect = currentRect;
+         }
+
+         /*
+          * draw last point
+          */
+         if (valueIndex == lastIndex ||
+
+         // check if last visible position + 1 is reached
+               devX > devXVisibleWidth) {
+
+//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] draw last point")
+////                  + ("\t: " + )
+////                  + ("\t: " + )
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+            /*
+             * this is the last point for a filled graph
+             */
+
+            final float devY = devY0Inverse - devY1;
+
+            path.lineTo((int) devXf, (int) devY);
+
+            // move path to the final point
+            if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM
+                  || graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM
+                  || graphFillMethod == ChartDataYSerie.FILL_METHOD_NO) {
+
+               // draw line to the bottom of the graph
+
+               path.lineTo((int) devXf, devGraphHeight);
+
+            } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+               // draw line to the x-axis, y=0
+
+               path.lineTo((int) devXf, (int) devY0);
+            }
+
+            // moveTo() is necessary that the graph is filled correctly (to prevent a triangle filled shape)
+            // finalize previous subpath
+            path.moveTo((int) devXf, 0);
+
+            if (isPath2) {
+               path2.lineTo(devXf, devY0Inverse - devY2);
+               path2.moveTo(devXf, 0);
+            }
+
+            valueIndexLastPoint = valueIndex;
+
+            /*
+             * set line rectangle
+             */
+            final double devXDiff = (devX - devXPrev) / 2;
+            final long devXDiffWidth = devXDiff < 1 ? 1 : (int) (devXDiff + 0.5);
+            final long devXRect = (long) (devX - devXDiffWidth);
+
+            // set right part of the rectangle width into the previous rectangle
+            prevLineRect.width += devXDiffWidth;
+
+            // check if hovered line is hit, this check is an inline for .contains(...)
+            if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
+               _hoveredValuePointIndex = valueIndex;
+               isSetHoveredIndex = true;
+            }
+
+            final RectangleLong lastRect = new RectangleLong(devXRect, 0, devXDiffWidth + 1, devChartHeight);
+            final PointLong lastPoint = new PointLong(devX_long, devYTop + (long) devY);
+
+            lineDevPositions[valueIndex] = lastPoint;
+            lineFocusRectangles[valueIndex] = lastRect;
+
+            if (isSetHoveredIndex == false && lastRect.contains(_devXMouseMove, _devYMouseMove)) {
+               _hoveredValuePointIndex = valueIndex;
+            }
+
+            break;
+         }
+
+         devXPrev = devX;
+         devY1Prev = devY1;
+
+         prevValueIndex = valueIndex;
+      }
+
+      final Color colorLine = new Color(display, rgbFg);
+      final Color colorBgDark = new Color(display, rgbBgDark);
+      final Color colorBgBright = new Color(display, rgbBgBright);
+
+      final double graphWidth = xValues[Math.min(xValueLength - 1, endIndex)] - graphValueOffset;
+
+      /**
+       * force a max width because the fill will not be drawn on Linux
+       */
+      final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
+
+      gc.setAntialias(_chart.graphAntialiasing);
+      gc.setAlpha(graphFillingAlpha);
+      gc.setClipping(path);
+
+      /*
+       * fill the graph
+       */
+      if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_BOTTOM) {
+
+         /*
+          * adjust the fill gradient in the height, otherwise the fill is not in the whole rectangle
+          */
+
+         gc.setForeground(colorBgDark);
+         gc.setBackground(colorBgBright);
+
+         gc.fillGradientRectangle(//
+               0,
+               devGraphHeight,
+               devGraphWidth,
+               -devGraphHeight,
+               true);
+
+      } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_FILL_ZERO) {
+
+         /*
+          * fill above 0 line
+          */
+
+         gc.setForeground(colorBgDark);
+         gc.setBackground(colorBgBright);
+
+         gc.fillGradientRectangle(
+               0,
+               (int) devY0,
+               devGraphWidth,
+               -(int) (devYGraphTop - devY_XAxisLine),
+               true);
+
+         /*
+          * fill below 0 line
+          */
+         gc.setForeground(colorBgBright);
+         gc.setBackground(colorBgDark);
+
+         gc.fillGradientRectangle(
+               0,
+               devGraphHeight, // start from the graph bottom
+               devGraphWidth,
+               -(int) Math.min(devGraphHeight, devGraphHeight - devY0Inverse),
+               true);
+
+      } else if (graphFillMethod == ChartDataYSerie.FILL_METHOD_CUSTOM) {
+
+         final IFillPainter customFillPainter = yData.getCustomFillPainter();
+
+         if (customFillPainter != null) {
+
+            gc.setForeground(colorBgDark);
+            gc.setBackground(colorBgBright);
+
+            customFillPainter.draw(
+                  gc,
+                  graphDrawingData,
+                  _chart,
+                  devXPositions,
+                  valueIndexFirstPoint,
+                  valueIndexLastPoint);
+         }
+      }
+
+      // reset clipping that the line is drawn everywhere
+      gc.setClipping((Rectangle) null);
+
+      gc.setBackground(colorLine);
+
+      /*
+       * paint skipped values
+       */
+      if (isShowSkippedValues && skippedValues.size() > 0) {
+         for (final Point skippedPoint : skippedValues) {
+            gc.fillRectangle(skippedPoint.x, skippedPoint.y, 2, 2);
+         }
+      }
+
+      /*
+       * draw line along the path
+       */
+      gc.setAlpha(graphLineAlpha);
+
+      // set line style
+      gc.setLineStyle(SWT.LINE_SOLID);
+
+      // draw the line of the graph
+      gc.setForeground(colorLine);
+
+      gc.drawPath(path);
+
+      // dispose resources
+      colorLine.dispose();
+      colorBgDark.dispose();
+      colorBgBright.dispose();
+
+      path.dispose();
+
+      /*
+       * Draw path2 above the other graph, this is currently used to draw the srtm or pulse by time
+       * graph
+       */
+      if (path2 != null) {
+
+         // this color is not yet user defined
+         final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
+         final Color path2Color = new Color(complimentColor);
+
+         gc.setForeground(path2Color);
+         gc.drawPath(path2);
+
+         path2Color.dispose();
+         path2.dispose();
+      }
+
+      gc.setAlpha(0xFF);
+      gc.setAntialias(SWT.OFF);
+   }
+
+   private void drawAsync_900_History(final GC gcGraph, final GraphDrawingData graphDrawingData) {
 
       final ChartDataXSerie xData = graphDrawingData.getXData();
 
