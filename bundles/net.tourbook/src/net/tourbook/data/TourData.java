@@ -6524,10 +6524,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final TimeData timeData = allTimeData[timeIndex];
          final int[] timeSlice_AllPulseTimes = timeData.pulseTime;
 
-//         if (timeIndex == 5400) {
-//            int a = 0;
-//            a++;
-//         }
+         if (timeIndex == 8695) {
+            int a = 0;
+            a++;
+         }
 
          if (timeSlice_AllPulseTimes != null) {
 

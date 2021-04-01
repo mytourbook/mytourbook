@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TFloatArrayList;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -4180,39 +4183,92 @@ public class TourManager {
 
             yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.SECOND_X_AXIS);
 
-            double sumRRTimeSec = 0;
+            final int[] timeSerie = tourData.timeSerie;
 
-            final int[] pulseTime_Milliseconds = tourData.pulseTime_Milliseconds;
-            final int[] pulseTime_TimeIndex = tourData.pulseTime_TimeIndex;
+            final int[] rrTime_TimeIndex = tourData.pulseTime_TimeIndex;
+            final int[] rrTime_Milliseconds = tourData.pulseTime_Milliseconds;
 
-            final boolean isPulseTimeAtStart = pulseTime_TimeIndex[0] != -1;
+            final boolean isPulseTimeAtStart = rrTime_TimeIndex[0] != -1;
             final int pulseTimeOffset = isPulseTimeAtStart ? 0 : 1;
 
             // it is possible that the first pulse time slice is not at the start of a tour -> set additional start slice
-            final int numPulseTimeSlices = pulseTime_Milliseconds.length + pulseTimeOffset;
+            final int numPulseTimeSlices = pulseTimeOffset + rrTime_Milliseconds.length;
 
-            final double[] xData_PulseTime = new double[numPulseTimeSlices];
-            final float[] yData_PulseTime = new float[numPulseTimeSlices];
+            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numPulseTimeSlices * 1.3));
+            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numPulseTimeSlices * 1.3));
 
-            for (int pulseTimeIndex = 0; pulseTimeIndex < pulseTime_Milliseconds.length; pulseTimeIndex++) {
+            /*
+             * Get index where the first value is available
+             */
+            int firstIndexWithData = 0;
+            for (int timeIndexIndex = 0; timeIndexIndex < rrTime_TimeIndex.length; timeIndexIndex++) {
 
-               final double rrTimeMS = pulseTime_Milliseconds[pulseTimeIndex];
-               final double rrTimeSec = rrTimeMS / 1000.0;
+               final int timeIndex = rrTime_TimeIndex[timeIndexIndex];
 
-               sumRRTimeSec += rrTimeSec;
+               if (timeIndex >= 0) {
+                  break;
+               }
 
-               final float pulseFromPulseTime = (float) (60.0f / rrTimeSec);
-
-               final int dataIndex = isPulseTimeAtStart ? pulseTimeIndex : pulseTimeIndex + 1;
-
-               xData_PulseTime[dataIndex] = sumRRTimeSec;
-               yData_PulseTime[dataIndex] = pulseFromPulseTime;
-
+               firstIndexWithData = timeIndexIndex;
             }
 
-            chartDataModel.setVariableXYData(xData_PulseTime, yData_PulseTime);
+            double xAxisTime = 0;
 
+            if (firstIndexWithData > 0) {
+
+               // data are not available at the first time slice -> move on the x-axis to the index with the first value
+
+               final int xAxisTimeOffset = timeSerie[firstIndexWithData];
+
+               xAxisTime += xAxisTimeOffset;
+            }
+
+            System.out.println();
+            System.out.println();
+
+            for (int rrIndex = 0; rrIndex < rrTime_Milliseconds.length; rrIndex++) {
+
+               final int rrTime_Millisecond = rrTime_Milliseconds[rrIndex];
+
+               final double rrTime = rrTime_Millisecond / 1000.0;
+
+//               final int rrTimeIndex = rrTime_TimeIndex[rrIndex];
+//
+//               if (rrTimeIndex >= 0) {
+//
+//                  final int xAxisRRTime = timeSerie[rrTimeIndex];
+//               }
+
+//               if (rrTime > 2) {
+//
+//                  int a = rrIndex;
+//                  a++;
+//               }
+//
+               if (rrIndex == 6375) {
+
+                  int a = rrIndex;
+                  a++;
+               }
+
+//               if (rrTime > 4.000) {
+//
+//                  System.out.println((System.currentTimeMillis() + " rrTime: " + rrTime));
+//                  // TODO remove SYSTEM.OUT.PRINTLN
+//
+//               }
+
+               xAxisTime += rrTime;
+
+               final float bpmFromRRValue = (float) (60.0f / rrTime);
+
+               xData_PulseTime.add(xAxisTime);
+               yData_PulseTime.add(bpmFromRRValue);
+            }
+
+            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray(), rrTime_Milliseconds);
          }
+
          break;
 
       case RR_INTERVALS__2ND_DEVICE_BPM:
