@@ -4682,18 +4682,21 @@ public class ChartComponentGraph extends Canvas {
 
             path.lineTo(devXf, devY);
 
-            final int xValueDiff = xValuesDiffs[valueIndex];
+            if (valueIndex < xValuesDiffs.length) {
 
-            if (xValueDiff > 5000) {
+               final int xValueDiff = xValuesDiffs[valueIndex];
 
-               final int devXDiff = (int) (devX - devXPrev);
+               if (xValueDiff > 5000) {
 
-               gc.fillRectangle(
-                     (int) devXPrev,
-                     0, //(int) devYGraphTop,
-                     devXDiff,
-                     20);
+                  final int devXDiff = (int) (devX - devXPrev);
 
+                  gc.fillRectangle(
+                        (int) devXPrev,
+                        0, //(int) devYGraphTop,
+                        devXDiff,
+                        20);
+
+               }
             }
          }
 

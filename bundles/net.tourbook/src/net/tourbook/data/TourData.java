@@ -7946,7 +7946,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[] getPulse_RRIntervals() {
 
       if (pulseSerie_FromTime != null) {
-         return pulseSerie_FromTime;
+//         return pulseSerie_FromTime;
       }
 
       /**
@@ -9382,10 +9382,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
       computeGeo_Grid();
 
-      gearSerie            = serieData.gears;
+      gearSerie               = serieData.gears;
 
-      pulseTime_Milliseconds       = serieData.pulseTimes;
-      pulseTime_TimeIndex  = serieData.pulseTime_TimeIndex;
+      pulseTime_Milliseconds  = serieData.pulseTimes;
+      pulseTime_TimeIndex     = serieData.pulseTime_TimeIndex;
 
       if (powerSerie != null) {
          isPowerSerieFromDevice = true;
