@@ -4,7 +4,14 @@
 TODO's
 ======
 
-* Frederic : Remove the unused redirect_uri in the Dropbox app console once the new version is released
+* UI Theme:    Provide a UI to select the UI theme
+  
+
+* Website:     Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+               Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+
+* Frederic :   Remove the unused redirect_uri in the Dropbox app console once the new version is released
+
 
 Issues
 ======
