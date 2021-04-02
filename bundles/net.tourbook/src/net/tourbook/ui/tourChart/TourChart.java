@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,12 +55,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -107,7 +108,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -375,8 +375,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private Composite                 _parent;
    //
    private I2ndAltiLayer             _layer2ndAlti;
-   private ChartLayerMarker          _layerMarker;
    private ChartLayer2ndAltiSerie    _layer2ndAltiSerie;
+   private ChartLayerMarker          _layerMarker;
+   private ChartLayerNight           _layerNightSections;
    private ChartLayerPause           _layerPause;
    private ChartLayerPhoto           _layerPhoto;
    private ChartLayerSegmentAltitude _layerTourSegmenterAltitude;
@@ -821,14 +822,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourInfoIconTooltip = new TourToolTip(getToolTipControl());
       _tourInfoIconTooltip.addToolTipProvider(_tourInfoIconTooltipProvider);
 
-      _tourInfoIconTooltip.addHideListener(new IToolTipHideListener() {
-         @Override
-         public void afterHideToolTip(final Event event) {
+      _tourInfoIconTooltip.addHideListener(event ->
+      // hide hovered image
+      getToolTipControl().afterHideToolTip());
 
-            // hide hovered image
-            getToolTipControl().afterHideToolTip();
-         }
-      });
       setTourInfoIconToolTipProvider(_tourInfoIconTooltipProvider);
 
       // Setup tooltips
@@ -1099,113 +1096,107 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    private void addPrefListeners() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            if (_tcc == null) {
-               return;
+         if (_tcc == null) {
+            return;
+         }
+
+         setIsInUpdateUI(true);
+         try {
+
+            final String property = propertyChangeEvent.getProperty();
+
+            boolean isChartModified = false;
+            final boolean keepMinMax = true;
+
+            if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
+                  || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
+
+               // zoom preferences has changed
+
+               _tcc.updateZoomOptions();
+
+               isChartModified = true;
+
+            } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
+
+               /*
+                * when the chart is computed, the modified colors are read from the preferences
+                */
+               isChartModified = true;
+
+               // dispose old colors
+               disposeColors();
+
+            } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
+                  || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
+                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+
+                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+                  || property.equals(GRID_HORIZONTAL_DISTANCE)
+                  || property.equals(GRID_VERTICAL_DISTANCE)
+            //
+            ) {
+
+               setupChartConfig();
+
+               isChartModified = true;
+
+            } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
+
+               setupSegmenterValueFont();
             }
 
-            setIsInUpdateUI(true);
-            try {
+            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
 
-               final String property = event.getProperty();
-
-               boolean isChartModified = false;
-               final boolean keepMinMax = true;
-
-               if (property.equals(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED)
-                     || property.equals(ITourbookPreferences.GRAPH_ZOOM_AUTO_ZOOM_TO_SLIDER)) {
-
-                  // zoom preferences has changed
-
-                  _tcc.updateZoomOptions();
-
-                  isChartModified = true;
-
-               } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)) {
-
-                  /*
-                   * when the chart is computed, the modified colors are read from the preferences
-                   */
-                  isChartModified = true;
-
-                  // dispose old colors
-                  disposeColors();
-
-               } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
-                     || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-                     || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
-                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
-                     || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
-
-                     || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                     || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-                     || property.equals(GRID_HORIZONTAL_DISTANCE)
-                     || property.equals(GRID_VERTICAL_DISTANCE)
-               //
-               ) {
-
-                  setupChartConfig();
-
-                  isChartModified = true;
-
-               } else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
-
-                  setupSegmenterValueFont();
-               }
-
-               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
-
-               if (isChartModified) {
-                  updateTourChart(keepMinMax);
-               }
-
-            } finally {
-               setIsInUpdateUI(false);
+            if (isChartModified) {
+               updateTourChart(keepMinMax);
             }
+
+         } finally {
+            setIsInUpdateUI(false);
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            if (_tcc == null) {
-               return;
+         if (_tcc == null) {
+            return;
+         }
+
+         setIsInUpdateUI(true);
+         try {
+
+            final String property = propertyChangeEvent.getProperty();
+
+            boolean isChartModified = false;
+            boolean keepMinMax = true;
+
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+
+               // measurement system has changed
+
+               isChartModified = true;
+               keepMinMax = false;
+
+               _valuePointTooltip.reopen();
+
+               final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
+               tourAction.setImages();
             }
 
-            setIsInUpdateUI(true);
-            try {
+            isChartModified |= setMinMaxDefaultValue(property, isChartModified);
 
-               final String property = event.getProperty();
-
-               boolean isChartModified = false;
-               boolean keepMinMax = true;
-
-               if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
-
-                  // measurement system has changed
-
-                  isChartModified = true;
-                  keepMinMax = false;
-
-                  _valuePointTooltip.reopen();
-
-                  final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
-                  tourAction.setImages();
-               }
-
-               isChartModified |= setMinMaxDefaultValue(property, isChartModified);
-
-               if (isChartModified) {
-                  updateTourChart(keepMinMax);
-               }
-
-            } finally {
-               setIsInUpdateUI(false);
+            if (isChartModified) {
+               updateTourChart(keepMinMax);
             }
+
+         } finally {
+            setIsInUpdateUI(false);
          }
       };
 
@@ -1236,6 +1227,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     */
    public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
       _openDlgMgr.closeOpenedDialogs(openingDialog);
+   }
+
+   private void create_NightSection_ChartLabel(final ChartNightConfig chartNightConfig,
+                                               final double[] xAxisSerie,
+                                               final int xAxisSerieIndex,
+                                               final int xAxisEndSerieIndex) {
+
+      final ChartLabel chartLabel = new ChartLabel();
+
+      chartLabel.graphX = xAxisSerie[xAxisSerieIndex];
+      chartLabel.graphXEnd = xAxisSerie[xAxisEndSerieIndex];
+      chartLabel.serieIndex = xAxisSerieIndex;
+
+      chartNightConfig.chartLabels.add(chartLabel);
    }
 
    /**
@@ -1501,13 +1506,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final boolean isTimeSerie = timeSerie != null;
 
       final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
-      final long[] multipleStartTime = _tourData.multipleTourStartTime;
+      final ZonedDateTime[] multipleZonedStartTime = _tourData.multipleTourZonedStartTime;
 
       /*
        * Is is possible, that multiple tours contain manually created tours which do not have data
        * series !!!
        */
-      final boolean isMultipleTours = _tourData.isMultipleTours() && multipleStartTime.length > 1;
+      final boolean isMultipleTours = _tourData.isMultipleTours() && multipleZonedStartTime.length > 1;
 
       final long tourStart = _tourData.getTourStartTimeMS() / 1000;
       final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
@@ -1557,7 +1562,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // setup first multiple tour
       if (isMultipleTours) {
 
-         firstTourStartTime = multipleStartTime[0];
+         firstTourStartTime = multipleZonedStartTime[0].toInstant().toEpochMilli();
          // this is the first tour
 
          tourStartTime = firstTourStartTime;
@@ -1594,7 +1599,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   final int tourDuration = timeSerie[nextTourSerieIndex - 1];
                   tourElapsedTime = tourDuration;
 
-                  tourStartTime = multipleStartTime[nextTourIndex];
+                  tourStartTime = multipleZonedStartTime[nextTourIndex].toInstant().toEpochMilli();
 
                   if (nextTourIndex < multipleStartTimeIndex.length - 1) {
 
@@ -1768,10 +1773,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _layerMarker.setChartMarkerConfig(cmc);
       _tourMarkerTooltip.setChartMarkerConfig(cmc);
 
-      // set data serie for the x-axis
-      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
-            ? _tourData.getTimeSerieDouble()
-            : _tourData.getDistanceSerieDouble();
+      // get the x-axis data serie
+      final double[] xAxisSerie = getXAxisDataSerie();
 
       if (_tourData.isMultipleTours()) {
 
@@ -1884,17 +1887,158 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return chartLabel;
    }
 
+   private void createLayer_NightSections() {
+
+      final ChartNightConfig chartNightConfig = new ChartNightConfig();
+
+      if (_layerNightSections == null) {
+
+         // setup the night sections layer, a layer is created only once
+
+         _layerNightSections = new ChartLayerNight();
+
+         // set overlay painter
+         addChartOverlay(_layerNightSections);
+      }
+
+      _layerNightSections.setChartNightConfig(chartNightConfig);
+
+      // get the x-axis data serie
+      final double[] xAxisSerie = getXAxisDataSerie();
+
+      final int[] timeSerie = _tourData.timeSerie;
+      final double[] latitudeSerie = _tourData.latitudeSerie;
+      final double[] longitudeSerie = _tourData.longitudeSerie;
+
+      if (timeSerie == null || latitudeSerie == null || longitudeSerie == null) {
+         return;
+      }
+
+      if (_tourData.isMultipleTours()) {
+
+         final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
+         if (multipleStartTimeIndex.length == 0) {
+            return;
+         }
+
+         final int numberOfTours = _tourData.multipleTourStartIndex.length;
+         final ZonedDateTime[] multipleTourZonedStartTime = _tourData.multipleTourZonedStartTime;
+
+         int tourSerieIndex = 0;
+         int nextTourSerieIndex = 0;
+         ZonedDateTime tourStartTime = null;
+         for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
+
+            tourStartTime = multipleTourZonedStartTime[tourIndex];
+            tourSerieIndex = multipleStartTimeIndex[tourIndex];
+            nextTourSerieIndex = tourIndex < numberOfTours - 1
+                  ? multipleStartTimeIndex[tourIndex + 1]
+                  : timeSerie.length;
+
+            long previousTourElapsedTime = 0;
+            if (tourIndex > 0) {
+               previousTourElapsedTime = timeSerie[tourSerieIndex - 1];
+            }
+
+            createLayer_NightSections_Chart(xAxisSerie, chartNightConfig, tourStartTime, tourSerieIndex, nextTourSerieIndex, previousTourElapsedTime);
+         }
+
+      } else {
+
+         createLayer_NightSections_Chart(xAxisSerie, chartNightConfig, _tourData.getTourStartTime(), 0, timeSerie.length, 0);
+      }
+   }
+
+   /**
+    * Finds and creates the night sections for a given tour in the tour chart
+    *
+    * @param xAxisSerie
+    * @param chartNightConfig
+    * @param tourStartTime
+    *           The tour start time with a time zone
+    * @param currentTourSerieIndex
+    *           Used when dealing with multiple tours: Gives the given tour's index start in the
+    *           time serie
+    * @param timeSerieLength
+    *           The length of the given tour's time serie
+    * @param timeOffset
+    *           Used when dealing with multiple tours: Gives the previous tour elapsed time in order
+    *           to compute
+    *           each time slice time for the given tour
+    */
+   private void createLayer_NightSections_Chart(final double[] xAxisSerie,
+                                                final ChartNightConfig chartNightConfig,
+                                                final ZonedDateTime tourStartTime,
+                                                final int currentTourSerieIndex,
+                                                final int timeSerieLength,
+                                                final long timeOffset) {
+
+      final int[] timeSerie = _tourData.timeSerie;
+      final double[] latitudeSerie = _tourData.latitudeSerie;
+      final double[] longitudeSerie = _tourData.longitudeSerie;
+
+      ZonedDateTime sunsetTimes = null;
+      ZonedDateTime sunriseTimes = null;
+      boolean isNightTime = false;
+      int nightStartSerieIndex = 0;
+      int currentDay = 0;
+      for (int index = currentTourSerieIndex; index < timeSerieLength; ++index) {
+
+         final ZonedDateTime currentZonedDateTime = tourStartTime.plusSeconds(timeSerie[index] - timeOffset);
+
+         //If the current time is in the next day, we need to recalculate the sunrise/sunset times for this new day.
+         if (currentDay == 0 || currentZonedDateTime.getDayOfMonth() != currentDay) {
+
+            sunriseTimes = TimeTools.determineSunRiseTimes(currentZonedDateTime, latitudeSerie[index], longitudeSerie[index]);
+            sunsetTimes = TimeTools.determineSunsetTimes(currentZonedDateTime, latitudeSerie[index], longitudeSerie[index]);
+
+            currentDay = currentZonedDateTime.getDayOfMonth();
+         }
+         final long currentTime = currentZonedDateTime.toEpochSecond();
+
+         if (isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime)) {
+
+            if (!isNightTime) {
+
+               isNightTime = true;
+               nightStartSerieIndex = index;
+            }
+            if (index == timeSerieLength - 1) {
+
+               //The last time slice is in the night,
+               //we need to create the night section it before exiting the for loop
+
+               create_NightSection_ChartLabel(
+                     chartNightConfig,
+                     xAxisSerie,
+                     nightStartSerieIndex,
+                     index);
+            }
+         } else if (isNightTime) {
+
+            //The current time slice is in daylight and
+            //the previous time slice was in the night
+
+            create_NightSection_ChartLabel(
+                  chartNightConfig,
+                  xAxisSerie,
+                  nightStartSerieIndex,
+                  index);
+
+            isNightTime = false;
+         }
+      }
+   }
+
    /**
     * @param pauseDuration
     * @param xAxisSerie
     * @param xAxisSerieIndex
-    * @param labelPosition
     * @return
     */
    private ChartLabel createLayer_Pause_ChartLabel(final String pauseDuration,
                                                    final double[] xAxisSerie,
-                                                   final int xAxisSerieIndex,
-                                                   final int labelPosition) {
+                                                   final int xAxisSerieIndex) {
 
       final ChartLabel chartLabel = new ChartLabel();
 
@@ -1939,17 +2083,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       _layerPause.setChartPauseConfig(cpc);
 
-      // set data serie for the x-axis
-      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
-            ? _tourData.getTimeSerieDouble()
-            : _tourData.getDistanceSerieDouble();
+      // get the x-axis data serie
+      final double[] xAxisSerie = getXAxisDataSerie();
 
       if (_tourData.isMultipleTours()) {
 
          final int numberOfTours = _tourData.multipleTourStartIndex.length;
          final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
          final int[] multipleNumberOfPauses = _tourData.multipleNumberOfPauses;
-         final long[] multipleTourStartTime = _tourData.multipleTourStartTime;
+         final ZonedDateTime[] multipleTourZonedStartTime = _tourData.multipleTourZonedStartTime;
 
          if (multipleStartTimeIndex.length == 0) {
             return;
@@ -1963,11 +2105,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          int currentTourPauseIndex = 0;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
-            tourStartTime = multipleTourStartTime[tourIndex];
+            tourStartTime = multipleTourZonedStartTime[tourIndex].toInstant().toEpochMilli();
             numberOfPauses = multipleNumberOfPauses[tourIndex];
             tourSerieIndex = multipleStartTimeIndex[tourIndex];
 
-            for (int relativeTourPauseIndex = 0; relativeTourPauseIndex < numberOfPauses;) {
+            for (int relativeTourPauseIndex = 0; relativeTourPauseIndex < numberOfPauses; ++relativeTourPauseIndex) {
 
                final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
                final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
@@ -1993,13 +2135,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                         pauseDurationText,
                         xAxisSerie,
-                        tourSerieIndex,
-                        0);
+                        tourSerieIndex);
 
                   cpc.chartLabels.add(chartLabel);
                }
 
-               ++relativeTourPauseIndex;
                ++currentTourPauseIndex;
             }
          }
@@ -2039,8 +2179,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             final ChartLabel chartLabel = createLayer_Pause_ChartLabel(
                   pauseDurationText,
                   xAxisSerie,
-                  serieIndex,
-                  0);
+                  serieIndex);
 
             cpc.chartLabels.add(chartLabel);
          }
@@ -3093,6 +3232,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return _segmenterValueFont;
    }
 
+   private double[] getXAxisDataSerie() {
+
+      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
+            ? _tourData.getTimeSerieDouble()
+            : _tourData.getDistanceSerieDouble();
+      return xAxisSerie;
+   }
+
    private ChartDataYSerie getYData(final int yDataInfoId) {
 
       final ArrayList<ChartDataYSerie> yDataList = getChartDataModel().getYData();
@@ -3158,6 +3305,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       removeChartMouseListener(_mousePhotoListener);
+   }
+
+   private boolean isTimeSliceAtNight(final ZonedDateTime sunsetTimes,
+                                      final ZonedDateTime sunriseTimes,
+                                      final long time) {
+
+      return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
    }
 
    private void onChart_KeyDown(final ChartKeyEvent keyEvent) {
@@ -5135,6 +5289,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       /*
+       * Night sections layer
+       */
+      if (_layerNightSections != null && yData == yDataWithLabels) {
+         customFgLayers.add(_layerNightSections);
+      }
+
+      /*
        * photo layer
        */
       // show photo layer only for ONE visible graph
@@ -5679,6 +5840,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       createLayer_TourSegmenter();
       createLayer_Marker(false);
       createLayer_Pauses(false);
+      createLayer_NightSections();
       createLayer_2ndAlti();
       createLayer_Photo();
 

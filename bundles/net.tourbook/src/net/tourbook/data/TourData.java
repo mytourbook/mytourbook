@@ -1462,10 +1462,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int[]               multipleTourStartIndex;
 
    /**
-    * Contains the tour start time for each tour.
+    * Contains the tour start time with a time zone for each tour.
     */
    @Transient
-   public long[]              multipleTourStartTime;
+   public ZonedDateTime[]     multipleTourZonedStartTime;
 
    /**
     * Contains tour titles for each tour.

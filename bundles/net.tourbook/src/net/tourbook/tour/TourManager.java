@@ -846,7 +846,7 @@ public class TourManager {
       final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
       final float[] allTours_CadenceMultiplier = joinedTourData.multipleTours_CadenceMultiplier = new float[numTours];
       final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
-      final long[] allStartTime = joinedTourData.multipleTourStartTime = new long[numTours];
+      final ZonedDateTime[] allStartTime = joinedTourData.multipleTourZonedStartTime = new ZonedDateTime[numTours];
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
       final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
       final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
@@ -1129,7 +1129,7 @@ public class TourManager {
          // tour titles
          final long tourStartTime = fromTourData.getTourStartTimeMS();
          allTourTitle[tourIndex] = TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S);
-         allStartTime[tourIndex] = tourStartTime;
+         allStartTime[tourIndex] = fromTourData.getTourStartTime();
 
          // cadence multiplier
          allTours_CadenceMultiplier[tourIndex] = fromTourData.getCadenceMultiplier();

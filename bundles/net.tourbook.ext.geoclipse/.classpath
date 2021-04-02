@@ -4,13 +4,13 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/geoapi-3.0.1.jar"/> <!-- https://mvnrepository.com/artifact/org.opengis/geoapi -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-main-22.2.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-main -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-wms-22.2.jar"/> <!--  https://mvnrepository.com/artifact/org.geotools/gt-wms -->
+	<classpathentry exported="true" kind="lib" path="lib/gt-wms-22.2.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-wms -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-api-20.5.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-api -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-metadata-22.2.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-metadata -->
-	<classpathentry exported="true" kind="lib" path="lib/jdom-2.0.2.jar"/> <!--  https://mvnrepository.com/artifact/org.jdom/jdom -->
+	<classpathentry exported="true" kind="lib" path="lib/jdom-2.0.2.jar"/> <!-- https://mvnrepository.com/artifact/org.jdom/jdom -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-xml-22.2.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-xml -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-referencing-22.2.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-referencing -->
-	<classpathentry exported="true" kind="lib" path="lib/jts-1.13.jar"/> <!--  https://mvnrepository.com/artifact/com.vividsolutions/jts -->
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.9.jar"/> <!--  https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+	<classpathentry exported="true" kind="lib" path="lib/jts-1.13.jar"/> <!-- https://mvnrepository.com/artifact/com.vividsolutions/jts -->
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.9.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
