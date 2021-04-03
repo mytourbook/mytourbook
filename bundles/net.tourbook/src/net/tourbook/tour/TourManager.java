@@ -4183,21 +4183,15 @@ public class TourManager {
 
             yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.SECOND_X_AXIS);
 
-            final int[] timeSerie = tourData.timeSerie;
+            final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
+            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex; //          length: numTimeSlices
+            final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
 
-            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
-            final int[] allRRTimeInMilliseconds = tourData.pulseTime_Milliseconds;
+            final int numTimeSlices = timeSerie.length;
+            final int numRRTimes = allRRTimesInMilliseconds.length;
 
-            final boolean isPulseTimeAtStart = timeSerie_WithRRIndex[0] != -1;
-            final int pulseTimeOffset = isPulseTimeAtStart ? 0 : 1;
-
-            // it is possible that the first pulse time slice is not at the start of a tour -> set additional start slice
-            final int numPulseTimeSlices = pulseTimeOffset + allRRTimeInMilliseconds.length;
-
-            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numPulseTimeSlices * 1.3));
-            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numPulseTimeSlices * 1.3));
-
-            double xAxisRRTime = 0;
+            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numRRTimes * 1.05));
+            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
 
             /**
              * Syncronize 2 time series which can contain gaps
@@ -4206,55 +4200,94 @@ public class TourManager {
              *
              * x-axis     0----1----2----3----4----5----6----7----10----11----12----13---15-  seconds
              *
-             * RR times   ------------320--561--------762---763-----1434-----785---1006-----  milliseconds
+             * RR times   ------------320---1434-------762---763-------561--785-------1006--  milliseconds
              *
              * .
              * </pre>
              */
 
-            final int numTimeSlices = timeSerie_WithRRIndex.length;
+            boolean areInitialRRValuesInvalid = false;
 
             int timeIndex = 0;
+            int rrIndex = 0;
 
-            for (final int rrTimeInMillisecond : allRRTimeInMilliseconds) {
+            double xAxisRRTime = 0;
 
-               final int xAxisTime_Start = timeSerie[timeIndex];
+            // loop: x-axis time
+            for (; timeIndex < numTimeSlices; timeIndex++) {
 
-               while (timeIndex < numTimeSlices) {
+               final int xAxisTime = timeSerie[timeIndex];
+               final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
 
-                  final int timeIndex_FromRR = timeSerie_WithRRIndex[timeIndex];
+               if (rrIndex_FromTimeSerie == -1) {
 
-                  System.out.println("timeIndex: " + timeIndex + " timeIndex_FromRR: " + timeIndex_FromRR);
+                  // RR time index is not valid
 
-                  if (timeIndex_FromRR != -1 && timeIndex >= timeIndex_FromRR) {
+                  if (xAxisRRTime == 0) {
 
-                     final int xAxisTime = timeSerie[timeIndex];
-                     final int xAxisDiff = xAxisTime - xAxisTime_Start;
+                     // keep time before RR values are available
 
-                     if (xAxisDiff > 0) {
+                     areInitialRRValuesInvalid = true;
 
-                        xAxisRRTime += xAxisDiff;
+                  } else {
 
-                        xData_PulseTime.add(xAxisRRTime);
-                        yData_PulseTime.add(0);
-                     }
+                     // this can occur when bpm < 60 -> time > 1 sec
 
-                     break;
                   }
 
-                  timeIndex++;
+               } else {
+
+                  // RR time index is valid
+
+                  // check if the initial rr values are invalid
+                  if (areInitialRRValuesInvalid && xAxisRRTime == 0) {
+
+                     // initial RR values are invalid
+
+                     xAxisRRTime += xAxisTime;
+
+                     xData_PulseTime.add(xAxisTime);
+                     yData_PulseTime.add(0);
+                  }
+
+                  if (xAxisRRTime < xAxisTime) {
+
+//                   System.out.println("xAxisRRTime <<< xAxisTime " + timeIndex + " - " + (xAxisRRTime - xAxisTime));
+
+                     while (rrIndex < numRRTimes && xAxisRRTime < xAxisTime) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        xData_PulseTime.add(xAxisRRTime);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+
+                  } else if (xAxisRRTime > xAxisTime) {
+
+//                   System.out.println("xAxisRRTime > xAxisTime " + timeIndex + " - " + (xAxisRRTime - xAxisTime));
+
+                     while (rrIndex < numRRTimes && xAxisRRTime > xAxisTime) {
+
+                        final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
+
+                        xAxisRRTime += rrSliceTime;
+                        final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
+
+                        xData_PulseTime.add(xAxisRRTime);
+                        yData_PulseTime.add(bpmFromRRTime);
+
+                        rrIndex++;
+                     }
+                  }
                }
-
-               final double rrTime = rrTimeInMillisecond / 1000.0;
-
-               xAxisRRTime += rrTime;
-               final float bpmFromRRValue = (float) (60.0f / rrTime);
-
-               xData_PulseTime.add(xAxisRRTime);
-               yData_PulseTime.add(bpmFromRRValue);
             }
 
-            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray(), allRRTimeInMilliseconds);
+            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray(), allRRTimesInMilliseconds);
          }
 
          break;

@@ -4434,13 +4434,11 @@ public class ChartComponentGraph extends Canvas {
                                        final GraphDrawingData graphDrawingData,
                                        final boolean isTopGraph) {
 
-      final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
-
       final ChartDataModel chartDataModel = graphDrawingData.getChartDrawingData().chartDataModel;
+
       final double[] xValues = chartDataModel.getVariableXValues();
       final float[] yValues = chartDataModel.getVariableYValues();
-      final int[] xValuesDiffs = chartDataModel.getVariableXValueDiffs();
 
       final int numXValues = xValues.length;
 
@@ -4681,23 +4679,6 @@ public class ChartComponentGraph extends Canvas {
             }
 
             path.lineTo(devXf, devY);
-
-            if (valueIndex < xValuesDiffs.length) {
-
-               final int xValueDiff = xValuesDiffs[valueIndex];
-
-               if (xValueDiff > 5000) {
-
-                  final int devXDiff = (int) (devX - devXPrev);
-
-                  gc.fillRectangle(
-                        (int) devXPrev,
-                        0, //(int) devYGraphTop,
-                        devXDiff,
-                        20);
-
-               }
-            }
          }
 
          /*

@@ -6524,11 +6524,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final TimeData timeData = allTimeData[timeIndex];
          final int[] timeSlice_AllPulseTimes = timeData.pulseTime;
 
-         if (timeIndex == 8695) {
-            int a = 0;
-            a++;
-         }
-
          if (timeSlice_AllPulseTimes != null) {
 
             boolean isTimeIndexSet = false;
@@ -7977,11 +7972,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
 
-         if (serieIndex == 5400) {
-            int a = 0;
-            a++;
-         }
-
          final int timeIndex = pulseTime_TimeIndex[serieIndex];
          final int timeIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
 
@@ -9410,7 +9400,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       swim_Strokes               = serieData.swim_Strokes;
       swim_StrokeStyle           = serieData.swim_StrokeStyle;
       swim_Time                  = serieData.swim_Time;
-      isSwimCadence = swim_Cadence != null;
+      isSwimCadence              = swim_Cadence != null;
 
       // currently only surfing data can be made visible/hidden
       visibleDataPointSerie      = serieData.visiblePoints_Surfing;
