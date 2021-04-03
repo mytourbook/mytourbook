@@ -5,6 +5,10 @@ TODO's
 ======
 
 * UI Theme:    Provide a UI to select the UI theme
+               https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_default
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
   
 
 =======
