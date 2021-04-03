@@ -221,6 +221,11 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
+
+//https://world.openfoodfacts.org/data
+
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
