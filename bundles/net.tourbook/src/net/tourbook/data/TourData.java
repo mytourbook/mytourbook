@@ -7970,49 +7970,97 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       pulseSerie_FromTime = new float[numTimeSlices];
 
+      /*
+       * Garmin Edge 1030 creates R-R intervals with 5000 ms when there is no heartbeat value or
+       * the devices signal is interrupted !!!
+       */
+
       for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
 
-         final int timeIndex = pulseTime_TimeIndex[serieIndex];
-         final int timeIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
+         final int rrIndex_FromTimeSerie = pulseTime_TimeIndex[serieIndex];
+         final int rrIndex_FromTimeSerie_Next = pulseTime_TimeIndex[serieIndex + 1];
 
-         if (serieIndex > 0 && (timeIndex < 0 || timeIndex_Next < 0)) {
+         if (serieIndex > 0 && (rrIndex_FromTimeSerie < 0 || rrIndex_FromTimeSerie_Next < 0)) {
 
             // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
 
-            pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
+            if (serieIndex >= 2296) {
+               int a = 0;
+               a++;
+            }
+
+            if (rrIndex_FromTimeSerie == -1) {
+
+               pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
+
+            } else {
+
+               final int pulseTimeMS = pulseTime_Milliseconds[rrIndex_FromTimeSerie];
+
+               if (pulseTimeMS == 5_000) {
+
+                  pulseSerie_FromTime[serieIndex] = 0;
+
+               } else {
+
+                  pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
+               }
+            }
 
             continue;
          }
 
-         if (timeIndex < 0 || timeIndex_Next < 0) {
+         if (rrIndex_FromTimeSerie < 0 || rrIndex_FromTimeSerie_Next < 0) {
 
             continue;
          }
 
-         final int numPulseTimes = timeIndex_Next - timeIndex;
+         float pulseFromPulseTime = 0;
+
+         final int numPulseTimes = rrIndex_FromTimeSerie_Next - rrIndex_FromTimeSerie;
 
          if (numPulseTimes == 0) {
 
             // there is only 1 pulse time
 
-            final int pulseTimeMS = pulseTime_Milliseconds[timeIndex];
-            final float pulseFromPulseTime = 60.0f / (pulseTimeMS / 1000.0f);
+            if (serieIndex >= 2296) {
+               int a = 0;
+               a++;
+            }
 
-            pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+            final int pulseTimeMS = pulseTime_Milliseconds[rrIndex_FromTimeSerie];
+
+            if (pulseTimeMS > 0 && pulseTimeMS != 5_000) {
+
+               pulseFromPulseTime = 60.0f / (pulseTimeMS / 1000.0f);
+            }
 
          } else {
 
+            if (serieIndex >= 2296) {
+               int a = 0;
+               a++;
+            }
             long sumPulseTimeMS = 0;
 
-            for (int avgSerieIndex = timeIndex; avgSerieIndex < timeIndex_Next; avgSerieIndex++) {
-               sumPulseTimeMS += pulseTime_Milliseconds[avgSerieIndex];
+            for (int avgSerieIndex = rrIndex_FromTimeSerie; avgSerieIndex < rrIndex_FromTimeSerie_Next; avgSerieIndex++) {
+
+               final int pulseTimeMS = pulseTime_Milliseconds[avgSerieIndex];
+
+               if (pulseTimeMS != 5_000) {
+                  sumPulseTimeMS += pulseTimeMS;
+               }
+
             }
 
-            final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
-            final float pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
+            if (sumPulseTimeMS > 0) {
 
-            pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
+               final float avgPulseTimeMS = sumPulseTimeMS / (float) numPulseTimes;
+               pulseFromPulseTime = 60.0f / (avgPulseTimeMS / 1000.0f);
+            }
          }
+
+         pulseSerie_FromTime[serieIndex] = pulseFromPulseTime;
       }
 
       return pulseSerie_FromTime;

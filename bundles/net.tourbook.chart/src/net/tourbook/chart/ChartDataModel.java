@@ -81,9 +81,8 @@ public class ChartDataModel {
     */
    private boolean                    _isNoLinesValuesDisplayed;
 
-   private double[]                   variableXValues;
-   private int[]                      variableXValueDiffs;
-   private float[]                    variableYValues;
+   private double[]                   variableX_Values;
+   private float[]                    variableY_Values;
 
    public ChartDataModel(final ChartType chartType) {
       _chartType = chartType;
@@ -131,16 +130,12 @@ public class ChartDataModel {
       return _title;
    }
 
-   public int[] getVariableXValueDiffs() {
-      return variableXValueDiffs;
+   public double[] getVariableX_Values() {
+      return variableX_Values;
    }
 
-   public double[] getVariableXValues() {
-      return variableXValues;
-   }
-
-   public float[] getVariableYValues() {
-      return variableYValues;
+   public float[] getVariableY_Values() {
+      return variableY_Values;
    }
 
    /**
@@ -234,11 +229,11 @@ public class ChartDataModel {
       _title = title;
    }
 
-   public void setVariableXYData(final double[] variableXValues, final float[] variableYValues, final int[] variableXValueDiffs) {
+   public void setVariableXYData(final double[] variableX_Values,
+                                 final float[] variableY_Values) {
 
-      this.variableXValues = variableXValues;
-      this.variableYValues = variableYValues;
-      this.variableXValueDiffs = variableXValueDiffs;
+      this.variableX_Values = variableX_Values;
+      this.variableY_Values = variableY_Values;
    }
 
    public void setXData(final ChartDataXSerie data) {

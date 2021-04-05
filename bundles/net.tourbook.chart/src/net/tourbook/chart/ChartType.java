@@ -35,6 +35,6 @@ public enum ChartType {
     * R-R intervals can contain multiple values (>100) in one time slice -> x-axis must be
     * calculated differently
     */
-   SECOND_X_AXIS,
+   VARIABLE_X_AXIS,
 
 }

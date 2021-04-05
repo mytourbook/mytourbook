@@ -4181,7 +4181,7 @@ public class TourManager {
 
          if (isPulseTimeSerie) {
 
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.SECOND_X_AXIS);
+            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.VARIABLE_X_AXIS);
 
             final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
             final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex; //          length: numTimeSlices
@@ -4208,16 +4208,33 @@ public class TourManager {
 
             boolean areInitialRRValuesInvalid = false;
 
-            int timeIndex = 0;
+            /*
+             * Adjust all values with the first value, otherwise the graph looks like it is shifted
+             * compared with the device bpm value
+             */
+            double firstValueOffset = 0;
+            for (final int rrTimeMS : allRRTimesInMilliseconds) {
+               final double rrSliceTime = rrTimeMS / 1000.0;
+               if (rrSliceTime > 0) {
+                  firstValueOffset = rrSliceTime;
+                  break;
+               }
+            }
+
             int rrIndex = 0;
 
             double xAxisRRTime = 0;
 
             // loop: x-axis time
-            for (; timeIndex < numTimeSlices; timeIndex++) {
+            for (int timeIndex = 0; timeIndex < numTimeSlices; timeIndex++) {
 
                final int xAxisTime = timeSerie[timeIndex];
                final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
+
+               if (timeIndex == 1347) {
+                  int a = 0;
+                  a++;
+               }
 
                if (rrIndex_FromTimeSerie == -1) {
 
@@ -4239,7 +4256,7 @@ public class TourManager {
 
                   // RR time index is valid
 
-                  // check if the initial rr values are invalid
+                  // check if the first RR values are invalid
                   if (areInitialRRValuesInvalid && xAxisRRTime == 0) {
 
                      // initial RR values are invalid
@@ -4250,44 +4267,95 @@ public class TourManager {
                      yData_PulseTime.add(0);
                   }
 
+                  final int rrIndexDiff = rrIndex_FromTimeSerie - rrIndex;
+                  if (rrIndexDiff > 1 || rrIndexDiff < -1) {
+                     int b = 0;
+                     b++;
+//                     rrIndex = rrIndex_FromTimeSerie;
+                  }
+
                   if (xAxisRRTime < xAxisTime) {
 
-//                   System.out.println("xAxisRRTime <<< xAxisTime " + timeIndex + " - " + (xAxisRRTime - xAxisTime));
+//                     System.out.println(""
+//                           + "RRTime <<< xAxisTime " + timeIndex + " diff: " + String.format("%1.3f", xAxisRRTime - xAxisTime)
+//                           + " rrIndex_FromTimeSerie: " + rrIndex_FromTimeSerie
+//                           + " rrIndex: " + rrIndex
+//                           + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
-                     while (rrIndex < numRRTimes && xAxisRRTime < xAxisTime) {
+                     while (rrIndex < numRRTimes
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime < xAxisTime
+
+                     ) {
 
                         final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
 
                         xAxisRRTime += rrSliceTime;
                         final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
 
-                        xData_PulseTime.add(xAxisRRTime);
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
                         yData_PulseTime.add(bpmFromRRTime);
 
                         rrIndex++;
                      }
 
+                     if (xAxisRRTime < xAxisTime - 2) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(-20);
+                     }
+
                   } else if (xAxisRRTime > xAxisTime) {
 
-//                   System.out.println("xAxisRRTime > xAxisTime " + timeIndex + " - " + (xAxisRRTime - xAxisTime));
+                     // this occured when bpm < 60
 
-                     while (rrIndex < numRRTimes && xAxisRRTime > xAxisTime) {
+//                   System.out.println(""
+//                   + "RRTime > xAxisTime " + timeIndex + " diff: " + String.format("%1.3f", xAxisRRTime - xAxisTime)
+//                   + " rrIndex_FromTimeSerie: " + rrIndex_FromTimeSerie
+//                   + " rrIndex: " + rrIndex
+//                   + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
+
+                     while (rrIndex < numRRTimes
+
+                           && rrIndex <= rrIndex_FromTimeSerie
+
+                           && xAxisRRTime > xAxisTime
+
+                     ) {
 
                         final double rrSliceTime = allRRTimesInMilliseconds[rrIndex] / 1000.0;
 
                         xAxisRRTime += rrSliceTime;
                         final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
 
-                        xData_PulseTime.add(xAxisRRTime);
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
                         yData_PulseTime.add(bpmFromRRTime);
 
                         rrIndex++;
+                     }
+
+                     if (xAxisRRTime > xAxisTime - 2) {
+
+                        // RR time is still too small -> adjust RR time to x-Axis time
+
+                        rrIndex=rrIndex_FromTimeSerie;
+
+                        xAxisRRTime += xAxisTime - xAxisRRTime;
+
+                        xData_PulseTime.add(xAxisRRTime - firstValueOffset);
+                        yData_PulseTime.add(-100);
                      }
                   }
                }
             }
 
-            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray(), allRRTimesInMilliseconds);
+            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray());
          }
 
          break;

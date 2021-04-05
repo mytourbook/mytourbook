@@ -6707,8 +6707,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
       _seriePulse_RR_Bpm = _tourData.getPulse_RRIntervals();
-      _seriePulse_RR_Times = _tourData.pulseTime_Milliseconds;
+
+      // time serie which is containing the index for the first slice in the RR serie
       _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
+
+      // RR serie
+      _seriePulse_RR_Times = _tourData.pulseTime_Milliseconds;
 
       _serieLatitude = _tourData.latitudeSerie;
       _serieLongitude = _tourData.longitudeSerie;
@@ -8194,7 +8198,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int numTimeSlices = _serieTime.length;
       final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
-      if (serieIndex > 0 && serieIndex < numTimeSlices - 1) {
+      if (serieIndex < numTimeSlices - 1) {
 
          final int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
          final int rrIndex_Next = _seriePulse_RR_Index[serieIndex + 1];
