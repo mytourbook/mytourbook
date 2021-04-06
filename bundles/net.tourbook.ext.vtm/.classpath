@@ -34,7 +34,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/svgSalamander-v1.1.1.jar" exported="true">
+	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.formdev/svgSalamander/1.1.2.4/97af14bc9e35d3a9a94c40da498ea7f2cfda3b1a/svgSalamander-1.1.2.4-sources.jar" kind="lib" path="libs/svgSalamander-1.1.2.4.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -50,11 +50,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.14.1/f8319293dad84c8ac79282b26d835f6edb9f637d/okhttp-3.14.1-sources.jar" kind="lib" path="libs/okhttp-3.14.1.jar" exported="true">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/ant-1.8.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -90,11 +85,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/331ecaeba2fd87c06a0766e8ebe718e1e294f27d/okio-1.17.2-sources.jar" kind="lib" path="libs/okio-1.17.2.jar" exported="true">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/ant-launcher-1.8.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
