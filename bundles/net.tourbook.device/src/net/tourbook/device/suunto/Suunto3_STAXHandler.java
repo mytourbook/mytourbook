@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -267,7 +267,8 @@ public class Suunto3_STAXHandler {
       /*
        * set tour start date/time
        */
-      tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
+      final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime);
+      tourData.setTourStartTime(zonedStartTime);
 
       tourData.setDeviceTimeInterval((short) -1);
       tourData.setImportFilePath(_importFilePath);
@@ -288,6 +289,17 @@ public class Suunto3_STAXHandler {
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO3);
       final Long tourId = tourData.createTourId(uniqueId);
+
+      /*
+       * The tour start time timezone is set from lat/lon in createTimeSeries()
+       */
+      final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
+
+      if (zonedStartTime.equals(tourStartTime_FromLatLon) == false) {
+
+         // time zone is different -> fix tour start components with adjusted time zone
+         tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
+      }
 
       // check if the tour is already imported
       if (_alreadyImportedTours.containsKey(tourId) == false) {

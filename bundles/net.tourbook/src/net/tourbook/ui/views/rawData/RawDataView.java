@@ -2831,7 +2831,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          public void update(final ViewerCell cell) {
 
             final TourData element = (TourData) cell.getElement();
-            final long value = element.getCalories();
+            final long value = element.getCalories() / 1000L;
 
             cell.setText(FormatManager.formatNumber_0(value));
          }
