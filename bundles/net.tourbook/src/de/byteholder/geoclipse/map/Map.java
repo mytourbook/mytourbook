@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 /*
  * 2007-04-29
  * - completely removed DesignTime; this can be re-added later if needed
@@ -154,7 +169,7 @@ public class Map extends Canvas {
    /**
     * Max zoomlevels which the maps supports
     */
-   public static final int              MAP_MAX_ZOOM_LEVEL               = 19;
+   public static final int              MAP_MAX_ZOOM_LEVEL               = 22;
 
    /**
     * these zoom levels are displayed in the UI therefore they start with 1 instead of 0
@@ -242,7 +257,7 @@ public class Map extends Canvas {
    private static final Pattern       _patternWikiParamter                  = Pattern.compile(PATTERN_SEPARATOR);
    private static final Pattern       _patternWikiKeyValue                  = Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
 
-   private final static ColorCacheSWT _colorCache                           = new ColorCacheSWT();
+   private static final ColorCacheSWT _colorCache                           = new ColorCacheSWT();
 
    // [181,208,208] is the color of water in the standard OSM material
    public static final RGB        OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
@@ -1490,7 +1505,7 @@ public class Map extends Canvas {
 
       if (geo_Start == null) {
 
-         // this can occure when hovering but not yet selected
+         // this can occur when hovering but not yet selected
 
          geo_Start = geo_End;
       }
@@ -2204,7 +2219,7 @@ public class Map extends Canvas {
 
       if (_worldPixel_TopLeft_Viewport == null) {
 
-         // this occured when comparing tours
+         // this occurred when comparing tours
 
          return false;
       }
@@ -2266,7 +2281,7 @@ public class Map extends Canvas {
 
       if (hoveredTile == null) {
 
-         // this can occure when map is zoomed
+         // this can occur when map is zoomed
          return false;
       }
 
@@ -2326,7 +2341,7 @@ public class Map extends Canvas {
                }
             }
 
-            // this must be checked again otherwise the last tour id occures multiple times
+            // this must be checked again otherwise the last tour id occurs multiple times
             if (hoverTourIdIndex >= numPainted_HoveredTourId) {
                break;
             }
@@ -3481,7 +3496,7 @@ public class Map extends Canvas {
       int numX = (int) (vpWidth / geoGridPixelSizeXAdjusted);
       int numY = (int) (vpHeight / geoGridPixelSizeYAdjusted);
 
-      // this can occure by high zoom level
+      // this can occur by high zoom level
       if (numX < 1) {
          numX = 1;
       }
@@ -3555,7 +3570,7 @@ public class Map extends Canvas {
       gc.setLineWidth(2);
 
       /*
-       * show info in the top/left corner that selection for the offline area is activ
+       * show info in the top/left corner that selection for the offline area is active
        */
       paint_GridBox_70_Info_MouseGeoPos(gc, mapGridData);
 
@@ -3811,7 +3826,7 @@ public class Map extends Canvas {
 
       if (tourData == null) {
 
-         // this occured, it can be that previously a history/multiple tour was displayed
+         // this occurred, it can be that previously a history/multiple tour was displayed
          return;
       }
 
@@ -3911,7 +3926,7 @@ public class Map extends Canvas {
 
          if (tourData == null) {
 
-            // this occured, it can be that previously a history/multiple tour was displayed
+            // this occurred, it can be that previously a history/multiple tour was displayed
 
          } else {
             paint_HoveredTour_52_TourDetail(gc, devXMouse, devYMouse, tourData);
@@ -4063,7 +4078,7 @@ public class Map extends Canvas {
 //      }
 
       /*
-       * show info in the top/right corner that selection for the offline area is activ
+       * show info in the top/right corner that selection for the offline area is active
        */
       if (_offline_IsSelectingOfflineArea) {
          paint_OfflineArea_10_Info(gc);
@@ -5707,7 +5722,7 @@ public class Map extends Canvas {
 
       if (_mp == null) {
 
-         // this occured when restore state had a wrong map provider
+         // this occurred when restore state had a wrong map provider
 
          setMapProvider(MapProviderManager.getDefaultMapProvider());
 
@@ -5825,7 +5840,7 @@ public class Map extends Canvas {
 
          // check zoom level
          if (zoom - 1 < minZoomLevel) {
-            // this should not occure -> a tour should not be larger than the earth
+            // this should not occur -> a tour should not be larger than the earth
             break;
          }
 
@@ -6309,7 +6324,7 @@ public class Map extends Canvas {
 
          if (mapGridData == null) {
 
-            // This can occure when geofilter is loaded from xml file and not created in the map
+            // This can occur when geofilter is loaded from xml file and not created in the map
 
             // create map grid box from tour geo filter
             mapGridData = new MapGridData();

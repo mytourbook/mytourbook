@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,12 +28,12 @@ public class ChartLabel {
    /**
     * marker was created in the device
     */
-   public final static int MARKER_TYPE_DEVICE     = 1;
+   public static final int MARKER_TYPE_DEVICE     = 1;
 
    /**
     * marker was created in the tourbook application
     */
-   public final static int MARKER_TYPE_CUSTOM     = 2;
+   public static final int MARKER_TYPE_CUSTOM     = 2;
 
    public static final int VISIBLE_TYPE_DEFAULT   = 0;
    public static final int VISIBLE_TYPE_TYPE_NEW  = 10;
@@ -46,6 +46,11 @@ public class ChartLabel {
     * x-position in graph units
     */
    public double           graphX;
+
+   /**
+    * x-position in graph units
+    */
+   public double           graphXEnd;
 
    /**
     * index in the data serie

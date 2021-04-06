@@ -160,13 +160,9 @@ public class FitData {
                TourManager.getInstance().clearTourDataCache();
 
                // Update Tour Type (Filter) list UI
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     // fire modify event
-                     TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-                  }
-               });
+               Display.getDefault().syncExec(() ->
+               // fire modify event
+               TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
             }
          }
 
@@ -251,6 +247,17 @@ public class FitData {
       // after all data are added, the tour id can be created
       final String uniqueId = _fitDataReader.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_FIT);
       final Long tourId = _tourData.createTourId(uniqueId);
+
+      /*
+       * The tour start time timezone is set from lat/lon in createTimeSeries()
+       */
+      final ZonedDateTime tourStartTime_FromLatLon = _tourData.getTourStartTime();
+
+      if (zonedStartTime.equals(tourStartTime_FromLatLon) == false) {
+
+         // time zone is different -> fix tour start components with adjusted time zone
+         _tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
+      }
 
       if (_alreadyImportedTours.containsKey(tourId) == false) {
 

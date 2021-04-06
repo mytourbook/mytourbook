@@ -480,7 +480,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
       /*
        * set tour start date/time
        */
-      tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
+      final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime);
+      tourData.setTourStartTime(zonedStartTime);
 
       tourData.setDeviceTimeInterval((short) -1);
       tourData.setImportFilePath(_importFilePath);
@@ -498,6 +499,17 @@ public class Suunto2SAXHandler extends DefaultHandler {
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTO2);
       final Long tourId = tourData.createTourId(uniqueId);
+
+      /*
+       * The tour start time timezone is set from lat/lon in createTimeSeries()
+       */
+      final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
+
+      if (zonedStartTime.equals(tourStartTime_FromLatLon) == false) {
+
+         // time zone is different -> fix tour start components with adjusted time zone
+         tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
+      }
 
       // check if the tour is already imported
       if (_alreadyImportedTours.containsKey(tourId) == false) {

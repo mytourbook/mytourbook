@@ -6,20 +6,21 @@ Bundle-Version: 21.3.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
- joda-time-2.10.5.jar,
+ joda-time-2.10.10.jar,
  c3p0-0.9.1.2.jar,
  edtftpj.jar,
  net.sf.swtaddons_0.1.1.jar,
  core-3.1.0.jar,
- caffeine-2.8.1.jar,
+ caffeine-3.0.1.jar,
  imgscalr-lib-4.2.jar,
  commons-imaging-1.0-alpha1.jar,
- json-20201115.jar,
+ json-20210307.jar,
  lat-lon-timezone-converter-2019-04-30.jar,
  simplelatlng-1.3.1.jar,
- jackson-core-2.12.0.jar,
- jackson-databind-2.12.0.jar,
- jackson-annotations-2.12.0.jar
+ jackson-core-2.12.2.jar,
+ jackson-databind-2.12.2.jar,
+ jackson-annotations-2.12.2.jar,
+ commons-suncalc-3.4.jar
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
  com.enterprisedt.net.ftp.internal,
@@ -61,8 +62,6 @@ Export-Package: com.enterprisedt,
  com.fasterxml.jackson.databind.ser.std,
  com.fasterxml.jackson.databind.type,
  com.fasterxml.jackson.databind.util,
- com.github.benmanes.caffeine,
- com.github.benmanes.caffeine.base,
  com.github.benmanes.caffeine.cache,
  com.github.benmanes.caffeine.cache.stats,
  com.javadocmd.simplelatlng,
@@ -203,6 +202,8 @@ Export-Package: com.enterprisedt,
  org.joda.time.tz.data.Europe,
  org.joda.time.tz.data.Indian,
  org.joda.time.tz.data.Pacific,
- org.json
+ org.json,
+ org.shredzone.commons.suncalc,
+ org.shredzone.commons.suncalc.param
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: net.tourbook.ext.jars
