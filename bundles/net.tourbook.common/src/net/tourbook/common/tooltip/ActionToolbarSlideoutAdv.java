@@ -16,7 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
@@ -65,8 +65,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
    public ActionToolbarSlideoutAdv() {
 
-      _image_Enabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions).createImage();
-      _image_Disabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
+      _image_Enabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions).createImage();
+      _image_Disabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 
    public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {

@@ -134,6 +134,9 @@ public final class SQL {
 
    public static void showException(SQLException exception) {
 
+      // log into the eclipse log file
+      StatusUtil.log(exception);
+
       while (exception != null) {
 
          final String sqlExceptionText = Util.getSQLExceptionText(exception);
@@ -141,9 +144,7 @@ public final class SQL {
          System.out.println(sqlExceptionText);
          exception.printStackTrace();
 
-         MessageDialog.openError(Display.getCurrent().getActiveShell(), //
-               "SQL Error", //$NON-NLS-1$
-               sqlExceptionText);
+         MessageDialog.openError(Display.getCurrent().getActiveShell(), "SQL Error", sqlExceptionText); //$NON-NLS-1$
 
          exception = exception.getNextException();
       }

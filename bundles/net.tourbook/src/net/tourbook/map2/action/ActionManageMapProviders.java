@@ -18,6 +18,7 @@ package net.tourbook.map2.action;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.map2.Messages;
@@ -38,7 +39,7 @@ public class ActionManageMapProviders extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__options));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
 
       _map2View = map2View;
    }

@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -134,7 +135,7 @@ public class MapBookmarkManager {
 
          super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_New));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapBookmark_New));
 
          __mapBookmarks = mapBookmarks;
       }
@@ -193,7 +194,7 @@ public class MapBookmarkManager {
 
          super(name, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Location));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MapBookmark_Location));
 
          __bookmarkId = bookmarkId;
          __mapBookmarks = mapBookmarks;

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
@@ -31,7 +32,7 @@ public class ActionShowValuePoint extends Action {
 
       _map2View = map2View;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowValuePoint));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowValuePoint));
 	}
 
 	@Override

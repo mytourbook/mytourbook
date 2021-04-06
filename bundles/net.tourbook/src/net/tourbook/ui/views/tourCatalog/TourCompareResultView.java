@@ -21,6 +21,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -164,7 +165,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    /*
     * UI resources
     */
-   private Image _dbImage = TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
+   private Image _dbImage = TourbookPlugin.getImageDescriptor(Images.Saved_Tour).createImage(true);
 
    /*
     * UI controls

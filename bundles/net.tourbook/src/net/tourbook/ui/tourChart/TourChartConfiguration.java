@@ -145,6 +145,11 @@ public class TourChartConfiguration {
    public Boolean                 isShowTourMarker        = true;
 
    /**
+    * The opacity of the night sections
+    */
+   public int                     tourNightSectionsOpacity;
+
+   /**
     * Is <code>true</code> when tour pauses are displayed.
     */
    public Boolean                 isShowTourPauses        = true;
@@ -333,6 +338,11 @@ public class TourChartConfiguration {
        * Tour pauses
        */
       isShowTourPauses              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE);
+
+      /*
+       * Tour night sections
+       */
+      tourNightSectionsOpacity              = _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS);
 
       /*
        * Tour info

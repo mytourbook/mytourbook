@@ -15,30 +15,31 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionNavigateHistoryBackward extends Action {
 
-	private static final String	ACTION_ID	= "net.tourbook.command.PicDir.NavigateHistoryBackward";	//$NON-NLS-1$
+   private static final String ACTION_ID = "net.tourbook.command.PicDir.NavigateHistoryBackward"; //$NON-NLS-1$
 
-	private PicDirImages		_picDirImages;
+   private PicDirImages        _picDirImages;
 
-	public ActionNavigateHistoryBackward(final PicDirImages picDirImages, final PicDirView picDirView) {
+   public ActionNavigateHistoryBackward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
-		setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward_Tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Backward_Nav));
+      setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward_Tooltip);
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Navigate_Backward));
 
-		setActionDefinitionId(ACTION_ID);
+      setActionDefinitionId(ACTION_ID);
 
-		picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);
+      picDirView.getViewSite().getActionBars().setGlobalActionHandler(ACTION_ID, this);
 
-		_picDirImages = picDirImages;
-	}
+      _picDirImages = picDirImages;
+   }
 
-	@Override
-	public void run() {
-		_picDirImages.actionNavigateBackward();
-	}
+   @Override
+   public void run() {
+      _picDirImages.actionNavigateBackward();
+   }
 }

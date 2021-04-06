@@ -15,6 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourSegmenter;
 
+import net.tourbook.Images;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.FontFieldEditorExtended;
+import net.tourbook.common.font.IFontDialogListener;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -41,19 +55,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorSelectorExtended;
-import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.font.FontFieldEditorExtended;
-import net.tourbook.common.font.IFontDialogListener;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
 
 /**
  * Tour chart marker properties slideout.
@@ -204,8 +205,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(//
-            TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
    }
 

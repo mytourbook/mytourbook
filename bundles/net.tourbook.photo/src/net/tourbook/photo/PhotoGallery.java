@@ -503,7 +503,7 @@ public class PhotoGallery extends ImageGallery {
 
          text = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail;
          toolTipText = Messages.Photo_Gallery_Action_PhotoGalleryThumbnail_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryThumbnail);
+         imageDescriptor = Activator.getImageDescriptor(PhotoImages.PhotoGallery_Thumbnail);
 
       } else {
 
@@ -511,7 +511,7 @@ public class PhotoGallery extends ImageGallery {
 
          text = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails;
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoGalleryDetails_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PotoGalleryDetails);
+         imageDescriptor = Activator.getImageDescriptor(PhotoImages.PhotoGallery_Details);
       }
 
       _actionPhotoGalleryType.setText(text);
@@ -527,19 +527,19 @@ public class PhotoGallery extends ImageGallery {
       if (ratingStarBehaviour == RatingStarBehaviour.NO_STARS) {
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered);
+         imageDescriptor = Activator.getImageDescriptor(PhotoImages.PhotoRatingStar_AndHovered);
 
       } else if (ratingStarBehaviour == RatingStarBehaviour.NO_HOVERED_STARS) {
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_NoHoveredStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStar);
+         imageDescriptor = Activator.getImageDescriptor(PhotoImages.PhotoRatingStar);
 
       } else {
 
          // set default: RatingStarBehaviour.HOVERED_STARS
 
          toolTipText = Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip;
-         imageDescriptor = Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered);
+         imageDescriptor = Activator.getImageDescriptor(PhotoImages.PhotoRatingStar_Hovered);
       }
 
       final boolean isShowRatingStars = ratingStarBehaviour != RatingStarBehaviour.NO_STARS;

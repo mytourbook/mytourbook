@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataModel;
@@ -322,7 +323,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage());
 
       _tourData = tourData;
 
@@ -1455,7 +1456,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
 
-      _imagePaste = TourbookPlugin.getImageDescriptor(Messages.Image__App_Edit_Paste).createImage();
+      _imagePaste = TourbookPlugin.getImageDescriptor(Images.App_Paste).createImage();
 
       restoreState_Viewer();
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,10 +29,12 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
@@ -892,7 +894,7 @@ public class TourMapPainter extends MapPainter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _twpImage = TourbookPlugin.getImageDescriptor(Messages.Image_Map_WayPoint).createImage();
+      _twpImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
       _twpImageBounds = _twpImage.getBounds();
 
       _isImageAvailable = true;
@@ -1345,7 +1347,7 @@ public class TourMapPainter extends MapPainter {
          final int numberOfTours = tourData.multipleTourStartIndex.length;
          final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
          final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
-         final long[] multipleTourStartTime = tourData.multipleTourStartTime;
+         final ZonedDateTime[] multipleTourZonedStartTime = tourData.multipleTourZonedStartTime;
 
          if (multipleStartTimeIndex.length == 0) {
             return isContentInTile;
@@ -1360,7 +1362,7 @@ public class TourMapPainter extends MapPainter {
          final int[] timeSerie = tourData.timeSerie;
          for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
 
-            tourStartTime = multipleTourStartTime[tourIndex];
+            tourStartTime = multipleTourZonedStartTime[tourIndex].toInstant().toEpochMilli();
             numberOfPauses = multipleNumberOfPauses[tourIndex];
             tourSerieIndex = multipleStartTimeIndex[tourIndex];
 

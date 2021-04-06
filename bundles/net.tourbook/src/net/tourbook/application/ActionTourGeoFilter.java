@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import de.byteholder.geoclipse.map.Map;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -35,7 +36,7 @@ import org.eclipse.ui.IViewPart;
 
 public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourGeoFilter);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.TourGeoFilter);
 
    private Slideout_TourGeoFilter       _slideoutTourGeoFilter;
 

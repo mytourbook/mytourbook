@@ -4,12 +4,12 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="commons-collections4-4.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
-	<classpathentry exported="true" kind="lib" path="commons-lang3-3.11.jar"/> <!--  https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+	<classpathentry exported="true" kind="lib" path="commons-lang3-3.12.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry exported="true" kind="lib" path="slf4j-api-1.7.30.jar"/> <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
 	<classpathentry exported="true" kind="lib" path="slf4j-simple-1.7.30.jar"/> <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
 	<classpathentry exported="true" kind="lib" path="log4j-1.2.17.jar"/> <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-	<classpathentry exported="true" kind="lib" path="velocity-engine-core-2.2.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity-engine-core -->
-	<classpathentry exported="true" kind="lib" path="velocity-tools-generic-3.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic -->
+	<classpathentry exported="true" kind="lib" path="velocity-engine-core-2.3.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.velocity/velocity-engine-core -->
+	<classpathentry exported="true" kind="lib" path="velocity-tools-generic-3.1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.velocity.tools/velocity-tools-generic -->
 	<classpathentry exported="true" kind="lib" path="dinopolis-util-0.5.4mt.jar"/>
 	<classpathentry exported="true" kind="lib" path="gpsinput-0.5.4mt.jar" sourcepath="gpsylon_src-0.5.3.zip"/>
 	<classpathentry kind="output" path="bin"/>

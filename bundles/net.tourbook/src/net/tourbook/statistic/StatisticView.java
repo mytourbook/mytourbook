@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -156,8 +157,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          setToolTipText(Messages.Tour_StatisticValues_Action_CopyIntoClipboard_Tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Copy_Disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Copy_Disabled));
       }
 
       @Override

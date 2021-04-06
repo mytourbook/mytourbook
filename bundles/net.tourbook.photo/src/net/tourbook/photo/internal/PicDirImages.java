@@ -22,6 +22,7 @@ import java.util.Collections;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
@@ -656,8 +657,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
          _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
          _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos);
-         _actionToggleFolderGallery.setImageDescriptor(Activator
-               .getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+         _actionToggleFolderGallery.setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFolderGallery_OnlyPhotos));
 
       } else {
 
@@ -665,8 +665,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
          _actionToggleFolderGallery.setText(Messages.Pic_Dir_Action_ToggleFolderGallery);
          _actionToggleFolderGallery.setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_Tooltip);
-         _actionToggleFolderGallery.setImageDescriptor(Activator
-               .getImageDescriptor(Messages.Image__PhotoFolderGallery));
+         _actionToggleFolderGallery.setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFolderGallery));
       }
 
       _picDirView.setMaximizedControl(_isShowOnlyPhotos);

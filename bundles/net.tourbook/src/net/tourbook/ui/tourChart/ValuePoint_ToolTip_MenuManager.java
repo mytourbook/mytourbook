@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.Pinned_ToolTip_PinLocation;
@@ -130,7 +131,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
       public ActionCloseTTContextMenu() {
          super(Messages.Tooltip_ValuePoint_Action_CloseContextMenu);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Cancel));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
       }
 
       @Override
@@ -143,7 +144,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
       public ActionHideToolTip() {
          setText(Messages.Action_ToolTip_Hide);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Cancel));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
       }
 
       @Override
@@ -207,7 +208,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
       public ActionSetDefaults() {
          setText(Messages.Action_ToolTip_SetDefaults);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit));
       }
 
       @Override
@@ -377,98 +378,98 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_Altitude = new ActionValueItem(
             VALUE_ID_ALTITUDE,
             Messages.Tooltip_ValuePoint_Action_Value_Altitude,
-            Messages.Image__graph_altitude,
-            Messages.Image__graph_altitude_disabled);
+            Images.Graph_Elevation,
+            Images.Graph_Elevation_Disabled);
 
       _actionValue_Altimeter = new ActionValueItem(
             VALUE_ID_ALTIMETER,
             Messages.Tooltip_ValuePoint_Action_Value_Altimeter,
-            Messages.Image__graph_altimeter,
-            Messages.Image__graph_altimeter_disabled);
+            Images.Graph_Altimeter,
+            Images.Graph_Altimeter_Disabled);
 
       _actionValue_Cadence = new ActionValueItem(
             VALUE_ID_CADENCE,
             Messages.Tooltip_ValuePoint_Action_Value_Cadence,
-            Messages.Image__graph_cadence,
-            Messages.Image__graph_cadence_disabled);
+            Images.Graph_Cadence,
+            Images.Graph_Cadence_Disabled);
 
       _actionValue_Gears = new ActionValueItem(
             VALUE_ID_GEARS,
             Messages.Tooltip_ValuePoint_Action_Value_Gears,
-            Messages.Image__Graph_Gears,
-            Messages.Image__Graph_Gears_disabled);
+            Images.Graph_Gears,
+            Images.Graph_Gears_Disabled);
 
       _actionValue_Gradient = new ActionValueItem(
             VALUE_ID_GRADIENT,
             Messages.Tooltip_ValuePoint_Action_Value_Gradient,
-            Messages.Image__graph_gradient,
-            Messages.Image__graph_gradient_disabled);
+            Images.Graph_Gradient,
+            Images.Graph_Gradient_Disabled);
 
       _actionValue_Pace = new ActionValueItem(
             VALUE_ID_PACE,
             Messages.Tooltip_ValuePoint_Action_Value_Pace,
-            Messages.Image__graph_pace,
-            Messages.Image__graph_pace_disabled);
+            Images.Graph_Pace,
+            Images.Graph_Pace_Disabled);
 
       _actionValue_Power = new ActionValueItem(
             VALUE_ID_POWER,
             Messages.Tooltip_ValuePoint_Action_Value_Power,
-            Messages.Image__graph_power,
-            Messages.Image__graph_power_disabled);
+            Images.Graph_Power,
+            Images.Graph_Power_Disabled);
 
       _actionValue_Pulse = new ActionValueItem(
             VALUE_ID_PULSE,
             Messages.Tooltip_ValuePoint_Action_Value_Pulse,
-            Messages.Image__graph_heartbeat,
-            Messages.Image__graph_heartbeat_disabled);
+            Images.Graph_Heartbeat,
+            Images.Graph_Heartbeat_Disabled);
 
       _actionValue_Speed = new ActionValueItem(
             VALUE_ID_SPEED,
             Messages.Tooltip_ValuePoint_Action_Value_Speed,
-            Messages.Image__graph_speed,
-            Messages.Image__graph_speed_disabled);
+            Images.Graph_Speed,
+            Images.Graph_Speed_Disabled);
 
       _actionValue_Temperature = new ActionValueItem(
             VALUE_ID_TEMPERATURE,
             Messages.Tooltip_ValuePoint_Action_Value_Temperature,
-            Messages.Image__graph_temperature,
-            Messages.Image__graph_temperature_disabled);
+            Images.Graph_Temperature,
+            Images.Graph_Temperature_Disabled);
 
       _actionValue_TourCompareResult = new ActionValueItem(
             VALUE_ID_TOUR_COMPARE_RESULT,
             Messages.Tooltip_ValuePoint_Action_Value_TourCompareResult,
-            Messages.Image__graph_tour_compare,
-            Messages.Image__graph_tour_compare_disabled);
+            Images.Graph_TourCompare,
+            Images.Graph_TourCompare_Disabled);
 
       _actionValue_RunDyn_StanceTime = new ActionValueItem(
             VALUE_ID_RUN_DYN_STANCE_TIME,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTime,
-            Messages.Image__Graph_RunDyn_StanceTime,
-            Messages.Image__Graph_RunDyn_StanceTime_Disabled);
+            Images.Graph_RunDyn_StanceTime,
+            Images.Graph_RunDyn_StanceTime_Disabled);
 
       _actionValue_RunDyn_StanceTimeBalance = new ActionValueItem(
             VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StanceTimeBalance,
-            Messages.Image__Graph_RunDyn_StanceTimeBalance,
-            Messages.Image__Graph_RunDyn_StanceTimeBalance_Disabled);
+            Images.Graph_RunDyn_StanceTimeBalance,
+            Images.Graph_RunDyn_StanceTimeBalance_Disabled);
 
       _actionValue_RunDyn_StepLength = new ActionValueItem(
             VALUE_ID_RUN_DYN_STEP_LENGTH,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_StepLength,
-            Messages.Image__Graph_RunDyn_StepLength,
-            Messages.Image__Graph_RunDyn_StepLength_Disabled);
+            Images.Graph_RunDyn_StepLength,
+            Images.Graph_RunDyn_StepLength_Disabled);
 
       _actionValue_RunDyn_VerticalOscillation = new ActionValueItem(
             VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalOscillation,
-            Messages.Image__Graph_RunDyn_VerticalOscillation,
-            Messages.Image__Graph_RunDyn_VerticalOscillation_Disabled);
+            Images.Graph_RunDyn_VerticalOscillation,
+            Images.Graph_RunDyn_VerticalOscillation_Disabled);
 
       _actionValue_RunDyn_VerticalRatio = new ActionValueItem(
             VALUE_ID_RUN_DYN_VERTICAL_RATIO,
             Messages.Tooltip_ValuePoint_Action_Value_RunDyn_VerticalRatio,
-            Messages.Image__Graph_RunDyn_VerticalRatio,
-            Messages.Image__Graph_RunDyn_VerticalRatio_Disabled);
+            Images.Graph_RunDyn_VerticalRatio,
+            Images.Graph_RunDyn_VerticalRatio_Disabled);
    }
 
    private void createPinActions() {

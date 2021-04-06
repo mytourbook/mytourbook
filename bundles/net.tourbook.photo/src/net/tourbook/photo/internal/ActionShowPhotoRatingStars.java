@@ -16,6 +16,7 @@
 package net.tourbook.photo.internal;
 
 import net.tourbook.common.UI;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -31,7 +32,7 @@ public class ActionShowPhotoRatingStars extends Action {
 		_photoGallery = photoGallery;
 
 		setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoRatingStar));
 	}
 
 	@Override

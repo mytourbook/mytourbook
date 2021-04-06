@@ -112,6 +112,9 @@ public class TourExporter {
    }
 
    private String       _activityType;
+   /**
+    * The speed is in meters/second
+    */
    private float        _camouflageSpeed;
    private String       _courseName;
    private final String _formatTemplate;
@@ -505,7 +508,7 @@ public class TourExporter {
 
       final int[] timeSerie = _tourData.timeSerie;
 
-      if ((timeSerie == null)) {
+      if (timeSerie == null) {
          return null;
       }
 
@@ -867,6 +870,7 @@ public class TourExporter {
    }
 
    public boolean export(final String exportFileName) {
+
       final ArrayList<GarminTrack> tracks = new ArrayList<>();
       final ArrayList<TourWayPoint> wayPoints = new ArrayList<>();
       final ArrayList<TourMarker> tourMarkers = new ArrayList<>();
@@ -935,6 +939,7 @@ public class TourExporter {
    }
 
    public TourExporter useTourData(final TourData tourData) {
+
       _tourData = tourData;
 
       return this;

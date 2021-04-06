@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionRefreshFolder extends Action {
@@ -27,7 +29,7 @@ public class ActionRefreshFolder extends Action {
 
 		_picDirFolder = picDirFolder;
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__refresh));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Refresh));
 	}
 
 	@Override

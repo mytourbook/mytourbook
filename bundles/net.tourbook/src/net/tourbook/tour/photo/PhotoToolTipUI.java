@@ -18,6 +18,7 @@ package net.tourbook.tour.photo;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -124,7 +125,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Close));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Close));
       }
 
       @Override
@@ -140,7 +141,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin_Blue));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Pin_Blue));
       }
 
       @Override
@@ -173,7 +174,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown));
       }
 
       @Override
@@ -713,19 +714,13 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
       if (_isVerticalGallery) {
 
-         _actionToggleGalleryOrientation.setToolTipText(//
-               Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-
-         _actionToggleGalleryOrientation.setImageDescriptor(//
-               TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryHorizontal));
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
-         _actionToggleGalleryOrientation.setToolTipText(//
-               Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-
-         _actionToggleGalleryOrientation.setImageDescriptor(//
-               TourbookPlugin.getImageDescriptor(Messages.Image__PhotoGalleryVertical));
+         _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 
@@ -736,14 +731,14 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          // above tour chart
 
          _actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_BelowTourChart_Tooltip);
-         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown));
 
       } else {
 
          // below tour chart
 
          _actionToolTipLocation.setToolTipText(Messages.App_Action_ToolTipLocation_AboveTourChart_Tooltip);
-         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+         _actionToolTipLocation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp));
       }
    }
 }

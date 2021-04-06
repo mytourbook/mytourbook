@@ -1462,10 +1462,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int[]               multipleTourStartIndex;
 
    /**
-    * Contains the tour start time for each tour.
+    * Contains the tour start time with a time zone for each tour.
     */
    @Transient
-   public long[]              multipleTourStartTime;
+   public ZonedDateTime[]     multipleTourZonedStartTime;
 
    /**
     * Contains tour titles for each tour.
@@ -9638,7 +9638,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * @param bodyWeight
-    *           Sets the body weight.
+    *           Sets the body weight in kilograms.
     */
    public void setBodyWeight(final float bodyWeight) {
       this.bodyWeight = bodyWeight;

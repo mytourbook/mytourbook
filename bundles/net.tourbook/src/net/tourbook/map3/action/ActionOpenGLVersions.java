@@ -33,6 +33,7 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.map3.Messages;
@@ -188,7 +189,7 @@ public class ActionOpenGLVersions extends Action {
 
       super(Messages.Map3_Action_ShowOpenGLVersion_Tooltip, AS_PUSH_BUTTON);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Map3_OpenGL_Version));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Map3_OpenGL_Version));
    }
 
    private Control createUI(final Composite parent) {

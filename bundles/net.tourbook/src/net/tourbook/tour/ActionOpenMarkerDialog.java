@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -30,97 +31,97 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionOpenMarkerDialog extends Action {
 
-	private ITourProvider	_tourProvider;
-	private TourMarker		_tourMarker;
-	private boolean			_isSaveTour;
+   private ITourProvider _tourProvider;
+   private TourMarker    _tourMarker;
+   private boolean       _isSaveTour;
 
-	/**
-	 * @param tourProvider
-	 * @param isSaveTour
-	 *            when <code>true</code> the tour will be saved when the marker dialog is closed
-	 */
-	public ActionOpenMarkerDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
+   /**
+    * @param tourProvider
+    * @param isSaveTour
+    *           when <code>true</code> the tour will be saved when the marker dialog is closed
+    */
+   public ActionOpenMarkerDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
 
-		_tourProvider = tourProvider;
-		_isSaveTour = isSaveTour;
+      _tourProvider = tourProvider;
+      _isSaveTour = isSaveTour;
 
-		setText(Messages.app_action_edit_tour_marker);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_disabled));
+      setText(Messages.app_action_edit_tour_marker);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled));
 
-		setEnabled(false);
-	}
+      setEnabled(false);
+   }
 
-	public static void doAction(final ITourProvider tourProvider,
-								final boolean isSaveTour,
-								final TourMarker selectedTourMarker) {
+   public static void doAction(final ITourProvider tourProvider,
+                               final boolean isSaveTour,
+                               final TourMarker selectedTourMarker) {
 
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
-		// check if one tour is selected
-		if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
-			return;
-		}
+      // check if one tour is selected
+      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+         return;
+      }
 
-		final TourData tourData = selectedTours.get(0);
+      final TourData tourData = selectedTours.get(0);
 
-		if (tourData.isManualTour()) {
-			// a manually created tour do not have time slices -> no markers
-			return;
-		}
+      if (tourData.isManualTour()) {
+         // a manually created tour do not have time slices -> no markers
+         return;
+      }
 
-		final DialogMarker markerDialog = new DialogMarker(
-				Display.getCurrent().getActiveShell(),
-				tourData,
-				selectedTourMarker);
+      final DialogMarker markerDialog = new DialogMarker(
+            Display.getCurrent().getActiveShell(),
+            tourData,
+            selectedTourMarker);
 
-		if (markerDialog.open() == Window.OK) {
+      if (markerDialog.open() == Window.OK) {
 
-			if (isSaveTour) {
+         if (isSaveTour) {
 
-				TourManager.saveModifiedTours(selectedTours);
+            TourManager.saveModifiedTours(selectedTours);
 
-			} else {
+         } else {
 
-				/*
-				 * don't save the tour, just update the tour data editor
-				 */
-				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-				if (tourDataEditor != null) {
-					tourDataEditor.updateUI(tourData, true);
-					fireTourChangeEvent(tourData);
-				}
+            /*
+             * don't save the tour, just update the tour data editor
+             */
+            final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+            if (tourDataEditor != null) {
+               tourDataEditor.updateUI(tourData, true);
+               fireTourChangeEvent(tourData);
+            }
 
 //				fireTourChangeEvent(tourData);
-			}
+         }
 
-		} else {
+      } else {
 
 //			fireTourChangeEvent(tourData);
-		}
-	}
+      }
+   }
 
-	/**
-	 * This event must be event when the dialog is canceled because the original tour marker are
-	 * replaced with the backedup markers.
-	 * <p>
-	 * Views which contain the original {@link TourMarker}'s need to know that the list has changed
-	 * otherwise marker actions do fail, e.g. Set Marker Hidden in tour chart view.
-	 * 
-	 * @param tourData
-	 */
-	private static void fireTourChangeEvent(final TourData tourData) {
+   /**
+    * This event must be event when the dialog is canceled because the original tour marker are
+    * replaced with the backedup markers.
+    * <p>
+    * Views which contain the original {@link TourMarker}'s need to know that the list has changed
+    * otherwise marker actions do fail, e.g. Set Marker Hidden in tour chart view.
+    *
+    * @param tourData
+    */
+   private static void fireTourChangeEvent(final TourData tourData) {
 
-		TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
-	}
+      TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
+   }
 
-	@Override
-	public void run() {
-		doAction(_tourProvider, _isSaveTour, _tourMarker);
-	}
+   @Override
+   public void run() {
+      doAction(_tourProvider, _isSaveTour, _tourMarker);
+   }
 
-	public void setTourMarker(final TourMarker tourMarker) {
-		_tourMarker = tourMarker;
-	}
+   public void setTourMarker(final TourMarker tourMarker) {
+      _tourMarker = tourMarker;
+   }
 
 }

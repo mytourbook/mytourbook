@@ -15,23 +15,25 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionClearNavigationHistory extends Action {
 
-	private PicDirImages	_picDirImages;
+   private PicDirImages _picDirImages;
 
-	public ActionClearNavigationHistory(final PicDirImages picDirImages) {
+   public ActionClearNavigationHistory(final PicDirImages picDirImages) {
 
-		super(Messages.Pic_Dir_Action_ClearHistory, AS_PUSH_BUTTON);
+      super(Messages.Pic_Dir_Action_ClearHistory, AS_PUSH_BUTTON);
 
-		_picDirImages = picDirImages;
+      _picDirImages = picDirImages;
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__delete));
-	}
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Delete));
+   }
 
-	@Override
-	public void run() {
-		_picDirImages.actionClearHistory();
-	}
+   @Override
+   public void run() {
+      _picDirImages.actionClearHistory();
+   }
 }
