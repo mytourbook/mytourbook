@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITreeViewer;
@@ -27,69 +28,69 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class ActionCollapseAll extends Action {
 
-	private ITreeViewer _treeViewerProvider;
+   private ITreeViewer _treeViewerProvider;
 
-	public ActionCollapseAll(final ITreeViewer treeViewerProvider) {
+   public ActionCollapseAll(final ITreeViewer treeViewerProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_treeViewerProvider = treeViewerProvider;
+      _treeViewerProvider = treeViewerProvider;
 
       setText(Messages.App_Action_CollapseAll);
       setToolTipText(Messages.App_Action_CollapseAll_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__collapse_all));
-	}
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CollapseAll));
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		if (_treeViewerProvider == null) {
-			return;
-		}
+      if (_treeViewerProvider == null) {
+         return;
+      }
 
-		final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
+      final TreeViewer treeViewer = _treeViewerProvider.getTreeViewer();
 
-		if (treeViewer == null) {
-			return;
-		}
+      if (treeViewer == null) {
+         return;
+      }
 
-		final Tree tree = treeViewer.getTree();
+      final Tree tree = treeViewer.getTree();
 
-		// disable redraw that the UI in not flickering
-		tree.setRedraw(false);
-		{
-			try {
-				treeViewer.collapseAll();
-			} catch (final Exception e) {
-				// this occured
-			}
-		}
-		tree.setRedraw(true);
+      // disable redraw that the UI in not flickering
+      tree.setRedraw(false);
+      {
+         try {
+            treeViewer.collapseAll();
+         } catch (final Exception e) {
+            // this occured
+         }
+      }
+      tree.setRedraw(true);
 
-		try {
+      try {
 
-			final StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
-			if (selection != null) {
-				final Object firstElement = selection.getFirstElement();
-				if (firstElement != null) {
-					treeViewer.reveal(firstElement);
-				}
-			}
+         final StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
+         if (selection != null) {
+            final Object firstElement = selection.getFirstElement();
+            if (firstElement != null) {
+               treeViewer.reveal(firstElement);
+            }
+         }
 
-		} catch (final Exception e) {
+      } catch (final Exception e) {
 
-			// this occured, ensure something is selected otherwise further NPEs occure
+         // this occured, ensure something is selected otherwise further NPEs occure
 
-			final TreeItem[] selection = tree.getSelection();
+         final TreeItem[] selection = tree.getSelection();
 
-			for (final TreeItem treeItem : selection) {
+         for (final TreeItem treeItem : selection) {
 
-				final Object itemData = treeItem.getData();
+            final Object itemData = treeItem.getData();
 
-				_treeViewerProvider.getTreeViewer().setSelection(new StructuredSelection(itemData), true);
+            _treeViewerProvider.getTreeViewer().setSelection(new StructuredSelection(itemData), true);
 
-				break;
-			}
-		}
-	}
+            break;
+         }
+      }
+   }
 }

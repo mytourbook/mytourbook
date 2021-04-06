@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -79,7 +80,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenCancel);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Cancel));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
       }
 
       @Override
@@ -130,7 +131,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
 
          super(Messages.Action_Tag_AutoOpenOK);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_OK));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_OK));
       }
 
       @Override
@@ -460,7 +461,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
           */
          _actionOK.setEnabled(isModifiedTags);
          _actionOK.setImageDescriptor(isModifiedTags
-               ? TourbookPlugin.getImageDescriptor(Messages.Image__App_OK)
+               ? TourbookPlugin.getImageDescriptor(Images.App_OK)
                : null);
       }
    }

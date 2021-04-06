@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -170,13 +170,11 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private Point                     _shellDefaultSize;
 
-   private float                     _exportState_CamouflageSpeed;
    private FileCollisionBehavior     _exportState_FileCollisionBehaviour;
    private boolean                   _exportState_isAbsoluteDistance;
    private boolean                   _exportState_IsCamouflageSpeed;
    private boolean                   _exportState_IsDescription;
    private boolean                   _exportState_IsMergeTours;
-   private boolean                   _exportState_IsOverwriteFiles;
    private boolean                   _exportState_IsRange;
 
    private boolean                   _exportState_GPX_IsExportAllTourData;
@@ -195,7 +193,6 @@ public class DialogExportTour extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button    _btnSelectDirectory;
    private Button    _btnSelectFile;
 
    private Button    _chkCamouflageSpeed;
@@ -878,7 +875,7 @@ public class DialogExportTour extends TitleAreaDialog {
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboFile);
          ((GridData) _comboFile.getLayoutData()).widthHint = SIZING_TEXT_FIELD_WIDTH;
          _comboFile.setVisibleItemCount(20);
-         _comboFile.addVerifyListener(net.tourbook.common.UI.verifyFilenameInput());
+         _comboFile.addVerifyListener(UI.verifyFilenameInput());
          _comboFile.addModifyListener(filePathModifyListener);
          _comboFile.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -927,16 +924,16 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * button: browse
           */
-         _btnSelectDirectory = new Button(group, SWT.PUSH);
-         _btnSelectDirectory.setText(Messages.app_btn_browse);
-         _btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
+         final Button btnSelectDirectory = new Button(group, SWT.PUSH);
+         btnSelectDirectory.setText(Messages.app_btn_browse);
+         btnSelectDirectory.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                onSelectBrowseDirectory();
                validateFields();
             }
          });
-         setButtonLayoutData(_btnSelectDirectory);
+         setButtonLayoutData(btnSelectDirectory);
 
          // -----------------------------------------------------------------------------
 
@@ -978,10 +975,10 @@ public class DialogExportTour extends TitleAreaDialog {
       getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
       _exportState_IsCamouflageSpeed = _chkCamouflageSpeed.getSelection();
-      _exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
+      final boolean exportState_IsOverwriteFiles = _chkOverwriteFiles.getSelection();
 
-      _exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
-      _exportState_CamouflageSpeed *= UI.UNIT_VALUE_DISTANCE / 3.6f;
+      int exportState_CamouflageSpeed = _spinnerCamouflageSpeed.getSelection();
+      exportState_CamouflageSpeed *= UI.UNIT_VALUE_DISTANCE / 3.6f;
       _exportState_FileCollisionBehaviour = new FileCollisionBehavior();
 
       if (_isSetup_TourRange) {
@@ -1018,7 +1015,7 @@ public class DialogExportTour extends TitleAreaDialog {
       boolean isOverwrite = true;
       final File exportFile = new File(exportFileName);
       if (exportFile.exists()) {
-         if (_exportState_IsOverwriteFiles) {
+         if (exportState_IsOverwriteFiles) {
             // overwrite is enabled in the UI
          } else {
             isOverwrite = net.tourbook.ui.UI.confirmOverwrite(_exportState_FileCollisionBehaviour, exportFile);
@@ -1029,10 +1026,12 @@ public class DialogExportTour extends TitleAreaDialog {
          return;
       }
 
+      net.tourbook.ui.UI.disableAllControls(_inputContainer);
+
       _tourExporter = new TourExporter(
             _formatTemplate,
             _exportState_IsCamouflageSpeed,
-            _exportState_CamouflageSpeed,
+            exportState_CamouflageSpeed,
             _exportState_IsRange,
             _tourStartIndex,
             _tourEndIndex,
@@ -1090,6 +1089,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
+            Thread.currentThread().interrupt();
          }
       }
    }
@@ -1217,7 +1217,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          final String notes = tourData.getTourDescription();
 
-         if ((notes != null) && (notes.length() > 0)) {
+         if (notes != null && notes.length() > 0) {
 
             final String lapNotes = tourLap.getNotes();
 
@@ -1232,6 +1232,7 @@ public class DialogExportTour extends TitleAreaDialog {
    }
 
    private void enableExportButton(final boolean isEnabled) {
+
       final Button okButton = getButton(IDialogConstants.OK_ID);
       if (okButton != null) {
          okButton.setEnabled(isEnabled);
@@ -1317,15 +1318,13 @@ public class DialogExportTour extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      net.tourbook.ui.UI.disableAllControls(_inputContainer);
+      BusyIndicator.showWhile(Display.getCurrent(), this::doExport);
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            doExport();
-         }
-      });
-
+      if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+         getButton(IDialogConstants.OK_ID).setEnabled(true);
+         getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+         return;
+      }
       super.okPressed();
    }
 
@@ -1648,7 +1647,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          final File newFile = new File(filePath.toOSString());
 
-         if ((fileName.length() == 0) || newFile.isDirectory()) {
+         if (fileName.length() == 0 || newFile.isDirectory()) {
 
             // invalid filename
 
@@ -1681,7 +1680,6 @@ public class DialogExportTour extends TitleAreaDialog {
             } catch (final IOException ioe) {
                setError(Messages.dialog_export_msg_fileNameIsInvalid);
             }
-
          }
       }
 

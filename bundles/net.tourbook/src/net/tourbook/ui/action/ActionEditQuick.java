@@ -17,6 +17,7 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -30,34 +31,34 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionEditQuick extends Action {
 
-	private final ITourProvider	_tourProvider;
+   private final ITourProvider _tourProvider;
 
-	public ActionEditQuick(final ITourProvider tourProvider) {
+   public ActionEditQuick(final ITourProvider tourProvider) {
 
-		setText(Messages.app_action_quick_edit);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit));
+      setText(Messages.app_action_quick_edit);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Edit));
 
-		_tourProvider = tourProvider;
-	}
+      _tourProvider = tourProvider;
+   }
 
-	public static void doAction(final ITourProvider tourProvider) {
+   public static void doAction(final ITourProvider tourProvider) {
 
-		// check tour, make sure only one tour is selected
-		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-		if (selectedTours == null || selectedTours.size() != 1) {
-			return;
-		}
+      // check tour, make sure only one tour is selected
+      final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+      if (selectedTours == null || selectedTours.size() != 1) {
+         return;
+      }
 
-		if (new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0)).open() == Window.OK) {
+      if (new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0)).open() == Window.OK) {
 
-			// save all tours with the new tour type
-			TourManager.saveModifiedTours(selectedTours);
-		}
-	}
+         // save all tours with the new tour type
+         TourManager.saveModifiedTours(selectedTours);
+      }
+   }
 
-	@Override
-	public void run() {
-		doAction(_tourProvider);
-	}
+   @Override
+   public void run() {
+      doAction(_tourProvider);
+   }
 
 }

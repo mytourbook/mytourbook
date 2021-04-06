@@ -18,6 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -304,7 +305,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          };
          _actionBack.setText(Messages.Calendar_View_Action_Back);
          _actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
-         _actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+         _actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp));
       }
 
       /*
@@ -319,7 +320,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          };
          _actionForward.setText(Messages.Calendar_View_Action_Forward);
          _actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
-         _actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         _actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown));
       }
 
       /*
@@ -333,7 +334,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
-         _actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews));
+         _actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncViews));
          _actionSetLinked.setChecked(true);
       }
 
@@ -348,7 +349,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
             }
          };
          _actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Today));
+         _actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Today));
       }
    }
 

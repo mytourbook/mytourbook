@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -69,7 +70,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
          }
       };
 
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
       _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 
       _actionPrefDialog = new ActionOpenPrefDialog(

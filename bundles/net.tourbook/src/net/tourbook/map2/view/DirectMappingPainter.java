@@ -24,6 +24,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
@@ -65,7 +66,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
       _imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
-      _imageValuePoint = TourbookPlugin.getImageDescriptor(Messages.Image_Map_ValuePoint).createImage();
+      _imageValuePoint = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
    }
 
    /**

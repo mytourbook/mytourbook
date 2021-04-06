@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
@@ -4320,8 +4321,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
       _spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
-      _imageSurfing_SaveState = TourbookPlugin.getImageDescriptor(Messages.Image__State_SavedInTour).createImage(true);
-      _imageSurfing_NotSaveState = TourbookPlugin.getImageDescriptor(Messages.Image__State_NotSavedInTour).createImage(true);
+      _imageSurfing_SaveState = TourbookPlugin.getImageDescriptor(Images.State_SavedInTour).createImage(true);
+      _imageSurfing_NotSaveState = TourbookPlugin.getImageDescriptor(Images.State_NotSavedInTour).createImage(true);
 
       _defaultSurfing_SelectionListener = new SelectionAdapter() {
          @Override

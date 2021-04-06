@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -198,69 +199,61 @@ public class UI {
        */
       createGraphImageInRegistry(
             MapGraphId.Altimeter,
-            Messages.Image__graph_altimeter,
-            Messages.Image__graph_altimeter_disabled);
+            Images.Graph_Altimeter,
+            Images.Graph_Altimeter_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Altitude,
-            Messages.Image__graph_altitude,
-            Messages.Image__graph_altitude_disabled);
+            Images.Graph_Elevation,
+            Images.Graph_Elevation_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Cadence,
-            Messages.Image__graph_cadence,
-            Messages.Image__graph_cadence_disabled);
+            Images.Graph_Cadence,
+            Images.Graph_Cadence_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Gradient,
-            Messages.Image__graph_gradient,
-            Messages.Image__graph_gradient_disabled);
+            Images.Graph_Gradient,
+            Images.Graph_Gradient_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.HrZone,
-            Messages.Image__PulseZones,
-            Messages.Image__PulseZones_Disabled);
+            Images.PulseZones,
+            Images.PulseZones_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Pace,
-            Messages.Image__graph_pace,
-            Messages.Image__graph_pace_disabled);
+            Images.Graph_Pace,
+            Images.Graph_Pace_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Power,
-            Messages.Image__graph_power,
-            Messages.Image__graph_power_disabled);
+            Images.Graph_Power,
+            Images.Graph_Power_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Pulse,
-            Messages.Image__graph_heartbeat,
-            Messages.Image__graph_heartbeat_disabled);
+            Images.Graph_Heartbeat,
+            Images.Graph_Heartbeat_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Speed,
-            Messages.Image__graph_speed,
-            Messages.Image__graph_speed_disabled);
+            Images.Graph_Speed,
+            Images.Graph_Speed_Disabled);
 
       createGraphImageInRegistry(
             MapGraphId.Temperature,
-            Messages.Image__graph_temperature,
-            Messages.Image__graph_temperature_disabled);
+            Images.Graph_Temperature,
+            Images.Graph_Temperature_Disabled);
 
       // tour type images
-      IMAGE_REGISTRY.put(
-            IMAGE_TOUR_TYPE_FILTER,
-            TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-      IMAGE_REGISTRY.put(
-            IMAGE_TOUR_TYPE_FILTER_SYSTEM,
-            TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin.getImageDescriptor(Images.TourType_Filter));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin.getImageDescriptor(Images.TourType_Filter_System));
 
       // photo
-      IMAGE_REGISTRY.put(
-            TourPhotoLinkView.IMAGE_PIC_DIR_VIEW,
-            TourbookPlugin.getImageDescriptor(Messages.Image__PhotoDirectoryView));
-      IMAGE_REGISTRY.put(
-            TourPhotoLinkView.IMAGE_PHOTO_PHOTO,
-            TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO, TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
        * set tag styler
@@ -710,25 +703,25 @@ public class UI {
 
       switch (graphId) {
       case Altitude:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Elevation);
 
       case Gradient:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Gradient);
 
       case Pace:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Pace);
 
       case Pulse:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Heartbeat);
 
       case Speed:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Speed);
 
       case HrZone:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones);
+         return TourbookPlugin.getImageDescriptor(Images.PulseZones);
 
       default:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Elevation);
       }
    }
 
@@ -736,25 +729,25 @@ public class UI {
 
       switch (graphId) {
       case Altitude:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Elevation_Disabled);
 
       case Gradient:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_gradient_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Gradient_Disabled);
 
       case Pace:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Pace_Disabled);
 
       case Pulse:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_heartbeat_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Heartbeat_Disabled);
 
       case Speed:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Speed_Disabled);
 
       case HrZone:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__PulseZones_Disabled);
+         return TourbookPlugin.getImageDescriptor(Images.PulseZones_Disabled);
 
       default:
-         return TourbookPlugin.getImageDescriptor(Messages.Image__graph_altitude_disabled);
+         return TourbookPlugin.getImageDescriptor(Images.Graph_Elevation_Disabled);
       }
    }
 

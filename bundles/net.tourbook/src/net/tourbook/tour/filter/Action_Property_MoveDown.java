@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -34,7 +35,7 @@ public class Action_Property_MoveDown extends Action {
       _filterProperty = filterProperty;
 
       setToolTipText(Messages.Slideout_TourFilter_Action_MovePropertyDown_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark));
    }
 
    @Override

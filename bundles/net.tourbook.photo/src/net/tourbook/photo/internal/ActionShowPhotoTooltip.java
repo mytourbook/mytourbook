@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
 
 import org.eclipse.jface.action.Action;
@@ -31,8 +32,8 @@ public class ActionShowPhotoTooltip extends Action {
 
 		setToolTipText(Messages.Pic_Dir_Action_ShowPhotoTooltip_Tooltip);
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoTooltip));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoTooltip_Disabled));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoTooltip));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoTooltip_Disabled));
 	}
 
 	@Override

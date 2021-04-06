@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
@@ -33,8 +34,8 @@ public class ActionSyncMapWith_Slider_One extends Action {
 
       setToolTipText(Messages.map_action_synch_with_slider);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_synch_with_slider_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Slider_Disabled));
    }
 
    @Override

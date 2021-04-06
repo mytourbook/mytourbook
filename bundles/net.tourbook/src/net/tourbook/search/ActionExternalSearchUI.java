@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.search;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -22,22 +23,22 @@ import org.eclipse.jface.action.Action;
 
 public class ActionExternalSearchUI extends Action {
 
-	private SearchView	_searchView;
+   private SearchView _searchView;
 
-	public ActionExternalSearchUI(final SearchView searchView) {
+   public ActionExternalSearchUI(final SearchView searchView) {
 
-		super(Messages.Search_View_Action_ExternalSearchUI, AS_CHECK_BOX);
+      super(Messages.Search_View_Action_ExternalSearchUI, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Search_View_Action_ExternalSearchUI_Tooltip);
+      setToolTipText(Messages.Search_View_Action_ExternalSearchUI_Tooltip);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SearchExternal));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SearchExternal_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchExternal));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SearchExternal_Disabled));
 
-		_searchView = searchView;
-	}
+      _searchView = searchView;
+   }
 
-	@Override
-	public void run() {
-		_searchView.actionSearchUI();
-	}
+   @Override
+   public void run() {
+      _searchView.actionSearchUI();
+   }
 }

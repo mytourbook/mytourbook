@@ -15,12 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
-
 
 public class ActionTourChartPauses extends Action {
 
@@ -34,8 +34,8 @@ public class ActionTourChartPauses extends Action {
 
       _tourChart = tourChart;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
    }
 
    @Override

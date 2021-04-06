@@ -452,9 +452,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Waypoint_Time_Tooltip;
    public static String        ColumnFactory_Waypoint_Time_Unit;
 
-   public static String        Image_ToolTip_TourInfo;
-   public static String        Image_ToolTip_TourInfo_Hovered;
-
    public static String        message_manager_pErrorSummary;
    public static String        message_manager_pMessageSummary;
    public static String        message_manager_pWarningSummary;

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourMarker;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -22,21 +23,21 @@ import org.eclipse.jface.action.Action;
 
 public class ActionMarkerFilterWithNoGPS extends Action {
 
-	private TourMarkerAllView	_tourMarkerAllView;
+   private TourMarkerAllView _tourMarkerAllView;
 
-	public ActionMarkerFilterWithNoGPS(final TourMarkerAllView tourMarkerAllView) {
+   public ActionMarkerFilterWithNoGPS(final TourMarkerAllView tourMarkerAllView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Action_MarkerFilter_WithoutGPS_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithoutGPS));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MarkerFilter_WithoutGPS_Disabled));
+      setToolTipText(Messages.Action_MarkerFilter_WithoutGPS_Tooltip);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.MarkerFilter_WithoutGPS_Disabled));
 
-		_tourMarkerAllView = tourMarkerAllView;
-	}
+      _tourMarkerAllView = tourMarkerAllView;
+   }
 
-	@Override
-	public void run() {
-		_tourMarkerAllView.actionMarkerFilterGPS(this);
-	}
+   @Override
+   public void run() {
+      _tourMarkerAllView.actionMarkerFilterGPS(this);
+   }
 }

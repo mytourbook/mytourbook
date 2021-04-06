@@ -17,6 +17,7 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
@@ -36,8 +37,8 @@ public class ActionDuplicateTour extends Action {
 
       setText(Messages.Tour_Action_DuplicateTour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Duplicate));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Duplicate_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate_Disabled));
 
       _tourProvider = tourProvider;
    }

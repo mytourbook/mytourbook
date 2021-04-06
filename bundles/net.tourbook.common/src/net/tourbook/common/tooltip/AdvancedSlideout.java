@@ -16,6 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -82,7 +83,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__App_Close_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close_Themed));
       }
 
       @Override
@@ -98,7 +99,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Slideout_Dialog_Action_PinSlideoutLocation_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__Pin_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Pin_Themed));
       }
 
       @Override
@@ -114,7 +115,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          super(null, Action.AS_CHECK_BOX);
 
          setToolTipText(Messages.Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__BookOpen_Themed));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.BookOpen_Themed));
       }
 
       @Override

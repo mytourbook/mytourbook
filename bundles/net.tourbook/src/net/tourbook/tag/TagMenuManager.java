@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
@@ -135,7 +136,7 @@ public class TagMenuManager {
 
          super(Messages.Action_Tag_SetTags, AS_PUSH_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourTags));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourTags));
       }
 
       @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018, 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.tourbook.Messages;
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -120,27 +120,27 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 // SET_FORMATTING_OFF
 
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = net.tourbook.map2.Messages.Image__Tour;
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = net.tourbook.map2.Messages.Image__Tour_Disabled;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = net.tourbook.map2.Messages.Image_Action_ShowPhotosInMap;
-   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = net.tourbook.map2.Messages.Image_Action_ShowAllPhotosInMap_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = net.tourbook.map2.Messages.Image_Action_SyncWith_Slider_Centered_Disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = net.tourbook.map2.Messages.Image_Action_SyncWith_Slider_Centered;
-   private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = net.tourbook.map2.Messages.image_action_change_tile_factory;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
-   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = net.tourbook.map2.Messages.image_action_synch_with_slider;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Tour;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Tour_Disabled;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.ShowPhotos_InMap;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.ShowAllPhotos_InMap_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.SyncWith_Slider_Centered_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = Images.SyncWith_Slider_Centered;
+   private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = Images.MapProvider;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = Images.SyncWith_Slider_Disabled;
+   private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.SyncWith_Slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    //private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "map_actionshow photos in map"; //must be externalyzed
 
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                     = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED            = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
-   //
+
    private static final String            STATE_IS_LAYER_BASE_MAP_VISIBLE                  = "STATE_IS_LAYER_BASE_MAP_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BUILDING_VISIBLE                  = "STATE_IS_LAYER_BUILDING_VISIBLE";                        //$NON-NLS-1$
    //private static final String          STATE_IS_LAYER_S3DB_VISIBLE                      = "STATE_IS_LAYER_S3DB_VISIBLE";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BOOKMARK_VISIBLE                  = "STATE_IS_LAYER_BOOKMARK_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE               = "STATE_IS_LAYER_SATELLITE_VISIBLE";                         //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE                 = "STATE_IS_LAYER_SATELLITE_VISIBLE";                       //$NON-NLS-1$
 
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
@@ -149,16 +149,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
-   //
+
    private static final String            STATE_MAP_SYNCHED_WITH                           = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
-   //
+
    private static final String            STATE_LAYER_HILLSHADING_OPACITY                  = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
-   //
+
    private static final ImageDescriptor   _imageSyncWithSlider                             = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled           = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED);
-   //
+
 // SET_FORMATTING_ON
    //
    public static final String           ID            = "net.tourbook.map25.Map25View"; //$NON-NLS-1$
@@ -286,9 +286,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       public ActionMap25_Options() {
 
-         super(
-               TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions),
-               TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Disabled));
+         super(TourbookPlugin.getImageDescriptor(Images.MapOptions),
+               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
       }
 
       @Override

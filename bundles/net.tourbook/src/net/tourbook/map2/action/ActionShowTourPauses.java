@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.view.Map2View;
@@ -33,8 +34,8 @@ public class ActionShowTourPauses extends Action {
 
       setText(Messages.Tour_Action_ShowTourPauses);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
    }
 
    @Override

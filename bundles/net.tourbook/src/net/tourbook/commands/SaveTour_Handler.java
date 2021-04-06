@@ -17,7 +17,7 @@ package net.tourbook.commands;
 
 import java.util.Map;
 
-import net.tourbook.Messages;
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.ui.views.tagging.TourTags_View;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -37,10 +37,10 @@ import org.eclipse.ui.menus.UIElement;
 
 public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
 
-   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour);
-   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled);
-   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags);
-   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags_Disabled);
+   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Images.SaveTour);
+   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Images.SaveTour_Disabled);
+   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Images.SaveTags);
+   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Images.SaveTags_Disabled);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {

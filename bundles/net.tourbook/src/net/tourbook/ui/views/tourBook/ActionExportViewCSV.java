@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -35,8 +36,8 @@ class ActionExportViewCSV extends Action {
 
       setText(Messages.Tour_Book_Action_ExportViewCSV);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__CSVFormat_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
    }
 
    @Override

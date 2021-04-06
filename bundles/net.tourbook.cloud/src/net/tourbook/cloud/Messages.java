@@ -35,11 +35,6 @@ public class Messages extends NLS {
    public static String        PrefPage_CloudConnectivity_Label_WebPage;
 
    //DROPBOX
-   public static String Image__Dropbox_File;
-   public static String Image__Dropbox_Folder;
-   public static String Image__Dropbox_Logo;
-   public static String Image__Dropbox_Parentfolder;
-
    public static String Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;
    public static String Dialog_DropboxBrowser_Button_SelectFolder;
    public static String Dialog_DropboxBrowser_Text_AbsolutePath_Tooltip;
@@ -49,8 +44,6 @@ public class Messages extends NLS {
    public static String PrefPage_CloudConnectivity_Dropbox_WebPage_Link;
 
    //SUUNTO
-   public static String Image__SuuntoApp_Icon;
-
    public static String Dialog_DownloadWorkoutsFromSuunto_Message;
    public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
    public static String Dialog_DownloadWorkoutsFromSuunto_Task;
@@ -81,8 +74,6 @@ public class Messages extends NLS {
    public static String VendorName_Suunto;
 
    //STRAVA
-   public static String Image__Connect_With_Strava;
-
    public static String Dialog_UploadToursToStrava_Message;
    public static String Dialog_UploadToursToStrava_SubTask;
    public static String Dialog_UploadToursToStrava_Task;

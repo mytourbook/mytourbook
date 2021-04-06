@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -243,7 +244,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataEditor = tourDataEditor;
       _tourDataSource = tourData;
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__MyTourbook16).createImage());
+      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage());
 
       _canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
@@ -256,8 +257,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       super.configureShell(shell);
 
-      shell.setText(_isSplitTour ? //
-            Messages.Dialog_SplitTour_DlgArea_Title
+      shell.setText(_isSplitTour
+            ? Messages.Dialog_SplitTour_DlgArea_Title
             : Messages.Dialog_ExtractTour_DlgArea_Title);
 
       shell.addDisposeListener(new DisposeListener() {

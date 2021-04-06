@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoImages;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionToggleFolderGallery extends Action {
@@ -28,7 +30,7 @@ public class ActionToggleFolderGallery extends Action {
 		_picDirImages = picDirImages;
 
 		setToolTipText(Messages.Pic_Dir_Action_ToggleFolderGallery_OnlyPhotos_Tooltip);
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__PhotoFolderGallery_OnlyPhotos));
+      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoFolderGallery_OnlyPhotos));
 	}
 
 	@Override

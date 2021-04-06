@@ -4,7 +4,16 @@
 TODO's
 ======
 
+* UI Theme:    Provide a UI to select the UI theme
+               https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_default
+               -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
+  
 
+=======
+* Website:     Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+               Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
 Issues
 ======
@@ -21,7 +30,11 @@ New
 Improvements
 ============
 
-* 
+* 2D Map (Frederic):
+  - Extending the zoom levels capacity from 20 to 23
+
+* Tour Chart (Frederic):
+  - Displaying the night sections with a grey color for a more intuitive chart and better readability
 
 
 Changes  
@@ -33,8 +46,17 @@ Changes
 Bugfix
 ======
 
-* 
+* Compress Database
+  Fixed SQL exception when the tour database size is too large to fit into an integer value
 
+* Tour Chart Value Tooltip 
+  - Fixed a bug when importing tours (FIT, Suunto SML, Suunto XML, Garmin TCX) where in some cases, the tour start components were erroneous (the Time of Day value in the Value Point Tooltip was wrong). Now this data is adjusted with the tour's time zone.
+
+* Tour Import View (Frederic)
+  - The kcal column was displaying values in calories units instead of kcalories
+
+* Chart Tooltip (Frederic)
+  - Displaying the hour from 0 when a new day starts
 
 Translation    
 ===========

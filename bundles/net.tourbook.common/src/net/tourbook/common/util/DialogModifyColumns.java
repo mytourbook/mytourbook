@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
@@ -144,7 +145,7 @@ public class DialogModifyColumns extends TrayDialog {
 
          super(null, AS_CHECK_BOX);
 
-         setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__ColumnCategory));
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.ColumnCategory));
          setToolTipText(Messages.ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip);
       }
 

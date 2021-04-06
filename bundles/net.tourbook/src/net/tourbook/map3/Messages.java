@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,12 +48,6 @@ public class Messages extends NLS {
    public static String        Default_Layer_WMS_USGS_TOPO_BASE_MAP;
    public static String        Default_Layer_WMS_USGS_TOPO_BASE_MAP_LARGE_SCALE;
    public static String        Default_Layer_WorldMap;
-
-   public static String        Image_Map3_DirectionArrow;
-   public static String        Image_Map3_DirectionArrow_Disabled;
-   public static String        Image_Map3_Map3PropertiesView;
-   public static String        Image_Map3_OpenGL_Version;
-   public static String        Image_Map3_StatisticsView;
 
    public static String        Layer_Category_Info;
    public static String        Layer_Category_Map;

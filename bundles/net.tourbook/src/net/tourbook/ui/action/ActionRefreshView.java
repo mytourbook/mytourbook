@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITourViewer;
@@ -34,7 +35,7 @@ public class ActionRefreshView extends Action {
       setText(Messages.App_Action_RefreshView);
       setToolTipText(Messages.tag_view_action_refresh_view_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__refresh));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Refresh));
    }
 
    @Override
