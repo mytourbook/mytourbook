@@ -4231,7 +4231,7 @@ public class TourManager {
                final int xAxisTime = timeSerie[timeIndex];
                final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
 
-               if (timeIndex == 1347) {
+               if (timeIndex == 501) {
                   int a = 0;
                   a++;
                }
@@ -4245,11 +4245,6 @@ public class TourManager {
                      // keep time before RR values are available
 
                      areInitialRRValuesInvalid = true;
-
-                  } else {
-
-                     // this can occur when bpm < 60 -> time > 1 sec
-
                   }
 
                } else {
@@ -4259,7 +4254,7 @@ public class TourManager {
                   // check if the first RR values are invalid
                   if (areInitialRRValuesInvalid && xAxisRRTime == 0) {
 
-                     // initial RR values are invalid
+                     // initial RR values are invalid -> adjust start of x-axis RR time
 
                      xAxisRRTime += xAxisTime;
 
@@ -4283,7 +4278,7 @@ public class TourManager {
 //                           + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
                      while (rrIndex < numRRTimes
-
+ 
                            && rrIndex <= rrIndex_FromTimeSerie
 
                            && xAxisRRTime < xAxisTime
@@ -4308,7 +4303,7 @@ public class TourManager {
                         xAxisRRTime += xAxisTime - xAxisRRTime;
 
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
-                        yData_PulseTime.add(-20);
+                        yData_PulseTime.add(-100);
                      }
 
                   } else if (xAxisRRTime > xAxisTime) {
@@ -4321,7 +4316,7 @@ public class TourManager {
 //                   + " rrIndex: " + rrIndex
 //                   + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
-                     while (rrIndex < numRRTimes
+                     while (rrIndex < numRRTimes // check array bounds
 
                            && rrIndex <= rrIndex_FromTimeSerie
 
@@ -4344,12 +4339,12 @@ public class TourManager {
 
                         // RR time is still too small -> adjust RR time to x-Axis time
 
-                        rrIndex=rrIndex_FromTimeSerie;
+                        rrIndex = rrIndex_FromTimeSerie;
 
                         xAxisRRTime += xAxisTime - xAxisRRTime;
 
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
-                        yData_PulseTime.add(-100);
+                        yData_PulseTime.add(200);
                      }
                   }
                }

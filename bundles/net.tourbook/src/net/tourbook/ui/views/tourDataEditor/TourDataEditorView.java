@@ -8200,8 +8200,44 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (serieIndex < numTimeSlices - 1) {
 
-         final int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
+         int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
          final int rrIndex_Next = _seriePulse_RR_Index[serieIndex + 1];
+ 
+         if (serieIndex == 3893) {
+            int a = 0;
+            a++;
+         }
+
+         if (serieIndex > 0 && rrIndex_Current == -1) {
+
+            final int rrIndex_Prev = _seriePulse_RR_Index[serieIndex - 1];
+
+            if (rrIndex_Prev != -1) {
+
+               final int rrIndexDiff = rrIndex_Next - rrIndex_Prev;
+
+               if (rrIndexDiff > 2) {
+
+                  /**
+                   * Adjust current index when there is a gap between previous and next index,
+                   * otherwise these values are not displayed
+                   * <p>
+                   * Example:
+                   * <p>
+                   * <code>
+                   *
+                   *     rrIndex_Current  = -1
+                   *     rrIndex_Next     = 4162
+                   *     rrIndex_Prev     = 4107
+                   *     rrIndexDiff      = 55
+                   *
+                   * </code>
+                   */
+
+                  rrIndex_Current = rrIndex_Prev + 1;
+               }
+            }
+         }
 
          final StringBuilder sb = new StringBuilder();
 
@@ -8209,8 +8245,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
 //            sb.append("T: ");
 
-            final int numRR = rrIndex_Next - 1 - rrIndex_Current;
-            if (numRR > 2) {
+            final int numRR = rrIndex_Next - rrIndex_Current;
+            if (numRR > 4) {
                sb.append(numRR + " ∑  ");
             }
 
@@ -8218,22 +8254,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                final int rrValue = _seriePulse_RR_Times[rrIndex];
 
-               sb.append(rrValue + UI.SPACE1);
+               final String space = rrIndex < rrIndex_Next - 1
+                     ? UI.SPACE1
+                     : UI.EMPTY_STRING;
+
+               sb.append(rrValue + space);
             }
 
          } else if (rrIndex_Current >= 0) {
 
             final int rrValue = _seriePulse_RR_Times[rrIndex_Current];
 
-            sb.append("S: " + rrValue);
+            sb.append(rrValue);
 
          } else if (rrIndex_Current < 0) {
 
-            sb.append("C: " + rrIndex_Current);
+            sb.append(rrIndex_Current);
 
          } else if (rrIndex_Next < 0) {
 
-            sb.append("N: " + rrIndex_Next);
+            sb.append("Next: " + rrIndex_Next);
 
          }
 
