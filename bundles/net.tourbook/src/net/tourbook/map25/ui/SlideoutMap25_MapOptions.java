@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,14 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map25.ui;
+
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -34,14 +42,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.Map25View;
 
 /**
  * Map 2.5D properties slideout.
@@ -69,6 +69,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowPhoto_Title;
+   private Button    _chkShowPhoto_Scaled;
    private Button    _chkShowLayer_TileInfo;
 
    private Button    _chkUseDraggedKeyboardNavigation;
@@ -250,6 +251,15 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
          {
             /*
+             * Photo Title
+             */
+            _chkShowPhoto_Scaled = new Button(group, SWT.CHECK);
+            _chkShowPhoto_Scaled.setText("Slideout_Map25MapOptions_Checkbox_Sclaed_Photos");
+            _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
+         }
+
+         {
+            /*
              * Tile info
              */
             _chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
@@ -395,6 +405,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
 
+      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Scaled.getSelection());
+
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
       // switching on/off both building layers
@@ -413,13 +425,15 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       _chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
-      //satellite maps
+
       _chkShowLayer_Satellite.setSelection(mapApp.getLayer_Satellite().isEnabled());
 
       _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
       _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
 
       _chkShowPhoto_Title.setSelection(mapApp.getIsPhotoShowTitle());
+
+      _chkShowPhoto_Scaled.setSelection(mapApp.getIsPhotoShowScaled());
 
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 
