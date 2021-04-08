@@ -1710,8 +1710,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeSlice) {
-         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-         _lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
+
+         /*
+          * Show the same time slice value which is also selected in the tour editor where time
+          * slices are starting with 1, otherwise it could be confusing
+          */
+
+         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex + 1));
+         _lblDataSerieMax.setText(Integer.toString(timeSerie.length));
       }
 
       if (_isVisible_And_Available_TourCompareResult) {
