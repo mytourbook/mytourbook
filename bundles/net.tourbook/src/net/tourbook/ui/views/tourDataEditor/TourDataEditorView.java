@@ -8202,11 +8202,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
          final int rrIndex_Next = _seriePulse_RR_Index[serieIndex + 1];
- 
-         if (serieIndex == 3893) {
-            int a = 0;
-            a++;
-         }
+
+//         if (serieIndex == 3893) {
+//            int a = 0;
+//            a++;
+//         } 
 
          if (serieIndex > 0 && rrIndex_Current == -1) {
 

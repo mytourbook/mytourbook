@@ -4278,7 +4278,7 @@ public class TourManager {
 //                           + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
                      while (rrIndex < numRRTimes
- 
+
                            && rrIndex <= rrIndex_FromTimeSerie
 
                            && xAxisRRTime < xAxisTime
@@ -4335,7 +4335,7 @@ public class TourManager {
                         rrIndex++;
                      }
 
-                     if (xAxisRRTime > xAxisTime - 2) {
+                     if (xAxisRRTime - 2 > xAxisTime) {
 
                         // RR time is still too small -> adjust RR time to x-Axis time
 
@@ -4344,7 +4344,7 @@ public class TourManager {
                         xAxisRRTime += xAxisTime - xAxisRRTime;
 
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
-                        yData_PulseTime.add(200);
+                        yData_PulseTime.add(300); 
                      }
                   }
                }
