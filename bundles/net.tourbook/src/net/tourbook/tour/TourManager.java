@@ -110,6 +110,15 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
+   private static final String SYS_PROP__LOG_RR_ERRORS = "logRRErrors";                                      //$NON-NLS-1$
+   private static boolean      _isLogging_RR_Errors    = System.getProperty(SYS_PROP__LOG_RR_ERRORS) != null;
+
+   static {
+      if (_isLogging_RR_Errors) {
+         Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_RR_ERRORS, "R-R errors are logged"); //$NON-NLS-1$
+      }
+   }
+
    private static final String GRAPH_LABEL_ALTIMETER                           = net.tourbook.common.Messages.Graph_Label_Altimeter;
    private static final String GRAPH_LABEL_ALTITUDE                            = net.tourbook.common.Messages.Graph_Label_Altitude;
    private static final String GRAPH_LABEL_CADENCE                             = net.tourbook.common.Messages.Graph_Label_Cadence;
@@ -4210,7 +4219,7 @@ public class TourManager {
 
             /*
              * Adjust all values with the first value, otherwise the graph looks like it is shifted
-             * compared with the device bpm value
+             * compared with the device bpm value. This value helps sometimes, but sometimes not.
              */
             double firstValueOffset = 0;
             for (final int rrTimeMS : allRRTimesInMilliseconds) {
@@ -4230,11 +4239,6 @@ public class TourManager {
 
                final int xAxisTime = timeSerie[timeIndex];
                final int rrIndex_FromTimeSerie = timeSerie_WithRRIndex[timeIndex];
-
-               if (timeIndex == 501) {
-                  int a = 0;
-                  a++;
-               }
 
                if (rrIndex_FromTimeSerie == -1) {
 
@@ -4262,20 +4266,9 @@ public class TourManager {
                      yData_PulseTime.add(0);
                   }
 
-                  final int rrIndexDiff = rrIndex_FromTimeSerie - rrIndex;
-                  if (rrIndexDiff > 1 || rrIndexDiff < -1) {
-                     int b = 0;
-                     b++;
-//                     rrIndex = rrIndex_FromTimeSerie;
-                  }
+                  final int minXAxisDiff = 1;
 
                   if (xAxisRRTime < xAxisTime) {
-
-//                     System.out.println(""
-//                           + "RRTime <<< xAxisTime " + timeIndex + " diff: " + String.format("%1.3f", xAxisRRTime - xAxisTime)
-//                           + " rrIndex_FromTimeSerie: " + rrIndex_FromTimeSerie
-//                           + " rrIndex: " + rrIndex
-//                           + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
                      while (rrIndex < numRRTimes
 
@@ -4290,31 +4283,64 @@ public class TourManager {
                         xAxisRRTime += rrSliceTime;
                         final float bpmFromRRTime = (float) (60.0f / rrSliceTime);
 
+                        final double xAxisDiff = xAxisRRTime - xAxisTime;
+
+                        if (xAxisDiff > 5) {
+
+                           /**
+                            * <code>
+                            *
+                            * timeIndex               = 8767
+                            * rrIndex                 = 12054
+                            * rrIndex_FromTimeSerie   = 12054
+                            * xAxisRRTime             = 16349.82
+                            * xAxisTime               = 16339
+                            *
+                            * </code>
+                            */
+
+                           xAxisRRTime = xAxisTime;
+
+                           if (_isLogging_RR_Errors) {
+                              System.out.println((System.currentTimeMillis() + " xAxisDiff 1: " + xAxisDiff));
+                           }
+                        }
+
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
                         yData_PulseTime.add(bpmFromRRTime);
 
                         rrIndex++;
                      }
 
-                     if (xAxisRRTime < xAxisTime - 2) {
+                     if (xAxisRRTime < xAxisTime - minXAxisDiff) {
 
                         // RR time is still too small -> adjust RR time to x-Axis time
 
                         xAxisRRTime += xAxisTime - xAxisRRTime;
 
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = -100;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
-                        yData_PulseTime.add(-100);
+                        yData_PulseTime.add(yPulseTime);
                      }
 
                   } else if (xAxisRRTime > xAxisTime) {
 
                      // this occured when bpm < 60
-
-//                   System.out.println(""
-//                   + "RRTime > xAxisTime " + timeIndex + " diff: " + String.format("%1.3f", xAxisRRTime - xAxisTime)
-//                   + " rrIndex_FromTimeSerie: " + rrIndex_FromTimeSerie
-//                   + " rrIndex: " + rrIndex
-//                   + " diff: " + (rrIndex_FromTimeSerie - rrIndex));
 
                      while (rrIndex < numRRTimes // check array bounds
 
@@ -4335,7 +4361,29 @@ public class TourManager {
                         rrIndex++;
                      }
 
-                     if (xAxisRRTime - 2 > xAxisTime) {
+                     final double xAxisDiff = xAxisRRTime - xAxisTime;
+                     if (xAxisDiff > 5) {
+
+                        /**
+                         * <code>
+                         *
+                         * timeIndex               = 8767
+                         * rrIndex                 = 12054
+                         * rrIndex_FromTimeSerie   = 12054
+                         * xAxisRRTime             = 16349.82
+                         * xAxisTime               = 16339
+                         *
+                         * </code>
+                         */
+
+                        xAxisRRTime = xAxisTime;
+
+                        if (_isLogging_RR_Errors) {
+                           System.out.println((System.currentTimeMillis() + " xAxisDiff 2: " + xAxisDiff));
+                        }
+                     }
+
+                     if (xAxisRRTime - minXAxisDiff > xAxisTime) {
 
                         // RR time is still too small -> adjust RR time to x-Axis time
 
@@ -4343,8 +4391,24 @@ public class TourManager {
 
                         xAxisRRTime += xAxisTime - xAxisRRTime;
 
+                        float yPulseTime = 0;
+                        if (_isLogging_RR_Errors) {
+
+                           yPulseTime = 500;
+
+                        } else {
+
+                           // show previous time
+
+                           final int numPulseTimes = yData_PulseTime.size();
+
+                           if (numPulseTimes > 0) {
+                              yPulseTime = yData_PulseTime.get(numPulseTimes - 1);
+                           }
+                        }
+
                         xData_PulseTime.add(xAxisRRTime - firstValueOffset);
-                        yData_PulseTime.add(300); 
+                        yData_PulseTime.add(yPulseTime);
                      }
                   }
                }
