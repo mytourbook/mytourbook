@@ -1918,6 +1918,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
+   public static String Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Satellite;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
@@ -1928,6 +1929,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Group_MapLayer;
    public static String Slideout_Map25MapOptions_Label_MapOptions;
    public static String Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
+   public static String Slideout_Map25MapOptions_Spinner_Layer_Photo_Size;
 
    public static String Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;

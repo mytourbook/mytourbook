@@ -69,12 +69,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowPhoto_Title;
-   private Button    _chkShowPhoto_Scaled;
+   private Button    _chkShowPhoto_Size;
    private Button    _chkShowLayer_TileInfo;
 
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
+   private Spinner   _spinnerPhoto_Size;
 
    /**
     * @param ownerControl
@@ -215,6 +216,48 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
          {
             /*
+             * Photo Size
+             */
+            final Composite containerPhotoSize = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerPhotoSize);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerPhotoSize);
+            {
+
+               {
+                  _chkShowPhoto_Size = new Button(containerPhotoSize, SWT.CHECK);
+                  _chkShowPhoto_Size.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size);
+                  _chkShowPhoto_Size.addSelectionListener(_layerSelectionListener);
+               }
+               {
+                  /*
+                   * PhotoSize
+                   */
+                  // spinner: fill
+                  _spinnerPhoto_Size = new Spinner(containerPhotoSize, SWT.BORDER);
+                  _spinnerPhoto_Size.setMinimum(160);
+                  _spinnerPhoto_Size.setMaximum(640);
+                  _spinnerPhoto_Size.setIncrement(5);
+                  _spinnerPhoto_Size.setPageIncrement(10);
+                  _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Photo_Size);
+
+                  _spinnerPhoto_Size.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onModify_PhotoSize();
+                     }
+                  });
+                  _spinnerPhoto_Size.addMouseWheelListener(new MouseWheelListener() {
+                     @Override
+                     public void mouseScrolled(final MouseEvent event) {
+                        UI.adjustSpinnerValueOnMouseScroll(event);
+                        onModify_PhotoSize();
+                     }
+                  });
+               }
+            }
+         }
+         {
+            /*
              * Scale
              */
             _chkShowLayer_Scale = new Button(group, SWT.CHECK);
@@ -247,15 +290,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowPhoto_Title = new Button(group, SWT.CHECK);
             _chkShowPhoto_Title.setText(Messages.Slideout_Map25MapOptions_Checkbox_Photo_Title);
             _chkShowPhoto_Title.addSelectionListener(_layerSelectionListener);
-         }
-
-         {
-            /*
-             * Photo Title
-             */
-            _chkShowPhoto_Scaled = new Button(group, SWT.CHECK);
-            _chkShowPhoto_Scaled.setText("Slideout_Map25MapOptions_Checkbox_Sclaed_Photos");
-            _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
          }
 
          {
@@ -405,7 +439,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
 
-      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Scaled.getSelection());
+      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Size.getSelection());
 
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
@@ -417,6 +451,19 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.getMap().updateMap(true);
       mapApp.updateUI_PhotoLayer();
+   }
+
+   private void onModify_PhotoSize() {
+
+      final Map25App mapApp = _map25View.getMapApp();
+
+      // updade model
+      final int photoSize = _spinnerPhoto_Size.getSelection();
+      mapApp.setLayer_Photo_Size(photoSize);
+
+      enableActions();
+
+      mapApp.getMap().updateMap(true);
    }
 
    private void restoreState() {
@@ -433,7 +480,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       _chkShowPhoto_Title.setSelection(mapApp.getIsPhotoShowTitle());
 
-      _chkShowPhoto_Scaled.setSelection(mapApp.getIsPhotoShowScaled());
+      _chkShowPhoto_Size.setSelection(mapApp.getIsPhotoShowScaled());
 
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 

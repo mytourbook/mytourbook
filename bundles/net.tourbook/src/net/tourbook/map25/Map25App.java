@@ -129,7 +129,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static Map25View        _map25View;
    private static LwjglApplication _lwjglApp;
 
-   public static DebugMode         debugMode                         = DebugMode.OFF;                      // before releasing, set this to OFF
+   public static DebugMode         debugMode                         = DebugMode.ON;                       // before releasing, set this to OFF
    private Boolean                 _mf_IsThemeFromFile               = null;
 
    private Boolean                 _firstRun                         = true;
@@ -162,6 +162,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * opacity.
     */
    private int                       _layer_HillShading_Opacity;
+   private int                       _layer_Photo_Size;
 
    private LabelLayerMT              _layer_Label;
    private MarkerLayer               _layer_Marker;
@@ -584,6 +585,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_Photo;
    }
 
+   public int getLayer_Photo_Size() {
+      return _layer_Photo_Size;
+   }
+
    public S3DBLayer getLayer_S3DB() {
       return _layer_S3DB_Building;
    }
@@ -998,6 +1003,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setLayer_HillShading_Opacity(final int layer_HillShading_Opacity) {
       _layer_HillShading_Opacity = layer_HillShading_Opacity;
+   }
+
+   public void setLayer_Photo_Size(final int layer_Photo_Size) {
+      _layer_Photo_Size = layer_Photo_Size;
+      debugPrint(" map25: " + "############# setLayer_PhotoSize to: " + layer_Photo_Size); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public void setMapProvider(final Map25Provider mapProvider) {

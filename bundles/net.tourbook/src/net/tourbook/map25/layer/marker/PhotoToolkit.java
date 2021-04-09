@@ -64,11 +64,16 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private Bitmap _bitmapCluster;
+   public static final int               IMAGE_SIZE_SMALL         = 160;
+   public static final int               IMAGE_SIZE_MEDIUM        = 320;
+   public static final int               IMAGE_SIZE_LARGE         = 320;
 
+   private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    public MarkerSymbol          _symbol;               //marker symbol, circle or star
+
    private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
+
    private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
 
    private ArrayList<Photo>     _allPhotos;
@@ -78,8 +83,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean               _isMarkerClusteredLast;
 
    public boolean               _isPhotoShowScaled;
-
    Display                      _display;
+
 
 //   private int  _imageSize;
 //   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
@@ -255,7 +260,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //debugPrint("??? getPhotoBitmap imageSize: " + photoBitmap.getWidth() + _imageSize);
       //final Image scaledThumbImage = getPhotoImage(photo, _imageSize);
 
-      final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
+      //final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
+      final Image scaledThumbImage = getPhotoImage(photo, IMAGE_SIZE_MEDIUM);
 
       if (scaledThumbImage != null) {
          try {
@@ -319,6 +325,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                isRotated = true;
                //thumbRotation = getRotation();
             }
+
+
+            debugPrint("??? getPhotoImage imageWidth and thumbsize: " + imageWidth + " " + thumbSize);
+
 
             scaledThumbImage = ImageUtils.resize(
                   _display,
