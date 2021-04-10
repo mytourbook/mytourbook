@@ -1010,12 +1010,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               _pulseSerie_Smoothed;
 
    /**
-    * Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}
+    * Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}.
+    * One pulse value is the average of all pulse times within one timeslice.
     */
    @Transient
    public float[]                pulseSerie_FromTime;
 
    /**
+    * One time slice contains all of it's R-R interval values.
+    */
+   @Transient
+   public String[]               pulseSerie_RRIntervals;
+
+   /**
+    * This value is contained in the saved {@link SerieData}
+    * <p>
     * Pulse times in milliseconds.
     * <p>
     * <b>This data serie has not the same serie length as the other data series because 1 second can
@@ -1025,9 +1034,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public int[]                  pulseTime_Milliseconds;
 
    /**
+    * This value is contained in the saved {@link SerieData}
+    * <p>
     * Contains the time index into {@link #timeSerie} for the pulse time(s) in {@link #pulseTime_Milliseconds}.
     * A time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
-    */
+   */
    @Transient
    public int[]                  pulseTime_TimeIndex;
 
@@ -2030,8 +2041,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       breakTimeSerie = null;
 
-      pulseSerie_FromTime = null;
       _pulseSerie_Smoothed = null;
+      pulseSerie_FromTime = null;
+      pulseSerie_RRIntervals = null;
 
       gradientSerie = null;
 
@@ -7938,17 +7950,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns beat values computed from the R-R intervals
     */
-   public float[] getPulse_RRIntervals() {
+   public float[] getPulse_BpmFromRRIntervals() {
 
       if (pulseSerie_FromTime != null) {
-//         return pulseSerie_FromTime;
+         return pulseSerie_FromTime;
       }
 
       /**
        * !!! VERY IMPORTANT !!!
        * <P>
+       * The check for
+       * <P>
        * <code>
-       *    pulseTimeSerie == null || pulseTime_TimeIndex == null
+       *    pulseTime_Milliseconds == null || pulseTime_TimeIndex == null
        * </code>
        * MUST BE AFTER
        * <code>
@@ -7984,11 +7998,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // time index can be -1 -> heartbeat is below 60 bpm -> use value from the previous time slice
 
-            if (serieIndex >= 2296) {
-               int a = 0;
-               a++;
-            }
-
             if (rrIndex_FromTimeSerie == -1) {
 
                pulseSerie_FromTime[serieIndex] = pulseSerie_FromTime[serieIndex - 1];
@@ -8023,11 +8032,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // there is only 1 pulse time
 
-            if (serieIndex >= 2296) {
-               int a = 0;
-               a++;
-            }
-
             final int pulseTimeMS = pulseTime_Milliseconds[rrIndex_FromTimeSerie];
 
             if (pulseTimeMS > 0 && pulseTimeMS != 5_000) {
@@ -8037,10 +8041,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          } else {
 
-            if (serieIndex >= 2296) {
-               int a = 0;
-               a++;
-            }
             long sumPulseTimeMS = 0;
 
             for (int avgSerieIndex = rrIndex_FromTimeSerie; avgSerieIndex < rrIndex_FromTimeSerie_Next; avgSerieIndex++) {
@@ -8064,6 +8064,94 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return pulseSerie_FromTime;
+   }
+
+   public String[] getPulse_RRIntervals() {
+
+      if (pulseSerie_RRIntervals != null) {
+         return pulseSerie_RRIntervals;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+
+      pulseSerie_RRIntervals = new String[numTimeSlices];
+
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         int rrIndex_Current = pulseTime_TimeIndex[serieIndex];
+         final int rrIndex_Next = pulseTime_TimeIndex[serieIndex + 1];
+
+         if (serieIndex > 0 && rrIndex_Current == -1) {
+
+            final int rrIndex_Prev = pulseTime_TimeIndex[serieIndex - 1];
+
+            if (rrIndex_Prev != -1) {
+
+               final int rrIndexDiff = rrIndex_Next - rrIndex_Prev;
+
+               if (rrIndexDiff > 2) {
+
+                  /**
+                   * Adjust current index when there is a gap between previous and next index,
+                   * otherwise these values are not displayed
+                   * <p>
+                   * Example:
+                   * <p>
+                   * <code>
+                   *
+                   *     rrIndex_Current  = -1
+                   *     rrIndex_Next     = 4162
+                   *     rrIndex_Prev     = 4107
+                   *     rrIndexDiff      = 55
+                   *
+                   * </code>
+                   */
+
+                  rrIndex_Current = rrIndex_Prev + 1;
+               }
+            }
+         }
+
+         final StringBuilder sb = new StringBuilder();
+
+         if (rrIndex_Current >= 0 && rrIndex_Next >= 0) {
+
+            final int numRR = rrIndex_Next - rrIndex_Current;
+            if (numRR > 4) {
+               sb.append(numRR + " ∑  ");
+            }
+
+            for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {
+
+               final int rrValue = pulseTime_Milliseconds[rrIndex];
+
+               final String space = rrIndex < rrIndex_Next - 1
+                     ? UI.SPACE1
+                     : UI.EMPTY_STRING;
+
+               sb.append(rrValue + space);
+            }
+
+         } else if (rrIndex_Current >= 0) {
+
+            final int rrValue = pulseTime_Milliseconds[rrIndex_Current];
+
+            sb.append(rrValue);
+
+         } else if (rrIndex_Current < 0) {
+
+            sb.append(rrIndex_Current);
+
+         } else if (rrIndex_Next < 0) {
+
+            sb.append("Next: " + rrIndex_Next);
+
+         }
+
+         pulseSerie_RRIntervals[serieIndex] = sb.toString();
+      }
+
+      return pulseSerie_RRIntervals;
    }
 
    public float[] getPulse_SmoothedSerie() {

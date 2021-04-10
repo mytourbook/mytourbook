@@ -290,7 +290,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[]                 _seriePower;
    private float[]                 _seriePulse;
    private float[]                 _seriePulse_RR_Bpm;
-   private int[]                   _seriePulse_RR_Times;
+   private String[]                _seriePulse_RR_Intervals;
    private int[]                   _seriePulse_RR_Index;
    private double[]                _serieLatitude;
    private double[]                _serieLongitude;
@@ -4941,6 +4941,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       defineColumn_TimeSlice_Body_Heartbeat_Device();
       defineColumn_TimeSlice_Body_Heartbeat_RR();
+      defineColumn_TimeSlice_Body_Heartbeat_RR_Intervals();
+      defineColumn_TimeSlice_Body_Heartbeat_RR_Index();
 
       defineColumn_TimeSlice_Tour_Marker();
 
@@ -5183,15 +5185,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Column: Device heartbeat
+    * Column: Heartbeat from device
     */
    private void defineColumn_TimeSlice_Body_Heartbeat_Device() {
 
       ColumnDefinition colDef;
 
       _timeSlice_ColDef_Pulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
-
-//      colDef.disableValueFormatter();
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -5209,13 +5209,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Column: R-R heartbeat
+    * Column: Heartbeat from R-R intervals
     */
    private void defineColumn_TimeSlice_Body_Heartbeat_RR() {
 
-      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR.createColumn(_timeSlice_ColumnManager, _pc);
-
-//      colDef.disableValueFormatter();
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_AVG_BPM.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
@@ -5229,6 +5227,59 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final float value = _seriePulse_RR_Bpm[timeSlice.serieIndex];
 
                colDef.printDetailValue(cell, value);
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: R-R index
+    */
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR_Index() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_INDEX.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR_Index != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               final int value = _seriePulse_RR_Index[timeSlice.serieIndex];
+
+               cell.setText(Integer.toString(value));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: R-R values
+    */
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR_Intervals() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_INTERVALS.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR_Intervals != null) {
+
+               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+               cell.setText(_seriePulse_RR_Intervals[serieIndex]);
 
             } else {
                cell.setText(UI.EMPTY_STRING);
@@ -5296,7 +5347,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: altitude
+    * Column: Elevation
     */
    private void defineColumn_TimeSlice_Elevation_Elevation() {
 
@@ -5312,31 +5363,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void update(final ViewerCell cell) {
 
-            if (_seriePulse_RR_Index != null) {
+            if (_serieAltitude != null) {
 
-               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-
-               cell.setText(Integer.toString(_seriePulse_RR_Index[serieIndex]));
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
 
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
-
-//            if (_serieAltitude != null) {
-//
-//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-//               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
-//
-//            } else {
-//               cell.setText(UI.EMPTY_STRING);
-//            }
          }
       });
 
    }
 
    /**
-    * column: gradient
+    * Column: Gradient
     */
    private void defineColumn_TimeSlice_Elevation_Gradient() {
 
@@ -5349,24 +5390,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          @Override
          public void update(final ViewerCell cell) {
 
-            if (_seriePulse_RR_Index != null) {
+            if (_serieGradient != null) {
 
-               setRRTimes(cell);
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               final float value = _serieGradient[timeSlice.serieIndex];
+
+               colDef.printDetailValue(cell, value);
 
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
-
-//            if (_serieGradient != null) {
-//
-//               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-//               final float value = _serieGradient[timeSlice.serieIndex];
-//
-//               colDef.printDetailValue(cell, value);
-//
-//            } else {
-//               cell.setText(UI.EMPTY_STRING);
-//            }
          }
       });
    }
@@ -6706,13 +6739,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieCadence = _tourData.getCadenceSerie();
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
-      _seriePulse_RR_Bpm = _tourData.getPulse_RRIntervals();
+
+      _seriePulse_RR_Bpm = _tourData.getPulse_BpmFromRRIntervals();
+      _seriePulse_RR_Intervals = _tourData.getPulse_RRIntervals();
 
       // time serie which is containing the index for the first slice in the RR serie
       _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
-
-      // RR serie
-      _seriePulse_RR_Times = _tourData.pulseTime_Milliseconds;
 
       _serieLatitude = _tourData.latitudeSerie;
       _serieLongitude = _tourData.longitudeSerie;
@@ -6727,7 +6759,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieTemperature = _tourData.temperatureSerie;
 
       _swimSerie_StrokeRate = _tourData.swim_Cadence;
-//    _swimSerie_LengthType = _tourData.swim_LengthType;
       _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
       _swimSerie_Time = _tourData.swim_Time;
@@ -8191,97 +8222,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionToggleRowSelectMode.setChecked(enabled);
 
       actionToggleRowSelectMode();
-   }
-
-   private void setRRTimes(final ViewerCell cell) {
-
-      final int numTimeSlices = _serieTime.length;
-      final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-
-      if (serieIndex < numTimeSlices - 1) {
-
-         int rrIndex_Current = _seriePulse_RR_Index[serieIndex];
-         final int rrIndex_Next = _seriePulse_RR_Index[serieIndex + 1];
-
-//         if (serieIndex == 3893) {
-//            int a = 0;
-//            a++;
-//         } 
-
-         if (serieIndex > 0 && rrIndex_Current == -1) {
-
-            final int rrIndex_Prev = _seriePulse_RR_Index[serieIndex - 1];
-
-            if (rrIndex_Prev != -1) {
-
-               final int rrIndexDiff = rrIndex_Next - rrIndex_Prev;
-
-               if (rrIndexDiff > 2) {
-
-                  /**
-                   * Adjust current index when there is a gap between previous and next index,
-                   * otherwise these values are not displayed
-                   * <p>
-                   * Example:
-                   * <p>
-                   * <code>
-                   *
-                   *     rrIndex_Current  = -1
-                   *     rrIndex_Next     = 4162
-                   *     rrIndex_Prev     = 4107
-                   *     rrIndexDiff      = 55
-                   *
-                   * </code>
-                   */
-
-                  rrIndex_Current = rrIndex_Prev + 1;
-               }
-            }
-         }
-
-         final StringBuilder sb = new StringBuilder();
-
-         if (rrIndex_Current >= 0 && rrIndex_Next >= 0) {
-
-//            sb.append("T: ");
-
-            final int numRR = rrIndex_Next - rrIndex_Current;
-            if (numRR > 4) {
-               sb.append(numRR + " ∑  ");
-            }
-
-            for (int rrIndex = rrIndex_Current; rrIndex < rrIndex_Next; rrIndex++) {
-
-               final int rrValue = _seriePulse_RR_Times[rrIndex];
-
-               final String space = rrIndex < rrIndex_Next - 1
-                     ? UI.SPACE1
-                     : UI.EMPTY_STRING;
-
-               sb.append(rrValue + space);
-            }
-
-         } else if (rrIndex_Current >= 0) {
-
-            final int rrValue = _seriePulse_RR_Times[rrIndex_Current];
-
-            sb.append(rrValue);
-
-         } else if (rrIndex_Current < 0) {
-
-            sb.append(rrIndex_Current);
-
-         } else if (rrIndex_Next < 0) {
-
-            sb.append("Next: " + rrIndex_Next);
-
-         }
-
-         cell.setText(sb.toString());
-
-      } else {
-         cell.setText(UI.EMPTY_STRING);
-      }
    }
 
    /**

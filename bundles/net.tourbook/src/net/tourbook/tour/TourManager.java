@@ -924,7 +924,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_TimeSerie = fromTourData.getPulse_RRIntervals();
+         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_BpmFromRRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -1030,9 +1030,9 @@ public class TourManager {
             isPulseSerie = true;
             System.arraycopy(fromPulseSerie, 0, toPulseSerie, toStartIndex, fromSerieLength);
          }
-         if (fromPulse_TimeSerie != null) {
+         if (fromPulse_BpmFromRRIntervals != null) {
             isPulseSerie_FromTime = true;
-            System.arraycopy(fromPulse_TimeSerie, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
+            System.arraycopy(fromPulse_BpmFromRRIntervals, 0, toPulseSerie_FromTime, toStartIndex, fromSerieLength);
          }
          if (fromTemperaturSerie != null) {
             isTempSerie = true;
@@ -4169,13 +4169,13 @@ public class TourManager {
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      final float[] pulseTimeSerie = tourData.getPulse_RRIntervals();
+      final float[] bpmFromRRIntervals = tourData.getPulse_BpmFromRRIntervals();
 
       final boolean isPulseSerie = pulseSerie != null;
-      final boolean isPulseTimeSerie = pulseTimeSerie != null;
+      final boolean isBpmFromRRIntervals = bpmFromRRIntervals != null;
 
       tcc.canShowPulseSerie = isPulseSerie;
-      tcc.canShowPulseTimeSerie = isPulseTimeSerie;
+      tcc.canShowPulseTimeSerie = isBpmFromRRIntervals;
 
       // set graph/line according to the selection
       switch (tcc.pulseGraph) {
@@ -4188,9 +4188,9 @@ public class TourManager {
 
       case RR_INTERVALS_ONLY:
 
-         if (isPulseTimeSerie) {
+         if (isBpmFromRRIntervals) {
 
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, ChartType.VARIABLE_X_AXIS);
+            yDataPulse = createChartDataSerieNoZero(bpmFromRRIntervals, ChartType.VARIABLE_X_AXIS);
 
             final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
             final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex; //          length: numTimeSlices
@@ -4421,16 +4421,16 @@ public class TourManager {
 
       case RR_INTERVALS__2ND_DEVICE_BPM:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseTimeSerie, pulseSerie }, chartType);
+         if (isPulseSerie && isBpmFromRRIntervals) {
+            yDataPulse = createChartDataSerie(new float[][] { bpmFromRRIntervals, pulseSerie }, chartType);
          }
          break;
 
       case DEVICE_BPM__2ND__RR_INTERVALS:
       default:
 
-         if (isPulseSerie && isPulseTimeSerie) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, pulseTimeSerie }, chartType);
+         if (isPulseSerie && isBpmFromRRIntervals) {
+            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, bpmFromRRIntervals }, chartType);
          }
       }
 
@@ -4441,9 +4441,9 @@ public class TourManager {
 
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
 
-         } else if (isPulseTimeSerie) {
+         } else if (isBpmFromRRIntervals) {
 
-            yDataPulse = createChartDataSerieNoZero(pulseTimeSerie, chartType);
+            yDataPulse = createChartDataSerieNoZero(bpmFromRRIntervals, chartType);
          }
       }
 
