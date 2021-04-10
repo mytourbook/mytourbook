@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
- * Copyright (C) 2018, 2021 Thomas Theussing
+ * Copyright (C) 2005, 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2019, 2020, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1460,7 +1460,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       } else {
          _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
       }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
       _layer_Photo.setEnabled(false);
       layers.add(_layer_Photo);
 
