@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,7 +70,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowPhoto_Title;
-   private Button    _chkShowPhoto_Resize;
+   private Button    _chkShowPhoto_Scaled;
    private Button    _chkShowLayer_TileInfo;
 
    private Button    _chkUseDraggedKeyboardNavigation;
@@ -225,9 +225,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             {
 
                {
-                  _chkShowPhoto_Resize = new Button(containerPhotoSize, SWT.CHECK);
-                  _chkShowPhoto_Resize.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size);
-                  _chkShowPhoto_Resize.addSelectionListener(_layerSelectionListener);
+                  _chkShowPhoto_Scaled = new Button(containerPhotoSize, SWT.CHECK);
+                  _chkShowPhoto_Scaled.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size);
+                  _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
                }
                {
                   /*
@@ -440,7 +440,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
 
-      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Resize.getSelection());
+      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Scaled.getSelection());
 
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
@@ -484,7 +484,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       _chkShowPhoto_Title.setSelection(mapApp.getIsPhotoShowTitle());
 
-      _chkShowPhoto_Resize.setSelection(mapApp.getIsPhotoShowScaled());
+      _chkShowPhoto_Scaled.setSelection(mapApp.getIsPhotoShowScaled());
 
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 
