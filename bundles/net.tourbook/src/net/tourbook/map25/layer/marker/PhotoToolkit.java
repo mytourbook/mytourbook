@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019, 2020, 2021 Wolfgang Schramm and Contributors
- * Copyright 2019, 2020, 2021 Thomas Theussing
+ * Copyright 2019, 2021 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,9 +64,9 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   public static final int               IMAGE_SIZE_SMALL         = 160;
-   public static final int               IMAGE_SIZE_MEDIUM        = 320;
-   public static final int               IMAGE_SIZE_LARGE         = 320;
+//   public static final int               IMAGE_SIZE_SMALL         = 160;
+//   public static final int               IMAGE_SIZE_MEDIUM        = 320;
+//   public static final int               IMAGE_SIZE_LARGE         = 320;
 
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
@@ -230,6 +230,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                photoName,
                photoDescription,
                new GeoPoint(photoLat, photoLon));
+
          final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, showPhotoTitle);
 
          if (markerSymbol != null) {
@@ -253,15 +254,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    private Bitmap getPhotoBitmap(final Photo photo) {
 
       Bitmap photoBitmap = null;
-
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final int scaledThumbImageSize = config.markerPhoto_Size;
       // using photo image size of 2D map, not working yet
       //_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
       // ensure that an image is displayed, it happend that image size was 0
-      //debugPrint("??? getPhotoBitmap imageSize: " + photoBitmap.getWidth() + _imageSize);
-      //final Image scaledThumbImage = getPhotoImage(photo, _imageSize);
 
-      //final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
-      final Image scaledThumbImage = getPhotoImage(photo, IMAGE_SIZE_MEDIUM);
+      final Image scaledThumbImage = getPhotoImage(photo, scaledThumbImageSize);
 
       if (scaledThumbImage != null) {
          try {
@@ -326,9 +325,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                //thumbRotation = getRotation();
             }
 
-
-            debugPrint("??? getPhotoImage imageWidth and thumbsize: " + imageWidth + " " + thumbSize);
-
+            //debugPrint("??? getPhotoImage imageWidth and thumbsize: " + imageWidth + " " + thumbSize);
 
             scaledThumbImage = ImageUtils.resize(
                   _display,

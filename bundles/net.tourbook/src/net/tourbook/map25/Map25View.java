@@ -153,7 +153,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_MAP_SYNCHED_WITH                           = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
    //
    private static final String            STATE_LAYER_HILLSHADING_OPACITY                  = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
-   private static final String            STATE_LAYER_PHOTO_SIZE                            = "STATE_LAYER_PHOTO_SIZE";                                  //$NON-NLS-1$
+//   private static final String            STATE_LAYER_PHOTO_SIZE                            = "STATE_LAYER_PHOTO_SIZE";                                  //$NON-NLS-1$
    //
    private static final ImageDescriptor   _imageSyncWithSlider                             = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
@@ -1625,8 +1625,9 @@ private int     _hashTourId;
       _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
       // photo_layer
-      final int layer_PhotoSize = Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, 160);
-      _mapApp.setLayer_Photo_Size(layer_PhotoSize);
+//      final int layer_PhotoSize = Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, 160);
+//      Map25App.debugPrint(" Map25View: ** restore_state photosize: " + layer_PhotoSize);
+//      _mapApp.setLayer_Photo_Size(layer_PhotoSize);
       _mapApp.setIsPhotoShowTitle(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
       _mapApp.setIsPhotoShowScaled(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
@@ -1637,6 +1638,7 @@ private int     _hashTourId;
       // hillshading layer
       final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
       final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
+      Map25App.debugPrint(" Map25View: ** restore_state opacy: " + layerHillshadingOpacity);
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
@@ -1685,7 +1687,8 @@ private int     _hashTourId;
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, _mapApp.getIsPhotoShowTitle());
       _state.put(STATE_IS_LAYER_PHOTO_SCALED, _mapApp.getIsPhotoShowScaled());
-      _state.put(STATE_LAYER_PHOTO_SIZE, _mapApp.getLayer_Photo_Size());
+      //_state.put(STATE_LAYER_PHOTO_SIZE, _mapApp.getLayer_Photo_Size());
+      //Map25App.debugPrint(" Map25View: ** savestate photosize: " + _mapApp.getLayer_Photo_Size());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
 

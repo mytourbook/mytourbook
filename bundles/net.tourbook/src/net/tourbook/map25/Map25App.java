@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020, 2021 Wolfgang Schramm and Contributors
- * Copyright (C) 2018, 2019, 2020, 2021 Thomas Theussing
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -129,7 +129,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static Map25View        _map25View;
    private static LwjglApplication _lwjglApp;
 
-   public static DebugMode         debugMode                         = DebugMode.ON;                       // before releasing, set this to OFF
+   public static DebugMode         debugMode                         = DebugMode.OFF;                      // before releasing, set this to OFF
    private Boolean                 _mf_IsThemeFromFile               = null;
 
    private Boolean                 _firstRun                         = true;
@@ -1457,9 +1457,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _phototoolkit = new PhotoToolkit();
       if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
          _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._markerRendererFactory, _phototoolkit);
-         //_layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, _phototoolkit);
       } else {
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
          _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _phototoolkit._symbol, _phototoolkit);
       }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
