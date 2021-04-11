@@ -64,10 +64,6 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-//   public static final int               IMAGE_SIZE_SMALL         = 160;
-//   public static final int               IMAGE_SIZE_MEDIUM        = 320;
-//   public static final int               IMAGE_SIZE_LARGE         = 320;
-
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    public MarkerSymbol          _symbol;               //marker symbol, circle or star
