@@ -153,6 +153,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_MAP_SYNCHED_WITH                           = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
    //
    private static final String            STATE_LAYER_HILLSHADING_OPACITY                  = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
+//   private static final String            STATE_LAYER_PHOTO_SIZE                            = "STATE_LAYER_PHOTO_SIZE";                                  //$NON-NLS-1$
    //
    private static final ImageDescriptor   _imageSyncWithSlider                             = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
@@ -1686,6 +1687,8 @@ private int     _hashTourId;
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, _mapApp.getIsPhotoShowTitle());
       _state.put(STATE_IS_LAYER_PHOTO_SCALED, _mapApp.getIsPhotoShowScaled());
+      //_state.put(STATE_LAYER_PHOTO_SIZE, _mapApp.getLayer_Photo_Size());
+      //Map25App.debugPrint(" Map25View: ** savestate photosize: " + _mapApp.getLayer_Photo_Size());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
 
