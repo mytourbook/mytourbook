@@ -1661,7 +1661,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
                TourChart.PULSE_GRAPH_DEFAULT);
 
-         // @FJBDev: Do NOT optimize these if statements, this way it is better readable for me !
+         // @FJBDev: Do NOT optimize the following if statements, this way it is better readable for me !
 
          if (_isAvailable_Pulse_BpmFromDevice) {
 
@@ -1676,7 +1676,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
             if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
 
-               _lblPulse.setText(_nf1.format(_tourData.getPulse_RRIntervals()[valueIndex]));
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_BpmFromRRIntervals()[valueIndex]));
             }
          }
       }

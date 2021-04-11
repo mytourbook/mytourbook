@@ -889,7 +889,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_RR_INDEX_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_RR_INTERVALS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 

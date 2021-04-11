@@ -5383,8 +5383,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_timeSlice_ColumnManager, _pc);
 
-      colDef.setColumnHeaderText("RR Times");
-
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

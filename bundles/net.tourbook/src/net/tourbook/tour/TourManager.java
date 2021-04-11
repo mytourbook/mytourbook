@@ -3524,7 +3524,7 @@ public class TourManager {
       computeValueClipping(tourData);
 
       /*
-       * distance
+       * Distance
        */
       final double[] distanceSerie = tourData.getDistanceSerieDouble();
       ChartDataXSerie xDataDist = null;
@@ -3549,7 +3549,7 @@ public class TourManager {
       xDataTime.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_OPTIONAL_SECOND);
 
       /*
-       * show the distance on the x-axis when a distance is available, otherwise the time is
+       * Show the distance on the x-axis when a distance is available, otherwise the time is
        * displayed
        */
       boolean isShowTimeOnXAxis;
@@ -3580,7 +3580,7 @@ public class TourManager {
          xDataTime.setStartDateTime(tourStartTime);
 
          /*
-          * when time is displayed, the x-axis can show the start time starting from 0 or from the
+          * When time is displayed, the x-axis can show the start time starting from 0 or from the
           * current time of the day
           */
          final int tourTimeOfDay = tourStartTime.get(ChronoField.SECOND_OF_DAY);
@@ -3588,10 +3588,11 @@ public class TourManager {
          final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 
          final X_AXIS_START_TIME configXAxisTime = tcc.xAxisTime;
-
          final double xAxisStartValue = configXAxisTime == X_AXIS_START_TIME.START_WITH_0
                ? 0
-               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
+               : configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME
+                     ? tourTimeOfDay
+                     : photoTimeOfDay;
 
          xDataTime.setUnitStartValue(xAxisStartValue);
 
@@ -4302,7 +4303,7 @@ public class TourManager {
                            xAxisRRTime = xAxisTime;
 
                            if (_isLogging_RR_Errors) {
-                              System.out.println((System.currentTimeMillis() + " xAxisDiff 1: " + xAxisDiff));
+                              System.out.println((System.currentTimeMillis() + " xAxisDiff 1: " + xAxisDiff));//$NON-NLS-1$
                            }
                         }
 
@@ -4379,7 +4380,7 @@ public class TourManager {
                         xAxisRRTime = xAxisTime;
 
                         if (_isLogging_RR_Errors) {
-                           System.out.println((System.currentTimeMillis() + " xAxisDiff 2: " + xAxisDiff));
+                           System.out.println((System.currentTimeMillis() + " xAxisDiff 2: " + xAxisDiff));//$NON-NLS-1$
                         }
                      }
 

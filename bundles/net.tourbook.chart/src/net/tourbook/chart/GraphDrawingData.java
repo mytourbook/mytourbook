@@ -65,10 +65,15 @@ public class GraphDrawingData {
    private ArrayList<ChartUnit> _yUnits            = new ArrayList<>();
 
    /**
-    * scaling from graph value to device value
+    * Scaling from graph value to device value
     */
    private double               _scaleX;
    private double               _scaleY;
+
+   /**
+    * Scaling for the variable x values
+    */
+   private double               _scaleXVariable;
 
    /**
     * scaling of the x unit
@@ -215,6 +220,10 @@ public class GraphDrawingData {
 
    public double getScaleX() {
       return _scaleX;
+   }
+
+   public double getScaleXVariable() {
+      return _scaleXVariable;
    }
 
    public double getScaleY() {
@@ -400,6 +409,10 @@ public class GraphDrawingData {
     */
    public void setScaleX(final double scaleX) {
       _scaleX = scaleX;
+   }
+
+   public void setScaleX_Variable(final double scaleXVariable) {
+      _scaleXVariable = scaleXVariable;
    }
 
    public void setScaleY(final double scaleY) {

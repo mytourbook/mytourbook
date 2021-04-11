@@ -8068,6 +8068,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public String[] getPulse_RRIntervals() {
 
+      if (pulseTime_TimeIndex == null) {
+         return null;
+      }
+
       if (pulseSerie_RRIntervals != null) {
          return pulseSerie_RRIntervals;
       }
@@ -8076,7 +8080,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       pulseSerie_RRIntervals = new String[numTimeSlices];
 
-      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices - 1; serieIndex++) {
 
          int rrIndex_Current = pulseTime_TimeIndex[serieIndex];
          final int rrIndex_Next = pulseTime_TimeIndex[serieIndex + 1];

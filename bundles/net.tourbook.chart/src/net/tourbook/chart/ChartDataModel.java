@@ -81,7 +81,16 @@ public class ChartDataModel {
     */
    private boolean                    _isNoLinesValuesDisplayed;
 
+   /**
+    * These x values have a different number of slices than {@link #_xData} but the same as
+    * {@link #variableY_Values}
+    */
    private double[]                   variableX_Values;
+
+   /**
+    * These y values have a different number of slices than {@link #_yData} but the same as
+    * {@link #variableX_Values}
+    */
    private float[]                    variableY_Values;
 
    public ChartDataModel(final ChartType chartType) {

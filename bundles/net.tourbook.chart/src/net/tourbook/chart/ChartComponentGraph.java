@@ -1727,7 +1727,7 @@ public class ChartComponentGraph extends Canvas {
          } else if (chartType == ChartType.VARIABLE_X_AXIS) {
 
             drawAsync_600_LineGraph2nd(gcGraph, graphDrawingData, isLastGraph);
-            drawAsync_700_2ndXAxis(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_700_Line_With_VariableXAxis(gcGraph, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.HISTORY) {
 
@@ -4686,41 +4686,34 @@ public class ChartComponentGraph extends Canvas {
       gc.setAntialias(SWT.OFF);
    }
 
-   private void drawAsync_700_2ndXAxis(final GC gc,
+   private void drawAsync_700_Line_With_VariableXAxis(final GC gc,
                                        final GraphDrawingData graphDrawingData,
                                        final boolean isTopGraph) {
 
       final ChartDataYSerie yData = graphDrawingData.getYData();
+
       final ChartDataModel chartDataModel = graphDrawingData.getChartDrawingData().chartDataModel;
 
-      final double[] xValues = chartDataModel.getVariableX_Values();
-      final float[] yValues = chartDataModel.getVariableY_Values();
+      final double[] xValuesVariable = chartDataModel.getVariableX_Values();
+      final float[] yValuesVariable = chartDataModel.getVariableY_Values();
 
-      final int numXValues = xValues.length;
+      final int numXValues = xValuesVariable.length;
 
-      final double scaleX = graphDrawingData.getScaleX();
+      final double scaleXVariable = graphDrawingData.getScaleXVariable();
       final double scaleY = graphDrawingData.getScaleY();
 
       // get the horizontal offset for the graph
       float graphValueOffset;
       if (_chartComponents._synchConfigSrc == null) {
          // a zoom marker is not set, draw it normally
-         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleX);
+         graphValueOffset = (float) (Math.max(0, _xxDevViewPortLeftBorder) / scaleXVariable);
       } else {
          // adjust the start position to the zoom marker position
-         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleX);
+         graphValueOffset = (float) (_xxDevViewPortLeftBorder / scaleXVariable);
       }
-
-      // synch marker is not displayed
 
       final int graphLineAlpha = getAlphaLine();
       final int graphFillingAlpha = getAlphaFill(isTopGraph);
-
-//      final float[][] yHighValues = yData.getHighValuesFloat();
-
-//      final double[] xValues = xData.getHighValuesDouble()[0];
-//      final float[] yValues = yHighValues[0];
-
       final int graphFillMethod = yData.getGraphFillMethod();
 
       final int startIndex = 0;
@@ -4735,18 +4728,6 @@ public class ChartComponentGraph extends Canvas {
       final float graphYBorderTop = graphDrawingData.getGraphYTop();
       final float graphYBorderBottom = graphDrawingData.getGraphYBottom();
 
-// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
-//
-//      if (_canChartBeOverlapped && _isChartOverlapped) {
-//
-//         // reduce scale for overlapped graphs
-//
-//         if (!isTopGraph) {
-//
-//            scaleY *= 0.6;
-//         }
-//      }
-
       final Display display = getDisplay();
 
       // path is scaled in device pixel
@@ -4759,9 +4740,6 @@ public class ChartComponentGraph extends Canvas {
       final float devYGraphTop = (float) (scaleY * graphYBorderTop);
       final float devYGraphBottom = (float) (scaleY * graphYBorderBottom);
 
-      /*
-       *
-       */
       final float devY0Inverse = devGraphHeight + devYGraphBottom;
 
       /*
@@ -4790,12 +4768,12 @@ public class ChartComponentGraph extends Canvas {
       }
       final float devY_XAxisLine = (float) (scaleY * graphY_XAxisLine);
 
-      final double graphXStart = xValues[startIndex] - graphValueOffset;
-      final float graphYStart = yValues[startIndex];
+      final double graphXStart = xValuesVariable[startIndex] - graphValueOffset;
+      final float graphYStart = yValuesVariable[startIndex];
 
       float graphY1Prev = graphYStart;
 
-      double devXPrev = (scaleX * graphXStart);
+      double devXPrev = (scaleXVariable * graphXStart);
       float devY1Prev = (float) (scaleY * graphY1Prev);
 
       final double devXPrevNoLine = 0;
@@ -4831,11 +4809,11 @@ public class ChartComponentGraph extends Canvas {
             break;
          }
 
-         final double graphX = xValues[valueIndex] - graphValueOffset;
-         devX = graphX * scaleX;
+         final double graphX = xValuesVariable[valueIndex] - graphValueOffset;
+         devX = graphX * scaleXVariable;
          final float devXf = (float) devX;
 
-         final float graphY1 = yValues[valueIndex];
+         final float graphY1 = yValuesVariable[valueIndex];
          final float devY1 = (float) (graphY1 * scaleY);
 
          final long devX_long = (long) devX;
@@ -4992,12 +4970,12 @@ public class ChartComponentGraph extends Canvas {
       final Color colorBgDark = new Color(display, rgbBgDark);
       final Color colorBgBright = new Color(display, rgbBgBright);
 
-      final double graphWidth = xValues[Math.min(numXValues - 1, endIndex)] - graphValueOffset;
+      final double graphWidth = xValuesVariable[Math.min(numXValues - 1, endIndex)] - graphValueOffset;
 
       /**
        * Force a max width because the fill will not be drawn on Linux
        */
-      final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleX));
+      final int devGraphWidth = Math.min(0x7fff, (int) (graphWidth * scaleXVariable));
 
       gc.setAntialias(_chart.graphAntialiasing);
       gc.setAlpha(graphFillingAlpha);
@@ -6659,6 +6637,10 @@ public class ChartComponentGraph extends Canvas {
    }
 
    private PointLong getHoveredValue_DevPosition() {
+
+      if (_lineDevPositions.size() == 0) {
+         return null;
+      }
 
       final PointLong[] lineDevPositions = _lineDevPositions.get(0);
       PointLong lineDevPos = lineDevPositions[_hoveredValuePointIndex];
