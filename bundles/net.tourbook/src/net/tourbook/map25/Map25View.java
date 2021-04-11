@@ -108,6 +108,7 @@ import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
@@ -119,7 +120,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       IMapSyncListener {
 
 // SET_FORMATTING_OFF
-
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Tour;
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Tour_Disabled;
    private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.ShowPhotos_InMap;
@@ -131,34 +131,34 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = Images.SyncWith_Slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    //private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "map_actionshow photos in map"; //must be externalyzed
-
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                     = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED            = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 
+   //
    private static final String            STATE_IS_LAYER_BASE_MAP_VISIBLE                  = "STATE_IS_LAYER_BASE_MAP_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BUILDING_VISIBLE                  = "STATE_IS_LAYER_BUILDING_VISIBLE";                        //$NON-NLS-1$
    //private static final String          STATE_IS_LAYER_S3DB_VISIBLE                      = "STATE_IS_LAYER_S3DB_VISIBLE";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BOOKMARK_VISIBLE                  = "STATE_IS_LAYER_BOOKMARK_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE                 = "STATE_IS_LAYER_SATELLITE_VISIBLE";                       //$NON-NLS-1$
-
+   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE                 = "STATE_IS_LAYER_SATELLITE_VISIBLE";                         //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE               = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";                     //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_PHOTO_SCALED                      = "STATE_IS_LAYER_PHOTO_SCALED";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
-
+   //
    private static final String            STATE_MAP_SYNCHED_WITH                           = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
-
+   //
    private static final String            STATE_LAYER_HILLSHADING_OPACITY                  = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
-
+   //
    private static final ImageDescriptor   _imageSyncWithSlider                             = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                    = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled           = TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED);
-
+   //
 // SET_FORMATTING_ON
    //
    public static final String           ID            = "net.tourbook.map25.Map25View"; //$NON-NLS-1$
@@ -174,13 +174,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    //private Map                           _map;
    //
    private OpenDialogManager    _openDlgMgr     = new OpenDialogManager();
+
    private final MapInfoManager _mapInfoManager = MapInfoManager.getInstance();
    //
    private boolean              _isPartVisible;
    private boolean              _isShowTour;
    private boolean              _isInZoom;
    private boolean              _isShowPhoto;
-
    //
    private IPartListener2                _partListener;
    private ISelectionListener            _postSelectionListener;
@@ -194,16 +194,18 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionMap25_MapProvider       _actionMapProvider;
    private ActionMap25_Options           _actionMapOptions;
    private ActionMap25_ShowMarker        _actionShowMarker_WithOptions;
-//   private ActionSelectMap25Provider     _actionSelectMapProvider;
+   //   private ActionSelectMap25Provider     _actionSelectMapProvider;
    private ActionSynchMapWithChartSlider _actionSyncMap_WithChartSlider;
    private ActionSyncMap2WithOtherMap    _actionSyncMap_WithOtherMap;
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
    private ActionShowEntireTour          _actionShowEntireTour;
+
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
    private ActionShowPhotos              _actionShowPhotos;
    //private ActionShowPhoto_WithConfig    _actionShowPhoto_WithOptions;
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
+
    private double                        _zoomFactor     = 1.5;
 
    /** Contains only geo tours */
@@ -211,16 +213,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private TIntArrayList                 _allTourStarts  = new TIntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _allBoundingBox;
-
    /**
     * contains photos which are displayed in the map
     */
 
    private final ArrayList<Photo>        _filteredPhotos = new ArrayList<>();
-
    private List<MarkerItem>              _photoItems     = new ArrayList<>();
+
    private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
-   private List<MarkerItem>              _photo_pts      = new ArrayList<>();
+   private List<MarkerInterface>         _photo_pts      = new ArrayList<>();
    private boolean                       _isPhotoFilterActive;
    private int                           _photoFilterRatingStars;
    private int                           _photoFilterRatingStarOperator;
@@ -231,75 +232,24 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private Bitmap                        _bitmapPhoto;
    private Bitmap                        _bitmapStar;
    //final Paint                               _fillPainter = CanvasAdapter.newPaint();
-
    //
    private int     _leftSliderValueIndex;
    private int     _rightSliderValueIndex;
    private int     _selectedSliderValueIndex;
    //
    private int     _hash_AllPhotos;
-   private int     _hashTourId;
+private int     _hashTourId;
+
    private int     _hashTourData;
+
    //
    private MapSync _mapSynchedWith = MapSync.NONE;
+
    private long    _lastFiredSyncEventTime;
+
    //
    // context menu
    private boolean _isContextMenuVisible;
-//	private MouseAdapter							_wwMouseListener;
-   private Menu    _swtContextMenu;
-
-   //
-   /*
-    * UI controls
-    */
-   private Composite _swtContainer;
-
-   Composite         _parent;
-
-   private class ActionMap25_MapProvider extends ActionToolbarSlideout {
-
-      private SlideoutMap25_MapProvider __slideoutMap25_MapProvider;
-
-      public ActionMap25_MapProvider() {
-
-         super(
-               TourbookPlugin.getImageDescriptor(IMAGE_ACTION_CHANGE_TILE_FACTORY),
-               TourbookPlugin.getImageDescriptor(IMAGE_ACTION_CHANGE_TILE_FACTORY));
-      }
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-         __slideoutMap25_MapProvider = new SlideoutMap25_MapProvider(_parent, toolbar, Map25View.this);
-
-         return __slideoutMap25_MapProvider;
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-   }
-
-   private class ActionMap25_Options extends ActionToolbarSlideout {
-
-      public ActionMap25_Options() {
-
-         super(TourbookPlugin.getImageDescriptor(Images.MapOptions),
-               TourbookPlugin.getImageDescriptor(Images.MapOptions_Disabled));
-      }
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_MapOptions(_parent, toolbar, Map25View.this);
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-   }
 
 /*
  * private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
@@ -326,6 +276,61 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
  * }
  */
 
+
+   // private MouseAdapter                   _wwMouseListener;
+   private Menu    _swtContextMenu;
+
+   //
+   /*
+    * UI controls
+    */
+   private Composite _swtContainer;
+
+   Composite         _parent;
+
+   private class ActionMap25_MapProvider extends ActionToolbarSlideout {
+
+         private SlideoutMap25_MapProvider __slideoutMap25_MapProvider;
+
+         public ActionMap25_MapProvider() {
+
+            super(
+                  TourbookPlugin.getImageDescriptor(IMAGE_ACTION_CHANGE_TILE_FACTORY),
+                  TourbookPlugin.getImageDescriptor(IMAGE_ACTION_CHANGE_TILE_FACTORY));
+         }
+
+         @Override
+         protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+            __slideoutMap25_MapProvider = new SlideoutMap25_MapProvider(_parent, toolbar, Map25View.this);
+
+            return __slideoutMap25_MapProvider;
+         }
+
+         @Override
+         protected void onBeforeOpenSlideout() {
+            closeOpenedDialogs(this);
+         }
+      }
+   private class ActionMap25_Options extends ActionToolbarSlideout {
+
+      public ActionMap25_Options() {
+
+         super(
+               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_TOUR_IN_MAP),
+               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new SlideoutMap25_MapOptions(_parent, toolbar, Map25View.this);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
    private class ActionShowTour_WithConfig extends ActionToolbarSlideout {
 
       public ActionShowTour_WithConfig() {
@@ -356,7 +361,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          actionShowTour(getSelection());
       }
    }
-
    private class Map3ContextMenu extends SWTPopupOverAWT {
 
       public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
@@ -364,7 +368,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
 
    }
-
    private enum MapSync {
 
       /** Map is not synced */
@@ -374,6 +377,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       WITH_SLIDER_CENTERED, //
       WITH_TOUR, //
    }
+
 
    void actionContextMenu(final int relativeX, final int relativeY) {
 
@@ -1138,7 +1142,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
 
    void onMapPosition(final GeoPoint mapGeoPoint, final int zoomLevel) {
-
       updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
    }
 
@@ -1177,8 +1180,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
-         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
-
          paintTour(tourData);
          paintPhotoSelection(selection);
 
@@ -1186,8 +1187,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
          paintPhotoSelection(selection);
@@ -1362,10 +1361,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
     */
    public ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
       Map25App.debugPrint("* Map25View: paintphotoselection: entering"); //$NON-NLS-1$
+      if (_mapApp._phototoolkit == null) {
+         //phototoolkit is not yet ready
+         return null;
+      }
       //_isLinkPhotoDisplayed = false;
       selection.toString();
       final ArrayList<Photo> allPhotos = new ArrayList<>();
-
       if (selection instanceof TourPhotoLinkSelection) {
 
          //   _isLinkPhotoDisplayed = true;
@@ -1378,7 +1380,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             allPhotos.addAll(tourPhotoLink.linkPhotos);
          }
 
-         //Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
+         Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
 
       } else {
 
@@ -1388,8 +1390,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);
-               /* playing with photos next lines */
-               //Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
             }
          }
       }
@@ -1398,18 +1398,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       paintPhotos(allPhotos);
 
-      //int allNewPhotoHash = allPhotos.hashCode();
-      //allNewPhotoHash = 1;
-      //if (allNewPhotoHash != _hash_AllPhotos) {
-      //   createPhotoItemList(allPhotos);
-      //}else {
-      //_mapApp.debugPrint("* Map25View: paintphotoselection same hash, skipping ");
-      //}
 
-      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
-
-      //PhotoToolkit phototoolkit = new PhotoToolkit();
-      //_photo_pts = phototoolkit.createPhotoItemList(allPhotos);
+      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle(), _mapApp.getIsPhotoShowScaled());
 
       _allPhotos = allPhotos;
 
@@ -1572,8 +1562,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       paintPhotos(_allPhotos);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
-
-      final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
+      final List<MarkerInterface> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos,
+            _mapApp.getIsPhotoShowTitle(),
+            _mapApp.getIsPhotoShowScaled());
 
       _mapApp.setPhotoSelection(photoItems);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
@@ -1633,6 +1624,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
       // photo_layer
+//      final int layer_PhotoSize = Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, 160);
+//      Map25App.debugPrint(" Map25View: ** restore_state photosize: " + layer_PhotoSize);
+//      _mapApp.setLayer_Photo_Size(layer_PhotoSize);
+      _mapApp.setIsPhotoShowTitle(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
+      _mapApp.setIsPhotoShowScaled(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
       _actionShowPhotos.setChecked(_isShowPhoto);
       //_actionShowPhoto_WithOptions.setSelection(_isShowPhoto);
@@ -1641,6 +1637,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       // hillshading layer
       final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
       final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
+      Map25App.debugPrint(" Map25View: ** restore_state opacy: " + layerHillshadingOpacity);
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
@@ -1656,7 +1653,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
       _mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
-      _mapApp.setIsPhotoShowTitle(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
+
 
       _mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
@@ -1688,6 +1685,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, _mapApp.getIsPhotoShowTitle());
+      _state.put(STATE_IS_LAYER_PHOTO_SCALED, _mapApp.getIsPhotoShowScaled());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
 
