@@ -102,6 +102,7 @@ public class Map25ConfigManager {
    private static final String ATTR_CONFIG_VERSION = "configVersion";      //$NON-NLS-1$
    //
    /*
+    * ############# setIsPhotoShowTitle:
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
@@ -175,6 +176,7 @@ public class Map25ConfigManager {
    private static final String ATTR_IS_SHOW_MAP_BOOKMARK   = "isShowMapBookmark";    //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_PHOTO          = "isShowPhoto";          //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_PHOTO_TITLE    = "isShowPhotoTitle";     //$NON-NLS-1$
+   private static final String ATTR_PHOTO_SIZE             = "markerPhotoSize";      //$NON-NLS-1$
    private static final String ATTR_MARKER_ORIENTATION     = "markerOrientation";    //$NON-NLS-1$
    //
    private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
@@ -201,6 +203,7 @@ public class Map25ConfigManager {
     * Defaults, min/max
     */
    // symbol
+   public static final int   DEFAULT_MARKER_PHOTO_SIZE   = 160;
    public static final int   DEFAULT_MARKER_SYMBOL_SIZE  = 20;
    public static final float DEFAULT_MARKER_OUTLINE_SIZE = 2.0f;
    public static final float MARKER_OUTLINE_SIZE_MIN     = 0;
@@ -474,6 +477,7 @@ public class Map25ConfigManager {
          xmlConfig.putBoolean(      ATTR_IS_SHOW_MAP_BOOKMARK,    config.isShowMapBookmark);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO,           config.isShowPhoto);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO_TITLE,     config.isShowPhotoTitle);
+         xmlConfig.putInteger(      ATTR_PHOTO_SIZE,              config.markerPhoto_Size);
          xmlConfig.putInteger(      ATTR_MARKER_ORIENTATION,      config.markerOrientation);
 
          xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,     config.markerFill_Opacity);
@@ -766,6 +770,7 @@ public class Map25ConfigManager {
       config.isShowMapBookmark      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_MAP_BOOKMARK,    true);
       config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
       config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
+      config.markerPhoto_Size       = Util.getXmlInteger(xmlConfig,     ATTR_PHOTO_SIZE,              DEFAULT_MARKER_PHOTO_SIZE);
       config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 
