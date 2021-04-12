@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,6 +291,15 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowPhoto_Title = new Button(group, SWT.CHECK);
             _chkShowPhoto_Title.setText(Messages.Slideout_Map25MapOptions_Checkbox_Photo_Title);
             _chkShowPhoto_Title.addSelectionListener(_layerSelectionListener);
+         }
+
+         {
+            /*
+             * Photo Title
+             */
+            _chkShowPhoto_Scaled = new Button(group, SWT.CHECK);
+            _chkShowPhoto_Scaled.setText("Slideout_Map25MapOptions_Checkbox_Sclaed_Photos");
+            _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
          }
 
          {
