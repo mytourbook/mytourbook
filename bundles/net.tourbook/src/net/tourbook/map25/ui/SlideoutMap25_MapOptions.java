@@ -295,15 +295,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
          {
             /*
-             * Photo Title
-             */
-            _chkShowPhoto_Scaled = new Button(group, SWT.CHECK);
-            _chkShowPhoto_Scaled.setText("Slideout_Map25MapOptions_Checkbox_Sclaed_Photos");
-            _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
-         }
-
-         {
-            /*
              * Tile info
              */
             _chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
@@ -312,6 +303,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
       }
    }
+
 
    private void createUI_80_Other(final Composite parent) {
 
