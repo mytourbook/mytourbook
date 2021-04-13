@@ -67,7 +67,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //   public static final int               IMAGE_SIZE_SMALL         = 160;
 //   public static final int               IMAGE_SIZE_MEDIUM        = 320;
 //   public static final int               IMAGE_SIZE_LARGE         = 320;
-  
+
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    public MarkerSymbol          _symbol;               //marker symbol, circle or star
@@ -301,7 +301,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       Image photoImage = null;
       Image scaledThumbImage = null;
 
-      final ImageQuality requestedImageQuality = ImageQuality.HQ;
+      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
