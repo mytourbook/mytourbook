@@ -5357,8 +5357,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setColumnHeaderText("RR Index");
-
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {

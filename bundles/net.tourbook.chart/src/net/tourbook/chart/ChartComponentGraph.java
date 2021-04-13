@@ -1726,8 +1726,8 @@ public class ChartComponentGraph extends Canvas {
 
          } else if (chartType == ChartType.VARIABLE_X_AXIS) {
 
-            drawAsync_600_LineGraph2nd(gcGraph, graphDrawingData, isLastGraph);
-            drawAsync_700_Line_With_VariableXAxis(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_600_LineGraph_2nd(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_610_LineGraph_With_VariableXAxis(gcGraph, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.HISTORY) {
 
@@ -4421,9 +4421,9 @@ public class ChartComponentGraph extends Canvas {
       gc.setAntialias(SWT.OFF);
    }
 
-   private void drawAsync_600_LineGraph2nd(final GC gc,
-                                           final GraphDrawingData graphDrawingData,
-                                           final boolean isTopGraph) {
+   private void drawAsync_600_LineGraph_2nd(final GC gc,
+                                            final GraphDrawingData graphDrawingData,
+                                            final boolean isTopGraph) {
 
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -4686,9 +4686,9 @@ public class ChartComponentGraph extends Canvas {
       gc.setAntialias(SWT.OFF);
    }
 
-   private void drawAsync_700_Line_With_VariableXAxis(final GC gc,
-                                       final GraphDrawingData graphDrawingData,
-                                       final boolean isTopGraph) {
+   private void drawAsync_610_LineGraph_With_VariableXAxis(final GC gc,
+                                                           final GraphDrawingData graphDrawingData,
+                                                           final boolean isTopGraph) {
 
       final ChartDataYSerie yData = graphDrawingData.getYData();
 

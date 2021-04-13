@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -3670,7 +3671,7 @@ public class TourManager {
 // SET_FORMATTING_OFF
 
       final ChartDataYSerie yDataAltitude       = createModelData_Altitude(   tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
       final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
@@ -4160,12 +4161,15 @@ public class TourManager {
 
    /**
     * Heartbeat
+    *
+    * @param isShowTimeOnXAxis
     */
    private ChartDataYSerie createModelData_Heartbeat(final TourData tourData,
                                                      final ChartDataModel chartDataModel,
                                                      final ChartType chartType,
                                                      final boolean useGraphBgStyle,
-                                                     final TourChartConfiguration tcc) {
+                                                     final TourChartConfiguration tcc,
+                                                     final boolean isShowTimeOnXAxis) {
 
       ChartDataYSerie yDataPulse = null;
 
@@ -4191,11 +4195,32 @@ public class TourManager {
 
          if (isBpmFromRRIntervals) {
 
+
             yDataPulse = createChartDataSerieNoZero(bpmFromRRIntervals, ChartType.VARIABLE_X_AXIS);
 
             final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
-            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex; //          length: numTimeSlices
             final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
+
+            // length: numTimeSlices
+            int[] timeSerie_WithRRIndex;
+
+            if (isShowTimeOnXAxis) {
+
+               timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
+
+            } else {
+
+               // distance is displayed on the x-axis -> too complicated to show the correct rr graph -> show avg rr graph
+
+               final int numTimeSlices = timeSerie.length;
+
+               final int[] timeSerie_WithRRIndex_Adjusted = new int[numTimeSlices];
+
+               // fill with invalid RR times
+               Arrays.fill(timeSerie_WithRRIndex_Adjusted, -1);
+
+               timeSerie_WithRRIndex = timeSerie_WithRRIndex_Adjusted;
+            }
 
             final int numTimeSlices = timeSerie.length;
             final int numRRTimes = allRRTimesInMilliseconds.length;
@@ -4415,6 +4440,7 @@ public class TourManager {
                }
             }
 
+            // set variable xy data after the arrays are filled up
             chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray());
          }
 
