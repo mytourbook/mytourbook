@@ -6736,7 +6736,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
 
-      _seriePulse_RR_Bpm = _tourData.getPulse_BpmFromRRIntervals();
+      _seriePulse_RR_Bpm = _tourData.getPulse_AvgBpmFromRRIntervals();
       _seriePulse_RR_Intervals = _tourData.getPulse_RRIntervals();
 
       // time serie which is containing the index for the first slice in the RR serie

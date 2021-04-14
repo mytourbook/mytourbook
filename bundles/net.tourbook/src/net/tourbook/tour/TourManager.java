@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -75,6 +74,7 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.tourChart.GraphBackgroundSource;
 import net.tourbook.ui.tourChart.GraphBackgroundStyle;
 import net.tourbook.ui.tourChart.IValueLabelProvider;
+import net.tourbook.ui.tourChart.PulseGraph;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
@@ -925,7 +925,7 @@ public class TourManager {
          final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
          final double[] fromLongitudeSerie = fromTourData.longitudeSerie;
          final float[] fromPulseSerie = fromTourData.pulseSerie;
-         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_BpmFromRRIntervals();
+         final float[] fromPulse_BpmFromRRIntervals = fromTourData.getPulse_AvgBpmFromRRIntervals();
          final float[] fromTemperaturSerie = fromTourData.temperatureSerie;
 
          final short[] fromRunDyn_StanceTime = fromTourData.runDyn_StanceTime;
@@ -4174,53 +4174,63 @@ public class TourManager {
       ChartDataYSerie yDataPulse = null;
 
       final float[] pulseSerie = tourData.getPulse_SmoothedSerie();
-      final float[] bpmFromRRIntervals = tourData.getPulse_BpmFromRRIntervals();
+      final float[] avgBpmFromRRIntervals = tourData.getPulse_AvgBpmFromRRIntervals();
 
-      final boolean isPulseSerie = pulseSerie != null;
-      final boolean isBpmFromRRIntervals = bpmFromRRIntervals != null;
+      final boolean isAvailable_PulseSerie = pulseSerie != null;
+      final boolean isAvailable_AvgBpmFromRRIntervals = avgBpmFromRRIntervals != null;
 
-      tcc.canShowPulseSerie = isPulseSerie;
-      tcc.canShowPulseTimeSerie = isBpmFromRRIntervals;
+      tcc.canShowPulseSerie = isAvailable_PulseSerie;
+      tcc.canShowPulseTimeSerie = isAvailable_AvgBpmFromRRIntervals;
 
       // set graph/line according to the selection
       switch (tcc.pulseGraph) {
-      case DEVICE_BPM_ONLY:
 
-         if (isPulseSerie) {
-            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
+      case RR_AVERAGE_ONLY:
+
+         if (isAvailable_AvgBpmFromRRIntervals) {
+            yDataPulse = createChartDataSerie(new float[][] { avgBpmFromRRIntervals }, chartType);
          }
          break;
 
       case RR_INTERVALS_ONLY:
+      case RR_INTERVALS___2ND_RR_AVERAGE:
+      case RR_INTERVALS___2ND_DEVICE_BPM:
 
-         if (isBpmFromRRIntervals) {
+         if (isAvailable_AvgBpmFromRRIntervals) {
 
+            // data serie which has the same number of slices as the time serie
+            final float[] dataSerie = tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM
+                  ? pulseSerie
+                  : avgBpmFromRRIntervals;
 
-            yDataPulse = createChartDataSerieNoZero(bpmFromRRIntervals, ChartType.VARIABLE_X_AXIS);
+            if (isShowTimeOnXAxis == false) {
+
+               // distance is displayed on the x-axis
+               //
+               // -> too complicated to show the correct RR graph
+               // -> show RR avg or device bpm graph
+
+               yDataPulse = createChartDataSerieNoZero(dataSerie, ChartType.LINE);
+
+               break;
+            }
+
+            final ChartType rrChartType = tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+
+                  ? ChartType.VARIABLE_X_AXIS
+
+                  // used for RR average and device bpm
+                  : ChartType.VARIABLE_X_AXIS_WITH_2ND_LINE;
+
+            // set a data serie for the 2nd line when it's displayed,
+            // when not displayed it is used to compute visible graph min/max values
+            yDataPulse = createChartDataSerieNoZero(dataSerie, rrChartType);
 
             final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
             final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
 
             // length: numTimeSlices
-            int[] timeSerie_WithRRIndex;
-
-            if (isShowTimeOnXAxis) {
-
-               timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
-
-            } else {
-
-               // distance is displayed on the x-axis -> too complicated to show the correct rr graph -> show avg rr graph
-
-               final int numTimeSlices = timeSerie.length;
-
-               final int[] timeSerie_WithRRIndex_Adjusted = new int[numTimeSlices];
-
-               // fill with invalid RR times
-               Arrays.fill(timeSerie_WithRRIndex_Adjusted, -1);
-
-               timeSerie_WithRRIndex = timeSerie_WithRRIndex_Adjusted;
-            }
+            final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;
 
             final int numTimeSlices = timeSerie.length;
             final int numRRTimes = allRRTimesInMilliseconds.length;
@@ -4446,31 +4456,52 @@ public class TourManager {
 
          break;
 
-      case RR_INTERVALS__2ND_DEVICE_BPM:
+      case DEVICE_BPM_ONLY:
 
-         if (isPulseSerie && isBpmFromRRIntervals) {
-            yDataPulse = createChartDataSerie(new float[][] { bpmFromRRIntervals, pulseSerie }, chartType);
+         if (isAvailable_PulseSerie) {
+            yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
          }
          break;
 
-      case DEVICE_BPM__2ND__RR_INTERVALS:
+      case RR_AVERAGE___2ND_DEVICE_BPM:
+
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  avgBpmFromRRIntervals,
+                  pulseSerie
+            },
+                  chartType);
+         }
+         break;
+
+      case DEVICE_BPM___2ND_RR_AVERAGE:
       default:
 
-         if (isPulseSerie && isBpmFromRRIntervals) {
-            yDataPulse = createChartDataSerie(new float[][] { pulseSerie, bpmFromRRIntervals }, chartType);
+         if (isAvailable_PulseSerie && isAvailable_AvgBpmFromRRIntervals) {
+
+            yDataPulse = createChartDataSerie(new float[][]
+
+            {
+                  pulseSerie,
+                  avgBpmFromRRIntervals
+            },
+                  chartType);
          }
       }
 
       // when user selection could not be applied, try to use the remaining possibilities
       if (yDataPulse == null) {
 
-         if (isPulseSerie) {
+         if (isAvailable_PulseSerie) {
 
             yDataPulse = createChartDataSerieNoZero(pulseSerie, chartType);
 
-         } else if (isBpmFromRRIntervals) {
+         } else if (isAvailable_AvgBpmFromRRIntervals) {
 
-            yDataPulse = createChartDataSerieNoZero(bpmFromRRIntervals, chartType);
+            yDataPulse = createChartDataSerieNoZero(avgBpmFromRRIntervals, chartType);
          }
       }
 

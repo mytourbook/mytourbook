@@ -70,10 +70,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private PulseGraph[]           _allPulseGraph_Value = {
 
-         PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
+         PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE,
          PulseGraph.DEVICE_BPM_ONLY,
+         PulseGraph.RR_AVERAGE_ONLY,
          PulseGraph.RR_INTERVALS_ONLY,
-         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
+         PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE,
+         PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM,
+         PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM,
 
    };
 
@@ -82,10 +85,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private String[]               _allPulseGraph_Label = {
 
-         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
+         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRAverage,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
+         Messages.TourChart_PulseGraph_RRAverage_Only,
          Messages.TourChart_PulseGraph_RRIntervals_Only,
+         Messages.TourChart_PulseGraph_RRIntervals_2nd_RRAverage,
          Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
+         Messages.TourChart_PulseGraph_RRAverage_2nd_DeviceBpm,
    };
 
    private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
@@ -558,10 +564,16 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       } else if (canShowPulseTimeSerie) {
 
          // update UI
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRAverage_Only);
          _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_Only);
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_2nd_RRAverage);
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm);
 
          // update model
+         _possiblePulseGraph_Values.add(PulseGraph.RR_AVERAGE_ONLY);
          _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS_ONLY);
+         _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE);
+         _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM);
       }
 
       final int numComboItems = _possiblePulseGraph_Values.size();

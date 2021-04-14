@@ -2777,6 +2777,7 @@ public class Messages extends NLS {
    public static String TourChart_PulseGraph_RRAverage_Only;
    public static String TourChart_PulseGraph_RRAverage_2nd_DeviceBpm;
    public static String TourChart_PulseGraph_RRIntervals_Only;
+   public static String TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm;
    public static String TourChart_PulseGraph_RRIntervals_2nd_RRAverage;
 
    public static String TourChart_Smoothing_Algorithm_Initial;

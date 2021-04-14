@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import net.tourbook.training.TrainingManager;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -49,7 +48,6 @@ public class GraphBackgroundPainter implements IFillPainter {
 
    private void createColors_HrZone(final GC gcGraph, final TourPerson tourPerson) {
 
-      final Device display = gcGraph.getDevice();
       final ArrayList<TourPersonHRZone> personHrZones = tourPerson.getHrZonesSorted();
 
       _hrZone_Colors = new Color[personHrZones.size()];
@@ -59,18 +57,16 @@ public class GraphBackgroundPainter implements IFillPainter {
          final TourPersonHRZone hrZone = personHrZones.get(colorIndex);
          final RGB rgb = hrZone.getColor();
 
-         _hrZone_Colors[colorIndex] = new Color(display, rgb);
+         _hrZone_Colors[colorIndex] = new Color(rgb);
       }
    }
 
    private void createColors_SwimStyle(final GC gcGraph) {
 
-      final Device display = gcGraph.getDevice();
-
       _strokeStyle_Colors = new HashMap<>();
 
       for (final Entry<SwimStroke, RGB> swimStrokeItem : SwimStrokeManager.getSwimStroke_RGB().entrySet()) {
-         _strokeStyle_Colors.put(swimStrokeItem.getKey().getValue(), new Color(display, swimStrokeItem.getValue()));
+         _strokeStyle_Colors.put(swimStrokeItem.getKey().getValue(), new Color(swimStrokeItem.getValue()));
       }
    }
 
@@ -159,53 +155,55 @@ public class GraphBackgroundPainter implements IFillPainter {
 
       if (useGraphBgStyle_HrZone) {
 
-         final boolean isVariableXValues = tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY;
-         final float[] pulseSerie = isVariableXValues
+         final boolean isVariableXValues = tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+               || tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE
+               || tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM;
+
+//         final float[] dataSerie = tourData.pulseSerie;
+         final float[] dataSerie = isVariableXValues
                ? dataModel.getVariableY_Values()
                : tourData.pulseSerie;
 
-         final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-         int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[timeIndexFirstPoint]);
+         if (dataSerie != null) {
 
-         for (int valueIndex = timeIndexFirstPoint + 1; valueIndex <= timeIndexLastPoint; valueIndex++) {
+            final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
+            int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[timeIndexFirstPoint]);
 
-            final long devXCurrent = devXPositions[valueIndex];
-            final boolean isLastIndex = valueIndex == timeIndexLastPoint;
+            for (int valueIndex = timeIndexFirstPoint + 1; valueIndex <= timeIndexLastPoint; valueIndex++) {
 
-            // ignore same position even when the HR zone has changed
-            if (devXCurrent == devXPrev && isLastIndex == false) {
-               continue;
+               final long devXCurrent = devXPositions[valueIndex];
+               final boolean isLastIndex = valueIndex == timeIndexLastPoint;
+
+               // ignore same position even when the HR zone has changed
+               if (devXCurrent == devXPrev && isLastIndex == false) {
+                  continue;
+               }
+
+               // check if zone has changed
+               final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[valueIndex]);
+               if (zoneIndex == prevZoneIndex && isLastIndex == false) {
+                  continue;
+               }
+
+               final int devWidth = (int) (devXCurrent - devXStart);
+               final Color color = _hrZone_Colors[prevZoneIndex];
+
+               if (isBgColor) {
+                  gcGraph.setBackground(color);
+               } else {
+                  gcGraph.setForeground(color);
+               }
+
+               if (isGradient) {
+                  gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
+               } else {
+                  gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
+               }
+
+               // set start for the next HR zone
+               devXStart = devXCurrent;
+               prevZoneIndex = zoneIndex;
             }
-
-            // check if zone has changed
-            final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, pulseSerie[valueIndex]);
-            if (zoneIndex == prevZoneIndex && isLastIndex == false) {
-               continue;
-            }
-
-            final int devWidth = (int) (devXCurrent - devXStart);
-            final Color color = _hrZone_Colors[prevZoneIndex];
-
-            if (isBgColor) {
-               gcGraph.setBackground(color);
-            } else {
-               gcGraph.setForeground(color);
-            }
-
-            if (isGradient) {
-               gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
-            } else {
-               gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
-            }
-
-            // set start for the next HR zone
-            devXStart = devXCurrent;
-            prevZoneIndex = zoneIndex;
-         }
-
-         // dispose colors
-         for (final Color color : _hrZone_Colors) {
-            color.dispose();
          }
 
       } else if (useGraphBgStyle_SwimStyle) {
@@ -255,11 +253,6 @@ public class GraphBackgroundPainter implements IFillPainter {
             // set start for the next HR zone
             devXStart = devXCurrent;
             prevStrokeStyle = currentStrokeStyle;
-         }
-
-         // dispose colors
-         for (final Color color : _strokeStyle_Colors.values()) {
-            color.dispose();
          }
       }
    }

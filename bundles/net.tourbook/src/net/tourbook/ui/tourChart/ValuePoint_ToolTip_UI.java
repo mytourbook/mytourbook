@@ -1665,7 +1665,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          if (_isAvailable_Pulse_BpmFromDevice) {
 
-            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS) {
+            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE) {
 
                _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
             }
@@ -1674,9 +1674,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          if (_isAvailable_Pulse_RRIntervals) {
 
-            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+                  || pulseGraph == PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM
+                  || pulseGraph == PulseGraph.RR_AVERAGE_ONLY) {
 
-               _lblPulse.setText(_nf1.format(_tourData.getPulse_BpmFromRRIntervals()[valueIndex]));
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_AvgBpmFromRRIntervals()[valueIndex]));
             }
          }
       }

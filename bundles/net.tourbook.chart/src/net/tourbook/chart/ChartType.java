@@ -37,4 +37,9 @@ public enum ChartType {
     */
    VARIABLE_X_AXIS,
 
+   /**
+    *
+    */
+   VARIABLE_X_AXIS_WITH_2ND_LINE,
+
 }

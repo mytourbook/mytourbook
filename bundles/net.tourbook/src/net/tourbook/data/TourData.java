@@ -7948,9 +7948,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns beat values computed from the R-R intervals
+    * @return Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}.
+    *         One pulse value is the average of all pulse times within one timeslice.
     */
-   public float[] getPulse_BpmFromRRIntervals() {
+   public float[] getPulse_AvgBpmFromRRIntervals() {
 
       if (pulseSerie_FromTime != null) {
          return pulseSerie_FromTime;
