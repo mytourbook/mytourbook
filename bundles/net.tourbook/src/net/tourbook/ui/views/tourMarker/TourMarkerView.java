@@ -1204,6 +1204,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          selectedTourMarker.add((TourMarker) name);
       }
 
+      //TODO FB catch that event in the map2view ?
       TourManager.fireEventWithCustomData(//
             TourEventId.MARKER_SELECTION,
             new SelectionTourMarker(_tourData, selectedTourMarker),
