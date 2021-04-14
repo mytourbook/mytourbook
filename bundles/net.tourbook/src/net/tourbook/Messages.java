@@ -2772,10 +2772,12 @@ public class Messages extends NLS {
    public static String TourChart_Property_label_pace_speed;
    public static String TourChart_Property_label_time_slices;
 
-   public static String TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals;
    public static String TourChart_PulseGraph_DeviceBpm_Only;
-   public static String TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm;
+   public static String TourChart_PulseGraph_DeviceBpm_2nd_RRAverage;
+   public static String TourChart_PulseGraph_RRAverage_Only;
+   public static String TourChart_PulseGraph_RRAverage_2nd_DeviceBpm;
    public static String TourChart_PulseGraph_RRIntervals_Only;
+   public static String TourChart_PulseGraph_RRIntervals_2nd_RRAverage;
 
    public static String TourChart_Smoothing_Algorithm_Initial;
    public static String TourChart_Smoothing_Algorithm_Jamet;
