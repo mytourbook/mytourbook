@@ -83,15 +83,21 @@ public class ChartDataModel {
 
    /**
     * These x values have a different number of slices than {@link #_xData} but the same as
-    * {@link #variableY_Values}
+    * {@link #_variableY_Values}
     */
-   private double[]                   variableX_Values;
+   private double[]                   _variableX_Values;
 
    /**
     * These y values have a different number of slices than {@link #_yData} but the same as
-    * {@link #variableX_Values}
+    * {@link #_variableX_Values}
     */
-   private float[]                    variableY_Values;
+   private float[]                    _variableY_Values;
+
+   /**
+    * Each value contains the index into the variable values {@link #_variableX_Values},
+    * {@link #getVariableY_Values()}
+    */
+   private int[]                      _xData_VariableIndex;
 
    public ChartDataModel(final ChartType chartType) {
       _chartType = chartType;
@@ -140,11 +146,11 @@ public class ChartDataModel {
    }
 
    public double[] getVariableX_Values() {
-      return variableX_Values;
+      return _variableX_Values;
    }
 
    public float[] getVariableY_Values() {
-      return variableY_Values;
+      return _variableY_Values;
    }
 
    /**
@@ -157,6 +163,10 @@ public class ChartDataModel {
          _xData = new ChartDataXSerie(new double[0]);
       }
       return _xData;
+   }
+
+   public int[] getXData_VariableIndex() {
+      return _xData_VariableIndex;
    }
 
    /**
@@ -239,10 +249,12 @@ public class ChartDataModel {
    }
 
    public void setVariableXYData(final double[] variableX_Values,
-                                 final float[] variableY_Values) {
+                                 final float[] variableY_Values,
+                                 final int[] xData_VariableIndex) {
 
-      this.variableX_Values = variableX_Values;
-      this.variableY_Values = variableY_Values;
+      this._variableX_Values = variableX_Values;
+      this._variableY_Values = variableY_Values;
+      this._xData_VariableIndex = xData_VariableIndex;
    }
 
    public void setXData(final ChartDataXSerie data) {

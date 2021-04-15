@@ -2552,7 +2552,7 @@ public class ChartComponentGraph extends Canvas {
          final int graphLineAlpha = getAlphaLine();
          final int graphFillingAlpha = getAlphaFill(isTopGraph);
 
-         drawAsync_510_LineGraphSegment(
+         drawAsync_510_LineGraph_Segment(
                gcGraph,
                graphDrawingData,
                0,
@@ -2574,7 +2574,7 @@ public class ChartComponentGraph extends Canvas {
          final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * noneMarkerAlpha);
 
          // draw graph without marker
-         drawAsync_510_LineGraphSegment(
+         drawAsync_510_LineGraph_Segment(
                gcGraph,
                graphDrawingData,
                0,
@@ -2587,7 +2587,7 @@ public class ChartComponentGraph extends Canvas {
                graphValueOffset);
 
          // draw the x-marker
-         drawAsync_510_LineGraphSegment(
+         drawAsync_510_LineGraph_Segment(
                gcGraph,
                graphDrawingData,
                synchMarkerStartIndex,
@@ -2619,7 +2619,7 @@ public class ChartComponentGraph extends Canvas {
     *           When <code>true</code> the whole graph is painted with several segments, otherwise
     *           the whole graph is painted once.
     */
-   private void drawAsync_510_LineGraphSegment(final GC gc,
+   private void drawAsync_510_LineGraph_Segment(final GC gc,
                                                final GraphDrawingData graphDrawingData,
                                                final int startIndex,
                                                final int endIndex,
@@ -3258,7 +3258,7 @@ public class ChartComponentGraph extends Canvas {
       for (final int markerStartIndex : startIndex) {
 
          // draw range marker
-         drawAsync_510_LineGraphSegment(
+         drawAsync_510_LineGraph_Segment(
                gc,
                drawingData,
                markerStartIndex,

@@ -4451,7 +4451,10 @@ public class TourManager {
             }
 
             // set variable xy data after the arrays are filled up
-            chartDataModel.setVariableXYData(xData_PulseTime.toArray(), yData_PulseTime.toArray());
+            chartDataModel.setVariableXYData(
+                  xData_PulseTime.toArray(),
+                  yData_PulseTime.toArray(),
+                  timeSerie_WithRRIndex);
          }
 
          break;
