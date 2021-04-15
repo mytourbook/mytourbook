@@ -3,8 +3,11 @@
 
 TODO's
 ======
+ 
+* Tour Search: - Test Edge browser if the tour selection in the result list is working with the mouse
+               - Implement workaround: Select tour with an action in the context menu
 
-* Geo Filter   Investigate/fix https://sourceforge.net/p/mytourbook/discussion/622811/thread/23132f7fbf/?limit=25#fbeb
+* Geo Filter:  Investigate/fix https://sourceforge.net/p/mytourbook/discussion/622811/thread/23132f7fbf/?limit=25#fbeb
 
 * UI Theme:    Provide a UI to select the UI theme
                https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
