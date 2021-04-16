@@ -4659,8 +4659,9 @@ public class ChartComponentGraph extends Canvas {
       // this color is not yet user defined
       final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
       final Color pathColor = new Color(complimentColor);
-
+      
       gc.setForeground(pathColor);
+      gc.setAlpha(getAlphaLine());
       gc.setLineStyle(SWT.LINE_SOLID);
       gc.drawPath(path);
 
