@@ -75,8 +75,9 @@ public class GraphBackgroundPainter implements IFillPainter {
                     final GraphDrawingData graphDrawingData,
                     final Chart chart,
                     final long[] devXPositions,
-                    final int timeIndexFirstPoint,
-                    final int timeIndexLastPoint) {
+                    final int xPos_FirstIndex,
+                    final int xPos_LastIndex,
+                    final boolean isVariableXValues) {
 
       final ChartDataModel dataModel = chart.getChartDataModel();
 
@@ -150,16 +151,10 @@ public class GraphBackgroundPainter implements IFillPainter {
 
       final int devCanvasHeight = graphDrawingData.devGraphHeight;
 
-      final long devXPrev = devXPositions[timeIndexFirstPoint];
-      long devXStart = devXPositions[timeIndexFirstPoint];
+      final long devXPrev = devXPositions[xPos_FirstIndex];
+      long devXStart = devXPositions[xPos_FirstIndex];
 
       if (useGraphBgStyle_HrZone) {
-
-         final boolean isVariableXValues =
-
-               tcc.pulseGraph == PulseGraph.RR_INTERVALS_ONLY
-                     || tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE
-                     || tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM;
 
          final float[] dataSerie = isVariableXValues
                ? dataModel.getVariableY_Values()
@@ -167,129 +162,55 @@ public class GraphBackgroundPainter implements IFillPainter {
 
          if (dataSerie != null) {
 
-            if (isVariableXValues) {
+            final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
+            int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[xPos_FirstIndex]);
 
-               final int[] xData_VariableIndex = dataModel.getXData_VariableIndex();
+            for (int valueIndex = xPos_FirstIndex + 1; valueIndex <= xPos_LastIndex; valueIndex++) {
 
-               final int timeIndex_xData;
+               final long devXCurrent = devXPositions[valueIndex];
+               final boolean isLastIndex = valueIndex == xPos_LastIndex;
 
-               final double[] xValues = dataModel.getXData().getHighValuesDouble()[0];
-               final int numTimeSlices = xValues.length;
-
-               // find first index
-               int xData_StartIndex = 0;
-               for (int xIndex = 0; xIndex < numTimeSlices; xIndex++) {
-
-                  final int variableIndex = xData_VariableIndex[xIndex];
-
-                  if (variableIndex >= timeIndexFirstPoint) {
-                     xData_StartIndex = variableIndex;
-                     break;
-                  }
-               }
-               // find last index
-               int xData_EndIndex = 0;
-               for (int xIndex = 0; xIndex < numTimeSlices; xIndex++) {
-
-                  final int variableIndex = xData_VariableIndex[xIndex];
-
-                  if (variableIndex >= timeIndexLastPoint) {
-                     xData_EndIndex = variableIndex;
-                     break;
-                  }
+               // ignore same position even when the HR zone has changed
+               if (devXCurrent == devXPrev && isLastIndex == false) {
+                  continue;
                }
 
-               final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-               int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[timeIndexFirstPoint]);
-
-               for (int valueIndex = timeIndexFirstPoint + 1; valueIndex <= timeIndexLastPoint; valueIndex++) {
-
-                  final long devXCurrent = devXPositions[valueIndex];
-                  final boolean isLastIndex = valueIndex == timeIndexLastPoint;
-
-                  // ignore same position even when the HR zone has changed
-                  if (devXCurrent == devXPrev && isLastIndex == false) {
-                     continue;
-                  }
-
-                  // check if zone has changed
-                  final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[valueIndex]);
-                  if (zoneIndex == prevZoneIndex && isLastIndex == false) {
-                     continue;
-                  }
-
-                  final int devWidth = (int) (devXCurrent - devXStart);
-                  final Color color = _hrZone_Colors[prevZoneIndex];
-
-                  if (isBgColor) {
-                     gcGraph.setBackground(color);
-                  } else {
-                     gcGraph.setForeground(color);
-                  }
-
-                  if (isGradient) {
-                     gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
-                  } else {
-                     gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
-                  }
-
-                  // set start for the next HR zone
-                  devXStart = devXCurrent;
-                  prevZoneIndex = zoneIndex;
+               // check if zone has changed
+               final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[valueIndex]);
+               if (zoneIndex == prevZoneIndex && isLastIndex == false) {
+                  continue;
                }
 
-            } else {
+               final int devWidth = (int) (devXCurrent - devXStart);
+               final Color color = _hrZone_Colors[prevZoneIndex];
 
-               final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
-               int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[timeIndexFirstPoint]);
-
-               for (int valueIndex = timeIndexFirstPoint + 1; valueIndex <= timeIndexLastPoint; valueIndex++) {
-
-                  final long devXCurrent = devXPositions[valueIndex];
-                  final boolean isLastIndex = valueIndex == timeIndexLastPoint;
-
-                  // ignore same position even when the HR zone has changed
-                  if (devXCurrent == devXPrev && isLastIndex == false) {
-                     continue;
-                  }
-
-                  // check if zone has changed
-                  final int zoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[valueIndex]);
-                  if (zoneIndex == prevZoneIndex && isLastIndex == false) {
-                     continue;
-                  }
-
-                  final int devWidth = (int) (devXCurrent - devXStart);
-                  final Color color = _hrZone_Colors[prevZoneIndex];
-
-                  if (isBgColor) {
-                     gcGraph.setBackground(color);
-                  } else {
-                     gcGraph.setForeground(color);
-                  }
-
-                  if (isGradient) {
-                     gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
-                  } else {
-                     gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
-                  }
-
-                  // set start for the next HR zone
-                  devXStart = devXCurrent;
-                  prevZoneIndex = zoneIndex;
+               if (isBgColor) {
+                  gcGraph.setBackground(color);
+               } else {
+                  gcGraph.setForeground(color);
                }
+
+               if (isGradient) {
+                  gcGraph.fillGradientRectangle((int) devXStart, 0, devWidth, devCanvasHeight, true);
+               } else {
+                  gcGraph.fillRectangle((int) devXStart, 0, devWidth, devCanvasHeight);
+               }
+
+               // set start for the next HR zone
+               devXStart = devXCurrent;
+               prevZoneIndex = zoneIndex;
             }
          }
 
       } else if (useGraphBgStyle_SwimStyle) {
 
          final float[] allStrokeStyles = tourData.getSwim_StrokeStyle();
-         short prevStrokeStyle = (short) allStrokeStyles[timeIndexFirstPoint];
+         short prevStrokeStyle = (short) allStrokeStyles[xPos_FirstIndex];
 
-         for (int valueIndex = timeIndexFirstPoint + 1; valueIndex <= timeIndexLastPoint; valueIndex++) {
+         for (int valueIndex = xPos_FirstIndex + 1; valueIndex <= xPos_LastIndex; valueIndex++) {
 
             final long devXCurrent = devXPositions[valueIndex];
-            final boolean isLastIndex = valueIndex == timeIndexLastPoint;
+            final boolean isLastIndex = valueIndex == xPos_LastIndex;
 
             // ignore same position
             if (devXCurrent == devXPrev && isLastIndex == false) {

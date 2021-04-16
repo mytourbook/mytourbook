@@ -2620,15 +2620,15 @@ public class ChartComponentGraph extends Canvas {
     *           the whole graph is painted once.
     */
    private void drawAsync_510_LineGraph_Segment(final GC gc,
-                                               final GraphDrawingData graphDrawingData,
-                                               final int startIndex,
-                                               final int endIndex,
-                                               final RGB rgbFg,
-                                               final RGB rgbBgDark,
-                                               final RGB rgbBgBright,
-                                               final int graphLineAlpha,
-                                               final int graphFillingAlpha,
-                                               final double graphValueOffset) {
+                                                final GraphDrawingData graphDrawingData,
+                                                final int startIndex,
+                                                final int endIndex,
+                                                final RGB rgbFg,
+                                                final RGB rgbBgDark,
+                                                final RGB rgbBgBright,
+                                                final int graphLineAlpha,
+                                                final int graphFillingAlpha,
+                                                final double graphValueOffset) {
 
       final ChartDataXSerie xData = graphDrawingData.getXData();
       final ChartDataYSerie yData = graphDrawingData.getYData();
@@ -2747,8 +2747,8 @@ public class ChartComponentGraph extends Canvas {
 
       final int lastIndex = endIndex - 1;
 
-      int valueIndexFirstPoint = startIndex;
-      int valueIndexLastPoint = startIndex;
+      int xPos_FirstIndex = startIndex;
+      int xPos_LastIndex = startIndex;
       int prevValueIndex = startIndex;
 
       /*
@@ -2801,7 +2801,7 @@ public class ChartComponentGraph extends Canvas {
             devXPrev = devX;
             devY1Prev = devY1;
 
-            valueIndexFirstPoint = valueIndex;
+            xPos_FirstIndex = valueIndex;
             prevValueIndex = valueIndex;
 
             continue;
@@ -2863,8 +2863,8 @@ public class ChartComponentGraph extends Canvas {
             final RectangleLong currentRect = new RectangleLong(devXRect, 0, 1, devChartHeight);
             final PointLong currentPoint = new PointLong(devXRect, (long) (devYTop + devY));
 
-            lineDevPositions[valueIndexFirstPoint] = currentPoint;
-            lineFocusRectangles[valueIndexFirstPoint] = currentRect;
+            lineDevPositions[xPos_FirstIndex] = currentPoint;
+            lineFocusRectangles[xPos_FirstIndex] = currentRect;
 
             prevLineRect = currentRect;
          }
@@ -3050,7 +3050,7 @@ public class ChartComponentGraph extends Canvas {
                path2.moveTo(devXf, 0);
             }
 
-            valueIndexLastPoint = valueIndex;
+            xPos_LastIndex = valueIndex;
 
             /*
              * set line rectangle
@@ -3164,8 +3164,9 @@ public class ChartComponentGraph extends Canvas {
                   graphDrawingData,
                   _chart,
                   devXPositions,
-                  valueIndexFirstPoint,
-                  valueIndexLastPoint);
+                  xPos_FirstIndex,
+                  xPos_LastIndex,
+                  false);
          }
       }
 
@@ -4660,6 +4661,7 @@ public class ChartComponentGraph extends Canvas {
       final Color pathColor = new Color(complimentColor);
 
       gc.setForeground(pathColor);
+      gc.setLineStyle(SWT.LINE_SOLID);
       gc.drawPath(path);
 
       path.dispose();
@@ -4772,8 +4774,8 @@ public class ChartComponentGraph extends Canvas {
 
       final int lastIndex = endIndex - 1;
 
-      int timeIndexFirstPoint = startIndex;
-      int timeIndexLastPoint = startIndex;
+      int xPos_FirstIndex = startIndex;
+      int xPos_LastIndex = startIndex;
 
       final long[] devXPositions = new long[endIndex];
       final float devY0 = devY0Inverse - devY_XAxisLine;
@@ -4815,7 +4817,7 @@ public class ChartComponentGraph extends Canvas {
             devXPrev = devX;
             devY1Prev = devY1;
 
-            timeIndexFirstPoint = valueIndex;
+            xPos_FirstIndex = valueIndex;
 
             continue;
          }
@@ -4939,7 +4941,7 @@ public class ChartComponentGraph extends Canvas {
             // finalize previous subpath
             path.moveTo((int) devXf, 0);
 
-            timeIndexLastPoint = valueIndex;
+            xPos_LastIndex = valueIndex;
 
             break;
          }
@@ -5029,8 +5031,9 @@ public class ChartComponentGraph extends Canvas {
                   graphDrawingData,
                   _chart,
                   devXPositions,
-                  timeIndexFirstPoint,
-                  timeIndexLastPoint);
+                  xPos_FirstIndex,
+                  xPos_LastIndex,
+                  true);
          }
       }
 
