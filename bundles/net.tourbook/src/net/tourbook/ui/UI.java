@@ -458,7 +458,7 @@ public class UI {
       if ((tourDataEditor != null) && tourDataEditor.isDirty() && (tourDataEditor.getTourData() == tourData)) {
          okText = Messages.app_action_update;
       } else {
-         okText = Messages.app_action_save;
+         okText = Messages.App_Action_Save;
       }
 
       return okText;

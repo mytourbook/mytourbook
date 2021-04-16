@@ -88,6 +88,7 @@ import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
+import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
@@ -198,7 +199,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
@@ -327,6 +327,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionExport                    _actionExportTour;
    private ActionExportViewCSV             _actionExportViewCSV;
    private ActionDeleteTourMenu            _actionDeleteTour;
+   private ActionDeleteTourValues          _actionDeleteTourValues;
    private ActionEditTour                  _actionEditTour;
    private ActionJoinTours                 _actionJoinTours;
    private ActionLinkWithOtherViews        _actionLinkWithOtherViews;
@@ -947,54 +948,51 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               /*
-                * Flat view do not preserve column reordering when reloaded -> recreate it
-                */
-               if (_isLayoutNatTable) {
+            /*
+             * Flat view do not preserve column reordering when reloaded -> recreate it
+             */
+            if (_isLayoutNatTable) {
 
-                  // save column ordering
-                  saveState();
+               // save column ordering
+               saveState();
 
-                  recreateViewer_NatTable();
+               recreateViewer_NatTable();
 
-               } else {
+            } else {
 
-                  reloadViewer();
-               }
-
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-               _tourViewer_NatTable.refresh();
-
-               // update tourbook viewer
-               _tourViewer_Tree.refresh();
-
-               // redraw must be done to see modified tour type image colors
-               _tourViewer_Tree.getTree().redraw();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
-
-               _columnFactory.updateToolTipState();
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-               _tourViewer_Tree.refresh();
-
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer_Tree.getTree().redraw();
+               reloadViewer();
             }
+
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            _tourViewer_NatTable.refresh();
+
+            // update tourbook viewer
+            _tourViewer_Tree.refresh();
+
+            // redraw must be done to see modified tour type image colors
+            _tourViewer_Tree.getTree().redraw();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+            _columnFactory.updateToolTipState();
+
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+            _tourViewer_Tree.refresh();
+
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tourViewer_Tree.getTree().redraw();
          }
       };
 
@@ -1110,6 +1108,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionCollapseOthers = new ActionCollapseOthers(this);
       _actionDuplicateTour = new ActionDuplicateTour(this);
       _actionDeleteTour = new ActionDeleteTourMenu(this);
+      _actionDeleteTourValues = new ActionDeleteTourValues(this);
       _actionEditQuick = new ActionEditQuick(this);
       _actionEditTour = new ActionEditTour(this);
       _actionExpandSelection = new ActionExpandSelection(this);
@@ -1320,7 +1319,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // add single click handler to sort the column without pressing additional the ALT key
       sortHeaderLayer.addConfiguration(new SingleClickSortConfiguration_MT(_columnManager_NatTable));
-      sortHeaderLayer.addLayerListener(listener -> natTable_OnColumnSort(listener));
+      sortHeaderLayer.addLayerListener(this::natTable_OnColumnSort);
 
       /*
        * Row header layer
@@ -1380,12 +1379,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _natTable_DataProvider,
             false); // Provides rows where any cell in the row is selected
 
-      selectionProvider.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_NatTableItem(event);
-         }
-      });
+      selectionProvider.addSelectionChangedListener(this::onSelect_NatTableItem);
 
       // prevent selecting all cells when column header is clicked on a column which cannot be sorted
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), null);
@@ -1447,13 +1441,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final Menu contextMenu = _viewerMenuManager_NatTable.createContextMenu(_tourViewer_NatTable);
 
-      _tourViewer_NatTable.addListener(SWT.MenuDetect, new Listener() {
-
-         @Override
-         public void handleEvent(final Event event) {
-            natTable_ContextMenu_OnMenuDetect(event);
-         }
-      });
+      _tourViewer_NatTable.addListener(SWT.MenuDetect, this::natTable_ContextMenu_OnMenuDetect);
 
       contextMenu.addMenuListener(new MenuAdapter() {
          @Override
@@ -1708,23 +1696,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // make var to a effectively final var, otherwise an exception occurs
          final TVITourBookTour finalFirstTour = firstTourItem;
 
-         CompletableFuture.supplyAsync(() -> {
+         CompletableFuture.supplyAsync(() -> TourManager.getInstance().getTourData(finalFirstTour.getTourId()))
+               .thenAccept(savedTour -> {
 
-            return TourManager.getInstance().getTourData(finalFirstTour.getTourId());
+                  if (savedTour != null) {
 
-         }).thenAccept(savedTour -> {
+                     final boolean isDeviceTour = savedTour.isManualTour() == false;
+                     final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
 
-            if (savedTour != null) {
-
-               final boolean isDeviceTour = savedTour.isManualTour() == false;
-               final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
-
-               _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
-               _actionMergeTour.setEnabled(canMergeTours);
-               _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-               _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
-            }
-         });
+                     _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+                     _actionMergeTour.setEnabled(canMergeTours);
+                     _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+                     _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+                  }
+               });
       }
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
@@ -1746,10 +1731,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
       _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
 
-      // re-import can be run on all/selected/between dates tours
+      // re-import and tour values deletion can be run on all/selected/between dates tours
       _actionReimport_Tours.setEnabled(true);
+      _actionDeleteTour.setEnabled(true);
 
-      _actionDeleteTour.setEnabled(isTourSelected);
+      _actionDeleteTourValues.setEnabled(isTourSelected);
       _actionEditQuick.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionExportTour.setEnabled(isTourSelected);
@@ -1852,6 +1838,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       menuMgr.add(new Separator());
       menuMgr.add(_subMenu_AdjustTourValues);
+      menuMgr.add(_actionDeleteTourValues);
       menuMgr.add(_actionReimport_Tours);
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTour);
@@ -2227,9 +2214,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectTours_NatTable(new int[] { hoveredRow }, true, false, true);
 
          // show context menu again
-         _pageBook.getDisplay().timerExec(10, () -> {
-            UI.openContextMenu(_tourViewer_NatTable);
-         });
+         _pageBook.getDisplay().timerExec(10, () -> UI.openContextMenu(_tourViewer_NatTable));
 
          fillContextMenu(manager, false);
 
@@ -2248,7 +2233,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // move selected tour into view
 
-         _pageBook.getDisplay().timerExec(1, () -> natTable_ScrollSelectedToursIntoView());
+         _pageBook.getDisplay().timerExec(1, this::natTable_ScrollSelectedToursIntoView);
       }
    }
 
@@ -2282,7 +2267,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void natTable_ScrollSelectedToursIntoView() {
 
-      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
+      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
          final int firstRowPosition = allRowPositions[0];
          final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
@@ -2784,7 +2769,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void reselectTourViewer_NatTable() {
 
-      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
+      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
          // don't check reload that a tour selection is fired
          selectTours_NatTable(allRowPositions, true, true, false);
@@ -3079,67 +3064,64 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       // run async otherwise an internal NPE occurs
-      _parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _parent.getDisplay().asyncExec(() -> {
 
-            final Tree tree = _tourViewer_Tree.getTree();
+         final Tree tree = _tourViewer_Tree.getTree();
 
-            if (tree.isDisposed()) {
-               return;
-            }
-
-            tree.setRedraw(false);
-            _isInReload = true;
-            {
-               if (_isCollapseOthers) {
-
-                  try {
-
-                     _tourViewer_Tree.collapseAll();
-
-                  } catch (final Exception e) {
-
-                     /**
-                      * <code>
-
-                        Caused by: java.lang.NullPointerException
-                        at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
-                        at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
-                        at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
-                        at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
-                        at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
-                        at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
-                        at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
-                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
-                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
-                        at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
-                        at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
-                        at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
-                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
-                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
-                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
-                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
-                        at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
-                        at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
-                        at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
-                        ... 22 more
-
-                      * </code>
-                      */
-
-                     // this occurs sometimes but it seems that it's an eclipse internal problem
-                     StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e); //$NON-NLS-1$
-                  }
-               }
-
-               reselectTourViewer();
-            }
-            _isInReload = false;
-            tree.setRedraw(true);
+         if (tree.isDisposed()) {
+            return;
          }
+
+         tree.setRedraw(false);
+         _isInReload = true;
+         {
+            if (_isCollapseOthers) {
+
+               try {
+
+                  _tourViewer_Tree.collapseAll();
+
+               } catch (final Exception e) {
+
+                  /**
+                   * <code>
+                  
+                     Caused by: java.lang.NullPointerException
+                     at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
+                     at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
+                     at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
+                     at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
+                     at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
+                     at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
+                     at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+                     at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
+                     at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
+                     at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
+                     at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
+                     at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
+                     at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
+                     at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
+                     at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
+                     at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
+                  
+                     at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
+                  
+                     at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
+                     at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
+                     ... 22 more
+                  
+                   * </code>
+                   */
+
+                  // this occurs sometimes but it seems that it's an eclipse internal problem
+                  StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e); //$NON-NLS-1$
+               }
+            }
+
+            reselectTourViewer();
+         }
+         _isInReload = false;
+         tree.setRedraw(true);
       });
    }
 

@@ -171,6 +171,9 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
 
+   public static String        Dialog_DatabaseAction_Confirmation_Message;
+   public static String        Dialog_DatabaseAction_Confirmation_Title;
+
    public static String        Dialog_ImportConfig_Action_AddSpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_NewOneTourType;
    public static String        Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
@@ -298,6 +301,17 @@ public class Messages extends NLS {
    public static String        Dialog_HRZone_Label_Header_ZoneShortcut;
    public static String        Dialog_HRZone_Label_Trash_Tooltip;
 
+   public static String        Dialog_DeleteTourValues_Action_OpenDialog;
+   public static String        Dialog_DeleteTourValues_Button_Delete;
+   public static String        Dialog_DeleteTourValues_Checkbox_Time;
+   public static String        Dialog_DeleteTourValues_Dialog_ConfirmDeleteValues_Message;
+   public static String        Dialog_DeleteTourValues_Dialog_Message;
+   public static String        Dialog_DeleteTourValues_Dialog_Title;
+   public static String        Dialog_DeleteTourValues_Group_Data;
+   public static String        Dialog_DeleteTourValues_Group_Data_Tooltip;
+   public static String        Dialog_DeleteTourValues_Group_Tours;
+   public static String        Dialog_DeleteTourValues_Group_Tours_Tooltip;
+
    public static String        Dialog_DoubleClickAction_InvalidAction_Message;
    public static String        Dialog_DoubleClickAction_InvalidAction_Title;
    public static String        Dialog_DoubleClickAction_NoAction_Message;
@@ -358,37 +372,37 @@ public class Messages extends NLS {
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
 
+   public static String        Dialog_ModifyTours_Checkbox_CadenceValues;
+   public static String        Dialog_ModifyTours_Checkbox_ElevationValues;
+   public static String        Dialog_ModifyTours_Checkbox_GearValues;
+   public static String        Dialog_ModifyTours_Checkbox_PowerAndPulseValues;
+   public static String        Dialog_ModifyTours_Checkbox_PowerAndSpeedValues;
+   public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
+   public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
+   public static String        Dialog_ModifyTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ModifyTours_Checkbox_TourMarkers;
+   public static String        Dialog_ModifyTours_Checkbox_TourTimerPauses;
+   public static String        Dialog_ModifyTours_Checkbox_TrainingValues;
    public static String        Dialog_ReimportTours_Action_OpenDialog;
    public static String        Dialog_ReimportTours_Button_ReImport;
-   public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
-   public static String        Dialog_ReimportTours_Checkbox_ElevationValues;
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
-   public static String        Dialog_ReimportTours_Checkbox_GearValues;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
-   public static String        Dialog_ReimportTours_Checkbox_PowerAndPulseValues;
-   public static String        Dialog_ReimportTours_Checkbox_PowerAndSpeedValues;
-   public static String        Dialog_ReimportTours_Checkbox_RunningDynamicsValues;
    public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
-   public static String        Dialog_ReimportTours_Checkbox_SwimmingValues;
-   public static String        Dialog_ReimportTours_Checkbox_TemperatureValues;
    public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
-   public static String        Dialog_ReimportTours_Checkbox_TourMarkers;
-   public static String        Dialog_ReimportTours_Checkbox_TourTimerPauses;
-   public static String        Dialog_ReimportTours_Checkbox_TrainingValues;
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
    public static String        Dialog_ReimportTours_Dialog_Message;
    public static String        Dialog_ReimportTours_Dialog_Title;
-   public static String        Dialog_ReimportTours_Dialog_ToursAreNotAvailable;
-   public static String        Dialog_ReimportTours_Dialog_ToursAreNotSelected;
-   public static String        Dialog_ReimportTours_Error_2ndDateMustBeLarger;
+   public static String        Dialog_ModifyTours_Dialog_ToursAreNotAvailable;
+   public static String        Dialog_ModifyTours_Dialog_ToursAreNotSelected;
+   public static String        Dialog_ModifyTours_Error_2ndDateMustBeLarger;
    public static String        Dialog_ReimportTours_Group_Tours;
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
    public static String        Dialog_ReimportTours_Group_Data_Tooltip;
-   public static String        Dialog_ReimportTours_Radio_AllTours;
-   public static String        Dialog_ReimportTours_Radio_BetweenDates;
-   public static String        Dialog_ReimportTours_Radio_SelectedTours;
+   public static String        Dialog_ModifyTours_Radio_AllTours;
+   public static String        Dialog_ModifyTours_Radio_BetweenDates;
+   public static String        Dialog_ModifyTours_Radio_SelectedTours;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
@@ -483,7 +497,6 @@ public class Messages extends NLS {
    public static String        app_action_open_tour;
    public static String        app_action_quick_edit;
    public static String        app_action_read_edit_tooltip;
-   public static String        app_action_save;
    public static String        app_action_update;
 
    public static String        app_btn_browse;
@@ -763,6 +776,8 @@ public class Messages extends NLS {
 
    public static String        DeviceManager_Selection_device_is_not_selected;
 
+   public static String        Dialog_DeleteData_Title;
+
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
    public static String        Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
@@ -979,7 +994,7 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        import_data_action_save_tours_for_person;
-   public static String        import_data_dlg_reimport_title;
+   public static String        Dialog_ReimportData_Title;
    public static String        import_data_dlg_save_tour_msg;
    public static String        import_data_dlg_save_tour_title;
    public static String        import_data_importTours_subTask;
@@ -997,26 +1012,28 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-   public static String        Import_Data_Text_AltitudeValues;
-   public static String        Import_Data_Text_CadenceValues;
-   public static String        Import_Data_Text_GearValues;
-   public static String        Import_Data_Text_PowerValues;
-   public static String        Import_Data_Text_PulseValues;
-   public static String        Import_Data_Text_RunningDynamicsValues;
-   public static String        Import_Data_Text_SwimmingValues;
-   public static String        Import_Data_Text_SpeedValues;
-   public static String        Import_Data_Text_TemperatureValues;
-   public static String        Import_Data_Text_TimeSlices;
-   public static String        Import_Data_Text_TourMarkers;
-   public static String        Import_Data_Text_TourTimerPauses;
-   public static String        Import_Data_Text_TrainingValues;
-   public static String        Import_Data_Text_EntireTour;
-   public static String        Import_Data_Text_ImportFileLocation;
+   public static String        Tour_Data_Text_AltitudeValues;
+   public static String        Tour_Data_Text_CadenceValues;
+   public static String        Tour_Data_Text_GearValues;
+   public static String        Tour_Data_Text_PowerValues;
+   public static String        Tour_Data_Text_PulseValues;
+   public static String        Tour_Data_Text_RunningDynamicsValues;
+   public static String        Tour_Data_Text_SwimmingValues;
+   public static String        Tour_Data_Text_SpeedValues;
+   public static String        Tour_Data_Text_TemperatureValues;
+   public static String        Tour_Data_Text_TimeSlices;
+   public static String        Tour_Data_Text_Time;
+   public static String        Tour_Data_Text_TourMarkers;
+   public static String        Tour_Data_Text_TourTimerPauses;
+   public static String        Tour_Data_Text_TrainingValues;
+   public static String        Tour_Data_Text_EntireTour;
+   public static String        Tour_Data_Text_ImportFileLocation;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
    public static String        Import_Data_Dialog_GetAlternativePath_Message;
    public static String        Import_Data_Dialog_GetReimportedFilePath_Message;
+   public static String        Import_Data_Dialog_DeleteTourValues_Task;
    public static String        Import_Data_Dialog_Reimport_SubTask;
    public static String        Import_Data_Dialog_Reimport_Task;
    public static String        Import_Data_Dialog_Reimport_Title;
@@ -1072,6 +1089,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_IsCancelReImport_Message;
    public static String        Import_Data_Dialog_IsCancelReImport_Title;
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
+   public static String        Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
    public static String        Import_Data_Monitor_Backup;
    public static String        Import_Data_Monitor_Backup_SubTask;
@@ -1117,6 +1135,8 @@ public class Messages extends NLS {
    public static String        Log_ComputeCadenceZonesTimes_010_Success;
    public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
+   public static String        Log_Delete_Text;
+
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
    public static String        Log_EasyImport_001_Copy;
@@ -1138,12 +1158,15 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour_End;
    public static String        Log_Import_Tour_Imported;
    public static String        Log_Import_Tours_Imported_From_File;
-   public static String        Log_Import_Tour_Old_Data_Vs_New_Data;
 
-   public static String        Log_Reimport_Combined_Values;
+   public static String        Log_Deleted_End;
+   public static String        Log_ModifiedTour_Old_Data_Vs_New_Data;
+   public static String        Log_Modify_Combined_Values;
+
    public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
+   public static String        Log_Reimport_Text;
    public static String        Log_Reimport_Tour_Skipped;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
@@ -2058,8 +2081,8 @@ public class Messages extends NLS {
 
    public static String Slideout_TourChartOptions_Check_InvertPaceGraph;
    public static String Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip;
-   public static String Slideout_TourChartOptions_Label_NightSectionsOpacity;
-   public static String Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
+   public static String Slideout_TourChartOptions_Check_NightSectionsOpacity;
+   public static String Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip;
    public static String Slideout_TourChartOptions_Label_PulseGraph;
    public static String Slideout_TourChartOptions_Label_Title;
 

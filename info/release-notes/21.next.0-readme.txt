@@ -31,7 +31,11 @@ Issues
 New
 ===
 
-* 
+* Tour Book View (Frederic)
+ - Added the ability to delete values, for any given tour, such as elevation, time, gear, cadence...etc
+
+* Tour values deletion/re-import (Frederic)
+ - Added a confirmation dialog that will always be displayed to the user when re-importing or deleting tour values for the whole database
 
 
 Improvements
@@ -43,6 +47,9 @@ Improvements
 * Tour Chart 
   - Displaying the night sections with a grey color for a more intuitive chart and better readability (Frederic)
   - More options to show R-R values together with other pules graphs (R-R average, device value)
+
+* 3D Map & Tour Chart Preferences (Frederic)
+ - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
 
 
 Changes  
@@ -83,4 +90,3 @@ System
 ======
 
 * Eclipse 2021-?
-* FIT SDK 21.47
