@@ -36,6 +36,9 @@ Improvements
 * Tour Chart (Frederic):
   - Displaying the night sections with a grey color for a more intuitive chart and better readability
 
+* 2.5D Map (Thomas):
+  - Upgrading VTM lib to 0.15
+  - Size of photothumbnails can be changed via slideout
 
 Changes  
 =======
