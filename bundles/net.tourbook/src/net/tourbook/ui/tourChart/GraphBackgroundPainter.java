@@ -87,6 +87,8 @@ public class GraphBackgroundPainter implements IFillPainter {
       final boolean useGraphBgStyle_HrZone = tcc.isBackgroundStyle_HrZone();
       final boolean useGraphBgStyle_SwimStyle = tcc.isBackgroundStyle_SwimmingStyle();
 
+      HrZoneContext hrZoneContext = null;
+
       if (useGraphBgStyle_HrZone) {
 
          final TourPerson tourPerson = tourData.getDataPerson();
@@ -96,6 +98,13 @@ public class GraphBackgroundPainter implements IFillPainter {
 
          final int numberOfHrZones = tourData.getNumberOfHrZones();
          if (numberOfHrZones == 0) {
+            return;
+         }
+
+         hrZoneContext = tourData.getHrZoneContext();
+         if (hrZoneContext == null) {
+
+            // this occure when a user do not have hr zones
             return;
          }
 
@@ -162,7 +171,6 @@ public class GraphBackgroundPainter implements IFillPainter {
 
          if (dataSerie != null) {
 
-            final HrZoneContext hrZoneContext = tourData.getHrZoneContext();
             int prevZoneIndex = TrainingManager.getZoneIndex(hrZoneContext, dataSerie[xPos_FirstIndex]);
 
             for (int valueIndex = xPos_FirstIndex + 1; valueIndex <= xPos_LastIndex; valueIndex++) {
