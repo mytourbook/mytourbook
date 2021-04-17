@@ -430,6 +430,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             _txtProfileName = new Text(container, SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
+            // do live update
             _txtProfileName.addTraverseListener(this::onModifyProfileName);
          }
       }
