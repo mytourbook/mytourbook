@@ -61,6 +61,9 @@ Bugfix
 * Chart Tooltip (Frederic)
   - Displaying the hour from 0 when a new day starts
 
+* Chart Create Tourmarker (Thomas)
+  - Same wording as on other places. "create marker" -> "create tour marker"
+
 Translation    
 ===========
 
