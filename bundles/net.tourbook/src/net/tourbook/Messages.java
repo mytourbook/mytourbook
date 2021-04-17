@@ -1085,6 +1085,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_WatchingIsOff;
    public static String        Import_Data_HTML_WatchingOff;
    public static String        Import_Data_HTML_WatchingOn;
+   public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Message;
+   public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Title;
    public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
    public static String        Import_Data_Dialog_IsCancelReImport_Message;
    public static String        Import_Data_Dialog_IsCancelReImport_Title;

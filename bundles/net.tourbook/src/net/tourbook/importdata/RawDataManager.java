@@ -1572,22 +1572,20 @@ public class RawDataManager {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            final boolean[] isUserAsked_ToCancelDeletion = { false };
-
             int imported = 0;
             final int importSize = selectedTourIds.length;
 
             monitor.beginTask(Messages.Import_Data_Dialog_DeleteTourValues_Task, importSize);
 
             // loop: all selected tours in the viewer
-            for (int index = 0; index < selectedTourIds.length && !monitor.isCanceled(); ++index) {
+            for (final Long selectedTourId : selectedTourIds) {
 
                monitor.worked(1);
                monitor.subTask(NLS.bind(
                      Messages.Import_Data_Dialog_Reimport_SubTask,
                      new Object[] { ++imported, importSize }));
 
-               final TourData tourData = TourManager.getTour(selectedTourIds[index]);
+               final TourData tourData = TourManager.getTour(selectedTourId);
 
                if (tourData == null) {
                   continue;
@@ -1595,7 +1593,7 @@ public class RawDataManager {
 
                deleteTourValuesFromTour(tourValueTypes, tourData);
 
-               if (!isUserAsked_ToCancelDeletion[0]) {
+               if (monitor.isCanceled()) {
 
                   // user has canceled the deletion -> ask if the whole deletion should be canceled
 
@@ -1604,14 +1602,11 @@ public class RawDataManager {
                   display.syncExec(() -> {
 
                      if (MessageDialog.openQuestion(display.getActiveShell(),
-                           Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                           Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+                           Messages.Import_Data_Dialog_IsCancelTourValuesDeletion_Title,
+                           Messages.Import_Data_Dialog_IsCancelTourValuesDeletion_Message)) {
 
                         isCancelDeletion[0] = true;
 
-                     } else {
-
-                        isUserAsked_ToCancelDeletion[0] = true;
                      }
                   });
 
@@ -1689,6 +1684,8 @@ public class RawDataManager {
                tourData.setCadenceSerie(null);
                tourData.setAvgCadence(0);
                tourData.setCadenceMultiplier(0);
+               tourData.setCadenceZone_SlowTime(0);
+               tourData.setCadenceZone_FastTime(0);
                break;
 
             case TIME_SLICES_ELEVATION:
