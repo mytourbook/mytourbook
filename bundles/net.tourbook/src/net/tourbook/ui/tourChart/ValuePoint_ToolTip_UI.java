@@ -1661,11 +1661,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                _prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES),
                TourChart.PULSE_GRAPH_DEFAULT);
 
-         // @FJBDev: Do NOT optimize these if statements, this way it is better readable for me !
+         // @FJBDev: Do NOT optimize the following if statements, this way it is better readable for me !
 
          if (_isAvailable_Pulse_BpmFromDevice) {
 
-            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS) {
+            if (pulseGraph == PulseGraph.DEVICE_BPM_ONLY || pulseGraph == PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE) {
 
                _lblPulse.setText(Integer.toString((int) _tourData.pulseSerie[valueIndex]));
             }
@@ -1674,9 +1674,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          if (_isAvailable_Pulse_RRIntervals) {
 
-            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY || pulseGraph == PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM) {
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+                  || pulseGraph == PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM
+                  || pulseGraph == PulseGraph.RR_AVERAGE_ONLY) {
 
-               _lblPulse.setText(_nf1.format(_tourData.getPulse_RRIntervals()[valueIndex]));
+               _lblPulse.setText(_nf1.format(_tourData.getPulse_AvgBpmFromRRIntervals()[valueIndex]));
             }
          }
       }
@@ -1710,8 +1712,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeSlice) {
-         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex));
-         _lblDataSerieMax.setText(Integer.toString(timeSerie.length - 1));
+
+         /*
+          * Show the same time slice value which is also selected in the tour editor where time
+          * slices are starting with 1, otherwise it could be confusing
+          */
+
+         _lblDataSerieCurrent.setText(Integer.toString(_currentValueIndex + 1));
+         _lblDataSerieMax.setText(Integer.toString(timeSerie.length));
       }
 
       if (_isVisible_And_Available_TourCompareResult) {

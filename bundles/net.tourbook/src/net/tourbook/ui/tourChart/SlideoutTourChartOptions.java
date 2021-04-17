@@ -70,10 +70,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private PulseGraph[]           _allPulseGraph_Value = {
 
-         PulseGraph.DEVICE_BPM__2ND__RR_INTERVALS,
+         PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE,
          PulseGraph.DEVICE_BPM_ONLY,
          PulseGraph.RR_INTERVALS_ONLY,
-         PulseGraph.RR_INTERVALS__2ND_DEVICE_BPM,
+         PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE,
+         PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM,
+         PulseGraph.RR_AVERAGE_ONLY,
+         PulseGraph.RR_AVERAGE___2ND_DEVICE_BPM,
 
    };
 
@@ -82,10 +85,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
     */
    private String[]               _allPulseGraph_Label = {
 
-         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRIntervals,
+         Messages.TourChart_PulseGraph_DeviceBpm_2nd_RRAverage,
          Messages.TourChart_PulseGraph_DeviceBpm_Only,
          Messages.TourChart_PulseGraph_RRIntervals_Only,
+         Messages.TourChart_PulseGraph_RRIntervals_2nd_RRAverage,
          Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm,
+         Messages.TourChart_PulseGraph_RRAverage_Only,
+         Messages.TourChart_PulseGraph_RRAverage_2nd_DeviceBpm,
    };
 
    private ArrayList<PulseGraph>  _possiblePulseGraph_Values;
@@ -445,7 +451,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkSelectAllTimeSlices.setSelection(isSelectInBetweenTimeSlices);
       _scaleNightSectionsOpacity.setSelection(tourNightSectionsOpacity);
 
-      setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT, tcc.canShowPulseSerie, tcc.canShowPulseTimeSerie);
+      setSelection_PulseGraph(TourChart.PULSE_GRAPH_DEFAULT,
+            tcc.canShowPulseSerie,
+            tcc.canShowPulseTimeSerie,
+            tcc.isShowTimeOnXAxis);
 
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
@@ -482,7 +491,10 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
       _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
-      setSelection_PulseGraph(tcc.pulseGraph, tcc.canShowPulseSerie, tcc.canShowPulseTimeSerie);
+      setSelection_PulseGraph(tcc.pulseGraph,
+            tcc.canShowPulseSerie,
+            tcc.canShowPulseTimeSerie,
+            tcc.isShowTimeOnXAxis);
 
       _gridUI.restoreState();
    }
@@ -528,14 +540,23 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       tcc.xAxisTime = xAxisStartTime;
    }
 
-   private void setSelection_PulseGraph(final PulseGraph pulseGraph,
+   /**
+    * @param requestedPulseGraph
+    * @param canShowPulseSerie
+    * @param canShowPulseTimeSerie
+    * @param isShowTimeOnXAxis
+    *           When distance is displayed on the x-axis, then it is not supported to show the R-R
+    *           intervals --> too complicated
+    */
+   private void setSelection_PulseGraph(final PulseGraph requestedPulseGraph,
                                         final boolean canShowPulseSerie,
-                                        final boolean canShowPulseTimeSerie) {
+                                        final boolean canShowPulseTimeSerie,
+                                        final boolean isShowTimeOnXAxis) {
 
       _comboPulseValueGraph.removeAll();
       _possiblePulseGraph_Values = new ArrayList<>();
 
-      if (canShowPulseSerie && canShowPulseTimeSerie) {
+      if (canShowPulseSerie && canShowPulseTimeSerie && isShowTimeOnXAxis == true) {
 
          // all options can be selected
 
@@ -546,6 +567,26 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          // update model
          Collections.addAll(_possiblePulseGraph_Values, _allPulseGraph_Value);
+
+      } else if (canShowPulseSerie && canShowPulseTimeSerie && isShowTimeOnXAxis == false) {
+
+         // distance is displayed on the x-axis -> rr intervals cannot be displayed
+
+         for (int graphIndex = 0; graphIndex < _allPulseGraph_Value.length; graphIndex++) {
+
+            final PulseGraph pulseGraph = _allPulseGraph_Value[graphIndex];
+
+            if (pulseGraph == PulseGraph.RR_INTERVALS_ONLY
+                  || pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM
+                  || pulseGraph == PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE) {
+
+               // skip unsupported features
+               continue;
+            }
+
+            _comboPulseValueGraph.add(_allPulseGraph_Label[graphIndex]);
+            _possiblePulseGraph_Values.add(pulseGraph);
+         }
 
       } else if (canShowPulseSerie) {
 
@@ -558,12 +599,27 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       } else if (canShowPulseTimeSerie) {
 
          // update UI
-         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_Only);
+         _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRAverage_Only);
+
+         if (isShowTimeOnXAxis) {
+            _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_Only);
+            _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_2nd_RRAverage);
+            _comboPulseValueGraph.add(Messages.TourChart_PulseGraph_RRIntervals_2nd_DeviceBpm);
+         }
 
          // update model
-         _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS_ONLY);
+         _possiblePulseGraph_Values.add(PulseGraph.RR_AVERAGE_ONLY);
+
+         if (isShowTimeOnXAxis) {
+            _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS_ONLY);
+            _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS___2ND_RR_AVERAGE);
+            _possiblePulseGraph_Values.add(PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM);
+         }
       }
 
+      /*
+       * Select pulse graph
+       */
       final int numComboItems = _possiblePulseGraph_Values.size();
 
       if (numComboItems == 0) {
@@ -580,14 +636,14 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          // get index of the requested pulse graph
          for (int graphIndex = 0; graphIndex < numComboItems; graphIndex++) {
-            if (_possiblePulseGraph_Values.get(graphIndex).equals(pulseGraph)) {
+
+            if (_possiblePulseGraph_Values.get(graphIndex).equals(requestedPulseGraph)) {
                comboIndex = graphIndex;
                break;
             }
          }
 
          _comboPulseValueGraph.select(comboIndex);
-
       }
 
       // disable combo when only 1 or 0 items can be selected

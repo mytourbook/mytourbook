@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -229,7 +229,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final int              COLUMN_SPACING                            = 20;
    //
    private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOURDISTANCE                   = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                  = "tourDistance";                                         //$NON-NLS-1$
    private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
    private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
    private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
@@ -257,19 +257,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
    static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
    //
-   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
    private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
    private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
    private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
    private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
    //
    private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    //
    private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
    private static final boolean          IS_OSX                                    = UI.IS_OSX;
@@ -289,6 +289,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[]                 _seriePace;
    private float[]                 _seriePower;
    private float[]                 _seriePulse;
+   private float[]                 _seriePulse_RR_Bpm;
+   private String[]                _seriePulse_RR_Intervals;
+   private int[]                   _seriePulse_RR_Index;
    private double[]                _serieLatitude;
    private double[]                _serieLongitude;
    private float[][]               _serieGears;
@@ -3513,7 +3516,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _txtDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtDistance.addModifyListener(_verifyFloatValue);
-            _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
+            _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOUR_DISTANCE);
             _txtDistance.addKeyListener(new KeyListener() {
                @Override
                public void keyPressed(final KeyEvent e) {
@@ -4933,10 +4936,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_TimeSlice_Motion_DistanceDiff();
       defineColumn_TimeSlice_Motion_SpeedDiff();
 
-      defineColumn_TimeSlice_Altitude_Altitude();
-      defineColumn_TimeSlice_Altitude_Gradient();
+      defineColumn_TimeSlice_Elevation_Elevation();
+      defineColumn_TimeSlice_Elevation_Gradient();
 
-      defineColumn_TimeSlice_Body_Pulse();
+      defineColumn_TimeSlice_Body_Heartbeat_Device();
+      defineColumn_TimeSlice_Body_Heartbeat_RR();
+      defineColumn_TimeSlice_Body_Heartbeat_RR_Intervals();
+      defineColumn_TimeSlice_Body_Heartbeat_RR_Index();
 
       defineColumn_TimeSlice_Tour_Marker();
 
@@ -5179,48 +5185,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: altitude
+    * Column: Heartbeat from device
     */
-   private void defineColumn_TimeSlice_Altitude_Altitude() {
+   private void defineColumn_TimeSlice_Body_Heartbeat_Device() {
 
       ColumnDefinition colDef;
 
-      _timeSlice_ColDef_Altitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Pulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
 
-      colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_serieAltitude != null) {
+            if (_seriePulse != null) {
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
-
+               cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
          }
       });
-
    }
 
    /**
-    * column: gradient
+    * Column: Heartbeat from R-R intervals
     */
-   private void defineColumn_TimeSlice_Altitude_Gradient() {
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR() {
 
-      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_timeSlice_ColumnManager, _pc);
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_AVG_BPM.createColumn(_timeSlice_ColumnManager, _pc);
 
-      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
-            if (_serieGradient != null) {
+            if (_seriePulse_RR_Bpm != null) {
 
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               final float value = _serieGradient[timeSlice.serieIndex];
+               final float value = _seriePulse_RR_Bpm[timeSlice.serieIndex];
 
                colDef.printDetailValue(cell, value);
 
@@ -5232,24 +5236,51 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: pulse
+    * Column: R-R index
     */
-   private void defineColumn_TimeSlice_Body_Pulse() {
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR_Index() {
 
-      ColumnDefinition colDef;
-
-      _timeSlice_ColDef_Pulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_timeSlice_ColumnManager, _pc);
-
-      colDef.disableValueFormatter();
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_INDEX.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_seriePulse != null) {
+
+            if (_seriePulse_RR_Index != null) {
+
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-               cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
+               final int value = _seriePulse_RR_Index[timeSlice.serieIndex];
+
+               cell.setText(Integer.toString(value));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: R-R values
+    */
+   private void defineColumn_TimeSlice_Body_Heartbeat_RR_Intervals() {
+
+      final TableColumnDefinition colDef = TableColumnFactory.BODY_PULSE_RR_INTERVALS.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_seriePulse_RR_Intervals != null) {
+
+               final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+               cell.setText(_seriePulse_RR_Intervals[serieIndex]);
+
             } else {
                cell.setText(UI.EMPTY_STRING);
             }
@@ -5310,6 +5341,60 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             if (isBgSet == false) {
                cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Elevation
+    */
+   private void defineColumn_TimeSlice_Elevation_Elevation() {
+
+      ColumnDefinition colDef;
+
+      _timeSlice_ColDef_Altitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_timeSlice_ColumnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_serieAltitude != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               cell.setText(_nf1.format(_serieAltitude[timeSlice.serieIndex] / _unitValueElevation));
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+
+   }
+
+   /**
+    * Column: Gradient
+    */
+   private void defineColumn_TimeSlice_Elevation_Gradient() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_timeSlice_ColumnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            if (_serieGradient != null) {
+
+               final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+               final float value = _serieGradient[timeSlice.serieIndex];
+
+               colDef.printDetailValue(cell, value);
+
+            } else {
+               cell.setText(UI.EMPTY_STRING);
             }
          }
       });
@@ -6651,6 +6736,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieGears = _tourData.getGears();
       _seriePulse = _tourData.pulseSerie;
 
+      _seriePulse_RR_Bpm = _tourData.getPulse_AvgBpmFromRRIntervals();
+      _seriePulse_RR_Intervals = _tourData.getPulse_RRIntervals();
+
+      // time serie which is containing the index for the first slice in the RR serie
+      _seriePulse_RR_Index = _tourData.pulseTime_TimeIndex;
+
       _serieLatitude = _tourData.latitudeSerie;
       _serieLongitude = _tourData.longitudeSerie;
 
@@ -6664,7 +6755,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _serieTemperature = _tourData.temperatureSerie;
 
       _swimSerie_StrokeRate = _tourData.swim_Cadence;
-//    _swimSerie_LengthType = _tourData.swim_LengthType;
       _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
       _swimSerie_Time = _tourData.swim_Time;

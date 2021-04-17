@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -390,7 +390,7 @@ public class HeartRateVariabilityView extends ViewPart {
             continue;
          }
 
-         final int[] tdPulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] tdPulseTimeSerie = tourData.pulseTime_Milliseconds;
 
          // check if required data series are available
          if (tdPulseTimeSerie != null && tdPulseTimeSerie.length > 1) {
@@ -410,17 +410,9 @@ public class HeartRateVariabilityView extends ViewPart {
 
       final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
-      final RGB rgbPrefLine = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-
-      final RGB rgbPrefDark = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-
-      final RGB rgbPrefBright = PreferenceConverter.getColor(//
-            _commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB rgbPrefLine = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final RGB rgbPrefDark = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final RGB rgbPrefBright = PreferenceConverter.getColor(_commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
       final double[][] rr0Series = new double[validDataLength][];
       final float[][] rr1Series = new float[validDataLength][];
@@ -442,7 +434,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
          final TourData tourData = validTours[tourIndex];
 
-         final int[] pulseTimeSerie = tourData.pulseTimeSerie;
+         final int[] pulseTimeSerie = tourData.pulseTime_Milliseconds;
          final int numPulseTimes = pulseTimeSerie.length - 1;
 
          final double[] rr0Values = new double[numPulseTimes];
