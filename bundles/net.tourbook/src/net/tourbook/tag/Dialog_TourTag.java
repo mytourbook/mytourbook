@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,7 +88,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       super.createButtonsForButtonBar(parent);
 
       // OK -> Save
-      getButton(IDialogConstants.OK_ID).setText(Messages.app_action_save);
+      getButton(IDialogConstants.OK_ID).setText(Messages.App_Action_Save);
    }
 
    @Override

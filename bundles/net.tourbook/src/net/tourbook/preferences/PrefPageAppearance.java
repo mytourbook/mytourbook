@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,10 +29,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -271,12 +268,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                      THEME_FONT_LOGGING_PREVIEW_TEXT,
                      fontContainer);
 
-               _valueFontEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-                  @Override
-                  public void propertyChange(final PropertyChangeEvent event) {
-                     onChangeFontInEditor();
-                  }
-               });
+               _valueFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor());
             }
          }
       }
@@ -342,12 +334,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeProperty();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeProperty();
       };
    }
 
@@ -374,6 +363,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES, false);
 
       MessageDialog.openInformation(getShell(),
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
@@ -438,12 +428,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                Messages.pref_appearance_showMemoryMonitor_title,
                Messages.pref_appearance_showMemoryMonitor_message)) {
 
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  PlatformUI.getWorkbench().restart();
-               }
-            });
+            Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
          }
       }
 

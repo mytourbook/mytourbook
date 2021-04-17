@@ -1005,7 +1005,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                final HashSet<String> importedFiles = _rawDataMgr.getImportedFiles();
                _state.put(STATE_IMPORTED_FILENAMES, importedFiles.toArray(new String[importedFiles.size()]));
 
-               if (RawDataManager.isReimportingActive() == false) {
+               if (!RawDataManager.isReimportingActive() &&
+                     !RawDataManager.isDeleteValuesActive()) {
 
                   /*
                    * Re-import files because computed values could be changed, e.g. elevation gain
@@ -2595,7 +2596,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                @Override
                public void completed(final ProgressEvent event) {
 
-                  onBrowser_Completed(event);
+                  onBrowser_Completed();
 
                }
             });
@@ -4213,7 +4214,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       return _watchingStoresThread != null;
    }
 
-   private void onBrowser_Completed(final ProgressEvent event) {
+   private void onBrowser_Completed() {
 
       _isBrowserCompleted = true;
 

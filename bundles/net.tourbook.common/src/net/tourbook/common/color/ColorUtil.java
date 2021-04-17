@@ -136,4 +136,9 @@ public class ColorUtil {
 
       return getContrastRGB(rgb.red, rgb.green, rgb.blue);
    }
+
+   public static int getTransparencyFromPercentage(final int percentageValue) {
+
+      return 0xff * percentageValue / 100;
+   }
 }
