@@ -1398,7 +1398,7 @@ public class RawDataManager {
 
          oldTourData.pulseSerie = reimportedTourData.pulseSerie;
 
-         oldTourData.pulseTimeSerie = reimportedTourData.pulseTimeSerie;
+         oldTourData.pulseTime_Milliseconds = reimportedTourData.pulseTime_Milliseconds;
          oldTourData.pulseTime_TimeIndex = reimportedTourData.pulseTime_TimeIndex;
       }
 

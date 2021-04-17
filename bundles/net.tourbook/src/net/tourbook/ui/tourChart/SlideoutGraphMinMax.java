@@ -342,7 +342,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -371,7 +371,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private void createUI_12_Actions(final Composite parent) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(toolbar);
@@ -389,7 +389,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(container);
-      GridLayoutFactory.swtDefaults()//
+      GridLayoutFactory.swtDefaults()
             .numColumns(7)
             .spacing(_pc.convertHorizontalDLUsToPixels(4), _pc.convertVerticalDLUsToPixels(4))
             .applyTo(container);
@@ -397,7 +397,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
          createUI_52_MinMax_Enable(container);
          createUI_54_MinMax_Header(container);
 
-         createUI_61_MinMax_Altitude(container);
+         createUI_61_MinMax_Elevation(container);
          createUI_64_MinMax_Pulse(container);
          createUI_65_MinMax_Speed(container);
          createUI_66_MinMax_Pace(container);
@@ -424,7 +424,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // ckeckbox: enable min/max
       _chkEnableMinMax = new Button(container, SWT.CHECK);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(7, 1)
             .applyTo(_chkEnableMinMax);
       _chkEnableMinMax.setText(Messages.Pref_Graphs_Checkbox_EnableMinMaxValues);
@@ -439,7 +439,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // label: min value
       _lblMinValue = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .indent(_columnSpacing, 0)
             .applyTo(_lblMinValue);
@@ -447,7 +447,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // label: max value
       _lblMaxValue = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(2, 1)
             .indent(_columnSpacing, 0)
             .applyTo(_lblMaxValue);
@@ -457,7 +457,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       new Label(parent, SWT.NONE);
    }
 
-   private void createUI_61_MinMax_Altitude(final Composite parent) {
+   private void createUI_61_MinMax_Elevation(final Composite parent) {
 
       _iconAltitude = createUI_Icon(parent, _imageAltitude);
 
@@ -521,14 +521,10 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _lblMinMax_Pulse = createUI_Label(parent, Messages.Pref_Graphs_Checkbox_ForcePulseValue);
 
       _chkMin_Pulse = createUI_Checkbox(parent);
-      _spinnerMin_Pulse = createUI_Spinner(parent, //
-            PrefPagePeople.HEART_BEAT_MIN,
-            PrefPagePeople.HEART_BEAT_MAX);
+      _spinnerMin_Pulse = createUI_Spinner(parent, 0, PrefPagePeople.HEART_BEAT_MAX);
 
       _chkMax_Pulse = createUI_Checkbox(parent);
-      _spinnerMax_Pulse = createUI_Spinner(parent, //
-            PrefPagePeople.HEART_BEAT_MIN,
-            PrefPagePeople.HEART_BEAT_MAX);
+      _spinnerMax_Pulse = createUI_Spinner(parent, 0, PrefPagePeople.HEART_BEAT_MAX);
 
       _lblMinMax_Pulse_Unit = createUI_Label(parent, GRAPH_LABEL_HEARTBEAT_UNIT);
    }
@@ -721,7 +717,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
       // ckeckbox
       final Button checkbox = new Button(parent, SWT.CHECK);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .indent(_columnSpacing, 0)
             .align(SWT.FILL, SWT.CENTER)
             .applyTo(checkbox);
@@ -733,7 +729,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private CLabel createUI_Icon(final Composite parent, final Image image) {
 
       final CLabel icon = new CLabel(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
 //				.indent(16, 0)
             .applyTo(icon);
       icon.setImage(image);
@@ -753,7 +749,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private Spinner createUI_Spinner(final Composite parent, final int minValue, final int maxValue) {
 
       final Spinner spinner = new Spinner(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.FILL)
 //            .grab(true, false)
             .applyTo(spinner);

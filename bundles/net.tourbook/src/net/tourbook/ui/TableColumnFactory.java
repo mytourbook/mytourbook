@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,6 +61,12 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory BODY_PULSE;
    public static final TableColumnFactory BODY_PULSE_MAX;
    public static final String             BODY_PULSE_MAX_ID                                  = "BODY_PULSE_MAX";                                  //$NON-NLS-1$
+   public static final TableColumnFactory BODY_PULSE_RR_AVG_BPM;
+   public static final String             BODY_PULSE_RR_AVG_BPM_ID                           = "BODY_PULSE_RR_AVG_BPM";                           //$NON-NLS-1$
+   public static final TableColumnFactory BODY_PULSE_RR_INDEX;
+   public static final String             BODY_PULSE_RR_INDEX_ID                             = "BODY_PULSE_RR_INDEX";                             //$NON-NLS-1$
+   public static final TableColumnFactory BODY_PULSE_RR_INTERVALS;
+   public static final String             BODY_PULSE_RR_INTERVALS_ID                         = "BODY_PULSE_RR_INTERVALS";                         //$NON-NLS-1$
    public static final TableColumnFactory BODY_RESTPULSE;
    public static final String             BODY_RESTPULSE_ID                                  = "BODY_RESTPULSE";                                  //$NON-NLS-1$
    public static final TableColumnFactory BODY_WEIGHT;
@@ -826,6 +832,73 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_max_pulse_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+            return colDef;
+         }
+      };
+
+      BODY_PULSE_RR_AVG_BPM = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_RR_AVG_BPM_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Pulse_RR_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Pulse_RR);
+            colDef.setColumnUnit(Messages.ColumnFactory_pulse);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Pulse_RR_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      BODY_PULSE_RR_INDEX = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_RR_INDEX_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Pulse_RR_Index);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Pulse_RR_Index);
+            colDef.setColumnUnit(UI.UNIT_MS);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Pulse_RR_Index_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+            return colDef;
+         }
+      };
+
+      BODY_PULSE_RR_INTERVALS = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_RR_INTERVALS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Pulse_RR_Intervals);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Pulse_RR_Intervals);
+            colDef.setColumnUnit(UI.UNIT_MS);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Pulse_RR_Intervals_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

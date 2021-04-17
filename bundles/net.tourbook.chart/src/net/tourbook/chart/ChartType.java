@@ -31,4 +31,15 @@ public enum ChartType {
 
    XY_SCATTER,
 
+   /**
+    * R-R intervals can contain multiple values (>100) in one time slice -> x-axis must be
+    * calculated differently
+    */
+   VARIABLE_X_AXIS,
+
+   /**
+    *
+    */
+   VARIABLE_X_AXIS_WITH_2ND_LINE,
+
 }

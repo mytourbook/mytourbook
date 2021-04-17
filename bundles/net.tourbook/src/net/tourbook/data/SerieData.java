@@ -124,7 +124,7 @@ public class SerieData implements Serializable {
 
    /**
     * Contains the time index into {@link TourData#timeSerie} for the pulse time(s) in
-    * {@link TourData#pulseTimeSerie}
+    * {@link TourData#pulseTime_Milliseconds}
     */
    public int[]                pulseTime_TimeIndex;
 

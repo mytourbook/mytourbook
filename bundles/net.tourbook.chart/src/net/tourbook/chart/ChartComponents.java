@@ -358,10 +358,19 @@ public class ChartComponents extends Composite {
       final double graphRange = graphMaxValue - graphMinValue;
 
       final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
-      final double scaleX = (devVirtualGraphWidth) / graphRange;
+      final double scaleX = devVirtualGraphWidth / graphRange;
 
       drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
       drawingData.setScaleX(scaleX);
+
+      final double[] variableX_Values = _chartDataModel.getVariableX_Values();
+      if (variableX_Values != null && variableX_Values.length > 0) {
+
+         final double lastVariableXValue = variableX_Values[variableX_Values.length - 1];
+         final double scaleXVariable = devVirtualGraphWidth / lastVariableXValue;
+
+         drawingData.setScaleX_Variable(scaleXVariable);
+      }
 
       /*
        * calculate the number of units which will be visible by dividing the visible length by the

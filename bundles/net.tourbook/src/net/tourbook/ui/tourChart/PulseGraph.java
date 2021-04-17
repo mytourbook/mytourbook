@@ -16,14 +16,14 @@
 package net.tourbook.ui.tourChart;
 
 /**
- * Pulse graph parts which are displayed in the pulse graph
+ * Pulse graph type which is displayed in the pulse graph
  */
 public enum PulseGraph {
 
    /**
     * Device bpm values are displayed as graph, pulse times are displayed as line
     */
-   DEVICE_BPM__2ND__RR_INTERVALS,
+   DEVICE_BPM___2ND_RR_AVERAGE,
 
    /**
     * Only device bpm values are displayed, however when not available then the pulse time values
@@ -32,14 +32,29 @@ public enum PulseGraph {
    DEVICE_BPM_ONLY,
 
    /**
+    * Bpm average values from R-R times
+    */
+   RR_AVERAGE_ONLY,
+
+   /**
     * Pulse times are displayed as line, device bpm values are displayed as graph
     */
-   RR_INTERVALS__2ND_DEVICE_BPM,
+   RR_AVERAGE___2ND_DEVICE_BPM,
 
    /**
     * Only pulse time values are displayed, however when not available then the device bpm values
     * are displayed
     */
-   RR_INTERVALS_ONLY
+   RR_INTERVALS_ONLY,
+
+   /**
+    * R-R values and it's average bpm values
+    */
+   RR_INTERVALS___2ND_RR_AVERAGE,
+
+   /**
+    * R-R values and the device bpm values
+    */
+   RR_INTERVALS___2ND_DEVICE_BPM,
 
 }
