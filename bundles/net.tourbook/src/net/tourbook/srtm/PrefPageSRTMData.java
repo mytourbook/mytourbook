@@ -62,7 +62,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
 //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
 
-   private static HttpClient    httpClient           = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+   private static HttpClient    _httpClient          = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
    private IPreferenceStore     _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -280,7 +280,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                   final HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl)).GET()
                         .build();
 
-                  final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+                  final HttpResponse<String> response = _httpClient.send(request, BodyHandlers.ofString());
 
                   final int statusCode = response.statusCode();
                   final String responseMessage = response.body();
