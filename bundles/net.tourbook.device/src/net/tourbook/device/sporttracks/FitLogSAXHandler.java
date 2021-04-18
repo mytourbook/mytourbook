@@ -1038,6 +1038,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
+         //TODO FB Not sure: That UTC offset is the one from the machine that exported the tour so it
+         //created more mess than anything it seems
          final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
                .atOffset(ZoneOffset.ofHours(
                      _currentActivity.timeZoneUtcOffset))
