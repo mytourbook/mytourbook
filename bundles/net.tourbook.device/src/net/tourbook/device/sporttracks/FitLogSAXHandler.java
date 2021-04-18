@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TimeZone;
@@ -128,8 +129,8 @@ public class FitLogSAXHandler extends DefaultHandler {
    private boolean                              _isInActivity;
    private boolean                              _isInTrack;
 
-   private LinkedHashMap<String, Integer>       _customDataFieldDefinitions;
-   private ArrayList<Equipment>                 _equipments;
+   private Map<String, Integer>                 _customDataFieldDefinitions;
+   private List<Equipment>                      _equipments;
    private boolean                              _isInCustomDataFields;
    private boolean                              _isInHasStartTime;
    private boolean                              _isInName;
@@ -533,6 +534,9 @@ public class FitLogSAXHandler extends DefaultHandler {
          //For FitLogEx formats, the <TimeZoneUtcOffset> value can be wrong as it seems to be the Utc Offset
          //of the machine from which the file was exported from.
          // In this case, we update the tour start time zone with the one obtained from the Lat/Lon values.
+
+         //TODO FB THat might not be necessary if we dont use that timezoneutcoffset in the first place.
+         //maybe inspire myself from other tour imports that dont have that timezoneutcoffset ?
          if (_currentActivity.hasTimeZoneUtcOffset && _currentActivity.timeZoneUtcOffset != 0 && zoneIdFromLatLon != _currentActivity.tourStartTime
                .getZone()) {
 
@@ -1040,6 +1044,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          //We update the tour start time with the retrieved UTC offset
          //TODO FB Not sure: That UTC offset is the one from the machine that exported the tour so it
          //created more mess than anything it seems
+         //see here : https://github.com/wolfgang-ch/mytourbook/commit/212237a75e4cdd6cef3475eed3b3d0c1c903f0c1#diff-f73bc5505ecef204b5dc43eecc01e6f26c7741dfb5cd65936955fb1b11c4ab62
+         //related to that https://sourceforge.net/p/mytourbook/discussion/622811/thread/e9cfb35008/#2e76/3dcb/1fd0
          final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
                .atOffset(ZoneOffset.ofHours(
                      _currentActivity.timeZoneUtcOffset))
