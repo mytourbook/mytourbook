@@ -44,6 +44,9 @@ Improvements
   - Displaying the night sections with a grey color for a more intuitive chart and better readability (Frederic)
   - More options to show R-R values together with other pules graphs (R-R average, device value)
 
+* 2.5D Map (Thomas):
+  - Upgrading VTM lib to 0.15
+  - Size of photothumbnails can be changed via slideout
 
 Changes  
 =======
@@ -66,8 +69,12 @@ Bugfix
 * Chart Tooltip (Frederic)
   - Displaying the hour from 0 when a new day starts
 
+* Chart Create Tourmarker (Thomas)
+  - Same wording as on other places. "create marker" -> "create tour marker"
+
 * Compress Database
-  Fixed SQL exception when the tour database size is too large to fit into an integer value
+  - Fixed SQL exception when the tour database size is too large to fit into an integer value
+
 
 Translation    
 ===========
