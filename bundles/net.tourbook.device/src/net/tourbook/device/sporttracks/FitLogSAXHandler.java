@@ -1114,7 +1114,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             final ZonedDateTime lapStartTime = ZonedDateTime.parse(startTime);
             pause.startTime = lapStartTime.toInstant().toEpochMilli();
-            //TODO FB with zonesameinstant
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(endTime);
             pause.endTime = lapEndTime.toInstant().toEpochMilli();
             pause.duration = Duration.between(lapStartTime, lapEndTime).toMillis();
