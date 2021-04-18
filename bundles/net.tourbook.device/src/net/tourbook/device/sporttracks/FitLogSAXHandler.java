@@ -34,6 +34,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -350,7 +351,7 @@ public class FitLogSAXHandler extends DefaultHandler {
        * get values
        */
       if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather) {
-         parseActivity_02_End(name);
+         parseActivity_02_End();
       }
 
       /*
@@ -478,8 +479,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          // If the activity doesn't have GPS data but contains a distance value,
          // we set the distance manually
-         if (!_currentActivity.hasGpsData &&
-               _currentActivity.distance > 0) {
+         if (!_currentActivity.hasGpsData && _currentActivity.distance > 0) {
             tourData.setTourDistance(_currentActivity.distance);
          }
 
@@ -524,6 +524,21 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
+      }
+
+      if (tourData.latitudeSerie != null && tourData.longitudeSerie != null) {
+
+         final int timeZoneIndex = TimeTools.getTimeZoneIndex(tourData.latitudeSerie[0], tourData.longitudeSerie[0]);
+         final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
+         //For FitLogEx formats, the <TimeZoneUtcOffset> value can be wrong. In this case,
+         //we update the tour start time with the one obtained from the Lat/Lon values.
+         if (_currentActivity.hasTimeZoneUtcOffset && _currentActivity.timeZoneUtcOffset != 0 && zoneIdFromLatLon != _currentActivity.tourStartTime
+               .getZone()) {
+
+            final ZonedDateTime tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
+            tourData.setTourStartTime(tourStartTime);
+            _currentActivity.tourStartTimeMills = tourStartTime.toInstant().toEpochMilli();
+         }
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
@@ -854,7 +869,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       _prevLongitude = Double.MIN_VALUE;
 
       final String startTime = attributes.getValue(ATTRIB_START_TIME);
-      if (!StringUtils.isNullOrEmpty(startTime)) {
+      if (StringUtils.hasContent(startTime)) {
 
          final ZonedDateTime tourDateTime = ZonedDateTime.parse(startTime);
 
@@ -989,7 +1004,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       _characters.delete(0, _characters.length());
    }
 
-   private void parseActivity_02_End(final String name) {
+   private void parseActivity_02_End() {
 
       if (_isInName) {
 
@@ -1098,6 +1113,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             final ZonedDateTime lapStartTime = ZonedDateTime.parse(startTime);
             pause.startTime = lapStartTime.toInstant().toEpochMilli();
+            //TODO FB with zonesameinstant
             final ZonedDateTime lapEndTime = ZonedDateTime.parse(endTime);
             pause.endTime = lapEndTime.toInstant().toEpochMilli();
             pause.duration = Duration.between(lapStartTime, lapEndTime).toMillis();
