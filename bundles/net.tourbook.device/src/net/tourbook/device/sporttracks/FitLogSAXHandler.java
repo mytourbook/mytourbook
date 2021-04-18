@@ -530,8 +530,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final int timeZoneIndex = TimeTools.getTimeZoneIndex(tourData.latitudeSerie[0], tourData.longitudeSerie[0]);
          final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
-         //For FitLogEx formats, the <TimeZoneUtcOffset> value can be wrong. In this case,
-         //we update the tour start time with the one obtained from the Lat/Lon values.
+         //For FitLogEx formats, the <TimeZoneUtcOffset> value can be wrong as it seems to be the Utc Offset
+         //of the machine from which the file was exported from.
+         // In this case, we update the tour start time zone with the one obtained from the Lat/Lon values.
          if (_currentActivity.hasTimeZoneUtcOffset && _currentActivity.timeZoneUtcOffset != 0 && zoneIdFromLatLon != _currentActivity.tourStartTime
                .getZone()) {
 
