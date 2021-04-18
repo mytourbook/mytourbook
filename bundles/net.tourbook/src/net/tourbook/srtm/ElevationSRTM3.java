@@ -22,45 +22,59 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import net.tourbook.common.UI;
+
 public final class ElevationSRTM3 extends ElevationBase {
 
-   private static final String                               ELEVATION_ID = "SRTM3";         //$NON-NLS-1$
+   private static final String ELEVATION_ID         = "SRTM3"; //$NON-NLS-1$
+   private static final String SRTM3_FILE_EXTENSION = ".hgt";  //$NON-NLS-1$
 
-   private static final HashMap<Integer, SRTM3ElevationFile> fileMap      = new HashMap<>(); // default initial 16 Files
-   private static SRTM3ElevationFile                         srtm3I;
+   // default initial 16 Files
+   private static final HashMap<Integer, SRTM3ElevationFile> _srtmElevationFilesCache = new HashMap<>();
+
+   private static SRTM3ElevationFile                         _srtm3ElevationFile;
 
    private class SRTM3ElevationFile {
 
-      ElevationFile elevationFile;
+      ElevationFile __elevationFile;
 
       private SRTM3ElevationFile(final GeoLat lat, final GeoLon lon) {
 
-//         System.out.println(lat + " - " + lon); //$NON-NLS-1$
-//         // TODO remove SYSTEM.OUT.PRINTLN
+         final String srtm3DataPath = getElevationData_FilePath("srtm3"); //$NON-NLS-1$
 
-         final String srtm3DataPath = getElevationDataPath("srtm3"); //$NON-NLS-1$
-         final String srtm3Suffix = ".hgt"; //$NON-NLS-1$
+         final String degreeNorthSouth = NumberForm.n2(lat.direction == GeoLat.DIRECTION_NORTH
+               ? lat.degrees
+               : lat.degrees + 1);
 
-         final String fileName = new String(srtm3DataPath
+         final String degreeEastWest = NumberForm.n3(lon.direction == GeoLon.DIRECTION_EAST
+               ? lon.degrees
+               : lon.degrees + 1);
+
+         final String fileName = new String(UI.EMPTY_STRING
+
+               + srtm3DataPath
                + File.separator
-               + lat.direction
-               + NumberForm.n2((lat.direction == GeoLat.DIRECTION_NORTH) ? lat.degrees : lat.degrees + 1)
-               + lon.direction
-               + NumberForm.n3((lon.direction == GeoLon.DIRECTION_EAST) ? lon.degrees : lon.degrees + 1)
-               + srtm3Suffix);
+               + lat.direction + degreeNorthSouth // e.g. N20
+               + lon.direction + degreeEastWest //   e.g. W018
+               + SRTM3_FILE_EXTENSION
+
+         );
 
          try {
-            elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_SRTM3);
+            __elevationFile = new ElevationFile(fileName, ElevationType.SRTM3);
          } catch (final Exception e) {
             e.printStackTrace();
          }
       }
 
       private float getElevation(final GeoLat lat, final GeoLon lon) {
-         return elevationFile.get(srtmFileOffset(lat, lon));
+
+         final int srtmFileOffset = srtmFileOffset(lat, lon);
+
+         return __elevationFile.get(srtmFileOffset);
       }
 
-      //    Offset in the SRTM3-File
+      // Offset in the SRTM3-File
       private int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
 
          if (lat.direction == GeoLat.DIRECTION_SOUTH) {
@@ -68,23 +82,19 @@ public final class ElevationSRTM3 extends ElevationBase {
 
                // SOUTH - EAST
 
-               return 1201//
+               return 1201
                      * (lat.minutes * 20 + lat.seconds / 3)
-                     + lon.minutes
-                           * 20
-                     + lon.seconds
-                           / 3;
+                     + lon.minutes * 20
+                     + lon.seconds / 3;
             } else {
 
                // SOUTH - WEST
 
-               return 1201//
+               return 1201
                      * (lat.minutes * 20 + lat.seconds / 3)
                      + 1200
-                     - lon.minutes
-                           * 20
-                     - lon.seconds
-                           / 3;
+                     - lon.minutes * 20
+                     - lon.seconds / 3;
             }
          } else {
 
@@ -92,12 +102,10 @@ public final class ElevationSRTM3 extends ElevationBase {
 
                // NORTH -EAST
 
-               return 1201//
+               return 1201
                      * (1200 - lat.minutes * 20 - lat.seconds / 3)
-                     + lon.minutes
-                           * 20
-                     + lon.seconds
-                           / 3;
+                     + lon.minutes * 20
+                     + lon.seconds / 3;
             } else {
 
                // NORTH - WEST
@@ -105,54 +113,15 @@ public final class ElevationSRTM3 extends ElevationBase {
                return 1201
                      * (1200 - lat.minutes * 20 - lat.seconds / 3)
                      + 1200
-                     - lon.minutes
-                           * 20
-                     - lon.seconds
-                           / 3;
+                     - lon.minutes * 20
+                     - lon.seconds / 3;
             }
          }
       }
-//      public int srtmFileOffset(final GeoLat lat, final GeoLon lon) {
-//
-//         if (lat.isSouth()) {
-//            if (lon.isEast()) {
-//               return 1201
-//               * (lat.getMinutes() * 20 + lat.getSeconds() / 3)
-//               + lon.getMinutes()
-//               * 20
-//               + lon.getSeconds()
-//               / 3;
-//            } else {
-//               return 1201
-//               * (lat.getMinutes() * 20 + lat.getSeconds() / 3)
-//               + 1200
-//               - lon.getMinutes()
-//               * 20
-//               - lon.getSeconds()
-//               / 3;
-//            }
-//         } else {
-//            if (lon.isEast()) {
-//               return 1201
-//               * (1200 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
-//               + lon.getMinutes()
-//               * 20
-//               + lon.getSeconds()
-//               / 3;
-//            } else {
-//               return 1201
-//               * (1200 - lat.getMinutes() * 20 - lat.getSeconds() / 3)
-//               + 1200
-//               - lon.getMinutes()
-//               * 20
-//               - lon.getSeconds()
-//               / 3;
-//            }
-//         }
-//      }
    }
 
    public ElevationSRTM3() {
+
       gridLat.setDegreesMinutesSecondsDirection(0, 0, 3, 'N');
       gridLon.setDegreesMinutesSecondsDirection(0, 0, 3, 'E');
    }
@@ -163,11 +132,11 @@ public final class ElevationSRTM3 extends ElevationBase {
    public static synchronized void clearElevationFileCache() {
 
       // close all files
-      for (final Entry<Integer, SRTM3ElevationFile> entry : fileMap.entrySet()) {
-         entry.getValue().elevationFile.close();
+      for (final Entry<Integer, SRTM3ElevationFile> entry : _srtmElevationFilesCache.entrySet()) {
+         entry.getValue().__elevationFile.close();
       }
 
-      fileMap.clear();
+      _srtmElevationFilesCache.clear();
    }
 
    @Override
@@ -197,15 +166,16 @@ public final class ElevationSRTM3 extends ElevationBase {
       }
 
       final Integer ii = Integer.valueOf(i);
-      srtm3I = fileMap.get(ii);
+      _srtm3ElevationFile = _srtmElevationFilesCache.get(ii);
 
-      if (srtm3I == null) {
+      if (_srtm3ElevationFile == null) {
+
          // first time only
-         srtm3I = new SRTM3ElevationFile(lat, lon);
-         fileMap.put(ii, srtm3I);
+         _srtm3ElevationFile = new SRTM3ElevationFile(lat, lon);
+         _srtmElevationFilesCache.put(ii, _srtm3ElevationFile);
       }
 
-      return srtm3I.getElevation(lat, lon);
+      return _srtm3ElevationFile.getElevation(lat, lon);
 
    }
 

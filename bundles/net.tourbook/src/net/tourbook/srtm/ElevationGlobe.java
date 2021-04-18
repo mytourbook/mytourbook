@@ -52,13 +52,13 @@ public final class ElevationGlobe extends ElevationBase {
 
 		private GlobeI(final int i) {
 
-			final String globeDataPath = getElevationDataPath("globe"); //$NON-NLS-1$
+			final String globeDataPath = getElevationData_FilePath("globe"); //$NON-NLS-1$
 			final String globeSuffix = "10g"; //$NON-NLS-1$
 			final char c = (char) ('a' + i);
 			final String fileName = new String(globeDataPath + File.separator + c + globeSuffix);
 
 			try {
-				elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_GLOBE);
+				elevationFile = new ElevationFile(fileName, ElevationType.GLOBE);
 			} catch (final Exception e) {
 				System.out.println("GlobeI: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
 				// dont return exception

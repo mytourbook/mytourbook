@@ -32,7 +32,7 @@ public class ElevationSRTM1 extends ElevationBase {
 
       private SRTM1I_ElevationFile(final GeoLat lat, final GeoLon lon) {
 
-         final String srtm1DataPath = getElevationDataPath("srtm1"); //$NON-NLS-1$
+         final String srtm1DataPath = getElevationData_FilePath("srtm1"); //$NON-NLS-1$
          final String srtm1Suffix = ".hgt"; //$NON-NLS-1$
 
          final String fileName = new String(srtm1DataPath
@@ -44,7 +44,7 @@ public class ElevationSRTM1 extends ElevationBase {
                + srtm1Suffix);
 
          try {
-            elevationFile = new ElevationFile(fileName, Constants.ELEVATION_TYPE_SRTM1);
+            elevationFile = new ElevationFile(fileName, ElevationType.SRTM1);
          } catch (final Exception e) {
             System.out.println("SRTM1I: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
             // dont return exception

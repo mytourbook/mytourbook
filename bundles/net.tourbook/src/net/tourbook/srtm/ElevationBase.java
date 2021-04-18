@@ -22,14 +22,20 @@ import java.io.File;
 
 import net.tourbook.application.TourbookPlugin;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 public abstract class ElevationBase {
 
-   public final GeoLat gridLat;
-   public final GeoLon gridLon;
-   public final GeoLat firstLat;
-   public final GeoLat lastLat;
-   public final GeoLon firstLon;
-   public final GeoLon lastLon;
+   private static final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
+
+   public final GeoLat                   gridLat;
+   public final GeoLon                   gridLon;
+
+   public final GeoLat                   firstLat;
+   public final GeoLat                   lastLat;
+
+   public final GeoLon                   firstLon;
+   public final GeoLon                   lastLon;
 
    public ElevationBase() {
 
@@ -41,15 +47,17 @@ public abstract class ElevationBase {
       lastLon = new GeoLon();
    }
 
-   public synchronized static String getElevationDataPath(final String layerSubdir) {
+   /**
+    * @param layerSubdir
+    * @return Filepath where elevation files are stored.
+    */
+   public synchronized static String getElevationData_FilePath(final String layerSubdir) {
 
       // Create directory for local placement of the elevation files and return its path
 
       String elevationDataPath;
 
-      final String prefDataPath = TourbookPlugin.getDefault()
-            .getPreferenceStore()
-            .getString(IPreferences.SRTM_DATA_FILEPATH); // TODO rename
+      final String prefDataPath = prefStore.getString(IPreferences.SRTM_DATA_FILEPATH);
 
       if (prefDataPath.length() == 0 || new File(prefDataPath).exists() == false) {
          elevationDataPath = (String) System.getProperties().get("user.home"); //$NON-NLS-1$
@@ -62,6 +70,7 @@ public abstract class ElevationBase {
          elevationDataPath = elevationDataPath + File.separator;
       }
       elevationDataPath = elevationDataPath + layerSubdir;
+
       final File elevationDataDir = new File(elevationDataPath);
       if (elevationDataDir.exists() == false) {
          if (elevationDataDir.mkdirs() == false) {

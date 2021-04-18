@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,24 +31,25 @@ import net.tourbook.srtm.download.DownloadSRTM3;
 
 public class ElevationFile {
 
-   private FileChannel fileChannel;
-   private ShortBuffer shortBuffer;
+   private FileChannel _fileChannel;
+   private ShortBuffer _shortBuffer;
 
-   private boolean     _exists           = false;
+   private boolean     _isFileAvailable  = false;
    private boolean     _isLocalFileError = false;
 
    public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
+
       switch (elevationTyp) {
-      case Constants.ELEVATION_TYPE_ETOPO:
+      case ElevationType.ETOPO:
          initETOPO(fileName);
          break;
-      case Constants.ELEVATION_TYPE_GLOBE:
+      case ElevationType.GLOBE:
          initGLOBE(fileName);
          break;
-      case Constants.ELEVATION_TYPE_SRTM3:
+      case ElevationType.SRTM3:
          initSRTM3(fileName);
          break;
-      case Constants.ELEVATION_TYPE_SRTM1:
+      case ElevationType.SRTM1:
          initSRTM1(fileName);
          break;
       }
@@ -57,8 +58,8 @@ public class ElevationFile {
    public void close() {
 
       try {
-         if (fileChannel != null) {
-            fileChannel.close();
+         if (_fileChannel != null) {
+            _fileChannel.close();
          }
       } catch (final IOException e) {
          e.printStackTrace();
@@ -66,10 +67,11 @@ public class ElevationFile {
    }
 
    public short get(final int index) {
-      if (!_exists) {
+
+      if (!_isFileAvailable) {
          return (-32767);
       }
-      return shortBuffer.get(index);
+      return _shortBuffer.get(index);
    }
 
    private void handleError(final String fileName, final Exception e) {
@@ -82,7 +84,7 @@ public class ElevationFile {
          e.printStackTrace();
       }
 
-      _exists = false;
+      _isFileAvailable = false;
       // dont return exception
    }
 
@@ -193,13 +195,17 @@ public class ElevationFile {
    private void open(final String fileName) throws Exception {
 
       try {
-         fileChannel = new FileInputStream(new File(fileName)).getChannel();
-         shortBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size()).asShortBuffer();
+
+         _fileChannel = new FileInputStream(new File(fileName)).getChannel();
+         _shortBuffer = _fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, _fileChannel.size()).asShortBuffer();
+
       } catch (final Exception e) {
          System.out.println(e.getMessage());
          throw (e);
       }
+
       System.out.println("open " + fileName); //$NON-NLS-1$
-      _exists = true;
+
+      _isFileAvailable = true;
    }
 }
