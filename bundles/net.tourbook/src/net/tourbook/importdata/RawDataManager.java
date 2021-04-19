@@ -812,10 +812,10 @@ public class RawDataManager {
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
             final File[] reimportedFile = new File[1];
-            int imported = 0;
-            final int importSize = selectedTourIds.length;
+            int deleted = 0;
+            final int numberOfTours = selectedTourIds.length;
 
-            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, importSize);
+            monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
 
             // loop: all selected tours in the viewer
             for (final Long tourId : selectedTourIds) {
@@ -828,7 +828,7 @@ public class RawDataManager {
                monitor.worked(1);
                monitor.subTask(NLS.bind(
                      Messages.Import_Data_Dialog_Reimport_SubTask,
-                     new Object[] { ++imported, importSize }));
+                     new Object[] { ++deleted, numberOfTours }));
 
                final TourData oldTourData = TourManager.getTour(tourId);
 
