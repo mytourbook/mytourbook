@@ -24,6 +24,6 @@ public final class DownloadGLOBE extends DownloadResource {
 
    public static void get(final String remoteFileName, final String localFilePathName) throws Exception {
 
-      HTTPDownloader.get(URL_BASE_PATH, remoteFileName, localFilePathName);
+      new HTTPDownloader().get(URL_BASE_PATH, remoteFileName, localFilePathName);
    }
 }

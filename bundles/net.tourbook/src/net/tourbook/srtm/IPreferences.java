@@ -45,5 +45,4 @@ public interface IPreferences {
    // Access to SRTM server
    static final String NASA_EARTHDATA_LOGIN_USER_NAME = "NASA_EARTHDATA_LOGIN_USER_NAME"; //$NON-NLS-1$
    static final String NASA_EARTHDATA_LOGIN_PASSWORD  = "NASA_EARTHDATA_LOGIN_PASSWORD";  //$NON-NLS-1$
-
 }

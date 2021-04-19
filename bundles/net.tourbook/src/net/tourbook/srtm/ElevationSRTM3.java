@@ -129,7 +129,7 @@ public final class ElevationSRTM3 extends ElevationBase {
    /**
     * Clears the file cache by closing and removing all evaluation files
     */
-   public static synchronized void clearElevationFileCache() {
+   private static synchronized void clearElevationFileCache() {
 
       // close all files
       for (final Entry<Integer, SRTM3ElevationFile> entry : _srtmElevationFilesCache.entrySet()) {

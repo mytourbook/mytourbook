@@ -174,7 +174,7 @@ public class ElevationFile {
             }
 
             final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
-            DownloadSRTM3.get(remoteFileName, localZipName);
+            new DownloadSRTM3().get(remoteFileName, localZipName);
             FileZip.unzip(localZipName);
 
             // delete zip archive file, this is not needed any more
