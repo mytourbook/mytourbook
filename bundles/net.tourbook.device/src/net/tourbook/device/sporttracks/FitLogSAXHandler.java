@@ -555,25 +555,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End);
       }
 
-      if (tourData.latitudeSerie != null && tourData.longitudeSerie != null) {
-
-         final int timeZoneIndex = TimeTools.getTimeZoneIndex(tourData.latitudeSerie[0], tourData.longitudeSerie[0]);
-         final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
-         //For FitLogEx formats, the <TimeZoneUtcOffset> value can be wrong as it seems to be the Utc Offset
-         //of the machine from which the file was exported from.
-         // In this case, we update the tour start time zone with the one obtained from the Lat/Lon values.
-
-         //TODO FB THat might not be necessary if we dont use that timezoneutcoffset in the first place.
-         //maybe inspire myself from other tour imports that dont have that timezoneutcoffset ?
-//         if (_currentActivity.hasTimeZoneUtcOffset && _currentActivity.timeZoneUtcOffset != 0 && zoneIdFromLatLon != _currentActivity.tourStartTime
-//               .getZone()) {
-//
-//            final ZonedDateTime tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
-//            tourData.setTourStartTime(tourStartTime);
-//            _currentActivity.tourStartTimeMills = tourStartTime.toInstant().toEpochMilli();
-//         }
-      }
-
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
       // when the time series were created) or if the activity has no time zone UTC offset or no start time.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
@@ -1072,10 +1053,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
-         //TODO FB Not sure: That UTC offset is the one from the machine that exported the tour so it
-         //created more mess than anything it seems
-         //see here : https://github.com/wolfgang-ch/mytourbook/commit/212237a75e4cdd6cef3475eed3b3d0c1c903f0c1#diff-f73bc5505ecef204b5dc43eecc01e6f26c7741dfb5cd65936955fb1b11c4ab62
-         //related to that https://sourceforge.net/p/mytourbook/discussion/622811/thread/e9cfb35008/#2e76/3dcb/1fd0
          final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
                .atOffset(ZoneOffset.ofHours(
                      _currentActivity.timeZoneUtcOffset))
@@ -1193,7 +1170,6 @@ public class FitLogSAXHandler extends DefaultHandler {
             //we update the tour start time with the correct time zone
             if (!_currentActivity.hasGpsData) {
 
-               //todo fb what if its not the first point, do we need to update the time for the previous ones ?
                final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude, longitude);
                final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
                _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
