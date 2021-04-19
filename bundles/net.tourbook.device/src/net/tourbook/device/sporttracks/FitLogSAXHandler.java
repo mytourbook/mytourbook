@@ -406,8 +406,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
-
+      final ZonedDateTime tourStartTime_FromImport = TimeTools.getZonedDateTime(_currentActivity.timeSlices.get(0).absoluteTime);
       tourData.setTourStartTime(tourStartTime_FromImport);
 
       tourData.setTourTitle(_currentActivity.name);
@@ -1140,11 +1139,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final TimeData timeSlice = new TimeData();
 
-         // relative time in seconds
-         final long tmValue = Util.parseLong(attributes, ATTRIB_PT_TM);
-         if (tmValue != Long.MIN_VALUE) {
-            timeSlice.absoluteTime = _currentActivity.tourStartTimeMills + (tmValue * 1000);
-         }
+
 
          final double tpDistance = Util.parseDouble(attributes, ATTRIB_PT_DIST);
          final double latitude = Util.parseDouble(attributes, ATTRIB_PT_LAT);
@@ -1166,6 +1161,21 @@ public class FitLogSAXHandler extends DefaultHandler {
             _prevLatitude = latitude;
             _prevLongitude = longitude;
             _currentActivity.hasGpsData = true;
+
+            //if first time we see lat/lon data
+            final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude,
+                  longitude);
+            final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
+            _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
+            _currentActivity.tourStartTimeMills = _currentActivity.tourStartTime.toInstant().toEpochMilli();
+//          tourData.setTourStartTime(tourStartTime);
+         }
+
+         // relative time in seconds
+         final long tmValue = Util.parseLong(attributes, ATTRIB_PT_TM);
+         if (tmValue != Long.MIN_VALUE) {
+
+            timeSlice.absoluteTime = _currentActivity.tourStartTimeMills + (tmValue * 1000);
          }
 
          timeSlice.absoluteDistance = (float) _distanceAbsolute;
