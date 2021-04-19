@@ -132,6 +132,12 @@ public class DialogReimportTours extends TitleAreaDialog {
       _tourViewer = tourViewer;
    }
 
+   private void addTourValueTypeFromCheckbox(final Button checkButton, final TourValueType tourValueType, final List<TourValueType> tourValueTypes) {
+      if (checkButton.getSelection()) {
+         tourValueTypes.add(tourValueType);
+      }
+   }
+
    @Override
    public boolean close() {
 
@@ -687,6 +693,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+//    return null;
    }
 
    private void initUI() {
@@ -747,44 +754,20 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             } else {
 
-               if (_chkData_Cadence.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_CADENCE);
-               }
-               if (_chkData_Elevation.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_ELEVATION);
-               }
-               if (_chkData_Gear.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_GEAR);
-               }
-               if (_chkData_PowerAndPulse.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_POWER_AND_PULSE);
-               }
-               if (_chkData_PowerAndSpeed.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_POWER_AND_SPEED);
-               }
-               if (_chkData_RunningDynamics.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_RUNNING_DYNAMICS);
-               }
-               if (_chkData_Swimming.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_SWIMMING);
-               }
-               if (_chkData_Temperature.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_TEMPERATURE);
-               }
-               if (_chkData_TourTimerPauses.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_TIMER_PAUSES);
-               }
-               if (_chkData_Training.getSelection()) {
-                  tourValueTypes.add(TourValueType.TIME_SLICES_TRAINING);
-               }
+               addTourValueTypeFromCheckbox(_chkData_Cadence, TourValueType.TIME_SLICES_CADENCE, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_Elevation, TourValueType.TIME_SLICES_ELEVATION, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_Gear, TourValueType.TIME_SLICES_GEAR, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_PowerAndPulse, TourValueType.TIME_SLICES_POWER_AND_PULSE, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_PowerAndSpeed, TourValueType.TIME_SLICES_POWER_AND_SPEED, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_RunningDynamics, TourValueType.TIME_SLICES_RUNNING_DYNAMICS, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_Swimming, TourValueType.TIME_SLICES_SWIMMING, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_Temperature, TourValueType.TIME_SLICES_TEMPERATURE, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_TourTimerPauses, TourValueType.TIME_SLICES_TIMER_PAUSES, tourValueTypes);
+               addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES_TRAINING, tourValueTypes);
             }
 
-            if (_chkData_TourMarkers.getSelection()) {
-               tourValueTypes.add(TourValueType.TOUR_MARKER);
-            }
-            if (_chkData_ImportFileLocation.getSelection()) {
-               tourValueTypes.add(TourValueType.IMPORT_FILE_LOCATION);
-            }
+            addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR_MARKER, tourValueTypes);
+            addTourValueTypeFromCheckbox(_chkData_ImportFileLocation, TourValueType.IMPORT_FILE_LOCATION, tourValueTypes);
          }
 
          doReimport(tourValueTypes);

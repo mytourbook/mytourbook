@@ -117,6 +117,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    }
 
    private void addTourValueTypeFromCheckbox(final Button checkButton, final TourValueType tourValueType, final List<TourValueType> tourValueTypes) {
+
       if (checkButton.getSelection()) {
          tourValueTypes.add(tourValueType);
       }
