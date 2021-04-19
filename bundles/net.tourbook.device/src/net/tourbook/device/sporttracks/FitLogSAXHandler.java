@@ -1155,17 +1155,20 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          if (latitude != Double.MIN_VALUE && longitude != Double.MIN_VALUE) {
+
+            //if it's the first time that we see lat/lon data,
+            //we update the tour start time with the correct time zone
+            if (!_currentActivity.hasGpsData) {
+
+               final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude, longitude);
+               final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
+               _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
+               _currentActivity.tourStartTimeMills = _currentActivity.tourStartTime.toInstant().toEpochMilli();
+            }
+
             _prevLatitude = latitude;
             _prevLongitude = longitude;
             _currentActivity.hasGpsData = true;
-
-            //if first time we see lat/lon data
-            final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude,
-                  longitude);
-            final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
-            _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
-            _currentActivity.tourStartTimeMills = _currentActivity.tourStartTime.toInstant().toEpochMilli();
-//          tourData.setTourStartTime(tourStartTime);
          }
 
          // relative time in seconds
