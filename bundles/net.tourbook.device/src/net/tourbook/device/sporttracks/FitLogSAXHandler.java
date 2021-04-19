@@ -212,7 +212,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private LinkedHashMap<String, String> customDataFields   = new LinkedHashMap<>();
    }
 
-   static public class Equipment {
+   public static class Equipment {
 
       String Id;
       String Name;
@@ -1139,16 +1139,13 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final TimeData timeSlice = new TimeData();
 
-
-
          final double tpDistance = Util.parseDouble(attributes, ATTRIB_PT_DIST);
          final double latitude = Util.parseDouble(attributes, ATTRIB_PT_LAT);
          final double longitude = Util.parseDouble(attributes, ATTRIB_PT_LON);
 
          if (tpDistance != Double.MIN_VALUE) {
             _distanceAbsolute = tpDistance;
-         } else if (tpDistance == Double.MIN_VALUE
-               && latitude != Double.MIN_VALUE
+         } else if (latitude != Double.MIN_VALUE
                && longitude != Double.MIN_VALUE
                && _prevLatitude != Double.MIN_VALUE
                && _prevLongitude != Double.MIN_VALUE) {
