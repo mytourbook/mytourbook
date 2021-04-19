@@ -234,28 +234,28 @@ public class FitLogSAXHandler extends DefaultHandler {
       public String generateNotes() {
          final StringBuilder notes = new StringBuilder(ATTRIB_EQUIPMENT_ID + "(SportTracks): " + Id); //$NON-NLS-1$
 
-         if (!StringUtils.isNullOrEmpty(DatePurchased)) {
+         if (StringUtils.hasContent(DatePurchased)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(ExpectedLifeKilometers)) {
+         if (StringUtils.hasContent(ExpectedLifeKilometers)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + ": " + ExpectedLifeKilometers); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(InUse)) {
+         if (StringUtils.hasContent(InUse)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_IN_USE + ": " + InUse); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(PurchaseLocation)) {
+         if (StringUtils.hasContent(PurchaseLocation)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_LOCATION + ": " + PurchaseLocation); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(PurchasePrice)) {
+         if (StringUtils.hasContent(PurchasePrice)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_PURCHASE_PRICE + ": " + PurchasePrice); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(Type)) {
+         if (StringUtils.hasContent(Type)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_TYPE + ": " + Type); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(WeightKilograms) && !WeightKilograms.equals("0.000")) { //$NON-NLS-1$
+         if (StringUtils.hasContent(WeightKilograms) && !WeightKilograms.equals("0.000")) { //$NON-NLS-1$
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_WEIGHT_KILOGRAMS + ": " + WeightKilograms); //$NON-NLS-1$
          }
-         if (!StringUtils.isNullOrEmpty(Notes)) {
+         if (StringUtils.hasContent(Notes)) {
             notes.append(UI.NEW_LINE + FitLogExSAXHandler.TAG_EQUIPMENT_NOTES + ": " + Notes); //$NON-NLS-1$
          }
 
@@ -264,15 +264,15 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       public String getName() {
 
-         if (!StringUtils.isNullOrEmpty(Name)) {
+         if (StringUtils.hasContent(Name)) {
             return Name;
          }
 
          final StringBuilder name = new StringBuilder();
-         if (!StringUtils.isNullOrEmpty(Brand)) {
+         if (StringUtils.hasContent(Brand)) {
             name.append(Brand);
          }
-         if (!StringUtils.isNullOrEmpty(Model)) {
+         if (StringUtils.hasContent(Model)) {
             if (name.length() > 0) {
                name.append(UI.DASH_WITH_SPACE + Model);
             } else {
@@ -1085,8 +1085,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          final String customFieldName = attributes.getValue(FitLogExSAXHandler.ATTRIB_CUSTOM_DATA_FIELD_NAME);
          final String customFieldValue = attributes.getValue(FitLogExSAXHandler.ATTRIB_CUSTOM_DATA_FIELD_VALUE);
 
-         final boolean isCustomDataFieldValid = !StringUtils.isNullOrEmpty(customFieldName) &&
-               !StringUtils.isNullOrEmpty(customFieldValue);
+         final boolean isCustomDataFieldValid = StringUtils.hasContent(customFieldName) &&
+               StringUtils.hasContent(customFieldValue);
 
          if (isCustomDataFieldValid) {
             formatCustomDataFieldValue(_currentActivity, customFieldName, customFieldValue);
@@ -1101,7 +1101,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          final String startTime = attributes.getValue(ATTRIB_START_TIME);
          final String durationSeconds = attributes.getValue(ATTRIB_DURATION_SECONDS);
 
-         if (!StringUtils.isNullOrEmpty(startTime)) {
+         if (StringUtils.hasContent(startTime)) {
 
             final Lap lap = new Lap();
 
@@ -1124,7 +1124,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          final String startTime = attributes.getValue(ATTRIB_START_TIME);
          final String endTime = attributes.getValue(ATTRIB_END_TIME);
 
-         if (!StringUtils.isNullOrEmpty(startTime)) {
+         if (StringUtils.hasContent(startTime)) {
 
             final Pause pause = new Pause();
 

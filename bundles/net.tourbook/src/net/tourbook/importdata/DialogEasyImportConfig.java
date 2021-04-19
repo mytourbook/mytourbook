@@ -3279,7 +3279,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
       final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
       final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !StringUtils.isNullOrEmpty(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+            StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
 
       boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
@@ -4111,7 +4111,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
             selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell(),
                   filterOSPath.replace(fileSystem.getId(), UI.EMPTY_STRING));
-            if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+            if (StringUtils.hasContent(selectedFolder)) {
                _comboIC_DeviceFolder.setText(selectedFolder);
             }
          } catch (final Exception e) {

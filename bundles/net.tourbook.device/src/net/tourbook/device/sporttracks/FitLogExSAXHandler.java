@@ -207,7 +207,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
             /*
              * We parse and save the field format in order to be able to format the double values
              */
-            if (!StringUtils.isNullOrEmpty(customFieldOptions)) {
+            if (StringUtils.hasContent(customFieldOptions)) {
 
                final String[] tokens = customFieldOptions.split("\\|"); //$NON-NLS-1$
                if (tokens.length < 2) {
