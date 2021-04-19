@@ -16,6 +16,7 @@
 package net.tourbook.device.sporttracks;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -336,6 +337,25 @@ public class FitLogSAXHandler extends DefaultHandler {
       _allTourTypes = TourDatabase.getAllTourTypes();
    }
 
+   private long adjustTime(final long epochTime) {
+
+      long convertedEpochTime;
+      final ZonedDateTime zonedDateTime = TimeTools.getZonedDateTime(epochTime);
+      if (_currentActivity.hasTimeZoneUtcOffset) {
+
+         final ZonedDateTime zonedDateTimeWithUTCOffset = Instant.ofEpochMilli(epochTime)
+               .atOffset(ZoneOffset.ofHours(
+                     _currentActivity.timeZoneUtcOffset))
+               .toZonedDateTime();
+         convertedEpochTime = zonedDateTimeWithUTCOffset.toInstant().toEpochMilli();
+      } else {
+
+         convertedEpochTime = zonedDateTime.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
+      }
+
+      return convertedEpochTime;
+   }
+
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
@@ -519,6 +539,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          final ArrayList<Long> _pausedTime_End = new ArrayList<>();
 
          for (final Pause element : _currentActivity.pauses) {
+
+            element.startTime = adjustTime(element.startTime);
+            element.endTime = adjustTime(element.endTime);
+
             _pausedTime_Start.add(element.startTime);
             _pausedTime_End.add(element.endTime);
          }
@@ -767,6 +791,10 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       for (final Lap lap : _laps) {
 
+         //We update the lap starttime and endtime as the tour start's time zone may have changed
+         lap.startTime = adjustTime(lap.startTime);
+         lap.endTime = adjustTime(lap.endTime);
+
          long startTimeDiff = lap.endTime - tourStartTime;// - tour2sliceTimeDiff;
 
          // If present, we add the total pause time
@@ -774,8 +802,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             //We need to make sure to only add the pauses that are
             //within the current lap time interval.
-            if (pause.startTime < lap.endTime &&
-                  pause.endTime > lap.startTime) {
+            if (pause.startTime < lap.endTime && pause.endTime > lap.startTime) {
                startTimeDiff += pause.duration;
             }
          }
