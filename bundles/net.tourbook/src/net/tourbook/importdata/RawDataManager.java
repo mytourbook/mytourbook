@@ -1715,6 +1715,8 @@ public class RawDataManager {
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
                tourData.pulseSerie = null;
+               tourData.pulseTime_Milliseconds = null;
+               tourData.pulseTime_TimeIndex = null;
                tourData.setAvgPulse(0);
                tourData.setCalories(0);
                break;
