@@ -1083,7 +1083,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          if (isCustomDataFieldValid) {
             formatCustomDataFieldValue(_currentActivity, customFieldName, customFieldValue);
          }
-
       }
    }
 
@@ -1100,8 +1099,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             final long lapDurationSeconds = (long) Float.parseFloat(durationSeconds);
 
-            final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds(lapDurationSeconds);
-            lap.startTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
+            final ZonedDateTime startZonedDateTime = ZonedDateTime.parse(startTime);
+            final ZonedDateTime lapEndTime = startZonedDateTime.plusSeconds(lapDurationSeconds);
+            lap.startTime = startZonedDateTime.toInstant().toEpochMilli();
             lap.endTime = lapEndTime.toInstant().toEpochMilli();
 
             _currentActivity.laps.add(lap);
@@ -1162,6 +1162,7 @@ public class FitLogSAXHandler extends DefaultHandler {
             //we update the tour start time with the correct time zone
             if (!_currentActivity.hasGpsData) {
 
+               //todo fb what if its not the first point, do we need to update the time for the previous ones ?
                final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude, longitude);
                final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
                _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
