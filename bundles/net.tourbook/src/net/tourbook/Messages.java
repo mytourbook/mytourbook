@@ -1127,7 +1127,7 @@ public class Messages extends NLS {
    public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
    public static String        Log_Delete_Text;
-   public static String        Log_Deleted_End;
+   public static String        Log_Delete_TourValues_End;
 
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;

@@ -109,7 +109,7 @@ public class RawDataManager {
 
    public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_Modify_Combined_Values, Messages.Log_Delete_Text);
 
-   public static final String    LOG_DELETED_END                             = Messages.Log_Deleted_End;
+   public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
    public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
 
    public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
@@ -1634,7 +1634,7 @@ public class RawDataManager {
          final double time = (System.currentTimeMillis() - start) / 1000.0;
          TourLogManager.addLog(//
                TourLogState.DEFAULT,
-               String.format(RawDataManager.LOG_DELETED_END, time));
+               String.format(RawDataManager.LOG_DELETE_TOURVALUES_END, time));
       }
    }
 
