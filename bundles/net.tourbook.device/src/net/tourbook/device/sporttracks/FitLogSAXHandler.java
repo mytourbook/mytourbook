@@ -337,6 +337,12 @@ public class FitLogSAXHandler extends DefaultHandler {
       _allTourTypes = TourDatabase.getAllTourTypes();
    }
 
+   /**
+    * Updates a given time based on the tour start's time zone
+    *
+    * @param epochTime
+    * @return The adjusted time
+    */
    private long adjustTime(final long epochTime) {
 
       long convertedEpochTime;
@@ -344,10 +350,9 @@ public class FitLogSAXHandler extends DefaultHandler {
       if (_currentActivity.hasTimeZoneUtcOffset) {
 
          final ZonedDateTime zonedDateTimeWithUTCOffset = Instant.ofEpochMilli(epochTime)
-               .atOffset(ZoneOffset.ofHours(
-                     _currentActivity.timeZoneUtcOffset))
+               .atOffset(ZoneOffset.ofHours(_currentActivity.timeZoneUtcOffset))
                .toZonedDateTime();
-         convertedEpochTime = zonedDateTimeWithUTCOffset.toInstant().toEpochMilli();
+         convertedEpochTime = zonedDateTimeWithUTCOffset.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
       } else {
 
          convertedEpochTime = zonedDateTime.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
@@ -791,7 +796,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       for (final Lap lap : _laps) {
 
-         //We update the lap starttime and endtime as the tour start's time zone may have changed
          lap.startTime = adjustTime(lap.startTime);
          lap.endTime = adjustTime(lap.endTime);
 
