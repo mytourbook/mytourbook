@@ -604,32 +604,6 @@ public class RawDataManager {
       runImport(osFiles, false, null);
    }
 
-   private boolean actionModifyTour_12_Confirm_Dialog(final String toggleState, final String dialogTitle, final String confirmMessage) {
-
-      if (_prefStore.getBoolean(toggleState)) {
-
-         return true;
-
-      } else {
-
-         final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
-               Display.getCurrent().getActiveShell(),
-               dialogTitle,
-               confirmMessage,
-               Messages.App_ToggleState_DoNotShowAgain,
-               false, // toggle default state
-               null,
-               null);
-
-         if (dialog.getReturnCode() == Window.OK) {
-            _prefStore.setValue(toggleState, dialog.getToggleState());
-            return true;
-         }
-      }
-
-      return false;
-   }
-
    /**
     * Asks the user if the modification (re-import or deletion) of all the chosen data is desired.
     *
@@ -733,7 +707,7 @@ public class RawDataManager {
             : Messages.Dialog_DeleteTourValues_Dialog_ConfirmDeleteValues_Message;
       confirmMessage = NLS.bind(confirmMessage, String.join(UI.NEW_LINE1, dataToModifyDetails));
 
-      if (actionModifyTour_12_Confirm_Dialog(
+      if (actionModifyTourValues_12_Confirm_Dialog(
             isReimport
                   ? ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES
                   : ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES,
@@ -752,6 +726,34 @@ public class RawDataManager {
                TourLogView.CSS_LOG_TITLE);
 
          return true;
+      }
+
+      return false;
+   }
+
+   private boolean actionModifyTourValues_12_Confirm_Dialog(final String toggleState,
+                                                            final String dialogTitle,
+                                                            final String confirmMessage) {
+
+      if (_prefStore.getBoolean(toggleState)) {
+
+         return true;
+
+      } else {
+
+         final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
+               Display.getCurrent().getActiveShell(),
+               dialogTitle,
+               confirmMessage,
+               Messages.App_ToggleState_DoNotShowAgain,
+               false, // toggle default state
+               null,
+               null);
+
+         if (dialog.getReturnCode() == Window.OK) {
+            _prefStore.setValue(toggleState, dialog.getToggleState());
+            return true;
+         }
       }
 
       return false;
@@ -2341,9 +2343,8 @@ public class RawDataManager {
 
       final HashSet<?> oldFileNames = (HashSet<?>) _importedFileNames.clone();
 
-      for (final Object item : removedTours) {
+      for (final TourData tourData : removedTours) {
 
-         final TourData tourData = (TourData) item;
          final Long key = tourData.getTourId();
 
          if (_toursInImportView.containsKey(key)) {
