@@ -107,14 +107,14 @@ public class RawDataManager {
    private static final String   LOG_IMPORT_TOUR_END                         = Messages.Log_Import_Tour_End;
    public static final String    LOG_IMPORT_TOURS_IMPORTED_FROM_FILE         = Messages.Log_Import_Tours_Imported_From_File;
 
-   public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_Modify_Combined_Values, Messages.Log_Delete_Text);
+   public static final String    LOG_DELETE_COMBINED_VALUES                  = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Delete_Text);
 
    public static final String    LOG_DELETE_TOURVALUES_END                   = Messages.Log_Delete_TourValues_End;
    public static final String    LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA       = Messages.Log_ModifiedTour_Old_Data_Vs_New_Data;
 
    public static final String    LOG_REIMPORT_PREVIOUS_FILES                 = Messages.Log_Reimport_PreviousFiles;
    public static final String    LOG_REIMPORT_END                            = Messages.Log_Reimport_PreviousFiles_End;
-   public static final String    LOG_REIMPORT_COMBINED_VALUES                = NLS.bind(Messages.Log_Modify_Combined_Values, Messages.Log_Reimport_Text);
+   public static final String    LOG_REIMPORT_COMBINED_VALUES                = NLS.bind(Messages.Log_ModifiedTour_Combined_Values, Messages.Log_Reimport_Text);
    private static final String   LOG_REIMPORT_MANUAL_TOUR                    = Messages.Log_Reimport_ManualTour;
    private static final String   LOG_REIMPORT_TOUR_SKIPPED                   = Messages.Log_Reimport_Tour_Skipped;
 
