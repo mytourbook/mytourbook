@@ -17,6 +17,7 @@ package net.tourbook.device.sporttracks;
 
 import java.time.Duration;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1044,11 +1045,12 @@ public class FitLogSAXHandler extends DefaultHandler {
          //created more mess than anything it seems
          //see here : https://github.com/wolfgang-ch/mytourbook/commit/212237a75e4cdd6cef3475eed3b3d0c1c903f0c1#diff-f73bc5505ecef204b5dc43eecc01e6f26c7741dfb5cd65936955fb1b11c4ab62
          //related to that https://sourceforge.net/p/mytourbook/discussion/622811/thread/e9cfb35008/#2e76/3dcb/1fd0
-//         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
-//               .atOffset(ZoneOffset.ofHours(
-//                     _currentActivity.timeZoneUtcOffset))
-//               .toZonedDateTime();
-         //_currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
+         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
+               .atOffset(ZoneOffset.ofHours(
+                     _currentActivity.timeZoneUtcOffset))
+               .toZonedDateTime();
+         _currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
+         _currentActivity.tourStartTimeMills = tourStartTimeWithUTCOffset.toInstant().toEpochMilli();
 
       } else if (_isInHasStartTime) {
 
