@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLogSAXHandler;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -50,6 +51,12 @@ public class FitLogTester {
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new FitLogDeviceDataReader();
    }
+
+	@AfterEach
+	void tearDown() {
+		newlyImportedTours.clear();
+		alreadyImportedTours.clear();
+	}
 
    @Test
    void testImportTimothyLake() throws SAXException, IOException {

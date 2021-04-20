@@ -21,9 +21,6 @@
       <Notes></Notes>
       <Intensity Id="0">0</Intensity>
       <Category Id="f8c0f4f0-8b58-4667-8bb7-909750932297" Name="RideRunRide" />
-      <EquipmentUsed>
-        <EquipmentItem Id="6b84c5a7-315e-4cb7-879d-f625f891ad8b" Name="Specialized - Allez Elite 2007" />
-      </EquipmentUsed>
       <Laps>
         <Lap StartTime="2016-09-19T20:06:55.000Z" DurationSeconds="2249.700">
           <Distance TotalMeters="7425.000" />

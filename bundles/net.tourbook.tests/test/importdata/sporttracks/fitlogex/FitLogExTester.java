@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLogSAXHandler;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -51,6 +52,11 @@ class FitLogExTester {
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
+	@AfterEach
+	void tearDown() {
+		newlyImportedTours.clear();
+		alreadyImportedTours.clear();
+	}
    	/**
 	 * This tests parses a file for which the time offset of -7 hours is wrong
 	 * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST

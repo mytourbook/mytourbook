@@ -159,13 +159,6 @@
   } ],
   "tourSaved" : false,
   "tourStartTimeMS" : 1474312015000,
-  "tourTags" : [ {
-    "expandType" : 1,
-    "root" : true,
-    "tagId" : 0,
-    "tagName" : "Specialized - Allez Elite 2007",
-    "validForSave" : true
-  } ],
   "tourType" : {
     "createId" : 1,
     "name" : "RideRunRide",
