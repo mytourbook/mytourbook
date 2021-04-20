@@ -22,6 +22,7 @@ import java.net.CookiePolicy;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.srtm.download.DownloadSRTM3;
 import net.tourbook.web.WEB;
 
@@ -170,7 +171,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
    private void createUI_20_SRTM(final Composite parent) {
 
-      final GridDataFactory inputLayout = GridDataFactory.fillDefaults()
+      final GridDataFactory inputFieldLayout = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.FILL)
             .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT);
 
@@ -188,7 +189,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             label.setText(Messages.PrefPage_SRTM_Label_Username);
 
             _txtSRTM_Username = new Text(group, SWT.BORDER);
-            inputLayout.applyTo(_txtSRTM_Username);
+            inputFieldLayout.applyTo(_txtSRTM_Username);
          }
          {
             /*
@@ -198,7 +199,12 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             label.setText(Messages.PrefPage_SRTM_Label_Password);
 
             _txtSRTM_Password = new Text(group, SWT.BORDER | SWT.PASSWORD);
-            inputLayout.applyTo(_txtSRTM_Password);
+
+            _txtSRTM_Password.addModifyListener(modifyEvent -> {
+               _txtSRTM_Password.setToolTipText(_txtSRTM_Password.getText());
+            });
+
+            inputFieldLayout.applyTo(_txtSRTM_Password);
          }
          {
             /*
@@ -294,21 +300,20 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
             MessageDialog.openInformation(
                   _prefContainer.getShell(),
-                  Messages.prefPage_srtm_checkHTTPConnection_title,
-                  NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionOK_message, HTTPS_NASA_TEST_URL));
+                  Messages.PrefPage_SRTM_Dialog_CheckConnection_Title,
+                  NLS.bind(Messages.PrefPage_SRTM_Dialog_CheckConnection_OK_Message, HTTPS_NASA_TEST_URL));
 
          } catch (final Exception e) {
 
             MessageDialog.openInformation(
 
                   _prefContainer.getShell(),
-                  Messages.prefPage_srtm_checkHTTPConnection_title,
+                  Messages.PrefPage_SRTM_Dialog_CheckConnection_Title,
+                  NLS.bind(Messages.PrefPage_SRTM_Dialog_CheckConnection_Error_Message,
+                        e.getMessage(),
+                        HTTPS_NASA_TEST_URL));
 
-                  NLS.bind(Messages.prefPage_srtm_checkHTTPConnection_message, HTTPS_NASA_TEST_URL)
-
-                        + UI.NEW_LINE2 + e.getMessage());
-
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       });
    }

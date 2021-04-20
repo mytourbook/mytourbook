@@ -115,6 +115,9 @@ public class Messages extends NLS {
    public static String        job_name_ftpDownload;
    public static String        job_name_httpDownload;
 
+   public static String        PrefPage_SRTM_Dialog_CheckConnection_Error_Message;
+   public static String        PrefPage_SRTM_Dialog_CheckConnection_OK_Message;
+   public static String        PrefPage_SRTM_Dialog_CheckConnection_Title;
    public static String        PrefPage_SRTM_Label_Password;
    public static String        PrefPage_SRTM_Label_Username;
    public static String        PrefPage_SRTM_Link_EarthdataUserProfile;

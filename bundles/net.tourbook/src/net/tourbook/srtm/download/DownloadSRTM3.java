@@ -145,7 +145,7 @@ public class DownloadSRTM3 {
 
             final String message = connection.getResponseMessage();
 
-            throw new Exception("Invalid response from server - status " + status + ": " + message);
+            throw new Exception("Response from server - " + status + ": " + message);
          }
 
          /*
