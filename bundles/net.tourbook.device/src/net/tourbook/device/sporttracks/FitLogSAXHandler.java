@@ -432,7 +432,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      final ZonedDateTime tourStartTime_FromImport = TimeTools.getZonedDateTime(_currentActivity.timeSlices.get(0).absoluteTime);
+      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
       tourData.setTourStartTime(tourStartTime_FromImport);
 
       tourData.setTourTitle(_currentActivity.name);
