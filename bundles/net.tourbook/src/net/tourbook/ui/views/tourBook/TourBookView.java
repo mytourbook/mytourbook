@@ -114,10 +114,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -999,35 +996,32 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-               recreateViewer_NatTable();
-               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
+            recreateViewer_NatTable();
+            _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _columnManager_NatTable.saveState(_state_NatTable,
-                     _natTable_Body_DataLayer,
-                     _natTable_Body_ColumnReorderLayer,
-                     _natTable_Body_ColumnHideShowLayer);
-               _columnManager_NatTable.clearColumns();
+            _columnManager_NatTable.saveState(_state_NatTable,
+                  _natTable_Body_DataLayer,
+                  _natTable_Body_ColumnReorderLayer,
+                  _natTable_Body_ColumnHideShowLayer);
+            _columnManager_NatTable.clearColumns();
 
-               _columnManager_Tree.saveState(_state_Tree);
-               _columnManager_Tree.clearColumns();
+            _columnManager_Tree.saveState(_state_Tree);
+            _columnManager_Tree.clearColumns();
 
-               _columnFactory.defineAllColumns();
+            _columnFactory.defineAllColumns();
 
-               recreateViewer_NatTable();
-               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
-            }
+            recreateViewer_NatTable();
+            _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
          }
       };
 
@@ -1484,28 +1478,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      _tourViewer_Tree.addDoubleClickListener(new IDoubleClickListener() {
+      _tourViewer_Tree.addDoubleClickListener(doubleClickEvent -> {
 
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
+         final Object selection = ((IStructuredSelection) _tourViewer_Tree.getSelection()).getFirstElement();
 
-            final Object selection = ((IStructuredSelection) _tourViewer_Tree.getSelection()).getFirstElement();
+         if (selection instanceof TVITourBookTour) {
 
-            if (selection instanceof TVITourBookTour) {
+            TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
 
-               TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+         } else if (selection != null) {
 
-            } else if (selection != null) {
+            // expand/collapse current item
 
-               // expand/collapse current item
+            final TreeViewerItem tourItem = (TreeViewerItem) selection;
 
-               final TreeViewerItem tourItem = (TreeViewerItem) selection;
-
-               if (_tourViewer_Tree.getExpandedState(tourItem)) {
-                  _tourViewer_Tree.collapseToLevel(tourItem, 1);
-               } else {
-                  _tourViewer_Tree.expandToLevel(tourItem, 1);
-               }
+            if (_tourViewer_Tree.getExpandedState(tourItem)) {
+               _tourViewer_Tree.collapseToLevel(tourItem, 1);
+            } else {
+               _tourViewer_Tree.expandToLevel(tourItem, 1);
             }
          }
       });
@@ -1734,8 +1724,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // re-import and tour values deletion can be run on all/selected/between dates tours
       _actionReimport_Tours.setEnabled(true);
       _actionDeleteTour.setEnabled(true);
+      _actionDeleteTourValues.setEnabled(true);
 
-      _actionDeleteTourValues.setEnabled(isTourSelected);
       _actionEditQuick.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionExportTour.setEnabled(isTourSelected);
@@ -3085,7 +3075,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3103,13 +3093,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 

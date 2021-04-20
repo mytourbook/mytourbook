@@ -24,25 +24,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTourValues extends Action {
 
-   /*
-    * This could be possible. Would it be more useful to add a submenu "Remove data from Tour" and
-    * have dialog where the user can not only remove altitude data but also cadence serie, power
-    * serie...etc.... ?
-    * yes
-    * I am thinking the dialog could be like the Re-Import dialog where the user checks all the data
-    * to be removed.
-    * Thoughts ?
-    * This makes sense.
-    * When I tested last time the Re-import tool, then I think it is a very dangerous tool when
-    * accidentally to run it for all tours. When "All Tour" is selected, then a confirmation from
-    * the user should be asked, the same should also be done for this new tool.
-    * > Removing elevations is also saving space instead of setting all values to 0.
-    * Do you mean I should set the altitudeSerie array to null to save space ?
-    * This is already done in net.tourbook.data.TourData.cleanupDataSeries() when tours are imported
-    * Wolfgang
-    * I think he means to call this method after removing tour values:
-    * TourData.cleanupDataSeries()
-    */
    private final ITourViewer3 _tourViewer;
 
    public ActionDeleteTourValues(final ITourViewer3 tourViewer) {
