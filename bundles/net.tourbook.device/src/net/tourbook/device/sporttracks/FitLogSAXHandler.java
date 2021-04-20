@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -320,6 +321,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          try {
 
             final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
+            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
 
             parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 
