@@ -349,17 +349,19 @@ public class FitLogSAXHandler extends DefaultHandler {
    private long adjustTime(final long epochTime) {
 
       long convertedEpochTime;
-      final ZonedDateTime zonedDateTime = TimeTools.getZonedDateTime(epochTime);
+      ZonedDateTime zonedDateTimeWithUTCOffset;
+
       if (_currentActivity.hasTimeZoneUtcOffset) {
 
-         final ZonedDateTime zonedDateTimeWithUTCOffset = Instant.ofEpochMilli(epochTime)
+         zonedDateTimeWithUTCOffset = Instant.ofEpochMilli(epochTime)
                .atOffset(ZoneOffset.ofHours(_currentActivity.timeZoneUtcOffset))
                .toZonedDateTime();
-         convertedEpochTime = zonedDateTimeWithUTCOffset.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
       } else {
 
-         convertedEpochTime = zonedDateTime.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
+         zonedDateTimeWithUTCOffset = TimeTools.getZonedDateTimeWithUTC(epochTime);
       }
+
+      convertedEpochTime = zonedDateTimeWithUTCOffset.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
 
       return convertedEpochTime;
    }
