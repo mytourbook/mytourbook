@@ -159,35 +159,6 @@
   } ],
   "tourSaved" : false,
   "tourStartTimeMS" : 1474312015000,
-  "tourType" : {
-    "createId" : 1,
-    "name" : "RideRunRide",
-    "rgbbright" : {
-      "blue" : 255,
-      "green" : 255,
-      "hsb" : [ 0.0, 0.0, 1.0 ],
-      "red" : 255
-    },
-    "rgbdark" : {
-      "blue" : 199,
-      "green" : 167,
-      "hsb" : [ 338.18182, 0.34509802, 1.0 ],
-      "red" : 255
-    },
-    "rgbline" : {
-      "blue" : 180,
-      "green" : 152,
-      "hsb" : [ 339.0, 0.34482756, 0.9098039 ],
-      "red" : 232
-    },
-    "rgbtext" : {
-      "blue" : 49,
-      "green" : 23,
-      "hsb" : [ 339.2, 0.7653061, 0.38431373 ],
-      "red" : 98
-    },
-    "typeId" : 0
-  },
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,

@@ -20,7 +20,6 @@
       <Calories TotalCal="397.270" />
       <Notes></Notes>
       <Intensity Id="0">0</Intensity>
-      <Category Id="f8c0f4f0-8b58-4667-8bb7-909750932297" Name="RideRunRide" />
       <Laps>
         <Lap StartTime="2016-09-19T20:06:55.000Z" DurationSeconds="2249.700">
           <Distance TotalMeters="7425.000" />
