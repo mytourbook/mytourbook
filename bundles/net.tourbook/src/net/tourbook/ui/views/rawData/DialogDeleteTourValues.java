@@ -256,12 +256,12 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
     */
    private void createUI_20_Values(final Composite parent) {
 
+      final GridDataFactory gridDataItem = GridDataFactory.fillDefaults()
+            .align(SWT.BEGINNING, SWT.CENTER);
+
       final GridDataFactory gridDataItem_FirstColumn = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
             .indent(16, 0);
-
-      final GridDataFactory gridDataItem = GridDataFactory.fillDefaults()
-            .align(SWT.BEGINNING, SWT.CENTER);
 
       /*
        * group: data
@@ -280,59 +280,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Cadence = new Button(group, SWT.CHECK);
             _chkData_Cadence.setText(Messages.Dialog_ModifyTours_Checkbox_CadenceValues);
             _chkData_Cadence.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Cadence);
+            gridDataItem_FirstColumn.applyTo(_chkData_Cadence);
          }
-         {
-            /*
-             * Checkbox: Elevation
-             */
-            _chkData_Elevation = new Button(group, SWT.CHECK);
-            _chkData_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
-            _chkData_Elevation.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Elevation);
-         }
-
-         // row 2
-         {
-            /*
-             * Checkbox: Gear
-             */
-            _chkData_Gear = new Button(group, SWT.CHECK);
-            _chkData_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
-            _chkData_Gear.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Gear);
-         }
-         {
-            /*
-             * Checkbox: Power And Pulse
-             */
-            _chkData_PowerAndPulse = new Button(group, SWT.CHECK);
-            _chkData_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
-            _chkData_PowerAndPulse.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_PowerAndPulse);
-         }
-
-         // row 3
-         {
-            /*
-             * Checkbox: Power And Speed
-             */
-            _chkData_PowerAndSpeed = new Button(group, SWT.CHECK);
-            _chkData_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
-            _chkData_PowerAndSpeed.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_PowerAndSpeed);
-         }
-         {
-            /*
-             * Checkbox: Running Dynamics
-             */
-            _chkData_RunningDynamics = new Button(group, SWT.CHECK);
-            _chkData_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
-            _chkData_RunningDynamics.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_RunningDynamics);
-         }
-
-         // row 4
          {
             /*
              * Checkbox: Swimming
@@ -340,7 +289,18 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Swimming = new Button(group, SWT.CHECK);
             _chkData_Swimming.setText(Messages.Dialog_ModifyTours_Checkbox_SwimmingValues);
             _chkData_Swimming.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Swimming);
+            gridDataItem.applyTo(_chkData_Swimming);
+         }
+
+         // row 2
+         {
+            /*
+             * Checkbox: Elevation
+             */
+            _chkData_Elevation = new Button(group, SWT.CHECK);
+            _chkData_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
+            _chkData_Elevation.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Elevation);
          }
          {
             /*
@@ -349,18 +309,38 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Temperature = new Button(group, SWT.CHECK);
             _chkData_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
             _chkData_Temperature.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Temperature);
+            gridDataItem.applyTo(_chkData_Temperature);
          }
 
-         // row 5
+         // row 3
          {
             /*
-             * Checkbox: Time
+             * Checkbox: Gear
+             */
+            _chkData_Gear = new Button(group, SWT.CHECK);
+            _chkData_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
+            _chkData_Gear.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Gear);
+         }
+         {
+            /*
+             * Checkbox:Time
              */
             _chkData_Time = new Button(group, SWT.CHECK);
             _chkData_Time.setText(Messages.Dialog_DeleteTourValues_Checkbox_Time);
             _chkData_Time.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Time);
+            gridDataItem.applyTo(_chkData_Time);
+         }
+
+         // row 4
+         {
+            /*
+             * Checkbox: Power And Pulse
+             */
+            _chkData_PowerAndPulse = new Button(group, SWT.CHECK);
+            _chkData_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
+            _chkData_PowerAndPulse.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndPulse);
          }
          {
             /*
@@ -372,7 +352,16 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             gridDataItem.applyTo(_chkData_TourMarkers);
          }
 
-         // row 6
+         // row 5
+         {
+            /*
+             * Checkbox: Power And Speed
+             */
+            _chkData_PowerAndSpeed = new Button(group, SWT.CHECK);
+            _chkData_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
+            _chkData_PowerAndSpeed.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndSpeed);
+         }
          {
             /*
              * Checkbox: Tour pauses
@@ -380,7 +369,18 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_TourTimerPauses = new Button(group, SWT.CHECK);
             _chkData_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
             _chkData_TourTimerPauses.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_TourTimerPauses);
+            gridDataItem.applyTo(_chkData_TourTimerPauses);
+         }
+
+         // row 6
+         {
+            /*
+             * Checkbox: Running Dynamics
+             */
+            _chkData_RunningDynamics = new Button(group, SWT.CHECK);
+            _chkData_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
+            _chkData_RunningDynamics.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_RunningDynamics);
          }
          {
             /*
@@ -389,7 +389,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_Training = new Button(group, SWT.CHECK);
             _chkData_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
             _chkData_Training.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Training);
+            gridDataItem.applyTo(_chkData_Training);
          }
 
          // row 7
