@@ -189,7 +189,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(container);
       {
          createUI_10_Tours(container);
-         createUI_20_Values(container);
+         createUI_20_ValuesToReset(container);
+         createUI_30_ValuesToDelete(container);
       }
    }
 
@@ -250,11 +251,45 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    }
 
    /**
+    * UI to select the values to reset for the chosen tours
+    *
+    * @param parent
+    */
+   private void createUI_20_ValuesToReset(final Composite parent) {
+
+      final GridDataFactory gridDataItem = GridDataFactory.fillDefaults()
+            .align(SWT.BEGINNING, SWT.CENTER)
+            .indent(16, 0);
+
+      /*
+       * group: data
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Dialog_ResetTourValues_Group_Data);
+      group.setToolTipText(Messages.Dialog_ResetTourValues_Group_Data_Tooltip);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      {
+         // row 1
+         {
+            /*
+             * Checkbox:Time
+             */
+            _chkData_Time = new Button(group, SWT.CHECK);
+            _chkData_Time.setText(Messages.Dialog_DeleteTourValues_Checkbox_Time);
+            _chkData_Time.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Time);
+         }
+
+      }
+   }
+
+   /**
     * UI to select the values to delete for the chosen tours
     *
     * @param parent
     */
-   private void createUI_20_Values(final Composite parent) {
+   private void createUI_30_ValuesToDelete(final Composite parent) {
 
       final GridDataFactory gridDataItem = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER);
@@ -324,12 +359,12 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
          {
             /*
-             * Checkbox:Time
+             * Checkbox: Tour markers
              */
-            _chkData_Time = new Button(group, SWT.CHECK);
-            _chkData_Time.setText(Messages.Dialog_DeleteTourValues_Checkbox_Time);
-            _chkData_Time.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Time);
+            _chkData_TourMarkers = new Button(group, SWT.CHECK);
+            _chkData_TourMarkers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
+            _chkData_TourMarkers.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TourMarkers);
          }
 
          // row 4
@@ -344,12 +379,12 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
          {
             /*
-             * Checkbox: Tour markers
+             * Checkbox: Tour pauses
              */
-            _chkData_TourMarkers = new Button(group, SWT.CHECK);
-            _chkData_TourMarkers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
-            _chkData_TourMarkers.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TourMarkers);
+            _chkData_TourTimerPauses = new Button(group, SWT.CHECK);
+            _chkData_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
+            _chkData_TourTimerPauses.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TourTimerPauses);
          }
 
          // row 5
@@ -364,12 +399,12 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
          {
             /*
-             * Checkbox: Tour pauses
+             * Checkbox: Training
              */
-            _chkData_TourTimerPauses = new Button(group, SWT.CHECK);
-            _chkData_TourTimerPauses.setText(Messages.Dialog_ModifyTours_Checkbox_TourTimerPauses);
-            _chkData_TourTimerPauses.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TourTimerPauses);
+            _chkData_Training = new Button(group, SWT.CHECK);
+            _chkData_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
+            _chkData_Training.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Training);
          }
 
          // row 6
@@ -382,17 +417,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_RunningDynamics.addSelectionListener(_defaultListener);
             gridDataItem_FirstColumn.applyTo(_chkData_RunningDynamics);
          }
-         {
-            /*
-             * Checkbox: Training
-             */
-            _chkData_Training = new Button(group, SWT.CHECK);
-            _chkData_Training.setText(Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
-            _chkData_Training.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_Training);
-         }
 
-         // row 7
          {
             /*
              * Button: Deselect all
@@ -414,20 +439,19 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       group.setTabList(new Control[] {
 
             // column 1
-            _chkData_Time,
-            _chkData_RunningDynamics,
-            _chkData_Swimming,
-            _chkData_Temperature,
-            _chkData_TourTimerPauses,
-            _chkData_Training,
-
-            // column 2
             _chkData_Cadence,
             _chkData_Elevation,
             _chkData_Gear,
             _chkData_PowerAndPulse,
             _chkData_PowerAndSpeed,
+            _chkData_RunningDynamics,
+
+            // column 2
+            _chkData_Swimming,
+            _chkData_Temperature,
             _chkData_TourMarkers,
+            _chkData_TourTimerPauses,
+            _chkData_Training,
 
             _btnDeselectAll
       });
