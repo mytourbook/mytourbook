@@ -116,8 +116,8 @@ public class FitLogSAXHandler extends DefaultHandler {
    //
    private String                               _importFilePath;
    private FitLogDeviceDataReader               _device;
-   private HashMap<Long, TourData>              _alreadyImportedTours;
-   private HashMap<Long, TourData>              _newlyImportedTours;
+   private Map<Long, TourData>                  _alreadyImportedTours;
+   private Map<Long, TourData>                  _newlyImportedTours;
 
    private Activity                             _currentActivity;
    private double                               _prevLatitude;
@@ -303,8 +303,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
                            final String importFilePath,
-                           final HashMap<Long, TourData> alreadyImportedTours,
-                           final HashMap<Long, TourData> newlyImportedTours,
+                           final Map<Long, TourData> alreadyImportedTours,
+                           final Map<Long, TourData> newlyImportedTours,
                            final boolean isFitLogExFile) {
 
       _device = device;
@@ -338,6 +338,19 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
 
       _allTourTypes = TourDatabase.getAllTourTypes();
+   }
+
+   private long addPauseTimeInLap(final Lap lap, long startTimeDiff) {
+
+      for (final Pause pause : _currentActivity.pauses) {
+
+         //We need to make sure to only add the pauses that are
+         //within the current lap time interval.
+         if (pause.startTime < lap.endTime && pause.endTime > lap.startTime) {
+            startTimeDiff += pause.duration;
+         }
+      }
+      return startTimeDiff;
    }
 
    /**
@@ -375,50 +388,8 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
    }
 
-   @Override
-   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+   private TourData createTour() {
 
-      /*
-       * get values
-       */
-      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather) {
-         parseActivity_02_End();
-      }
-
-      /*
-       * set state
-       */
-      if (name.equals(TAG_TRACK)) {
-
-         _isInTrack = false;
-
-      } else if (name.equals(TAG_LAPS)) {
-
-         _isInLaps = false;
-
-      } else if (name.equals(TAG_TRACK_CLOCK)) {
-
-         _isInPauses = false;
-
-      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
-
-         _isInCustomDataFields = false;
-
-      } else if (name.equals(TAG_ACTIVITY)) {
-
-         // activity/tour ends
-         _isInActivity = false;
-
-         finalizeTour();
-
-      }
-   }
-
-   private void finalizeTour() {
-
-      boolean isComputeMovingTime = true;
-
-      // create data object for each tour
       final TourData tourData = new TourData();
 
       /*
@@ -437,9 +408,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
-      tourData.setTourStartTime(tourStartTime_FromImport);
-
+      tourData.setTourStartTime(_currentActivity.tourStartTime);
       tourData.setTourTitle(_currentActivity.name);
       tourData.setTourDescription(_currentActivity.notes);
       tourData.setTourStartPlace(_currentActivity.location);
@@ -484,7 +453,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       tourData.setImportFilePath(_importFilePath);
 
       tourData.setDeviceTimeInterval((short) -1);
-
       if (_currentActivity.timeSlices.isEmpty()) {
 
          // tour do not contain a track
@@ -493,7 +461,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
          tourData.setTourComputedTime_Moving(_currentActivity.duration);
-         isComputeMovingTime = false;
 
          tourData.setTourAltUp(_currentActivity.elevationUp);
          tourData.setTourAltDown(_currentActivity.elevationDown);
@@ -518,7 +485,7 @@ public class FitLogSAXHandler extends DefaultHandler {
           */
          final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
 
-         if (tourStartTime_FromImport.equals(tourStartTime_FromLatLon) == false) {
+         if (_currentActivity.tourStartTime.equals(tourStartTime_FromLatLon) == false) {
 
             // time zone is different -> fix tour start components with adjusted time zone
             tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
@@ -526,6 +493,102 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setDeviceId(_device.deviceId);
       }
+
+      return tourData;
+   }
+
+   private TourMarker createTourMarker(final TourData tourData,
+                                       final String label,
+                                       final int lapRelativeTime,
+                                       final int serieIndex) {
+
+      final float[] altitudeSerie = tourData.altitudeSerie;
+      final float[] distanceSerie = tourData.distanceSerie;
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
+
+      tourMarker.setLabel(label);
+      tourMarker.setSerieIndex(serieIndex);
+      tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));
+
+      if (distanceSerie != null) {
+         tourMarker.setDistance(distanceSerie[serieIndex]);
+      }
+
+      if (altitudeSerie != null) {
+         tourMarker.setAltitude(altitudeSerie[serieIndex]);
+      }
+
+      if (latitudeSerie != null) {
+         tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
+      }
+      return tourMarker;
+   }
+
+   private TourTag createTourTag(final Equipment tag) {
+
+      final TourTag tourTag = new TourTag(tag.getName());
+      // There is no notes to import as we are here in a FitLog file as
+      // FitLogEx files would not have unavailable tags since, at this
+      // point, they would be already imported.
+      tourTag.setRoot(true);
+
+      // persist tag
+      final TourTag savedTag = TourDatabase.saveEntity(
+            tourTag,
+            TourDatabase.ENTITY_IS_NOT_SAVED,
+            TourTag.class);
+
+      return savedTag;
+   }
+
+   @Override
+   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+
+      /*
+       * get values
+       */
+      if (_isInTimeZoneUtcOffset || _isInHasStartTime || _isInName || _isInNotes || _isInWeather) {
+         parseActivity_02_End();
+      }
+
+      /*
+       * set state
+       */
+      if (name.equals(TAG_TRACK)) {
+
+         _isInTrack = false;
+
+      } else if (name.equals(TAG_LAPS)) {
+
+         _isInLaps = false;
+
+      } else if (name.equals(TAG_TRACK_CLOCK)) {
+
+         _isInPauses = false;
+
+      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
+
+         _isInCustomDataFields = false;
+
+      } else if (name.equals(TAG_ACTIVITY)) {
+
+         // activity/tour ends
+         _isInActivity = false;
+
+         finalizeTour();
+
+      }
+   }
+
+   private void finalizeTour() {
+
+      // create data object for each tour
+      final TourData tourData = createTour();
+
+      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
 
       if (_currentActivity.avgPower != 0) {
          tourData.setPower_Avg(_currentActivity.avgPower);
@@ -599,7 +662,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         if (isComputeMovingTime) {
+         if (_currentActivity.timeSlices.isEmpty()) {
             tourData.computeTourMovingTime();
          }
 
@@ -686,63 +749,34 @@ public class FitLogSAXHandler extends DefaultHandler {
       HashMap<Long, TourTag> tourTagMap = TourDatabase.getAllTourTags();
       TourTag[] allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
 
-      boolean searchTagById = false;
-      // If we are in a FitLogEx file, then we have parsed equipments
-      // and we need to map tour tags using each equipment's GUID.
-      if (_equipments != null && _equipments.size() > 0) {
-         searchTagById = true;
-      }
-
       final Set<TourTag> tourTags = new HashSet<>();
-
       try {
 
          for (final Equipment tag : equipmentNames) {
 
-            boolean isTagAvailable = false;
+            final boolean isTagAvailable = searchTourTagInDatabase(allTourTags, tourTags, tag);
 
-            for (final TourTag tourTag : allTourTags) {
-               if ((searchTagById && tourTag.getNotes().contains(tag.Id)) ||
-                     (!searchTagById && tourTag.getTagName().equals(tag.getName()))) {
-                  isTagAvailable = true;
-
-                  tourTags.add(tourTag);
-                  break;
-               }
+            if (isTagAvailable) {
+               continue;
             }
 
-            if (isTagAvailable == false) {
+            // create a new tag
+            final TourTag savedTag = createTourTag(tag);
 
-               // create a new tag
+            if (savedTag != null) {
 
-               final TourTag tourTag = new TourTag(tag.getName());
-               // There is no notes to import as we are here in a FitLog file as
-               // FitLogEx files would not have unavailable tags since, at this
-               // point, they would be already imported.
-               tourTag.setRoot(true);
+               tourTags.add(savedTag);
 
-               // persist tag
-               final TourTag savedTag = TourDatabase.saveEntity(
-                     tourTag,
-                     TourDatabase.ENTITY_IS_NOT_SAVED,
-                     TourTag.class);
+               // reload tour tag list
 
-               if (savedTag != null) {
+               TourDatabase.clearTourTags();
 
-                  tourTags.add(savedTag);
+               tourTagMap = TourDatabase.getAllTourTags();
+               allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
 
-                  // reload tour tag list
-
-                  TourDatabase.clearTourTags();
-
-                  tourTagMap = TourDatabase.getAllTourTags();
-                  allTourTags = tourTagMap.values().toArray(new TourTag[tourTagMap.size()]);
-
-                  isNewTag = true;
-               }
+               isNewTag = true;
             }
          }
-
       } catch (final NoSuchElementException e) {
          // no further tokens
       } finally {
@@ -766,12 +800,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          return;
       }
 
-      final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-      final float[] altitudeSerie = tourData.altitudeSerie;
-      final float[] distanceSerie = tourData.distanceSerie;
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
-
       /*
        * tour and track can have different start times
        */
@@ -779,7 +807,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //      final long tour2sliceTimeDiff = _currentActivity.trackTourStartTime - tourStartTime;
 
       int lapCounter = 1;
-
+      final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
       for (final Lap lap : _laps) {
 
          lap.startTime = adjustTime(lap.startTime);
@@ -788,14 +816,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          long startTimeDiff = lap.endTime - tourStartTime;// - tour2sliceTimeDiff;
 
          // If present, we add the total pause time
-         for (final Pause pause : _currentActivity.pauses) {
+         startTimeDiff = addPauseTimeInLap(lap, startTimeDiff);
 
-            //We need to make sure to only add the pauses that are
-            //within the current lap time interval.
-            if (pause.startTime < lap.endTime && pause.endTime > lap.startTime) {
-               startTimeDiff += pause.duration;
-            }
-         }
          int lapRelativeTime = (int) (startTimeDiff / 1000);
          int serieIndex = 0;
 
@@ -817,23 +839,10 @@ public class FitLogSAXHandler extends DefaultHandler {
             serieIndex = timeSerie.length - 1;
          }
 
-         final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_DEVICE);
-
-         tourMarker.setLabel(Integer.toString(lapCounter));
-         tourMarker.setSerieIndex(serieIndex);
-         tourMarker.setTime(lapRelativeTime, tourData.getTourStartTimeMS() + (lapRelativeTime * 1000));
-
-         if (distanceSerie != null) {
-            tourMarker.setDistance(distanceSerie[serieIndex]);
-         }
-
-         if (altitudeSerie != null) {
-            tourMarker.setAltitude(altitudeSerie[serieIndex]);
-         }
-
-         if (latitudeSerie != null) {
-            tourMarker.setGeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]);
-         }
+         final TourMarker tourMarker = createTourMarker(tourData,
+               Integer.toString(lapCounter),
+               lapRelativeTime,
+               serieIndex);
 
          tourMarkers.add(tourMarker);
 
@@ -913,60 +922,46 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void parseActivity_01_Start(final String name, final Attributes attributes) {
 
-      if (name.equals(TAG_ACTIVITY_NAME)) {
-
+      switch (name) {
+      case TAG_ACTIVITY_NAME:
          _isInName = true;
-
-      } else if (name.equals(TAG_ACTIVITY_NOTES)) {
-
+         break;
+      case TAG_ACTIVITY_NOTES:
          _isInNotes = true;
-
-      } else if (name.equals(TAG_ACTIVITY_LOCATION)) {
-
+         break;
+      case TAG_ACTIVITY_LOCATION:
          _currentActivity.location = attributes.getValue(ATTRIB_NAME);
-
-      } else if (name.equals(TAG_ACTIVITY_CATEGORY)) {
-
+         break;
+      case TAG_ACTIVITY_CATEGORY:
          _currentActivity.categoryName = attributes.getValue(ATTRIB_NAME);
-      } else if (name.equals(TAG_ACTIVITY_EQUIPMENT_ITEM)) {
-
+         break;
+      case TAG_ACTIVITY_EQUIPMENT_ITEM:
          final Equipment newEquipment = new Equipment();
          newEquipment.Name = attributes.getValue(ATTRIB_NAME);
          newEquipment.Id = attributes.getValue(ATTRIB_EQUIPMENT_ID);
-
          _currentActivity.equipmentNames.add(newEquipment);
-
-      } else if (name.equals(TAG_ACTIVITY_CALORIES)) {
-
-         //      <xs:element name="Calories">
-         //         <xs:complexType>
-         //            <xs:attribute name="TotalCal" type="xs:decimal" use="optional"/>
-         //         </xs:complexType>
-         //      </xs:element>
-
+         break;
+      case TAG_ACTIVITY_CALORIES:
          // Converting from Calories to calories
          _currentActivity.calories = Math.round(Util.parseFloat0(attributes, ATTRIB_TOTAL_CAL) * 1000f);
-
-      } else if (name.equals(TAG_ACTIVITY_DURATION)) {
-
+         break;
+      case TAG_ACTIVITY_DURATION:
          //      <xs:element name="Duration">
          //         <xs:complexType>
          //            <xs:attribute name="TotalSeconds" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
          _currentActivity.duration = Util.parseInt0(attributes, ATTRIB_TOTAL_SECONDS);
-
-      } else if (name.equals(TAG_ACTIVITY_DISTANCE)) {
-
+         break;
+      case TAG_ACTIVITY_DISTANCE:
          //      <xs:element name="Distance">
          //         <xs:complexType>
          //            <xs:attribute name="TotalMeters" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
          _currentActivity.distance = Util.parseInt0(attributes, ATTRIB_TOTAL_METERS);
-
-      } else if (name.equals(TAG_ACTIVITY_ELEVATION)) {
-
+         break;
+      case TAG_ACTIVITY_ELEVATION:
          //      <xs:element name="Elevation">
          //         <xs:complexType>
          //            <xs:attribute name="DescendMeters" type="xs:decimal" use="optional"/>
@@ -975,9 +970,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          //      </xs:element>
          _currentActivity.elevationUp = Util.parseInt0(attributes, ATTRIB_ASCEND_METERS);
          _currentActivity.elevationDown = Util.parseInt0(attributes, ATTRIB_DESCEND_METERS);
-
-      } else if (name.equals(TAG_ACTIVITY_HEART_RATE)) {
-
+         break;
+      case TAG_ACTIVITY_HEART_RATE:
          //      <xs:element name="HeartRate">
          //         <xs:complexType>
          //            <xs:attribute name="AverageBPM" type="xs:decimal" use="optional"/>
@@ -986,22 +980,18 @@ public class FitLogSAXHandler extends DefaultHandler {
          //      </xs:element>
          _currentActivity.avgPulse = Util.parseInt0(attributes, ATTRIB_AVERAGE_BPM);
          _currentActivity.maxPulse = Util.parseInt0(attributes, ATTRIB_MAXIMUM_BPM);
-
-      } else if (name.equals(TAG_ACTIVITY_POWER)) {
-
+         break;
+      case TAG_ACTIVITY_POWER:
          _currentActivity.avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
          _currentActivity.maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
-
-      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET)) {
-
+         break;
+      case FitLogExSAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET:
          _isInTimeZoneUtcOffset = true;
-
-      } else if (name.equals(FitLogExSAXHandler.TAG_ACTIVITY_HAS_START_TIME)) {
-
+         break;
+      case FitLogExSAXHandler.TAG_ACTIVITY_HAS_START_TIME:
          _isInHasStartTime = true;
-
-      } else if (name.equals(TAG_ACTIVITY_CADENCE)) {
-
+         break;
+      case TAG_ACTIVITY_CADENCE:
          //      <xs:element name="Cadence">
          //         <xs:complexType>
          //            <xs:attribute name="AverageRPM" type="xs:decimal" use="optional"/>
@@ -1011,14 +1001,13 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.avgCadence = Util.parseInt0(attributes, ATTRIB_AVERAGE_RPM);
 //   !!! not yet supported !!!
 //         _currentActivity.maxCadence = Util.parseInt0(attributes, ATTRIB_MAXIMUM_RPM);
-
-      } else if (name.equals(TAG_ACTIVITY_WEATHER)) {
-
+         break;
+      case TAG_ACTIVITY_WEATHER:
          _isInWeather = true;
          _currentActivity.weatherTemperature = Util.parseFloat(attributes, ATTRIB_WEATHER_TEMP);
          _currentActivity.weatherConditions = attributes.getValue(ATTRIB_WEATHER_CONDITIONS);
-
-      } else {
+         break;
+      default:
          return;
       }
 
@@ -1206,16 +1195,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
    }
 
-//   private void parseTrack(final Attributes attributes) {
-//
-//      final String startTime = attributes.getValue(ATTRIB_START_TIME);
-//
-//      if (startTime != null) {
-//         _currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
-//         _currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
-//      }
-//   }
-
    /**
     * @param weatherText
     *           Example:
@@ -1245,6 +1224,16 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       return Math.round(windSpeedValue);
    }
+
+//   private void parseTrack(final Attributes attributes) {
+//
+//      final String startTime = attributes.getValue(ATTRIB_START_TIME);
+//
+//      if (startTime != null) {
+//         _currentActivity.trackTourDateTime = _dtParser.parseDateTime(startTime);
+//         _currentActivity.trackTourStartTime = _currentActivity.trackTourDateTime.getMillis();
+//      }
+//   }
 
    /**
     * We save the <Equipment> elements in order to be able to create them if they don't
@@ -1291,6 +1280,30 @@ public class FitLogSAXHandler extends DefaultHandler {
       }
 
       TourDatabase.clearTourTags();
+   }
+
+   private boolean searchTourTagInDatabase(final TourTag[] allTourTags,
+                                           final Set<TourTag> tourTags,
+                                           final Equipment tag) {
+
+      boolean searchTagById = false;
+      // If we are in a FitLogEx file, then we have parsed equipments
+      // and we need to map tour tags using each equipment's GUID.
+      if (_equipments != null && _equipments.size() > 0) {
+         searchTagById = true;
+      }
+
+      boolean isTagAvailable = false;
+      for (final TourTag tourTag : allTourTags) {
+         if ((searchTagById && tourTag.getNotes().contains(tag.Id)) ||
+               (!searchTagById && tourTag.getTagName().equals(tag.getName()))) {
+            isTagAvailable = true;
+
+            tourTags.add(tourTag);
+            break;
+         }
+      }
+      return isTagAvailable;
    }
 
    @Override
