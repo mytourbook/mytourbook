@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
- * Initialize preferences for the SRTM plugin
+ * Initialize preferences for SRTM
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -42,5 +42,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // apply profile when it's selected in the profile list
       prefStore.setDefault(IPreferences.SRTM_APPLY_WHEN_PROFILE_IS_SELECTED, false);
+
+      // set validation date to be discated
+      prefStore.setDefault(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
    }
 }

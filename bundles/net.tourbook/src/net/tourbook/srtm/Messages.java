@@ -118,10 +118,14 @@ public class Messages extends NLS {
    public static String        PrefPage_SRTM_Dialog_CheckConnection_Error_Message;
    public static String        PrefPage_SRTM_Dialog_CheckConnection_OK_Message;
    public static String        PrefPage_SRTM_Dialog_CheckConnection_Title;
+   public static String        PrefPage_SRTM_Group_SrtmServerAccount;
+   public static String        PrefPage_SRTM_Label_AccountInfo;
+   public static String        PrefPage_SRTM_Label_AccountValidation_NO;
+   public static String        PrefPage_SRTM_Label_AccountValidation_YES;
+   public static String        PrefPage_SRTM_Label_CredentialValidation;
    public static String        PrefPage_SRTM_Label_Password;
    public static String        PrefPage_SRTM_Label_Username;
-   public static String        PrefPage_SRTM_Link_EarthdataUserProfile;
-
+   public static String        PrefPage_SRTM_Link_AccountInfo;
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

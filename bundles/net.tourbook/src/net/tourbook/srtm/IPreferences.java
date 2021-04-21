@@ -43,6 +43,7 @@ public interface IPreferences {
    static final String SRTM_SHADOW                         = "srtm.shadow";                         //$NON-NLS-1$
 
    // Access to SRTM server
-   static final String NASA_EARTHDATA_LOGIN_USER_NAME = "NASA_EARTHDATA_LOGIN_USER_NAME"; //$NON-NLS-1$
-   static final String NASA_EARTHDATA_LOGIN_PASSWORD  = "NASA_EARTHDATA_LOGIN_PASSWORD";  //$NON-NLS-1$
+   static final String NASA_EARTHDATA_LOGIN_USER_NAME         = "NASA_EARTHDATA_LOGIN_USER_NAME";         //$NON-NLS-1$
+   static final String NASA_EARTHDATA_LOGIN_PASSWORD          = "NASA_EARTHDATA_LOGIN_PASSWORD";          //$NON-NLS-1$
+   static final String NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE = "NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE"; //$NON-NLS-1$
 }

@@ -44,7 +44,7 @@ public class ElevationSRTM1 extends ElevationBase {
                + srtm1Suffix);
 
          try {
-            elevationFile = new ElevationFile(fileName, ElevationType.SRTM1);
+            elevationFile = new ElevationFile(fileName, null, ElevationType.SRTM1);
          } catch (final Exception e) {
             System.out.println("SRTM1I: Error: " + e.getMessage()); // NOT File not found //$NON-NLS-1$
             // dont return exception

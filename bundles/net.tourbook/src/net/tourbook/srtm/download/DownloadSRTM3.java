@@ -19,12 +19,14 @@
 package net.tourbook.srtm.download;
 
 import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.srtm.IPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -90,6 +92,14 @@ public class DownloadSRTM3 {
    public InputStream getResource(String resourceUrl,
                                   final String username,
                                   final String password) throws Exception {
+
+      /*
+       * Set up a cookie handler to maintain session cookies. A custom
+       * CookiePolicy could be used to limit cookies to just the resource
+       * server and URS.
+       */
+      CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+
       int redirects = 0;
 
       /* Place an upper limit on the number of redirects we will follow */
@@ -156,8 +166,10 @@ public class DownloadSRTM3 {
 
          // log just a few redirects in case it is not working any more
          if (_numRedirectedLogs < MAX_REDIRECTED_LOGS) {
+
             _numRedirectedLogs++;
-            System.out.println(UI.timeStampNano() + " Redirecting to: " + resourceUrl);
+
+            System.out.println(this.getClass().getCanonicalName() + " - Redirecting to: " + resourceUrl);
          }
       }
 

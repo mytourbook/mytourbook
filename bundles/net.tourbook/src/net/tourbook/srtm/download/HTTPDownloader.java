@@ -89,7 +89,7 @@ public class HTTPDownloader {
 
                final String resourceUrl = baseUrl + remoteFileName;
 
-               System.out.println("loading: " + resourceUrl); //$NON-NLS-1$
+               System.out.println(HTTPDownloader.class.getCanonicalName() + " - loading: " + resourceUrl); //$NON-NLS-1$
 
                inputStream = getInputStream(resourceUrl);
 
@@ -111,7 +111,7 @@ public class HTTPDownloader {
                   }
                }
 
-               System.out.println("# Bytes localName = " + numBytes_Written); //$NON-NLS-1$
+               System.out.println(HTTPDownloader.class.getCanonicalName() + " - # Bytes localName = " + numBytes_Written[0]); //$NON-NLS-1$
 
             } catch (final UnknownHostException e) {
 
@@ -147,7 +147,7 @@ public class HTTPDownloader {
                tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_END_LOADING, remoteFileName, 0);
             }
 
-            System.out.println("get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            System.out.println(HTTPDownloader.class.getCanonicalName() + " - get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
             return Status.OK_STATUS;
          }

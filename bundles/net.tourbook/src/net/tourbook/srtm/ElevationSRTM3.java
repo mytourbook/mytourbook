@@ -26,8 +26,15 @@ import net.tourbook.common.UI;
 
 public final class ElevationSRTM3 extends ElevationBase {
 
-   private static final String ELEVATION_ID         = "SRTM3"; //$NON-NLS-1$
-   private static final String SRTM3_FILE_EXTENSION = ".hgt";  //$NON-NLS-1$
+   private static final String ELEVATION_ID         = "SRTM3";    //$NON-NLS-1$
+
+   /**
+    * Example for a file name
+    * <p>
+    * http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N47E008.SRTMGL3.hgt.zip
+    */
+   private static final String SRTM3_FILE_NAME_PART = ".SRTMGL3"; //$NON-NLS-1$
+   private static final String SRTM3_FILE_EXTENSION = ".hgt";     //$NON-NLS-1$
 
    // default initial 16 Files
    private static final HashMap<Integer, SRTM3ElevationFile> _srtmElevationFilesCache = new HashMap<>();
@@ -50,7 +57,18 @@ public final class ElevationSRTM3 extends ElevationBase {
                ? lon.degrees
                : lon.degrees + 1);
 
-         final String fileName = new String(UI.EMPTY_STRING
+         final String localFilePath = new String(UI.EMPTY_STRING
+
+               + srtm3DataPath
+               + File.separator
+               + lat.direction + degreeNorthSouth // e.g. N20
+               + lon.direction + degreeEastWest //   e.g. W018
+               + SRTM3_FILE_NAME_PART
+               + SRTM3_FILE_EXTENSION
+
+         );
+
+         final String localFilePathUnzipped = new String(UI.EMPTY_STRING
 
                + srtm3DataPath
                + File.separator
@@ -61,7 +79,7 @@ public final class ElevationSRTM3 extends ElevationBase {
          );
 
          try {
-            __elevationFile = new ElevationFile(fileName, ElevationType.SRTM3);
+            __elevationFile = new ElevationFile(localFilePath, localFilePathUnzipped, ElevationType.SRTM3);
          } catch (final Exception e) {
             e.printStackTrace();
          }
@@ -129,6 +147,7 @@ public final class ElevationSRTM3 extends ElevationBase {
    /**
     * Clears the file cache by closing and removing all evaluation files
     */
+   @SuppressWarnings("unused")
    private static synchronized void clearElevationFileCache() {
 
       // close all files

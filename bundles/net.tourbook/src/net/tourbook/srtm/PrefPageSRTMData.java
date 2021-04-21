@@ -16,12 +16,10 @@
 package net.tourbook.srtm;
 
 import java.io.InputStream;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.srtm.download.DownloadSRTM3;
 import net.tourbook.web.WEB;
@@ -83,6 +81,12 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
    private Composite _prefContainer;
    private Composite _pathContainer;
 
+   private Group     _groupSRTM;
+
+   private Button    _btnTestConnection;
+
+   private Label     _lblSRTMValidation;
+
    private Text      _txtSRTM_Username;
    private Text      _txtSRTM_Password;
 
@@ -92,6 +96,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       initUI(parent);
       createUI(parent);
 
+      updateUI_AccountValidation();
       restoreState();
 
       enableControls();
@@ -111,13 +116,14 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       GridDataFactory.swtDefaults().grab(true, false).applyTo(_prefContainer);
       GridLayoutFactory.fillDefaults().applyTo(_prefContainer);
       GridDataFactory.swtDefaults().applyTo(_prefContainer);
+//      _prefContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_10_CacheSettings(_prefContainer);
-         createUI_20_SRTM(_prefContainer);
+         createUI_10_LocalCache(_prefContainer);
+         createUI_20_ServerAccount(_prefContainer);
       }
    }
 
-   private void createUI_10_CacheSettings(final Composite parent) {
+   private void createUI_10_LocalCache(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.prefPage_srtm_group_label_data_location);
@@ -146,7 +152,11 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
              * SRTM data filepath
              */
             _pathContainer = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pathContainer);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .span(3, 1)
+                  .applyTo(_pathContainer);
             {
                _dataPathEditor = new DirectoryFieldEditor(
                      IPreferences.SRTM_DATA_FILEPATH,
@@ -169,49 +179,26 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
    }
 
-   private void createUI_20_SRTM(final Composite parent) {
+   private void createUI_20_ServerAccount(final Composite parent) {
+
+      final int defaultCommentWidth = _pc.convertWidthInCharsToPixels(40);
 
       final GridDataFactory inputFieldLayout = GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.FILL)
             .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT);
 
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.prefPage_srtm_group_label_srtm3);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+      _groupSRTM = new Group(parent, SWT.NONE);
+      _groupSRTM.setText(Messages.PrefPage_SRTM_Group_SrtmServerAccount);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupSRTM);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupSRTM);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          {
             /*
-             * Username
+             * Link/Info: How enable SRTM download
              */
-            final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.PrefPage_SRTM_Label_Username);
-
-            _txtSRTM_Username = new Text(group, SWT.BORDER);
-            inputFieldLayout.applyTo(_txtSRTM_Username);
-         }
-         {
-            /*
-             * Password
-             */
-            final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.PrefPage_SRTM_Label_Password);
-
-            _txtSRTM_Password = new Text(group, SWT.BORDER | SWT.PASSWORD);
-
-            _txtSRTM_Password.addModifyListener(modifyEvent -> {
-               _txtSRTM_Password.setToolTipText(_txtSRTM_Password.getText());
-            });
-
-            inputFieldLayout.applyTo(_txtSRTM_Password);
-         }
-         {
-            /*
-             * Link: NASA Earthdata user profile
-             */
-            final Link link = new Link(group, SWT.NONE);
-            link.setText(NLS.bind(Messages.PrefPage_SRTM_Link_EarthdataUserProfile, HTTPS_NASA_EARTHDATA_LOGIN));
+            final Link link = new Link(_groupSRTM, SWT.NONE);
+            link.setText(NLS.bind(Messages.PrefPage_SRTM_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
             link.setToolTipText(HTTPS_NASA_EARTHDATA_LOGIN);
             link.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -221,16 +208,44 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             });
             GridDataFactory.fillDefaults()
                   .span(2, 1)
-                  .indent(0, 10)
+                  .hint(defaultCommentWidth, SWT.DEFAULT)
+//                  .indent(0, 10)
                   .applyTo(link);
+         }
+         UI.createSpacer_Horizontal(_groupSRTM, 2);
+         {
+            /*
+             * Username
+             */
+            final Label label = new Label(_groupSRTM, SWT.NONE);
+            label.setText(Messages.PrefPage_SRTM_Label_Username);
+
+            _txtSRTM_Username = new Text(_groupSRTM, SWT.BORDER);
+            _txtSRTM_Username.addModifyListener(modifyEvent -> enableControls());
+            inputFieldLayout.applyTo(_txtSRTM_Username);
+         }
+         {
+            /*
+             * Password
+             */
+            final Label label = new Label(_groupSRTM, SWT.NONE);
+            label.setText(Messages.PrefPage_SRTM_Label_Password);
+
+            _txtSRTM_Password = new Text(_groupSRTM, SWT.BORDER | SWT.PASSWORD);
+            _txtSRTM_Password.addModifyListener(modifyEvent -> {
+               _txtSRTM_Password.setToolTipText(_txtSRTM_Password.getText());
+               enableControls();
+            });
+
+            inputFieldLayout.applyTo(_txtSRTM_Password);
          }
          {
             /*
              * Test connection
              */
-            final Button btnTestConnection = new Button(group, SWT.NONE);
-            btnTestConnection.setText(Messages.prefPage_srtm_button_testConnection);
-            btnTestConnection.addSelectionListener(new SelectionAdapter() {
+            _btnTestConnection = new Button(_groupSRTM, SWT.NONE);
+            _btnTestConnection.setText(Messages.prefPage_srtm_button_testConnection);
+            _btnTestConnection.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onCheckConnection();
@@ -239,7 +254,19 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             GridDataFactory.swtDefaults()
                   .indent(0, 10)
                   .span(2, 1)
-                  .applyTo(btnTestConnection);
+                  .applyTo(_btnTestConnection);
+         }
+         {
+            /*
+             * Account validation
+             */
+            _lblSRTMValidation = new Label(_groupSRTM, SWT.WRAP);
+
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .grab(true, false)
+                  .hint(defaultCommentWidth, SWT.DEFAULT)
+                  .applyTo(_lblSRTMValidation);
          }
       }
    }
@@ -259,6 +286,11 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       } else {
          _dataPathEditor.setEnabled(true, _pathContainer);
       }
+
+      final boolean isUserPasswordAvailable = _txtSRTM_Username.getText().trim().length() > 0
+            && _txtSRTM_Password.getText().trim().length() > 0;
+
+      _btnTestConnection.setEnabled(isUserPasswordAvailable);
    }
 
    @Override
@@ -281,22 +313,18 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
    private void onCheckConnection() {
 
-      // ensure username and password are saved
-      saveState();
-
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-         /*
-          * Set up a cookie handler to maintain session cookies. A custom
-          * CookiePolicy could be used to limit cookies to just the resource
-          * server and URS.
-          */
-         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-
-         final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
-         final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+         final String password = _txtSRTM_Password.getText().trim();
+         final String username = _txtSRTM_Username.getText().trim();
 
          try (final InputStream inputStream = new DownloadSRTM3().getResource(HTTPS_NASA_TEST_URL, username, password)) {
+
+            // set validation time, this is used to check (enable actions) if a user can download SRTM data
+            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE,
+                  TimeTools.now().toInstant().toEpochMilli());
+
+            updateUI_AccountValidation();
 
             MessageDialog.openInformation(
                   _prefContainer.getShell(),
@@ -304,6 +332,11 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                   NLS.bind(Messages.PrefPage_SRTM_Dialog_CheckConnection_OK_Message, HTTPS_NASA_TEST_URL));
 
          } catch (final Exception e) {
+
+            // discard validation
+            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
+
+            updateUI_AccountValidation();
 
             MessageDialog.openInformation(
 
@@ -365,6 +398,23 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
       _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD, _txtSRTM_Password.getText().trim());
       _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME, _txtSRTM_Username.getText().trim());
+   }
+
+   private void updateUI_AccountValidation() {
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+
+      final String validationText = validationDate == Long.MIN_VALUE
+
+            ? Messages.PrefPage_SRTM_Label_AccountValidation_NO
+
+            : NLS.bind(Messages.PrefPage_SRTM_Label_AccountValidation_YES,
+                  TimeTools.Formatter_DateTime_M.format(TimeTools.getZonedDateTime(validationDate)));
+
+      _lblSRTMValidation.setText(validationText);
+
+      // the validation text can have different heights -> relayout to have no vertical gaps
+      _prefContainer.layout(true, true);
    }
 
    private boolean validateData() {

@@ -37,20 +37,20 @@ public class ElevationFile {
    private boolean     _isFileAvailable  = false;
    private boolean     _isLocalFileError = false;
 
-   public ElevationFile(final String fileName, final int elevationTyp) throws Exception {
+   public ElevationFile(final String localFilePath, final String localFilePathUnzipped, final int elevationTyp) throws Exception {
 
       switch (elevationTyp) {
       case ElevationType.ETOPO:
-         initETOPO(fileName);
+         initETOPO(localFilePath);
          break;
       case ElevationType.GLOBE:
-         initGLOBE(fileName);
+         initGLOBE(localFilePath);
          break;
       case ElevationType.SRTM3:
-         initSRTM3(fileName);
+         initSRTM3(localFilePath, localFilePathUnzipped);
          break;
       case ElevationType.SRTM1:
-         initSRTM1(fileName);
+         initSRTM1(localFilePath);
          break;
       }
    }
@@ -76,7 +76,7 @@ public class ElevationFile {
 
    private void handleError(final String fileName, final Exception e) {
 
-      System.out.println("handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+      System.out.println(this.getClass().getCanonicalName() + " - handleError: " + fileName + ": " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 
       if (e instanceof FileNotFoundException) {
          // done
@@ -144,18 +144,19 @@ public class ElevationFile {
       }
    }
 
-   private void initSRTM3(final String fileName) throws Exception {
+   private void initSRTM3(final String localFilePath, final String localFilePathUnzipped) throws Exception {
 
       if (_isLocalFileError) {
          return;
       }
 
       try {
-         open(fileName);
+         open(localFilePathUnzipped);
       } catch (final FileNotFoundException e1) {
          try {
+
             //  download zip-File <fileName>.zip and unzip
-            final String localZipName = fileName + ".zip"; //$NON-NLS-1$
+            final String localZipName = localFilePath + ".zip"; //$NON-NLS-1$
 
             // check if local zip file exists with a size == 0
             final File localFile = new File(localZipName);
@@ -170,7 +171,7 @@ public class ElevationFile {
                 */
                localFile.delete();
 
-               throw new Exception("local file is empty"); //$NON-NLS-1$
+               throw new Exception(this.getClass().getCanonicalName() + " - local file is empty: " + localFile.getAbsolutePath()); //$NON-NLS-1$
             }
 
             final String remoteFileName = localZipName.substring(localZipName.lastIndexOf(File.separator) + 1);
@@ -181,13 +182,13 @@ public class ElevationFile {
             final File zipArchive = new File(localZipName);
             zipArchive.delete();
 
-            open(fileName);
+            open(localFilePathUnzipped);
 
          } catch (final Exception e2) {
-            handleError(fileName, e2);
+            handleError(localFilePath, e2);
          }
       } catch (final Exception e1) { // other Error
-         handleError(fileName, e1);
+         handleError(localFilePathUnzipped, e1);
       }
    }
 
@@ -200,11 +201,11 @@ public class ElevationFile {
          _shortBuffer = _fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, _fileChannel.size()).asShortBuffer();
 
       } catch (final Exception e) {
-         System.out.println(e.getMessage());
+         System.out.println(this.getClass().getCanonicalName() + " - " + e.getMessage());
          throw (e);
       }
 
-      System.out.println("open " + fileName); //$NON-NLS-1$
+      System.out.println(this.getClass().getCanonicalName() + " - open " + fileName); //$NON-NLS-1$
 
       _isFileAvailable = true;
    }
