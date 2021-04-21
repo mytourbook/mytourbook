@@ -735,7 +735,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      //We close the window so the user can see that import progress bar and log view
+      //We close the window so the user can see the import progress bar and log view
       _parent.getShell().setVisible(false);
 
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
@@ -839,7 +839,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       Util.setStateDate(_state, STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM, _dtTourDate_From);
       Util.setStateDate(_state, STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL, _dtTourDate_Until);
 
-      // Data to import
+      // Data to re-import
       _state.put(STATE_IS_IMPORT_ENTIRE_TOUR, _chkData_EntireTour.getSelection());
       _state.put(STATE_IS_IMPORT_ELEVATION, _chkData_Elevation.getSelection());
       _state.put(STATE_IS_IMPORT_CADENCE, _chkData_Cadence.getSelection());
