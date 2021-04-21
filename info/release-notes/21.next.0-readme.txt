@@ -10,6 +10,9 @@ TODO's
  
 * Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
                - Implement workaround: Select tour with an action in the context menu
+               
+* Compare Tours by Elevation
+               - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
 
 * Geo Filter   Investigate/fix https://sourceforge.net/p/mytourbook/discussion/622811/thread/23132f7fbf/?limit=25#fbeb
 
