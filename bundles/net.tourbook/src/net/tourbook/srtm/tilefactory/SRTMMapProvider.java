@@ -98,12 +98,13 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
       // i.e. it gives the resolution of the image!
       final int grid = srtmProfile.getResolutionValue();
 
-      System.out.println(Messages.SRTM_MapProvider_Log_PaintingTile + ("(L=" + elevationLayer.getName())//$NON-NLS-1$
-            + (", G=" + grid)//$NON-NLS-1$
-            + (", X=" + tileX) //$NON-NLS-1$
-            + (", Y=" + tileY) //$NON-NLS-1$
-            + (", Z=" + tileZoom) //$NON-NLS-1$
-            + (")")); //$NON-NLS-1$
+      System.out.println(this.getClass().getCanonicalName() + " - Painting tile "
+            + " L=" + elevationLayer.getName() + "," //$NON-NLS-1$
+            + " G=" + grid + "," //$NON-NLS-1$
+            + " X=" + tileX + "," //$NON-NLS-1$
+            + " Y=" + tileY + "," //$NON-NLS-1$
+            + " Z=" + tileZoom //$NON-NLS-1$
+      );
 
       double lon = 0.;
       double lat = 0.;

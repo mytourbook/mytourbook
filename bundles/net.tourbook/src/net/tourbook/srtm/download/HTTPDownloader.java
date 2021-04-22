@@ -52,7 +52,7 @@ public class HTTPDownloader {
       if (Display.getCurrent() != null) {
 
          /*
-          * display info in the status line when this is running in the UI thread because the
+          * Display info in the status line when this is running in the UI thread because the
           * download will be blocking the UI thread until the download is finished
           */
          tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_START_LOADING, remoteFileName, -99);
@@ -64,8 +64,8 @@ public class HTTPDownloader {
 
             tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, numBytes_Written[0]);
 
-            // update every 200ms
-            this.schedule(200);
+            // update every 500ms
+            this.schedule(500);
 
             return Status.OK_STATUS;
          }
@@ -161,6 +161,7 @@ public class HTTPDownloader {
          downloadJob.join();
       } catch (final InterruptedException e) {
          e.printStackTrace();
+         Thread.currentThread().interrupt();
       }
 
       // stop monitor job
@@ -169,12 +170,16 @@ public class HTTPDownloader {
          monitorJob.join();
       } catch (final InterruptedException e) {
          e.printStackTrace();
+         Thread.currentThread().interrupt();
       }
 
       // throw exception when it occured during the download
-      final Exception e = (Exception) downloadJob.getResult().getException();
-      if (e != null) {
-//         throw (e);
+      final IStatus result = downloadJob.getResult();
+      if (result != null) {
+         final Exception e = (Exception) result.getException();
+         if (e != null) {
+            throw (e);
+         }
       }
 
    }
