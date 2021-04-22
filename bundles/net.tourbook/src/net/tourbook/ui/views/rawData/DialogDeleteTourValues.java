@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogDeleteTourValues extends TitleAreaDialog {
@@ -265,11 +266,15 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
        * group: data
        */
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Dialog_ResetTourValues_Group_Data);
-      group.setToolTipText(Messages.Dialog_ResetTourValues_Group_Data_Tooltip);
+      group.setText(Messages.Dialog_DeleteTourValues_Group_Reset);
+      group.setToolTipText(Messages.Dialog_DeleteTourValues_Group_Reset_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
+         final Label label = new Label(group, SWT.WRAP);
+         label.setText(Messages.Dialog_DeleteTourValues_Group_Reset_Label_Info);
+         gridDataItem.span(2, 1).applyTo(label);
+
          // row 1
          {
             /*
@@ -302,11 +307,15 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
        * group: data
        */
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Dialog_DeleteTourValues_Group_Data);
-      group.setToolTipText(Messages.Dialog_DeleteTourValues_Group_Data_Tooltip);
+      group.setText(Messages.Dialog_DeleteTourValues_Group_Delete);
+      group.setToolTipText(Messages.Dialog_DeleteTourValues_Group_Delete_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
+         final Label label = new Label(group, SWT.WRAP);
+         label.setText(Messages.Dialog_DeleteTourValues_Group_Delete_Label_Info);
+         GridDataFactory.fillDefaults().indent(16, 0).span(2, 1).applyTo(label);
+
          // row 1
          {
             /*

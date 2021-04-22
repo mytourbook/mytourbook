@@ -180,8 +180,9 @@ public class Messages extends NLS {
    public static String        Dialog_DeleteTourValues_Dialog_ConfirmDeleteValues_Message;
    public static String        Dialog_DeleteTourValues_Dialog_Message;
    public static String        Dialog_DeleteTourValues_Dialog_Title;
-   public static String        Dialog_DeleteTourValues_Group_Data;
-   public static String        Dialog_DeleteTourValues_Group_Data_Tooltip;
+   public static String        Dialog_DeleteTourValues_Group_Delete;
+   public static String        Dialog_DeleteTourValues_Group_Delete_Label_Info;
+   public static String        Dialog_DeleteTourValues_Group_Delete_Tooltip;
    public static String        Dialog_DeleteTourValues_Group_Tours;
    public static String        Dialog_DeleteTourValues_Group_Tours_Tooltip;
 
@@ -405,8 +406,9 @@ public class Messages extends NLS {
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
 
-   public static String        Dialog_ResetTourValues_Group_Data;
-   public static String        Dialog_ResetTourValues_Group_Data_Tooltip;
+   public static String        Dialog_DeleteTourValues_Group_Reset;
+   public static String        Dialog_DeleteTourValues_Group_Reset_Label_Info;
+   public static String        Dialog_DeleteTourValues_Group_Reset_Tooltip;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
