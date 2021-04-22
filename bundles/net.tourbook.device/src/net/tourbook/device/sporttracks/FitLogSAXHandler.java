@@ -16,9 +16,7 @@
 package net.tourbook.device.sporttracks;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +35,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -198,7 +195,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       private float   avgPower;
       private float   maxPower;
 
-      private int     timeZoneUtcOffset;
       private boolean hasTimeZoneUtcOffset = false;
       private boolean hasStartTime         = false;
 
@@ -353,32 +349,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       return startTimeDiff;
    }
 
-   /**
-    * Updates a given time based on the tour start's time zone
-    *
-    * @param epochTime
-    * @return The adjusted time
-    */
-   private long adjustTime(final long epochTime) {
-
-      long convertedEpochTime;
-      ZonedDateTime zonedDateTimeWithUTCOffset;
-
-      if (_currentActivity.hasTimeZoneUtcOffset) {
-
-         zonedDateTimeWithUTCOffset = Instant.ofEpochMilli(epochTime)
-               .atOffset(ZoneOffset.ofHours(_currentActivity.timeZoneUtcOffset))
-               .toZonedDateTime();
-      } else {
-
-         zonedDateTimeWithUTCOffset = TimeTools.getZonedDateTimeWithUTC(epochTime);
-      }
-
-      convertedEpochTime = zonedDateTimeWithUTCOffset.withZoneSameLocal(_currentActivity.tourStartTime.getZone()).toInstant().toEpochMilli();
-
-      return convertedEpochTime;
-   }
-
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
@@ -485,7 +455,7 @@ public class FitLogSAXHandler extends DefaultHandler {
           */
          final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
 
-         if (_currentActivity.tourStartTime.equals(tourStartTime_FromLatLon) == false) {
+         if (!_currentActivity.tourStartTime.equals(tourStartTime_FromLatLon)) {
 
             // time zone is different -> fix tour start components with adjusted time zone
             tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
@@ -613,9 +583,6 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          for (final Pause element : _currentActivity.pauses) {
 
-            element.startTime = adjustTime(element.startTime);
-            element.endTime = adjustTime(element.endTime);
-
             _pausedTime_Start.add(element.startTime);
             _pausedTime_End.add(element.endTime);
          }
@@ -656,7 +623,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       final Long tourId = tourData.createTourId(uniqueId);
 
       // check if the tour is already imported
-      if (_alreadyImportedTours.containsKey(tourId) == false) {
+      if (!_alreadyImportedTours.containsKey(tourId)) {
 
          // add new tour to other tours
          _newlyImportedTours.put(tourId, tourData);
@@ -809,9 +776,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       int lapCounter = 1;
       final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
       for (final Lap lap : _laps) {
-
-         lap.startTime = adjustTime(lap.startTime);
-         lap.endTime = adjustTime(lap.endTime);
 
          long startTimeDiff = lap.endTime - tourStartTime;// - tour2sliceTimeDiff;
 
@@ -1035,24 +999,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (_isInTimeZoneUtcOffset) {
 
          _isInTimeZoneUtcOffset = false;
-         _currentActivity.hasTimeZoneUtcOffset = false;
-
-         if (StringUtils.isNullOrEmpty(_characters.toString())) {
-            return;
-         }
-
-         final int timeZoneUtcOffset = Integer.parseInt(_characters.toString());
-
-         _currentActivity.hasTimeZoneUtcOffset = true;
-         _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
-
-         //We update the tour start time with the retrieved UTC offset
-         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
-               .atOffset(ZoneOffset.ofHours(
-                     _currentActivity.timeZoneUtcOffset))
-               .toZonedDateTime();
-         _currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
-         _currentActivity.tourStartTimeMills = tourStartTimeWithUTCOffset.toInstant().toEpochMilli();
+         _currentActivity.hasTimeZoneUtcOffset = StringUtils.hasContent(_characters.toString());
 
       } else if (_isInHasStartTime) {
 
@@ -1060,7 +1007,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          _currentActivity.hasStartTime = Boolean.parseBoolean(_characters.toString());
 
-         if (_currentActivity.hasStartTime == false) {
+         if (!_currentActivity.hasStartTime) {
             //We remove the hour from the start time
             final ZonedDateTime tourDateTime = ZonedDateTime.parse(String.format("%d-%02d-%02dT00:00:00.000Z", //$NON-NLS-1$
                   _currentActivity.tourStartTime.getYear(),
@@ -1159,16 +1106,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          if (latitude != Double.MIN_VALUE && longitude != Double.MIN_VALUE) {
-
-            //if it's the first time that we see lat/lon data,
-            //we update the tour start time with the correct time zone
-            if (!_currentActivity.hasGpsData) {
-
-               final int timeZoneIndex = TimeTools.getTimeZoneIndex(latitude, longitude);
-               final ZoneId zoneIdFromLatLon = ZoneId.of(TimeTools.getTimeZone_ByIndex(timeZoneIndex).zoneId);
-               _currentActivity.tourStartTime = _currentActivity.tourStartTime.withZoneSameLocal(zoneIdFromLatLon);
-               _currentActivity.tourStartTimeMills = _currentActivity.tourStartTime.toInstant().toEpochMilli();
-            }
 
             _prevLatitude = latitude;
             _prevLongitude = longitude;
