@@ -90,8 +90,7 @@ Bugfix
   - Fixed SQL exception when the tour database size is too large to fit into an integer value
 
 * Fitlog/FitlogEx import (Frederic)
-  - Fixed an issue where in some cases the time zone would be wrong and needed to be corrected with the coordinate's time zone while keeping the same tour start time
-
+  - Fixed an issue where in some cases the imported tour time zone could be wrong
 
 Translation    
 ===========
