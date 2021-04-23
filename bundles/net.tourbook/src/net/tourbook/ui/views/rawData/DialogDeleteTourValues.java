@@ -77,7 +77,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private final ITourViewer3           _tourViewer;
 
    private SelectionAdapter             _defaultListener;
-   private SelectionAdapter             _severalToursSelectionListener;
+   private SelectionAdapter             _mutltipleToursSelectionListener;
    private SelectionAdapter             _unlockButtonListener;
 
    private boolean                      _canSelectMultipleTours                     = false;
@@ -108,6 +108,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
+   private Button    _btnUnlockMultipleToursSelection;
 
    public DialogDeleteTourValues(final Shell parentShell,
                                  final ITourViewer3 tourViewer) {
@@ -220,7 +221,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
 
          /*
-          * Modify several tours
+          * Modify multiple tours
           */
          final Composite innerContainer = new Composite(group, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(innerContainer);
@@ -232,7 +233,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                 */
                _rdoDeleteTourValues_Tours_All = new Button(innerContainer, SWT.RADIO);
                _rdoDeleteTourValues_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-               _rdoDeleteTourValues_Tours_All.addSelectionListener(_severalToursSelectionListener);
+               _rdoDeleteTourValues_Tours_All.addSelectionListener(_mutltipleToursSelectionListener);
                _rdoDeleteTourValues_Tours_All.setSelection(false);
                _rdoDeleteTourValues_Tours_All.setEnabled(false);
                GridDataFactory.fillDefaults().span(3, 1).indent(0, 3).applyTo(_rdoDeleteTourValues_Tours_All);
@@ -243,7 +244,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                 */
                _rdoDeleteTourValues_Tours_BetweenDates = new Button(innerContainer, SWT.RADIO);
                _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_severalToursSelectionListener);
+               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_mutltipleToursSelectionListener);
                _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
                _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
 
@@ -265,13 +266,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             }
          }
          {
-            /*
-             * Unlock the area to select several tours to be modified
-             */
-            final Button unlock = new Button(group, SWT.PUSH);
-            unlock.setText("UNLOCK");
-            GridDataFactory.fillDefaults().span(1, 2).align(SWT.CENTER, SWT.CENTER).applyTo(unlock);
-            unlock.addSelectionListener(_unlockButtonListener);
+            _btnUnlockMultipleToursSelection = new Button(group, SWT.PUSH);
+            _btnUnlockMultipleToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            GridDataFactory.fillDefaults().span(1, 2).align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockMultipleToursSelection);
+            _btnUnlockMultipleToursSelection.addSelectionListener(_unlockButtonListener);
          }
       }
    }
@@ -632,7 +630,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       getButton(IDialogConstants.OK_ID).setEnabled(isDataSelected && isDataValid());
    }
 
-   private void enableSeveralToursSelectionControls() {
+   private void enableMultipleToursSelectionControls() {
 
       _canSelectMultipleTours = !_canSelectMultipleTours;
 
@@ -647,6 +645,11 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          _rdoDeleteTourValues_Tours_All.setSelection(false);
          _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
       }
+
+      _btnUnlockMultipleToursSelection.setText(_canSelectMultipleTours
+            ? Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text
+            : Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text);
+
    }
 
    private void fireTourModifyEvent() {
@@ -683,7 +686,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          }
       };
 
-      _severalToursSelectionListener = new SelectionAdapter() {
+      _mutltipleToursSelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
@@ -695,7 +698,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
-            enableSeveralToursSelectionControls();
+            enableMultipleToursSelectionControls();
          }
       };
    }

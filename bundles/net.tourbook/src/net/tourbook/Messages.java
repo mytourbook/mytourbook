@@ -370,6 +370,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
 
+   public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
+   public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Checkbox_CadenceValues;
    public static String        Dialog_ModifyTours_Checkbox_ElevationValues;
    public static String        Dialog_ModifyTours_Checkbox_GearValues;
