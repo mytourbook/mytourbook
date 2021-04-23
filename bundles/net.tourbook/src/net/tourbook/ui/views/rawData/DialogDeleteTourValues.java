@@ -647,9 +647,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       }
 
       _btnUnlockMultipleToursSelection.setText(_canSelectMultipleTours
-            ? Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text
-            : Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text);
-
+            ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+            : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
    }
 
    private void fireTourModifyEvent() {
