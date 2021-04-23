@@ -2600,60 +2600,57 @@ public class Util {
     */
    public static IViewPart showView(final String viewId, final boolean isActivateView) {
 
-      final IViewPart returnValue[] = { null };
+      final IViewPart[] returnValue = { null };
 
       /*
        * Ensure this is running in the UI thread otherwise workbench window is null.
        */
 
-      Display.getDefault().syncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().syncExec(() -> {
 
-            try {
+         try {
 
-               final IWorkbench wb = PlatformUI.getWorkbench();
-               if (wb == null) {
-                  return;
-               }
-
-               final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
-               if (wbWin == null) {
-                  return;
-               }
-
-               IWorkbenchPage page = wbWin.getActivePage();
-               if (page == null) {
-
-                  // this case can happen when all perspectives are closed, try to open default perspective
-
-                  final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
-                  if (defaultPerspectiveID == null) {
-                     return;
-                  }
-
-                  try {
-                     page = wb.showPerspective(defaultPerspectiveID, wbWin);
-                  } catch (final WorkbenchException e) {
-                     // ignore
-                  }
-
-                  if (page == null) {
-                     return;
-                  }
-               }
-
-               final int activationMode = isActivateView
-                     ? IWorkbenchPage.VIEW_ACTIVATE
-                     : IWorkbenchPage.VIEW_VISIBLE;
-
-               returnValue[0] = page.showView(viewId, null, activationMode);
-
+            final IWorkbench wb = PlatformUI.getWorkbench();
+            if (wb == null) {
                return;
-
-            } catch (final PartInitException e) {
-               StatusUtil.showStatus(e);
             }
+
+            final IWorkbenchWindow wbWin = wb.getActiveWorkbenchWindow();
+            if (wbWin == null) {
+               return;
+            }
+
+            IWorkbenchPage page = wbWin.getActivePage();
+            if (page == null) {
+
+               // this case can happen when all perspectives are closed, try to open default perspective
+
+               final String defaultPerspectiveID = wb.getPerspectiveRegistry().getDefaultPerspective();
+               if (defaultPerspectiveID == null) {
+                  return;
+               }
+
+               try {
+                  page = wb.showPerspective(defaultPerspectiveID, wbWin);
+               } catch (final WorkbenchException e1) {
+                  // ignore
+               }
+
+               if (page == null) {
+                  return;
+               }
+            }
+
+            final int activationMode = isActivateView
+                  ? IWorkbenchPage.VIEW_ACTIVATE
+                  : IWorkbenchPage.VIEW_VISIBLE;
+
+            returnValue[0] = page.showView(viewId, null, activationMode);
+
+            return;
+
+         } catch (final PartInitException e2) {
+            StatusUtil.showStatus(e2);
          }
       });
 

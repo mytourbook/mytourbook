@@ -76,10 +76,10 @@ import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.HoveredAreaContext;
-import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -104,8 +104,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -120,23 +118,17 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -152,7 +144,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 public class Map extends Canvas {
 
@@ -736,19 +727,9 @@ public class Map extends Canvas {
 
    private void addAllListener() {
 
-      addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            onPaint(e);
-         }
-      });
+      addPaintListener(this::onPaint);
 
-      addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose(e);
-         }
-      });
+      addDisposeListener(this::onDispose);
 
       addFocusListener(new FocusListener() {
          @Override
@@ -795,33 +776,13 @@ public class Map extends Canvas {
          public void mouseHover(final MouseEvent e) {}
       });
 
-      addMouseMoveListener(new MouseMoveListener() {
-         @Override
-         public void mouseMove(final MouseEvent event) {
-            onMouse_Move(event);
-         }
-      });
+      addMouseMoveListener(this::onMouse_Move);
 
-      addListener(SWT.MouseVerticalWheel, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onMouse_Wheel(event);
-         }
-      });
+      addListener(SWT.MouseVerticalWheel, this::onMouse_Wheel);
 
-      addListener(SWT.MouseHorizontalWheel, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onMouse_Wheel(event);
-         }
-      });
+      addListener(SWT.MouseHorizontalWheel, this::onMouse_Wheel);
 
-      addListener(SWT.KeyDown, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            onKey_Down(event);
-         }
-      });
+      addListener(SWT.KeyDown, this::onKey_Down);
 
       addControlListener(new ControlAdapter() {
          @Override
@@ -830,13 +791,8 @@ public class Map extends Canvas {
          }
       });
 
-      addTraverseListener(new TraverseListener() {
-         @Override
-         public void keyTraversed(final TraverseEvent e) {
-            // enable traverse keys
-            e.doit = true;
-         }
-      });
+      // enable traverse keys
+      addTraverseListener(traverseEvent -> traverseEvent.doit = true);
    }
 
    /**
@@ -845,7 +801,7 @@ public class Map extends Canvas {
    private void addDropTarget() {
 
       _dropTarget = new DropTarget(this, DND.DROP_MOVE | DND.DROP_COPY);
-      _dropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), TextTransfer.getInstance() });
+      _dropTarget.setTransfer(URLTransfer.getInstance(), TextTransfer.getInstance());
 
       _dropTarget.addDropListener(new DropTargetAdapter() {
          @Override
@@ -878,12 +834,7 @@ public class Map extends Canvas {
             /*
              * run async to free the mouse cursor from the drop operation
              */
-            _display.asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  onDropRunnable(event);
-               }
-            });
+            _display.asyncExec(() -> onDropRunnable(event));
          }
       });
    }
@@ -1064,17 +1015,14 @@ public class Map extends Canvas {
 
       menuMgr.setRemoveAllWhenShown(true);
 
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            if ((_mp == null) || _isContextMenuEnabled == false) {
-               return;
-            }
+         if ((_mp == null) || _isContextMenuEnabled == false) {
+            return;
+         }
 
-            if (_mapContextProvider != null) {
-               _mapContextProvider.fillContextMenu(menuMgr, _actionManageOfflineImages);
-            }
+         if (_mapContextProvider != null) {
+            _mapContextProvider.fillContextMenu(menuManager, _actionManageOfflineImages);
          }
       });
 
@@ -3225,17 +3173,13 @@ public class Map extends Canvas {
 
          // update display even when this is not the last created runnable
 
-         _display.syncExec(new Runnable() {
+         _display.syncExec(() -> {
 
-            @Override
-            public void run() {
-
-               if (isDisposed()) {
-                  return;
-               }
-
-               paint_10_PaintMapImage();
+            if (isDisposed()) {
+               return;
             }
+
+            paint_10_PaintMapImage();
          });
 
       } else {
@@ -4307,68 +4251,65 @@ public class Map extends Canvas {
 
    private void paint_Overlay_20_Tiles() {
 
-      BusyIndicator.showWhile(_display, new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(_display, () -> {
 
-            Tile tile;
+         Tile tile;
 
-            checkImageTemplate9Parts();
+         checkImageTemplate9Parts();
 
-            final long startTime = System.currentTimeMillis();
+         final long startTime = System.currentTimeMillis();
 
-            while ((tile = _tileOverlayPaintQueue.poll()) != null) {
+         while ((tile = _tileOverlayPaintQueue.poll()) != null) {
 
-               // skip tiles from another zoom level
-               if (tile.getZoom() == _mapZoomLevel) {
+            // skip tiles from another zoom level
+            if (tile.getZoom() == _mapZoomLevel) {
 
-                  // set state that this tile is checked
-                  tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
+               // set state that this tile is checked
+               tile.setOverlayTourStatus(OverlayTourState.TILE_IS_CHECKED);
 
-                  // cleanup previous positions
-                  tile.allPainted_HoverRectangle.clear();
-                  tile.allPainted_HoverTourID.clear();
+               // cleanup previous positions
+               tile.allPainted_HoverRectangle.clear();
+               tile.allPainted_HoverTourID.clear();
 
-                  /*
-                   * check if a tour, marker or photo is within the current tile
-                   */
-                  boolean isPaintingNeeded = false;
+               /*
+                * check if a tour, marker or photo is within the current tile
+                */
+               boolean isPaintingNeeded = false;
 
-                  for (final MapPainter overlayPainter : _overlays) {
+               for (final MapPainter overlayPainter : _overlays) {
 
-                     isPaintingNeeded = overlayPainter.isPaintingNeeded(Map.this, tile);
+                  isPaintingNeeded = overlayPainter.isPaintingNeeded(Map.this, tile);
 
-                     if (isPaintingNeeded) {
-                        break;
-                     }
-                  }
-
-                  if (isPaintingNeeded == false) {
-
-                     // set tile state
-                     tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
-
-                     continue;
-                  }
-
-                  // paint overlay
-                  if (isPaintTile_With_BasicMethod()) {
-                     paint_Overlay_22_PaintTileBasic(tile);
-                  } else {
-                     paint_Overlay_30_PaintTileEnhanced(tile);
-                  }
-
-                  // allow to display painted overlays
-                  final long paintTime = System.currentTimeMillis();
-                  if (paintTime > startTime + 100) {
+                  if (isPaintingNeeded) {
                      break;
                   }
-
-               } else {
-
-                  // tile has a different zoom level, ignore this tile
-                  tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
                }
+
+               if (isPaintingNeeded == false) {
+
+                  // set tile state
+                  tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
+
+                  continue;
+               }
+
+               // paint overlay
+               if (isPaintTile_With_BasicMethod()) {
+                  paint_Overlay_22_PaintTileBasic(tile);
+               } else {
+                  paint_Overlay_30_PaintTileEnhanced(tile);
+               }
+
+               // allow to display painted overlays
+               final long paintTime = System.currentTimeMillis();
+               if (paintTime > startTime + 100) {
+                  break;
+               }
+
+            } else {
+
+               // tile has a different zoom level, ignore this tile
+               tile.setOverlayTourStatus(OverlayTourState.TILE_IS_NOT_CHECKED);
             }
          }
       });
@@ -5739,12 +5680,9 @@ public class Map extends Canvas {
 
          // current thread is not the display thread
 
-         _display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!isDisposed()) {
-                  setMapCenterInWorldPixel(newMapCenter);
-               }
+         _display.syncExec(() -> {
+            if (!isDisposed()) {
+               setMapCenterInWorldPixel(newMapCenter);
             }
          });
       }
@@ -6158,15 +6096,12 @@ public class Map extends Canvas {
 
       _tour_ToolTip = tourToolTip;
 
-      tourToolTip.addHideListener(new IToolTipHideListener() {
-         @Override
-         public void afterHideToolTip(final Event event) {
+      tourToolTip.addHideListener(event -> {
 
-            // hide hovered area
-            _hoveredAreaContext = null;
+         // hide hovered area
+         _hoveredAreaContext = null;
 
-            redraw();
-         }
+         redraw();
       });
    }
 
@@ -6411,7 +6346,7 @@ public class Map extends Canvas {
       _overlayAlpha = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
 
             // convert % to 0xff
-            ? 0xff * _prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY) / 100
+            ? ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY))
 
             // no opacity
             : 0xff;

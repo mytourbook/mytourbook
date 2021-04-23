@@ -158,8 +158,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             + Integer.toString(TourManager.GRAPH_POWER));
 
       store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 100);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 50);
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
@@ -233,7 +233,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
       //
-      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 0x40); //64
+      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
+      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 50);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);

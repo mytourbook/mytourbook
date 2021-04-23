@@ -136,7 +136,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       final String dropboxResult = updateViewers();
 
-      if (!StringUtils.isNullOrEmpty(dropboxResult)) {
+      if (StringUtils.hasContent(dropboxResult)) {
          _isInErrorState = true;
 
          dialogAreaContainer.dispose();
@@ -350,7 +350,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
       final String dropboxResult = selectFolder(_workingDirectory);
 
-      if (!StringUtils.isNullOrEmpty(dropboxResult)) {
+      if (StringUtils.hasContent(dropboxResult)) {
          return dropboxResult;
       }
 

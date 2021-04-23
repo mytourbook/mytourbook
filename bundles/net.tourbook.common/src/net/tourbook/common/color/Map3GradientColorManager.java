@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -101,7 +101,6 @@ public class Map3GradientColorManager {
    public static final int    OPACITY_MIN           = 0;
    public static final int    OPACITY_MAX           = 100;
    public static final double OPACITY_DIGITS_FACTOR = 100.0;
-   public static final int    OPACITY_DIGITS        = 2;
    public static final float  OPACITY_DEFAULT       = 1.0f;
 
    /**
@@ -1148,14 +1147,10 @@ public class Map3GradientColorManager {
     */
    public static void saveColors() {
 
-      BufferedWriter writer = null;
+      final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
+      final File file = stateLocation.append(MAP3_COLOR_FILE).toFile();
 
-      try {
-
-         final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
-         final File file = stateLocation.append(MAP3_COLOR_FILE).toFile();
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+      try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8))) {
 
          final XMLMemento xmlRoot = saveColors_0_getXMLRoot();
 
@@ -1165,15 +1160,6 @@ public class Map3GradientColorManager {
 
       } catch (final IOException e) {
          StatusUtil.log(e);
-      } finally {
-
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
    }
 

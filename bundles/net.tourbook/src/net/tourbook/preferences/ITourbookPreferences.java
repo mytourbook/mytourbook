@@ -198,6 +198,7 @@ public interface ITourbookPreferences {
     */
    public static final String GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES = "GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES"; //$NON-NLS-1$
    public static final String GRAPH_IS_SHOW_PACE_GRAPH_INVERTED     = "GRAPH_IS_SHOW_PACE_GRAPH_INVERTED";     //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_NIGHT_SECTIONS          = "GRAPH_IS_SHOW_NIGHT_SECTIONS";
    public static final String GRAPH_OPACITY_NIGHT_SECTIONS          = "GRAPH_OPACITY_NIGHT_SECTIONS";
    public static final String GRAPH_MOUSE_MODE                      = "graph.toggle-mouse";                    //$NON-NLS-1$
    public static final String GRAPH_MOVE_SLIDERS_WHEN_ZOOMED        = "graphs.move-sliders-when-zoomed";       //$NON-NLS-1$
@@ -526,6 +527,7 @@ public interface ITourbookPreferences {
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$
 
+   public static final String TOGGLE_STATE_DELETE_TOUR_VALUES                 = "TOGGLE_STATE_DELETE_TOUR_VALUES";                //$NON-NLS-1$
    public static final String TOGGLE_STATE_REIMPORT_TOUR_VALUES               = "TOGGLE_STATE_REIMPORT_TOUR_VALUES";              //$NON-NLS-1$
 
    public static final String TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING     = "TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING";    //$NON-NLS-1$

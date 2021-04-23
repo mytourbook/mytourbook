@@ -25,6 +25,9 @@ TODO's
 * Website      Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
+* Tour modification - Create a separate checkbox for calories
+		    - Use multi-threading (ThreadPoolExecutor)
+
 Issues
 ======
 
@@ -34,7 +37,11 @@ Issues
 New
 ===
 
-* 
+* Tour Book View (Frederic)
+ - Added the ability to delete values, for any given tour, such as elevation, time, gear, cadence...etc
+
+* Tour values deletion/re-import (Frederic)
+ - Added a confirmation dialog that will always be displayed to the user when re-importing or deleting tour values for the whole database
 
 
 Improvements
@@ -47,6 +54,10 @@ Improvements
   - Displaying the night sections with a grey color for a more intuitive chart and better readability (Frederic)
   - More options to show R-R values together with other pules graphs (R-R average, device value)
 
+* 3D Map & Tour Chart Preferences (Frederic)
+ - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
+
+======
 * 2.5D Map (Thomas):
   - Upgrading VTM lib to 0.15
   - Size of photothumbnails can be changed via slideout
@@ -78,6 +89,8 @@ Bugfix
 * Compress Database
   - Fixed SQL exception when the tour database size is too large to fit into an integer value
 
+* Fitlog/FitlogEx import (Frederic)
+  - Fixed an issue where in some cases the imported tour time zone could be wrong
 
 Translation    
 ===========
@@ -93,4 +106,3 @@ System
 ======
 
 * Eclipse 2021-?
-* FIT SDK 21.47

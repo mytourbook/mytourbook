@@ -213,7 +213,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       if (folderChooserResult[0] == Window.OK) {
 
          final String selectedFolder = dropboxFolderChooser[0].getSelectedFolder();
-         if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+         if (StringUtils.hasContent(selectedFolder)) {
             FILE_SYSTEM_FOLDER = selectedFolder;
 
             return getDisplayId() + selectedFolder;
