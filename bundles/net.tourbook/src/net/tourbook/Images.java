@@ -155,6 +155,8 @@ public class Images {
    public static final String Graph_TourCompare_Disabled                = "tour-map-compare-result-graph-disabled.png";      //$NON-NLS-1$
    public static final String GroupValues                               = "app-group-values.png";                            //$NON-NLS-1$
    public static final String GroupValues_Disabled                      = "app-group-values-disabled.png";                   //$NON-NLS-1$
+   public static final String Lock_Closed                               = "lock-closed.png";                                 //$NON-NLS-1$
+   public static final String Lock_Open                                 = "lock-open.png";                                   //$NON-NLS-1$
    public static final String Map                                       = "map.png";                                         //$NON-NLS-1$
    public static final String Map_ValuePoint                            = "map-marker-value-point.png";                      //$NON-NLS-1$
    public static final String Map_WayPoint                              = "waypoint-large.png";                              //$NON-NLS-1$

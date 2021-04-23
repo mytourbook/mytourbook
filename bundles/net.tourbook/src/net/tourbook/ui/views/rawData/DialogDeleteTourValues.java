@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITourViewer3;
@@ -44,6 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -56,23 +58,23 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogDeleteTourValues extends TitleAreaDialog {
 
-   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM  = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM";      //$NON-NLS-1$
-   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM  = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM";        //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL";       //$NON-NLS-1$
 
-   private static final String          STATE_IS_DELETE_CADENCE                     = "STATE_IS_DELETE_CADENCE";                         //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_ELEVATION                   = "STATE_IS_DELETE_ELEVATION";                       //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_GEAR                        = "STATE_IS_DELETE_GEAR";                            //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_PULSE             = "STATE_IS_DELETE_POWER_AND_PULSE";                 //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                 //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                     //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                        //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_CADENCE                     = "STATE_IS_DELETE_CADENCE";                           //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_ELEVATION                   = "STATE_IS_DELETE_ELEVATION";                         //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_GEAR                        = "STATE_IS_DELETE_GEAR";                              //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_PULSE             = "STATE_IS_DELETE_POWER_AND_PULSE";                   //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                   //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                  //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                       //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                              //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                      //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                      //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                          //$NON-NLS-1$
 
-   private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues"); //$NON-NLS-1$
+   private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues");   //$NON-NLS-1$
 
    private final ITourViewer3           _tourViewer;
 
@@ -81,6 +83,11 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private SelectionAdapter             _unlockButtonListener;
 
    private boolean                      _canSelectMultipleTours                     = false;
+
+   private Image                        _imageLockClosed                            = TourbookPlugin.getImageDescriptor(Images.Lock_Closed)
+         .createImage();
+   private Image                        _imageLockOpen                              = TourbookPlugin.getImageDescriptor(Images.Lock_Open)
+         .createImage();
 
    /*
     * UI controls
@@ -268,6 +275,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          {
             _btnUnlockMultipleToursSelection = new Button(group, SWT.PUSH);
             _btnUnlockMultipleToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockMultipleToursSelection.setImage(_imageLockClosed);
             GridDataFactory.fillDefaults().span(1, 2).align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockMultipleToursSelection);
             _btnUnlockMultipleToursSelection.addSelectionListener(_unlockButtonListener);
          }
@@ -649,6 +657,9 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _btnUnlockMultipleToursSelection.setText(_canSelectMultipleTours
             ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
             : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+      _btnUnlockMultipleToursSelection.setImage(_canSelectMultipleTours
+            ? _imageLockOpen
+            : _imageLockClosed);
    }
 
    private void fireTourModifyEvent() {
