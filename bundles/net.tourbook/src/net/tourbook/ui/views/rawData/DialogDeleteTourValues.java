@@ -56,20 +56,23 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogDeleteTourValues extends TitleAreaDialog {
 
-   private static final String          STATE_IS_DELETE_CADENCE          = "STATE_IS_DELETE_CADENCE";                         //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_ELEVATION        = "STATE_IS_DELETE_ELEVATION";                       //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_GEAR             = "STATE_IS_DELETE_GEAR";                            //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_PULSE  = "STATE_IS_DELETE_POWER_AND_PULSE";                 //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_SPEED  = "STATE_IS_DELETE_POWER_AND_SPEED";                 //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_SWIMMING         = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TEMPERATURE      = "STATE_IS_DELETE_TEMPERATURE";                     //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIME             = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIMER_PAUSES     = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TOUR_MARKERS     = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TRAINING         = "STATE_IS_DELETE_TRAINING";                        //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM  = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM";      //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
 
-   private static final IDialogSettings _state                           = TourbookPlugin.getState("DialogDeleteTourValues"); //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_CADENCE                     = "STATE_IS_DELETE_CADENCE";                         //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_ELEVATION                   = "STATE_IS_DELETE_ELEVATION";                       //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_GEAR                        = "STATE_IS_DELETE_GEAR";                            //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_PULSE             = "STATE_IS_DELETE_POWER_AND_PULSE";                 //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                 //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                     //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                        //$NON-NLS-1$
+
+   private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues"); //$NON-NLS-1$
 
    private final ITourViewer3           _tourViewer;
 
@@ -77,7 +80,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private SelectionAdapter             _severalToursSelectionListener;
    private SelectionAdapter             _unlockButtonListener;
 
-   private boolean                      _canSelectMultipleTours          = false;
+   private boolean                      _canSelectMultipleTours                     = false;
 
    /*
     * UI controls
@@ -770,6 +773,9 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private void restoreState() {
 
+      Util.getStateDate(_state, STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM, LocalDate.now(), _dtTourDate_From);
+      Util.getStateDate(_state, STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL, LocalDate.now(), _dtTourDate_Until);
+
       // Data to delete
       _chkData_Time.setSelection(_state.getBoolean(STATE_IS_DELETE_TIME));
       _chkData_Elevation.setSelection(_state.getBoolean(STATE_IS_DELETE_ELEVATION));
@@ -788,6 +794,9 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    }
 
    private void saveState() {
+
+      Util.setStateDate(_state, STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM, _dtTourDate_From);
+      Util.setStateDate(_state, STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL, _dtTourDate_Until);
 
       // Data to delete
       _state.put(STATE_IS_DELETE_ELEVATION, _chkData_Elevation.getSelection());
