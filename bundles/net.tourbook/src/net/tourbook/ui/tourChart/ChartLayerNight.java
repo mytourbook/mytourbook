@@ -21,6 +21,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.PixelConverter;
@@ -33,7 +34,7 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private ChartNightConfig              _cnc;
+   private ChartNightConfig              _chartNightConfig;
 
    public ChartLayerNight() {
       //Nothing to do
@@ -45,19 +46,23 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
    @Override
    public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
 
-      final int opacity = _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS);
+      if (!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS)) {
+         return;
+      }
+
+      final int opacity = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
 
       final int devYTop = drawingData.getDevYTop();
       final int devGraphHeight = drawingData.devGraphHeight;
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
-      gc.setBackground(new Color(gc.getDevice(), 0x8c, 0x8c, 0x8c, opacity));
+      gc.setBackground(new Color(0x8c, 0x8c, 0x8c, opacity));
       gc.setAlpha(opacity);
 
       final double scaleX = drawingData.getScaleX();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
       final int devYBottom = drawingData.getDevYBottom();
-      for (final ChartLabel chartLabel : _cnc.chartLabels) {
+      for (final ChartLabel chartLabel : _chartNightConfig.chartLabels) {
 
          final double virtualXPos = chartLabel.graphX * scaleX;
          final int devXNightSectionStart = (int) (virtualXPos - devVirtualGraphImageOffset);
@@ -81,6 +86,6 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
    }
 
    public void setChartNightConfig(final ChartNightConfig chartNightConfig) {
-      _cnc = chartNightConfig;
+      _chartNightConfig = chartNightConfig;
    }
 }

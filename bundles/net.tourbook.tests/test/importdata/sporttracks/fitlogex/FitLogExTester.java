@@ -25,6 +25,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLogSAXHandler;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -51,7 +52,42 @@ class FitLogExTester {
       deviceDataReader = new FitLogDeviceDataReader();
    }
 
+	@AfterEach
+	void tearDown() {
+		newlyImportedTours.clear();
+		alreadyImportedTours.clear();
+	}
+   	/**
+	 * This tests parses a file for which the time offset of -7 hours is wrong
+	 * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
+	 * zone (-6h or -21600). However, the start time is correct and needs to be
+	 * kept.
+	 *
+	 * @throws SAXException
+	 * @throws IOException
+	 */
    @Test
+   void testImportParkCity() throws SAXException, IOException {
+      final String filePathWithoutExtension = IMPORT_PATH +
+				"ParkCity"; //$NON-NLS-1$
+      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
+      final InputStream fitLogExFile = FitLogExTester.class.getResourceAsStream(importFilePath);
+
+      final FitLogSAXHandler handler = new FitLogSAXHandler(
+            deviceDataReader,
+            importFilePath,
+            alreadyImportedTours,
+            newlyImportedTours,
+            true);
+
+      parser.parse(fitLogExFile, handler);
+
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      Comparison.compareTourDataAgainstControl(tour, "test/" + filePathWithoutExtension); //$NON-NLS-1$
+   }
+
+	@Test
    void testImportTimothyLake() throws SAXException, IOException {
       final String filePathWithoutExtension = IMPORT_PATH +
             "TimothyLake"; //$NON-NLS-1$

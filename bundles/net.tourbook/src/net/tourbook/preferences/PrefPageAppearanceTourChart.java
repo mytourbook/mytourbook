@@ -32,18 +32,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -174,7 +168,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    @Override
    protected Control createContents(final Composite parent) {
 
-      initUI(parent);
+      initUI();
 
       final Control ui = createUI(parent);
 
@@ -293,27 +287,21 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          }
       });
 
-      _graphCheckboxList.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
+      _graphCheckboxList.addCheckStateListener(checkStateChangedEvent -> {
 
-            // keep the checked status
-            final Graph item = (Graph) event.getElement();
-            item.__isChecked = event.getChecked();
+         // keep the checked status
+         final Graph item = (Graph) checkStateChangedEvent.getElement();
+         item.__isChecked = checkStateChangedEvent.getChecked();
 
-            // select the checked item
-            _graphCheckboxList.setSelection(new StructuredSelection(item));
+         // select the checked item
+         _graphCheckboxList.setSelection(new StructuredSelection(item));
 
-            validateInput();
-         }
+         validateInput();
       });
 
-      _graphCheckboxList.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            enableUpDownActions();
-            doLiveUpdate();
-         }
+      _graphCheckboxList.addSelectionChangedListener(selectionChangedEvent -> {
+         enableUpDownActions();
+         doLiveUpdate();
       });
 
 //      final Table table = _graphCheckboxList.getTable();
@@ -383,14 +371,17 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip);
 
          /*
-          * spinner: graph filling transparence
+          * spinner: graph filling transparency
           */
          _spinnerGraphTransparencyLine = new Spinner(container, SWT.BORDER);
          GridDataFactory.fillDefaults() //
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_spinnerGraphTransparencyLine);
-         _spinnerGraphTransparencyLine.setMinimum(0x10);
-         _spinnerGraphTransparencyLine.setMaximum(0xff);
+         _spinnerGraphTransparencyLine.setMinimum(0);
+         _spinnerGraphTransparencyLine.setMaximum(100);
+         _spinnerGraphTransparencyLine.setIncrement(1);
+         _spinnerGraphTransparencyLine.setPageIncrement(10);
+         _spinnerGraphTransparencyLine.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip);
          _spinnerGraphTransparencyLine.addMouseWheelListener(_defaultMouseWheelListener);
          _spinnerGraphTransparencyLine.addSelectionListener(_defaultSelectionListener);
 
@@ -405,14 +396,17 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
 
          /*
-          * spinner: graph filling transparence
+          * spinner: graph filling transparency
           */
          _spinnerGraphTransparencyFilling = new Spinner(container, SWT.BORDER);
          GridDataFactory.fillDefaults() //
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_spinnerGraphTransparencyFilling);
-         _spinnerGraphTransparencyFilling.setMinimum(0x00);
-         _spinnerGraphTransparencyFilling.setMaximum(0xff);
+         _spinnerGraphTransparencyFilling.setMinimum(0);
+         _spinnerGraphTransparencyFilling.setMaximum(100);
+         _spinnerGraphTransparencyFilling.setIncrement(1);
+         _spinnerGraphTransparencyFilling.setPageIncrement(10);
+         _spinnerGraphTransparencyFilling.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
          _spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
          _spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
 
@@ -724,14 +718,11 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       setPreferenceStore(_prefStore);
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onSelection();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelection();
       };
 
       _defaultSelectionListener = new SelectionAdapter() {
@@ -741,12 +732,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          }
       };
 
-      _defaultChangePropertyListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onSelection();
-         }
-      };
+      _defaultChangePropertyListener = propertyChangeEvent -> onSelection();
 
 // SET_FORMATTING_OFF
 
