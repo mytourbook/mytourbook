@@ -74,6 +74,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private final ITourViewer3           _tourViewer;
 
    private SelectionAdapter             _defaultListener;
+   private SelectionAdapter             _severalToursSelectionListener;
    private SelectionAdapter             _unlockButtonListener;
 
    private boolean                      _canSelectMultipleTours          = false;
@@ -228,7 +229,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                 */
                _rdoDeleteTourValues_Tours_All = new Button(innerContainer, SWT.RADIO);
                _rdoDeleteTourValues_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-               _rdoDeleteTourValues_Tours_All.addSelectionListener(_defaultListener);
+               _rdoDeleteTourValues_Tours_All.addSelectionListener(_severalToursSelectionListener);
                _rdoDeleteTourValues_Tours_All.setSelection(false);
                _rdoDeleteTourValues_Tours_All.setEnabled(false);
                GridDataFactory.fillDefaults().span(3, 1).indent(0, 3).applyTo(_rdoDeleteTourValues_Tours_All);
@@ -239,7 +240,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                 */
                _rdoDeleteTourValues_Tours_BetweenDates = new Button(innerContainer, SWT.RADIO);
                _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_defaultListener);
+               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_severalToursSelectionListener);
                _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
                _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
 
@@ -611,18 +612,6 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private void enableControls() {
 
-      final boolean isValid = isDataValid();
-
-      if (_rdoDeleteTourValues_Tours_All.getSelection() || _rdoDeleteTourValues_Tours_BetweenDates.getSelection()) {
-
-         _rdoDeleteTourValues_Tours_Selected.setSelection(false);
-
-      } else if (_rdoDeleteTourValues_Tours_Selected.getSelection()) {
-
-         _rdoDeleteTourValues_Tours_All.setSelection(false);
-         _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
-      }
-
       final boolean isDataSelected = _chkData_Time.getSelection() ||
             _chkData_Elevation.getSelection() ||
             _chkData_Cadence.getSelection() ||
@@ -637,7 +626,7 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _chkData_TourTimerPauses.getSelection();
 
       // OK button
-      getButton(IDialogConstants.OK_ID).setEnabled(isDataSelected && isValid);
+      getButton(IDialogConstants.OK_ID).setEnabled(isDataSelected && isDataValid());
    }
 
    private void enableSeveralToursSelectionControls() {
@@ -684,7 +673,18 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          @Override
          public void widgetSelected(final SelectionEvent e) {
 
+            _rdoDeleteTourValues_Tours_All.setSelection(false);
+            _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
+
             enableControls();
+         }
+      };
+
+      _severalToursSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+
+            _rdoDeleteTourValues_Tours_Selected.setSelection(false);
          }
       };
 
@@ -804,4 +804,3 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _state.put(STATE_IS_DELETE_TIMER_PAUSES, _chkData_TourTimerPauses.getSelection());
    }
 }
-
