@@ -43,7 +43,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -53,18 +52,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String ID                      = "net.tourbook.srtm.PrefPageSRTMData";//$NON-NLS-1$
+
+   public static final String FOCUS_USER_NAME         = "focusUsername";                     //$NON-NLS-1$
+   public static final String FOCUS_VALIDATE_DOWNLOAD = "focusValidateDownload";             //$NON-NLS-1$
+
 // SET_FORMATTING_OFF
 
    private static final String HTTPS_NASA_EARTHDATA_LOGIN = "https://urs.earthdata.nasa.gov/home"; //$NON-NLS-1$
    private static final String HTTPS_NASA_TEST_URL        = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N10E012.SRTMGL3.hgt.zip.xml";      //$NON-NLS-1$
-// private static final String HTTPS_NASA_TEST_URL        = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL1.003/2000.02.11/S20E120.SRTMGL1.hgt.zip.xml";
+
 
    // Old url for SRTM 3 data
    //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
 
 // SET_FORMATTING_ON
-
-//   private static HttpClient    _httpClient          = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
    private IPreferenceStore     _prefStore           = TourbookPlugin.getPrefStore();
 
@@ -81,14 +83,32 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
    private Composite _prefContainer;
    private Composite _pathContainer;
 
-   private Group     _groupSRTM;
-
-   private Button    _btnTestConnection;
+   private Button    _btnResetValidation;
+   private Button    _btnValidateDownloadOfSRTMData;
 
    private Label     _lblSRTMValidation;
 
    private Text      _txtSRTM_Username;
    private Text      _txtSRTM_Password;
+
+   @Override
+   public void applyData(final Object data) {
+
+      // run async otherwise the button do not have the focus !!!
+      _prefContainer.getDisplay().asyncExec(() -> {
+
+         if (FOCUS_USER_NAME.equals(data)) {
+
+            // set focus to username
+            _txtSRTM_Username.setFocus();
+
+         } else if (FOCUS_VALIDATE_DOWNLOAD.equals(data)) {
+
+            // set focus to validation button
+            _btnValidateDownloadOfSRTMData.setFocus();
+         }
+      });
+   }
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -187,17 +207,17 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             .align(SWT.BEGINNING, SWT.FILL)
             .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT);
 
-      _groupSRTM = new Group(parent, SWT.NONE);
-      _groupSRTM.setText(Messages.PrefPage_SRTM_Group_SrtmServerAccount);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupSRTM);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupSRTM);
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.PrefPage_SRTM_Group_SrtmServerAccount);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          {
             /*
              * Link/Info: How enable SRTM download
              */
-            final Link link = new Link(_groupSRTM, SWT.NONE);
+            final Link link = new Link(group, SWT.NONE);
             link.setText(NLS.bind(Messages.PrefPage_SRTM_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
             link.setToolTipText(HTTPS_NASA_EARTHDATA_LOGIN);
             link.addSelectionListener(new SelectionAdapter() {
@@ -209,18 +229,17 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .hint(defaultCommentWidth, SWT.DEFAULT)
-//                  .indent(0, 10)
                   .applyTo(link);
          }
-         UI.createSpacer_Horizontal(_groupSRTM, 2);
+         UI.createSpacer_Horizontal(group, 2);
          {
             /*
              * Username
              */
-            final Label label = new Label(_groupSRTM, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.PrefPage_SRTM_Label_Username);
 
-            _txtSRTM_Username = new Text(_groupSRTM, SWT.BORDER);
+            _txtSRTM_Username = new Text(group, SWT.BORDER);
             _txtSRTM_Username.addModifyListener(modifyEvent -> enableControls());
             inputFieldLayout.applyTo(_txtSRTM_Username);
          }
@@ -228,39 +247,72 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             /*
              * Password
              */
-            final Label label = new Label(_groupSRTM, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.PrefPage_SRTM_Label_Password);
 
-            _txtSRTM_Password = new Text(_groupSRTM, SWT.BORDER | SWT.PASSWORD);
-            _txtSRTM_Password.addModifyListener(modifyEvent -> {
-               _txtSRTM_Password.setToolTipText(_txtSRTM_Password.getText());
-               enableControls();
-            });
-
+            _txtSRTM_Password = new Text(group, SWT.BORDER | SWT.PASSWORD);
+            _txtSRTM_Password.addModifyListener(modifyEvent -> onModifyPassword());
             inputFieldLayout.applyTo(_txtSRTM_Password);
          }
          {
-            /*
-             * Test connection
-             */
-            _btnTestConnection = new Button(_groupSRTM, SWT.NONE);
-            _btnTestConnection.setText(Messages.prefPage_srtm_button_testConnection);
-            _btnTestConnection.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onCheckConnection();
-               }
-            });
-            GridDataFactory.swtDefaults()
-                  .indent(0, 10)
+            final Composite container = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
                   .span(2, 1)
-                  .applyTo(_btnTestConnection);
+                  .indent(0, 10)
+                  .applyTo(container);
+            GridLayoutFactory.fillDefaults()
+                  .numColumns(3)
+                  .applyTo(container);
+            {
+               {
+                  /*
+                   * Validate download of SRTM data files
+                   */
+                  _btnValidateDownloadOfSRTMData = new Button(container, SWT.NONE);
+                  _btnValidateDownloadOfSRTMData.setText(Messages.PrefPage_SRTM_Button_ValidateDownloadOfSrtmData);
+                  _btnValidateDownloadOfSRTMData.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_ValidateSrtmDownload();
+                     }
+                  });
+               }
+               {
+                  /*
+                   * Reset validation
+                   */
+                  _btnResetValidation = new Button(container, SWT.NONE);
+                  _btnResetValidation.setText(Messages.PrefPage_SRTM_Button_ResetValidation);
+                  _btnResetValidation.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_ResetValidation();
+                     }
+                  });
+               }
+               {
+                  /*
+                   * Allow dummy validation, this can be helpful when validation is currently not
+                   * working or to use already downloaded SRTM files
+                   */
+                  final Button btnSrtmDummyValidation = new Button(container, SWT.NONE);
+                  btnSrtmDummyValidation.setText(Messages.PrefPage_SRTM_Button_SrtmDummyValidation);
+                  btnSrtmDummyValidation.setToolTipText(Messages.PrefPage_SRTM_Button_SrtmDummyValidation_Tooltip);
+                  btnSrtmDummyValidation.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_DummyValidation();
+                     }
+                  });
+               }
+            }
          }
          {
             /*
              * Account validation
              */
-            _lblSRTMValidation = new Label(_groupSRTM, SWT.WRAP);
+            _lblSRTMValidation = new Label(group, SWT.WRAP);
 
             GridDataFactory.fillDefaults()
                   .span(2, 1)
@@ -287,10 +339,20 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
          _dataPathEditor.setEnabled(true, _pathContainer);
       }
 
-      final boolean isUserPasswordAvailable = _txtSRTM_Username.getText().trim().length() > 0
-            && _txtSRTM_Password.getText().trim().length() > 0;
+      final String username = _txtSRTM_Username.getText();
+      final String password = _txtSRTM_Password.getText();
 
-      _btnTestConnection.setEnabled(isUserPasswordAvailable);
+      final String usernameTrimmed = username.trim();
+      final String passwordTrimmed = password.trim();
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+
+      final boolean isValidationDateSet = validationDate != Long.MIN_VALUE;
+      final boolean isAccountDataSet = usernameTrimmed.length() > 0 && passwordTrimmed.length() > 0;
+      final boolean canResetValidation = username.length() > 0 || password.length() > 0 || isValidationDateSet;
+
+      _btnResetValidation.setEnabled(canResetValidation);
+      _btnValidateDownloadOfSRTMData.setEnabled(isAccountDataSet);
    }
 
    @Override
@@ -311,9 +373,50 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       return super.okToLeave();
    }
 
-   private void onCheckConnection() {
+   private void onModifyPassword() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+      final String passwordText = _txtSRTM_Password.getText();
+
+      _txtSRTM_Password.setToolTipText(passwordText.length() == 0
+            ? Messages.PrefPage_SRTM_Info_EmptyPassword
+            : passwordText);
+
+      enableControls();
+   }
+
+   private void onSelect_DummyValidation() {
+
+      final String password = _txtSRTM_Password.getText().trim();
+      final String username = _txtSRTM_Username.getText().trim();
+
+      if (UI.EMPTY_STRING.equals(password)) {
+         _txtSRTM_Password.setText(Messages.PrefPage_SRTM_Info_DummyPassword);
+      }
+
+      if (UI.EMPTY_STRING.equals(username)) {
+         _txtSRTM_Username.setText(Messages.PrefPage_SRTM_Info_DummyUsername);
+      }
+
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, TimeTools.nowInMilliseconds());
+
+      updateUI_AccountValidation();
+   }
+
+   private void onSelect_ResetValidation() {
+
+      _txtSRTM_Password.setText(UI.EMPTY_STRING);
+      _txtSRTM_Username.setText(UI.EMPTY_STRING);
+
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
+
+      updateUI_AccountValidation();
+
+      enableControls();
+   }
+
+   private void onSelect_ValidateSrtmDownload() {
+
+      BusyIndicator.showWhile(_prefContainer.getDisplay(), () -> {
 
          final String password = _txtSRTM_Password.getText().trim();
          final String username = _txtSRTM_Username.getText().trim();
@@ -321,15 +424,14 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
          try (final InputStream inputStream = new DownloadSRTM3().getResource(HTTPS_NASA_TEST_URL, username, password)) {
 
             // set validation time, this is used to check (enable actions) if a user can download SRTM data
-            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE,
-                  TimeTools.now().toInstant().toEpochMilli());
+            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, TimeTools.nowInMilliseconds());
 
             updateUI_AccountValidation();
 
             MessageDialog.openInformation(
                   _prefContainer.getShell(),
-                  Messages.PrefPage_SRTM_Dialog_CheckConnection_Title,
-                  NLS.bind(Messages.PrefPage_SRTM_Dialog_CheckConnection_OK_Message, HTTPS_NASA_TEST_URL));
+                  Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_OK_Message, HTTPS_NASA_TEST_URL));
 
          } catch (final Exception e) {
 
@@ -341,10 +443,10 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             MessageDialog.openInformation(
 
                   _prefContainer.getShell(),
-                  Messages.PrefPage_SRTM_Dialog_CheckConnection_Title,
-                  NLS.bind(Messages.PrefPage_SRTM_Dialog_CheckConnection_Error_Message,
-                        e.getMessage(),
-                        HTTPS_NASA_TEST_URL));
+                  Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Error_Message,
+                        HTTPS_NASA_TEST_URL,
+                        e.getMessage()));
 
             StatusUtil.log(e);
          }
@@ -396,11 +498,26 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       _useDefaultLocation.store();
       _dataPathEditor.store();
 
-      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD, _txtSRTM_Password.getText().trim());
-      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME, _txtSRTM_Username.getText().trim());
+      final String password = _txtSRTM_Password.getText().trim();
+      final String username = _txtSRTM_Username.getText().trim();
+
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD, password);
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME, username);
+
+      if (password.length() == 0 || username.length() == 0) {
+
+         // reset validation
+         _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
+
+         updateUI_AccountValidation();
+      }
    }
 
    private void updateUI_AccountValidation() {
+
+      if (_prefContainer.isDisposed()) {
+         return;
+      }
 
       final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
 

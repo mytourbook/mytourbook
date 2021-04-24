@@ -35,6 +35,7 @@ import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.srtm.IPreferences;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.I2ndAltiLayer;
 import net.tourbook.ui.tourChart.IXAxisSelectionListener;
@@ -196,6 +197,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    private Composite _pageOption_GeoPosition;
 
    private Combo     _comboAdjustmentType;
+   private Label     _lblAdjustmentTypeInfo;
 
    private Button    _btnSRTMRemoveAllPoints;
    private Button    _btnResetAltitude;
@@ -852,12 +854,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
       final Composite typeContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(typeContainer);
-      GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 5, 0).applyTo(typeContainer);
+      GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 5, 0).applyTo(typeContainer);
       {
+         // label: adjustment type
          final Label label = new Label(typeContainer, SWT.NONE);
          label.setText(Messages.adjust_altitude_label_adjustment_type);
 
-         // combo: adjust type
+         // combo: adjustment type
          _comboAdjustmentType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
          _comboAdjustmentType.setVisibleItemCount(20);
          _comboAdjustmentType.addSelectionListener(new SelectionAdapter() {
@@ -866,6 +869,16 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                onSelectAdjustmentType();
             }
          });
+
+         // label: adjustment type info
+         _lblAdjustmentTypeInfo = new Label(typeContainer, SWT.NONE);
+         _lblAdjustmentTypeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         _lblAdjustmentTypeInfo.setText(UI.SPACE1);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.FILL, SWT.CENTER)
+               .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+               .applyTo(_lblAdjustmentTypeInfo);
       }
 
       // fill combo
@@ -1646,6 +1659,22 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       return getSelectedAdjustmentType().__id == ADJUST_TYPE_SRTM_SPLINE;
    }
 
+   private boolean isSrtmDownloadValid() {
+
+      final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+      final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+      if (password.trim().length() == 0 || username.trim().length() == 0) {
+         return false;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+      if (validationDate < 0) {
+         return false;
+      }
+
+      return true;
+   }
+
    @Override
    protected void okPressed() {
 
@@ -1850,15 +1879,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _tourData.splineDataPoints = null;
       _splineData.splinePoint_DataSerieIndex = null;
 
+      _lblAdjustmentTypeInfo.setText(UI.EMPTY_STRING);
+
       final int adjustmentType = getSelectedAdjustmentType().__id;
       switch (adjustmentType) {
-      case ADJUST_TYPE_SRTM:
-
-         _pageBookOptions.showPage(_pageOption_SRTM);
-
-         computeElevation_SRTM();
-
-         break;
 
       case ADJUST_TYPE_HORIZONTAL_GEO_POSITION:
 
@@ -1868,7 +1892,23 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          break;
 
+      case ADJUST_TYPE_SRTM:
+
+         if (isSrtmDownloadValid() == false) {
+            _lblAdjustmentTypeInfo.setText(Messages.Dialog_AdjustAltitude_Label_SrtmIsInvalid);
+         }
+
+         _pageBookOptions.showPage(_pageOption_SRTM);
+
+         computeElevation_SRTM();
+
+         break;
+
       case ADJUST_TYPE_SRTM_SPLINE:
+
+         if (isSrtmDownloadValid() == false) {
+            _lblAdjustmentTypeInfo.setText(Messages.Dialog_AdjustAltitude_Label_SrtmIsInvalid);
+         }
 
          _pageBookOptions.showPage(_pageOption_SRTM_AndSpline);
 

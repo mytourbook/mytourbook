@@ -27,10 +27,13 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
+import net.tourbook.srtm.IPreferences;
+import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -47,8 +50,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * Tour chart properties slideout.
@@ -175,14 +180,17 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults()
-               .numColumns(2)
-               .applyTo(container);
+         GridLayoutFactory.fillDefaults().applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
-            createUI_10_Title(container);
-            createUI_12_Actions(container);
-            createUI_20_Controls(container);
+            final Composite titleContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(titleContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(titleContainer);
+            {
+               createUI_10_Title(titleContainer);
+               createUI_12_Actions(titleContainer);
+            }
+            createUI_20_Options(container);
             createUI_30_Graph(container);
 
             _gridUI.createUI(container);
@@ -221,14 +229,13 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       tbm.update(true);
    }
 
-   private void createUI_20_Controls(final Composite parent) {
+   private void createUI_20_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .span(2, 1)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
             /*
@@ -236,11 +243,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
              */
             _chkShowBreaktimeValues = new Button(container, SWT.CHECK);
             _chkShowBreaktimeValues.setText(Messages.Tour_Action_ShowBreaktimeValues);
-
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkShowBreaktimeValues);
-
             _chkShowBreaktimeValues.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -249,11 +251,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
              */
             _chkShowStartTimeOnXAxis = new Button(container, SWT.CHECK);
             _chkShowStartTimeOnXAxis.setText(Messages.Tour_Action_show_start_time_on_x_axis);
-
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkShowStartTimeOnXAxis);
-
             _chkShowStartTimeOnXAxis.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -262,33 +259,38 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
              */
             _chkShowSrtmData = new Button(container, SWT.CHECK);
             _chkShowSrtmData.setText(Messages.tour_action_show_srtm_data);
-
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkShowSrtmData);
-
-            _chkShowSrtmData.addSelectionListener(_defaultSelectionListener);
+            _chkShowSrtmData.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectSRTM();
+               }
+            });
          }
          {
-            /*
-             * label: Night Sections Opacity
-             */
-            _chkShowNightSections = new Button(container, SWT.CHECK);
-            _chkShowNightSections.setText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity);
-            _chkShowNightSections.setToolTipText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip);
-            _chkShowNightSections.addSelectionListener(_defaultSelectionListener);
+            final Composite nightContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(nightContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(nightContainer);
+            {
+               /*
+                * label: Night Sections Opacity
+                */
+               _chkShowNightSections = new Button(nightContainer, SWT.CHECK);
+               _chkShowNightSections.setText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity);
+               _chkShowNightSections.setToolTipText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip);
+               _chkShowNightSections.addSelectionListener(_defaultSelectionListener);
 
-            /*
-             * Night Sections Opacity Scale
-             */
-            _spinnerNightSectionsOpacity = new Spinner(container, SWT.BORDER);
-            _spinnerNightSectionsOpacity.setMinimum(0);
-            _spinnerNightSectionsOpacity.setMaximum(100);
-            _spinnerNightSectionsOpacity.setIncrement(1);
-            _spinnerNightSectionsOpacity.setPageIncrement(10);
-            _spinnerNightSectionsOpacity.setToolTipText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip);
-            _spinnerNightSectionsOpacity.addSelectionListener(_defaultSelectionListener);
-            _spinnerNightSectionsOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+               /*
+                * Night Sections Opacity Scale
+                */
+               _spinnerNightSectionsOpacity = new Spinner(nightContainer, SWT.BORDER);
+               _spinnerNightSectionsOpacity.setMinimum(0);
+               _spinnerNightSectionsOpacity.setMaximum(100);
+               _spinnerNightSectionsOpacity.setIncrement(1);
+               _spinnerNightSectionsOpacity.setPageIncrement(10);
+               _spinnerNightSectionsOpacity.setToolTipText(Messages.Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip);
+               _spinnerNightSectionsOpacity.addSelectionListener(_defaultSelectionListener);
+               _spinnerNightSectionsOpacity.addMouseWheelListener(_defaultMouseWheelListener);
+            }
          }
          {
             /*
@@ -296,11 +298,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
              */
             _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
             _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
-
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkShowValuePointTooltip);
-
             _chkShowValuePointTooltip.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -321,11 +318,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
             _chkSelectAllTimeSlices = new Button(container, SWT.CHECK);
             _chkSelectAllTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
             _chkSelectAllTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
-
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkSelectAllTimeSlices);
-
             _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
       }
@@ -337,7 +329,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       group.setText(Messages.Pref_Graphs_Group_Graphs);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .span(2, 1)
             .applyTo(group);
       GridLayoutFactory.swtDefaults()
             .numColumns(2)
@@ -435,6 +426,61 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
       // update chart with new settings
       _tourChart.updateTourChart();
+   }
+
+   private void onSelectSRTM() {
+
+      final boolean isSrtmSelected = _chkShowSrtmData.getSelection();
+      if (isSrtmSelected) {
+
+         // check if the user has validated the SRTM download
+
+         String message = null;
+         String focusField = null;
+
+         final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+         final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+         if (password.trim().length() == 0 || username.trim().length() == 0) {
+
+            message = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
+            focusField = PrefPageSRTMData.FOCUS_USER_NAME;
+         }
+
+         final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+         if (message == null && validationDate < 0) {
+
+            message = Messages.SRTM_Download_Info_NoDownloadValidation;
+            focusField = PrefPageSRTMData.FOCUS_VALIDATE_DOWNLOAD;
+         }
+
+         if (message != null && message.length() > 0) {
+
+            // SRTM download is not valid
+
+            final Shell shell = _chkShowSrtmData.getShell();
+
+            setIsAnotherDialogOpened(true);
+            {
+               MessageDialog.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+            }
+            setIsAnotherDialogOpened(false);
+
+            close();
+
+            // show SRTM pref page
+            PreferencesUtil.createPreferenceDialogOn(
+                  shell,
+                  PrefPageSRTMData.ID,
+                  null,
+
+                  // set focus to a control
+                  focusField).open();
+
+            return;
+         }
+      }
+
+      onChangeUI();
    }
 
    private void resetToDefaults() {

@@ -157,6 +157,7 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_SrtmIsInvalid;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip;
@@ -2194,6 +2195,10 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String Slideout_TrainingOptions_Label_Title;
+
+   public static String SRTM_Download_Dialog_SRTMDownloadValidation_Title;
+   public static String SRTM_Download_Info_NoDownloadValidation;
+   public static String SRTM_Download_Info_UsernamePasswordIsEmpty;
 
    public static String Tag_Manager_Action_DeleteCategory;
    public static String Tag_Manager_Action_DeleteTag;
