@@ -4,9 +4,8 @@
 TODO's
 ======
 
-* SRTM         Fix access to SRTM data
-
-* Tour Chart   Select color for 2nd graph line instead of compliment color
+* Tour Chart   - Select color for 2nd graph line instead of compliment color
+               - Set default graphs in the graph slideout, sorting still needs the pref page
  
 * Tour Search  - Test Edge browser if the tour selection in the result list is working with the mouse
                - Implement workaround: Select tour with an action in the context menu
@@ -14,19 +13,21 @@ TODO's
 * Compare Tours by Elevation
                - Make it concurrent, with many tours it gets really slow which was not a problem in the beginning of MT               
 
-* Geo Filter   Investigate/fix https://sourceforge.net/p/mytourbook/discussion/622811/thread/23132f7fbf/?limit=25#fbeb
-
 * UI Theme     Provide a UI to select the UI theme
                https://www.eclipse.org/eclipse/news/4.18/platform.php#system-theme
                -cssTheme org.eclipse.e4.ui.css.theme.e4_classic
                -cssTheme org.eclipse.e4.ui.css.theme.e4_default
                -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
   
-* Website      Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-               Need to check how to apply it to all projects, must maybe be done with the already existing ant script
+* Website      - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+                 Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
-* Tour modification - Create a separate checkbox for calories
-		    - Use multi-threading (ThreadPoolExecutor)
+               - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
+                 mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
+
+* Tour modification (Frederic) 
+               - Create a separate checkbox for calories
+		         - Use multi-threading (ThreadPoolExecutor)
 
 Issues
 ======
@@ -47,25 +48,26 @@ New
 Improvements
 ============
 
-* 2D Map (Frederic)
-  - Extending the zoom levels capacity from 20 to 23
-
 * Tour Chart 
   - Displaying the night sections with a grey color for a more intuitive chart and better readability (Frederic)
   - More options to show R-R values together with other pules graphs (R-R average, device value)
 
-* 3D Map & Tour Chart Preferences (Frederic)
- - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
+* 2D Map (Frederic)
+  - Extending the zoom levels capacity from 20 to 23
 
-======
 * 2.5D Map (Thomas):
   - Upgrading VTM lib to 0.15
   - Size of photothumbnails can be changed via slideout
 
+* 3D Map & Tour Chart Preferences (Frederic)
+ - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
+
+
 Changes  
 =======
 
-* 
+* SRTM Download
+  - The download of SRTM data files is still free but it requires that a user is authenticated. Username and password can be entered in the SRTM data preferences page which also contains information how to request a SRTM server account 
     
 
 Bugfix

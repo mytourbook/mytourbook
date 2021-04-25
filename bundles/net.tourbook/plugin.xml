@@ -195,7 +195,7 @@
          <page
             name="%Pref_Page_Map2_Appearance"
             id="net.tourbook.preferences.PrefPageMap2Appearance"
-            class="net.tourbook.preferences.PrefPageMap2Appearance"
+            class="net.tourbook.preferences.PrefPage_Map2_Appearance"
             category    ="de.byteholder.geoclipse.preferences.map"
          />
          <page
@@ -207,7 +207,7 @@
          <page
             name="%pref_page_cache"
             id="de.byteholder.geoclipse.preferences.PrefPageCache"
-            class="de.byteholder.geoclipse.preferences.PrefPageCache"
+            class="de.byteholder.geoclipse.preferences.PrefPage_Map2_Cache"
             category    ="de.byteholder.geoclipse.preferences.map"
          />
 

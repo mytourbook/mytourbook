@@ -16,14 +16,13 @@
 /**
  * @author Alfred Barten
  */
-package net.tourbook.srtm.download;
+package net.tourbook.srtm;
 
-public final class DownloadGLOBE extends DownloadResource {
+public interface ElevationType {
 
-   private final static String URL_BASE_PATH = "https://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/"; //$NON-NLS-1$
-
-   public static void get(final String remoteFileName, final String localFilePathName) throws Exception {
-
-      new HTTPDownloader().get(URL_BASE_PATH, remoteFileName, localFilePathName);
-   }
+    int ETOPO = 0;
+    int GLOBE = 1;
+    int SRTM3 = 2;
+    int SRTM1 = 3;
 }
+

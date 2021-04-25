@@ -115,7 +115,7 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -1281,7 +1281,7 @@ public class Map2View extends ViewPart implements
             final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
             final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
 
-            _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
+            _map.setTourPaintMethodEnhanced(PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
          } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
@@ -1590,7 +1590,7 @@ public class Map2View extends ViewPart implements
 
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionDimMap_SubMenu                       = new ActionDimMap(this);
-      _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
+      _actionEditMap2Preferences          = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPage_Map2_Appearance.ID);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -1754,7 +1754,7 @@ public class Map2View extends ViewPart implements
 
       final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
       final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
-      _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
+      _map.setTourPaintMethodEnhanced(PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
