@@ -17,12 +17,19 @@ package net.tourbook.preferences;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.statistic.StatisticValuesView;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.css.swt.theme.ITheme;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -62,6 +69,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private PixelConverter         _pc;
    private SelectionAdapter       _defaultSelectionAdapter;
    private MouseWheelListener     _defaultMouseWheelListener;
+
+   private IThemeEngine           _cssThemeEngine;
 
    /*
     * UI controls
@@ -129,7 +138,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       return _uiContainer;
    }
-
 
    private void createUI_20_Tagging(final Composite parent) {
 
@@ -278,10 +286,54 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
+   private List<ITheme> getCSSThemes(final boolean highContrastMode) {
+
+      final ArrayList<ITheme> allThemes = new ArrayList<>();
+
+      for (final ITheme theme : _cssThemeEngine.getThemes()) {
+         /*
+          * When we have Win32 OS - when the high contrast mode is enabled on the
+          * platform, we display the 'high-contrast' special theme only. If not, we don't
+          * want to mess the themes combo with the theme since it is the special
+          * variation of the 'classic' one
+          * When we have GTK - we have to display the entire list of the themes since we
+          * are not able to figure out if the high contrast mode is enabled on the
+          * platform. The user has to manually select the theme if they need it
+          */
+//         if (!highContrastMode && !Util.isGtk() && theme.getId().equals(E4Application.HIGH_CONTRAST_THEME_ID)) {
+//            continue;
+//         }
+
+         allThemes.add(theme);
+      }
+
+      allThemes.sort((final ITheme t1, final ITheme t2) -> t1.getLabel().compareTo(t2.getLabel()));
+
+      return allThemes;
+   }
+
    @Override
    public void init(final IWorkbench workbench) {
 
       setPreferenceStore(_prefStore);
+
+      final MApplication application = workbench.getService(MApplication.class);
+      final IEclipseContext context = application.getContext();
+//      defaultTheme = (String) context.get(E4Application.THEME_ID);
+      _cssThemeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
+
+      final ITheme activeTheme = _cssThemeEngine.getActiveTheme();
+      System.out.println("active: " + activeTheme.getId() + " - " + activeTheme.getLabel());
+      System.out.println();
+
+      final List<ITheme> cssThemes = getCSSThemes(false);
+
+      for (final ITheme iTheme : cssThemes) {
+         System.out.println(iTheme.getId() + " - " + iTheme.getLabel());
+         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+
+      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", false);
    }
 
    private void initUI(final Composite parent) {
@@ -357,7 +409,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       // set font editor default values
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
-
 
       super.performDefaults();
 
