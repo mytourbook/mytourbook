@@ -25,7 +25,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -251,7 +251,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
          // get current painting method
          final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-         final boolean isEnhancedPainting = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
+         final boolean isEnhancedPainting = PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
 
          if (isEnhancedPainting) {
 
@@ -285,7 +285,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
                   // set painting method to basic
                   _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-                        PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+                        PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
                }
             }
             setIsAnotherDialogOpened(false);
