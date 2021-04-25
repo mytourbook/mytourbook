@@ -115,23 +115,23 @@ public class Messages extends NLS {
    public static String        job_name_ftpDownload;
    public static String        job_name_httpDownload;
 
-   public static String        PrefPage_SRTM_Button_ResetValidation;
-   public static String        PrefPage_SRTM_Button_SrtmDummyValidation;
-   public static String        PrefPage_SRTM_Button_SrtmDummyValidation_Tooltip;
-   public static String        PrefPage_SRTM_Button_ValidateDownloadOfSrtmData;
-   public static String        PrefPage_SRTM_Dialog_ValidateSrtmDownload_Error_Message;
-   public static String        PrefPage_SRTM_Dialog_ValidateSrtmDownload_OK_Message;
-   public static String        PrefPage_SRTM_Dialog_ValidateSrtmDownload_Title;
-   public static String        PrefPage_SRTM_Group_SrtmServerAccount;
-   public static String        PrefPage_SRTM_Info_DummyPassword;
-   public static String        PrefPage_SRTM_Info_DummyUsername;
-   public static String        PrefPage_SRTM_Info_EmptyPassword;
-   public static String        PrefPage_SRTM_Label_AccountValidation_NO;
-   public static String        PrefPage_SRTM_Label_AccountValidation_YES;
-   public static String        PrefPage_SRTM_Label_CredentialValidation;
-   public static String        PrefPage_SRTM_Label_Password;
-   public static String        PrefPage_SRTM_Label_Username;
-   public static String        PrefPage_SRTM_Link_AccountInfo;
+   public static String        PrefPage_SRTMData_Button_ResetValidation;
+   public static String        PrefPage_SRTMData_Button_SrtmDummyValidation;
+   public static String        PrefPage_SRTMData_Button_SrtmDummyValidation_Tooltip;
+   public static String        PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData;
+   public static String        PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Error_Message;
+   public static String        PrefPage_SRTMData_Dialog_ValidateSrtmDownload_OK_Message;
+   public static String        PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Title;
+   public static String        PrefPage_SRTMData_Group_SrtmServerAccount;
+   public static String        PrefPage_SRTMData_Info_DummyPassword;
+   public static String        PrefPage_SRTMData_Info_DummyUsername;
+   public static String        PrefPage_SRTMData_Info_EmptyPassword;
+   public static String        PrefPage_SRTMData_Label_AccountValidation_NO;
+   public static String        PrefPage_SRTMData_Label_AccountValidation_YES;
+   public static String        PrefPage_SRTMData_Label_CredentialValidation;
+   public static String        PrefPage_SRTMData_Label_Password;
+   public static String        PrefPage_SRTMData_Label_Username;
+   public static String        PrefPage_SRTMData_Link_AccountInfo;
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -208,7 +208,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT);
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.PrefPage_SRTM_Group_SrtmServerAccount);
+      group.setText(Messages.PrefPage_SRTMData_Group_SrtmServerAccount);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -218,7 +218,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
              * Link/Info: How enable SRTM download
              */
             final Link link = new Link(group, SWT.NONE);
-            link.setText(NLS.bind(Messages.PrefPage_SRTM_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
+            link.setText(NLS.bind(Messages.PrefPage_SRTMData_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
             link.setToolTipText(HTTPS_NASA_EARTHDATA_LOGIN);
             link.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -237,7 +237,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
              * Username
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.PrefPage_SRTM_Label_Username);
+            label.setText(Messages.PrefPage_SRTMData_Label_Username);
 
             _txtSRTM_Username = new Text(group, SWT.BORDER);
             _txtSRTM_Username.addModifyListener(modifyEvent -> enableControls());
@@ -248,7 +248,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
              * Password
              */
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.PrefPage_SRTM_Label_Password);
+            label.setText(Messages.PrefPage_SRTMData_Label_Password);
 
             _txtSRTM_Password = new Text(group, SWT.BORDER | SWT.PASSWORD);
             _txtSRTM_Password.addModifyListener(modifyEvent -> onModifyPassword());
@@ -270,7 +270,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    * Validate download of SRTM data files
                    */
                   _btnValidateDownloadOfSRTMData = new Button(container, SWT.NONE);
-                  _btnValidateDownloadOfSRTMData.setText(Messages.PrefPage_SRTM_Button_ValidateDownloadOfSrtmData);
+                  _btnValidateDownloadOfSRTMData.setText(Messages.PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData);
                   _btnValidateDownloadOfSRTMData.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
@@ -283,7 +283,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    * Reset validation
                    */
                   _btnResetValidation = new Button(container, SWT.NONE);
-                  _btnResetValidation.setText(Messages.PrefPage_SRTM_Button_ResetValidation);
+                  _btnResetValidation.setText(Messages.PrefPage_SRTMData_Button_ResetValidation);
                   _btnResetValidation.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
@@ -297,8 +297,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    * working or to use already downloaded SRTM files
                    */
                   final Button btnSrtmDummyValidation = new Button(container, SWT.NONE);
-                  btnSrtmDummyValidation.setText(Messages.PrefPage_SRTM_Button_SrtmDummyValidation);
-                  btnSrtmDummyValidation.setToolTipText(Messages.PrefPage_SRTM_Button_SrtmDummyValidation_Tooltip);
+                  btnSrtmDummyValidation.setText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation);
+                  btnSrtmDummyValidation.setToolTipText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation_Tooltip);
                   btnSrtmDummyValidation.addSelectionListener(new SelectionAdapter() {
                      @Override
                      public void widgetSelected(final SelectionEvent e) {
@@ -378,7 +378,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       final String passwordText = _txtSRTM_Password.getText();
 
       _txtSRTM_Password.setToolTipText(passwordText.length() == 0
-            ? Messages.PrefPage_SRTM_Info_EmptyPassword
+            ? Messages.PrefPage_SRTMData_Info_EmptyPassword
             : passwordText);
 
       enableControls();
@@ -390,11 +390,11 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       final String username = _txtSRTM_Username.getText().trim();
 
       if (UI.EMPTY_STRING.equals(password)) {
-         _txtSRTM_Password.setText(Messages.PrefPage_SRTM_Info_DummyPassword);
+         _txtSRTM_Password.setText(Messages.PrefPage_SRTMData_Info_DummyPassword);
       }
 
       if (UI.EMPTY_STRING.equals(username)) {
-         _txtSRTM_Username.setText(Messages.PrefPage_SRTM_Info_DummyUsername);
+         _txtSRTM_Username.setText(Messages.PrefPage_SRTMData_Info_DummyUsername);
       }
 
       _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, TimeTools.nowInMilliseconds());
@@ -430,8 +430,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
             MessageDialog.openInformation(
                   _prefContainer.getShell(),
-                  Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Title,
-                  NLS.bind(Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_OK_Message, HTTPS_NASA_TEST_URL));
+                  Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_OK_Message, HTTPS_NASA_TEST_URL));
 
          } catch (final Exception e) {
 
@@ -443,8 +443,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
             MessageDialog.openInformation(
 
                   _prefContainer.getShell(),
-                  Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Title,
-                  NLS.bind(Messages.PrefPage_SRTM_Dialog_ValidateSrtmDownload_Error_Message,
+                  Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Error_Message,
                         HTTPS_NASA_TEST_URL,
                         e.getMessage()));
 
@@ -523,9 +523,9 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
       final String validationText = validationDate == Long.MIN_VALUE
 
-            ? Messages.PrefPage_SRTM_Label_AccountValidation_NO
+            ? Messages.PrefPage_SRTMData_Label_AccountValidation_NO
 
-            : NLS.bind(Messages.PrefPage_SRTM_Label_AccountValidation_YES,
+            : NLS.bind(Messages.PrefPage_SRTMData_Label_AccountValidation_YES,
                   TimeTools.Formatter_DateTime_M.format(TimeTools.getZonedDateTime(validationDate)));
 
       _lblSRTMValidation.setText(validationText);
