@@ -242,34 +242,32 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             /*
              * Modify between dates
              */
-            _rdoDeleteTourValues_Tours_BetweenDates = new Button(group, SWT.RADIO);
-            _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-            _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_mutltipleToursSelectionListener);
-            _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
-            _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
-
-            final Composite datesContainer = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(datesContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(datesContainer);
+            final Composite betweenDatesContainer = new Composite(group, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(betweenDatesContainer);
             {
+               _rdoDeleteTourValues_Tours_BetweenDates = new Button(betweenDatesContainer, SWT.RADIO);
+               _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
+               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_mutltipleToursSelectionListener);
+               _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
+               _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
                {
-                  _dtTourDate_From = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+                  _dtTourDate_From = new DateTime(betweenDatesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
                   _dtTourDate_From.addSelectionListener(_defaultListener);
                   _dtTourDate_From.setEnabled(false);
                }
                {
-                  _dtTourDate_Until = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+                  _dtTourDate_Until = new DateTime(betweenDatesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
                   _dtTourDate_Until.addSelectionListener(_defaultListener);
                   _dtTourDate_Until.setEnabled(false);
                }
             }
-         }
-         {
-            _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
-            _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockAllToursSelection);
-            _btnUnlockBetweenDatesSelection.addSelectionListener(_unlockButtonListener);
+            {
+               _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
+               _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+               _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+               GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockAllToursSelection);
+               _btnUnlockBetweenDatesSelection.addSelectionListener(_unlockButtonListener);
+            }
          }
       }
    }

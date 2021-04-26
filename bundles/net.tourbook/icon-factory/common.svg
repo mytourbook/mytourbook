@@ -3693,9 +3693,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="124.75219"
-     inkscape:cx="225.53727"
-     inkscape:zoom="11.313708"
+     inkscape:cy="125.20654"
+     inkscape:cx="223.83666"
+     inkscape:zoom="7.9999996"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -7974,7 +7974,7 @@
        d="m 184.2774,69.713507 3.72262,-3.53224 3.72255,3.53224"
        style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
     <rect
-       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:2.04416;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:2.95000005;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect12"
        width="11.008351"
        height="8.1465588"
@@ -7986,13 +7986,13 @@
        inkscape:export-ydpi="95.81086" />
     <path
        id="path917"
-       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:2.04416;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.95000005;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
        d="m 215.72266,130.02208 c -0.46404,0 -0.83763,0.37359 -0.83763,0.83764 v 4.95208 l 7.23851,0.0282 v -4.98023 c 0,-0.46405 -0.37358,-0.83764 -0.83763,-0.83764 z"
        inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\lock-closed.png"
        inkscape:export-xdpi="95.81086"
        inkscape:export-ydpi="95.81086" />
     <rect
-       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:1.96763;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect12-9"
        width="10.596154"
        height="7.8415179"
@@ -8004,8 +8004,8 @@
        inkscape:export-ydpi="100.00993" />
     <path
        id="path917-5"
-       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:1.96763;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
-       d="m 245.20776,135.13421 v -3.77115 c 0,-0.44668 -0.35959,-0.80627 -0.80627,-0.80627 h -5.35494 v 0 c -0.44667,0 -0.80627,0.35959 -0.80627,0.80627 v 3.82625"
+       style="fill:none;fill-opacity:0.745098;stroke:#000000;stroke-width:0.54968;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.95;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       d="m 245.19056,135.84297 v -4.58041 c 0,-0.54253 -0.35782,-0.97928 -0.80229,-0.97928 h -5.3285 v 0 c -0.44446,0 -0.80229,0.43675 -0.80229,0.97928 v 4.64733"
        inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\lock-open.png"
        inkscape:export-xdpi="100.00993"
        inkscape:export-ydpi="100.00993" />
