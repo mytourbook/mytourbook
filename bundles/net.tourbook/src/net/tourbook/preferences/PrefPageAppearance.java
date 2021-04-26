@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,10 +29,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,27 +46,22 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
-   private static final String THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
+   private static final String    THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
+   private static final String    THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
-   //
+   public static final String     ID                              = "net.tourbook.preferences.PrefPageAppearance";                               //$NON-NLS-1$
 
-   public static final String     ID          = "net.tourbook.preferences.PrefPageAppearance"; //$NON-NLS-1$
+   private final boolean          _isOSX                          = net.tourbook.common.UI.IS_OSX;
+   private final boolean          _isLinux                        = net.tourbook.common.UI.IS_LINUX;
 
-   private final boolean          _isOSX      = net.tourbook.common.UI.IS_OSX;
-   private final boolean          _isLinux    = net.tourbook.common.UI.IS_LINUX;
+   private final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore _prefStore  = TourbookPlugin.getPrefStore();
+   private boolean                _isModified                     = false;
 
-   private boolean                _isModified = false;
-
-   /*
-    * UI tools
-    */
-   private int                _hintDefaultSpinnerWidth;
-   private PixelConverter     _pc;
-   private SelectionAdapter   _defaultSelectionAdapter;
-   private MouseWheelListener _defaultMouseWheelListener;
+   private int                    _hintDefaultSpinnerWidth;
+   private PixelConverter         _pc;
+   private SelectionAdapter       _defaultSelectionAdapter;
+   private MouseWheelListener     _defaultMouseWheelListener;
 
    /*
     * UI controls
@@ -88,12 +80,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner                 _spinnerRecentTags;
    private Spinner                 _spinnerAutoOpenDelay;
 
-   private Button                  _rdoDeviceTime_Recorded;
-   private Button                  _rdoComputedTime_Moving;
-
    private FontFieldEditorExtended _valueFontEditor;
 
+//   @import url("platform:/plugin/org.eclipse.ui.themes/css/e4-dark.css");
+//
+//   /* add new CSS rules here. You can also override setting defined in the imported CSS
+//   by using the same selector-property combination */
+
    public PrefPageAppearance() {
+
 //		noDefaultAndApplyButton();
    }
 
@@ -127,8 +122,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //      GridDataFactory.fillDefaults().grab(true, false).applyTo(_uiContainer);
       GridLayoutFactory.fillDefaults().applyTo(_uiContainer);
       {
-
-         createUI_10_PaceAndSpeedDisplay(_uiContainer);
          createUI_20_Tagging(_uiContainer);
          createUI_30_LogFont(_uiContainer);
          createUI_40_OtherOptions(_uiContainer);
@@ -137,42 +130,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       return _uiContainer;
    }
 
-   private void createUI_10_PaceAndSpeedDisplay(final Composite parent) {
-
-      final Group group = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-      {
-         /*
-          * Time to use for pace and speed computation
-          */
-         {
-            final Label label = new Label(group, NONE);
-            label.setText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption);
-            label.setToolTipText(Messages.Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-         }
-
-         final Composite container = new Composite(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-         {
-            {
-               // Recorded time
-               _rdoDeviceTime_Recorded = new Button(container, SWT.RADIO);
-               _rdoDeviceTime_Recorded.setText(Messages.Pref_Appearance_Radio_UseRecordedTime);
-               _rdoDeviceTime_Recorded.setToolTipText(Messages.Pref_Appearance_Radio_UseRecordedTime_Tooltip);
-            }
-            {
-               // Moving time
-               _rdoComputedTime_Moving = new Button(container, SWT.RADIO);
-               _rdoComputedTime_Moving.setText(Messages.Pref_Appearance_Radio_UseMovingTime);
-               _rdoComputedTime_Moving.setToolTipText(Messages.Pref_Appearance_Radio_UseMovingTime_Tooltip);
-            }
-         }
-      }
-   }
 
    private void createUI_20_Tagging(final Composite parent) {
 
@@ -271,12 +228,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                      THEME_FONT_LOGGING_PREVIEW_TEXT,
                      fontContainer);
 
-               _valueFontEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-                  @Override
-                  public void propertyChange(final PropertyChangeEvent event) {
-                     onChangeFontInEditor();
-                  }
-               });
+               _valueFontEditor.setPropertyChangeListener(propertyChangeEvent -> onChangeFontInEditor());
             }
          }
       }
@@ -318,14 +270,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       final boolean isEnabled = true; // eclipse 3.7 supports this feature in OSX
 
       _chkAutoOpenTagging.setEnabled(isEnabled);
+      _chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
+
       _lblAutoOpenMS.setEnabled(isEnabled && isTagAutoOpen);
       _lblAutoTagDelay.setEnabled(isEnabled && isTagAutoOpen);
+
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
-      _chkTaggingAnimation.setEnabled(isEnabled && isTagAutoOpen);
    }
 
    @Override
    public void init(final IWorkbench workbench) {
+
       setPreferenceStore(_prefStore);
    }
 
@@ -342,12 +297,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeProperty();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeProperty();
       };
    }
 
@@ -374,6 +326,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING, false);
 
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_VALUES, false);
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES, false);
 
       MessageDialog.openInformation(getShell(),
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
@@ -405,9 +358,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
 
-      final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getDefaultBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-      _rdoDeviceTime_Recorded.setSelection(isPaceAndSpeedFromRecordedTime);
-      _rdoComputedTime_Moving.setSelection(!isPaceAndSpeedFromRecordedTime);
 
       super.performDefaults();
 
@@ -438,12 +388,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                Messages.pref_appearance_showMemoryMonitor_title,
                Messages.pref_appearance_showMemoryMonitor_message)) {
 
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  PlatformUI.getWorkbench().restart();
-               }
-            });
+            Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
          }
       }
 
@@ -462,9 +407,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       _valueFontEditor.setPreferenceStore(_prefStore);
       _valueFontEditor.load();
-
-      _rdoDeviceTime_Recorded.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME));
-      _rdoComputedTime_Moving.setSelection(!_rdoDeviceTime_Recorded.getSelection());
    }
 
    private void saveState() {
@@ -476,7 +418,5 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY, _spinnerAutoOpenDelay.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR, _chkMemMonitor.getSelection());
-
-      _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, _rdoDeviceTime_Recorded.getSelection());
    }
 }

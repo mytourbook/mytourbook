@@ -158,8 +158,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             + Integer.toString(TourManager.GRAPH_POWER));
 
       store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 0xFF);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 0x80);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 100);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 50);
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
@@ -233,7 +233,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
       //
-      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 0x40); //64
+      store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
+      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 50);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
@@ -371,7 +372,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * map
        */
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE, PrefPageMap2Appearance.DEFAULT_PLOT_TYPE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,             6);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,        true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,             1);
@@ -379,12 +380,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,  new RGB(0x00, 0x00, 0x00));
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,  PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,  true);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
-      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   false);
-      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      70);     // opacity in %
+      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,      false);
+      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         70);     // opacity in %
 
 
       /*

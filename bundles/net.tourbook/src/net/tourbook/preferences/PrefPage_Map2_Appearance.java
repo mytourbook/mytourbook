@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.part.PageBook;
 
-public class PrefPageMap2Appearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPage_Map2_Appearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    private static final String LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE         = net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate;
    private static final String LEGEND_COLOR_DIALOG_CHECK_LIVE_UPDATE_TOOLTIP = net.tourbook.map2.Messages.LegendColor_Dialog_Check_LiveUpdate_Tooltip;

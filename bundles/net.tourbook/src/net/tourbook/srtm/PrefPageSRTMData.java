@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,22 +15,20 @@
  *******************************************************************************/
 package net.tourbook.srtm;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
+import java.io.InputStream;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.srtm.download.DownloadSRTM3;
+import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -40,55 +38,85 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String PROTOCOL_HTTP  = "http://";  //$NON-NLS-1$
-   public static final String PROTOCOL_HTTPS = "https://"; //$NON-NLS-1$
-   public static final String PROTOCOL_FTP   = "ftp://";   //$NON-NLS-1$
+   public static final String ID                      = "net.tourbook.srtm.PrefPageSRTMData";//$NON-NLS-1$
 
-//	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
+   public static final String FOCUS_USER_NAME         = "focusUsername";                     //$NON-NLS-1$
+   public static final String FOCUS_VALIDATE_DOWNLOAD = "focusValidateDownload";             //$NON-NLS-1$
 
-   private static HttpClient    httpClient           = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+// SET_FORMATTING_OFF
 
-   private IPreferenceStore     _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final String HTTPS_NASA_EARTHDATA_LOGIN = "https://urs.earthdata.nasa.gov/home"; //$NON-NLS-1$
+   private static final String HTTPS_NASA_TEST_URL        = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N10E012.SRTMGL3.hgt.zip.xml";      //$NON-NLS-1$
+
+
+   // Old url for SRTM 3 data
+   //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
+
+// SET_FORMATTING_ON
+
+   private IPreferenceStore     _prefStore           = TourbookPlugin.getPrefStore();
 
    private final String         _defaultSRTMFilePath = Platform.getInstanceLocation().getURL().getPath();
-
-   private Composite            _prefContainer;
-   private Composite            _pathContainer;
 
    private BooleanFieldEditor   _useDefaultLocation;
    private DirectoryFieldEditor _dataPathEditor;
 
-   private Button               _rdoSRTM3FtpUrl;
-   private Text                 _txtSRTM3FtpUrl;
-   private Button               _rdoSRTM3HttpUrl;
-   private Text                 _txtSRTM3HttpUrl;
+   private PixelConverter       _pc;
 
-   // original values when page is opened
-   private boolean _backupIsFtp;
-   private String  _backupFtpUrl;
-   private String  _backupHttpUrl;
+   /*
+    * UI controls
+    */
+   private Composite _prefContainer;
+   private Composite _pathContainer;
+
+   private Button    _btnResetValidation;
+   private Button    _btnValidateDownloadOfSRTMData;
+
+   private Label     _lblSRTMValidation;
+
+   private Text      _txtSRTM_Username;
+   private Text      _txtSRTM_Password;
+
+   @Override
+   public void applyData(final Object data) {
+
+      // run async otherwise the button do not have the focus !!!
+      _prefContainer.getDisplay().asyncExec(() -> {
+
+         if (FOCUS_USER_NAME.equals(data)) {
+
+            // set focus to username
+            _txtSRTM_Username.setFocus();
+
+         } else if (FOCUS_VALIDATE_DOWNLOAD.equals(data)) {
+
+            // set focus to validation button
+            _btnValidateDownloadOfSRTMData.setFocus();
+         }
+      });
+   }
 
    @Override
    protected Control createContents(final Composite parent) {
 
+      initUI(parent);
       createUI(parent);
 
+      updateUI_AccountValidation();
       restoreState();
 
       enableControls();
@@ -108,50 +136,62 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       GridDataFactory.swtDefaults().grab(true, false).applyTo(_prefContainer);
       GridLayoutFactory.fillDefaults().applyTo(_prefContainer);
       GridDataFactory.swtDefaults().applyTo(_prefContainer);
+//      _prefContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_10_CacheSettings(_prefContainer);
-         createUI_20_Srtm3Url(_prefContainer);
+         createUI_10_LocalCache(_prefContainer);
+         createUI_20_ServerAccount(_prefContainer);
       }
    }
 
-   private void createUI_10_CacheSettings(final Composite parent) {
+   private void createUI_10_LocalCache(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.prefPage_srtm_group_label_data_location);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       {
-         // field: use default location
-         _useDefaultLocation = new BooleanFieldEditor(
-               IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
-               Messages.prefPage_srtm_chk_use_default_location,
-               group);
-         _useDefaultLocation.setPage(this);
-         _useDefaultLocation.setPreferenceStore(_prefStore);
-         _useDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent event) {
-               enableControls();
-            }
-         });
-         new Label(group, SWT.NONE);
-
-         _pathContainer = new Composite(group, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pathContainer);
          {
-            // field: path for the srtm data
-            _dataPathEditor = new DirectoryFieldEditor(
-                  IPreferences.SRTM_DATA_FILEPATH,
-                  Messages.prefPage_srtm_editor_data_filepath,
-                  _pathContainer);
-            _dataPathEditor.setPage(this);
-            _dataPathEditor.setPreferenceStore(_prefStore);
-            _dataPathEditor.setEmptyStringAllowed(false);
-            _dataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+            /*
+             * Default location
+             */
+            _useDefaultLocation = new BooleanFieldEditor(
+                  IPreferences.SRTM_USE_DEFAULT_DATA_FILEPATH,
+                  Messages.prefPage_srtm_chk_use_default_location,
+                  group);
+            _useDefaultLocation.setPage(this);
+            _useDefaultLocation.setPreferenceStore(_prefStore);
+            _useDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
                @Override
                public void propertyChange(final PropertyChangeEvent event) {
-                  validateData();
+                  enableControls();
                }
             });
+            new Label(group, SWT.NONE);
+         }
+         {
+            /*
+             * SRTM data filepath
+             */
+            _pathContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .span(3, 1)
+                  .applyTo(_pathContainer);
+            {
+               _dataPathEditor = new DirectoryFieldEditor(
+                     IPreferences.SRTM_DATA_FILEPATH,
+                     Messages.prefPage_srtm_editor_data_filepath,
+                     _pathContainer);
+               _dataPathEditor.setPage(this);
+               _dataPathEditor.setPreferenceStore(_prefStore);
+               _dataPathEditor.setEmptyStringAllowed(false);
+               _dataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+                  @Override
+                  public void propertyChange(final PropertyChangeEvent event) {
+                     validateData();
+                  }
+               });
+            }
          }
       }
 
@@ -159,64 +199,127 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
    }
 
-   private void createUI_20_Srtm3Url(final Composite parent) {
+   private void createUI_20_ServerAccount(final Composite parent) {
 
-      final SelectionAdapter selectListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            enableControls();
-            validateData();
-         }
-      };
+      final int defaultCommentWidth = _pc.convertWidthInCharsToPixels(40);
 
-      final ModifyListener modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            validateData();
-         }
-      };
+      final GridDataFactory inputFieldLayout = GridDataFactory.fillDefaults()
+            .align(SWT.BEGINNING, SWT.FILL)
+            .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT);
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.prefPage_srtm_group_label_srtm3);
+      group.setText(Messages.PrefPage_SRTMData_Group_SrtmServerAccount);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         // radio: http url
-         _rdoSRTM3HttpUrl = new Button(group, SWT.RADIO);
-         _rdoSRTM3HttpUrl.setText(Messages.prefPage_srtm_radio_srtm3HttpUrl);
-         _rdoSRTM3HttpUrl.addSelectionListener(selectListener);
+         {
+            /*
+             * Link/Info: How enable SRTM download
+             */
+            final Link link = new Link(group, SWT.NONE);
+            link.setText(NLS.bind(Messages.PrefPage_SRTMData_Link_AccountInfo, HTTPS_NASA_EARTHDATA_LOGIN));
+            link.setToolTipText(HTTPS_NASA_EARTHDATA_LOGIN);
+            link.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  WEB.openUrl(HTTPS_NASA_EARTHDATA_LOGIN);
+               }
+            });
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .hint(defaultCommentWidth, SWT.DEFAULT)
+                  .applyTo(link);
+         }
+         UI.createSpacer_Horizontal(group, 2);
+         {
+            /*
+             * Username
+             */
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.PrefPage_SRTMData_Label_Username);
 
-         // text: http url
-         _txtSRTM3HttpUrl = new Text(group, SWT.BORDER);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtSRTM3HttpUrl);
-         _txtSRTM3HttpUrl.addModifyListener(modifyListener);
+            _txtSRTM_Username = new Text(group, SWT.BORDER);
+            _txtSRTM_Username.addModifyListener(modifyEvent -> enableControls());
+            inputFieldLayout.applyTo(_txtSRTM_Username);
+         }
+         {
+            /*
+             * Password
+             */
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.PrefPage_SRTMData_Label_Password);
 
-         // radio: ftp url
-         _rdoSRTM3FtpUrl = new Button(group, SWT.RADIO);
-         _rdoSRTM3FtpUrl.setText(Messages.prefPage_srtm_radio_srtm3FtpUrl);
-         _rdoSRTM3FtpUrl.addSelectionListener(selectListener);
-
-         /*
-          * is disabled becuase the server is currently not available 2009-08-18 and the
-          * connection test feature cannot be tested
-          */
-         _rdoSRTM3FtpUrl.setEnabled(false);
-
-         // text: ftp url
-         _txtSRTM3FtpUrl = new Text(group, SWT.BORDER);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtSRTM3FtpUrl);
-         _txtSRTM3FtpUrl.addModifyListener(modifyListener);
-
-         // button: test connection
-         final Button btnTestConnection = new Button(group, SWT.NONE);
-         GridDataFactory.swtDefaults().indent(0, 10).span(2, 1).applyTo(btnTestConnection);
-         btnTestConnection.setText(Messages.prefPage_srtm_button_testConnection);
-         btnTestConnection.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onCheckConnection();
+            _txtSRTM_Password = new Text(group, SWT.BORDER | SWT.PASSWORD);
+            _txtSRTM_Password.addModifyListener(modifyEvent -> onModifyPassword());
+            inputFieldLayout.applyTo(_txtSRTM_Password);
+         }
+         {
+            final Composite container = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(2, 1)
+                  .indent(0, 10)
+                  .applyTo(container);
+            GridLayoutFactory.fillDefaults()
+                  .numColumns(3)
+                  .applyTo(container);
+            {
+               {
+                  /*
+                   * Validate download of SRTM data files
+                   */
+                  _btnValidateDownloadOfSRTMData = new Button(container, SWT.NONE);
+                  _btnValidateDownloadOfSRTMData.setText(Messages.PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData);
+                  _btnValidateDownloadOfSRTMData.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_ValidateSrtmDownload();
+                     }
+                  });
+               }
+               {
+                  /*
+                   * Reset validation
+                   */
+                  _btnResetValidation = new Button(container, SWT.NONE);
+                  _btnResetValidation.setText(Messages.PrefPage_SRTMData_Button_ResetValidation);
+                  _btnResetValidation.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_ResetValidation();
+                     }
+                  });
+               }
+               {
+                  /*
+                   * Allow dummy validation, this can be helpful when validation is currently not
+                   * working or to use already downloaded SRTM files
+                   */
+                  final Button btnSrtmDummyValidation = new Button(container, SWT.NONE);
+                  btnSrtmDummyValidation.setText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation);
+                  btnSrtmDummyValidation.setToolTipText(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation_Tooltip);
+                  btnSrtmDummyValidation.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
+                        onSelect_DummyValidation();
+                     }
+                  });
+               }
             }
-         });
+         }
+         {
+            /*
+             * Account validation
+             */
+            _lblSRTMValidation = new Label(group, SWT.WRAP);
+
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .grab(true, false)
+                  .hint(defaultCommentWidth, SWT.DEFAULT)
+                  .applyTo(_lblSRTMValidation);
+         }
       }
    }
 
@@ -236,14 +339,29 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
          _dataPathEditor.setEnabled(true, _pathContainer);
       }
 
-      // SRTM3 server
-      final boolean isFTP = _rdoSRTM3FtpUrl.getSelection();
-      _txtSRTM3FtpUrl.setEnabled(isFTP);
-      _txtSRTM3HttpUrl.setEnabled(!isFTP);
+      final String username = _txtSRTM_Username.getText();
+      final String password = _txtSRTM_Password.getText();
+
+      final String usernameTrimmed = username.trim();
+      final String passwordTrimmed = password.trim();
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+
+      final boolean isValidationDateSet = validationDate != Long.MIN_VALUE;
+      final boolean isAccountDataSet = usernameTrimmed.length() > 0 && passwordTrimmed.length() > 0;
+      final boolean canResetValidation = username.length() > 0 || password.length() > 0 || isValidationDateSet;
+
+      _btnResetValidation.setEnabled(canResetValidation);
+      _btnValidateDownloadOfSRTMData.setEnabled(isAccountDataSet);
    }
 
    @Override
    public void init(final IWorkbench workbench) {}
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+   }
 
    @Override
    public boolean okToLeave() {
@@ -255,60 +373,82 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       return super.okToLeave();
    }
 
-   private void onCheckConnection() {
+   private void onModifyPassword() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      final String passwordText = _txtSRTM_Password.getText();
 
-            String baseUrl;
-            if (_rdoSRTM3FtpUrl.getSelection()) {
+      _txtSRTM_Password.setToolTipText(passwordText.length() == 0
+            ? Messages.PrefPage_SRTMData_Info_EmptyPassword
+            : passwordText);
 
-               // check ftp connection
+      enableControls();
+   }
 
-//					baseUrl = fTxtSRTM3FtpUrl.getText().trim();
-//
-//					final FTPClient ftp = new FTPClient();
+   private void onSelect_DummyValidation() {
 
-            } else {
+      final String password = _txtSRTM_Password.getText().trim();
+      final String username = _txtSRTM_Username.getText().trim();
 
-               // check http connection
+      if (UI.EMPTY_STRING.equals(password)) {
+         _txtSRTM_Password.setText(Messages.PrefPage_SRTMData_Info_DummyPassword);
+      }
 
-               baseUrl = _txtSRTM3HttpUrl.getText().trim();
+      if (UI.EMPTY_STRING.equals(username)) {
+         _txtSRTM_Username.setText(Messages.PrefPage_SRTMData_Info_DummyUsername);
+      }
 
-               try {
-                  final HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl)).GET()
-                        .build();
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, TimeTools.nowInMilliseconds());
 
-                  final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+      updateUI_AccountValidation();
+   }
 
-                  final int statusCode = response.statusCode();
-                  final String responseMessage = response.body();
+   private void onSelect_ResetValidation() {
 
-                  final String message = statusCode == HttpURLConnection.HTTP_OK
-                        ? NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionOK_message, baseUrl)
-                        : NLS.bind(
-                              Messages.prefPage_srtm_checkHTTPConnectionFAILED_message, //
-                              new Object[] {
-                                    baseUrl,
-                                    statusCode,
-                                    responseMessage });
+      _txtSRTM_Password.setText(UI.EMPTY_STRING);
+      _txtSRTM_Username.setText(UI.EMPTY_STRING);
 
-                  MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
-                        Messages.prefPage_srtm_checkHTTPConnection_title,
-                        message);
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
 
-               } catch (final IOException | InterruptedException e) {
+      updateUI_AccountValidation();
 
-                  MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
-                        Messages.prefPage_srtm_checkHTTPConnection_title,
-                        NLS.bind(Messages.prefPage_srtm_checkHTTPConnection_message, baseUrl));
+      enableControls();
+   }
 
-                  e.printStackTrace();
-               }
-            }
+   private void onSelect_ValidateSrtmDownload() {
+
+      BusyIndicator.showWhile(_prefContainer.getDisplay(), () -> {
+
+         final String password = _txtSRTM_Password.getText().trim();
+         final String username = _txtSRTM_Username.getText().trim();
+
+         try (final InputStream inputStream = new DownloadSRTM3().getResource(HTTPS_NASA_TEST_URL, username, password)) {
+
+            // set validation time, this is used to check (enable actions) if a user can download SRTM data
+            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, TimeTools.nowInMilliseconds());
+
+            updateUI_AccountValidation();
+
+            MessageDialog.openInformation(
+                  _prefContainer.getShell(),
+                  Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_OK_Message, HTTPS_NASA_TEST_URL));
+
+         } catch (final Exception e) {
+
+            // discard validation
+            _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
+
+            updateUI_AccountValidation();
+
+            MessageDialog.openInformation(
+
+                  _prefContainer.getShell(),
+                  Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Title,
+                  NLS.bind(Messages.PrefPage_SRTMData_Dialog_ValidateSrtmDownload_Error_Message,
+                        HTTPS_NASA_TEST_URL,
+                        e.getMessage()));
+
+            StatusUtil.log(e);
          }
       });
    }
@@ -318,17 +458,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
       _useDefaultLocation.loadDefault();
 
-      _prefStore.setToDefault(IPreferences.STATE_IS_SRTM3_FTP);
-      _prefStore.setToDefault(IPreferences.STATE_SRTM3_HTTP_URL);
-      _prefStore.setToDefault(IPreferences.STATE_SRTM3_FTP_URL);
-
-      // update controls
-      final boolean isFtp = _prefStore.getDefaultBoolean(IPreferences.STATE_IS_SRTM3_FTP);
-      _rdoSRTM3FtpUrl.setSelection(isFtp);
-      _rdoSRTM3HttpUrl.setSelection(!isFtp);
-
-      _txtSRTM3FtpUrl.setText(_prefStore.getDefaultString(IPreferences.STATE_SRTM3_FTP_URL));
-      _txtSRTM3HttpUrl.setText(_prefStore.getDefaultString(IPreferences.STATE_SRTM3_HTTP_URL));
+      _txtSRTM_Username.setText(UI.EMPTY_STRING);
+      _txtSRTM_Password.setText(UI.EMPTY_STRING);
 
       enableControls();
 
@@ -339,7 +470,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
    public boolean performOk() {
 
       if (_useDefaultLocation == null) {
-         // page is not initialized this case happened and created an NPE
+
+         // page is not initialized this case happened and created a NPE
          return super.performOk();
       }
 
@@ -349,20 +481,6 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
       saveState();
 
-      /*
-       * when the srtm3 server has been modified, clear the file cache to reload the files from
-       * the new location
-       */
-      if (_backupIsFtp != _prefStore.getBoolean(IPreferences.STATE_IS_SRTM3_FTP)
-            || _backupFtpUrl.equalsIgnoreCase(_prefStore.getString(IPreferences.STATE_SRTM3_FTP_URL)) == false
-            || _backupHttpUrl.equalsIgnoreCase(_prefStore.getString(IPreferences.STATE_SRTM3_HTTP_URL)) == false) {
-
-         ElevationSRTM3.clearElevationFileCache();
-
-         // fire event to clear the tour data cache which removes existing srtm data
-         _prefStore.setValue(ITourbookPreferences.CLEAR_TOURDATA_CACHE, Math.random());
-      }
-
       return super.performOk();
    }
 
@@ -371,14 +489,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       _useDefaultLocation.load();
       _dataPathEditor.load();
 
-      _backupIsFtp = _prefStore.getBoolean(IPreferences.STATE_IS_SRTM3_FTP);
-      _rdoSRTM3FtpUrl.setSelection(_backupIsFtp);
-      _rdoSRTM3HttpUrl.setSelection(!_backupIsFtp);
-
-      _backupFtpUrl = _prefStore.getString(IPreferences.STATE_SRTM3_FTP_URL);
-      _backupHttpUrl = _prefStore.getString(IPreferences.STATE_SRTM3_HTTP_URL);
-      _txtSRTM3FtpUrl.setText(_backupFtpUrl);
-      _txtSRTM3HttpUrl.setText(_backupHttpUrl);
+      _txtSRTM_Password.setText(_prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD));
+      _txtSRTM_Username.setText(_prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME));
    }
 
    private void saveState() {
@@ -386,9 +498,40 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
       _useDefaultLocation.store();
       _dataPathEditor.store();
 
-      _prefStore.setValue(IPreferences.STATE_IS_SRTM3_FTP, _rdoSRTM3FtpUrl.getSelection());
-      _prefStore.setValue(IPreferences.STATE_SRTM3_HTTP_URL, _txtSRTM3HttpUrl.getText().trim());
-      _prefStore.setValue(IPreferences.STATE_SRTM3_FTP_URL, _txtSRTM3FtpUrl.getText().trim());
+      final String password = _txtSRTM_Password.getText().trim();
+      final String username = _txtSRTM_Username.getText().trim();
+
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD, password);
+      _prefStore.setValue(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME, username);
+
+      if (password.length() == 0 || username.length() == 0) {
+
+         // reset validation
+         _prefStore.setValue(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE, Long.MIN_VALUE);
+
+         updateUI_AccountValidation();
+      }
+   }
+
+   private void updateUI_AccountValidation() {
+
+      if (_prefContainer.isDisposed()) {
+         return;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+
+      final String validationText = validationDate == Long.MIN_VALUE
+
+            ? Messages.PrefPage_SRTMData_Label_AccountValidation_NO
+
+            : NLS.bind(Messages.PrefPage_SRTMData_Label_AccountValidation_YES,
+                  TimeTools.Formatter_DateTime_M.format(TimeTools.getZonedDateTime(validationDate)));
+
+      _lblSRTMValidation.setText(validationText);
+
+      // the validation text can have different heights -> relayout to have no vertical gaps
+      _prefContainer.layout(true, true);
    }
 
    private boolean validateData() {
@@ -401,32 +544,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
          isValid = false;
 
          setErrorMessage(Messages.prefPage_srtm_msg_invalid_data_path);
+
          _dataPathEditor.setFocus();
-
-      } else if (_rdoSRTM3FtpUrl.getSelection()) {
-
-         // check ftp url
-
-         if (_txtSRTM3FtpUrl.getText().trim().toLowerCase().startsWith(PROTOCOL_FTP) == false) {
-
-            isValid = false;
-
-            setErrorMessage(Messages.prefPage_srtm_msg_invalidSrtm3FtpUrl);
-            _txtSRTM3FtpUrl.setFocus();
-         }
-
-      } else {
-
-         // check http url
-
-         final String httpUrl = _txtSRTM3HttpUrl.getText().trim().toLowerCase();
-         if (httpUrl.startsWith(PROTOCOL_HTTP) == false && httpUrl.startsWith(PROTOCOL_HTTPS) == false) {
-
-            isValid = false;
-
-            setErrorMessage(Messages.prefPage_srtm_msg_invalidSrtm3HttpUrl);
-            _txtSRTM3HttpUrl.setFocus();
-         }
       }
 
       if (isValid) {

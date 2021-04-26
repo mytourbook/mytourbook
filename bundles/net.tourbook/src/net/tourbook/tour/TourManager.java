@@ -4196,7 +4196,9 @@ public class TourManager {
       case RR_INTERVALS___2ND_RR_AVERAGE:
       case RR_INTERVALS___2ND_DEVICE_BPM:
 
-         if (isAvailable_AvgBpmFromRRIntervals) {
+         final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
+
+         if (isAvailable_AvgBpmFromRRIntervals && allRRTimesInMilliseconds != null) {
 
             // data serie which has the same number of slices as the time serie
             final float[] dataSerie = tcc.pulseGraph == PulseGraph.RR_INTERVALS___2ND_DEVICE_BPM
@@ -4227,7 +4229,6 @@ public class TourManager {
             yDataPulse = createChartDataSerieNoZero(dataSerie, rrChartType);
 
             final int[] timeSerie = tourData.timeSerie; //                                length: numTimeSlices
-            final int[] allRRTimesInMilliseconds = tourData.pulseTime_Milliseconds; //    length: numRRTimes
 
             // length: numTimeSlices
             final int[] timeSerie_WithRRIndex = tourData.pulseTime_TimeIndex;

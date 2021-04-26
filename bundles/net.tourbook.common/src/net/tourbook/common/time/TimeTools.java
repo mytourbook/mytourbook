@@ -609,7 +609,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTime(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             getDefaultTimeZone());
    }
@@ -621,7 +621,7 @@ public class TimeTools {
     */
    public static ZonedDateTime getZonedDateTimeWithUTC(final long epochOfMilli) {
 
-      return ZonedDateTime.ofInstant(//
+      return ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             ZoneOffset.UTC);
    }
@@ -632,6 +632,14 @@ public class TimeTools {
    public static ZonedDateTime now() {
 
       return ZonedDateTime.now(getDefaultTimeZone());
+   }
+
+   /**
+    * @return Return now with the default time zone in milliseconds
+    */
+   public static long nowInMilliseconds() {
+
+      return now().toInstant().toEpochMilli();
    }
 
    /**

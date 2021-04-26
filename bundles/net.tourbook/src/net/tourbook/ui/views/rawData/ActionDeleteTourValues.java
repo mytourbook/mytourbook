@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,17 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-/**
- * @author Alfred Barten
- */
-package net.tourbook.srtm.download;
+package net.tourbook.ui.views.rawData;
 
-public final class DownloadGLOBE extends DownloadResource {
+import net.tourbook.Messages;
+import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.tour.TourManager;
 
-   private final static String URL_BASE_PATH = "https://www.ngdc.noaa.gov/mgg/topo/DATATILES/elev/"; //$NON-NLS-1$
+import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
 
-   public static void get(final String remoteFileName, final String localFilePathName) throws Exception {
+public class ActionDeleteTourValues extends Action {
 
-      new HTTPDownloader().get(URL_BASE_PATH, remoteFileName, localFilePathName);
+   private final ITourViewer3 _tourViewer;
+
+   public ActionDeleteTourValues(final ITourViewer3 tourViewer) {
+
+      _tourViewer = tourViewer;
+
+      setText(Messages.Dialog_DeleteTourValues_Action_OpenDialog);
+   }
+
+   @Override
+   public void run() {
+
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      new DialogDeleteTourValues(Display.getCurrent().getActiveShell(), _tourViewer).open();
    }
 }

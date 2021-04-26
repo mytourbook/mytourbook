@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.device.sporttracks;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.device.sporttracks.FitLogSAXHandler.Equipment;
@@ -182,11 +184,11 @@ public class FitLogExSAXHandler extends DefaultHandler {
       }
    }
 
-   public LinkedHashMap<String, Integer> getCustomDataFieldDefinitions() {
+   public Map<String, Integer> getCustomDataFieldDefinitions() {
       return _customDataFieldDefinitions;
    }
 
-   public ArrayList<Equipment> getEquipments() {
+   public List<Equipment> getEquipments() {
       return _equipments;
    }
 
@@ -205,7 +207,7 @@ public class FitLogExSAXHandler extends DefaultHandler {
             /*
              * We parse and save the field format in order to be able to format the double values
              */
-            if (!StringUtils.isNullOrEmpty(customFieldOptions)) {
+            if (StringUtils.hasContent(customFieldOptions)) {
 
                final String[] tokens = customFieldOptions.split("\\|"); //$NON-NLS-1$
                if (tokens.length < 2) {
