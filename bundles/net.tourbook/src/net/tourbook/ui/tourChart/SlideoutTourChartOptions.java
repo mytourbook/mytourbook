@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -33,7 +34,6 @@ import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -461,7 +461,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
             setIsAnotherDialogOpened(true);
             {
-               MessageDialog.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+               MessageDialog_OnTop.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
             }
             setIsAnotherDialogOpened(false);
 

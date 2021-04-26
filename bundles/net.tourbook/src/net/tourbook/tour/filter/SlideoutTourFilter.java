@@ -24,7 +24,7 @@ import java.util.Collections;
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -250,7 +250,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 
@@ -1875,7 +1875,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 
