@@ -115,7 +115,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
-   private Button    _btnUnlockMultipleToursSelection;
+   private Button    _btnUnlockAllToursSelection;
+   private Button    _btnUnlockBetweenDatesSelection;
 
    public DialogDeleteTourValues(final Shell parentShell,
                                  final ITourViewer3 tourViewer) {
@@ -219,58 +220,56 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             _rdoDeleteTourValues_Tours_Selected.setSelection(true);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoDeleteTourValues_Tours_Selected);
          }
-
-         /*
-          * Modify multiple tours
-          */
-         final Composite innerContainer = new Composite(group, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(innerContainer);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
          {
-            {
-               /*
-                * Modify ALL tours in the database
-                */
-               _rdoDeleteTourValues_Tours_All = new Button(innerContainer, SWT.RADIO);
-               _rdoDeleteTourValues_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-               _rdoDeleteTourValues_Tours_All.addSelectionListener(_mutltipleToursSelectionListener);
-               _rdoDeleteTourValues_Tours_All.setSelection(false);
-               _rdoDeleteTourValues_Tours_All.setEnabled(false);
-               GridDataFactory.fillDefaults().span(3, 1).indent(0, 3).applyTo(_rdoDeleteTourValues_Tours_All);
-            }
-            {
-               /*
-                * Modify between dates
-                */
-               _rdoDeleteTourValues_Tours_BetweenDates = new Button(innerContainer, SWT.RADIO);
-               _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-               _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_mutltipleToursSelectionListener);
-               _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
-               _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
+            /*
+             * Modify ALL tours in the database
+             */
+            _rdoDeleteTourValues_Tours_All = new Button(group, SWT.RADIO);
+            _rdoDeleteTourValues_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
+            _rdoDeleteTourValues_Tours_All.addSelectionListener(_mutltipleToursSelectionListener);
+            _rdoDeleteTourValues_Tours_All.setSelection(false);
+            _rdoDeleteTourValues_Tours_All.setEnabled(false);
+            GridDataFactory.fillDefaults().indent(0, 3).applyTo(_rdoDeleteTourValues_Tours_All);
+         }
+         {
+            _btnUnlockAllToursSelection = new Button(group, SWT.PUSH);
+            _btnUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockAllToursSelection.setImage(_imageLockClosed);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockAllToursSelection);
+            _btnUnlockAllToursSelection.addSelectionListener(_unlockButtonListener);
+         }
+         {
+            /*
+             * Modify between dates
+             */
+            _rdoDeleteTourValues_Tours_BetweenDates = new Button(group, SWT.RADIO);
+            _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
+            _rdoDeleteTourValues_Tours_BetweenDates.addSelectionListener(_mutltipleToursSelectionListener);
+            _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
+            _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
 
-               final Composite datesContainer = new Composite(innerContainer, SWT.NONE);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(datesContainer);
-               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(datesContainer);
+            final Composite datesContainer = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(datesContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(datesContainer);
+            {
                {
-                  {
-                     _dtTourDate_From = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                     _dtTourDate_From.addSelectionListener(_defaultListener);
-                     _dtTourDate_From.setEnabled(false);
-                  }
-                  {
-                     _dtTourDate_Until = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                     _dtTourDate_Until.addSelectionListener(_defaultListener);
-                     _dtTourDate_Until.setEnabled(false);
-                  }
+                  _dtTourDate_From = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+                  _dtTourDate_From.addSelectionListener(_defaultListener);
+                  _dtTourDate_From.setEnabled(false);
+               }
+               {
+                  _dtTourDate_Until = new DateTime(datesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+                  _dtTourDate_Until.addSelectionListener(_defaultListener);
+                  _dtTourDate_Until.setEnabled(false);
                }
             }
          }
          {
-            _btnUnlockMultipleToursSelection = new Button(group, SWT.PUSH);
-            _btnUnlockMultipleToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockMultipleToursSelection.setImage(_imageLockClosed);
-            GridDataFactory.fillDefaults().span(1, 2).align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockMultipleToursSelection);
-            _btnUnlockMultipleToursSelection.addSelectionListener(_unlockButtonListener);
+            _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
+            _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(_btnUnlockAllToursSelection);
+            _btnUnlockBetweenDatesSelection.addSelectionListener(_unlockButtonListener);
          }
       }
    }
@@ -647,10 +646,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
       }
 
-      _btnUnlockMultipleToursSelection.setText(_canSelectMultipleTours
+      _btnUnlockAllToursSelection.setText(_canSelectMultipleTours
             ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
             : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-      _btnUnlockMultipleToursSelection.setImage(_canSelectMultipleTours
+      _btnUnlockAllToursSelection.setImage(_canSelectMultipleTours
             ? _imageLockOpen
             : _imageLockClosed);
    }
