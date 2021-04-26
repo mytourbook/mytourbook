@@ -693,6 +693,8 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+
+      //Helpful during development
 //    return null;
    }
 
