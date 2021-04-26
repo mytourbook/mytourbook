@@ -23,7 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -461,7 +461,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
             setIsAnotherDialogOpened(true);
             {
-               MessageDialog_Customized.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+               MessageDialog_OnTop.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
             }
             setIsAnotherDialogOpened(false);
 

@@ -47,7 +47,6 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -1814,7 +1813,7 @@ public class TourManager {
 
          final Shell shell = Display.getCurrent().getActiveShell();
 
-         MessageDialog_Customized.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+         MessageDialog.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
 
          // show SRTM pref page
          PreferencesUtil.createPreferenceDialogOn(
