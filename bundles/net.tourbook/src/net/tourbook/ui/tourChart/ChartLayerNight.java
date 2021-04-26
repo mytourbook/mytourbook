@@ -76,6 +76,7 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
       }
 
       gc.setClipping((Rectangle) null);
+      gc.setAlpha(0xff);
    }
 
    /**
