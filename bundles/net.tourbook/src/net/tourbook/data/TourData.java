@@ -5706,63 +5706,59 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private void createSRTMDataSerie() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-         @Override
-         public void run() {
+         int serieIndex = 0;
+         float lastValidSRTM = 0;
+         boolean isSRTMValid = false;
 
-            int serieIndex = 0;
-            float lastValidSRTM = 0;
-            boolean isSRTMValid = false;
+         final int serieLength = timeSerie.length;
 
-            final int serieLength = timeSerie.length;
+         final float[] newSRTMSerie = new float[serieLength];
+         final float[] newSRTMSerieImperial = new float[serieLength];
 
-            final float[] newSRTMSerie = new float[serieLength];
-            final float[] newSRTMSerieImperial = new float[serieLength];
+         for (final double latitude : latitudeSerie) {
 
-            for (final double latitude : latitudeSerie) {
+            final double longitude = longitudeSerie[serieIndex];
 
-               final double longitude = longitudeSerie[serieIndex];
+            float srtmValue = 0;
 
-               float srtmValue = 0;
-
-               // ignore lat/lon 0/0, this is in the ocean
-               if (latitude != 0 || longitude != 0) {
-                  srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
-               }
-
-               /*
-                * set invalid values to the previous valid value
-                */
-               if (srtmValue == Float.MIN_VALUE) {
-                  // invalid data
-                  srtmValue = lastValidSRTM;
-               } else {
-                  // valid data are available
-                  isSRTMValid = true;
-                  lastValidSRTM = srtmValue;
-               }
-
-               // adjust wrong values
-               if (srtmValue < -1000) {
-                  srtmValue = 0;
-               } else if (srtmValue > 10000) {
-                  srtmValue = 10000;
-               }
-
-               newSRTMSerie[serieIndex] = srtmValue;
-               newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
-
-               serieIndex++;
+            // ignore lat/lon 0/0, this is in the ocean
+            if (latitude != 0 || longitude != 0) {
+               srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
             }
 
-            if (isSRTMValid) {
-               srtmSerie = newSRTMSerie;
-               srtmSerieImperial = newSRTMSerieImperial;
+            /*
+             * set invalid values to the previous valid value
+             */
+            if (srtmValue == Float.MIN_VALUE) {
+               // invalid data
+               srtmValue = lastValidSRTM;
             } else {
-               // set state that srtm altitude is invalid
-               srtmSerie = new float[0];
+               // valid data are available
+               isSRTMValid = true;
+               lastValidSRTM = srtmValue;
             }
+
+            // adjust wrong values
+            if (srtmValue < -1000) {
+               srtmValue = 0;
+            } else if (srtmValue > 10000) {
+               srtmValue = 10000;
+            }
+
+            newSRTMSerie[serieIndex] = srtmValue;
+            newSRTMSerieImperial[serieIndex] = srtmValue / UI.UNIT_FOOT;
+
+            serieIndex++;
+         }
+
+         if (isSRTMValid) {
+            srtmSerie = newSRTMSerie;
+            srtmSerieImperial = newSRTMSerieImperial;
+         } else {
+            // set state that srtm altitude is invalid
+            srtmSerie = new float[0];
          }
       });
    }
