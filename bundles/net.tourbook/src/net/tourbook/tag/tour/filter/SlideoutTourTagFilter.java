@@ -26,7 +26,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ITreeViewer;
@@ -1675,7 +1675,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       boolean isDeleteProfile = false;
       setIsKeepOpenInternally(true);
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 
