@@ -47,6 +47,7 @@ import net.tourbook.chart.ComputeChartValue;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.dialog.MessageDialog_Customized;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -67,6 +68,8 @@ import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageViews;
+import net.tourbook.srtm.IPreferences;
+import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -100,6 +103,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -108,6 +112,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class TourManager {
 
@@ -1780,6 +1785,53 @@ public class TourManager {
    }
 
    /**
+    * @return <code>true</code> when the user has validated the SRTM server account
+    */
+   private static boolean isSrtmAccountValid() {
+
+      String message = null;
+      String focusField = null;
+
+      final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
+      final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
+
+      if (password.trim().length() == 0 || username.trim().length() == 0) {
+
+         message = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
+         focusField = PrefPageSRTMData.FOCUS_USER_NAME;
+      }
+
+      final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
+      if (message == null && validationDate < 0) {
+
+         message = Messages.SRTM_Download_Info_NoDownloadValidation;
+         focusField = PrefPageSRTMData.FOCUS_VALIDATE_DOWNLOAD;
+      }
+
+      if (message != null && message.length() > 0) {
+
+         // SRTM download is not valid
+
+         final Shell shell = Display.getCurrent().getActiveShell();
+
+         MessageDialog_Customized.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
+
+         // show SRTM pref page
+         PreferencesUtil.createPreferenceDialogOn(
+               shell,
+               PrefPageSRTMData.ID,
+               null,
+
+               // set focus to a control
+               focusField).open();
+
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
     * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
     * modified. A message dialog informs the user about the modified tour and that the requested
     * actions cannot be done.
@@ -2671,35 +2723,39 @@ public class TourManager {
       }
    }
 
-   public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {
+   public static boolean setElevationValuesFromSRTM(final ArrayList<TourData> allTourData) {
 
-      if (tourDataList == null || tourDataList.isEmpty()) {
+      if (allTourData == null || allTourData.isEmpty()) {
          return false;
       }
+
+      if (isSrtmAccountValid() == false) {
+         return false;
+      }
+
+      final Display display = Display.getCurrent();
 
       if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
+            display.getActiveShell(),
             Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Title,
             Messages.TourEditor_Dialog_SetAltitudeFromSRTM_Message) == false) {
+
          return false;
       }
 
-      final boolean[] retValue = { false };
+      final boolean[] returnValue = { false };
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      BusyIndicator.showWhile(display, () -> {
 
-            for (final TourData tourData : tourDataList) {
+         for (final TourData tourData : allTourData) {
 
-               final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+            final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
 
-               retValue[0] = retValue[0] || isReplaced;
-            }
+            returnValue[0] = returnValue[0] || isReplaced;
          }
       });
 
-      return retValue[0];
+      return returnValue[0];
    }
 
    /**
@@ -2715,21 +2771,10 @@ public class TourManager {
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final RGB prefLineColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_LINE);
-
-      final RGB prefTextColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
-
-      final RGB prefDarkColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_DARK);
-
-      final RGB prefBrightColor = PreferenceConverter.getColor( //
-            commonPrefStore,
-            prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
+      final RGB prefLineColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_LINE);
+      final RGB prefTextColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_TEXT);
+      final RGB prefDarkColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_DARK);
+      final RGB prefBrightColor = PreferenceConverter.getColor(commonPrefStore, prefGraphName + GraphColorManager.PREF_COLOR_BRIGHT);
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
