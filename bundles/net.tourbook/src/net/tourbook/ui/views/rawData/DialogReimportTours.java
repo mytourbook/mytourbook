@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITourViewer3;
@@ -47,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -58,38 +60,43 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
-   private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                          //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                     //$NON-NLS-1$
 
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";           //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";      //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";                //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";           //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";          //$NON-NLS-1$
 
-   private static final String          STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                      //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                    //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                         //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";             //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                 //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                 //$NON-NLS-1$
-   private static final String          STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                           //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                         //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                       //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                     //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                              //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";                  //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                       //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                      //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                      //$NON-NLS-1$
+   private static final String          STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND";      //$NON-NLS-1$
 
    private static final int             VERTICAL_SECTION_MARGIN                      = 10;
 
-   private static final IDialogSettings _state                                       = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
+   private static final IDialogSettings _state                                       = TourbookPlugin.getState("DialogReimportTours");      //$NON-NLS-1$
 
    private final ITourViewer3           _tourViewer;
 
    private SelectionAdapter             _defaultListener;
 
    private PixelConverter               _pc;
+
+   private Image                        _imageLockClosed                             = TourbookPlugin.getImageDescriptor(Images.Lock_Closed)
+         .createImage();
+   private Image                        _imageLockOpen                               = TourbookPlugin.getImageDescriptor(Images.Lock_Open)
+         .createImage();
 
    /*
     * UI controls
@@ -117,6 +124,8 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _rdoReimport_Tours_All;
    private Button    _rdoReimport_Tours_BetweenDates;
    private Button    _rdoReimport_Tours_Selected;
+   private Button    _btnUnlockAllToursSelection;
+   private Button    _btnUnlockBetweenDatesSelection;
 
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
@@ -199,7 +208,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       {
          createUI_10_Tours(container);
          createUI_20_Data(container);
-
          {
             /*
              * Checkbox: Skip tours for which the import file is not found
@@ -222,17 +230,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       group.setText(Messages.Dialog_ReimportTours_Group_Tours);
       group.setToolTipText(Messages.Dialog_ReimportTours_Group_Tours_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(4).applyTo(group);
       {
-         {
-            /*
-             * Re-import ALL tours in the database
-             */
-            _rdoReimport_Tours_All = new Button(group, SWT.RADIO);
-            _rdoReimport_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-            _rdoReimport_Tours_All.addSelectionListener(_defaultListener);
-            GridDataFactory.fillDefaults().span(2, 1).indent(0, 3).applyTo(_rdoReimport_Tours_All);
-         }
          {
             /*
              * Re-import the SELECTED tours
@@ -240,7 +239,45 @@ public class DialogReimportTours extends TitleAreaDialog {
             _rdoReimport_Tours_Selected = new Button(group, SWT.RADIO);
             _rdoReimport_Tours_Selected.setText(Messages.Dialog_ModifyTours_Radio_SelectedTours);
             _rdoReimport_Tours_Selected.addSelectionListener(_defaultListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoReimport_Tours_Selected);
+            _rdoReimport_Tours_Selected.setSelection(true);
+            GridDataFactory.fillDefaults().span(4, 1).applyTo(_rdoReimport_Tours_Selected);
+         }
+         {
+            /*
+             * Re-import ALL tours in the database
+             */
+            _rdoReimport_Tours_All = new Button(group, SWT.RADIO);
+            _rdoReimport_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
+            _rdoReimport_Tours_All.setSelection(false);
+            _rdoReimport_Tours_All.setEnabled(false);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_rdoReimport_Tours_All);
+         }
+         {
+            _btnUnlockAllToursSelection = new Button(group, SWT.PUSH);
+            _btnUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockAllToursSelection.setImage(_imageLockClosed);
+            _btnUnlockAllToursSelection.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  _rdoReimport_Tours_All.setEnabled(
+                        !_rdoReimport_Tours_All.isEnabled());
+
+                  final boolean isEnabled = _rdoReimport_Tours_All.isEnabled();
+
+                  _btnUnlockAllToursSelection.setText(isEnabled
+                        ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+                        : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+                  _btnUnlockAllToursSelection.setImage(isEnabled
+                        ? _imageLockOpen
+                        : _imageLockClosed);
+
+                  if (!isEnabled) {
+                     _rdoReimport_Tours_All.setSelection(false);
+                     _rdoReimport_Tours_Selected.setSelection(true);
+                  }
+               }
+            });
          }
          {
             /*
@@ -248,22 +285,46 @@ public class DialogReimportTours extends TitleAreaDialog {
              */
             _rdoReimport_Tours_BetweenDates = new Button(group, SWT.RADIO);
             _rdoReimport_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-            _rdoReimport_Tours_BetweenDates.addSelectionListener(_defaultListener);
-
-            final Composite container = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            _rdoReimport_Tours_BetweenDates.setSelection(false);
+            _rdoReimport_Tours_BetweenDates.setEnabled(false);
             {
-               {
-
-                  _dtTourDate_From = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                  _dtTourDate_From.addSelectionListener(_defaultListener);
-               }
-               {
-                  _dtTourDate_Until = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                  _dtTourDate_Until.addSelectionListener(_defaultListener);
-               }
+               _dtTourDate_From = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+               _dtTourDate_From.addSelectionListener(_defaultListener);
+               _dtTourDate_From.setEnabled(false);
             }
+            {
+               _dtTourDate_Until = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+               _dtTourDate_Until.addSelectionListener(_defaultListener);
+               _dtTourDate_Until.setEnabled(false);
+            }
+            _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
+            _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+            _btnUnlockBetweenDatesSelection.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  _rdoReimport_Tours_BetweenDates.setEnabled(
+                        !_rdoReimport_Tours_BetweenDates.isEnabled());
+
+                  final boolean isEnabled = _rdoReimport_Tours_BetweenDates.isEnabled();
+
+                  _dtTourDate_From.setEnabled(isEnabled);
+                  _dtTourDate_Until.setEnabled(isEnabled);
+
+                  _btnUnlockBetweenDatesSelection.setText(isEnabled
+                        ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+                        : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+                  _btnUnlockBetweenDatesSelection.setImage(isEnabled
+                        ? _imageLockOpen
+                        : _imageLockClosed);
+
+                  if (!isEnabled) {
+                     _rdoReimport_Tours_BetweenDates.setSelection(false);
+                     _rdoReimport_Tours_Selected.setSelection(true);
+                  }
+               }
+            });
          }
       }
    }
