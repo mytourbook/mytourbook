@@ -23,7 +23,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -34,6 +33,7 @@ import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -435,37 +436,39 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
          // check if the user has validated the SRTM download
 
-         String message = null;
+         String srtmAccountErrorMessage = null;
          String focusField = null;
 
          final String password = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_PASSWORD);
          final String username = _prefStore.getString(IPreferences.NASA_EARTHDATA_LOGIN_USER_NAME);
          if (password.trim().length() == 0 || username.trim().length() == 0) {
 
-            message = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
+            srtmAccountErrorMessage = Messages.SRTM_Download_Info_UsernamePasswordIsEmpty;
             focusField = PrefPageSRTMData.FOCUS_USER_NAME;
          }
 
          final long validationDate = _prefStore.getLong(IPreferences.NASA_EARTHDATA_ACCOUNT_VALIDATION_DATE);
-         if (message == null && validationDate < 0) {
+         if (srtmAccountErrorMessage == null && validationDate < 0) {
 
-            message = Messages.SRTM_Download_Info_NoDownloadValidation;
+            srtmAccountErrorMessage = Messages.SRTM_Download_Info_NoDownloadValidation;
             focusField = PrefPageSRTMData.FOCUS_VALIDATE_DOWNLOAD;
          }
 
-         if (message != null && message.length() > 0) {
+         if (srtmAccountErrorMessage != null && srtmAccountErrorMessage.length() > 0) {
 
             // SRTM download is not valid
 
-            final Shell shell = _chkShowSrtmData.getShell();
-
-            setIsAnotherDialogOpened(true);
-            {
-               MessageDialog_OnTop.openInformation(shell, Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title, message);
-            }
-            setIsAnotherDialogOpened(false);
-
+            /*
+             * Close slideout now otherwise on Linux the message dialog is behind the slideout even
+             * when it's on top and the slidout is it's shell
+             */
             close();
+
+            final Shell shell = Display.getDefault().getActiveShell();
+
+            MessageDialog.openInformation(shell,
+                  Messages.SRTM_Download_Dialog_SRTMDownloadValidation_Title,
+                  srtmAccountErrorMessage);
 
             // show SRTM pref page
             PreferencesUtil.createPreferenceDialogOn(
