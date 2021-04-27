@@ -222,7 +222,6 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
              */
             _rdoDeleteTourValues_Tours_All = new Button(group, SWT.RADIO);
             _rdoDeleteTourValues_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-//            _rdoDeleteTourValues_Tours_All.addSelectionListener(_allToursSelectionListener);
             _rdoDeleteTourValues_Tours_All.setSelection(false);
             _rdoDeleteTourValues_Tours_All.setEnabled(false);
             GridDataFactory.fillDefaults().indent(0, 3).applyTo(_rdoDeleteTourValues_Tours_All);
@@ -235,9 +234,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                @Override
                public void widgetSelected(final SelectionEvent e) {
 
-                  final boolean isEnabled = _rdoDeleteTourValues_Tours_BetweenDates.isEnabled();
+                  _rdoDeleteTourValues_Tours_All.setEnabled(
+                        !_rdoDeleteTourValues_Tours_All.isEnabled());
 
-                  _rdoDeleteTourValues_Tours_All.setEnabled(!isEnabled);
+                  final boolean isEnabled = _rdoDeleteTourValues_Tours_All.isEnabled();
 
                   _btnUnlockAllToursSelection.setText(isEnabled
                         ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
@@ -259,7 +259,6 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                _rdoDeleteTourValues_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
                _rdoDeleteTourValues_Tours_BetweenDates.setSelection(false);
                _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(false);
-               GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnUnlockAllToursSelection);
                {
                   _dtTourDate_From = new DateTime(betweenDatesContainer, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
                   _dtTourDate_From.addSelectionListener(_defaultListener);
@@ -279,11 +278,13 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
                   @Override
                   public void widgetSelected(final SelectionEvent e) {
 
-                     final boolean isEnabled = _dtTourDate_From.isEnabled();
+                     _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(
+                           !_rdoDeleteTourValues_Tours_BetweenDates.isEnabled());
 
-                     _dtTourDate_From.setEnabled(!isEnabled);
-                     _dtTourDate_Until.setEnabled(!isEnabled);
-                     _rdoDeleteTourValues_Tours_BetweenDates.setEnabled(!isEnabled);
+                     final boolean isEnabled = _rdoDeleteTourValues_Tours_BetweenDates.isEnabled();
+
+                     _dtTourDate_From.setEnabled(isEnabled);
+                     _dtTourDate_Until.setEnabled(isEnabled);
 
                      _btnUnlockBetweenDatesSelection.setText(isEnabled
                            ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
