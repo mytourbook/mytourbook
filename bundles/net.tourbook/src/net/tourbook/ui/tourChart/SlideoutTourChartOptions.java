@@ -170,6 +170,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final Composite ui = createUI(parent);
 
       restoreState();
+      enableControls();
 
       return ui;
    }
