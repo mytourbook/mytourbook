@@ -689,6 +689,11 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
             enableControls();
          }
       };
+
+      _parent.addDisposeListener(disposeEvent -> {
+         _imageLockClosed.dispose();
+         _imageLockOpen.dispose();
+      });
    }
 
    private boolean isDataValid() {
