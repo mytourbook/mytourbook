@@ -50,7 +50,11 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
          return;
       }
 
-      final int opacity = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
+      int opacity = ColorUtil.getTransparencyFromPercentage(
+            _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
+      //This occurred where 303 was returned. Not sure how it is possible and how
+      //to reproduce it but to avoid this, we bound the returned value
+      opacity = Math.min(255, opacity);
 
       final int devYTop = graphDrawingData.getDevYTop();
       final int devGraphHeight = graphDrawingData.devGraphHeight;
