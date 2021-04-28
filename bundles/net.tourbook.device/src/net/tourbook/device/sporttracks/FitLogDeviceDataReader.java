@@ -45,8 +45,9 @@ public class FitLogDeviceDataReader extends TourbookDevice {
 
    private static final IPreferenceStore _prefStore              = TourbookPlugin.getDefault().getPreferenceStore();
 
-   // plugin constructor
-   public FitLogDeviceDataReader() {}
+   public FitLogDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -124,8 +125,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             TourDatabase.clearTourTypes();
             TourManager.getInstance().clearTourDataCache();
 
+            // fire modify event
             display.syncExec(() -> _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
-
          }
       }
 
