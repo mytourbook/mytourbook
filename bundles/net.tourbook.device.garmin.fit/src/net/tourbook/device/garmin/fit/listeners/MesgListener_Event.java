@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.tourbook.data.GearData;
 import net.tourbook.device.garmin.fit.FitData;
+import net.tourbook.device.garmin.fit.FitUtils;
 
 /**
  * Set gear data
@@ -45,7 +46,6 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
    }
 
-   @SuppressWarnings("incomplete-switch")
    @Override
    public void onMesg(final EventMesg mesg) {
 
@@ -64,9 +64,11 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
                return;
             }
 
-            final long lastPausedTime_Start = _pausedTime_Start.get(numberOfPausedTime_Start - 1);
+            final long lastPausedTime_Start = _pausedTime_Start.get(
+                  numberOfPausedTime_Start - 1);
+            final long pausedTime_End = FitUtils.convertGarminTimeToJavaTime(
+                  mesg.getTimestamp().getTimestamp());
 
-            final long pausedTime_End = mesg.getTimestamp().getTimestamp() * 1000 + com.garmin.fit.DateTime.OFFSET;
             if (pausedTime_End - lastPausedTime_Start > 1000) {
                _pausedTime_End.add(pausedTime_End);
             }
@@ -80,13 +82,16 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
             if (numberOfPausedTime_Start > numberOfPausedTime_End) {
                _pausedTime_Start.remove(numberOfPausedTime_Start - 1);
             }
-            final long javaTime = mesg.getTimestamp().getTimestamp() * 1000 + com.garmin.fit.DateTime.OFFSET;
+            final long javaTime = FitUtils.convertGarminTimeToJavaTime(
+                  mesg.getTimestamp().getTimestamp());
             _pausedTime_Start.add(javaTime);
             break;
 
          //The Garmin usage of START/STOP/STOP_ALL is described here:
          //https://www.thisisant.com/forum/viewthread/4319/#7452
 
+         default:
+            break;
          }
       }
 
@@ -95,21 +100,15 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       // check if gear data are available, it can be null
       if (gearChangeData != null) {
 
+         final long javaTime = FitUtils.convertGarminTimeToJavaTime(
+               mesg.getTimestamp().getTimestamp());
+
          // create gear data for the current time
          final GearData gearData = new GearData();
-
-         final com.garmin.fit.DateTime garminTime = mesg.getTimestamp();
-
-         // convert garmin time into java time
-         final long garminTimeS = garminTime.getTimestamp();
-         final long garminTimeMS = garminTimeS * 1000;
-         final long javaTime = garminTimeMS + com.garmin.fit.DateTime.OFFSET;
-
          gearData.absoluteTime = javaTime;
          gearData.gears = gearChangeData;
 
          _gearData.add(gearData);
       }
    }
-
 }
