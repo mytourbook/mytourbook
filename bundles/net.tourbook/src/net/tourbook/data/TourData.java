@@ -217,7 +217,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private static final NumberForm     srtmNumberForm                    = new NumberForm();
 
    @Transient
-   private static final ElevationSRTM3 elevationSRTM3                    = new ElevationSRTM3();
+   private static final ElevationSRTM3 _elevationSRTM3                   = new ElevationSRTM3();
 
    @Transient
    private static IPreferenceStore     _prefStore                        = TourbookPlugin.getPrefStore();
@@ -5725,7 +5725,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             // ignore lat/lon 0/0, this is in the ocean
             if (latitude != 0 || longitude != 0) {
-               srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+               srtmValue = _elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
             }
 
             /*
