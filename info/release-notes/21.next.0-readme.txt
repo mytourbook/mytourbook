@@ -26,7 +26,6 @@ TODO's
                  mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
 
 * Tour modification (Frederic) 
-               - Create a separate checkbox for calories
 		         - Use multi-threading (ThreadPoolExecutor)
 
 Issues
