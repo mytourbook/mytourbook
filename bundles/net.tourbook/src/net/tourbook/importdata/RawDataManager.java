@@ -1695,8 +1695,8 @@ public class RawDataManager {
                clonedTourData.setTourAltUp(tourData.getTourAltUp());
 
                tourData.altitudeSerie = null;
-               tourData.setTourAltDown(0);
                tourData.setTourAltUp(0);
+               tourData.setTourAltDown(0);
                break;
 
             case TIME_SLICES_GEAR:
