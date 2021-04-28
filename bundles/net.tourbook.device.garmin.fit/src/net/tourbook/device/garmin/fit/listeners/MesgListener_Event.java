@@ -35,6 +35,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
    List<GearData>     _gearData;
    private List<Long> _pausedTime_Start = new ArrayList<>();
    private List<Long> _pausedTime_End   = new ArrayList<>();
+   private boolean    _isTimerStartedYet = false;
 
    public MesgListener_Event(final FitData fitData) {
 
@@ -43,7 +44,6 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       _gearData = fitData.getGearData();
       _pausedTime_Start = fitData.getPausedTime_Start();
       _pausedTime_End = fitData.getPausedTime_End();
-
    }
 
    @Override
@@ -60,7 +60,8 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
          case START:
 
-            if (numberOfPausedTime_Start == 0) {
+            if (!_isTimerStartedYet) {
+               _isTimerStartedYet = true;
                return;
             }
 
@@ -70,6 +71,13 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
                   mesg.getTimestamp().getTimestamp());
 
             if (pausedTime_End - lastPausedTime_Start >= 1000) {
+
+               // We need to avoid the cases where stops are consecutive events.
+               // In this case, we don't add the latest and keep the previous one.
+               if (numberOfPausedTime_Start == numberOfPausedTime_End) {
+                  break;
+               }
+
                _pausedTime_End.add(pausedTime_End);
             }
             break;
@@ -78,10 +86,13 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          case STOP_ALL:
 
             // We need to avoid the cases where stops are consecutive events.
-            // In this case, we take the latest and remove the previous one.
+            // In this case, we remove the latest and keep the previous one.
             if (numberOfPausedTime_Start > numberOfPausedTime_End) {
                _pausedTime_Start.remove(numberOfPausedTime_Start - 1);
             }
+//            else if (numberOfPausedTime_End > numberOfPausedTime_Start) {
+//               _pausedTime_End.remove(numberOfPausedTime_End - 1);
+//            }
             final long javaTime = FitUtils.convertGarminTimeToJavaTime(
                   mesg.getTimestamp().getTimestamp());
             _pausedTime_Start.add(javaTime);
