@@ -71,6 +71,17 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       }
    }
 
+   private void handleTimerStopEvents(final long javaTime) {
+      // We need to avoid the cases where stops are consecutive events.
+      // In this case, we ignore the stop event if the timer is already stopped.
+      if (_isTimerStopped) {
+         return;
+      }
+
+      _pausedTime_Start.add(javaTime);
+      _isTimerStopped = true;
+   }
+
    @Override
    public void onMesg(final EventMesg mesg) {
 
@@ -78,6 +89,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       final EventType eventType = mesg.getEventType();
       final long javaTime = FitUtils.convertGarminTimeToJavaTime(
             mesg.getTimestamp().getTimestamp());
+
       if (event != null && event == Event.TIMER && eventType != null) {
 
          switch (eventType) {
@@ -114,16 +126,5 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       gearData.gears = gearChangeData;
 
       _gearData.add(gearData);
-   }
-
-   private void handleTimerStopEvents(final long javaTime) {
-      // We need to avoid the cases where stops are consecutive events.
-      // In this case, we ignore the stop event if the timer is already stopped.
-      if (_isTimerStopped) {
-         return;
-      }
-
-      _pausedTime_Start.add(javaTime);
-      _isTimerStopped = true;
    }
 }
