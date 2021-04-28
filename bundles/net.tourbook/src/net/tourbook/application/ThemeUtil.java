@@ -28,6 +28,20 @@ public class ThemeUtil {
 
    private static IThemeEngine _themeEngine;
 
+   /**
+    * These are all Eclipse themes when using W10:
+    *
+    * <pre>
+    *
+    * org.eclipse.e4.ui.css.theme.e4_classic       - Classic
+    * org.eclipse.e4.ui.css.theme.e4_dark          - Dark
+    * org.eclipse.e4.ui.css.theme.high-contrast    - High Contrast
+    * org.eclipse.e4.ui.css.theme.e4_default       - Light
+    * org.eclipse.e4.ui.css.theme.e4_system        - System
+    * </pre>
+    *
+    * @return
+    */
    public static List<ITheme> getAllThemes() {
 
       setupTheme();
@@ -84,6 +98,8 @@ public class ThemeUtil {
    }
 
    /**
+    * W10 do not set all controls into a dark mode, e.g. menu bar
+    * <p>
     * Copied from org.eclipse.swt.internal.win32.OS.setTheme(boolean)
     * <p>
     * See also {@link "https://www.eclipse.org/eclipse/news/4.16/platform_isv.html#win-dark-tweaks"}
@@ -109,24 +125,29 @@ public class ThemeUtil {
          return;
       }
 
-      /**
-       */
-
       final Display display = Display.getDefault();
 
 // SET_FORMATTING_OFF
 
+      final Color menuBarForegroundColor        = new Color(0xD0, 0xD0, 0xD0);
+      final Color menuBarBackgroundColor        = new Color(0x30, 0x30, 0x30);
+      final Color menuBarBorderColor            = new Color(0x50, 0x50, 0x50);
+
+      // table header color: 38 3D 3F
+      final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
+      final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
+
       display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? new Color(0xD0, 0xD0, 0xD0) : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? new Color(0x30, 0x30, 0x30) : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? new Color(0x50, 0x50, 0x50) : null);
+      display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
+      display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
+      display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
       display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
       display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
       display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
       display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
       display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? new Color(0x50, 0x50, 0x50) : null);
-      display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? new Color(0x80, 0x80, 0x80) : null);
+      display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
+      display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
       display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
       display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
 

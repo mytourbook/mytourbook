@@ -366,40 +366,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       // _defaultTheme = "org.eclipse.e4.ui.css.theme.e4_default"
       _defaultTheme = (String) context.get(ThemeUtil.THEME_ID);
       _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
-
-//      final ITheme activeTheme = _cssThemeEngine.getActiveTheme();
-//      System.out.println("active: " + activeTheme.getId() + " - " + activeTheme.getLabel());
-//      System.out.println();
-
-//      final List<ITheme> cssThemes = getCSSThemes();
-//
-//      for (final ITheme iTheme : cssThemes) {
-//         System.out.println(iTheme.getId() + " - " + iTheme.getLabel());
-//         // TODO remove SYSTEM.OUT.PRINTLN
-//      }
-
-//      org.eclipse.e4.ui.css.theme.e4_classic       - Classic
-//      org.eclipse.e4.ui.css.theme.e4_dark          - Dark
-//      org.eclipse.e4.ui.css.theme.high-contrast    - High Contrast
-//      org.eclipse.e4.ui.css.theme.e4_default       - Light
-//      org.eclipse.e4.ui.css.theme.e4_system        - System
-
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_classic", false);
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_classic", true);
-
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", false);
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", true);
-
-//            E4_DARK_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_dark";
-
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.high-contrast", false);
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.high-contrast", true);
-
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_default", false);
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_default", true);
-
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_system", false);
-//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_system", true);
    }
 
    private void initUI(final Composite parent) {
