@@ -234,6 +234,7 @@ public class RawDataManager {
       ALL_TIME_SLICES, //
 
       TOUR_MARKER, //
+      TOUR_CALORIES, //
       IMPORT_FILE_LOCATION, //
 
       TIME_SLICES_ELEVATION, //
@@ -246,8 +247,7 @@ public class RawDataManager {
       TIME_SLICES_TEMPERATURE, //
       TIME_SLICES_TRAINING, //
       TIME_SLICES_TIME, //
-      TIME_SLICES_TIMER_PAUSES, //
-      TOUR_CALORIES //
+      TIME_SLICES_TIMER_PAUSES //
    }
 
    private RawDataManager() {}
@@ -367,15 +367,12 @@ public class RawDataManager {
    }
 
    public static boolean doesInvalidFileExist(final String fileName) {
+
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
 
-      for (final String invalidFilePath : invalidFilesList) {
-         if (Paths.get(invalidFilePath).getFileName().toString().equals(fileName)) {
-            return true;
-         }
-      }
-
-      return false;
+      return invalidFilesList
+            .stream()
+            .anyMatch(invalidFilePath -> Paths.get(invalidFilePath).getFileName().toString().equals(fileName));
    }
 
    /**
@@ -632,7 +629,7 @@ public class RawDataManager {
          }
 
          // Calories
-         if (tourValueType == TourValueType.ALL_TIME_SLICES || tourValueType == TourValueType.TOUR_CALORIES) {
+         if (tourValueType == TourValueType.TOUR_CALORIES) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_Calories);
          }
 
@@ -1094,8 +1091,6 @@ public class RawDataManager {
                   clonedTourData.setTourMarkers(new HashSet<>(oldTourData.getTourMarkers()));
                   break;
 
-               //
-
                case TIME_SLICES_CADENCE:
                   clonedTourData.setAvgCadence(oldTourData.getAvgCadence());
                   clonedTourData.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
@@ -1311,12 +1306,16 @@ public class RawDataManager {
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_SWIMMING)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_TEMPERATURE)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_TIMER_PAUSES)
-                  || tourValueTypes.contains(TourValueType.TIME_SLICES_TRAINING)
-                  || tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
+                  || tourValueTypes.contains(TourValueType.TIME_SLICES_TRAINING)) {
 
                // replace part of the tour
 
                actionReimportTour_50_ReplacesValues(tourValueTypes, oldTourData, reimportedTourData);
+            }
+
+            if (tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
+
+               oldTourData.setCalories(reimportedTourData.getCalories());
             }
 
             if (tourValueTypes.contains(TourValueType.TOUR_MARKER)) {
@@ -1382,12 +1381,6 @@ public class RawDataManager {
          oldTourData.setCadenceSerie(reimportedTourData.getCadenceSerie());
          oldTourData.setCadenceMultiplier(reimportedTourData.getCadenceMultiplier());
          oldTourData.setIsStrideSensorPresent(reimportedTourData.isStrideSensorPresent());
-      }
-
-      // Calories
-      if (tourValueTypes.contains(TourValueType.ALL_TIME_SLICES) || tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
-
-         oldTourData.setCalories(reimportedTourData.getCalories());
       }
 
       // Elevation
