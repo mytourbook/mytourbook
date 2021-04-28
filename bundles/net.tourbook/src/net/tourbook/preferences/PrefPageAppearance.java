@@ -15,12 +15,13 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.jface.viewers.LabelProvider.createTextProvider;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.tourbook.Messages;
+import net.tourbook.application.ThemeUtil;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.FontFieldEditorExtended;
@@ -31,25 +32,35 @@ import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.notifications.AbstractNotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchMessages;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -70,13 +81,13 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private SelectionAdapter       _defaultSelectionAdapter;
    private MouseWheelListener     _defaultMouseWheelListener;
 
-   private IThemeEngine           _cssThemeEngine;
+   private ITheme                 _currentTheme;
+   private String                 _defaultTheme;
+   private IThemeEngine           _themeEngine;
 
    /*
     * UI controls
     */
-   private Composite               _uiContainer;
-
    private Button                  _btnResetAllToggleDialogs;
 
    private Button                  _chkAutoOpenTagging;
@@ -89,12 +100,32 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    private Spinner                 _spinnerRecentTags;
    private Spinner                 _spinnerAutoOpenDelay;
 
+   private ComboViewer             _themeIdCombo;
+   private ControlDecoration       _themeComboDecorator;
    private FontFieldEditorExtended _valueFontEditor;
 
-//   @import url("platform:/plugin/org.eclipse.ui.themes/css/e4-dark.css");
-//
-//   /* add new CSS rules here. You can also override setting defined in the imported CSS
-//   by using the same selector-property combination */
+   private class NotificationPopUp extends AbstractNotificationPopup {
+
+      public NotificationPopUp(final Display display) {
+         super(display);
+         setDelayClose(0);
+         setParentShell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+      }
+
+      @Override
+      protected void createContentArea(final Composite parent) {
+         parent.setLayout(new RowLayout());
+
+         final Link link = new Link(parent, SWT.WRAP);
+         link.setText(WorkbenchMessages.ThemeChangeWarningText);
+         link.addSelectionListener(widgetSelectedAdapter(e -> PlatformUI.getWorkbench().restart(true)));
+      }
+
+      @Override
+      protected String getPopupShellTitle() {
+         return WorkbenchMessages.ThemeChangeWarningTitle;
+      }
+   }
 
    public PrefPageAppearance() {
 
@@ -127,16 +158,46 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private Composite createUI(final Composite parent) {
 
-      _uiContainer = new Composite(parent, SWT.NONE);
+      final Composite container = new Composite(parent, SWT.NONE);
 //      GridDataFactory.fillDefaults().grab(true, false).applyTo(_uiContainer);
-      GridLayoutFactory.fillDefaults().applyTo(_uiContainer);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         createUI_20_Tagging(_uiContainer);
-         createUI_30_LogFont(_uiContainer);
-         createUI_40_OtherOptions(_uiContainer);
+         createUI_10_Theme(container);
+         createUI_20_Tagging(container);
+         createUI_30_LogFont(container);
+         createUI_40_OtherOptions(container);
       }
 
-      return _uiContainer;
+      return container;
+   }
+
+   private void createUI_10_Theme(final Composite parent) {
+      // TODO Auto-generated method stub
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_Appearance_Group_Theme);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      GridLayoutFactory.swtDefaults()
+            .numColumns(2)
+
+            // more horizontal space is needed that the decorator is not clipped
+            .spacing(10, 5)
+
+            .applyTo(group);
+      {
+         new Label(group, SWT.NONE).setText(Messages.Pref_Appearance_Label_Theme);
+
+         _themeIdCombo = new ComboViewer(group, SWT.READ_ONLY);
+         _themeIdCombo.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
+         _themeIdCombo.setContentProvider(ArrayContentProvider.getInstance());
+         _themeIdCombo.setInput(ThemeUtil.getAllThemes());
+         _themeIdCombo.getCombo().setEnabled(true);
+         _themeIdCombo.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
+//         _themeIdCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+         _themeComboDecorator = new ControlDecoration(_themeIdCombo.getCombo(), SWT.TOP | SWT.LEFT);
+
+      }
    }
 
    private void createUI_20_Tagging(final Composite parent) {
@@ -155,7 +216,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // spinner
          _spinnerRecentTags = new Spinner(group, SWT.BORDER);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinnerRecentTags);
@@ -193,7 +254,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             // spinner
             _spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerAutoOpenDelay);
@@ -229,7 +290,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             final Composite fontContainer = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
             GridLayoutFactory.swtDefaults().numColumns(1).applyTo(fontContainer);
-//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//            fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
             {
                _valueFontEditor = new FontFieldEditorExtended(IMappingPreferences.THEME_FONT_LOGGING,
                      UI.EMPTY_STRING,
@@ -265,7 +326,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                onResetAllToggleDialogs();
             }
          });
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
 //               .indent(0, 10)
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_btnResetAllToggleDialogs);
@@ -286,30 +347,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _spinnerAutoOpenDelay.setEnabled(isEnabled && isTagAutoOpen);
    }
 
-   private List<ITheme> getCSSThemes(final boolean highContrastMode) {
-
-      final ArrayList<ITheme> allThemes = new ArrayList<>();
-
-      for (final ITheme theme : _cssThemeEngine.getThemes()) {
-         /*
-          * When we have Win32 OS - when the high contrast mode is enabled on the
-          * platform, we display the 'high-contrast' special theme only. If not, we don't
-          * want to mess the themes combo with the theme since it is the special
-          * variation of the 'classic' one
-          * When we have GTK - we have to display the entire list of the themes since we
-          * are not able to figure out if the high contrast mode is enabled on the
-          * platform. The user has to manually select the theme if they need it
-          */
-//         if (!highContrastMode && !Util.isGtk() && theme.getId().equals(E4Application.HIGH_CONTRAST_THEME_ID)) {
-//            continue;
-//         }
-
-         allThemes.add(theme);
-      }
-
-      allThemes.sort((final ITheme t1, final ITheme t2) -> t1.getLabel().compareTo(t2.getLabel()));
-
-      return allThemes;
+   /** @return the currently selected theme or null if there are no themes */
+   private ITheme getSelectedTheme() {
+      return (ITheme) (_themeIdCombo.getStructuredSelection().getFirstElement());
    }
 
    @Override
@@ -317,23 +357,49 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       setPreferenceStore(_prefStore);
 
+      /*
+       * Setup themes
+       */
       final MApplication application = workbench.getService(MApplication.class);
       final IEclipseContext context = application.getContext();
-//      defaultTheme = (String) context.get(E4Application.THEME_ID);
-      _cssThemeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
 
-      final ITheme activeTheme = _cssThemeEngine.getActiveTheme();
-      System.out.println("active: " + activeTheme.getId() + " - " + activeTheme.getLabel());
-      System.out.println();
+      // _defaultTheme = "org.eclipse.e4.ui.css.theme.e4_default"
+      _defaultTheme = (String) context.get(ThemeUtil.THEME_ID);
+      _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
 
-      final List<ITheme> cssThemes = getCSSThemes(false);
+//      final ITheme activeTheme = _cssThemeEngine.getActiveTheme();
+//      System.out.println("active: " + activeTheme.getId() + " - " + activeTheme.getLabel());
+//      System.out.println();
 
-      for (final ITheme iTheme : cssThemes) {
-         System.out.println(iTheme.getId() + " - " + iTheme.getLabel());
-         // TODO remove SYSTEM.OUT.PRINTLN
-      }
+//      final List<ITheme> cssThemes = getCSSThemes();
+//
+//      for (final ITheme iTheme : cssThemes) {
+//         System.out.println(iTheme.getId() + " - " + iTheme.getLabel());
+//         // TODO remove SYSTEM.OUT.PRINTLN
+//      }
 
-      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", false);
+//      org.eclipse.e4.ui.css.theme.e4_classic       - Classic
+//      org.eclipse.e4.ui.css.theme.e4_dark          - Dark
+//      org.eclipse.e4.ui.css.theme.high-contrast    - High Contrast
+//      org.eclipse.e4.ui.css.theme.e4_default       - Light
+//      org.eclipse.e4.ui.css.theme.e4_system        - System
+
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_classic", false);
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_classic", true);
+
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", false);
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_dark", true);
+
+//            E4_DARK_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_dark";
+
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.high-contrast", false);
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.high-contrast", true);
+
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_default", false);
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_default", true);
+
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_system", false);
+//      _cssThemeEngine.setTheme("org.eclipse.e4.ui.css.theme.e4_system", true);
    }
 
    private void initUI(final Composite parent) {
@@ -385,6 +451,31 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
    }
 
+   private void onSelectTheme() {
+
+      final ITheme selectedTheme = getSelectedTheme();
+
+      if (!selectedTheme.equals(_currentTheme)) {
+
+         final boolean isDarkThemeSelected = ThemeUtil.E4_DARK_THEME_ID.equals(selectedTheme.getId());
+
+         ThemeUtil.setWinDarkThemeHack(isDarkThemeSelected);
+
+         _themeEngine.setTheme(selectedTheme, false);
+
+         final Image decorationImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
+         _themeComboDecorator.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
+         _themeComboDecorator.setImage(decorationImage);
+         _themeComboDecorator.show();
+
+      } else {
+
+         _themeComboDecorator.hide();
+      }
+
+//      selectColorsAndFontsTheme(getColorAndFontThemeIdByThemeId(selection.getId()));
+   }
+
    @Override
    protected void performApply() {
 
@@ -394,8 +485,39 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    }
 
    @Override
+   public boolean performCancel() {
+
+      if (_themeEngine != null) {
+
+         if (_currentTheme != null) {
+            _themeEngine.setTheme(_currentTheme, false);
+         }
+      }
+
+      return super.performCancel();
+   }
+
+   @Override
    protected void performDefaults() {
 
+      /*
+       * Theme
+       */
+      if (_themeEngine != null) {
+
+         // update model
+         _themeEngine.setTheme(_defaultTheme, true);
+
+         // update UI
+         final ITheme activeTheme = _themeEngine.getActiveTheme();
+         if (activeTheme != null) {
+            _themeIdCombo.setSelection(new StructuredSelection(activeTheme));
+         }
+      }
+
+      /*
+       * Other
+       */
       _isModified = true;
 
       _spinnerRecentTags.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
@@ -421,6 +543,22 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    @Override
    public boolean performOk() {
 
+      /*
+       * Theme
+       */
+      if (_themeEngine != null) {
+
+         final ITheme selectedTheme = getSelectedTheme();
+
+         if (selectedTheme != null) {
+            // set theme and save it in the pref store (2nd parameter)
+            _themeEngine.setTheme(selectedTheme, true);
+         }
+      }
+
+      /*
+       * Others
+       */
       saveState();
 
       final boolean isShowMemoryOld = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_SHOW_MEMORY_MONITOR);
@@ -448,6 +586,17 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private void restoreState() {
 
+      /*
+       * Theme
+       */
+      _currentTheme = _themeEngine.getActiveTheme();
+      if (_currentTheme != null) {
+         _themeIdCombo.setSelection(new StructuredSelection(_currentTheme));
+      }
+
+      /*
+       * Other
+       */
       _spinnerRecentTags.setSelection(_prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS));
 
       _chkAutoOpenTagging.setSelection(_prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN));
