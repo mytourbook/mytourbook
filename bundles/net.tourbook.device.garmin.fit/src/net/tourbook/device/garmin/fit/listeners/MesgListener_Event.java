@@ -69,7 +69,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
             final long pausedTime_End = FitUtils.convertGarminTimeToJavaTime(
                   mesg.getTimestamp().getTimestamp());
 
-            if (pausedTime_End - lastPausedTime_Start > 1000) {
+            if (pausedTime_End - lastPausedTime_Start >= 1000) {
                _pausedTime_End.add(pausedTime_End);
             }
             break;
