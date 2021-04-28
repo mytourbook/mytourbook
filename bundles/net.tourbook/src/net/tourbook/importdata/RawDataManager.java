@@ -247,6 +247,7 @@ public class RawDataManager {
       TIME_SLICES_TRAINING, //
       TIME_SLICES_TIME, //
       TIME_SLICES_TIMER_PAUSES, //
+      TOUR_CALORIES //
    }
 
    private RawDataManager() {}
@@ -310,18 +311,14 @@ public class RawDataManager {
 
       case TIME_SLICES_POWER_AND_PULSE:
          previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE + UI.COMMA_SPACE
-               + oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+               + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE;
          newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE + UI.COMMA_SPACE
-               + newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+               + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE;
          break;
 
       case TIME_SLICES_POWER_AND_SPEED:
-         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
-         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
+         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
          break;
 
       case TIME_SLICES_TEMPERATURE:
@@ -349,6 +346,11 @@ public class RawDataManager {
       case TOUR_MARKER:
          previousData = oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER;
          newData = newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER;
+         break;
+
+      case TOUR_CALORIES:
+         previousData = oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+         newData = newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
          break;
 
       case TIME_SLICES_TIME:
@@ -627,6 +629,11 @@ public class RawDataManager {
          // Cadence
          if (tourValueType == TourValueType.ALL_TIME_SLICES || tourValueType == TourValueType.TIME_SLICES_CADENCE) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_CadenceValues);
+         }
+
+         // Calories
+         if (tourValueType == TourValueType.ALL_TIME_SLICES || tourValueType == TourValueType.TOUR_CALORIES) {
+            dataToModifyDetails.add(Messages.Tour_Data_Text_Calories);
          }
 
          // Gear
@@ -1107,12 +1114,10 @@ public class RawDataManager {
                case TIME_SLICES_POWER_AND_PULSE:
                   clonedTourData.setPower_Avg(oldTourData.getPower_Avg());
                   clonedTourData.setAvgPulse(oldTourData.getAvgPulse());
-                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                case TIME_SLICES_POWER_AND_SPEED:
                   clonedTourData.setPower_Avg(oldTourData.getPower_Avg());
-                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                case TIME_SLICES_TEMPERATURE:
@@ -1121,6 +1126,10 @@ public class RawDataManager {
 
                case TIME_SLICES_TIMER_PAUSES:
                   clonedTourData.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
+                  break;
+
+               case TOUR_CALORIES:
+                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                default:
@@ -1302,7 +1311,8 @@ public class RawDataManager {
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_SWIMMING)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_TEMPERATURE)
                   || tourValueTypes.contains(TourValueType.TIME_SLICES_TIMER_PAUSES)
-                  || tourValueTypes.contains(TourValueType.TIME_SLICES_TRAINING)) {
+                  || tourValueTypes.contains(TourValueType.TIME_SLICES_TRAINING)
+                  || tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
 
                // replace part of the tour
 
@@ -1374,6 +1384,12 @@ public class RawDataManager {
          oldTourData.setIsStrideSensorPresent(reimportedTourData.isStrideSensorPresent());
       }
 
+      // Calories
+      if (tourValueTypes.contains(TourValueType.ALL_TIME_SLICES) || tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
+
+         oldTourData.setCalories(reimportedTourData.getCalories());
+      }
+
       // Elevation
       if (tourValueTypes.contains(TourValueType.ALL_TIME_SLICES) || tourValueTypes.contains(TourValueType.TIME_SLICES_ELEVATION)) {
 
@@ -1394,8 +1410,6 @@ public class RawDataManager {
       if (tourValueTypes.contains(TourValueType.ALL_TIME_SLICES)
             || tourValueTypes.contains(TourValueType.TIME_SLICES_POWER_AND_PULSE)
             || tourValueTypes.contains(TourValueType.TIME_SLICES_POWER_AND_SPEED)) {
-
-         oldTourData.setCalories(reimportedTourData.getCalories());
 
          // re-import power and speed only when it's from the device
          final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
@@ -1710,7 +1724,6 @@ public class RawDataManager {
             case TIME_SLICES_POWER_AND_PULSE:
                clonedTourData.setPower_Avg(tourData.getPower_Avg());
                clonedTourData.setAvgPulse(tourData.getAvgPulse());
-               clonedTourData.setCalories(tourData.getCalories());
 
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
@@ -1718,16 +1731,13 @@ public class RawDataManager {
                tourData.pulseTime_Milliseconds = null;
                tourData.pulseTime_TimeIndex = null;
                tourData.setAvgPulse(0);
-               tourData.setCalories(0);
                break;
 
             case TIME_SLICES_POWER_AND_SPEED:
                clonedTourData.setPower_Avg(tourData.getPower_Avg());
-               clonedTourData.setCalories(tourData.getCalories());
 
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
-               tourData.setCalories(0);
                tourData.setSpeedSerie(null);
                break;
 
@@ -1745,6 +1755,12 @@ public class RawDataManager {
                tourData.setPausedTime_End(null);
                tourData.setTourDeviceTime_Paused(0);
                tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+               break;
+
+            case TOUR_CALORIES:
+               clonedTourData.setCalories(tourData.getCalories());
+
+               tourData.setCalories(0);
                break;
 
             case ALL_TIME_SLICES:
