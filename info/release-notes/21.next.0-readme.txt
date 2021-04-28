@@ -94,6 +94,9 @@ Bugfix
 * Fitlog/FitlogEx import (Frederic)
   - Fixed an issue where in some cases the imported tour time zone could be wrong
 
+* FIT File: Pause Re-Import (Frederic)
+  - In some scenarii, the pause re-import could be erroneous and lead to negative paused time values
+
 Translation    
 ===========
 
