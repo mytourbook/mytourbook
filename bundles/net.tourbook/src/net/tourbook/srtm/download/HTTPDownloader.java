@@ -31,6 +31,7 @@ import java.net.UnknownHostException;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.srtm.Messages;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -89,7 +90,10 @@ public class HTTPDownloader {
 
                final String resourceUrl = baseUrl + remoteFileName;
 
-               System.out.println(HTTPDownloader.class.getCanonicalName() + " - loading: " + resourceUrl); //$NON-NLS-1$
+               // show log in log view that a download durting tour import is visible
+               TourLogManager.logInfo(NLS.bind(Messages.Log_SRTM_DownloadingResource, resourceUrl));
+
+               System.out.println(HTTPDownloader.class.getCanonicalName() + " - downloading: " + resourceUrl); //$NON-NLS-1$
 
                inputStream = getInputStream(resourceUrl);
 

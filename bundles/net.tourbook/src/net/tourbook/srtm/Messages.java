@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.srtm.messages";             //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.srtm.messages";                 //$NON-NLS-1$
 
    public static String        app_ui_N;
    public static String        app_ui_Y;
@@ -114,6 +114,8 @@ public class Messages extends NLS {
    public static String        job_name_downloadMonitor;
    public static String        job_name_ftpDownload;
    public static String        job_name_httpDownload;
+
+   public static String        Log_SRTM_DownloadingResource;
 
    public static String        PrefPage_SRTMData_Button_ResetValidation;
    public static String        PrefPage_SRTMData_Button_SrtmDummyValidation;
