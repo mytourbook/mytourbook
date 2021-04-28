@@ -19,9 +19,9 @@ import com.garmin.fit.SessionMesg;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -49,56 +49,56 @@ import org.eclipse.swt.widgets.Display;
  */
 public class FitData {
 
-   private static final Integer    DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
+   private static final Integer   DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
 
-   private IPreferenceStore        _prefStore            = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore       _prefStore            = Activator.getDefault().getPreferenceStore();
 
-   private boolean                 _isIgnoreLastMarker;
-   private boolean                 _isSetLastMarker;
-   private boolean                 _isFitImportTourType;
-   private String                  _fitImportTourTypeMode;
-   private int                     _lastMarkerTimeSlices;
+   private boolean                _isIgnoreLastMarker;
+   private boolean                _isSetLastMarker;
+   private boolean                _isFitImportTourType;
+   private String                 _fitImportTourTypeMode;
+   private int                    _lastMarkerTimeSlices;
 
-   public boolean                  isComputeAveragePower;
+   public boolean                 isComputeAveragePower;
 
-   private FitDataReader           _fitDataReader;
-   private String                  _importFilePathName;
+   private FitDataReader          _fitDataReader;
+   private String                 _importFilePathName;
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private Map<Long, TourData>    _alreadyImportedTours;
+   private Map<Long, TourData>    _newlyImportedTours;
 
-   private TourData                _tourData             = new TourData();
+   private TourData               _tourData             = new TourData();
 
-   private String                  _deviceId;
-   private String                  _manufacturer;
-   private String                  _garminProduct;
-   private String                  _softwareVersion;
+   private String                 _deviceId;
+   private String                 _manufacturer;
+   private String                 _garminProduct;
+   private String                 _softwareVersion;
 
-   private String                  _sessionIndex;
-   private ZonedDateTime           _sessionStartTime;
+   private String                 _sessionIndex;
+   private ZonedDateTime          _sessionStartTime;
 
-   private String                  _sportName            = UI.EMPTY_STRING;
-   private String                  _profileName          = UI.EMPTY_STRING;
+   private String                 _sportName            = UI.EMPTY_STRING;
+   private String                 _profileName          = UI.EMPTY_STRING;
 
-   private final List<TimeData>    _allTimeData          = new ArrayList<>();
+   private final List<TimeData>   _allTimeData          = new ArrayList<>();
 
-   private final List<GearData>    _allGearData          = new ArrayList<>();
-   private final List<SwimData>    _allSwimData          = new ArrayList<>();
-   private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
-   private List<Long>              _pausedTime_Start     = new ArrayList<>();
-   private final List<Long>        _pausedTime_End       = new ArrayList<>();
+   private final List<GearData>   _allGearData          = new ArrayList<>();
+   private final List<SwimData>   _allSwimData          = new ArrayList<>();
+   private final List<TourMarker> _allTourMarker        = new ArrayList<>();
+   private List<Long>             _pausedTime_Start     = new ArrayList<>();
+   private final List<Long>       _pausedTime_End       = new ArrayList<>();
 
-   private TimeData                _current_TimeData;
-   private TimeData                _lastAdded_TimeData;
-   private TimeData                _previous_TimeData;
+   private TimeData               _current_TimeData;
+   private TimeData               _lastAdded_TimeData;
+   private TimeData               _previous_TimeData;
 
-   private TourMarker              _current_TourMarker;
-   private long                    _timeDiffMS;
+   private TourMarker             _current_TourMarker;
+   private long                   _timeDiffMS;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
-                  final HashMap<Long, TourData> alreadyImportedTours,
-                  final HashMap<Long, TourData> newlyImportedTours) {
+                  final Map<Long, TourData> alreadyImportedTours,
+                  final Map<Long, TourData> newlyImportedTours) {
 
       this._fitDataReader = fitDataReader;
       this._importFilePathName = importFilePath;
