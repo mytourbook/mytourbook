@@ -605,6 +605,7 @@ public class Messages extends NLS {
    public static String        App_Dialog_FirstStartup_Title;
    public static String        App_Dialog_FirstStartupTip_Message;
    public static String        App_Dialog_FirstStartupTip_Title;
+   public static String        App_Dialog_RestartApp_Title;
 
    public static String        App_Label_BooleanNo;
    public static String        App_Label_BooleanYes;
@@ -1337,6 +1338,8 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
+   public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
+   public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Title;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
    public static String        Pref_Appearance_Group_Theme;

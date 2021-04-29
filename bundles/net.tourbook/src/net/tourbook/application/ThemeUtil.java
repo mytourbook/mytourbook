@@ -94,6 +94,8 @@ public class ThemeUtil {
          final boolean isDarkThemeSelected = E4_DARK_THEME_ID.equals(activeTheme.getId());
 
          setWinDarkThemeHack(isDarkThemeSelected);
+
+         UI.setIsDarkTheme(isDarkThemeSelected);
       }
    }
 

@@ -16,7 +16,6 @@
 package net.tourbook.preferences;
 
 import static org.eclipse.jface.viewers.LabelProvider.createTextProvider;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -31,13 +30,13 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.notifications.AbstractNotificationPopup;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -48,87 +47,62 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchMessages;
 
 public class PrefPageAppearance extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String    THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
-   private static final String    THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
+   private static final String     THEME_FONT_LOGGING_PREVIEW_TEXT = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging_PREVIEW_TEXT;
+   private static final String     THEME_FONT_LOGGING              = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
-   public static final String     ID                              = "net.tourbook.preferences.PrefPageAppearance";                               //$NON-NLS-1$
+   public static final String      ID                              = "net.tourbook.preferences.PrefPageAppearance";                               //$NON-NLS-1$
 
-   private final boolean          _isOSX                          = net.tourbook.common.UI.IS_OSX;
-   private final boolean          _isLinux                        = net.tourbook.common.UI.IS_LINUX;
+   private final boolean           _isOSX                          = net.tourbook.common.UI.IS_OSX;
+   private final boolean           _isLinux                        = net.tourbook.common.UI.IS_LINUX;
 
-   private final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private boolean                _isModified                     = false;
+   private boolean                 _isModified                     = false;
 
-   private int                    _hintDefaultSpinnerWidth;
-   private PixelConverter         _pc;
-   private SelectionAdapter       _defaultSelectionAdapter;
-   private MouseWheelListener     _defaultMouseWheelListener;
+   private int                     _hintDefaultSpinnerWidth;
+   private PixelConverter          _pc;
+   private SelectionAdapter        _defaultSelectionAdapter;
+   private MouseWheelListener      _defaultMouseWheelListener;
 
-   private ITheme                 _currentTheme;
-   private String                 _defaultTheme;
-   private IThemeEngine           _themeEngine;
+   private ITheme                  _currentTheme;
+   private String                  _defaultThemeId;
+   private IThemeEngine            _themeEngine;
+
+   private ComboViewer             _comboThemeId;
+   private ControlDecoration       _comboDecorator_Theme;
+   private FontFieldEditorExtended _valueFontEditor;
 
    /*
     * UI controls
     */
-   private Button                  _btnResetAllToggleDialogs;
+   private Button  _btnResetAllToggleDialogs;
 
-   private Button                  _chkAutoOpenTagging;
-   private Button                  _chkMemMonitor;
-   private Button                  _chkTaggingAnimation;
+   private Button  _chkAutoOpenTagging;
+   private Button  _chkMemMonitor;
+   private Button  _chkTaggingAnimation;
 
-   private Label                   _lblAutoTagDelay;
-   private Label                   _lblAutoOpenMS;
+   private Label   _lblAutoOpenMS;
+   private Label   _lblAutoTagDelay;
 
-   private Spinner                 _spinnerRecentTags;
-   private Spinner                 _spinnerAutoOpenDelay;
-
-   private ComboViewer             _themeIdCombo;
-   private ControlDecoration       _themeComboDecorator;
-   private FontFieldEditorExtended _valueFontEditor;
-
-   private class NotificationPopUp extends AbstractNotificationPopup {
-
-      public NotificationPopUp(final Display display) {
-         super(display);
-         setDelayClose(0);
-         setParentShell(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-      }
-
-      @Override
-      protected void createContentArea(final Composite parent) {
-         parent.setLayout(new RowLayout());
-
-         final Link link = new Link(parent, SWT.WRAP);
-         link.setText(WorkbenchMessages.ThemeChangeWarningText);
-         link.addSelectionListener(widgetSelectedAdapter(e -> PlatformUI.getWorkbench().restart(true)));
-      }
-
-      @Override
-      protected String getPopupShellTitle() {
-         return WorkbenchMessages.ThemeChangeWarningTitle;
-      }
-   }
+   private Spinner _spinnerAutoOpenDelay;
+   private Spinner _spinnerRecentTags;
 
    public PrefPageAppearance() {
 
+// hide default button
 //		noDefaultAndApplyButton();
    }
 
@@ -187,15 +161,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       {
          new Label(group, SWT.NONE).setText(Messages.Pref_Appearance_Label_Theme);
 
-         _themeIdCombo = new ComboViewer(group, SWT.READ_ONLY);
-         _themeIdCombo.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
-         _themeIdCombo.setContentProvider(ArrayContentProvider.getInstance());
-         _themeIdCombo.setInput(ThemeUtil.getAllThemes());
-         _themeIdCombo.getCombo().setEnabled(true);
-         _themeIdCombo.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
+         _comboThemeId = new ComboViewer(group, SWT.READ_ONLY);
+         _comboThemeId.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
+         _comboThemeId.setContentProvider(ArrayContentProvider.getInstance());
+         _comboThemeId.setInput(ThemeUtil.getAllThemes());
+         _comboThemeId.getCombo().setEnabled(true);
+         _comboThemeId.addSelectionChangedListener(selectionChangedEvent -> onSelectTheme());
 //         _themeIdCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-         _themeComboDecorator = new ControlDecoration(_themeIdCombo.getCombo(), SWT.TOP | SWT.LEFT);
+         _comboDecorator_Theme = new ControlDecoration(_comboThemeId.getCombo(), SWT.TOP | SWT.LEFT);
 
       }
    }
@@ -216,15 +190,15 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          // spinner
          _spinnerRecentTags = new Spinner(group, SWT.BORDER);
-         GridDataFactory.fillDefaults()
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinnerRecentTags);
          _spinnerRecentTags.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
          _spinnerRecentTags.setMinimum(0);
          _spinnerRecentTags.setMaximum(9);
          _spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
          _spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
+         GridDataFactory.fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerRecentTags);
 
          /*
           * autoopen tagging
@@ -237,10 +211,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //					label.setText(Messages.Pref_Appearance_Label_NoOSXSupport);
 //				}
          _chkAutoOpenTagging = new Button(group, SWT.CHECK);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
          _chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
          _chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
          _chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
 
          final Composite autoTagContainer = new Composite(group, SWT.NONE);
          GridDataFactory.fillDefaults().grab(false, false).indent(16, 0).span(2, 1).applyTo(autoTagContainer);
@@ -254,14 +228,14 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             // spinner
             _spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
-            GridDataFactory.fillDefaults()
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinnerAutoOpenDelay);
             _spinnerAutoOpenDelay.setMinimum(0);
             _spinnerAutoOpenDelay.setMaximum(3000);
             _spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionAdapter);
             _spinnerAutoOpenDelay.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinnerAutoOpenDelay);
 
             // label: ms
             _lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
@@ -269,9 +243,9 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             // check: show animation
             _chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
             _chkTaggingAnimation.setText(Messages.Pref_Appearance_Check_TaggingAnimation);
             _chkTaggingAnimation.addSelectionListener(_defaultSelectionAdapter);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
          }
       }
    }
@@ -349,7 +323,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    /** @return the currently selected theme or null if there are no themes */
    private ITheme getSelectedTheme() {
-      return (ITheme) (_themeIdCombo.getStructuredSelection().getFirstElement());
+      return (ITheme) (_comboThemeId.getStructuredSelection().getFirstElement());
    }
 
    @Override
@@ -364,7 +338,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       final IEclipseContext context = application.getContext();
 
       // _defaultTheme = "org.eclipse.e4.ui.css.theme.e4_default"
-      _defaultTheme = (String) context.get(ThemeUtil.THEME_ID);
+      _defaultThemeId = (String) context.get(ThemeUtil.THEME_ID);
       _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
    }
 
@@ -413,6 +387,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_DELETE_TOUR_VALUES, false);
 
       MessageDialog.openInformation(getShell(),
+
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Title,
             Messages.Pref_Appearance_Dialog_ResetAllToggleDialogs_Message);
    }
@@ -423,23 +398,28 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
       if (!selectedTheme.equals(_currentTheme)) {
 
+         // another theme is selected
+
          final boolean isDarkThemeSelected = ThemeUtil.E4_DARK_THEME_ID.equals(selectedTheme.getId());
 
          ThemeUtil.setWinDarkThemeHack(isDarkThemeSelected);
 
+         // set theme but do not save it in the pref store (2nd parameter)
          _themeEngine.setTheme(selectedTheme, false);
 
-         final Image decorationImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING).getImage();
-         _themeComboDecorator.setDescriptionText(WorkbenchMessages.ThemeChangeWarningText);
-         _themeComboDecorator.setImage(decorationImage);
-         _themeComboDecorator.show();
+         final Image decorationImage = FieldDecorationRegistry.getDefault()
+               .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
+               .getImage();
+
+         // a restart is required for the theme change to take full effect
+         _comboDecorator_Theme.setDescriptionText(Messages.Pref_Appearance_Dialog_RestartAfterThemeChange_Message);
+         _comboDecorator_Theme.setImage(decorationImage);
+         _comboDecorator_Theme.show();
 
       } else {
 
-         _themeComboDecorator.hide();
+         _comboDecorator_Theme.hide();
       }
-
-//      selectColorsAndFontsTheme(getColorAndFontThemeIdByThemeId(selection.getId()));
    }
 
    @Override
@@ -456,6 +436,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       if (_themeEngine != null) {
 
          if (_currentTheme != null) {
+
+            // set theme but do not save it in the pref store (2nd parameter)
             _themeEngine.setTheme(_currentTheme, false);
          }
       }
@@ -472,12 +454,12 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       if (_themeEngine != null) {
 
          // update model
-         _themeEngine.setTheme(_defaultTheme, true);
+         _themeEngine.setTheme(_defaultThemeId, true);
 
          // update UI
          final ITheme activeTheme = _themeEngine.getActiveTheme();
          if (activeTheme != null) {
-            _themeIdCombo.setSelection(new StructuredSelection(activeTheme));
+            _comboThemeId.setSelection(new StructuredSelection(activeTheme));
          }
       }
 
@@ -509,16 +491,50 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    @Override
    public boolean performOk() {
 
+      boolean isDoRestartNow = false;
+
       /*
        * Theme
        */
       if (_themeEngine != null) {
 
          final ITheme selectedTheme = getSelectedTheme();
+         final boolean isThemeChanged = selectedTheme != null && !selectedTheme.equals(_currentTheme);
 
          if (selectedTheme != null) {
+
             // set theme and save it in the pref store (2nd parameter)
             _themeEngine.setTheme(selectedTheme, true);
+
+            _currentTheme = selectedTheme;
+         }
+
+         _comboDecorator_Theme.hide();
+
+         if (isThemeChanged) {
+
+            // an app restart is required for the theme change to take full effect
+
+            if (new MessageDialog(
+
+                  getShell(),
+
+                  Messages.App_Dialog_RestartApp_Title,
+                  null,
+
+                  Messages.Pref_Appearance_Dialog_RestartAfterThemeChange_Message,
+                  MessageDialog.QUESTION,
+
+                  // default index
+                  0,
+
+                  Messages.App_Action_RestartApp,
+                  Messages.App_Action_Cancel
+
+            ).open() == IDialogConstants.OK_ID) {
+
+               isDoRestartNow = true;
+            }
          }
       }
 
@@ -538,13 +554,18 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       }
 
       if (isShowMemoryNew != isShowMemoryOld) {
-         if (MessageDialog.openQuestion(
-               Display.getDefault().getActiveShell(),
+
+         if (MessageDialog.openQuestion(getShell(),
                Messages.pref_appearance_showMemoryMonitor_title,
                Messages.pref_appearance_showMemoryMonitor_message)) {
 
-            Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+            isDoRestartNow = true;
          }
+      }
+
+      if (isDoRestartNow) {
+
+         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
       }
 
       return isOK;
@@ -557,7 +578,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
        */
       _currentTheme = _themeEngine.getActiveTheme();
       if (_currentTheme != null) {
-         _themeIdCombo.setSelection(new StructuredSelection(_currentTheme));
+         _comboThemeId.setSelection(new StructuredSelection(_currentTheme));
       }
 
       /*
