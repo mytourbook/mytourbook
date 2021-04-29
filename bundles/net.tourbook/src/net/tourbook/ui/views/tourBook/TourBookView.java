@@ -175,7 +175,9 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.style.theme.DarkNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.theme.ThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
@@ -704,9 +706,53 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   private class NatTable_Configuration_Theme extends ModernNatTableThemeConfiguration {
+   private class NatTable_Configuration_Theme_Dark extends DarkNatTableThemeConfiguration {
 
-      public NatTable_Configuration_Theme() {
+      public NatTable_Configuration_Theme_Dark() {
+
+         super();
+
+         /*
+          * Overwrite default modern theme
+          */
+
+         // hide grid lines
+         this.renderBodyGridLines = false;
+
+         // show selection header with default colors
+         this.cHeaderSelectionBgColor = cHeaderBgColor;
+         this.cHeaderSelectionFgColor = cHeaderFgColor;
+
+         // default selection style
+         this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
+         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
+
+         // show sort column indicator in black than in white
+         final SortableHeaderTextPainter interiorPainter = new SortableHeaderTextPainter(
+               new TextPainter(false, false),
+               CellEdgeEnum.RIGHT,
+               new SortIconPainter(false, false),
+               false,
+               0,
+               true // with this fix, the sort column indicator is not written over the column label
+         );
+
+         this.selectedSortHeaderCellPainter = new BackgroundPainter(new PaddingDecorator(interiorPainter,
+               0, // top
+               2, // right
+               0, // bottom
+               5, // left
+               false // is paint bg
+         ));
+
+         // freeze column separator
+         this.freezeSeparatorColor = GUIHelper.COLOR_WIDGET_BORDER;
+      }
+   }
+
+   private class NatTable_Configuration_Theme_Light extends ModernNatTableThemeConfiguration {
+
+      public NatTable_Configuration_Theme_Light() {
 
          super();
 
@@ -1398,8 +1444,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _tourViewer_NatTable.configure();
 
-      // overwrite theme with MT's own theme based on the modern theme
-      _tourViewer_NatTable.setTheme(new NatTable_Configuration_Theme());
+      // overwrite theme with MT's own theme, which is based on the modern or dark theme
+      final ThemeConfiguration themeConfiguration = UI.isDarkTheme()
+            ? new NatTable_Configuration_Theme_Dark()
+            : new NatTable_Configuration_Theme_Light();
+
+      _tourViewer_NatTable.setTheme(themeConfiguration);
 
       // set header tooltip
       _natTable_Tooltip = new NatTable_Header_Tooltip(_tourViewer_NatTable, this);
@@ -3075,7 +3125,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3093,13 +3143,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
