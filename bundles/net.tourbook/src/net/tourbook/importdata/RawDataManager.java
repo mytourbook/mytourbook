@@ -654,7 +654,7 @@ public class RawDataManager {
 
          // Calories
          if (tourValueType == TourValueType.TOUR_CALORIES) {
-            dataToModifyDetails.add(Messages.Tour_Data_Text_Calories);
+            //dataToModifyDetails.add(Messages.Tour_Data_Text_Calories);
          }
 
          // Gear
