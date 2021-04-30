@@ -91,13 +91,16 @@ public class ChartOptions_Grid {
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
+            Label label = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+
             /*
              * label: grid distance
              */
-            final Label label = new Label(group, SWT.NONE);
+            label = new Label(group, SWT.NONE);
             label.setText(Messages.Pref_Graphs_Label_GridDistance);
             label.setToolTipText(Messages.Pref_Graphs_Label_GridDistance_Tooltip);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
          }
 
          {
