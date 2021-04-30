@@ -27,6 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -246,7 +247,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    @Override
    public void dispose() {
 
-      _imageStravaConnect.dispose();
+      Util.disposeResource(_imageStravaConnect);
 
       super.dispose();
    }

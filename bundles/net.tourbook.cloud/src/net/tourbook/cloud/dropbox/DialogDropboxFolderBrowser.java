@@ -32,6 +32,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -151,10 +152,10 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       }
 
       parent.addDisposeListener(disposeEvent -> {
-         _imageDropboxLogo.dispose();
-         _imageDropboxParentFolder.dispose();
-         _imageDropboxFolder.dispose();
-         _imageDropboxFile.dispose();
+         Util.disposeResource(_imageDropboxLogo);
+         Util.disposeResource(_imageDropboxParentFolder);
+         Util.disposeResource(_imageDropboxFolder);
+         Util.disposeResource(_imageDropboxFile);
       });
 
       return dialogAreaContainer;
