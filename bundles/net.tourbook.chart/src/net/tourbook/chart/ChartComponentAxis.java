@@ -18,8 +18,10 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITourToolTipProvider;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -43,6 +45,9 @@ public class ChartComponentAxis extends Canvas {
    private static final String         ZOOM_TEXT_LARGER_THEN_0 = "> 0";                           //$NON-NLS-1$
 
    private static final int            UNIT_OFFSET             = 7;
+
+   @SuppressWarnings("restriction")
+   private static final IThemeEngine   _themeEngine            = ThemeUtil.getThemeEngine();
 
    private final Chart                 _chart;
 
@@ -88,7 +93,17 @@ public class ChartComponentAxis extends Canvas {
 
    ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
-      super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
+//      super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
+      super(parent, SWT.DOUBLE_BUFFERED);
+
+//      parent.setBackgroundMode(SWT.INHERIT_FORCE);
+      parent.setBackgroundMode(SWT.INHERIT_DEFAULT);
+
+//      setData("org.eclipse.e4.ui.css.CssClassName", "Canvas");
+//      setData("org.eclipse.e4.ui.css.CssClassName", "container");
+      setData("org.eclipse.e4.ui.css.CssClassName", "Composite");
+
+//      engine.applyStyles(p, true); // Apply the CSS-Instructions of the current active theme
 
       _chart = chart;
 
@@ -97,8 +112,6 @@ public class ChartComponentAxis extends Canvas {
       addDisposeListener(disposeEvent -> onDispose());
 
       addPaintListener(paintEvent -> onPaint(paintEvent.gc));
-
-      addDisposeListener(disposeEvent -> _axisImage = Util.disposeResource(_axisImage));
 
       addMouseListener(new MouseAdapter() {
          @Override
@@ -174,6 +187,7 @@ public class ChartComponentAxis extends Canvas {
    /**
     * draw the chart on the axisImage
     */
+   @SuppressWarnings("restriction")
    private void draw_00_AxisImage() {
 
       final Rectangle axisRect = getClientArea();
@@ -206,7 +220,12 @@ public class ChartComponentAxis extends Canvas {
       // draw into the image
       final GC gc = new GC(_axisImage);
       {
-         gc.setBackground(_chart.getBackgroundColor());
+//         gc.setBackground(_chart.getBackgroundColor());
+         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+         // Apply the CSS-Instructions of the current active theme
+         _themeEngine.applyStyles(_chart, true);
+
          gc.fillRectangle(_axisImage.getBounds());
 
          draw_10_ZoomMarker(gc, axisRect);
@@ -250,13 +269,13 @@ public class ChartComponentAxis extends Canvas {
       final int devMarkerHeight = 6;
       final int devYMarker = devAxisHeight - devMarkerHeight;
 
-      gc.setBackground(_moveMarkerColor);
+//      gc.setBackground(_moveMarkerColor);
 
       if (_isLeft) {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveRatio);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                0,
                devYMarker,
                devZoomMarkerWidth,
@@ -280,7 +299,7 @@ public class ChartComponentAxis extends Canvas {
 
          final int devZoomMarkerWidth = (int) (devAxisWidth * moveValue);
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                devAxisWidth - devZoomMarkerWidth,
                devYMarker,
                devZoomMarkerWidth,
@@ -480,6 +499,8 @@ public class ChartComponentAxis extends Canvas {
       if (_moveMarkerColor != null) {
          _moveMarkerColor.dispose();
       }
+
+      _axisImage = Util.disposeResource(_axisImage);
    }
 
    private void onMouseDown() {

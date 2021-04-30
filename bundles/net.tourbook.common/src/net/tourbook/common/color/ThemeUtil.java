@@ -1,3 +1,4 @@
+package net.tourbook.common.color;
 /*******************************************************************************
  * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
@@ -13,8 +14,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.application;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +89,13 @@ public class ThemeUtil {
       allThemes.sort((final ITheme t1, final ITheme t2) -> t1.getLabel().compareTo(t2.getLabel()));
 
       return allThemes;
+   }
+
+   public static IThemeEngine getThemeEngine() {
+
+      setupTheme();
+
+      return _themeEngine;
    }
 
    public static final void setupTheme() {

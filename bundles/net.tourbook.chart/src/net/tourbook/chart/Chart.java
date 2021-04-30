@@ -151,22 +151,23 @@ public class Chart extends ViewForm {
    /*
     * Segment alternate color
     */
-   protected boolean isShowSegmentAlternateColor = true;
-   protected RGB     segmentAlternateColor       = new RGB(0xf5, 0xf5, 0xf5);
+   protected boolean      isShowSegmentAlternateColor = true;
+   protected RGB          segmentAlternateColor       = new RGB(0xf5, 0xf5, 0xf5);
 
    /**
     * mouse behaviour:<br>
     * <br>
     * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
     */
-   private String    _mouseMode                  = MOUSE_MODE_SLIDER;
+   private String         _mouseMode                  = MOUSE_MODE_SLIDER;
 
-   private boolean   _isTopMenuPosition;
+   private boolean        _isTopMenuPosition;
 
    /**
     * Is <code>true</code> when running in UI update, then events are not fired.
     */
-   private boolean   _isInUpdateUI;
+   private boolean        _isInUpdateUI;
+
 
    /**
     * Chart widget
@@ -196,7 +197,9 @@ public class Chart extends ViewForm {
       setContent(_chartComponents);
 
       // set the default background color
-      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+//      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+//      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
    }
 
    private static int removeBorder(final int style) {
@@ -1013,13 +1016,12 @@ public class Chart extends ViewForm {
    }
 
    /**
-    * Set the background color for the chart, the default is SWT.COLOR_WHITE
+    * Set the background color for the chart, the default is SWT.COLOR_WIDGET_BACKGROUND
     *
     * @param backgroundColor
     *           The backgroundColor to set.
     */
    public void setBackgroundColor(final Color backgroundColor) {
-
       _backgroundColor = backgroundColor;
    }
 

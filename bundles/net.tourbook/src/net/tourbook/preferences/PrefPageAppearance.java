@@ -20,9 +20,9 @@ import static org.eclipse.jface.viewers.LabelProvider.createTextProvider;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ThemeUtil;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.statistic.StatisticValuesView;
 
