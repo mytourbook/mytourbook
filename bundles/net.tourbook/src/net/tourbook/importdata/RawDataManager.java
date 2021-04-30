@@ -33,6 +33,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -141,6 +145,9 @@ public class RawDataManager {
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
+   private static ThreadPoolExecutor       _dbUpdateExecutor;
+   private static ArrayBlockingQueue<Long> _dbUpdateQueue                        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -149,6 +156,23 @@ public class RawDataManager {
             new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
 
       };
+
+      final ThreadFactory threadFactory = new ThreadFactory() {
+
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
+
    }
 
    private static RawDataManager           _instance                           = null;
@@ -234,6 +258,7 @@ public class RawDataManager {
       ALL_TIME_SLICES, //
 
       TOUR_MARKER, //
+      TOUR_CALORIES, //
       IMPORT_FILE_LOCATION, //
 
       TIME_SLICES_ELEVATION, //
@@ -246,7 +271,7 @@ public class RawDataManager {
       TIME_SLICES_TEMPERATURE, //
       TIME_SLICES_TRAINING, //
       TIME_SLICES_TIME, //
-      TIME_SLICES_TIMER_PAUSES, //
+      TIME_SLICES_TIMER_PAUSES //
    }
 
    private RawDataManager() {}
@@ -310,18 +335,14 @@ public class RawDataManager {
 
       case TIME_SLICES_POWER_AND_PULSE:
          previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE + UI.COMMA_SPACE
-               + oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+               + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE;
          newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE + UI.COMMA_SPACE
-               + newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+               + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE;
          break;
 
       case TIME_SLICES_POWER_AND_SPEED:
-         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
-         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-               + newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
+         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
          break;
 
       case TIME_SLICES_TEMPERATURE:
@@ -351,6 +372,11 @@ public class RawDataManager {
          newData = newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER;
          break;
 
+      case TOUR_CALORIES:
+         previousData = oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+         newData = newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES;
+         break;
+
       case TIME_SLICES_TIME:
       default:
          break;
@@ -365,15 +391,12 @@ public class RawDataManager {
    }
 
    public static boolean doesInvalidFileExist(final String fileName) {
+
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
 
-      for (final String invalidFilePath : invalidFilesList) {
-         if (Paths.get(invalidFilePath).getFileName().toString().equals(fileName)) {
-            return true;
-         }
-      }
-
-      return false;
+      return invalidFilesList
+            .stream()
+            .anyMatch(invalidFilePath -> Paths.get(invalidFilePath).getFileName().toString().equals(fileName));
    }
 
    /**
@@ -629,6 +652,11 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_CadenceValues);
          }
 
+         // Calories
+         if (tourValueType == TourValueType.TOUR_CALORIES) {
+            dataToModifyDetails.add(Messages.Tour_Data_Text_Calories);
+         }
+
          // Gear
          if (tourValueType == TourValueType.ALL_TIME_SLICES || tourValueType == TourValueType.TIME_SLICES_GEAR) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_GearValues);
@@ -836,8 +864,25 @@ public class RawDataManager {
                   continue;
                }
 
-               reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+               try {
 
+                  _dbUpdateQueue.put(tourId);
+
+               } catch (final InterruptedException e) {
+
+                  StatusUtil.log(e);
+                  Thread.currentThread().interrupt();
+               }
+               _dbUpdateExecutor.submit(() -> {
+                  // get last added item
+                  final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+                  if (queueItem_TourId == null) {
+                     return;
+                  }
+
+                  reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
+               });
                if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false
                      && skipToursWithFileNotFound == false) {
 
@@ -864,6 +909,8 @@ public class RawDataManager {
                   }
                }
             }
+
+            while (!_dbUpdateExecutor.isTerminated()) {}
 
             if (reImportStatus.isReImported) {
 
@@ -1087,8 +1134,6 @@ public class RawDataManager {
                   clonedTourData.setTourMarkers(new HashSet<>(oldTourData.getTourMarkers()));
                   break;
 
-               //
-
                case TIME_SLICES_CADENCE:
                   clonedTourData.setAvgCadence(oldTourData.getAvgCadence());
                   clonedTourData.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
@@ -1107,12 +1152,10 @@ public class RawDataManager {
                case TIME_SLICES_POWER_AND_PULSE:
                   clonedTourData.setPower_Avg(oldTourData.getPower_Avg());
                   clonedTourData.setAvgPulse(oldTourData.getAvgPulse());
-                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                case TIME_SLICES_POWER_AND_SPEED:
                   clonedTourData.setPower_Avg(oldTourData.getPower_Avg());
-                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                case TIME_SLICES_TEMPERATURE:
@@ -1121,6 +1164,10 @@ public class RawDataManager {
 
                case TIME_SLICES_TIMER_PAUSES:
                   clonedTourData.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
+                  break;
+
+               case TOUR_CALORIES:
+                  clonedTourData.setCalories(oldTourData.getCalories());
                   break;
 
                default:
@@ -1309,6 +1356,11 @@ public class RawDataManager {
                actionReimportTour_50_ReplacesValues(tourValueTypes, oldTourData, reimportedTourData);
             }
 
+            if (tourValueTypes.contains(TourValueType.TOUR_CALORIES)) {
+
+               oldTourData.setCalories(reimportedTourData.getCalories());
+            }
+
             if (tourValueTypes.contains(TourValueType.TOUR_MARKER)) {
 
                oldTourData.setTourMarkers(reimportedTourData.getTourMarkers());
@@ -1394,8 +1446,6 @@ public class RawDataManager {
       if (tourValueTypes.contains(TourValueType.ALL_TIME_SLICES)
             || tourValueTypes.contains(TourValueType.TIME_SLICES_POWER_AND_PULSE)
             || tourValueTypes.contains(TourValueType.TIME_SLICES_POWER_AND_SPEED)) {
-
-         oldTourData.setCalories(reimportedTourData.getCalories());
 
          // re-import power and speed only when it's from the device
          final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
@@ -1695,8 +1745,8 @@ public class RawDataManager {
                clonedTourData.setTourAltUp(tourData.getTourAltUp());
 
                tourData.altitudeSerie = null;
-               tourData.setTourAltDown(0);
                tourData.setTourAltUp(0);
+               tourData.setTourAltDown(0);
                break;
 
             case TIME_SLICES_GEAR:
@@ -1710,7 +1760,6 @@ public class RawDataManager {
             case TIME_SLICES_POWER_AND_PULSE:
                clonedTourData.setPower_Avg(tourData.getPower_Avg());
                clonedTourData.setAvgPulse(tourData.getAvgPulse());
-               clonedTourData.setCalories(tourData.getCalories());
 
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
@@ -1718,16 +1767,13 @@ public class RawDataManager {
                tourData.pulseTime_Milliseconds = null;
                tourData.pulseTime_TimeIndex = null;
                tourData.setAvgPulse(0);
-               tourData.setCalories(0);
                break;
 
             case TIME_SLICES_POWER_AND_SPEED:
                clonedTourData.setPower_Avg(tourData.getPower_Avg());
-               clonedTourData.setCalories(tourData.getCalories());
 
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
-               tourData.setCalories(0);
                tourData.setSpeedSerie(null);
                break;
 
@@ -1745,6 +1791,12 @@ public class RawDataManager {
                tourData.setPausedTime_End(null);
                tourData.setTourDeviceTime_Paused(0);
                tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed());
+               break;
+
+            case TOUR_CALORIES:
+               clonedTourData.setCalories(tourData.getCalories());
+
+               tourData.setCalories(0);
                break;
 
             case ALL_TIME_SLICES:
@@ -2786,3 +2838,4 @@ public class RawDataManager {
    }
 
 }
+
