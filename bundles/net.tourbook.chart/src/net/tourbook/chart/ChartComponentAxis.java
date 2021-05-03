@@ -18,10 +18,9 @@ package net.tourbook.chart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -45,9 +44,6 @@ public class ChartComponentAxis extends Canvas {
    private static final String         ZOOM_TEXT_LARGER_THEN_0 = "> 0";                           //$NON-NLS-1$
 
    private static final int            UNIT_OFFSET             = 7;
-
-   @SuppressWarnings("restriction")
-   private static final IThemeEngine   _themeEngine            = ThemeUtil.getThemeEngine();
 
    private final Chart                 _chart;
 
@@ -107,7 +103,7 @@ public class ChartComponentAxis extends Canvas {
 
       _chart = chart;
 
-      _moveMarkerColor = new Color(parent.getDisplay(), 0x8B, 0xC6, 0xFF);
+      _moveMarkerColor = new Color(0x8B, 0xC6, 0xFF);
 
       addDisposeListener(disposeEvent -> onDispose());
 
@@ -187,7 +183,6 @@ public class ChartComponentAxis extends Canvas {
    /**
     * draw the chart on the axisImage
     */
-   @SuppressWarnings("restriction")
    private void draw_00_AxisImage() {
 
       final Rectangle axisRect = getClientArea();
@@ -217,15 +212,14 @@ public class ChartComponentAxis extends Canvas {
          _axisImage = Util.createImage(_display, _axisImage, axisRect);
       }
 
+      final Color backgroundColor = UI.isDarkTheme()
+            ? _chart.getBackground() // this is the theme background color
+            : _chart.getBackgroundColor();
+
       // draw into the image
       final GC gc = new GC(_axisImage);
       {
-//         gc.setBackground(_chart.getBackgroundColor());
-         gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
-         // Apply the CSS-Instructions of the current active theme
-         _themeEngine.applyStyles(_chart, true);
-
+         gc.setBackground(backgroundColor);
          gc.fillRectangle(_axisImage.getBounds());
 
          draw_10_ZoomMarker(gc, axisRect);
@@ -269,7 +263,7 @@ public class ChartComponentAxis extends Canvas {
       final int devMarkerHeight = 6;
       final int devYMarker = devAxisHeight - devMarkerHeight;
 
-//      gc.setBackground(_moveMarkerColor);
+      gc.setBackground(_moveMarkerColor);
 
       if (_isLeft) {
 
@@ -495,10 +489,6 @@ public class ChartComponentAxis extends Canvas {
    }
 
    private void onDispose() {
-
-      if (_moveMarkerColor != null) {
-         _moveMarkerColor.dispose();
-      }
 
       _axisImage = Util.disposeResource(_axisImage);
    }

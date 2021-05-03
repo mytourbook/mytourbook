@@ -128,16 +128,16 @@ public class Chart extends ViewForm {
    /**
     * Transparency of the graph lines
     */
-   protected int                                     graphTransparencyLine            = 0xFF;
+   protected int                                     graphTransparency_Line           = 0xFF;
 
    /**
     * Transparency of the graph fillings
     */
-   protected int                                     graphTransparencyFilling         = 0xE0;
+   protected int                                     graphTransparency_Filling        = 0xE0;
 
    /**
     * The graph transparency can be adjusted with this value. This value is multiplied with the
-    * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine}.
+    * {@link #graphTransparency_Filling} and {@link #graphTransparency_Line}.
     * <p>
     * Opacity: 0.0 = transparent, 1.0 = opaque.
     */
@@ -151,23 +151,23 @@ public class Chart extends ViewForm {
    /*
     * Segment alternate color
     */
-   protected boolean      isShowSegmentAlternateColor = true;
-   protected RGB          segmentAlternateColor       = new RGB(0xf5, 0xf5, 0xf5);
+   protected boolean isShowSegmentAlternateColor = true;
+   protected RGB     segmentAlternateColor_Light = new RGB(0xf5, 0xf5, 0xf5);
+   protected RGB     segmentAlternateColor_Dark  = new RGB(0x40, 0x40, 0x40);
 
    /**
-    * mouse behaviour:<br>
+    * Mouse behaviour:<br>
     * <br>
     * {@link #MOUSE_MODE_SLIDER} or {@link #MOUSE_MODE_ZOOM}
     */
-   private String         _mouseMode                  = MOUSE_MODE_SLIDER;
+   private String    _mouseMode                  = MOUSE_MODE_SLIDER;
 
-   private boolean        _isTopMenuPosition;
+   private boolean   _isTopMenuPosition;
 
    /**
     * Is <code>true</code> when running in UI update, then events are not fired.
     */
-   private boolean        _isInUpdateUI;
-
+   private boolean   _isInUpdateUI;
 
    /**
     * Chart widget
@@ -197,9 +197,7 @@ public class Chart extends ViewForm {
       setContent(_chartComponents);
 
       // set the default background color
-      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-//      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-//      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+      _backgroundColor = getDisplay().getSystemColor(SWT.COLOR_WHITE);
    }
 
    private static int removeBorder(final int style) {
@@ -1016,7 +1014,7 @@ public class Chart extends ViewForm {
    }
 
    /**
-    * Set the background color for the chart, the default is SWT.COLOR_WIDGET_BACKGROUND
+    * Set the background color for the chart, the default is SWT.COLOR_WHITE
     *
     * @param backgroundColor
     *           The backgroundColor to set.
@@ -1104,7 +1102,8 @@ public class Chart extends ViewForm {
 
    /**
     * Adjust the alpha value for the filling operation, this value is multiplied with
-    * {@link #graphTransparencyFilling} and {@link #graphTransparencyLine} which is set in the tour
+    * {@link #graphTransparency_Filling} and {@link #graphTransparency_Line} which is set in the
+    * tour
     * chart preference page.
     * <p>
     * Opacity: 0.0 = transparent, 1.0 = opaque.
@@ -1420,13 +1419,15 @@ public class Chart extends ViewForm {
     * @param isHGridVisible
     * @param isVGridVisible
     * @param isAlternateColor
+    * @param rgb
     */
    public void updateProperties(final int horizontalGrid,
                                 final int verticalGrid,
                                 final boolean isHGridVisible,
                                 final boolean isVGridVisible,
                                 final boolean isAlternateColor,
-                                final RGB rgbAlternateColor) {
+                                final RGB rgbAlternateColor_Light,
+                                final RGB rgbAlternateColor_Dark) {
 
       gridHorizontalDistance = horizontalGrid;
       gridVerticalDistance = verticalGrid;
@@ -1435,7 +1436,8 @@ public class Chart extends ViewForm {
       isShowVerticalGridLines = isVGridVisible;
 
       isShowSegmentAlternateColor = isAlternateColor;
-      segmentAlternateColor = rgbAlternateColor;
+      segmentAlternateColor_Light = rgbAlternateColor_Light;
+      segmentAlternateColor_Dark = rgbAlternateColor_Dark;
 
       _chartComponents.onResize();
    }

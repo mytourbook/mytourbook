@@ -27,11 +27,8 @@ import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -98,7 +95,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private ArrayList<Graph>        _graphList;
    private ArrayList<Graph>        _viewerGraphs;
 
-   private IPropertyChangeListener _defaultChangePropertyListener;
    private MouseWheelListener      _defaultMouseWheelListener;
    private SelectionAdapter        _defaultSelectionListener;
 
@@ -119,7 +115,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Button              _chkLiveUpdate;
 
    private Button              _chkMoveSlidersWhenZoomed;
-   private Button              _chkSegmentAlternateColor;
    private Button              _chkShowGrid_HorizontalLines;
    private Button              _chkShowStartTime;
    private Button              _chkShowGrid_VerticalLines;
@@ -139,8 +134,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Spinner             _spinnerGraphTransparencyFilling;
    private Spinner             _spinnerGridHorizontalDistance;
    private Spinner             _spinnerGridVerticalDistance;
-
-   private ColorSelector       _colorSegmentAlternateColor;
 
    private static class Graph {
 
@@ -418,18 +411,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          _chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
          _chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
          _chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
-
-         /*
-          * Checkbox: Segments with alternate colors
-          */
-         _chkSegmentAlternateColor = new Button(container, SWT.CHECK);
-         _chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
-         _chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
-         _chkSegmentAlternateColor.addSelectionListener(_defaultSelectionListener);
-
-         // Color: Segment alternate color
-         _colorSegmentAlternateColor = new ColorSelector(container);
-         _colorSegmentAlternateColor.addListener(_defaultChangePropertyListener);
       }
    }
 
@@ -683,7 +664,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
    private void enableControls() {
 
-      _colorSegmentAlternateColor.setEnabled(_chkSegmentAlternateColor.getSelection());
    }
 
    /**
@@ -731,8 +711,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
             onSelection();
          }
       };
-
-      _defaultChangePropertyListener = propertyChangeEvent -> onSelection();
 
 // SET_FORMATTING_OFF
 
@@ -930,11 +908,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          _spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
          _spinnerGraphTransparencyLine.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
-         // segment alternate color
-         _chkSegmentAlternateColor.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-         _colorSegmentAlternateColor.setColorValue(//
-               PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
-
       } else if (selectedTab == _tab2_Grid) {
 
          _spinnerGridHorizontalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
@@ -981,10 +954,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       _spinnerGraphTransparencyFilling.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
       _spinnerGraphTransparencyLine.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-
-      // segment alternate color
-      _chkSegmentAlternateColor.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR));
-      _colorSegmentAlternateColor.setColorValue(PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 
       restoreState_Tab_1_Graphs_Graphs();
    }
@@ -1089,12 +1058,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, _spinnerGraphTransparencyFilling.getSelection());
       _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, _spinnerGraphTransparencyLine.getSelection());
-
-      // segment alternate color
-      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, _chkSegmentAlternateColor.getSelection());
-      PreferenceConverter.setValue(_prefStore,
-            ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,
-            _colorSegmentAlternateColor.getColorValue());
 
       saveState_Tab_1_Graphs_Graphs();
    }

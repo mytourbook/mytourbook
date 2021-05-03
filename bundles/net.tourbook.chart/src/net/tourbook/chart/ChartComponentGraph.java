@@ -392,6 +392,8 @@ public class ChartComponentGraph extends Canvas {
    private int[]                      _autoScrollCounter           = new int[1];
 
    private final ColorCache           _colorCache                  = new ColorCache();
+   private Color                      _backgroundColor;
+   private Color                      _foregroundColor;
 
    private boolean                    _isSelectionVisible;
 
@@ -1536,13 +1538,21 @@ public class ChartComponentGraph extends Canvas {
       final int devGraphHeight = graphDrawingData.devGraphHeight;
       final Rectangle graphImageRect = new Rectangle(
             0,
-            0, //
+            0,
             devNewImageWidth,
             devGraphHeight < 1 ? 1 : devGraphHeight + 1); // ensure valid height
 
       if (Util.canReuseImage(_chartImage_10_Graphs, graphImageRect) == false) {
          _chartImage_10_Graphs = Util.createImage(getDisplay(), _chartImage_10_Graphs, graphImageRect);
       }
+
+      _backgroundColor = UI.isDarkTheme()
+            ? _chart.getBackground() // this is the theme background color
+            : _chart.getBackgroundColor();
+
+      _foregroundColor = UI.isDarkTheme()
+            ? _chart.getForeground() // this is the theme foreground color
+            : _chart.getBackgroundColor();
 
       // create chart context
       final GC gcChart = new GC(_chartImage_20_Chart);
@@ -1561,7 +1571,7 @@ public class ChartComponentGraph extends Canvas {
             historyColor.dispose();
 
          } else {
-            gcChart.setBackground(_chart.getBackgroundColor());
+            gcChart.setBackground(_backgroundColor);
          }
          gcChart.fillRectangle(_chartImage_20_Chart.getBounds());
 
@@ -1623,7 +1633,6 @@ public class ChartComponentGraph extends Canvas {
       _lineDevPositions.clear();
       _lineFocusRectangles.clear();
 
-      final Color chartBackgroundColor = _chart.getBackgroundColor();
       final Rectangle graphBounds = _chartImage_10_Graphs.getBounds();
 
       // loop: all graphs in the chart
@@ -1658,7 +1667,7 @@ public class ChartComponentGraph extends Canvas {
          // fill background
          if (isDrawBackground) {
 
-            gcGraph.setBackground(chartBackgroundColor);
+            gcGraph.setBackground(_backgroundColor);
             gcGraph.fillRectangle(graphBounds);
 
             if (_chart.isShowSegmentAlternateColor && chartTitleSegmentConfig.isShowSegmentBackground) {
@@ -1793,37 +1802,35 @@ public class ChartComponentGraph extends Canvas {
          return;
       }
 
-      final Color alternateColor = new Color(gc.getDevice(), _chart.segmentAlternateColor);
-      {
-         for (int segmentIndex = 0; segmentIndex < segmentStartValue.length; segmentIndex++) {
+      final Color alternateColor = UI.isDarkTheme()
+            ? new Color(_chart.segmentAlternateColor_Dark)
+            : new Color(_chart.segmentAlternateColor_Light);
 
-            if (segmentIndex % 2 == 1) {
+      for (int segmentIndex = 0; segmentIndex < segmentStartValue.length; segmentIndex++) {
 
-               // draw segment background color for every second segment
+         if (segmentIndex % 2 == 1) {
 
-               final double startValue = segmentStartValue[segmentIndex];
-               final double endValue = segmentEndValue[segmentIndex];
+            // draw segment background color for every second segment
 
-               final int devXValueStart = (int) ((scaleX * startValue) - _xxDevViewPortLeftBorder);
+            final double startValue = segmentStartValue[segmentIndex];
+            final double endValue = segmentEndValue[segmentIndex];
 
-               // adjust endValue to fill the last part of the segment
-               final int devValueEnd = (int) (scaleX * (endValue + 1) - _xxDevViewPortLeftBorder);
+            final int devXValueStart = (int) ((scaleX * startValue) - _xxDevViewPortLeftBorder);
 
-               gc.setBackground(alternateColor);
-               gc.fillRectangle(//
-                     devXValueStart,
-                     devYTop,
-                     devValueEnd - devXValueStart,
-                     devYBottom - devYTop);
-            }
+            // adjust endValue to fill the last part of the segment
+            final int devValueEnd = (int) (scaleX * (endValue + 1) - _xxDevViewPortLeftBorder);
+
+            gc.setBackground(alternateColor);
+            gc.fillRectangle(
+                  devXValueStart,
+                  devYTop,
+                  devValueEnd - devXValueStart,
+                  devYBottom - devYTop);
          }
       }
-      alternateColor.dispose();
    }
 
    private void drawAsync_200_XTitle(final GC gc, final GraphDrawingData graphDrawingData) {
-
-      final Display display = Display.getCurrent();
 
       final int devYBottom = graphDrawingData.getDevYBottom();
       final int devYGraphTop = devYBottom - graphDrawingData.devGraphHeight;
@@ -1838,10 +1845,12 @@ public class ChartComponentGraph extends Canvas {
 
       final int devGraphWidth = getDevVisibleChartWidth();
 
+      gc.setForeground(_foregroundColor);
+
       if (historyTitle != null) {
 
          /*
-          * draw title for each history top segment
+          * Draw title for each history top segment
           */
 
          final double scaleX = graphDrawingData.getScaleX();
@@ -1897,7 +1906,7 @@ public class ChartComponentGraph extends Canvas {
       } else if (chartSegments != null) {
 
          /*
-          * draw title for each chart segment
+          * Draw title for each chart segment
           */
 
          final double scaleX = graphDrawingData.getScaleX();
@@ -1974,7 +1983,6 @@ public class ChartComponentGraph extends Canvas {
                      // keep position when the title is drawn
                      devXTitleEnd = devXTitle + titleWidth + titlePadding;
 
-                     gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
                      gc.drawText(segmentTitle, devXTitle, devYTitle, false);
                   }
                }
@@ -2007,7 +2015,7 @@ public class ChartComponentGraph extends Canvas {
       } else {
 
          /*
-          * draw default title, center within the chart
+          * Draw default title, center within the chart
           */
 
          String title = graphDrawingData.getXTitle();
@@ -2027,7 +2035,7 @@ public class ChartComponentGraph extends Canvas {
          if (chartTitleSegmentConfig.isShowSegmentTitle) {
 
             gc.drawText(
-                  title, //
+                  title,
                   devXTitle < 0 ? 0 : devXTitle,
                   devYTitle,
                   true);
@@ -2505,12 +2513,9 @@ public class ChartComponentGraph extends Canvas {
 
       final int devYTop = drawingData.getDevYTop() - labelHeight;
 
-      final Color colorText = new Color(gcGraph.getDevice(), yData.getDefaultRGB());
-      {
-         gcGraph.setForeground(colorText);
-         gcGraph.drawString(graphTitle, 0, devYTop, true);
-      }
-      colorText.dispose();
+      final Color colorText = new Color(yData.getDefaultRGB());
+      gcGraph.setForeground(colorText);
+      gcGraph.drawString(graphTitle, 0, devYTop, true);
    }
 
    private void drawAsync_500_LineGraph(final GC gcGraph,
@@ -2570,8 +2575,8 @@ public class ChartComponentGraph extends Canvas {
 
          final double noneMarkerAlpha = 0.4;
 
-         final int noneMarkerLineAlpha = (int) (_chart.graphTransparencyLine * noneMarkerAlpha);
-         final int noneMarkerFillingAlpha = (int) (_chart.graphTransparencyFilling * noneMarkerAlpha);
+         final int noneMarkerLineAlpha = (int) (_chart.graphTransparency_Line * noneMarkerAlpha);
+         final int noneMarkerFillingAlpha = (int) (_chart.graphTransparency_Filling * noneMarkerAlpha);
 
          // draw graph without marker
          drawAsync_510_LineGraph_Segment(
@@ -2595,8 +2600,8 @@ public class ChartComponentGraph extends Canvas {
                rgbFg,
                rgbBgDark,
                rgbBgBright,
-               _chart.graphTransparencyLine,
-               _chart.graphTransparencyFilling,
+               _chart.graphTransparency_Line,
+               _chart.graphTransparency_Filling,
                graphValueOffset);
       }
    }
@@ -3249,8 +3254,8 @@ public class ChartComponentGraph extends Canvas {
          graphValueOffset = (_xxDevViewPortLeftBorder / scaleX);
       }
 
-      int graphFillingAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
-      int graphLineAlpha = (int) (_chart.graphTransparencyFilling * 0.5);
+      int graphFillingAlpha = (int) (_chart.graphTransparency_Filling * 0.5);
+      int graphLineAlpha = (int) (_chart.graphTransparency_Filling * 0.5);
 
       graphFillingAlpha = graphFillingAlpha < 0 ? 0 : graphFillingAlpha > 255 ? 255 : graphFillingAlpha;
       graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;
@@ -4079,7 +4084,7 @@ public class ChartComponentGraph extends Canvas {
             }
             gc.setBackground(bgColor);
 
-            gc.fillRectangle(//
+            gc.fillRectangle(
                   barXStart - devXOverlap,
                   barY - barHeight2,
                   barWidth,
@@ -4659,7 +4664,7 @@ public class ChartComponentGraph extends Canvas {
       // this color is not yet user defined
       final RGB complimentColor = ColorUtil.getComplimentColor(rgbFg);
       final Color pathColor = new Color(complimentColor);
-      
+
       gc.setForeground(pathColor);
       gc.setAlpha(getAlphaLine());
       gc.setLineStyle(SWT.LINE_SOLID);
@@ -5268,7 +5273,7 @@ public class ChartComponentGraph extends Canvas {
       if (_allGraphDrawingData == null || _allGraphDrawingData.isEmpty()) {
 
          // fill the image area when there is no graphic
-         gc.setBackground(_chart.getBackgroundColor());
+         gc.setBackground(_backgroundColor);
          gc.fillRectangle(_clientArea);
 
          drawSyncBg_999_ErrorMessage(gc);
@@ -5310,7 +5315,7 @@ public class ChartComponentGraph extends Canvas {
                if (gcHeight > imageHeight) {
 
                   // fill the gap between the image and the drawable area
-                  gc.setBackground(_chart.getBackgroundColor());
+                  gc.setBackground(_backgroundColor);
                   gc.fillRectangle(0, imageHeight, _clientArea.width, _clientArea.height - imageHeight);
 
                } else {
@@ -5330,7 +5335,7 @@ public class ChartComponentGraph extends Canvas {
           */
          if (_chartImage_20_Chart == null) {
             // fill the image area when there is no graphic
-            gc.setBackground(_chart.getBackgroundColor());
+            gc.setBackground(_backgroundColor);
 //            gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
             gc.fillRectangle(_clientArea);
             return;
@@ -5412,7 +5417,7 @@ public class ChartComponentGraph extends Canvas {
       /*
        * draw background that the none painted areas do not look ugly when the chart is dragged
        */
-      gc.setBackground(_chart.getBackgroundColor());
+      gc.setBackground(_backgroundColor);
 
       if (devXDiff > 0) {
          gc.fillRectangle(0, devYDiff, devXDiff, _clientArea.height);
@@ -5684,7 +5689,7 @@ public class ChartComponentGraph extends Canvas {
          gcGraph.setAlpha(0xff);
 
          // draw label background
-         gcGraph.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+         gcGraph.setBackground(_backgroundColor);
          gcGraph.fillRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
 
          gcGraph.setBackground(colorDark);
@@ -5696,7 +5701,7 @@ public class ChartComponentGraph extends Canvas {
          gcGraph.drawRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
 
          // draw slider label
-         gcGraph.setForeground(colorTxt);
+         gcGraph.setForeground(_foregroundColor);
          gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
          // draw a tiny marker on the graph
@@ -6546,13 +6551,14 @@ public class ChartComponentGraph extends Canvas {
 
       final String errorMessage = _chartComponents.errorMessage;
       if (errorMessage != null) {
+         gc.setForeground(_foregroundColor);
          gc.drawText(errorMessage, 0, 10);
       }
    }
 
    private int getAlphaFill(final boolean isTopGraph) {
 
-      int graphFillingAlpha = (int) (_chart.graphTransparencyFilling * _chart.graphTransparencyAdjustment);
+      int graphFillingAlpha = (int) (_chart.graphTransparency_Filling * _chart.graphTransparencyAdjustment);
 
       if (_canChartBeOverlapped && _isChartOverlapped) {
 
@@ -6576,7 +6582,7 @@ public class ChartComponentGraph extends Canvas {
 
    private int getAlphaLine() {
 
-      int graphLineAlpha = (int) (_chart.graphTransparencyLine * _chart.graphTransparencyAdjustment);
+      int graphLineAlpha = (int) (_chart.graphTransparency_Line * _chart.graphTransparencyAdjustment);
 
       // check ranges
       graphLineAlpha = graphLineAlpha < 0 ? 0 : graphLineAlpha > 255 ? 255 : graphLineAlpha;

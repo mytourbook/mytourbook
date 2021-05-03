@@ -1133,6 +1133,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             } else if (property.equals(ITourbookPreferences.GRAPH_ANTIALIASING)
                   || property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+                  || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
 
@@ -5032,31 +5033,24 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    void setupChartConfig() {
 
-      graphAntialiasing = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
+// SET_FORMATTING_OFF
 
-      isShowSegmentAlternateColor = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
-      segmentAlternateColor = PreferenceConverter.getColor(
-            _prefStore,
-            ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
+      graphAntialiasing             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
-      graphTransparencyLine = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-      graphTransparencyFilling = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      isShowSegmentAlternateColor   = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
+      segmentAlternateColor_Light   = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
+      segmentAlternateColor_Dark    = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK);
 
-      isShowHorizontalGridLines = Util.getPrefixPrefBoolean(_prefStore,
-            GRID_PREF_PREFIX,
-            ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+      graphTransparency_Line        = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
+      graphTransparency_Filling     = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
 
-      isShowVerticalGridLines = Util.getPrefixPrefBoolean(_prefStore,
-            GRID_PREF_PREFIX,
-            ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+      isShowHorizontalGridLines     = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+      isShowVerticalGridLines       = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-      gridVerticalDistance = Util.getPrefixPrefInt(_prefStore,
-            GRID_PREF_PREFIX,
-            ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+      gridVerticalDistance          = Util.getPrefixPrefInt(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+      gridHorizontalDistance        = Util.getPrefixPrefInt(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
-      gridHorizontalDistance = Util.getPrefixPrefInt(_prefStore,
-            GRID_PREF_PREFIX,
-            ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+// SET_FORMATTING_ON
    }
 
    private void setupChartSegmentTitle() {
