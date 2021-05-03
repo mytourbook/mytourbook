@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,12 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import net.tourbook.common.UI;
 import net.tourbook.photo.internal.Activator;
@@ -27,7 +30,6 @@ import net.tourbook.photo.internal.Activator;
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -49,15 +51,12 @@ public class ImageUtils {
 
    static {
 
-      final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
-               _isRotateImageAutomatically = (Boolean) event.getNewValue();
-            }
+         if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+            _isRotateImageAutomatically = (Boolean) propertyChangeEvent.getNewValue();
          }
       };
 
@@ -66,34 +65,42 @@ public class ImageUtils {
 
    public static FileFilter createImageFileFilter() {
 
-      return new FileFilter() {
-         @Override
-         public boolean accept(final File pathname) {
+      return pathname -> {
 
-            if (pathname.isDirectory()) {
-               return false;
-            }
-
-            if (pathname.isHidden()) {
-               return false;
-            }
-
-            final String name = pathname.getName();
-            if (name == null || name.length() == 0) {
-               return false;
-            }
-
-            if (name.startsWith(UI.SYMBOL_DOT)) {
-               return false;
-            }
-
-            if (Imaging.hasImageFileExtension(pathname)) {
-               return true;
-            }
-
+         if (pathname.isDirectory()) {
             return false;
          }
+
+         if (pathname.isHidden()) {
+            return false;
+         }
+
+         final String name = pathname.getName();
+         if (name == null || name.length() == 0) {
+            return false;
+         }
+
+         if (name.startsWith(UI.SYMBOL_DOT)) {
+            return false;
+         }
+
+         if (Imaging.hasImageFileExtension(pathname)) {
+            return true;
+         }
+
+         return false;
       };
+   }
+
+   public static Image decodeStringToImage(final String imageString) {
+
+      Image image = null;
+      try (final InputStream inputStream = new ByteArrayInputStream(imageString.getBytes(StandardCharsets.UTF_8))) {
+         image = new Image(Display.getCurrent(), inputStream);
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
+      return image;
    }
 
    /**

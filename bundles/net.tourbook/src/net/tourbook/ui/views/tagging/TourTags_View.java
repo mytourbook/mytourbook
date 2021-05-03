@@ -1020,13 +1020,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             final Object element = cell.getElement();
             if (element instanceof TVITagView_Tag) {
 
-               cell.setImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
+               // cell.setImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
 
             } else if (element instanceof TVITagView_TagCategory) {
 
-               final long categoryId = ((TVITagView_TagCategory) element).getCategoryId();
+               //  final long categoryId = ((TVITagView_TagCategory) element).getCategoryId();
 
-               cell.setText(Long.toString(categoryId));
+               //   cell.setText(Long.toString(categoryId));
 
             } else {
 
