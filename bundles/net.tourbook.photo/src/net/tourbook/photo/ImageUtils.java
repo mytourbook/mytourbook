@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import net.tourbook.common.UI;
 import net.tourbook.photo.internal.Activator;
@@ -95,7 +95,7 @@ public class ImageUtils {
    public static Image decodeStringToImage(final String imageString) {
 
       Image image = null;
-      try (final InputStream inputStream = new ByteArrayInputStream(imageString.getBytes(StandardCharsets.UTF_8))) {
+      try (final InputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(imageString))) {
          image = new Image(Display.getCurrent(), inputStream);
       } catch (final IOException e) {
          e.printStackTrace();
