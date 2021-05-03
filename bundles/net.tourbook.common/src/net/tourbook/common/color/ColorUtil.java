@@ -136,4 +136,19 @@ public class ColorUtil {
 
       return getContrastRGB(rgb.red, rgb.green, rgb.blue);
    }
+
+   /**
+    * Converts a percentage value to a transparency value: 0 to 255
+    *
+    * @param percentageValue
+    * @return
+    */
+   public static int getTransparencyFromPercentage(final int percentageValue) {
+
+      final int opacity = 0xff * percentageValue / 100;
+
+      //This occurred where 303 was returned. Not sure how it is possible and how
+      //to reproduce it but to avoid this, we bound the returned value
+      return Math.min(255, opacity);
+   }
 }

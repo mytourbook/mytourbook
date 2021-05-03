@@ -512,6 +512,7 @@ public class UI {
    private static Formatter            _formatter                 = new Formatter(_formatterSB);
 
    private static FontMetrics          _fontMetrics;
+   private static boolean              _isDarkThemeSelected;
 
 // SET_FORMATTING_OFF
 
@@ -1605,6 +1606,13 @@ public class UI {
       return isCtrlKey;
    }
 
+   /**
+    * @return <code>true</code> when a dark theme is selected in the UI
+    */
+   public static boolean isDarkTheme() {
+      return _isDarkThemeSelected;
+   }
+
    public static boolean isLinuxAsyncEvent(final Widget widget) {
 
       if (IS_LINUX) {
@@ -2256,6 +2264,10 @@ public class UI {
       field.getTextControl(parent).setLayoutData(gd);
 
       return gd;
+   }
+
+   public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
+      _isDarkThemeSelected = isDarkThemeSelected;
    }
 
    private static boolean setupUI_FontMetrics() {

@@ -157,6 +157,7 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
    public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_SrtmIsInvalid;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM;
    public static String        Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip;
@@ -170,6 +171,91 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_SubTask;
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
+
+   public static String        Dialog_DatabaseAction_Confirmation_Message;
+   public static String        Dialog_DatabaseAction_Confirmation_Title;
+
+   public static String        Dialog_DeleteTourValues_Action_OpenDialog;
+   public static String        Dialog_DeleteTourValues_Button_Delete;
+   public static String        Dialog_DeleteTourValues_Checkbox_Time;
+   public static String        Dialog_DeleteTourValues_Dialog_ConfirmDeleteValues_Message;
+   public static String        Dialog_DeleteTourValues_Dialog_Message;
+   public static String        Dialog_DeleteTourValues_Dialog_Title;
+   public static String        Dialog_DeleteTourValues_Group_Delete;
+   public static String        Dialog_DeleteTourValues_Group_Delete_Label_Info;
+   public static String        Dialog_DeleteTourValues_Group_Delete_Tooltip;
+   public static String        Dialog_DeleteTourValues_Group_Tours;
+   public static String        Dialog_DeleteTourValues_Group_Tours_Tooltip;
+
+   public static String        Dialog_DoubleClickAction_InvalidAction_Message;
+   public static String        Dialog_DoubleClickAction_InvalidAction_Title;
+   public static String        Dialog_DoubleClickAction_NoAction_Message;
+   public static String        Dialog_DoubleClickAction_NoAction_Title;
+
+   public static String        Dialog_EditTimeslicesValues_Title;
+   public static String        Dialog_EditTimeslicesValues_Area_Title;
+   public static String        Dialog_EditTimeslicesValues_Label_NewValues;
+   public static String        Dialog_EditTimeslicesValues_Label_OffsetValues;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature_Tooltip;
+
+   public static String        Dialog_Export_Checkbox_Description;
+   public static String        Dialog_Export_Checkbox_SurfingWaves;
+   public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
+   public static String        Dialog_Export_Checkbox_TourFields;
+   public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
+   public static String        Dialog_Export_Checkbox_WithBarometer;
+   public static String        Dialog_Export_Checkbox_WithBarometer_Tooltip;
+   public static String        Dialog_Export_Description_SurfingWaves;
+   public static String        Dialog_Export_Error_CourseNameIsInvalid;
+   public static String        Dialog_Export_Group_Custom;
+   public static String        Dialog_Export_Group_Custom_Tooltip;
+   public static String        Dialog_Export_Group_How;
+   public static String        Dialog_Export_Group_How_Tooltip;
+   public static String        Dialog_Export_Group_What;
+   public static String        Dialog_Export_Group_What_Tooltip;
+   public static String        Dialog_Export_Label_GPX_DistanceValues;
+   public static String        Dialog_Export_Label_TCX_ActivityType;
+   public static String        Dialog_Export_Label_TCX_CourseName;
+   public static String        Dialog_Export_Label_TCX_NameFrom;
+   public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
+   public static String        Dialog_Export_Label_TCX_Type;
+   public static String        Dialog_Export_Radio_GPX_DistanceAbsolute;
+   public static String        Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip;
+   public static String        Dialog_Export_Radio_GPX_DistanceRelative;
+   public static String        Dialog_Export_Radio_GPX_DistanceRelative_Tooltip;
+   public static String        Dialog_Export_Radio_TCX_Aktivities;
+   public static String        Dialog_Export_Radio_TCX_Aktivities_Tooltip;
+   public static String        Dialog_Export_Radio_TCX_Courses;
+   public static String        Dialog_Export_Radio_TCX_Courses_Tooltip;
+   public static String        Dialog_Export_Radio_TCX_NameFromField;
+   public static String        Dialog_Export_Radio_TCX_NameFromTour;
+   public static String        Dialog_Export_SubTask_CreatingExportFile;
+   public static String        Dialog_Export_SubTask_Export;
+
+   public static String        Dialog_ExtractTour_DlgArea_Message;
+   public static String        Dialog_ExtractTour_DlgArea_Title;
+   public static String        Dialog_ExtractTour_Label_DeviceName;
+   public static String        Dialog_ExtractTour_Label_SplitMethod;
+
+   public static String        Dialog_HRZone_Button_AddZone;
+   public static String        Dialog_HRZone_Button_EditHrZones;
+   public static String        Dialog_HRZone_Button_RemoveZone;
+   public static String        Dialog_HRZone_Button_SortZone;
+   public static String        Dialog_HRZone_Button_SortZone_Tooltip;
+   public static String        Dialog_HRZone_DialogMessage;
+   public static String        Dialog_HRZone_DialogTitle;
+   public static String        Dialog_HRZone_Label_Header_Color;
+   public static String        Dialog_HRZone_Label_Header_Pulse;
+   public static String        Dialog_HRZone_Label_Header_Zone;
+   public static String        Dialog_HRZone_Label_Header_ZoneShortcut;
+   public static String        Dialog_HRZone_Label_Trash_Tooltip;
 
    public static String        Dialog_ImportConfig_Action_AddSpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_NewOneTourType;
@@ -285,110 +371,48 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
 
-   public static String        Dialog_HRZone_Button_AddZone;
-   public static String        Dialog_HRZone_Button_EditHrZones;
-   public static String        Dialog_HRZone_Button_RemoveZone;
-   public static String        Dialog_HRZone_Button_SortZone;
-   public static String        Dialog_HRZone_Button_SortZone_Tooltip;
-   public static String        Dialog_HRZone_DialogMessage;
-   public static String        Dialog_HRZone_DialogTitle;
-   public static String        Dialog_HRZone_Label_Header_Color;
-   public static String        Dialog_HRZone_Label_Header_Pulse;
-   public static String        Dialog_HRZone_Label_Header_Zone;
-   public static String        Dialog_HRZone_Label_Header_ZoneShortcut;
-   public static String        Dialog_HRZone_Label_Trash_Tooltip;
-
-   public static String        Dialog_DoubleClickAction_InvalidAction_Message;
-   public static String        Dialog_DoubleClickAction_InvalidAction_Title;
-   public static String        Dialog_DoubleClickAction_NoAction_Message;
-   public static String        Dialog_DoubleClickAction_NoAction_Title;
-
-   public static String        Dialog_EditTimeslicesValues_Title;
-   public static String        Dialog_EditTimeslicesValues_Area_Title;
-   public static String        Dialog_EditTimeslicesValues_Label_NewValues;
-   public static String        Dialog_EditTimeslicesValues_Label_OffsetValues;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse_Tooltip;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence_Tooltip;
-   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature_Tooltip;
-
-   public static String        Dialog_Export_Checkbox_Description;
-   public static String        Dialog_Export_Checkbox_SurfingWaves;
-   public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
-   public static String        Dialog_Export_Checkbox_TourFields;
-   public static String        Dialog_Export_Checkbox_TourFields_Tooltip;
-   public static String        Dialog_Export_Checkbox_WithBarometer;
-   public static String        Dialog_Export_Checkbox_WithBarometer_Tooltip;
-   public static String        Dialog_Export_Description_SurfingWaves;
-   public static String        Dialog_Export_Error_CourseNameIsInvalid;
-   public static String        Dialog_Export_Group_Custom;
-   public static String        Dialog_Export_Group_Custom_Tooltip;
-   public static String        Dialog_Export_Group_How;
-   public static String        Dialog_Export_Group_How_Tooltip;
-   public static String        Dialog_Export_Group_What;
-   public static String        Dialog_Export_Group_What_Tooltip;
-   public static String        Dialog_Export_Label_GPX_DistanceValues;
-   public static String        Dialog_Export_Label_TCX_ActivityType;
-   public static String        Dialog_Export_Label_TCX_CourseName;
-   public static String        Dialog_Export_Label_TCX_NameFrom;
-   public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
-   public static String        Dialog_Export_Label_TCX_Type;
-   public static String        Dialog_Export_Radio_GPX_DistanceAbsolute;
-   public static String        Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip;
-   public static String        Dialog_Export_Radio_GPX_DistanceRelative;
-   public static String        Dialog_Export_Radio_GPX_DistanceRelative_Tooltip;
-   public static String        Dialog_Export_Radio_TCX_Aktivities;
-   public static String        Dialog_Export_Radio_TCX_Aktivities_Tooltip;
-   public static String        Dialog_Export_Radio_TCX_Courses;
-   public static String        Dialog_Export_Radio_TCX_Courses_Tooltip;
-   public static String        Dialog_Export_Radio_TCX_NameFromField;
-   public static String        Dialog_Export_Radio_TCX_NameFromTour;
-   public static String        Dialog_Export_SubTask_CreatingExportFile;
-   public static String        Dialog_Export_SubTask_Export;
-
-   public static String        Dialog_ExtractTour_DlgArea_Message;
-   public static String        Dialog_ExtractTour_DlgArea_Title;
-   public static String        Dialog_ExtractTour_Label_DeviceName;
-   public static String        Dialog_ExtractTour_Label_SplitMethod;
-
-   public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
-   public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
+   public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
+   public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
+   public static String        Dialog_ModifyTours_Checkbox_CadenceValues;
+   public static String        Dialog_ModifyTours_Checkbox_Calories;
+   public static String        Dialog_ModifyTours_Checkbox_ElevationValues;
+   public static String        Dialog_ModifyTours_Checkbox_GearValues;
+   public static String        Dialog_ModifyTours_Checkbox_PowerAndPulseValues;
+   public static String        Dialog_ModifyTours_Checkbox_PowerAndSpeedValues;
+   public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
+   public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
+   public static String        Dialog_ModifyTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ModifyTours_Checkbox_TourMarkers;
+   public static String        Dialog_ModifyTours_Checkbox_TourTimerPauses;
+   public static String        Dialog_ModifyTours_Checkbox_TrainingValues;
+   public static String        Dialog_ModifyTours_Dialog_ToursAreNotAvailable;
+   public static String        Dialog_ModifyTours_Dialog_ToursAreNotSelected;
+   public static String        Dialog_ModifyTours_Error_2ndDateMustBeLarger;
+   public static String        Dialog_ModifyTours_Radio_AllTours;
+   public static String        Dialog_ModifyTours_Radio_BetweenDates;
+   public static String        Dialog_ModifyTours_Radio_SelectedTours;
 
    public static String        Dialog_ReimportTours_Action_OpenDialog;
    public static String        Dialog_ReimportTours_Button_ReImport;
-   public static String        Dialog_ReimportTours_Checkbox_CadenceValues;
-   public static String        Dialog_ReimportTours_Checkbox_ElevationValues;
    public static String        Dialog_ReimportTours_Checkbox_EntireTour;
-   public static String        Dialog_ReimportTours_Checkbox_GearValues;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation;
    public static String        Dialog_ReimportTours_Checkbox_ImportFileLocation_Tooltip;
-   public static String        Dialog_ReimportTours_Checkbox_PowerAndPulseValues;
-   public static String        Dialog_ReimportTours_Checkbox_PowerAndSpeedValues;
-   public static String        Dialog_ReimportTours_Checkbox_RunningDynamicsValues;
    public static String        Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound;
-   public static String        Dialog_ReimportTours_Checkbox_SwimmingValues;
-   public static String        Dialog_ReimportTours_Checkbox_TemperatureValues;
    public static String        Dialog_ReimportTours_Checkbox_TimeSlices;
-   public static String        Dialog_ReimportTours_Checkbox_TourMarkers;
-   public static String        Dialog_ReimportTours_Checkbox_TourTimerPauses;
-   public static String        Dialog_ReimportTours_Checkbox_TrainingValues;
    public static String        Dialog_ReimportTours_Dialog_ConfirmReimportValues_Message;
    public static String        Dialog_ReimportTours_Dialog_Message;
    public static String        Dialog_ReimportTours_Dialog_Title;
-   public static String        Dialog_ReimportTours_Dialog_ToursAreNotAvailable;
-   public static String        Dialog_ReimportTours_Dialog_ToursAreNotSelected;
-   public static String        Dialog_ReimportTours_Error_2ndDateMustBeLarger;
    public static String        Dialog_ReimportTours_Group_Tours;
    public static String        Dialog_ReimportTours_Group_Tours_Tooltip;
    public static String        Dialog_ReimportTours_Group_Data;
    public static String        Dialog_ReimportTours_Group_Data_Tooltip;
-   public static String        Dialog_ReimportTours_Radio_AllTours;
-   public static String        Dialog_ReimportTours_Radio_BetweenDates;
-   public static String        Dialog_ReimportTours_Radio_SelectedTours;
+
+   public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
+   public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
+
+   public static String        Dialog_DeleteTourValues_Group_Reset;
+   public static String        Dialog_DeleteTourValues_Group_Reset_Label_Info;
+   public static String        Dialog_DeleteTourValues_Group_Reset_Tooltip;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
@@ -483,7 +507,6 @@ public class Messages extends NLS {
    public static String        app_action_open_tour;
    public static String        app_action_quick_edit;
    public static String        app_action_read_edit_tooltip;
-   public static String        app_action_save;
    public static String        app_action_update;
 
    public static String        app_btn_browse;
@@ -585,6 +608,7 @@ public class Messages extends NLS {
    public static String        App_Dialog_FirstStartup_Title;
    public static String        App_Dialog_FirstStartupTip_Message;
    public static String        App_Dialog_FirstStartupTip_Title;
+   public static String        App_Dialog_RestartApp_Title;
 
    public static String        App_Label_BooleanNo;
    public static String        App_Label_BooleanYes;
@@ -762,6 +786,8 @@ public class Messages extends NLS {
    public static String        Db_Field_TourTag_Notes;
 
    public static String        DeviceManager_Selection_device_is_not_selected;
+
+   public static String        Dialog_DeleteData_Title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
@@ -979,7 +1005,7 @@ public class Messages extends NLS {
    public static String        import_data_action_save_tour_for_person;
    public static String        import_data_action_save_tour_with_person;
    public static String        import_data_action_save_tours_for_person;
-   public static String        import_data_dlg_reimport_title;
+   public static String        Dialog_ReimportData_Title;
    public static String        import_data_dlg_save_tour_msg;
    public static String        import_data_dlg_save_tour_title;
    public static String        import_data_importTours_subTask;
@@ -997,36 +1023,29 @@ public class Messages extends NLS {
    public static String        Import_Data_Default_FirstEasyImportLauncher_Description;
    public static String        Import_Data_Default_FirstEasyImportLauncher_Name;
    public static String        Import_Data_Default_ImportConfig_Name;
-   public static String        Import_Data_Text_AltitudeValues;
-   public static String        Import_Data_Text_CadenceValues;
-   public static String        Import_Data_Text_GearValues;
-   public static String        Import_Data_Text_PowerValues;
-   public static String        Import_Data_Text_PulseValues;
-   public static String        Import_Data_Text_RunningDynamicsValues;
-   public static String        Import_Data_Text_SwimmingValues;
-   public static String        Import_Data_Text_SpeedValues;
-   public static String        Import_Data_Text_TemperatureValues;
-   public static String        Import_Data_Text_TimeSlices;
-   public static String        Import_Data_Text_TourMarkers;
-   public static String        Import_Data_Text_TourTimerPauses;
-   public static String        Import_Data_Text_TrainingValues;
-   public static String        Import_Data_Text_EntireTour;
-   public static String        Import_Data_Text_ImportFileLocation;
+
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
+   public static String        Import_Data_Dialog_DeleteTourValues_Task;
+
+   public static String        Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
+   public static String        Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message;
+   public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
+   public static String        Import_Data_Dialog_EasyImport_Title;
    public static String        Import_Data_Dialog_GetAlternativePath_Message;
    public static String        Import_Data_Dialog_GetReimportedFilePath_Message;
+   public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Message;
+   public static String        Import_Data_Dialog_IsCancelTourValuesDeletion_Title;
+   public static String        Import_Data_Dialog_IsCancelReImport_Message;
+   public static String        Import_Data_Dialog_IsCancelReImport_Title;
+   public static String        Import_Data_Dialog_NoActivePersion_Message;
    public static String        Import_Data_Dialog_Reimport_SubTask;
    public static String        Import_Data_Dialog_Reimport_Task;
    public static String        Import_Data_Dialog_Reimport_Title;
    public static String        Import_Data_Dialog_ReimportFile_Title;
    public static String        Import_Data_Error_CreatingFileName_Message;
    public static String        Import_Data_Error_CreatingFileName_Title;
-   public static String        Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
-   public static String        Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message;
-   public static String        Import_Data_Dialog_EasyImport_Title;
-   public static String        Import_Data_Dialog_NoActivePersion_Message;
    public static String        Import_Data_HTML_AcquireDeviceInfo;
    public static String        Import_Data_HTML_Action_OldUI;
    public static String        Import_Data_HTML_Action_OldUI_Tooltip;
@@ -1068,10 +1087,9 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_WatchingIsOff;
    public static String        Import_Data_HTML_WatchingOff;
    public static String        Import_Data_HTML_WatchingOn;
-   public static String        Import_Data_Dialog_EasyImport_NoImportFiles_Message;
-   public static String        Import_Data_Dialog_IsCancelReImport_Message;
-   public static String        Import_Data_Dialog_IsCancelReImport_Title;
+
    public static String        Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
+   public static String        Import_Data_Log_ReimportIsInvalid_TourNotFoundInFile_Message;
    public static String        Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
    public static String        Import_Data_Monitor_Backup;
    public static String        Import_Data_Monitor_Backup_SubTask;
@@ -1079,6 +1097,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Monitor_DeleteTourFiles_Subtask;
    public static String        Import_Data_Task_CloseDeviceInfo;
    public static String        Import_Data_Task_CloseDeviceInfo_CannotClose;
+
    public static String        Import_Data_TourTypeConfig_BySpeed;
    public static String        Import_Data_TourTypeConfig_OneForAll;
    public static String        Import_Data_OldUI_Label_Hint;
@@ -1117,6 +1136,9 @@ public class Messages extends NLS {
    public static String        Log_ComputeCadenceZonesTimes_010_Success;
    public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
+   public static String        Log_Delete_Text;
+   public static String        Log_Delete_TourValues_End;
+
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
    public static String        Log_EasyImport_001_Copy;
@@ -1138,12 +1160,14 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour_End;
    public static String        Log_Import_Tour_Imported;
    public static String        Log_Import_Tours_Imported_From_File;
-   public static String        Log_Import_Tour_Old_Data_Vs_New_Data;
 
-   public static String        Log_Reimport_Combined_Values;
+   public static String        Log_ModifiedTour_Old_Data_Vs_New_Data;
+   public static String        Log_ModifiedTour_Combined_Values;
+
    public static String        Log_Reimport_ManualTour;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
+   public static String        Log_Reimport_Text;
    public static String        Log_Reimport_Tour_Skipped;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_Auto;
    public static String        Log_Reimport_Tour_Skipped_FileLocationDialog_ByUser;
@@ -1317,12 +1341,16 @@ public class Messages extends NLS {
    public static String        Pref_Appearance_Check_TaggingAnimation;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
    public static String        Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
+   public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Message;
+   public static String        Pref_Appearance_Dialog_RestartAfterThemeChange_Title;
    public static String        Pref_Appearance_Group_PaceAndSpeedDisplay;
    public static String        Pref_Appearance_Group_Tagging;
+   public static String        Pref_Appearance_Group_Theme;
    public static String        Pref_Appearance_Label_AutoOpenTagging_Tooltip;
    public static String        Pref_Appearance_Label_AutoOpenTaggingDelay;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption;
    public static String        Pref_Appearance_Label_PaceAndSpeed_ComputationOption_Tooltip;
+   public static String        Pref_Appearance_Label_Theme;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes;
    public static String        Pref_Appearance_NumberOfRecent_TourTypes_Tooltip;
    public static String        Pref_Appearance_Radio_UseRecordedTime;
@@ -2058,8 +2086,8 @@ public class Messages extends NLS {
 
    public static String Slideout_TourChartOptions_Check_InvertPaceGraph;
    public static String Slideout_TourChartOptions_Check_InvertPaceGraph_Tooltip;
-   public static String Slideout_TourChartOptions_Label_NightSectionsOpacity;
-   public static String Slideout_TourChartOptions_Label_NightSectionsOpacity_Tooltip;
+   public static String Slideout_TourChartOptions_Check_NightSectionsOpacity;
+   public static String Slideout_TourChartOptions_Check_NightSectionsOpacity_Tooltip;
    public static String Slideout_TourChartOptions_Label_PulseGraph;
    public static String Slideout_TourChartOptions_Label_Title;
 
@@ -2175,6 +2203,10 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String Slideout_TrainingOptions_Label_Title;
+
+   public static String SRTM_Download_Dialog_SRTMDownloadValidation_Title;
+   public static String SRTM_Download_Info_NoDownloadValidation;
+   public static String SRTM_Download_Info_UsernamePasswordIsEmpty;
 
    public static String Tag_Manager_Action_DeleteCategory;
    public static String Tag_Manager_Action_DeleteTag;
@@ -2327,6 +2359,24 @@ public class Messages extends NLS {
    public static String Tour_Data_LoadTourData_Monitor_SubTask;
    public static String Tour_Data_SaveTour_Monitor;
    public static String Tour_Data_SaveTour_MonitorSubtask;
+
+   public static String Tour_Data_Text_AltitudeValues;
+   public static String Tour_Data_Text_CadenceValues;
+   public static String Tour_Data_Text_Calories;
+   public static String Tour_Data_Text_GearValues;
+   public static String Tour_Data_Text_PowerValues;
+   public static String Tour_Data_Text_PulseValues;
+   public static String Tour_Data_Text_RunningDynamicsValues;
+   public static String Tour_Data_Text_SwimmingValues;
+   public static String Tour_Data_Text_SpeedValues;
+   public static String Tour_Data_Text_TemperatureValues;
+   public static String Tour_Data_Text_TimeSlices;
+   public static String Tour_Data_Text_Time;
+   public static String Tour_Data_Text_TourMarkers;
+   public static String Tour_Data_Text_TourTimerPauses;
+   public static String Tour_Data_Text_TrainingValues;
+   public static String Tour_Data_Text_EntireTour;
+   public static String Tour_Data_Text_ImportFileLocation;
 
    public static String Tour_Database_CannotConnectToDerbyServer_Message;
    public static String Tour_Database_CannotConnectToDerbyServer_Title;

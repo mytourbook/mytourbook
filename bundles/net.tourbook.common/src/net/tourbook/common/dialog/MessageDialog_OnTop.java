@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,18 +21,20 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Customized {@link MessageDialog} which can be set on top of other windows. This is needed when
- * the message dialog is opened in a slideout to ensure that it is not hidden.
+ * Customized {@link MessageDialog} which is displayed on top of other windows.
+ * <p>
+ * For LINUX it is necessary to display a message dialog in a slideout on top, otherwise it is
+ * displayed behind the slideout !
  */
-public class MessageDialog_Customized extends MessageDialog {
+public class MessageDialog_OnTop extends MessageDialog {
 
-   public MessageDialog_Customized(final Shell parentShell,
-                                   final String dialogTitle,
-                                   final Image dialogTitleImage,
-                                   final String dialogMessage,
-                                   final int dialogImageType,
-                                   final int defaultIndex,
-                                   final String... dialogButtonLabels) {
+   public MessageDialog_OnTop(final Shell parentShell,
+                              final String dialogTitle,
+                              final Image dialogTitleImage,
+                              final String dialogMessage,
+                              final int dialogImageType,
+                              final int defaultIndex,
+                              final String... dialogButtonLabels) {
 
       super(parentShell, dialogTitle, dialogTitleImage, dialogMessage, dialogImageType, defaultIndex, dialogButtonLabels);
    }
@@ -42,7 +44,7 @@ public class MessageDialog_Customized extends MessageDialog {
     *
     * @return
     */
-   public MessageDialog_Customized withStyleOnTop() {
+   public MessageDialog_OnTop withStyleOnTop() {
 
       setShellStyle(getShellStyle() | SWT.ON_TOP);
 

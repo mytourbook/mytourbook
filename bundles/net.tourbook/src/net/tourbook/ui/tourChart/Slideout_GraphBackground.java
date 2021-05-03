@@ -34,14 +34,12 @@ import net.tourbook.preferences.PrefPage_Appearance_Swimming;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -79,12 +77,9 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
          }
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
 
       _keepOpenListener = new FocusListener() {
@@ -120,8 +115,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    public Slideout_GraphBackground(final Control ownerControl,
                                    final ToolBar toolBar,
-                                   final TourChart tourChart,
-                                   final IDialogSettings state) {
+                                   final TourChart tourChart) {
 
       super(ownerControl, toolBar);
 
@@ -281,14 +275,17 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
          label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
 
          /*
-          * spinner: graph filling transparence
+          * spinner: graph filling transparency
           */
          _spinnerGraphTransparencyFilling = new Spinner(parent, SWT.BORDER);
          GridDataFactory.fillDefaults() //
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_spinnerGraphTransparencyFilling);
-         _spinnerGraphTransparencyFilling.setMinimum(0x00);
-         _spinnerGraphTransparencyFilling.setMaximum(0xff);
+         _spinnerGraphTransparencyFilling.setMinimum(0);
+         _spinnerGraphTransparencyFilling.setMaximum(100);
+         _spinnerGraphTransparencyFilling.setIncrement(1);
+         _spinnerGraphTransparencyFilling.setPageIncrement(10);
+         _spinnerGraphTransparencyFilling.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparency_Tooltip);
          _spinnerGraphTransparencyFilling.addMouseWheelListener(_defaultMouseWheelListener);
          _spinnerGraphTransparencyFilling.addSelectionListener(_defaultSelectionListener);
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1810,7 +1810,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final String transferPath = _rawDataPathEditor.getStringValue().trim();
 
-         if (!StringUtils.isNullOrEmpty(transferPath) && Util.isDirectory(transferPath) == false) {
+         if (StringUtils.hasContent(transferPath) && Util.isDirectory(transferPath) == false) {
 
             setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 

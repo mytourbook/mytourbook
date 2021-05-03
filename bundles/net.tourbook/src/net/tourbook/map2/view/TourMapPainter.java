@@ -64,7 +64,7 @@ import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap2Appearance;
+import net.tourbook.preferences.PrefPage_Map2_Appearance;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
 import org.eclipse.core.runtime.Assert;
@@ -822,8 +822,8 @@ public class TourMapPainter extends MapPainter {
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
-      _prefIsDrawLine = drawSymbol.equals(PrefPageMap2Appearance.PLOT_TYPE_LINE);
-      _prefIsDrawSquare = drawSymbol.equals(PrefPageMap2Appearance.PLOT_TYPE_SQUARE);
+      _prefIsDrawLine = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_LINE);
+      _prefIsDrawSquare = drawSymbol.equals(PrefPage_Map2_Appearance.PLOT_TYPE_SQUARE);
 
       _prefLineWidth = _prefStore.getInt(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH);
       _prefIsWithBorder = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER);
@@ -2417,7 +2417,7 @@ public class TourMapPainter extends MapPainter {
       /*
        * Get border color
        */
-      if (isBorder && _prefBorderType == PrefPageMap2Appearance.BORDER_TYPE_COLOR) {
+      if (isBorder && _prefBorderType == PrefPage_Map2_Appearance.BORDER_TYPE_COLOR) {
          return _colorCache.getColor(_prefBorderRGB);
       }
 

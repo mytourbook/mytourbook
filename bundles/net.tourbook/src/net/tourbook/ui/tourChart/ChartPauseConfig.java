@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2021 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,9 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChartPauseConfig {
 
-	public final ArrayList<ChartLabel>	chartLabels	= new ArrayList<>();
+   public final List<ChartLabel> chartLabels = new ArrayList<>();
 }

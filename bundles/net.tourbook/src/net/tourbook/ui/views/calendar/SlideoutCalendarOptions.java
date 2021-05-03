@@ -22,7 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.dialog.MessageDialog_Customized;
+import net.tourbook.common.dialog.MessageDialog_OnTop;
 import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.FormatManager;
@@ -3601,7 +3601,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
       setIsKeepOpenInternally(true);
       boolean isDeleteProfile = false;
       {
-         MessageDialog_Customized dialog = new MessageDialog_Customized(
+         MessageDialog_OnTop dialog = new MessageDialog_OnTop(
 
                getToolTipShell(),
 
