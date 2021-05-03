@@ -27,6 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -58,17 +59,19 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private static final String PREFPAGE_CLOUDCONNECTIVITY_LABEL_WEBPAGE      = net.tourbook.cloud.Messages.PrefPage_CloudConnectivity_Label_WebPage;
    //SET_FORMATTING_ON
 
-   public static final String      ID            = "net.tourbook.cloud.PrefPageStrava";        //$NON-NLS-1$
-   public static final int         CALLBACK_PORT = 4918;
+   public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
+   public static final int         CALLBACK_PORT       = 4918;
 
-   public static final String      ClientId      = "55536";                                    //$NON-NLS-1$
+   public static final String      ClientId            = "55536";                                                                     //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore        _prefStore          = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
 
    private String                  _athleteId;
    private long                    _accessTokenExpiresAt;
+
+   private Image                   _imageStravaConnect = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
 
    /*
     * UI controls
@@ -156,8 +159,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          // No variations or modifications are acceptable."
 
          final Button buttonConnect = new Button(container, SWT.NONE);
-         final Image imageConnect = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
-         buttonConnect.setImage(imageConnect);
+         buttonConnect.setImage(_imageStravaConnect);
          buttonConnect.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -240,6 +242,14 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
       }
+   }
+
+   @Override
+   public void dispose() {
+
+      Util.disposeResource(_imageStravaConnect);
+
+      super.dispose();
    }
 
    private String getLocalExpireAtDateTime() {
