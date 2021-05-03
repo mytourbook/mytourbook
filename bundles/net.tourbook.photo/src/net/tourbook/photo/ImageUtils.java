@@ -95,12 +95,18 @@ public class ImageUtils {
    public static Image decodeStringToImage(final String imageString) {
 
       Image image = null;
+      Image scaled050 = null;
       try (final InputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(imageString))) {
+
+         //TODO FB
+         //When uploading the image to the DB, we will limit the size
          image = new Image(Display.getCurrent(), inputStream);
+         scaled050 = new Image(Display.getCurrent(),
+               image.getImageData().scaledTo(70, 70));
       } catch (final IOException e) {
          e.printStackTrace();
       }
-      return image;
+      return scaled050;
    }
 
    /**
