@@ -42,6 +42,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
@@ -1030,7 +1031,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
             } else {
 
-               cell.setImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
+               cell.setImage(ImageUtils.decodeStringToImage(""));
             }
          }
       });
