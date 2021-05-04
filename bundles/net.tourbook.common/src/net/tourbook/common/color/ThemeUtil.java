@@ -18,6 +18,7 @@ package net.tourbook.common.color;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -29,6 +30,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
+
+   /**
+    * Currently only .png files are supported for themed images !!!
+    */
+   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";
+
+   /**
+    * All images for the dark theme should have this postfix.
+    */
+   private static final String DARK_THEME_POSTFIX       = "-dark"; //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -97,6 +108,27 @@ public class ThemeUtil {
       setupTheme();
 
       return _themeEngine;
+   }
+
+   /**
+    * @param imageName
+    * @return Returns the themed image name. The postfix {@value CommonImages#DARK_THEME_POSTFIX} is
+    *         appended to
+    *         the image name when the dark theme image name is returned.
+    */
+   public static String getThemeImageName(final String imageName) {
+
+      String imageNameThemed;
+
+      if (UI.isDarkTheme()) {
+
+         imageNameThemed = imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
+
+      } else {
+         imageNameThemed = imageName;
+      }
+
+      return imageNameThemed;
    }
 
    /**

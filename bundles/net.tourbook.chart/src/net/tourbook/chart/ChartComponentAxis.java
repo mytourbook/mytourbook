@@ -89,17 +89,7 @@ public class ChartComponentAxis extends Canvas {
 
    ChartComponentAxis(final Chart chart, final Composite parent, final int style) {
 
-//      super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
-      super(parent, SWT.DOUBLE_BUFFERED);
-
-//      parent.setBackgroundMode(SWT.INHERIT_FORCE);
-      parent.setBackgroundMode(SWT.INHERIT_DEFAULT);
-
-//      setData("org.eclipse.e4.ui.css.CssClassName", "Canvas");
-//      setData("org.eclipse.e4.ui.css.CssClassName", "container");
-      setData("org.eclipse.e4.ui.css.CssClassName", "Composite");
-
-//      engine.applyStyles(p, true); // Apply the CSS-Instructions of the current active theme
+      super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
       _chart = chart;
 

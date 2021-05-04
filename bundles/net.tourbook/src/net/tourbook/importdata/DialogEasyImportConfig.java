@@ -23,12 +23,14 @@ import java.util.HashMap;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -603,7 +605,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _imageAppOptions = TourbookPlugin.getImageDescriptor(CommonImages.getThemeImage(CommonImages.App_Options)).createImage();
+      _imageAppOptions = CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)).createImage();
       setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);

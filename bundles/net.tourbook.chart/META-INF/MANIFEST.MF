@@ -14,7 +14,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: gnu.trove.list.array,
- javax.inject,
  net.tourbook.common,
  net.tourbook.common.form,
  net.tourbook.common.util,

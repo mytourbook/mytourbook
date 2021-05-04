@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.Assert;
@@ -80,7 +81,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    public ActionToolbarSlideout() {
 
-      _imageEnabled = CommonActivator.getImageDescriptor(CommonImages.getThemeImage(CommonImages.TourOptions)).createImage();
+      _imageEnabled = CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.TourOptions)).createImage();
       _imageDisabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 
