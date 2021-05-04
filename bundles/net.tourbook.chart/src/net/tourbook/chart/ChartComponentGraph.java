@@ -1546,13 +1546,7 @@ public class ChartComponentGraph extends Canvas {
          _chartImage_10_Graphs = Util.createImage(getDisplay(), _chartImage_10_Graphs, graphImageRect);
       }
 
-      _backgroundColor = UI.isDarkTheme()
-            ? _chart.getBackground() // this is the theme background color
-            : _chart.getBackgroundColor();
-
-      _foregroundColor = UI.isDarkTheme()
-            ? _chart.getForeground() // this is the theme foreground color
-            : _chart.getBackgroundColor();
+      setupColors();
 
       // create chart context
       final GC gcChart = new GC(_chartImage_20_Chart);
@@ -5273,6 +5267,9 @@ public class ChartComponentGraph extends Canvas {
       if (_allGraphDrawingData == null || _allGraphDrawingData.isEmpty()) {
 
          // fill the image area when there is no graphic
+         if (_backgroundColor == null) {
+            setupColors();
+         }
          gc.setBackground(_backgroundColor);
          gc.fillRectangle(_clientArea);
 
@@ -9028,6 +9025,17 @@ public class ChartComponentGraph extends Canvas {
       _isSelectionVisible = isSelectionVisible;
 
       redrawSelection();
+   }
+
+   private void setupColors() {
+
+      _backgroundColor = UI.isDarkTheme()
+            ? _chart.getBackground() // this is the theme background color
+            : _chart.getBackgroundColor();
+
+      _foregroundColor = UI.isDarkTheme()
+            ? _chart.getForeground() // this is the theme foreground color
+            : _chart.getBackgroundColor();
    }
 
    void setXSliderAreaVisible(final boolean isXSliderAreaVisible) {

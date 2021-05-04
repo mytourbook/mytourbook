@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonImages;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -34,7 +35,7 @@ public class ActionTourChartPauses extends Action {
 
       _tourChart = tourChart;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(CommonImages.getThemeImage(Images.TourPauses)));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourPauses_Disabled));
    }
 

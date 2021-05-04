@@ -43,13 +43,13 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -854,7 +854,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       _actionMap3Color = new ActionMap3Color();
       _actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID, _graphId);
-      _actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options));
+      _actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(CommonImages.getThemeImage(CommonImages.App_Options)));
 
       _actionMapBookmarks = new ActionMapBookmarks(_parent, this);
       _actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);

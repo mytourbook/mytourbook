@@ -1,4 +1,5 @@
 package net.tourbook.common.color;
+
 /*******************************************************************************
  * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
@@ -98,28 +99,6 @@ public class ThemeUtil {
       return _themeEngine;
    }
 
-   public static final void setupTheme() {
-
-      if (_themeEngine != null) {
-         return;
-      }
-
-      final MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
-      final IEclipseContext context = application.getContext();
-
-      _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
-
-      final ITheme activeTheme = _themeEngine.getActiveTheme();
-      if (activeTheme != null) {
-
-         final boolean isDarkThemeSelected = E4_DARK_THEME_ID.equals(activeTheme.getId());
-
-         setWinDarkThemeHack(isDarkThemeSelected);
-
-         UI.setIsDarkTheme(isDarkThemeSelected);
-      }
-   }
-
    /**
     * W10 do not set all controls into a dark mode, e.g. menu bar
     * <p>
@@ -139,41 +118,63 @@ public class ThemeUtil {
     * @param isDarkTheme
     *           <code>true</code> for dark theme
     */
-   public static final void setWinDarkThemeHack(final boolean isDarkTheme) {
+   public static final void setDarkTheme(final boolean isDarkTheme) {
 
-      if (!UI.IS_WIN) {
+      UI.setIsDarkTheme(isDarkTheme);
+
+      if (UI.IS_WIN) {
 
          // this hack is only for windows
 
-         return;
-      }
-
-      final Display display = Display.getDefault();
+         final Display display = Display.getDefault();
 
 // SET_FORMATTING_OFF
 
-      final Color menuBarForegroundColor        = new Color(0xD0, 0xD0, 0xD0);
-      final Color menuBarBackgroundColor        = new Color(0x30, 0x30, 0x30);
-      final Color menuBarBorderColor            = new Color(0x50, 0x50, 0x50);
+         // menu colors
+         final Color menuBarForegroundColor        = new Color(0xD0, 0xD0, 0xD0);
+         final Color menuBarBackgroundColor        = new Color(0x30, 0x30, 0x30);
+         final Color menuBarBorderColor            = new Color(0x50, 0x50, 0x50);
 
-      // table header color: 38 3D 3F
-      final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
-      final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
+         // table header color: 38 3D 3F
+         final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
+         final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
 
-      display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
 
 // SET_FORMATTING_ON
+
+      }
+   }
+
+   public static final void setupTheme() {
+
+      if (_themeEngine != null) {
+         return;
+      }
+
+      final MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
+      final IEclipseContext context = application.getContext();
+
+      _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
+
+      final ITheme activeTheme = _themeEngine.getActiveTheme();
+      if (activeTheme != null) {
+
+         final boolean isDarkThemeSelected = E4_DARK_THEME_ID.equals(activeTheme.getId());
+
+         setDarkTheme(isDarkThemeSelected);
+      }
    }
 }

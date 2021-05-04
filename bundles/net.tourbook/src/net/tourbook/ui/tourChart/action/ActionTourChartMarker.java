@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart.action;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.ui.tourChart.SlideoutTourChartMarker;
@@ -62,7 +63,7 @@ public class ActionTourChartMarker extends ContributionItem implements IOpeningD
       _tourChart = tourChart;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
+      _imageEnabled = TourbookPlugin.getImageDescriptor(CommonImages.getThemeImage(Images.TourMarker)).createImage();
       _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
    }
 

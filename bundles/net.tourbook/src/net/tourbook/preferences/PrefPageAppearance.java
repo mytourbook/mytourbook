@@ -402,7 +402,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          final boolean isDarkThemeSelected = ThemeUtil.E4_DARK_THEME_ID.equals(selectedTheme.getId());
 
-         ThemeUtil.setWinDarkThemeHack(isDarkThemeSelected);
+         ThemeUtil.setDarkTheme(isDarkThemeSelected);
 
          // set theme but do not save it in the pref store (2nd parameter)
          _themeEngine.setTheme(selectedTheme, false);
