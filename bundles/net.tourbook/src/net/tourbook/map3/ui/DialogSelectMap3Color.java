@@ -20,6 +20,8 @@ import java.util.HashMap;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
 import net.tourbook.common.color.Map3ColorProfile;
@@ -29,6 +31,7 @@ import net.tourbook.common.color.Map3ProfileComparator;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.TourMapPainter;
@@ -291,7 +294,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditAllColors();
          }
       };
-      _actionEditAllColors.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Options_Bright));
+      _actionEditAllColors.setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)));
       _actionEditAllColors.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditAllColors);
    }
 

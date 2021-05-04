@@ -1,3 +1,5 @@
+package net.tourbook.common.color;
+
 /*******************************************************************************
  * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
@@ -13,11 +15,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.application;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -29,6 +30,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
+
+   /**
+    * Currently only .png files are supported for themed images !!!
+    */
+   private static final String IMAGE_NAME_EXTENSION_PNG = ".png";
+
+   /**
+    * All images for the dark theme should have this postfix.
+    */
+   private static final String DARK_THEME_POSTFIX       = "-dark"; //$NON-NLS-1$
 
    /*
     * Copied from org.eclipse.e4.ui.internal.workbench.swt.E4Application
@@ -92,26 +103,32 @@ public class ThemeUtil {
       return allThemes;
    }
 
-   public static final void setupTheme() {
+   public static IThemeEngine getThemeEngine() {
 
-      if (_themeEngine != null) {
-         return;
+      setupTheme();
+
+      return _themeEngine;
+   }
+
+   /**
+    * @param imageName
+    * @return Returns the themed image name. The postfix {@value CommonImages#DARK_THEME_POSTFIX} is
+    *         appended to
+    *         the image name when the dark theme image name is returned.
+    */
+   public static String getThemeImageName(final String imageName) {
+
+      String imageNameThemed;
+
+      if (UI.isDarkTheme()) {
+
+         imageNameThemed = imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
+
+      } else {
+         imageNameThemed = imageName;
       }
 
-      final MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
-      final IEclipseContext context = application.getContext();
-
-      _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
-
-      final ITheme activeTheme = _themeEngine.getActiveTheme();
-      if (activeTheme != null) {
-
-         final boolean isDarkThemeSelected = E4_DARK_THEME_ID.equals(activeTheme.getId());
-
-         setWinDarkThemeHack(isDarkThemeSelected);
-
-         UI.setIsDarkTheme(isDarkThemeSelected);
-      }
+      return imageNameThemed;
    }
 
    /**
@@ -133,41 +150,63 @@ public class ThemeUtil {
     * @param isDarkTheme
     *           <code>true</code> for dark theme
     */
-   public static final void setWinDarkThemeHack(final boolean isDarkTheme) {
+   public static final void setDarkTheme(final boolean isDarkTheme) {
 
-      if (!UI.IS_WIN) {
+      UI.setIsDarkTheme(isDarkTheme);
+
+      if (UI.IS_WIN) {
 
          // this hack is only for windows
 
-         return;
-      }
-
-      final Display display = Display.getDefault();
+         final Display display = Display.getDefault();
 
 // SET_FORMATTING_OFF
 
-      final Color menuBarForegroundColor        = new Color(0xD0, 0xD0, 0xD0);
-      final Color menuBarBackgroundColor        = new Color(0x30, 0x30, 0x30);
-      final Color menuBarBorderColor            = new Color(0x50, 0x50, 0x50);
+         // menu colors
+         final Color menuBarForegroundColor        = new Color(0xD0, 0xD0, 0xD0);
+         final Color menuBarBackgroundColor        = new Color(0x30, 0x30, 0x30);
+         final Color menuBarBorderColor            = new Color(0x50, 0x50, 0x50);
 
-      // table header color: 38 3D 3F
-      final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
-      final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
+         // table header color: 38 3D 3F
+         final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
+         final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
 
-      display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
-      display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
-      display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.menuBarBackgroundColor",         isDarkTheme ? menuBarBackgroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.menuBarBorderColor",             isDarkTheme ? menuBarBorderColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Canvas.use_WS_BORDER",           isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.List.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Table.use_WS_BORDER",            isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);
+         display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);
+         display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);
 
 // SET_FORMATTING_ON
+
+      }
+   }
+
+   public static final void setupTheme() {
+
+      if (_themeEngine != null) {
+         return;
+      }
+
+      final MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
+      final IEclipseContext context = application.getContext();
+
+      _themeEngine = context.get(org.eclipse.e4.ui.css.swt.theme.IThemeEngine.class);
+
+      final ITheme activeTheme = _themeEngine.getActiveTheme();
+      if (activeTheme != null) {
+
+         final boolean isDarkThemeSelected = E4_DARK_THEME_ID.equals(activeTheme.getId());
+
+         setDarkTheme(isDarkThemeSelected);
+      }
    }
 }

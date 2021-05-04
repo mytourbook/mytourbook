@@ -54,8 +54,6 @@ public class Images {
    public static final String App_Navigate_Next                         = "backward_nav.gif";                                //$NON-NLS-1$
    public static final String App_Navigate_Previous                     = "forward_nav.gif";                                 //$NON-NLS-1$
    public static final String App_OK                                    = "16px-Crystal_Clear_action_apply.png";             //$NON-NLS-1$
-   public static final String App_Options                               = "options.png";                                     //$NON-NLS-1$
-   public static final String App_Options_Bright                        = "options-bright.png";                              //$NON-NLS-1$
    public static final String App_Paste                                 = "paste_edit.png";                                  //$NON-NLS-1$
    public static final String App_Placeholder16                         = "placeholder16.png";                               //$NON-NLS-1$
    public static final String App_Refresh                               = "refresh.png";                                     //$NON-NLS-1$
@@ -309,8 +307,6 @@ public class Images {
    public static final String TourMarker_Disabled                       = "tour-marker-disabled.png";                        //$NON-NLS-1$
    public static final String TourMarker_New                            = "tour-marker-new.png";                             //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                   = "tour-marker-new-disabled.png";                    //$NON-NLS-1$
-   public static final String TourOptions                               = "tour-options.png";                                //$NON-NLS-1$
-   public static final String TourOptions_Disabled                      = "tour-options-disabled.png";                       //$NON-NLS-1$
    public static final String TourPauses                                = "tour-pauses.png";                                 //$NON-NLS-1$
    public static final String TourPauses_Disabled                       = "tour-pauses-disabled.png";                        //$NON-NLS-1$
    public static final String TourSegments                              = "tour-segments.png";                               //$NON-NLS-1$

@@ -66,7 +66,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
@@ -112,6 +111,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
    private FormToolkit             _tk;
 
+//   @Inject
+//   private IThemeManager           manager;
+//
+//   @Inject
+//   private IThemeEngine            engine;
    /*
     * UI controls
     */
@@ -869,26 +873,23 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
          _pageBook.showPage(_pageNoData);
 
          // a tour is not displayed, find a tour provider which provides a tour
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         _pageBook.getDisplay().asyncExec(() -> {
 
-               // validate widget
-               if (_pageBook.isDisposed()) {
-                  return;
-               }
+            // validate widget
+            if (_pageBook.isDisposed()) {
+               return;
+            }
 
-               /*
-                * check if tour was set from a selection provider
-                */
-               if (_tourData != null) {
-                  return;
-               }
+            /*
+             * check if tour was set from a selection provider
+             */
+            if (_tourData != null) {
+               return;
+            }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if (selectedTours != null && selectedTours.size() > 0) {
-                  updateChart(selectedTours.get(0));
-               }
+            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            if (selectedTours != null && selectedTours.size() > 0) {
+               updateChart(selectedTours.get(0));
             }
          });
       }
