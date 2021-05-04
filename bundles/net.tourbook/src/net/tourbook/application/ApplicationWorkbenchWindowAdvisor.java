@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.DialogSelectMeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
