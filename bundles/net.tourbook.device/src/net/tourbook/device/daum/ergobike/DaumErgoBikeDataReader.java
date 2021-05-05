@@ -47,8 +47,9 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
    private DecimalFormat       _decimalFormat        = (DecimalFormat) DecimalFormat.getInstance();
 
-   // plugin constructor
-   public DaumErgoBikeDataReader() {}
+   public DaumErgoBikeDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

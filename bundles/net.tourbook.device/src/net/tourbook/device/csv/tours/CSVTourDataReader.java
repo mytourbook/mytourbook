@@ -87,8 +87,9 @@ public class CSVTourDataReader extends TourbookDevice {
       public int minute;
    }
 
-   // plugin constructor
-   public CSVTourDataReader() {}
+   public CSVTourDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -405,27 +406,17 @@ public class CSVTourDataReader extends TourbookDevice {
 
                // fire modify event
 
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
-                  }
-               });
+               Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
             }
 
             if (isNewTourType) {
 
                // fire modify event
 
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     TourbookPlugin
-                           .getDefault()
-                           .getPreferenceStore()
-                           .setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-                  }
-               });
+               Display.getDefault().syncExec(() -> TourbookPlugin
+                     .getDefault()
+                     .getPreferenceStore()
+                     .setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
             }
 
          } catch (final Exception e) {

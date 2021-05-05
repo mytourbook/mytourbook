@@ -698,11 +698,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
     */
    private boolean verifyReferenceConsitency(final RandomAccessFile file, final int offsetDDRecord) throws IOException {
       final byte[] buffer = new byte[5];
-      String recordType = UI.EMPTY_STRING;
 
       file.seek(offsetDDRecord);
       file.read(buffer);
-      recordType = new String(buffer, 2, 2);
+      String recordType = new String(buffer, 2, 2);
 
       // make sure we read a DD record
       if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$

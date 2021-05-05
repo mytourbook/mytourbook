@@ -63,8 +63,9 @@ public class HAC5DeviceDataReader extends TourbookDevice {
       public int minute;
    }
 
-   // plugin constructor
-   public HAC5DeviceDataReader() {}
+   public HAC5DeviceDataReader() {
+      // plugin constructor
+   }
 
    /**
     * Adjust the offset for the DD record so it's within the tour data area

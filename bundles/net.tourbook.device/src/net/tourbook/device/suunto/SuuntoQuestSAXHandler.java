@@ -490,7 +490,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     * @param tourStartTime
     *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
     */
-   private void finalizeSamples(final ZonedDateTime tourStartTime) {
+   private void finalizeSamples() {
 
       //Inserting
       int relativeTime = 0;
@@ -555,7 +555,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             TimeTools.UTC);
       tourData.setTourStartTime(tourStartTime);
 
-      finalizeSamples(tourStartTime);
+      finalizeSamples();
 
       assignAdditionalData(tourData);
 

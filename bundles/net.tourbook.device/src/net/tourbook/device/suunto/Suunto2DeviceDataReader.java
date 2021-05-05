@@ -44,8 +44,9 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    private static final String SUUNTO_TAG_HEADER            = "<header>";             //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES           = "<samples>";            //$NON-NLS-1$
 
-   // plugin constructor
-   public Suunto2DeviceDataReader() {}
+   public Suunto2DeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

@@ -31,8 +31,9 @@ public class GarminDeviceDataReader extends TourbookDevice {
 
    private static final String XML_GARMIN_TAG = "<TrainingCenterDatabase"; //$NON-NLS-1$
 
-   // plugin constructor
-   public GarminDeviceDataReader() {}
+   public GarminDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

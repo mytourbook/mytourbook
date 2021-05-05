@@ -38,7 +38,9 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    private static final String MOVESCOUNT_TAG     = "<movescount";    //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES = "<samples>";      //$NON-NLS-1$
 
-   public SuuntoQuestDeviceDataReader() {}
+   public SuuntoQuestDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

@@ -43,8 +43,9 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
    private static final String XML_GPX_TAG = "<gpx"; //$NON-NLS-1$
 
-   // plugin constructor
-   public GPXDeviceDataReader() {}
+   public GPXDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -204,12 +205,7 @@ public class GPXDeviceDataReader extends TourbookDevice {
          //
          ;
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-               MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString()); //$NON-NLS-1$
-            }
-         });
+         Display.getDefault().syncExec(() -> MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", sb.toString()));
 
          TourLogManager.logEx(e);
 

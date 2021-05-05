@@ -62,15 +62,16 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
       public int minute;
    }
 
-   // plugin constructor
-   public HAC4ProDeviceDataReader() {}
+   public HAC4ProDeviceDataReader() {
+      // plugin constructor
+   }
 
    /**
     * @param timeData
     * @param rawData
     * @throws IOException
     */
-   public static void readTimeSlice(final int data, final TimeData timeData) throws IOException {
+   public static void readTimeSlice(final int data, final TimeData timeData) {
 
       // pulse (4 bits)
       if ((data & 0x8000) != 0) {

@@ -28,8 +28,9 @@ public class Suunto3_DeviceDataReader extends TourbookDevice {
 
    private static final String SUUNTO_XML_TAG = "<sml"; //$NON-NLS-1$
 
-   // plugin constructor
-   public Suunto3_DeviceDataReader() {}
+   public Suunto3_DeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

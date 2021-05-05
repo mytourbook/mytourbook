@@ -92,8 +92,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       private int           sport;
    }
 
-   // plugin constructor
-   public Polar_PDD_DataReader() {}
+   public Polar_PDD_DataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

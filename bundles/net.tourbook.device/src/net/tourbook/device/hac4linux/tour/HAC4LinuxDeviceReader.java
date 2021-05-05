@@ -59,7 +59,9 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
    /**
     * The box standard constructor
     */
-   public HAC4LinuxDeviceReader() {}
+   public HAC4LinuxDeviceReader() {
+      // plugin constructor
+   }
 
    /*
     * (non-Javadoc)

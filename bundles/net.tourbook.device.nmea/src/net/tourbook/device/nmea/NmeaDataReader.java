@@ -54,7 +54,9 @@ public class NmeaDataReader extends TourbookDevice {
    private Map<Long, TourData>   _alreadyImportedTours;
    private Map<Long, TourData>   _newlyImportedTours;
 
-   public NmeaDataReader() {}
+   public NmeaDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

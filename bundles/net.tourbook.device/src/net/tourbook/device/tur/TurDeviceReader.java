@@ -44,10 +44,9 @@ public class TurDeviceReader extends TourbookDevice {
 
    private final int MAX_INT = 0x10000;
 
-   /**
-    * Plugin constructor
-    */
-   public TurDeviceReader() {}
+   public TurDeviceReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

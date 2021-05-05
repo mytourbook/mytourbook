@@ -60,10 +60,9 @@ public class HAC4DeviceReader extends TourbookDevice {
       public short minute;
    }
 
-   /**
-    * constructor is used when the plugin is loaded
-    */
-   public HAC4DeviceReader() {}
+   public HAC4DeviceReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

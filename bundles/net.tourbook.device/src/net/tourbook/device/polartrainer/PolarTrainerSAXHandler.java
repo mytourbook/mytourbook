@@ -34,7 +34,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -231,7 +230,6 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
    public PolarTrainerSAXHandler(final TourbookDevice device,
                                  final String importFileName,
-                                 final DeviceData deviceData,
                                  final Map<Long, TourData> alreadyImportedTours,
                                  final Map<Long, TourData> newlyImportedTours) {
 

@@ -46,6 +46,8 @@ public interface IRawDataReader {
     *           import view.
     * @param newlyImportedTours
     *           Contains all tours which are imported by this method.
+    * @param isReimport
+    *           True if this tour is re-imported, false otherwise
     * @return Returns <code>true</code> when the import was successful, the parameters
     *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
     */

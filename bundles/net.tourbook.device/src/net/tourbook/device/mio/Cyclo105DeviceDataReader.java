@@ -37,7 +37,9 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
    private static final String TAG_MAGELLAN    = UI.SYMBOL_LESS_THAN + Cyclo105SAXHandler.TAG_ROOT_MAGELLAN + UI.SYMBOL_GREATER_THAN;
    private static final String TAG_TRACKPOINTS = UI.SYMBOL_LESS_THAN + Cyclo105SAXHandler.TAG_ROOT_TRACKPOINTS + UI.SYMBOL_GREATER_THAN;
 
-   public Cyclo105DeviceDataReader() {}
+   public Cyclo105DeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {

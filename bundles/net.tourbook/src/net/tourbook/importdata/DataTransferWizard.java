@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -172,18 +172,15 @@ public class DataTransferWizard extends Wizard {
          @Override
          public void shellActivated(final ShellEvent e) {
 
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getCurrent().asyncExec(() -> {
 
-                  // start downloading
-                  final boolean importResult = receiveData();
+               // start downloading
+               final boolean importResult = receiveData();
 
-                  _dataTransferWizardPage.saveState();
+               _dataTransferWizardPage.saveState();
 
-                  if (importResult) {
-                     getContainer().getShell().close();
-                  }
+               if (importResult) {
+                  getContainer().getShell().close();
                }
             });
          }
