@@ -19,28 +19,29 @@ import de.byteholder.geoclipse.Messages;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
 
-	private IMapDefaultActions	_mapActionProvider;
+   private IMapDefaultActions _mapActionProvider;
 
-	public ActionZoomOut(final IMapDefaultActions mapActionProvider) {
+   public ActionZoomOut(final IMapDefaultActions mapActionProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapActionProvider = mapActionProvider;
+      _mapActionProvider = mapActionProvider;
 
-		setToolTipText(Messages.Map_Action_ZoomOut_Tooltip);
+      setToolTipText(Messages.Map_Action_ZoomOut_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out)));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out_Disabled)));
+   }
 
-	@Override
-	public void run() {
-		_mapActionProvider.actionZoomOut();
-	}
+   @Override
+   public void run() {
+      _mapActionProvider.actionZoomOut();
+   }
 
 }

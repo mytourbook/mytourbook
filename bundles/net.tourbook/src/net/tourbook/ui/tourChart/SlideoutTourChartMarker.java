@@ -15,10 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
@@ -26,7 +27,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String     GRAPH_LABEL_ALTITUDE      = net.tourbook.common.Messages.Graph_Label_Altitude;
    private static final String     GRAPH_LABEL_TIME          = net.tourbook.common.Messages.Graph_Label_Time;
@@ -103,7 +103,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private PixelConverter _pc;
 
-   private Action         _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    /*
     * UI controls
@@ -159,18 +159,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -741,7 +730,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
       TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       /*
        * Update UI with defaults from pref store

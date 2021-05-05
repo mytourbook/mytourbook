@@ -18,13 +18,15 @@ package net.tourbook.ui.tourChart;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.HoveredValuePointData;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.Pinned_ToolTip_Shell;
@@ -223,10 +225,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private class ActionOpenTooltipMenu extends Action {
 
       public ActionOpenTooltipMenu() {
+
          super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourOptions));
+         setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.TourOptions)));
       }
 
       @Override

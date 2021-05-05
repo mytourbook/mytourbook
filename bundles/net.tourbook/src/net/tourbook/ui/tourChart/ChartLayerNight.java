@@ -44,24 +44,25 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
     * This paints the night sections for the current graph configuration.
     */
    @Override
-   public void draw(final GC gc, final GraphDrawingData drawingData, final Chart chart, final PixelConverter pc) {
+   public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart, final PixelConverter pc) {
 
       if (!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS)) {
          return;
       }
 
-      final int opacity = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
+      final int opacity = ColorUtil.getTransparencyFromPercentage(
+            _prefStore.getInt(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS));
 
-      final int devYTop = drawingData.getDevYTop();
-      final int devGraphHeight = drawingData.devGraphHeight;
+      final int devYTop = graphDrawingData.getDevYTop();
+      final int devGraphHeight = graphDrawingData.devGraphHeight;
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
       gc.setBackground(new Color(0x8c, 0x8c, 0x8c, opacity));
       gc.setAlpha(opacity);
 
-      final double scaleX = drawingData.getScaleX();
+      final double scaleX = graphDrawingData.getScaleX();
       final long devVirtualGraphImageOffset = chart.getXXDevViewPortLeftBorder();
-      final int devYBottom = drawingData.getDevYBottom();
+      final int devYBottom = graphDrawingData.getDevYBottom();
       for (final ChartLabel chartLabel : _chartNightConfig.chartLabels) {
 
          final double virtualXPos = chartLabel.graphX * scaleX;
@@ -69,10 +70,13 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
          final double virtualXPosEnd = chartLabel.graphXEnd * scaleX;
          final int devXNightSectionEnd = (int) (virtualXPosEnd - devVirtualGraphImageOffset);
 
-         gc.fillRectangle(devXNightSectionStart, devYTop, devXNightSectionEnd - devXNightSectionStart, devYBottom - devYTop);
+         final int width = devXNightSectionEnd - devXNightSectionStart;
+         final int height = devYBottom - devYTop;
+         gc.fillRectangle(devXNightSectionStart, devYTop, width, height);
       }
 
       gc.setClipping((Rectangle) null);
+      gc.setAlpha(0xff);
    }
 
    /**

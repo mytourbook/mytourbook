@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import net.tourbook.common.color.ThemeUtil;
+
 import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
@@ -28,8 +30,8 @@ public class ActionZoomOut extends Action {
       setText(Messages.Action_zoom_out);
       setToolTipText(Messages.Action_zoom_out_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_Out));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ChartImages.Zoom_Out_Disabled));
+      setImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_Out)));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_Out_Disabled)));
    }
 
    @Override

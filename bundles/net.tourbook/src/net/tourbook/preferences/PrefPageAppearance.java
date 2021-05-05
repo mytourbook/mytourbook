@@ -20,9 +20,9 @@ import static org.eclipse.jface.viewers.LabelProvider.createTextProvider;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ThemeUtil;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.statistic.StatisticValuesView;
 
@@ -402,7 +402,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
          final boolean isDarkThemeSelected = ThemeUtil.E4_DARK_THEME_ID.equals(selectedTheme.getId());
 
-         ThemeUtil.setWinDarkThemeHack(isDarkThemeSelected);
+         ThemeUtil.setDarkTheme(isDarkThemeSelected);
 
          // set theme but do not save it in the pref store (2nd parameter)
          _themeEngine.setTheme(selectedTheme, false);

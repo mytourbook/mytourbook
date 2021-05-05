@@ -146,15 +146,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       final String separator = StringToArrayConverter.STRING_SEPARATOR;
 
       store.setDefault(ITourbookPreferences.GRAPH_ALL,
-              (Integer.toString(TourManager.GRAPH_ALTITUDE) + separator)
-            + (Integer.toString(TourManager.GRAPH_PULSE) + separator)
-            + (Integer.toString(TourManager.GRAPH_SPEED) + separator)
-            + (Integer.toString(TourManager.GRAPH_PACE) + separator)
+              (Integer.toString(TourManager.GRAPH_ALTITUDE)    + separator)
+            + (Integer.toString(TourManager.GRAPH_PULSE)       + separator)
+            + (Integer.toString(TourManager.GRAPH_SPEED)       + separator)
+            + (Integer.toString(TourManager.GRAPH_PACE)        + separator)
             + (Integer.toString(TourManager.GRAPH_TEMPERATURE) + separator)
-            + (Integer.toString(TourManager.GRAPH_CADENCE) + separator)
-            + (Integer.toString(TourManager.GRAPH_GEARS) + separator)
-            + (Integer.toString(TourManager.GRAPH_ALTIMETER) + separator)
-            + (Integer.toString(TourManager.GRAPH_GRADIENT) + separator)
+            + (Integer.toString(TourManager.GRAPH_CADENCE)     + separator)
+            + (Integer.toString(TourManager.GRAPH_GEARS)       + separator)
+            + (Integer.toString(TourManager.GRAPH_ALTIMETER)   + separator)
+            + (Integer.toString(TourManager.GRAPH_GRADIENT)    + separator)
             + Integer.toString(TourManager.GRAPH_POWER));
 
       store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
@@ -163,7 +163,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
-      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR, new RGB(0xf5, 0xf5, 0xf5));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR,       new RGB(0xf5, 0xf5, 0xf5));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK,  new RGB(0x40, 0x40, 0x40));
 
       // tour segmenter chart value font
       final FontData[] segmenterDefaultFontData = Display.getDefault().getSystemFont().getFontData();

@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.ITourViewer3;
@@ -47,6 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -58,38 +60,44 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
-   private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                          //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                     //$NON-NLS-1$
 
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";           //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";      //$NON-NLS-1$
-   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";                //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";           //$NON-NLS-1$
+   private static final String          STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";          //$NON-NLS-1$
 
-   private static final String          STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                      //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                    //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                         //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";              //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";             //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                  //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                     //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                 //$NON-NLS-1$
-   private static final String          STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                 //$NON-NLS-1$
-   private static final String          STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_CADENCE                      = "STATE_IS_IMPORT_CADENCE";                           //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_CALORIES                     = "STATE_IS_IMPORT_CALORIES";                          //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ELEVATION                    = "STATE_IS_IMPORT_ELEVATION";                         //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                       //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_FILE_LOCATION                = "STATE_IS_IMPORT_FILE_LOCATION";                     //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_GEAR                         = "STATE_IS_IMPORT_GEAR";                              //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_POWER_AND_PULSE              = "STATE_IS_IMPORT_POWER_AND_PULSE";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_POWER_AND_SPEED              = "STATE_IS_IMPORT_POWER_AND_SPEED";                   //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_RUNNING_DYNAMICS             = "STATE_IS_IMPORT_RUNNING_DYNAMICS";                  //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_SWIMMING                     = "STATE_IS_IMPORT_SWIMMING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TEMPERATURE                  = "STATE_IS_IMPORT_TEMPERATURE";                       //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TRAINING                     = "STATE_IS_IMPORT_TRAINING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TOUR_MARKERS                 = "STATE_IS_IMPORT_TOUR_MARKERS";                      //$NON-NLS-1$
+   private static final String          STATE_IS_IMPORT_TIMER_PAUSES                 = "STATE_IS_IMPORT_TIMER_PAUSES";                      //$NON-NLS-1$
+   private static final String          STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND";      //$NON-NLS-1$
 
    private static final int             VERTICAL_SECTION_MARGIN                      = 10;
 
-   private static final IDialogSettings _state                                       = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
+   private static final IDialogSettings _state                                       = TourbookPlugin.getState("DialogReimportTours");      //$NON-NLS-1$
 
    private final ITourViewer3           _tourViewer;
 
    private SelectionAdapter             _defaultListener;
 
    private PixelConverter               _pc;
+
+   private Image                        _imageLockClosed                             = TourbookPlugin.getImageDescriptor(Images.Lock_Closed)
+         .createImage();
+   private Image                        _imageLockOpen                               = TourbookPlugin.getImageDescriptor(Images.Lock_Open)
+         .createImage();
 
    /*
     * UI controls
@@ -100,6 +108,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private Button    _chkData_AllTimeSlices;
    private Button    _chkData_Cadence;
+   private Button    _chkData_Calories;
    private Button    _chkData_Elevation;
    private Button    _chkData_EntireTour;
    private Button    _chkData_Gear;
@@ -117,6 +126,8 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _rdoReimport_Tours_All;
    private Button    _rdoReimport_Tours_BetweenDates;
    private Button    _rdoReimport_Tours_Selected;
+   private Button    _btnUnlockAllToursSelection;
+   private Button    _btnUnlockBetweenDatesSelection;
 
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
@@ -130,12 +141,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       super(parentShell);
 
       _tourViewer = tourViewer;
-   }
-
-   private void addTourValueTypeFromCheckbox(final Button checkButton, final TourValueType tourValueType, final List<TourValueType> tourValueTypes) {
-      if (checkButton.getSelection()) {
-         tourValueTypes.add(tourValueType);
-      }
    }
 
    @Override
@@ -205,7 +210,6 @@ public class DialogReimportTours extends TitleAreaDialog {
       {
          createUI_10_Tours(container);
          createUI_20_Data(container);
-
          {
             /*
              * Checkbox: Skip tours for which the import file is not found
@@ -228,17 +232,8 @@ public class DialogReimportTours extends TitleAreaDialog {
       group.setText(Messages.Dialog_ReimportTours_Group_Tours);
       group.setToolTipText(Messages.Dialog_ReimportTours_Group_Tours_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(2).applyTo(group);
+      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(4).applyTo(group);
       {
-         {
-            /*
-             * Re-import ALL tours in the database
-             */
-            _rdoReimport_Tours_All = new Button(group, SWT.RADIO);
-            _rdoReimport_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
-            _rdoReimport_Tours_All.addSelectionListener(_defaultListener);
-            GridDataFactory.fillDefaults().span(2, 1).indent(0, 3).applyTo(_rdoReimport_Tours_All);
-         }
          {
             /*
              * Re-import the SELECTED tours
@@ -246,7 +241,45 @@ public class DialogReimportTours extends TitleAreaDialog {
             _rdoReimport_Tours_Selected = new Button(group, SWT.RADIO);
             _rdoReimport_Tours_Selected.setText(Messages.Dialog_ModifyTours_Radio_SelectedTours);
             _rdoReimport_Tours_Selected.addSelectionListener(_defaultListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoReimport_Tours_Selected);
+            _rdoReimport_Tours_Selected.setSelection(true);
+            GridDataFactory.fillDefaults().span(4, 1).applyTo(_rdoReimport_Tours_Selected);
+         }
+         {
+            /*
+             * Re-import ALL tours in the database
+             */
+            _rdoReimport_Tours_All = new Button(group, SWT.RADIO);
+            _rdoReimport_Tours_All.setText(Messages.Dialog_ModifyTours_Radio_AllTours);
+            _rdoReimport_Tours_All.setSelection(false);
+            _rdoReimport_Tours_All.setEnabled(false);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_rdoReimport_Tours_All);
+         }
+         {
+            _btnUnlockAllToursSelection = new Button(group, SWT.PUSH);
+            _btnUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockAllToursSelection.setImage(_imageLockClosed);
+            _btnUnlockAllToursSelection.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  _rdoReimport_Tours_All.setEnabled(
+                        !_rdoReimport_Tours_All.isEnabled());
+
+                  final boolean isEnabled = _rdoReimport_Tours_All.isEnabled();
+
+                  _btnUnlockAllToursSelection.setText(isEnabled
+                        ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+                        : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+                  _btnUnlockAllToursSelection.setImage(isEnabled
+                        ? _imageLockOpen
+                        : _imageLockClosed);
+
+                  if (!isEnabled) {
+                     _rdoReimport_Tours_All.setSelection(false);
+                     _rdoReimport_Tours_Selected.setSelection(true);
+                  }
+               }
+            });
          }
          {
             /*
@@ -254,22 +287,46 @@ public class DialogReimportTours extends TitleAreaDialog {
              */
             _rdoReimport_Tours_BetweenDates = new Button(group, SWT.RADIO);
             _rdoReimport_Tours_BetweenDates.setText(Messages.Dialog_ModifyTours_Radio_BetweenDates);
-            _rdoReimport_Tours_BetweenDates.addSelectionListener(_defaultListener);
-
-            final Composite container = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            _rdoReimport_Tours_BetweenDates.setSelection(false);
+            _rdoReimport_Tours_BetweenDates.setEnabled(false);
             {
-               {
-
-                  _dtTourDate_From = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                  _dtTourDate_From.addSelectionListener(_defaultListener);
-               }
-               {
-                  _dtTourDate_Until = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-                  _dtTourDate_Until.addSelectionListener(_defaultListener);
-               }
+               _dtTourDate_From = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+               _dtTourDate_From.addSelectionListener(_defaultListener);
+               _dtTourDate_From.setEnabled(false);
             }
+            {
+               _dtTourDate_Until = new DateTime(group, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+               _dtTourDate_Until.addSelectionListener(_defaultListener);
+               _dtTourDate_Until.setEnabled(false);
+            }
+            _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
+            _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+            _btnUnlockBetweenDatesSelection.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+
+                  _rdoReimport_Tours_BetweenDates.setEnabled(
+                        !_rdoReimport_Tours_BetweenDates.isEnabled());
+
+                  final boolean isEnabled = _rdoReimport_Tours_BetweenDates.isEnabled();
+
+                  _dtTourDate_From.setEnabled(isEnabled);
+                  _dtTourDate_Until.setEnabled(isEnabled);
+
+                  _btnUnlockBetweenDatesSelection.setText(isEnabled
+                        ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+                        : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+                  _btnUnlockBetweenDatesSelection.setImage(isEnabled
+                        ? _imageLockOpen
+                        : _imageLockClosed);
+
+                  if (!isEnabled) {
+                     _rdoReimport_Tours_BetweenDates.setSelection(false);
+                     _rdoReimport_Tours_Selected.setSelection(true);
+                  }
+               }
+            });
          }
       }
    }
@@ -339,26 +396,6 @@ public class DialogReimportTours extends TitleAreaDialog {
          }
          {
             /*
-             * Checkbox: Running Dynamics
-             */
-            _chkData_RunningDynamics = new Button(group, SWT.CHECK);
-            _chkData_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
-            _chkData_RunningDynamics.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_RunningDynamics);
-         }
-
-         // row 2
-         {
-            /*
-             * Checkbox: Elevation
-             */
-            _chkData_Elevation = new Button(group, SWT.CHECK);
-            _chkData_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
-            _chkData_Elevation.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Elevation);
-         }
-         {
-            /*
              * Checkbox: Swimming
              */
             _chkData_Swimming = new Button(group, SWT.CHECK);
@@ -367,15 +404,15 @@ public class DialogReimportTours extends TitleAreaDialog {
             gridDataItem.applyTo(_chkData_Swimming);
          }
 
-         // row 3
+         // row 2
          {
             /*
-             * Checkbox: Gear
+             * Checkbox: Calories
              */
-            _chkData_Gear = new Button(group, SWT.CHECK);
-            _chkData_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
-            _chkData_Gear.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_Gear);
+            _chkData_Calories = new Button(group, SWT.CHECK);
+            _chkData_Calories.setText(Messages.Dialog_ModifyTours_Checkbox_Calories);
+            _chkData_Calories.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Calories);
          }
          {
             /*
@@ -387,15 +424,15 @@ public class DialogReimportTours extends TitleAreaDialog {
             gridDataItem.applyTo(_chkData_Temperature);
          }
 
-         // row 4
+         // row 3
          {
             /*
-             * Checkbox: Power And Pulse
+             * Checkbox: Elevation
              */
-            _chkData_PowerAndPulse = new Button(group, SWT.CHECK);
-            _chkData_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
-            _chkData_PowerAndPulse.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndPulse);
+            _chkData_Elevation = new Button(group, SWT.CHECK);
+            _chkData_Elevation.setText(Messages.Dialog_ModifyTours_Checkbox_ElevationValues);
+            _chkData_Elevation.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Elevation);
          }
          {
             /*
@@ -407,15 +444,15 @@ public class DialogReimportTours extends TitleAreaDialog {
             gridDataItem.applyTo(_chkData_TourTimerPauses);
          }
 
-         // row 5
+         // row 4
          {
             /*
-             * Checkbox: Power And Speed
+             * Checkbox: Gear
              */
-            _chkData_PowerAndSpeed = new Button(group, SWT.CHECK);
-            _chkData_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
-            _chkData_PowerAndSpeed.addSelectionListener(_defaultListener);
-            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndSpeed);
+            _chkData_Gear = new Button(group, SWT.CHECK);
+            _chkData_Gear.setText(Messages.Dialog_ModifyTours_Checkbox_GearValues);
+            _chkData_Gear.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_Gear);
          }
          {
             /*
@@ -427,7 +464,16 @@ public class DialogReimportTours extends TitleAreaDialog {
             gridDataItem.applyTo(_chkData_Training);
          }
 
-         // row 6
+         // row 5
+         {
+            /*
+             * Checkbox: Power And Pulse
+             */
+            _chkData_PowerAndPulse = new Button(group, SWT.CHECK);
+            _chkData_PowerAndPulse.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndPulseValues);
+            _chkData_PowerAndPulse.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndPulse);
+         }
          {
             /*
              * Checkbox: Tour markers
@@ -435,7 +481,18 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkData_TourMarkers = new Button(group, SWT.CHECK);
             _chkData_TourMarkers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
             _chkData_TourMarkers.addSelectionListener(_defaultListener);
-            gridDataTour_MoreVSpace.applyTo(_chkData_TourMarkers);
+            gridDataItem.applyTo(_chkData_TourMarkers);
+         }
+
+         // row 6
+         {
+            /*
+             * Checkbox: Power And Speed
+             */
+            _chkData_PowerAndSpeed = new Button(group, SWT.CHECK);
+            _chkData_PowerAndSpeed.setText(Messages.Dialog_ModifyTours_Checkbox_PowerAndSpeedValues);
+            _chkData_PowerAndSpeed.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_PowerAndSpeed);
          }
          {
             /*
@@ -447,6 +504,18 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkData_ImportFileLocation.addSelectionListener(_defaultListener);
             gridDataItem.applyTo(_chkData_ImportFileLocation);
          }
+
+         // row 7
+         {
+            /*
+             * Checkbox: Running Dynamics
+             */
+            _chkData_RunningDynamics = new Button(group, SWT.CHECK);
+            _chkData_RunningDynamics.setText(Messages.Dialog_ModifyTours_Checkbox_RunningDynamicsValues);
+            _chkData_RunningDynamics.addSelectionListener(_defaultListener);
+            gridDataItem_FirstColumn.applyTo(_chkData_RunningDynamics);
+         }
+
          {
             /*
              * Button: Deselect all
@@ -474,18 +543,18 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             // column 1
             _chkData_Cadence,
+            _chkData_Calories,
             _chkData_Elevation,
             _chkData_Gear,
             _chkData_PowerAndPulse,
             _chkData_PowerAndSpeed,
+            _chkData_RunningDynamics,
 
             // column 2
-            _chkData_RunningDynamics,
             _chkData_Swimming,
             _chkData_Temperature,
             _chkData_TourTimerPauses,
             _chkData_Training,
-
             _chkData_TourMarkers,
             _chkData_ImportFileLocation,
 
@@ -639,6 +708,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkData_AllTimeSlices.getSelection() ||
             _chkData_Elevation.getSelection() ||
             _chkData_Cadence.getSelection() ||
+            _chkData_Calories.getSelection() ||
             _chkData_Gear.getSelection() ||
             _chkData_ImportFileLocation.getSelection() ||
             _chkData_PowerAndPulse.getSelection() ||
@@ -658,6 +728,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       _chkData_Elevation.setEnabled(isTimeSlice);
       _chkData_Cadence.setEnabled(isTimeSlice);
+      _chkData_Calories.setEnabled(isTimeSlice);
       _chkData_Gear.setEnabled(isTimeSlice);
       _chkData_PowerAndPulse.setEnabled(isTimeSlice);
       _chkData_PowerAndSpeed.setEnabled(isTimeSlice);
@@ -693,6 +764,8 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       // keep window size and position
       return _state;
+
+      //Helpful during development
 //    return null;
    }
 
@@ -706,6 +779,11 @@ public class DialogReimportTours extends TitleAreaDialog {
             enableControls();
          }
       };
+
+      _parent.addDisposeListener(disposeEvent -> {
+         _imageLockClosed.dispose();
+         _imageLockOpen.dispose();
+      });
    }
 
    private boolean isDataValid() {
@@ -754,20 +832,21 @@ public class DialogReimportTours extends TitleAreaDialog {
 
             } else {
 
-               addTourValueTypeFromCheckbox(_chkData_Cadence, TourValueType.TIME_SLICES_CADENCE, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_Elevation, TourValueType.TIME_SLICES_ELEVATION, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_Gear, TourValueType.TIME_SLICES_GEAR, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_PowerAndPulse, TourValueType.TIME_SLICES_POWER_AND_PULSE, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_PowerAndSpeed, TourValueType.TIME_SLICES_POWER_AND_SPEED, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_RunningDynamics, TourValueType.TIME_SLICES_RUNNING_DYNAMICS, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_Swimming, TourValueType.TIME_SLICES_SWIMMING, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_Temperature, TourValueType.TIME_SLICES_TEMPERATURE, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_TourTimerPauses, TourValueType.TIME_SLICES_TIMER_PAUSES, tourValueTypes);
-               addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES_TRAINING, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Cadence, TourValueType.TIME_SLICES_CADENCE, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Calories, TourValueType.TOUR_CALORIES, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Elevation, TourValueType.TIME_SLICES_ELEVATION, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Gear, TourValueType.TIME_SLICES_GEAR, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_PowerAndPulse, TourValueType.TIME_SLICES_POWER_AND_PULSE, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_PowerAndSpeed, TourValueType.TIME_SLICES_POWER_AND_SPEED, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_RunningDynamics, TourValueType.TIME_SLICES_RUNNING_DYNAMICS, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Swimming, TourValueType.TIME_SLICES_SWIMMING, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Temperature, TourValueType.TIME_SLICES_TEMPERATURE, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourTimerPauses, TourValueType.TIME_SLICES_TIMER_PAUSES, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES_TRAINING, tourValueTypes);
             }
 
-            addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR_MARKER, tourValueTypes);
-            addTourValueTypeFromCheckbox(_chkData_ImportFileLocation, TourValueType.IMPORT_FILE_LOCATION, tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR_MARKER, tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_ImportFileLocation, TourValueType.IMPORT_FILE_LOCATION, tourValueTypes);
          }
 
          doReimport(tourValueTypes);
@@ -782,6 +861,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_Elevation.setSelection(false);
       _chkData_EntireTour.setSelection(false);
       _chkData_Cadence.setSelection(false);
+      _chkData_Calories.setSelection(false);
       _chkData_Gear.setSelection(false);
       _chkData_ImportFileLocation.setSelection(false);
       _chkData_PowerAndPulse.setSelection(false);
@@ -812,6 +892,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_EntireTour.setSelection(isReimportEntireTour);
       _chkData_Elevation.setSelection(_state.getBoolean(STATE_IS_IMPORT_ELEVATION));
       _chkData_Cadence.setSelection(_state.getBoolean(STATE_IS_IMPORT_CADENCE));
+      _chkData_Calories.setSelection(_state.getBoolean(STATE_IS_IMPORT_CALORIES));
       _chkData_Gear.setSelection(_state.getBoolean(STATE_IS_IMPORT_GEAR));
       _chkData_ImportFileLocation.setSelection(_state.getBoolean(STATE_IS_IMPORT_FILE_LOCATION));
       _chkData_PowerAndPulse.setSelection(_state.getBoolean(STATE_IS_IMPORT_POWER_AND_PULSE));
@@ -843,6 +924,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _state.put(STATE_IS_IMPORT_ENTIRE_TOUR, _chkData_EntireTour.getSelection());
       _state.put(STATE_IS_IMPORT_ELEVATION, _chkData_Elevation.getSelection());
       _state.put(STATE_IS_IMPORT_CADENCE, _chkData_Cadence.getSelection());
+      _state.put(STATE_IS_IMPORT_CALORIES, _chkData_Calories.getSelection());
       _state.put(STATE_IS_IMPORT_GEAR, _chkData_Gear.getSelection());
       _state.put(STATE_IS_IMPORT_FILE_LOCATION, _chkData_ImportFileLocation.getSelection());
       _state.put(STATE_IS_IMPORT_POWER_AND_PULSE, _chkData_PowerAndPulse.getSelection());

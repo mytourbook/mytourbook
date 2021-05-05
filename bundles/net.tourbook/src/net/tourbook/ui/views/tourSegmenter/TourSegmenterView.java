@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -123,23 +123,24 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class TourSegmenterView extends ViewPart implements ITourViewer {
 
-   public static final String ID = "net.tourbook.views.TourSegmenter"; //$NON-NLS-1$
+   private static final String APP_ACTION_RESTORE_DEFAULT                         = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
+   public static final String  ID                                                 = "net.tourbook.views.TourSegmenter";                    //$NON-NLS-1$
    //
    private static final float  UNIT_MILE                                          = UI.UNIT_MILE;
    private static final float  UNIT_MILE_2_NAUTICAL_MILE                          = UI.UNIT_MILE_2_NAUTICAL_MILE;
    private static final float  UNIT_NAUTICAL_MILE                                 = UI.UNIT_NAUTICAL_MILE;
    private static final float  UNIT_YARD                                          = UI.UNIT_YARD;
    //
-   private static final String DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_1_4                                 = "1/4";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_3_8                                 = "3/8";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_1_2                                 = "1/2";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_5_8                                 = "5/8";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_3_4                                 = "3/4";                                        //$NON-NLS-1$
-   private static final String DISTANCE_MILES_7_8                                 = "7/8";                                        //$NON-NLS-1$
+   private static final String DISTANCE_MILES_1_8                                 = "1/8";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_1_4                                 = "1/4";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_3_8                                 = "3/8";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_1_2                                 = "1/2";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_5_8                                 = "5/8";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_3_4                                 = "3/4";                                                 //$NON-NLS-1$
+   private static final String DISTANCE_MILES_7_8                                 = "7/8";                                                 //$NON-NLS-1$
    //
-   private static final String FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                 //$NON-NLS-1$
+   private static final String FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                          //$NON-NLS-1$
    //
    private static final int    SEGMENTER_REQUIRES_ALTITUDE                        = 0x01;
    private static final int    SEGMENTER_REQUIRES_DISTANCE                        = 0x02;
@@ -151,27 +152,27 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    private static final int    MAX_DISTANCE_SPINNER_NAUTICAL_MILE                 = 70;
    private static final int    MAX_DISTANCE_SPINNER_METRIC                        = 100;
    //
-   private static final String STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS"; //$NON-NLS-1$
+   private static final String STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS         = "STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS";          //$NON-NLS-1$
    private static final int    STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT = 100;
-   private static final String STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                   //$NON-NLS-1$
-   private static final String STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                   //$NON-NLS-1$
-   private static final String STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                     //$NON-NLS-1$
-   private static final String STATE_SELECTED_DISTANCE                            = "selectedDistance";                           //$NON-NLS-1$
-   private static final String STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";           //$NON-NLS-1$
+   private static final String STATE_DP_TOLERANCE_POWER                           = "STATE_DP_TOLERANCE_POWER";                            //$NON-NLS-1$
+   private static final String STATE_DP_TOLERANCE_PULSE                           = "STATE_DP_TOLERANCE_PULSE";                            //$NON-NLS-1$
+   private static final String STATE_MINIMUM_ALTITUDE                             = "STATE_MINIMUM_ALTITUDE";                              //$NON-NLS-1$
+   private static final String STATE_SELECTED_DISTANCE                            = "selectedDistance";                                    //$NON-NLS-1$
+   private static final String STATE_SELECTED_SEGMENTER_BY_USER                   = "STATE_SELECTED_SEGMENTER_BY_USER";                    //$NON-NLS-1$
    //
    /**
     * Initially this was an int value, with 2 it's a string.
     */
-   private static final String STATE_SELECTED_BREAK_METHOD2                       = "selectedBreakMethod2";                       //$NON-NLS-1$
+   private static final String STATE_SELECTED_BREAK_METHOD2                       = "selectedBreakMethod2";                                //$NON-NLS-1$
    //
-   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED_AS                  = "selectedBreakTimeMinAvgSpeedAS";             //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED_AS                = "selectedBreakTimeMinSliceSpeedAS";           //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_SLICE_TIME_AS                 = "selectedBreakTimeMinSliceTimeAS";            //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED                     = "selectedBreakTimeMinAvgSpeed";               //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED                   = "selectedBreakTimeMinSliceSpeed";             //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_DISTANCE_VALUE                = "selectedBreakTimeMinDistance";               //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_MIN_TIME_VALUE                    = "selectedBreakTimeMinTime";                   //$NON-NLS-1$
-   private static final String STATE_BREAK_TIME_SLICE_DIFF                        = "selectedBreakTimeSliceDiff";                 //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED_AS                  = "selectedBreakTimeMinAvgSpeedAS";                      //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED_AS                = "selectedBreakTimeMinSliceSpeedAS";                    //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_TIME_AS                 = "selectedBreakTimeMinSliceTimeAS";                     //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_AVG_SPEED                     = "selectedBreakTimeMinAvgSpeed";                        //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_SLICE_SPEED                   = "selectedBreakTimeMinSliceSpeed";                      //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_DISTANCE_VALUE                = "selectedBreakTimeMinDistance";                        //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_MIN_TIME_VALUE                    = "selectedBreakTimeMinTime";                            //$NON-NLS-1$
+   private static final String STATE_BREAK_TIME_SLICE_DIFF                        = "selectedBreakTimeSliceDiff";                          //$NON-NLS-1$
    //
    /*
     * Tour segmenter
@@ -2770,7 +2771,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
              * Button: Restore defaults
              */
             _btnSurfing_RestoreFrom_Defaults = new Button(container, SWT.NONE);
-            _btnSurfing_RestoreFrom_Defaults.setText(Messages.App_Action_RestoreDefault);
+            _btnSurfing_RestoreFrom_Defaults.setText(APP_ACTION_RESTORE_DEFAULT);
             _btnSurfing_RestoreFrom_Defaults.setToolTipText(Messages.Tour_Segmenter_Surfing_Button_RestoreFromDefaults_Tooltip);
             _btnSurfing_RestoreFrom_Defaults.addSelectionListener(new SelectionAdapter() {
                @Override

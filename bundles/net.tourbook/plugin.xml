@@ -526,21 +526,21 @@
             <!-- Tour Import -->
             <command 
                commandId="command.net.tourbook.views.rawData.RawDataView"
-               icon="icons/imported-tours.png"
+               icon="icons/directory-tour-import.png"
                label="%view_name_Data_Import"
                mnemonic="%view_name_Data_Import_Mnemonic"/>
                   
             <!-- Tour Book -->
             <command 
                commandId="command.net.tourbook.views.tourListView"
-               icon="icons/tourbook-tours.png"
+               icon="icons/directory-tour-book.png"
                label="%view_name_Book"
                mnemonic="%view_name_Book_Mnemonic"/>
 
             <!-- Tagged Tours -->
             <command 
                commandId="command.net.tourbook.views.tagViewID"
-               icon="icons/tagged-tours.png"
+               icon="icons/directory-tagged-tours.png"
                label="%command_tagging_name"
                mnemonic="%command_tagging_name_Mnemonic"
                tooltip="%command_tagging_name_tooltip"/>
@@ -548,14 +548,14 @@
             <!-- Reference Tours -->
             <command 
                commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
-               icon="icons/reference-tours.png"
+               icon="icons/directory-reference-tours.png"
                label="%view_name_ReferenceTours"
                mnemonic="%view_name_ReferenceTours_Mnemonic"/>
 
             <!-- Collated Tours -->
             <command 
                commandId="command.net.tourbook.views.collatedToursViewID"
-               icon="icons/collated-tours.png"
+               icon="icons/directory-collated-tours.png"
                label="%View_Name_CollatedTours"
                mnemonic="%View_Name_CollatedTours_Mnemonic"
                tooltip="%View_Name_CollatedTours_Tooltip"/>
@@ -902,14 +902,14 @@
             <!-- Tour Import -->
             <command 
                commandId="command.net.tourbook.views.rawData.RawDataView"
-               icon="icons/imported-tours.png"
+               icon="icons/directory-tour-import.png"
                label="%view_name_Data_Import"
                mnemonic="%view_name_Data_Import_Mnemonic"/>
             
             <!-- Tour Book -->
             <command 
                commandId="command.net.tourbook.views.tourListView"
-               icon="icons/tourbook-tours.png"
+               icon="icons/directory-tour-book.png"
                label="%view_name_Book"
                mnemonic="%view_name_Book_Mnemonic"/>
                
@@ -1161,7 +1161,7 @@
       <command
          id             ="command.net.tourbook.views.rawData.RawDataView"
          name           ="%view_name_Data_Import"
-         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourImport"
       />
 
       <command
@@ -1173,13 +1173,13 @@
       <command
          id             ="command.net.tourbook.views.tourListView"
          name           ="%view_name_Book"
-         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourBook"
       />
 
       <command
          id             ="command.net.tourbook.views.tagViewID"
          name           ="%view_name_tagView"
-         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TaggedTours"
       />
 
       <command
@@ -1191,7 +1191,7 @@
       <command
          id             ="command.net.tourbook.views.tourCatalog.TourCatalogView"
          name           ="%view_name_ReferenceTours"
-         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_ReferenceTours"
       />
 
       <command
@@ -1572,14 +1572,14 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.rawData.RawDataView"
-            icon        ="icons/imported-tours.png"
+            icon        ="icons/directory-tour-import.png"
             id          ="net.tourbook.views.rawData.RawDataView"
             name        ="%view_name_Data_Import"/>
             
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tourBook.TourBookView"
-            icon        ="icons/tourbook-tours.png"
+            icon        ="icons/directory-tour-book.png"
             id          ="net.tourbook.views.tourListView"
             name        ="%view_name_Book"/>
 
@@ -1593,7 +1593,7 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tagging.TaggingView"
-            icon        ="icons/tagged-tours.png"
+            icon        ="icons/directory-tagged-tours.png"
             id          ="net.tourbook.views.tagViewID"
             name        ="%view_name_tagView"/>
 
@@ -1601,13 +1601,13 @@
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.collateTours.CollatedToursView"
             id          ="net.tourbook.ui.views.collateTours.CollatedToursView"
-            icon        ="icons/collated-tours.png"
+            icon        ="icons/directory-collated-tours.png"
             name        ="%View_Name_CollatedTours"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView"
-            icon        ="icons/reference-tours.png"
+            icon        ="icons/directory-reference-tours.png"
             id          ="net.tourbook.views.tourCatalog.TourCatalogView"
             name        ="%view_name_ReferenceTours"/>
 
@@ -2299,33 +2299,17 @@
    
    <extension point="org.eclipse.ui.handlers">
 
+      <!-- this handler is enabled/disabled in the command handler: net.tourbook.commands.RestoreTour_Handler.isEnabled() -->
       <handler
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
-      >
-         <!-- enabled/disabled is set in the command handler: net.tourbook.commands.RestoreTour_Handler.isEnabled()
-         
-            <enabledWhen>
-               <with variable="activePart">
-                  <test property="net.tourbook.expression.TourEditor.isDirty"/>
-               </with>
-            </enabledWhen>
-         -->
-     </handler>
+      />
 
+      <!-- this handler is enabled/disabled in the command handler: net.tourbook.commands.SaveTour_Handler.isEnabled() -->
       <handler
          commandId   ="command.net.tourbook.tour.SaveTour"
          class       ="net.tourbook.commands.SaveTour_Handler"
-      >
-         <!-- enabled/disabled is set in the command handler: net.tourbook.commands.SaveTour_Handler.isEnabled()
-
-            <enabledWhen>
-               <with variable="activePart">
-                  <test property="net.tourbook.expression.TourEditor.isDirty"/>
-               </with>
-            </enabledWhen>
-         -->
-     </handler>
+      />
 
       <!-- This handler is enabled when at least one part is opened -->
       <handler
