@@ -839,6 +839,7 @@ public class RawDataManager {
             final boolean[] isUserAsked_ToCancelReImport = { false };
 
             final File[] reimportedFile = new File[1];
+            //TODO FB to rename to reimport, did I mix it up with the delete task ?
             int deleted = 0;
             final int numberOfTours = selectedTourIds.length;
 
@@ -851,11 +852,6 @@ public class RawDataManager {
                   // stop re-importing but process re-imported tours
                   break;
                }
-
-               monitor.worked(1);
-               monitor.subTask(NLS.bind(
-                     Messages.Import_Data_Dialog_Reimport_SubTask,
-                     new Object[] { ++deleted, numberOfTours }));
 
                final TourData oldTourData = TourManager.getTour(tourId);
 
@@ -872,7 +868,9 @@ public class RawDataManager {
                   StatusUtil.log(e);
                   Thread.currentThread().interrupt();
                }
-               _dbUpdateExecutor.submit(() -> {
+
+               final Runnable executorTask = () -> {
+
                   // get last added item
                   final Long queueItem_TourId = _dbUpdateQueue.poll();
 
@@ -881,35 +879,55 @@ public class RawDataManager {
                   }
 
                   reimportTour(tourValueTypes, oldTourData, reimportedFile, skipToursWithFileNotFound, reImportStatus);
-               });
-               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false
-                     && skipToursWithFileNotFound == false) {
 
-                  // user has canceled the re-import -> ask if the whole re-import should be canceled
+               };
 
-                  final boolean[] isCancelReimport = { false };
+               _dbUpdateExecutor.submit(executorTask);
 
-                  display.syncExec(() -> {
-
-                     if (MessageDialog.openQuestion(display.getActiveShell(),
-                           Messages.Import_Data_Dialog_IsCancelReImport_Title,
-                           Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
-
-                        isCancelReimport[0] = true;
-
-                     } else {
-
-                        isUserAsked_ToCancelReImport[0] = true;
-                     }
-                  });
-
-                  if (isCancelReimport[0]) {
-                     break;
-                  }
-               }
+//               if (reImportStatus.isCanceled_ByUser_TheFileLocationDialog && isUserAsked_ToCancelReImport[0] == false
+//                     && skipToursWithFileNotFound == false) {
+//
+//                  // user has canceled the re-import -> ask if the whole re-import should be canceled
+//
+//                  final boolean[] isCancelReimport = { false };
+//
+//                  display.syncExec(() -> {
+//
+//                     if (MessageDialog.openQuestion(display.getActiveShell(),
+//                           Messages.Import_Data_Dialog_IsCancelReImport_Title,
+//                           Messages.Import_Data_Dialog_IsCancelReImport_Message)) {
+//
+//                        isCancelReimport[0] = true;
+//
+//                     } else {
+//
+//                        isUserAsked_ToCancelReImport[0] = true;
+//                     }
+//                  });
+//
+//                  if (isCancelReimport[0]) {
+//                     break;
+//                  }
+//               }
             }
 
-            while (!_dbUpdateExecutor.isTerminated()) {}
+            int toto = _dbUpdateExecutor.getActiveCount();
+            while (_dbUpdateExecutor.getActiveCount() > 0) {
+
+               final int currentActiveCount = _dbUpdateExecutor.getActiveCount();
+
+               if (toto > currentActiveCount) {
+
+                  System.out.println(currentActiveCount);
+                  final int difference = toto - currentActiveCount;
+                  monitor.worked(difference);
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { deleted += difference, numberOfTours }));
+
+                  toto = currentActiveCount;
+               }
+            }
 
             if (reImportStatus.isReImported) {
 
