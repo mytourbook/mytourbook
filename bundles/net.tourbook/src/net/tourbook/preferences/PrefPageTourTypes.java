@@ -32,6 +32,7 @@ import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -842,7 +843,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       _btnDelete.setEnabled(isSelected);
       _btnRename.setEnabled(selectedItemsSize == 1);
 
-      _colorSelector.setEnabled(selectedItemsSize == 1 && isGraphSelected);
+      _colorSelector.setEnabled(isGraphSelected);
    }
 
    private void enableLayoutControls() {
@@ -907,7 +908,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    }
 
    /**
-    * @return Returns the selected color definition in the color viewer
+    * @return Returns the first selected color definition in the color viewer
     */
    private TourTypeColorDefinition getFirstSelectedColorDefinition() {
 
@@ -943,7 +944,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
       final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
 
-      final Iterator<Object> selectedItemsIterator = selectedItems.iterator();
+      final Iterator<?> selectedItemsIterator = selectedItems.iterator();
       while (selectedItemsIterator.hasNext()) {
 
          final Object selectedItem = selectedItemsIterator.next();
@@ -1184,19 +1185,22 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    private void onDeleteTourType() {
 
       final List<TourTypeColorDefinition> selectedColorDefinitions = getSelectedColorDefinitions();
-      final TourType selectedTourTypetoto = selectedColorDefinitions.get(0).getTourType();
       final List<TourType> selectedTourTypes = new ArrayList<>();
 
-      for (int index = 0; index < selectedColorDefinitions.size(); ++index) {
-         selectedTourTypes.add(selectedColorDefinitions.get(index).getTourType());
-      }
+      selectedColorDefinitions.stream().forEach(
+            colorDefinition -> selectedTourTypes.add(colorDefinition.getTourType()));
+
+      final List<String> tourTypeNames = new ArrayList<>();
+      selectedTourTypes.stream().forEach(tourType -> tourTypeNames.add(tourType.getName()));
 
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             this.getShell(),
             Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
             null,
-            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, String.join(',', selectedTourTypes.forEach(c -> c.getName()))),
+            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg,
+                  StringUtils.join(tourTypeNames.stream()
+                        .toArray(String[]::new), UI.COMMA_SPACE)),
             MessageDialog.QUESTION,
             new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
             1);
@@ -1230,8 +1234,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
    private void onRenameTourType() {
 
-      //TODO fb disable the rename button when several are selected
       final TourTypeColorDefinition selectedColorDefinition = getFirstSelectedColorDefinition();
+      if (selectedColorDefinition == null) {
+         return;
+      }
+
       final TourType selectedTourType = selectedColorDefinition.getTourType();
 
       // ask for the tour type name

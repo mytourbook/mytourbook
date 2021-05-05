@@ -98,6 +98,10 @@ Bugfix
 * FIT File: Pause Re-Import (Frederic)
   - In some scenarii, the pause import could be erroneous and lead to negative paused time values
 
+* Tour Type Preference page (Frederic)
+  - Fixed a bug in the tour type viewer when selecting several tour types and only the first one was deleted.
+  - Disabling the "Rename" button when more than 1 tour type is selected
+
 Translation    
 ===========
 
