@@ -38,6 +38,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
@@ -125,29 +126,30 @@ public class RawDataManager {
 
 // SET_FORMATTING_ON
 
-   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
-   private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
+   private static final String             RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
+   private static final String             TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
 
-   private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
+   private static final String             FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
+   private static final IPreferenceStore   _prefStore                            = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings    _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
+   private static final String             INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
 
-   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
+   public static final int                 ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
 
-   static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
+   static final ComboEnumEntry<?>[]        ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean                _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean                _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
+   private static boolean                  _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean                  _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   private static boolean                  _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static CadenceMultiplier        _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
    private static ThreadPoolExecutor       _dbUpdateExecutor;
    private static ArrayBlockingQueue<Long> _dbUpdateQueue                        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static final ReentrantLock      DATABASE_LOCK                         = new ReentrantLock();
 
    static {
 
@@ -158,18 +160,14 @@ public class RawDataManager {
 
       };
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Saving database entities");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
@@ -1204,7 +1202,9 @@ public class RawDataManager {
                 * Save tour but don't fire a change event because the tour editor would set the tour
                 * to dirty
                 */
+               DATABASE_LOCK.lock();
                final TourData savedTourData = TourManager.saveModifiedTour(updatedTourData, false);
+               DATABASE_LOCK.unlock();
 
                updatedTourData = savedTourData;
             }
