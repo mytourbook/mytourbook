@@ -42,7 +42,7 @@ public class ActionExpandAll extends Action {
       setText(Messages.App_Action_Expand_All_Tooltip);
       setToolTipText(Messages.App_Action_Expand_All_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemeImageName(Images.App_ExpandAll)));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.App_ExpandAll)));
    }
 
    @Override

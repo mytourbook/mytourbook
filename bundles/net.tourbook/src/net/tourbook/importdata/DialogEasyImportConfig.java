@@ -30,6 +30,8 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -126,7 +128,7 @@ import org.joda.time.PeriodType;
 /**
  * Dialog to configure the device import.
  */
-public class DialogEasyImportConfig extends TitleAreaDialog {
+public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
    public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
@@ -168,7 +170,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private SelectionAdapter             _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
-   private Action                       _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
    private ActionSpeedTourType_Add      _actionTTSpeed_Add;
    private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
@@ -605,7 +607,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _imageAppOptions = CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)).createImage();
+      _imageAppOptions = CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)).createImage();
       setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);
@@ -735,18 +737,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetDashboardToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -4229,7 +4220,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _ilViewer.getTable().redraw();
    }
 
-   private void resetDashboardToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _chkDash_LiveUpdate.setSelection(EasyConfig.LIVE_UPDATE_DEFAULT);
 

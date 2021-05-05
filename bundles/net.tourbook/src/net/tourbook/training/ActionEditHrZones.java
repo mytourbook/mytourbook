@@ -32,7 +32,7 @@ public class ActionEditHrZones extends Action {
 
       setToolTipText(Messages.Training_Action_EditHrZones_Tooltip);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)));
+      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)));
 
       _trainingView = trainingView;
    }

@@ -331,7 +331,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionPreferences = ActionFactory.PREFERENCES.create(window);
       _actionPreferences.setText(Messages.App_Action_open_preferences);
-      _actionPreferences.setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)));
+      _actionPreferences.setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)));
       register(_actionPreferences);
 
       _actionOtherViews = new ActionOtherViews(window);

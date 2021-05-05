@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
@@ -28,7 +29,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String     MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
 
@@ -68,7 +68,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
    private MouseWheelListener      _defaultState_MouseWheelListener;
    private IPropertyChangeListener _defaultState_ChangePropertyListener;
 
-   private Action                  _actionRestoreDefaults;
+   private ActionResetToDefaults   _actionRestoreDefaults;
    private ActionOpenPrefDialog    _actionPrefDialog;
 
    private PixelConverter          _pc;
@@ -135,15 +135,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
    private void createActions() {
 
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPage_Map2_Appearance.ID);
       _actionPrefDialog.closeThisTooltip(this);
@@ -637,7 +629,8 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _map2View.restoreState_Map2_TrackOptions(true);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 

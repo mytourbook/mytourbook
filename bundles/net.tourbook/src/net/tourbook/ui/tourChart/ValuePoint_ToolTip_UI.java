@@ -229,7 +229,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.TourOptions)));
+         setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.TourOptions)));
       }
 
       @Override

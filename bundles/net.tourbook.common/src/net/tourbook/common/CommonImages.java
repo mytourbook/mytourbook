@@ -26,8 +26,8 @@ public class CommonImages {
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
    public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
-   public static final String App_Options_Dark             = "options-dark.png";                          //$NON-NLS-1$
    public static final String App_Pin_Themed               = "pin-blue.png";                              //$NON-NLS-1$
+   public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
 
    public static final String BookOpen_Themed              = "book-open-blue.png";                        //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$

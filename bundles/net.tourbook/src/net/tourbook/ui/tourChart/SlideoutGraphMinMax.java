@@ -19,6 +19,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -26,7 +28,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -49,7 +50,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String    GRAPH_LABEL_CADENCE_UNIT         = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
@@ -103,7 +104,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private PixelConverter _pc;
 
-   private Action         _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    private int            _columnSpacing;
 
@@ -305,18 +306,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -1044,7 +1034,8 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _prefStore.setValue(prefName, prefValue);
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _parent.setRedraw(false);
 

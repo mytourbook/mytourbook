@@ -116,7 +116,7 @@ public class ThemeUtil {
     *         appended to
     *         the image name when the dark theme image name is returned.
     */
-   public static String getThemeImageName(final String imageName) {
+   public static String getThemedImageName(final String imageName) {
 
       String imageNameThemed;
 

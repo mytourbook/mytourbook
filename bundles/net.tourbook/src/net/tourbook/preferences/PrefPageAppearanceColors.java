@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -258,7 +259,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       restoreState();
 
-      _colorViewer.setInput(this);
+      /*
+       * MUST be run async otherwise the background color is NOT themed !!!
+       */
+      ui.getDisplay().asyncExec(() -> {
+
+         _colorViewer.setInput(this);
+      });
 
       return ui;
    }
@@ -508,10 +515,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             if (element instanceof ColorDefinition) {
 
+               final Color backgroundColor = _colorViewer.getTree().getBackground();
+
                cell.setImage(_graphColorPainter.drawColorDefinitionImage(
                      (ColorDefinition) element,
                      numberOfHorizontalImages,
-                     false));
+                     false,
+                     backgroundColor));
 
             } else if (element instanceof GraphColorItem) {
 

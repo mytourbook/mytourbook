@@ -31,7 +31,7 @@ public class ActionManageMap25Providers extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)));
+      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)));
    }
 
    @Override

@@ -43,7 +43,7 @@ public class ActionExpandSelection extends Action {
       setText(Messages.app_action_expand_selection_tooltip);
       setToolTipText(Messages.app_action_expand_selection_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemeImageName(Images.App_ExpandAll)));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.App_ExpandAll)));
    }
 
    /**

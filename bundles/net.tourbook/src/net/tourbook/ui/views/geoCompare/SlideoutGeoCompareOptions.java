@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,10 +17,11 @@ package net.tourbook.ui.views.geoCompare;
 
 import java.util.ArrayList;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
@@ -31,7 +32,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for the tour tag filter
  */
-public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final String      VALUE_FORMAT_1_0              = "%1.0f %s";                   //$NON-NLS-1$
    private static final String      VALUE_FORMAT_1_1              = "%1.1f %s";                   //$NON-NLS-1$
@@ -73,7 +73,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
    private IPropertyChangeListener  _mapOptions_PropertyListener;
    private SelectionAdapter         _mapOptions_SelectionListener;
 
-   private Action                   _actionRestoreDefaults;
+   private ActionResetToDefaults    _actionRestoreDefaults;
 
    private GeoCompareView           _geoCompareView;
 
@@ -141,18 +141,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -589,7 +578,8 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
       _secondColumnControls.clear();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 
