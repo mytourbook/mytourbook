@@ -887,6 +887,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Tour_Tags();
       defineColumn_Tour_TagAndCategoryNotes();
       defineColumn_Tour_TagID();
+      defineColumn_Tour_TagThumbnail();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -1418,6 +1419,37 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                cell.setText(tagNames);
                setCellColor(cell, element);
             } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tag thumbnail
+    */
+   private void defineColumn_Tour_TagThumbnail() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_THUMBNAIL.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITagView_Tag) {
+
+               cell.setImage(TourbookPlugin.getImageDescriptor(Images.AdjustElevation).createImage());
+
+            } else if (element instanceof TVITagView_TagCategory) {
+
+               final long categoryId = ((TVITagView_TagCategory) element).getCategoryId();
+
+               cell.setText(Long.toString(categoryId));
+
+            } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }

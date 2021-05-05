@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,10 +34,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -211,7 +210,7 @@ public class EasyImportManager {
                return returnState;
             }
 
-            getImportFiles(fileStores);
+            getImportFiles();
 
          } finally {
             STORE_LOCK.unlock();
@@ -223,11 +222,11 @@ public class EasyImportManager {
       return returnState;
    }
 
-   private HashSet<String> getBackupFiles(final String folder, final Iterable<FileStore> fileStores) {
+   private HashSet<String> getBackupFiles(final String folder) {
 
       final HashSet<String> backupFiles = new HashSet<>();
 
-      final Path validPath = getValidPath(folder, fileStores);
+      final Path validPath = getValidPath(folder);
       if (validPath == null) {
          return backupFiles;
       }
@@ -329,7 +328,7 @@ public class EasyImportManager {
 
    /**
     */
-   private void getImportFiles(final Iterable<FileStore> fileStores) throws InterruptedException {
+   private void getImportFiles() throws InterruptedException {
 
       final ArrayList<OSFile> movedFiles = new ArrayList<>();
       final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
@@ -348,7 +347,7 @@ public class EasyImportManager {
       HashSet<String> availableBackupFiles = null;
       if (importConfig.isCreateBackup) {
 
-         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder(), fileStores);
+         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
       }
 
       /*
@@ -356,8 +355,7 @@ public class EasyImportManager {
        */
       final List<OSFile> existingDeviceFiles = getOSFiles(
             importConfig.getDeviceOSFolder(),
-            importConfig.fileGlobPattern,
-            fileStores);
+            importConfig.fileGlobPattern);
 
       easyConfig.numDeviceFiles = existingDeviceFiles.size();
 
@@ -372,8 +370,7 @@ public class EasyImportManager {
 
          final List<OSFile> existingBackupFiles = getOSFiles(
                importConfig.getBackupOSFolder(),
-               importConfig.fileGlobPattern,
-               fileStores);
+               importConfig.fileGlobPattern);
 
          for (final OSFile backupFile : existingBackupFiles) {
 
@@ -443,21 +440,15 @@ public class EasyImportManager {
       }
 
       // sort by filename
-      Collections.sort(notImportedFiles, new Comparator<OSFile>() {
-         @Override
-         public int compare(final OSFile file1, final OSFile file2) {
-            return file1.getFileName().compareTo(file2.getFileName());
-         }
-      });
+      Collections.sort(notImportedFiles, (file1, file2) -> file1.getFileName().compareTo(file2.getFileName()));
    }
 
    private List<OSFile> getOSFiles(final String folder,
-                                   final String globFilePattern,
-                                   final Iterable<FileStore> fileStores) throws InterruptedException {
+                                   final String globFilePattern) throws InterruptedException {
 
       final List<OSFile> osFiles = new ArrayList<>();
 
-      final Path validPath = getValidPath(folder, fileStores);
+      final Path validPath = getValidPath(folder);
       if (validPath == null) {
          return osFiles;
       }
@@ -527,7 +518,7 @@ public class EasyImportManager {
     * @param osFolder
     * @return Returns the device OS path or <code>null</code> when this folder is not valid.
     */
-   private Path getValidPath(final String osFolder, final Iterable<FileStore> fileStores) {
+   private Path getValidPath(final String osFolder) {
 
       if (osFolder != null && osFolder.trim().length() > 0) {
 
@@ -603,7 +594,7 @@ public class EasyImportManager {
 
                case TAG_CONFIG:
 
-                  loadEasyConfig_10_Common(xmlConfig, easyConfig);
+                  // loadEasyConfig_10_Common(xmlConfig, easyConfig);
                   break;
 
                case TAG_DASH_CONFIG:
@@ -667,9 +658,9 @@ public class EasyImportManager {
       return easyConfig;
    }
 
-   private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
-
-   }
+//   private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
+//
+//   }
 
    private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
@@ -971,7 +962,7 @@ public class EasyImportManager {
 
       TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
 
-      final boolean isCanceled[] = { false };
+      final boolean[] isCanceled = { false };
 
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
@@ -1026,7 +1017,7 @@ public class EasyImportManager {
 
    private void runImport_UpdateTourData(final ImportLauncher importLauncher, final ImportDeviceState importState) {
 
-      final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
+      final Map<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
       if (importedTours.isEmpty()) {
          // nothing is imported

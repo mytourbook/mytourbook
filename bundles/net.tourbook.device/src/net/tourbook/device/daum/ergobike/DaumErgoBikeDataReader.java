@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
@@ -47,8 +47,9 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
    private DecimalFormat       _decimalFormat        = (DecimalFormat) DecimalFormat.getInstance();
 
-   // plugin constructor
-   public DaumErgoBikeDataReader() {}
+   public DaumErgoBikeDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -94,8 +95,9 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 //		// TODO Auto-generated method stub
 //		return false;
 //	}

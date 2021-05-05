@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
@@ -203,12 +204,12 @@ public class RawDataManager {
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private final HashMap<Long, TourData>   _toursInImportView                  = new HashMap<>();
+   private final Map<Long, TourData>       _toursInImportView                  = new HashMap<>();
 
    /**
     * Contains tours which are imported from the last file name.
     */
-   private final HashMap<Long, TourData>   _newlyImportedTours                 = new HashMap<>();
+   private final Map<Long, TourData>       _newlyImportedTours                 = new HashMap<>();
 
    private String                          _lastImportedFileName;
 
@@ -1112,7 +1113,7 @@ public class RawDataManager {
        */
       final TourData oldTourDataInImportView = _toursInImportView.remove(oldTourId);
 
-      if (importRawData(reimportedFile, null, false, null, false)) {
+      if (importRawData(reimportedFile, null, false, null, false, true)) {
 
          /*
           * tour(s) could be re-imported from the file, check if it contains a valid tour
@@ -1880,7 +1881,7 @@ public class RawDataManager {
     * @return Returns all {@link TourData} which has been imported or received and are displayed in
     *         the import view, tour id is the key.
     */
-   public HashMap<Long, TourData> getImportedTours() {
+   public Map<Long, TourData> getImportedTours() {
       return _toursInImportView;
    }
 
@@ -1939,7 +1940,8 @@ public class RawDataManager {
                                 final String destinationPath,
                                 final boolean buildNewFileNames,
                                 final FileCollisionBehavior fileCollision,
-                                final boolean isTourDisplayedInImportView) {
+                                final boolean isTourDisplayedInImportView,
+                                final boolean isReimport) {
 
       final String importFilePathName = importFile.getAbsolutePath();
       final Display display = Display.getDefault();
@@ -2018,7 +2020,8 @@ public class RawDataManager {
                      destinationPath,
                      buildNewFileNames,
                      fileCollision,
-                     isTourDisplayedInImportView)) {
+                     isTourDisplayedInImportView,
+                     isReimport)) {
 
                   isDataImported = true;
                   _isImported = true;
@@ -2050,7 +2053,8 @@ public class RawDataManager {
                      destinationPath,
                      buildNewFileNames,
                      fileCollision,
-                     isTourDisplayedInImportView)) {
+                     isTourDisplayedInImportView,
+                     isReimport)) {
 
                   isDataImported = true;
                   _isImported = true;
@@ -2103,7 +2107,8 @@ public class RawDataManager {
                                     final String destinationPath,
                                     final boolean buildNewFileName,
                                     FileCollisionBehavior fileCollision,
-                                    final boolean isTourDisplayedInImportView) {
+                                    final boolean isTourDisplayedInImportView,
+                                    final boolean isReimport) {
 
       if (fileCollision == null) {
          fileCollision = new FileCollisionBehavior();
@@ -2152,7 +2157,8 @@ public class RawDataManager {
                   sourceFileName,
                   _deviceData,
                   _toursInImportView,
-                  _newlyImportedTours);
+                  _newlyImportedTours,
+                  isReimport);
 
          } catch (final Exception e) {
             TourLogManager.logEx(e);
@@ -2554,7 +2560,7 @@ public class RawDataManager {
 
                }
 
-               if (importRawData(importFile, null, false, null, true)) {
+               if (importRawData(importFile, null, false, null, true, false)) {
 
                   importCounter++;
 

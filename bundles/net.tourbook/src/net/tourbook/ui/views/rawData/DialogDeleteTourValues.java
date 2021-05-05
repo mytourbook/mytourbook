@@ -81,10 +81,9 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
    private SelectionAdapter             _defaultListener;
 
-   private Image                        _imageLockClosed                            = TourbookPlugin.getImageDescriptor(Images.Lock_Closed)
-         .createImage();
-   private Image                        _imageLockOpen                              = TourbookPlugin.getImageDescriptor(Images.Lock_Open)
-         .createImage();
+   //
+   private Image _imageLockClosed = TourbookPlugin.getImageDescriptor(Images.Lock_Closed).createImage();
+   private Image _imageLockOpen   = TourbookPlugin.getImageDescriptor(Images.Lock_Open).createImage();
 
    /*
     * UI controls

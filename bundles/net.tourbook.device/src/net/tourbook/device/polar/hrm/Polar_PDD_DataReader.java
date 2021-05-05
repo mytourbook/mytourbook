@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
@@ -47,27 +48,29 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Polar_PDD_DataReader extends TourbookDevice {
 
-   private static final String     DATA_DELIMITER           = "\t";                                       //$NON-NLS-1$
+   private static final String    DATA_DELIMITER           = "\t";                                       //$NON-NLS-1$
 
-   private static final String     SECTION_DAY_INFO         = "[DayInfo]";                                //$NON-NLS-1$
-   private static final String     SECTION_EXERCISE_INFO    = "[ExerciseInfo";                            //$NON-NLS-1$
+   private static final String    SECTION_DAY_INFO         = "[DayInfo]";                                //$NON-NLS-1$
+   private static final String    SECTION_EXERCISE_INFO    = "[ExerciseInfo";                            //$NON-NLS-1$
    //
-   private final IPreferenceStore  _prefStore               = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore               = Activator.getDefault().getPreferenceStore();
 
-   private DeviceData              _deviceData;
-   private String                  _importFilePath;
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private DeviceData             _deviceData;
+   private String                 _importFilePath;
+   private Map<Long, TourData>    _alreadyImportedTours;
+   private Map<Long, TourData>    _newlyImportedTours;
    //
-   private boolean                 _isDebug                 = false;
-   private int                     _fileVersionDayInfo      = -1;
+   private boolean                _isDebug                 = false;
+   private int                    _fileVersionDayInfo      = -1;
 
-   private Day                     _currentDay;
-   private Exercise                _currentExercise;
+   private Day                    _currentDay;
+   private Exercise               _currentExercise;
 
-   private ArrayList<String>       _exerciseFiles           = new ArrayList<>();
-   private ArrayList<String>       _additionalImportedFiles = new ArrayList<>();
-   private HashMap<Long, Integer>  _tourSportMap            = new HashMap<>();
+   private ArrayList<String>      _exerciseFiles           = new ArrayList<>();
+   private ArrayList<String>      _additionalImportedFiles = new ArrayList<>();
+   private HashMap<Long, Integer> _tourSportMap            = new HashMap<>();
+
+   private boolean                _isReimport;
 
    private class Day {
 
@@ -89,8 +92,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       private int           sport;
    }
 
-   // plugin constructor
-   public Polar_PDD_DataReader() {}
+   public Polar_PDD_DataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -269,7 +273,8 @@ public class Polar_PDD_DataReader extends TourbookDevice {
             importFilePath.toOSString(),
             _deviceData,
             alreadyImportedTours,
-            newlyImportedTours) == false) {
+            newlyImportedTours,
+            _isReimport) == false) {
          return null;
       }
 
@@ -955,8 +960,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;
@@ -965,6 +971,8 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
       _additionalImportedFiles.clear();
       _exerciseFiles.clear();
+
+      _isReimport = isReimport;
 
       if (_isDebug) {
          System.out.println(importFilePath);

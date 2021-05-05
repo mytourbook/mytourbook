@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.device.mio;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -37,7 +37,9 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
    private static final String TAG_MAGELLAN    = UI.SYMBOL_LESS_THAN + Cyclo105SAXHandler.TAG_ROOT_MAGELLAN + UI.SYMBOL_GREATER_THAN;
    private static final String TAG_TRACKPOINTS = UI.SYMBOL_LESS_THAN + Cyclo105SAXHandler.TAG_ROOT_TRACKPOINTS + UI.SYMBOL_GREATER_THAN;
 
-   public Cyclo105DeviceDataReader() {}
+   public Cyclo105DeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -81,12 +83,12 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
             final BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
          String line = fileReader.readLine();
-         if (StringUtils.isNullOrEmpty(line) || line.toLowerCase().startsWith(XML_START_ID) == false) {
+         if (StringUtils.isNullOrEmpty(line) || !line.toLowerCase().startsWith(XML_START_ID)) {
             return false;
          }
 
          line = fileReader.readLine();
-         if (StringUtils.isNullOrEmpty(line) || line.equalsIgnoreCase(TAG_MAGELLAN) == false) {
+         if (StringUtils.isNullOrEmpty(line) || !line.equalsIgnoreCase(TAG_MAGELLAN)) {
             return false;
          }
 
@@ -107,10 +109,11 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
-      if (isValidCyclo105File(importFilePath) == false) {
+      if (!isValidCyclo105File(importFilePath)) {
          return false;
       }
 

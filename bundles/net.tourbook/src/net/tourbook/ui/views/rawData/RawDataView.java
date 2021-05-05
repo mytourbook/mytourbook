@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -125,7 +126,6 @@ import net.tourbook.web.WEB;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.GroupMarker;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -597,13 +597,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          final int selectedIndex = ((Number) arguments[0]).intValue();
 
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-
-               onSelectImportConfig(selectedIndex);
-            }
-         });
+         Display.getCurrent().asyncExec(() -> onSelectImportConfig(selectedIndex));
 
 //// this can be used to show created JS in the debugger
 //         if (true) {
@@ -2179,13 +2173,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-
-            fillContextMenu(manager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(this::fillContextMenu);
    }
 
    @Override
@@ -3562,7 +3550,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<Long> savedToursIds = new ArrayList<>();
 
       // update raw data map with the saved tour data
-      final HashMap<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
+      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
       for (final TourData tourData : savedTours) {
 
          final Long tourId = tourData.getTourId();
@@ -4252,12 +4240,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (locationParts.length > 1) {
 
          // finalize loading of the browser page and then start the action
-         _browser.getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               onBrowser_LocationChanging_Runnable(locationParts);
-            }
-         });
+         _browser.getDisplay().asyncExec(() -> onBrowser_LocationChanging_Runnable(locationParts));
       }
 
       // prevent to load a new url
@@ -4525,7 +4508,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true);
+            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true, true);
 
             if (isImported) {
                TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
@@ -4610,7 +4593,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void removeTours(final ArrayList<ITourItem> removedTours) {
 
-      final HashMap<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
+      final Map<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
 
       for (final ITourItem tourItem : removedTours) {
 
@@ -4789,12 +4772,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // open import config dialog to solve problems
          if (importState.isOpenSetup) {
 
-            _parent.getDisplay().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  action_Easy_SetupImport(0);
-               }
-            });
+            _parent.getDisplay().asyncExec(() -> action_Easy_SetupImport(0));
 
             return;
          }
@@ -5454,95 +5432,93 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private Runnable thread_WatchFolders_Runnable() {
 
-      return new Runnable() {
-         @Override
-         public void run() {
+      return () -> {
 
-            WatchService folderWatcher = null;
-            WatchKey watchKey = null;
+         WatchService folderWatcher = null;
+         WatchKey watchKey = null;
 
-            try {
+         try {
 
-               final EasyConfig easyConfig = getEasyConfig();
-               final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+            final EasyConfig easyConfig = getEasyConfig();
+            final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
-               /*
-                * Check device folder
-                */
-               boolean isDeviceFolderValid = false;
-               final String deviceFolder = importConfig.getDeviceOSFolder();
+            /*
+             * Check device folder
+             */
+            boolean isDeviceFolderValid = false;
+            final String deviceFolder = importConfig.getDeviceOSFolder();
 
-               final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
-                     deviceFolder)
-                           ? FileSystemManager.getFileSystem(deviceFolder) : null;
+            final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
+                  deviceFolder)
+                        ? FileSystemManager.getFileSystem(deviceFolder) : null;
 
-               // keep watcher local because it could be set to null !!!
-               folderWatcher = _folderWatcher =
-                     tourbookFileSystem != null
-                           ? tourbookFileSystem.newWatchService()
-                           : FileSystems.getDefault().newWatchService();
+            // keep watcher local because it could be set to null !!!
+            folderWatcher = _folderWatcher =
+                  tourbookFileSystem != null
+                        ? tourbookFileSystem.newWatchService()
+                        : FileSystems.getDefault().newWatchService();
 
-               if (deviceFolder != null) {
+            if (deviceFolder != null) {
 
-                  try {
+               try {
 
-                     final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
+                  final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
 
-                     if (Files.exists(deviceFolderPath)) {
+                  if (Files.exists(deviceFolderPath)) {
 
-                        isDeviceFolderValid = true;
+                     isDeviceFolderValid = true;
 
-                        deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
-                     }
-
-                  } catch (final Exception e) {}
-               }
-
-               if (isDeviceFolderValid) {
-
-                  Thread.currentThread().setName("WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
-
-               } else {
-
-                  // the device folder is not available, update the folder state
-
-                  updateUI_DeviceState();
-
-                  return;
-               }
-
-               /*
-                * Check backup folder
-                */
-               final String backupFolder = importConfig.getBackupOSFolder();
-               if (backupFolder != null) {
-
-                  try {
-
-                     final Path watchBackupFolder = Paths.get(backupFolder);
-
-                     if (Files.exists(watchBackupFolder)) {
-                        watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
-                     }
-
-                  } catch (final Exception e) {}
-               }
-
-               do {
-
-                  // wait for the next event
-                  watchKey = folderWatcher.take();
-
-                  if (Thread.currentThread().isInterrupted()) {
-                     Thread.currentThread().interrupt();
-                     throw new InterruptedException(); // Needed because DropboxFileWatcher take() doesn't throw interruptedException when interrupted
+                     deviceFolderPath.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
                   }
 
-                  /*
-                   * Events MUST be polled otherwise this will stay in an endless loop.
-                   */
-                  @SuppressWarnings("unused")
-                  final List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
+               } catch (final Exception e1) {}
+            }
+
+            if (isDeviceFolderValid) {
+
+               Thread.currentThread().setName("WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
+
+            } else {
+
+               // the device folder is not available, update the folder state
+
+               updateUI_DeviceState();
+
+               return;
+            }
+
+            /*
+             * Check backup folder
+             */
+            final String backupFolder = importConfig.getBackupOSFolder();
+            if (backupFolder != null) {
+
+               try {
+
+                  final Path watchBackupFolder = Paths.get(backupFolder);
+
+                  if (Files.exists(watchBackupFolder)) {
+                     watchBackupFolder.register(folderWatcher, ENTRY_CREATE, ENTRY_DELETE);
+                  }
+
+               } catch (final Exception e2) {}
+            }
+
+            do {
+
+               // wait for the next event
+               watchKey = folderWatcher.take();
+
+               if (Thread.currentThread().isInterrupted()) {
+                  Thread.currentThread().interrupt();
+                  throw new InterruptedException(); // Needed because DropboxFileWatcher take() doesn't throw interruptedException when interrupted
+               }
+
+               /*
+                * Events MUST be polled otherwise this will stay in an endless loop.
+                */
+               @SuppressWarnings("unused")
+               final List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
 
 //// log events, they are not used
 //                  for (final WatchEvent<?> event : polledEvents) {
@@ -5554,31 +5530,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //                     // TODO remove SYSTEM.OUT.PRINTLN
 //                  }
 
-                  // do not update the device state when the import is running otherwise the import file list can be wrong
-                  if (_isUpdateDeviceState) {
-                     thread_UpdateDeviceState();
-                  }
-
+               // do not update the device state when the import is running otherwise the import file list can be wrong
+               if (_isUpdateDeviceState) {
+                  thread_UpdateDeviceState();
                }
-               while (watchKey.reset());
 
-            } catch (final InterruptedException | ClosedWatchServiceException e) {
-               // no-op
-            } catch (final Exception e) {
-               TourLogManager.logEx(e);
-            } finally {
+            }
+            while (watchKey.reset());
 
-               try {
-                  if (watchKey != null) {
-                     watchKey.cancel();
-                  }
+         } catch (final InterruptedException | ClosedWatchServiceException e3) {
+            // no-op
+         } catch (final Exception e4) {
+            TourLogManager.logEx(e4);
+         } finally {
 
-                  if (folderWatcher != null) {
-                     folderWatcher.close();
-                  }
-               } catch (final Exception e) {
-                  TourLogManager.logEx(e);
+            try {
+               if (watchKey != null) {
+                  watchKey.cancel();
                }
+
+               if (folderWatcher != null) {
+                  folderWatcher.close();
+               }
+            } catch (final Exception e5) {
+               TourLogManager.logEx(e5);
             }
          }
       };

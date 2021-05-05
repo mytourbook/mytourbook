@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,7 @@ import de.byteholder.geoclipse.map.UI;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -34,7 +34,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -138,51 +137,51 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
    private static final String  TAG_USER_SETTINGS_RESTING   = "resting";                                                          //$NON-NLS-1$
 
    //
-   private boolean                 _isPolarDataValid = false;
-   private int                     _dataVersion      = -1;
+   private boolean             _isPolarDataValid = false;
+   private int                 _dataVersion      = -1;
    //
-   private boolean                 _isInExercise;
-   private boolean                 _isInExerciseCreated;
-   private boolean                 _isInExerciseTime;
-   private boolean                 _isInExerciseName;
-   private boolean                 _isInExerciseSport;
+   private boolean             _isInExercise;
+   private boolean             _isInExerciseCreated;
+   private boolean             _isInExerciseTime;
+   private boolean             _isInExerciseName;
+   private boolean             _isInExerciseSport;
    //
-   private boolean                 _isInResult;
-   private boolean                 _isInResultCalories;
-   private boolean                 _isInResultDuration;
-   private boolean                 _isInResultRecordingRate;
+   private boolean             _isInResult;
+   private boolean             _isInResultCalories;
+   private boolean             _isInResultDuration;
+   private boolean             _isInResultRecordingRate;
    //
-   private boolean                 _isInLaps;
-   private boolean                 _isInLap;
-   private boolean                 _isInLapDuration;
-   private boolean                 _isInLapDistance;
+   private boolean             _isInLaps;
+   private boolean             _isInLap;
+   private boolean             _isInLapDuration;
+   private boolean             _isInLapDistance;
    //
-   private boolean                 _isInSamples;
-   private boolean                 _isInSample;
-   private boolean                 _isInSampleType;
-   private boolean                 _isInSampleValues;
+   private boolean             _isInSamples;
+   private boolean             _isInSample;
+   private boolean             _isInSampleType;
+   private boolean             _isInSampleValues;
    //
-   private boolean                 _isInUserSettings;
-   private boolean                 _isInUserSettingsResting;
+   private boolean             _isInUserSettings;
+   private boolean             _isInUserSettingsResting;
 
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private ArrayList<TourType>     _allTourTypes;
+   private TourbookDevice      _device;
+   private String              _importFilePath;
+   private Map<Long, TourData> _alreadyImportedTours;
+   private Map<Long, TourData> _newlyImportedTours;
+   private ArrayList<TourType> _allTourTypes;
 
-   private boolean                 _isImported;
-   private boolean                 _isDebug          = false;
-   private boolean                 _isNewTourType    = false;
+   private boolean             _isImported;
+   private boolean             _isDebug          = false;
+   private boolean             _isNewTourType    = false;
 
-   private ArrayList<TimeData>     _timeSlices       = new ArrayList<>();
-   private ArrayList<Lap>          _laps             = new ArrayList<>();
+   private ArrayList<TimeData> _timeSlices       = new ArrayList<>();
+   private ArrayList<Lap>      _laps             = new ArrayList<>();
 
-   private Exercise                _currentExercise;
-   private Lap                     _currentLap;
-   private String                  _currentSampleType;
+   private Exercise            _currentExercise;
+   private Lap                 _currentLap;
+   private String              _currentSampleType;
 
-   private StringBuilder           _characters       = new StringBuilder(100);
+   private StringBuilder       _characters       = new StringBuilder(100);
 
    private class Exercise {
 
@@ -231,9 +230,8 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
    public PolarTrainerSAXHandler(final TourbookDevice device,
                                  final String importFileName,
-                                 final DeviceData deviceData,
-                                 final HashMap<Long, TourData> alreadyImportedTours,
-                                 final HashMap<Long, TourData> newlyImportedTours) {
+                                 final Map<Long, TourData> alreadyImportedTours,
+                                 final Map<Long, TourData> newlyImportedTours) {
 
       _device = device;
       _importFilePath = importFileName;

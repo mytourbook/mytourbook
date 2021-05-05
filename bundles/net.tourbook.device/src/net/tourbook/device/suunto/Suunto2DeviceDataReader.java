@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -44,8 +44,9 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    private static final String SUUNTO_TAG_HEADER            = "<header>";             //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES           = "<samples>";            //$NON-NLS-1$
 
-   // plugin constructor
-   public Suunto2DeviceDataReader() {}
+   public Suunto2DeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -158,8 +159,9 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       if (isSuuntoXMLFile(importFilePath) == false) {
          return false;
