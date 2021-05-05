@@ -30,8 +30,8 @@ public class ActionZoomIn extends Action {
       setText(Messages.Action_zoom_in);
       setToolTipText(Messages.Action_zoom_in_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemeImageName(ChartImages.Zoom_In)));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemeImageName(ChartImages.Zoom_In_Disabled)));
+      setImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_In)));
+      setDisabledImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_In_Disabled)));
    }
 
    @Override

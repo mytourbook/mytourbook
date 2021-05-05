@@ -25,6 +25,8 @@ public class Messages extends NLS {
    public static String        App_Action_New_WithConfirm;
    public static String        App_Action_Remove_NoConfirm;
    public static String        App_Action_Rename_WithConfirm;
+   public static String        App_Action_RestoreDefault;
+   public static String        App_Action_RestoreDefault_Tooltip;
 
    public static String        App_Error_NotSupportedValueFormatter;
 

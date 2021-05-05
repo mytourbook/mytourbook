@@ -18,11 +18,12 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -31,7 +32,6 @@ import net.tourbook.srtm.IPreferences;
 import net.tourbook.srtm.PrefPageSRTMData;
 import net.tourbook.ui.ChartOptions_Grid;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -59,7 +59,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 /**
  * Tour chart properties slideout.
  */
-public class SlideoutTourChartOptions extends ToolbarSlideout {
+public class SlideoutTourChartOptions extends ToolbarSlideout implements IActionResetToDefault {
 
    private final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
@@ -67,7 +67,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private MouseWheelListener     _defaultMouseWheelListener;
 
    private ActionOpenPrefDialog   _actionPrefDialog;
-   private Action                 _actionRestoreDefaults;
+   private ActionResetToDefaults  _actionRestoreDefaults;
 
    private ChartOptions_Grid      _gridUI;
 
@@ -142,18 +142,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
       _actionPrefDialog.closeThisTooltip(this);
@@ -487,7 +476,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       onChangeUI();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
 

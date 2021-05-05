@@ -58,7 +58,7 @@ public class ActionTourMarkerFilter extends ContributionItem {
       _tourMarkerAllView = tourMarkerAllView;
       _parent = parent;
 
-      _actionImage = CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.TourOptions)).createImage();
+      _actionImage = CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.TourOptions)).createImage();
    }
 
    @Override

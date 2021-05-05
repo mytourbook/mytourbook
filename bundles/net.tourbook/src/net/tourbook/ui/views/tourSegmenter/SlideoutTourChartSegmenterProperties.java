@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourSegmenter;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.FontFieldEditorExtended;
@@ -29,7 +30,6 @@ import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * Tour chart marker properties slideout.
  */
 public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
-      implements IFontDialogListener, IColorSelectorListener {
+      implements IFontDialogListener, IColorSelectorListener, IActionResetToDefault {
 
    private static final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _segmenterState = TourSegmenterView.getState();
@@ -114,7 +114,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
    private TourSegmenterView _tourSegmenterView;
 
-   private Action            _actionRestoreDefaults;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    /*
     * UI controls
@@ -195,18 +195,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -695,46 +684,47 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
       }
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       // set font editor default values
       _valueFontEditor.loadDefault();
       _valueFontEditor.store();
 
       // hide small values
-      _segmenterState.put(//
-            TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
             TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT);
-      _segmenterState.put(//
-            TourSegmenterView.STATE_SMALL_VALUE_SIZE, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_SMALL_VALUE_SIZE,
             TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT);
 
       // show segment lines
-      _segmenterState.put(//
-            TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT);
-      _segmenterState.put(//
-            TourSegmenterView.STATE_LINE_OPACITY, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_LINE_OPACITY,
             TourSegmenterView.STATE_LINE_OPACITY_DEFAULT);
 
-      _segmenterState.put(//
+      _segmenterState.put(
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT);
-      _segmenterState.put(//
+      _segmenterState.put(
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT);
-      _segmenterState.put(//
+      _segmenterState.put(
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT);
-      _segmenterState.put(//
+      _segmenterState.put(
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
             TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT);
 
-      _segmenterState.put(//
-            TourSegmenterView.STATE_GRAPH_OPACITY, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_GRAPH_OPACITY,
             TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT);
-      _segmenterState.put(//
-            TourSegmenterView.STATE_STACKED_VISIBLE_VALUES, //
+      _segmenterState.put(
+            TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
             TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
       resetToDefaults_Segmenter();

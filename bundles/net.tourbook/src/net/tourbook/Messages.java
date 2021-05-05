@@ -563,8 +563,6 @@ public class Messages extends NLS {
    public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Rename;
    public static String        App_Action_RestartApp;
-   public static String        App_Action_RestoreDefault;
-   public static String        App_Action_RestoreDefault_Tooltip;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
    public static String        App_Action_SetPerson;

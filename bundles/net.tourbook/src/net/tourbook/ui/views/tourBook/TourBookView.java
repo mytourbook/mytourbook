@@ -218,9 +218,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_ON
    //
-   public static final String ID = "net.tourbook.views.tourListView"; //$NON-NLS-1$
-
-//
+   public static final String              ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
+   //
    private static final IPreferenceStore   _prefStore                                      = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore   _prefStore_Common                               = CommonActivator.getPrefStore();
    //

@@ -17,11 +17,12 @@ package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourPerson;
@@ -32,7 +33,6 @@ import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.preferences.PrefPagePeopleData;
 import net.tourbook.preferences.PrefPage_Appearance_Swimming;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart properties slideout.
  */
-public class Slideout_GraphBackground extends ToolbarSlideout {
+public class Slideout_GraphBackground extends ToolbarSlideout implements IActionResetToDefault {
 
    private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
 
@@ -62,7 +62,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
     */
    private ArrayList<GraphBgSourceType>  _availableGraphBgSourceTypes = new ArrayList<>();
 
-   private Action                        _actionRestoreDefaults;
+   private ActionResetToDefaults         _actionRestoreDefaults;
    private ActionOpenPrefDialog          _actionPrefDialog;
 
    private SelectionAdapter              _defaultSelectionListener;
@@ -124,18 +124,7 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Slideout_TourChartGraphBackground_Action_Colors_Tooltip,
@@ -352,7 +341,8 @@ public class Slideout_GraphBackground extends ToolbarSlideout {
 
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _spinnerGraphTransparencyFilling.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
 
