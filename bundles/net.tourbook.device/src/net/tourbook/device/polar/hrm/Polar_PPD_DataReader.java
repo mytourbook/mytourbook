@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
@@ -119,9 +120,9 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
    private HashMap<Integer, TourType> addAllMissingSportTypes() {
 
-      final HashMap<Integer, TourType> tourTypeForSport = new HashMap<Integer, TourType>();
+      final HashMap<Integer, TourType> tourTypeForSport = new HashMap<>();
 
-      final HashMap<String, TourType> knownTourTypes = new HashMap<String, TourType>();
+      final HashMap<String, TourType> knownTourTypes = new HashMap<>();
 
       final ArrayList<TourType> backendTourTypes = TourDatabase.getAllTourTypes();
 
@@ -377,7 +378,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
       String line;
       int numberOfSports;
 
-      _sports = new HashMap<Integer, Sport>();
+      _sports = new HashMap<>();
 
       try {
 
@@ -437,8 +438,9 @@ public class Polar_PPD_DataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       if (_isDebug) {
          System.out.println(importFilePath);
@@ -481,7 +483,8 @@ public class Polar_PPD_DataReader extends TourbookDevice {
                      pddFile.getAbsolutePath(),
                      deviceData,
                      alreadyImportedTours,
-                     newlyImportedTours);
+                     newlyImportedTours,
+                     isReimport);
             }
 
             for (final Long tourId : newlyImportedTours.keySet()) {

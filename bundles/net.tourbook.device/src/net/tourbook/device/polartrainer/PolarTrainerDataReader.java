@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.polartrainer;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -56,7 +56,7 @@ public class PolarTrainerDataReader extends TourbookDevice {
 		return false;
 	}
 
-	public String getDeviceModeName(final int profileId) {
+	@Override public String getDeviceModeName(final int profileId) {
 		return null;
 	}
 
@@ -70,15 +70,16 @@ public class PolarTrainerDataReader extends TourbookDevice {
 		return -1;
 	}
 
-	public int getTransferDataSize() {
+	@Override public int getTransferDataSize() {
 		return -1;
 	}
 
 	@Override
 	public boolean processDeviceData(	final String importFilePath,
 										final DeviceData deviceData,
-										final HashMap<Long, TourData> alreadyImportedTours,
-										final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
 		if (isValidXMLFile(importFilePath, XML_POLAR_TAG) == false) {
 			return false;
@@ -113,7 +114,7 @@ public class PolarTrainerDataReader extends TourbookDevice {
 				TourManager.getInstance().clearTourDataCache();
 
 				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
+					@Override public void run() {
 						// fire modify event
 						_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 					}
@@ -124,7 +125,7 @@ public class PolarTrainerDataReader extends TourbookDevice {
 		return saxHandler.isImported();
 	}
 
-	public boolean validateRawData(final String fileName) {
+	@Override public boolean validateRawData(final String fileName) {
 		return isValidXMLFile(fileName, XML_POLAR_TAG);
 	}
 

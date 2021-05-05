@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -445,8 +445,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       }
    }
 
-   private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
-                               final HashMap<Long, TourData> newlyImportedTours) {
+   private void createTourData(final Map<Long, TourData> alreadyImportedTours,
+                               final Map<Long, TourData> newlyImportedTours) {
 
       // create data object for each tour
       final TourData tourData = new TourData();
@@ -850,8 +850,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    private boolean parseSection(final String importFileName,
                                 final DeviceData deviceData,
-                                final HashMap<Long, TourData> alreadyImportedTours,
-                                final HashMap<Long, TourData> newlyImportedTours) {
+                                final Map<Long, TourData> alreadyImportedTours,
+                                final Map<Long, TourData> newlyImportedTours) {
 
       boolean returnValue = false;
 
@@ -1597,8 +1597,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;

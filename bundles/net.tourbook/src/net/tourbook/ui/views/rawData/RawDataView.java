@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -3562,7 +3563,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ArrayList<Long> savedToursIds = new ArrayList<>();
 
       // update raw data map with the saved tour data
-      final HashMap<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
+      final Map<Long, TourData> rawDataMap = _rawDataMgr.getImportedTours();
       for (final TourData tourData : savedTours) {
 
          final Long tourId = tourData.getTourId();
@@ -4610,7 +4611,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void removeTours(final ArrayList<ITourItem> removedTours) {
 
-      final HashMap<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
+      final Map<Long, TourData> tourMap = _rawDataMgr.getImportedTours();
 
       for (final ITourItem tourItem : removedTours) {
 

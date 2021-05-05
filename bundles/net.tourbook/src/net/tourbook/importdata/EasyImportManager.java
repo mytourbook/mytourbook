@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,9 +35,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -1026,7 +1026,7 @@ public class EasyImportManager {
 
    private void runImport_UpdateTourData(final ImportLauncher importLauncher, final ImportDeviceState importState) {
 
-      final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
+      final Map<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
       if (importedTours.isEmpty()) {
          // nothing is imported
