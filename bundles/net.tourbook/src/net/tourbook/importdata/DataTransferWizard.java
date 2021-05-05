@@ -150,7 +150,8 @@ public class DataTransferWizard extends Wizard {
                _dataTransferWizardPage._pathEditor.getStringValue(),
                _importDevice.buildNewFileNames,
                fileCollision,
-               true);
+               true,
+               false);
       }
 
       rawDataManager.updateTourData_InImportView_FromDb(null);

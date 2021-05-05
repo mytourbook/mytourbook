@@ -301,7 +301,8 @@ public class FitLogSAXHandler extends DefaultHandler {
                            final String importFilePath,
                            final Map<Long, TourData> alreadyImportedTours,
                            final Map<Long, TourData> newlyImportedTours,
-                           final boolean isFitLogExFile) {
+                           final boolean isFitLogExFile,
+                           final boolean isReimport) {
 
       _device = device;
       _importFilePath = importFilePath;
@@ -328,9 +329,12 @@ public class FitLogSAXHandler extends DefaultHandler {
             StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
          }
 
-         _customDataFieldDefinitions = saxHandler.getCustomDataFieldDefinitions();
-         _equipments = saxHandler.getEquipments();
-         saveEquipmentsAsTags();
+         //TODO FB
+         if (!isReimport) {
+            _customDataFieldDefinitions = saxHandler.getCustomDataFieldDefinitions();
+            _equipments = saxHandler.getEquipments();
+            saveEquipmentsAsTags();
+         }
       }
 
       _allTourTypes = TourDatabase.getAllTourTypes();

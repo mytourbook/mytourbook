@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -65,8 +65,9 @@ public class Suunto3_DeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       if (isValidXMLFile(importFilePath, SUUNTO_XML_TAG) == false) {
          return false;

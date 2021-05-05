@@ -4525,7 +4525,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final File file = new File(fileName);
          if (file.exists()) {
 
-            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true);
+            final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true, true);
 
             if (isImported) {
                TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
