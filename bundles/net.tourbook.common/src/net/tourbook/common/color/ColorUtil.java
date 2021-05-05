@@ -145,6 +145,10 @@ public class ColorUtil {
     */
    public static int getTransparencyFromPercentage(final int percentageValue) {
 
-      return 0xff * percentageValue / 100;
+      final int opacity = 0xff * percentageValue / 100;
+
+      //This occurred where 303 was returned. Not sure how it is possible and how
+      //to reproduce it but to avoid this, we bound the returned value
+      return Math.min(255, opacity);
    }
 }

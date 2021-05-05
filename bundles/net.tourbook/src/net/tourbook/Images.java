@@ -54,8 +54,6 @@ public class Images {
    public static final String App_Navigate_Next                         = "backward_nav.gif";                                //$NON-NLS-1$
    public static final String App_Navigate_Previous                     = "forward_nav.gif";                                 //$NON-NLS-1$
    public static final String App_OK                                    = "16px-Crystal_Clear_action_apply.png";             //$NON-NLS-1$
-   public static final String App_Options                               = "options.png";                                     //$NON-NLS-1$
-   public static final String App_Options_Bright                        = "options-bright.png";                              //$NON-NLS-1$
    public static final String App_Paste                                 = "paste_edit.png";                                  //$NON-NLS-1$
    public static final String App_Placeholder16                         = "placeholder16.png";                               //$NON-NLS-1$
    public static final String App_Refresh                               = "refresh.png";                                     //$NON-NLS-1$
@@ -155,6 +153,8 @@ public class Images {
    public static final String Graph_TourCompare_Disabled                = "tour-map-compare-result-graph-disabled.png";      //$NON-NLS-1$
    public static final String GroupValues                               = "app-group-values.png";                            //$NON-NLS-1$
    public static final String GroupValues_Disabled                      = "app-group-values-disabled.png";                   //$NON-NLS-1$
+   public static final String Lock_Closed                               = "lock-closed.png";                                 //$NON-NLS-1$
+   public static final String Lock_Open                                 = "lock-open.png";                                   //$NON-NLS-1$
    public static final String Map                                       = "map.png";                                         //$NON-NLS-1$
    public static final String Map_ValuePoint                            = "map-marker-value-point.png";                      //$NON-NLS-1$
    public static final String Map_WayPoint                              = "waypoint-large.png";                              //$NON-NLS-1$
@@ -307,8 +307,6 @@ public class Images {
    public static final String TourMarker_Disabled                       = "tour-marker-disabled.png";                        //$NON-NLS-1$
    public static final String TourMarker_New                            = "tour-marker-new.png";                             //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                   = "tour-marker-new-disabled.png";                    //$NON-NLS-1$
-   public static final String TourOptions                               = "tour-options.png";                                //$NON-NLS-1$
-   public static final String TourOptions_Disabled                      = "tour-options-disabled.png";                       //$NON-NLS-1$
    public static final String TourPauses                                = "tour-pauses.png";                                 //$NON-NLS-1$
    public static final String TourPauses_Disabled                       = "tour-pauses-disabled.png";                        //$NON-NLS-1$
    public static final String TourSegments                              = "tour-segments.png";                               //$NON-NLS-1$

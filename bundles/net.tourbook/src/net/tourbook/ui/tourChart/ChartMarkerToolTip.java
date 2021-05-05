@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -241,7 +242,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       _shellContainer = new Composite(shell, SWT.NONE);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
 //            .spacing(0, 0)
 //            .numColumns(2)
             // set margin to draw the border
@@ -257,12 +258,12 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       });
       {
          _ttContainer = new Composite(_shellContainer, SWT.NONE);
-         GridLayoutFactory.fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .extendedMargins(2, 5, 2, 5)
                .numColumns(1)
                .applyTo(_ttContainer);
-         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+//         _ttContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
             createUI_20_TopContainer();
             createUI_40_Description(_ttContainer);
@@ -293,7 +294,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           * Name
           */
          final Label lblName = new Label(topContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.FILL, SWT.CENTER)
                .indent(3, 0)
@@ -344,7 +345,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       if (markerDescription.length() > 0) {
 
          final Text txtDescription = new Text(parent, _textStyle);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
 //               .indent(-3, 0)
                .applyTo(txtDescription);
          txtDescription.setText(markerDescription);
@@ -376,7 +377,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       }
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
             .grab(true, false)
             .indent(3, 0)
@@ -598,7 +599,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       if (isText || isAddress) {
 
          final Link linkUrl = new Link(_ttContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .indent(3, 0)
                .applyTo(linkUrl);
 
@@ -1015,9 +1016,25 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
       final Display display = container.getDisplay();
 
+      Color foregroundColor;
+      Color backgroundColor;
+
+      if (UI.isDarkTheme()) {
+
+         final Shell shell = _shellContainer.getShell();
+
+         foregroundColor = shell.getForeground();
+         backgroundColor = shell.getBackground();
+
+      } else {
+
+         foregroundColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+         backgroundColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+      }
+
       UI.setColorForAllChildren(container,
-            display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-            display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+            foregroundColor,
+            backgroundColor);
    }
 
    void setIsShowMarkerActions(final boolean isShowMarkerActions) {
@@ -1067,7 +1084,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       txtControl.dispose();
 
       txtControl = new Text(parent, _textStyle | SWT.V_SCROLL);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .hint(widthHint, _defaultTextHeight)
             .applyTo(txtControl);
 

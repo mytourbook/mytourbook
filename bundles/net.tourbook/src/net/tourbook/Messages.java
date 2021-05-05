@@ -371,7 +371,10 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
 
+   public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
+   public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Checkbox_CadenceValues;
+   public static String        Dialog_ModifyTours_Checkbox_Calories;
    public static String        Dialog_ModifyTours_Checkbox_ElevationValues;
    public static String        Dialog_ModifyTours_Checkbox_GearValues;
    public static String        Dialog_ModifyTours_Checkbox_PowerAndPulseValues;
@@ -1425,6 +1428,8 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
    public static String        Pref_Graphs_Checkbox_ShowHorizontalGrid;
    public static String        Pref_Graphs_Checkbox_ShowVerticalGrid;
+   public static String        Pref_Graphs_ColorSelector_DarkTheme_Tooltip;
+   public static String        Pref_Graphs_ColorSelector_LightTheme_Tooltip;
    public static String        Pref_Graphs_Dialog_GridLine_Warning_Message;
    public static String        Pref_Graphs_Error_one_graph_must_be_selected;
    public static String        Pref_Graphs_grid_horizontal_distance;
@@ -2359,6 +2364,7 @@ public class Messages extends NLS {
 
    public static String Tour_Data_Text_AltitudeValues;
    public static String Tour_Data_Text_CadenceValues;
+   public static String Tour_Data_Text_Calories;
    public static String Tour_Data_Text_GearValues;
    public static String Tour_Data_Text_PowerValues;
    public static String Tour_Data_Text_PulseValues;
