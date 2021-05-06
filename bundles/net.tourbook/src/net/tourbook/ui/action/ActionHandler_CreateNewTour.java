@@ -15,51 +15,44 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.commands.IElementUpdater;
+import org.eclipse.ui.menus.UIElement;
 
-public class ActionEditTour extends Action {
-
-   private ITourProvider _tourProvider;
-
-   public ActionEditTour(final ITourProvider tourProvider) {
-
-      setText(Messages.App_Action_edit_tour);
-
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.EditTour)));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
-
-      setEnabled(false);
-
-      _tourProvider = tourProvider;
-   }
-
-   public static void doAction(final ITourProvider tourProvider) {
-
-      final TourDataEditorView tourEditorView = TourManager.openTourEditor(true);
-
-      if (tourEditorView != null) {
-
-         final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-         if (selectedTours != null && selectedTours.size() > 0) {
-            tourEditorView.setTourData(selectedTours.get(0));
-         }
-      }
-   }
+public class ActionHandler_CreateNewTour extends AbstractHandler implements IElementUpdater {
 
    @Override
-   public void run() {
-      doAction(_tourProvider);
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+      if (TourManager.isTourEditorModified()) {
+         return null;
+      }
+
+      final TourDataEditorView tourEditor = TourManager.openTourEditor(true);
+      if (tourEditor != null) {
+         tourEditor.actionCreateTour();
+      }
+
+      return null;
    }
 
+   @SuppressWarnings("rawtypes")
+   @Override
+   public void updateElement(final UIElement uiElement, final Map parameters) {
+
+      // set themed icon
+
+      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
+            ThemeUtil.getThemedImageName(Images.TourNew)));
+   }
 }

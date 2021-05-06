@@ -120,8 +120,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       IMapSyncListener {
 
 // SET_FORMATTING_OFF
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.Tour;
-   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.Tour_Disabled;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = Images.TourChart;
+   private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = Images.TourChart_Disabled;
    private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = Images.ShowPhotos_InMap;
    private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = Images.ShowAllPhotos_InMap_Disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = Images.SyncWith_Slider_Centered_Disabled;

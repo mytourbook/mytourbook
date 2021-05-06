@@ -53,7 +53,10 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private static final String     APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
+   private static final String     APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
+
+   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
 
    private IPropertyChangeListener _defaultChangePropertyListener;
    private SelectionAdapter        _defaultSelectionListener;
@@ -254,13 +257,13 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
             {
                // light color
                _colorSegmentAlternateColor_Light = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Light.getButton().setToolTipText(Messages.Pref_Graphs_ColorSelector_LightTheme_Tooltip);
+               _colorSegmentAlternateColor_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmentAlternateColor_Light.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Light.addOpenListener(this);
 
                // dark color
                _colorSegmentAlternateColor_Dark = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(Messages.Pref_Graphs_ColorSelector_DarkTheme_Tooltip);
+               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmentAlternateColor_Dark.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Dark.addOpenListener(this);
             }

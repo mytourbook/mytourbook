@@ -236,7 +236,7 @@ public class SearchMgr implements XHRHandler {
       /*
        * set image urls
        */
-      _iconUrl_Tour = getIconUrl(Images.Tour);
+      _iconUrl_Tour = getIconUrl(Images.TourChart);
       _iconUrl_Marker = getIconUrl(Images.TourMarker);
       _iconUrl_WayPoint = getIconUrl(IMAGE_ACTION_TOUR_WAY_POINT);
 
