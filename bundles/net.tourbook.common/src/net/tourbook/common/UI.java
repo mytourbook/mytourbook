@@ -1980,31 +1980,6 @@ public class UI {
       return new String(scrambledText);
    }
 
-   public static void setBackgroundColorForAllChildren(final Control parent, final Color bgColor) {
-
-      parent.setBackground(bgColor);
-
-      if (parent instanceof Composite) {
-
-         final Control[] children = ((Composite) parent).getChildren();
-
-         for (final Control child : children) {
-
-            if (child != null
-                  && child.isDisposed() == false //
-
-                  // exclude controls which look ugly
-                  && !child.getClass().equals(Combo.class)
-                  && !child.getClass().equals(Spinner.class)
-            //
-            ) {
-
-               setBackgroundColorForAllChildren(child, bgColor);
-            }
-         }
-      }
-   }
-
    /**
     * Set the layout data of the button to a GridData with appropriate heights and widths.
     *

@@ -5624,14 +5624,12 @@ public class ChartComponentGraph extends Canvas {
     */
    private void drawSync_410_XSlider(final GC gcGraph, final ChartXSlider slider) {
 
-      final Display display = getDisplay();
-
       final boolean isGraphOverlapped = _chartDrawingData.chartDataModel.isGraphOverlapped();
 
       final int devSliderLinePos = (int) (slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
 
       final int grayColorIndex = 60;
-      final Color colorTxt = new Color(display, grayColorIndex, grayColorIndex, grayColorIndex);
+      final Color colorTxt = new Color(grayColorIndex, grayColorIndex, grayColorIndex);
 
       int graphNo = 0;
 
@@ -5657,9 +5655,9 @@ public class ChartComponentGraph extends Canvas {
          final ChartDataYSerie yData = drawingData.getYData();
          final ChartXSliderLabel label = labelList.get(graphNo - 1);
 
-         final Color colorLine = new Color(display, yData.getRgbLine()[0]);
-         final Color colorBright = new Color(display, yData.getRgbBright()[0]);
-         final Color colorDark = new Color(display, yData.getRgbDark()[0]);
+         final Color colorLine = new Color(yData.getRgbLine()[0]);
+         final Color colorBright = new Color(yData.getRgbBright()[0]);
+         final Color colorDark = new Color(yData.getRgbDark()[0]);
 
          final int labelHeight = label.height;
          final int labelWidth = label.width;
@@ -5698,6 +5696,7 @@ public class ChartComponentGraph extends Canvas {
          gcGraph.drawRoundRectangle(devXLabel, devYLabel - 4, labelWidth, labelHeight + 3, 4, 4);
 
          // draw slider label
+//         gcGraph.setForeground(colorTxt);
          gcGraph.setForeground(_foregroundColor);
          gcGraph.drawText(label.text, devXLabel + 2, devYLabel - 5, true);
 
@@ -5736,13 +5735,7 @@ public class ChartComponentGraph extends Canvas {
 
             gcGraph.setAlpha(0xff);
          }
-
-         colorLine.dispose();
-         colorBright.dispose();
-         colorDark.dispose();
       }
-
-      colorTxt.dispose();
    }
 
    private void drawSync_415_XSliderArea(final GC gc) {
@@ -9035,7 +9028,7 @@ public class ChartComponentGraph extends Canvas {
 
       _foregroundColor = UI.isDarkTheme()
             ? _chart.getForeground() // this is the theme foreground color
-            : _chart.getBackgroundColor();
+            : _chart.getForeground();
    }
 
    void setXSliderAreaVisible(final boolean isXSliderAreaVisible) {

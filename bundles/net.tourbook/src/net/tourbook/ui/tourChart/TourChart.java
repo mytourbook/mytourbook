@@ -1137,6 +1137,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                   || property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
                   || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
+                  || property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK)
 
                   || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
                   || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
@@ -1733,33 +1734,40 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartMarkerConfig cmc = new ChartMarkerConfig();
 
-      cmc.isDrawMarkerWithDefaultColor = _tourChartConfiguration.isDrawMarkerWithDefaultColor;
-      cmc.isShowAbsoluteValues = _tourChartConfiguration.isShowAbsoluteValues;
-      cmc.isShowHiddenMarker = _tourChartConfiguration.isShowHiddenMarker;
-      cmc.isShowMarkerLabel = _tourChartConfiguration.isShowMarkerLabel;
-      cmc.isShowMarkerTooltip = _tourChartConfiguration.isShowMarkerTooltip;
-      cmc.isShowTooltipData_Elevation = _tourChartConfiguration.isShowTooltipData_Elevation;
-      cmc.isShowTooltipData_Distance = _tourChartConfiguration.isShowTooltipData_Distance;
-      cmc.isShowTooltipData_Duration = _tourChartConfiguration.isShowTooltipData_Duration;
-      cmc.isShowTooltipData_ElevationGainDifference = _tourChartConfiguration.isShowTooltipData_ElevationGainDifference;
-      cmc.isShowTooltipData_DistanceDifference = _tourChartConfiguration.isShowTooltipData_DistanceDifference;
-      cmc.isShowTooltipData_DurationDifference = _tourChartConfiguration.isShowTooltipData_DurationDifference;
-      cmc.isShowMarkerPoint = _tourChartConfiguration.isShowMarkerPoint;
-      cmc.isShowOnlyWithDescription = _tourChartConfiguration.isShowOnlyWithDescription;
-      cmc.isShowSignImage = _tourChartConfiguration.isShowSignImage;
-      cmc.isShowLabelTempPos = _tourChartConfiguration.isShowLabelTempPos;
+// SET_FORMATTING_OFF
 
-      cmc.markerLabelTempPos = _tourChartConfiguration.markerLabelTempPos;
-      cmc.markerTooltipPosition = _tourChartConfiguration.markerTooltipPosition;
+      cmc.isDrawMarkerWithDefaultColor                = _tourChartConfiguration.isDrawMarkerWithDefaultColor;
+      cmc.isShowAbsoluteValues                        = _tourChartConfiguration.isShowAbsoluteValues;
+      cmc.isShowHiddenMarker                          = _tourChartConfiguration.isShowHiddenMarker;
+      cmc.isShowMarkerLabel                           = _tourChartConfiguration.isShowMarkerLabel;
+      cmc.isShowMarkerTooltip                         = _tourChartConfiguration.isShowMarkerTooltip;
+      cmc.isShowTooltipData_Elevation                 = _tourChartConfiguration.isShowTooltipData_Elevation;
+      cmc.isShowTooltipData_Distance                  = _tourChartConfiguration.isShowTooltipData_Distance;
+      cmc.isShowTooltipData_Duration                  = _tourChartConfiguration.isShowTooltipData_Duration;
+      cmc.isShowTooltipData_ElevationGainDifference   = _tourChartConfiguration.isShowTooltipData_ElevationGainDifference;
+      cmc.isShowTooltipData_DistanceDifference        = _tourChartConfiguration.isShowTooltipData_DistanceDifference;
+      cmc.isShowTooltipData_DurationDifference        = _tourChartConfiguration.isShowTooltipData_DurationDifference;
+      cmc.isShowMarkerPoint                           = _tourChartConfiguration.isShowMarkerPoint;
+      cmc.isShowOnlyWithDescription                   = _tourChartConfiguration.isShowOnlyWithDescription;
+      cmc.isShowSignImage                             = _tourChartConfiguration.isShowSignImage;
+      cmc.isShowLabelTempPos                          = _tourChartConfiguration.isShowLabelTempPos;
 
-      cmc.markerHoverSize = _tourChartConfiguration.markerHoverSize;
-      cmc.markerLabelOffset = _tourChartConfiguration.markerLabelOffset;
-      cmc.markerPointSize = _tourChartConfiguration.markerPointSize;
-      cmc.markerSignImageSize = _tourChartConfiguration.markerSignImageSize;
+      cmc.markerLabelTempPos        = _tourChartConfiguration.markerLabelTempPos;
+      cmc.markerTooltipPosition     = _tourChartConfiguration.markerTooltipPosition;
 
-      cmc.markerColorDefault = _tourChartConfiguration.markerColorDefault;
-      cmc.markerColorDevice = _tourChartConfiguration.markerColorDevice;
-      cmc.markerColorHidden = _tourChartConfiguration.markerColorHidden;
+      cmc.markerHoverSize           = _tourChartConfiguration.markerHoverSize;
+      cmc.markerLabelOffset         = _tourChartConfiguration.markerLabelOffset;
+      cmc.markerPointSize           = _tourChartConfiguration.markerPointSize;
+      cmc.markerSignImageSize       = _tourChartConfiguration.markerSignImageSize;
+
+      cmc.markerColorDefault_Light  = _tourChartConfiguration.markerColorDefault_Light;
+      cmc.markerColorDefault_Dark   = _tourChartConfiguration.markerColorDefault_Dark;
+      cmc.markerColorDevice_Light   = _tourChartConfiguration.markerColorDevice_Light;
+      cmc.markerColorDevice_Dark    = _tourChartConfiguration.markerColorDevice_Dark;
+      cmc.markerColorHidden_Light   = _tourChartConfiguration.markerColorHidden_Light;
+      cmc.markerColorHidden_Dark    = _tourChartConfiguration.markerColorHidden_Dark;
+
+// SET_FORMATTING_ON
 
       if (_layerMarker == null) {
 
@@ -5036,6 +5044,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 // SET_FORMATTING_OFF
 
+      final int prefGraphTransparencyFilling_Light  = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
+      final int prefGraphTransparencyFilling_Dark   = _prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK);
+
       graphAntialiasing             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;
 
       isShowSegmentAlternateColor   = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
@@ -5043,7 +5054,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       segmentAlternateColor_Dark    = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK);
 
       graphTransparency_Line        = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-      graphTransparency_Filling     = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING));
+      graphTransparency_Filling     = ColorUtil.getTransparencyFromPercentage(UI.isDarkTheme()
+            ?prefGraphTransparencyFilling_Dark
+            :prefGraphTransparencyFilling_Light);
 
       isShowHorizontalGridLines     = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
       isShowVerticalGridLines       = Util.getPrefixPrefBoolean(_prefStore, GRID_PREF_PREFIX, ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
