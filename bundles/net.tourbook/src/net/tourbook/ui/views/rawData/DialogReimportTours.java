@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
@@ -127,7 +128,9 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _rdoReimport_Tours_BetweenDates;
    private Button    _rdoReimport_Tours_Selected;
    private Button    _btnUnlockAllToursSelection;
+   private Label     _lblUnlockAllToursSelection;
    private Button    _btnUnlockBetweenDatesSelection;
+   private Label     _lblUnlockBetweenDatesSelection;
 
    private DateTime  _dtTourDate_From;
    private DateTime  _dtTourDate_Until;
@@ -232,7 +235,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       group.setText(Messages.Dialog_ReimportTours_Group_Tours);
       group.setToolTipText(Messages.Dialog_ReimportTours_Group_Tours_Tooltip);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(4).applyTo(group);
+      GridLayoutFactory.swtDefaults().spacing(5, 7).numColumns(5).applyTo(group);
       {
          {
             /*
@@ -242,7 +245,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             _rdoReimport_Tours_Selected.setText(Messages.Dialog_ModifyTours_Radio_SelectedTours);
             _rdoReimport_Tours_Selected.addSelectionListener(_defaultListener);
             _rdoReimport_Tours_Selected.setSelection(true);
-            GridDataFactory.fillDefaults().span(4, 1).applyTo(_rdoReimport_Tours_Selected);
+            GridDataFactory.fillDefaults().span(5, 1).applyTo(_rdoReimport_Tours_Selected);
          }
          {
             /*
@@ -256,8 +259,7 @@ public class DialogReimportTours extends TitleAreaDialog {
          }
          {
             _btnUnlockAllToursSelection = new Button(group, SWT.PUSH);
-            _btnUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockAllToursSelection.setImage(_imageLockClosed);
+            _btnUnlockAllToursSelection.setImage(_imageLockOpen);
             _btnUnlockAllToursSelection.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -267,12 +269,12 @@ public class DialogReimportTours extends TitleAreaDialog {
 
                   final boolean isEnabled = _rdoReimport_Tours_All.isEnabled();
 
-                  _btnUnlockAllToursSelection.setText(isEnabled
+                  _btnUnlockAllToursSelection.setImage(isEnabled
+                        ? _imageLockClosed
+                        : _imageLockOpen);
+                  _lblUnlockAllToursSelection.setText(isEnabled
                         ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
                         : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-                  _btnUnlockAllToursSelection.setImage(isEnabled
-                        ? _imageLockOpen
-                        : _imageLockClosed);
 
                   if (!isEnabled) {
                      _rdoReimport_Tours_All.setSelection(false);
@@ -280,6 +282,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
                }
             });
+
+            _lblUnlockAllToursSelection = new Label(group, SWT.NONE);
+            _lblUnlockAllToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
          }
          {
             /*
@@ -300,8 +305,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                _dtTourDate_Until.setEnabled(false);
             }
             _btnUnlockBetweenDatesSelection = new Button(group, SWT.PUSH);
-            _btnUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-            _btnUnlockBetweenDatesSelection.setImage(_imageLockClosed);
+            _btnUnlockBetweenDatesSelection.setImage(_imageLockOpen);
             _btnUnlockBetweenDatesSelection.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -314,12 +318,12 @@ public class DialogReimportTours extends TitleAreaDialog {
                   _dtTourDate_From.setEnabled(isEnabled);
                   _dtTourDate_Until.setEnabled(isEnabled);
 
-                  _btnUnlockBetweenDatesSelection.setText(isEnabled
+                  _btnUnlockBetweenDatesSelection.setImage(isEnabled
+                        ? _imageLockClosed
+                        : _imageLockOpen);
+                  _lblUnlockBetweenDatesSelection.setText(isEnabled
                         ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
                         : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-                  _btnUnlockBetweenDatesSelection.setImage(isEnabled
-                        ? _imageLockOpen
-                        : _imageLockClosed);
 
                   if (!isEnabled) {
                      _rdoReimport_Tours_BetweenDates.setSelection(false);
@@ -327,6 +331,9 @@ public class DialogReimportTours extends TitleAreaDialog {
                   }
                }
             });
+
+            _lblUnlockBetweenDatesSelection = new Label(group, SWT.NONE);
+            _lblUnlockBetweenDatesSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
          }
       }
    }
