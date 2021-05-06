@@ -526,21 +526,21 @@
             <!-- Tour Import -->
             <command 
                commandId="command.net.tourbook.views.rawData.RawDataView"
-               icon="icons/directory-tour-import.png"
+               icon="icons/imported-tours.png"
                label="%view_name_Data_Import"
                mnemonic="%view_name_Data_Import_Mnemonic"/>
                   
             <!-- Tour Book -->
             <command 
                commandId="command.net.tourbook.views.tourListView"
-               icon="icons/directory-tour-book.png"
+               icon="icons/tourbook-tours.png"
                label="%view_name_Book"
                mnemonic="%view_name_Book_Mnemonic"/>
 
             <!-- Tagged Tours -->
             <command 
                commandId="command.net.tourbook.views.tagViewID"
-               icon="icons/directory-tagged-tours.png"
+               icon="icons/tagged-tours.png"
                label="%command_tagging_name"
                mnemonic="%command_tagging_name_Mnemonic"
                tooltip="%command_tagging_name_tooltip"/>
@@ -548,14 +548,14 @@
             <!-- Reference Tours -->
             <command 
                commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
-               icon="icons/directory-reference-tours.png"
+               icon="icons/reference-tours.png"
                label="%view_name_ReferenceTours"
                mnemonic="%view_name_ReferenceTours_Mnemonic"/>
 
             <!-- Collated Tours -->
             <command 
                commandId="command.net.tourbook.views.collatedToursViewID"
-               icon="icons/directory-collated-tours.png"
+               icon="icons/collated-tours.png"
                label="%View_Name_CollatedTours"
                mnemonic="%View_Name_CollatedTours_Mnemonic"
                tooltip="%View_Name_CollatedTours_Tooltip"/>
@@ -902,14 +902,14 @@
             <!-- Tour Import -->
             <command 
                commandId="command.net.tourbook.views.rawData.RawDataView"
-               icon="icons/directory-tour-import.png"
+               icon="icons/imported-tours.png"
                label="%view_name_Data_Import"
                mnemonic="%view_name_Data_Import_Mnemonic"/>
             
             <!-- Tour Book -->
             <command 
                commandId="command.net.tourbook.views.tourListView"
-               icon="icons/directory-tour-book.png"
+               icon="icons/tourbook-tours.png"
                label="%view_name_Book"
                mnemonic="%view_name_Book_Mnemonic"/>
                
@@ -1572,14 +1572,14 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.rawData.RawDataView"
-            icon        ="icons/directory-tour-import.png"
+            icon        ="icons/imported-tours.png"
             id          ="net.tourbook.views.rawData.RawDataView"
             name        ="%view_name_Data_Import"/>
             
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tourBook.TourBookView"
-            icon        ="icons/directory-tour-book.png"
+            icon        ="icons/tourbook-tours.png"
             id          ="net.tourbook.views.tourListView"
             name        ="%view_name_Book"/>
 
@@ -1593,7 +1593,7 @@
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tagging.TaggingView"
-            icon        ="icons/directory-tagged-tours.png"
+            icon        ="icons/tagged-tours.png"
             id          ="net.tourbook.views.tagViewID"
             name        ="%view_name_tagView"/>
 
@@ -1601,13 +1601,13 @@
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.collateTours.CollatedToursView"
             id          ="net.tourbook.ui.views.collateTours.CollatedToursView"
-            icon        ="icons/directory-collated-tours.png"
+            icon        ="icons/collated-tours.png"
             name        ="%View_Name_CollatedTours"/>
 
          <view
             category    ="net.tourbook.category.Tour_Directory"
             class       ="net.tourbook.ui.views.tourCatalog.TourCatalogView"
-            icon        ="icons/directory-reference-tours.png"
+            icon        ="icons/reference-tours.png"
             id          ="net.tourbook.views.tourCatalog.TourCatalogView"
             name        ="%view_name_ReferenceTours"/>
 

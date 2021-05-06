@@ -4212,8 +4212,8 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="267.37764"
-     inkscape:cx="130.10885"
+     inkscape:cy="274.87764"
+     inkscape:cx="170.10885"
      inkscape:zoom="16"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -6605,7 +6605,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07"
@@ -6614,7 +6614,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4"
@@ -6623,7 +6623,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours.png"
        y="244.00267"
        x="160.00023"
        height="15.999999"
@@ -6633,7 +6633,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4"
@@ -6642,7 +6642,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0"
@@ -6651,7 +6651,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours.png"
        y="244.00267"
        x="180.00021"
        height="15.999999"
@@ -6661,7 +6661,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0"
@@ -6670,7 +6670,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0"
@@ -6679,7 +6679,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours.png"
        y="244.06075"
        x="139.99979"
        height="15.999999"
@@ -6689,7 +6689,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0-6"
@@ -6698,7 +6698,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0-1"
@@ -6707,7 +6707,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours.png"
        y="244.00267"
        x="120.00067"
        height="15.999999"
@@ -6717,7 +6717,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0-6-2"
@@ -6726,7 +6726,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0-1-5"
@@ -6735,7 +6735,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours.png"
        y="244.00311"
        x="100.00025"
        height="15.999999"
@@ -11391,7 +11391,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-8"
@@ -11400,7 +11400,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-3"
@@ -11409,7 +11409,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tourbook-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-tours-dark.png"
        y="269.05765"
        x="160.00002"
        height="15.999999"
@@ -11419,7 +11419,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-2"
@@ -11428,7 +11428,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-04"
@@ -11437,7 +11437,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tour-import-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\imported-tours-dark.png"
        y="269.00269"
        x="180.00021"
        height="15.999999"
@@ -11447,7 +11447,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0-3"
@@ -11456,7 +11456,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0-9"
@@ -11465,7 +11465,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-tagged-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tagged-tours-dark.png"
        y="268.99957"
        x="140.00545"
        height="15.999999"
@@ -11475,7 +11475,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0-6-7"
@@ -11484,7 +11484,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0-1-4"
@@ -11493,7 +11493,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-reference-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\reference-tours-dark.png"
        y="269.00003"
        x="119.99997"
        height="15.999999"
@@ -11503,7 +11503,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12618-2-9-4-07-4-0-6-2-1"
@@ -11512,7 +11512,7 @@
     <path
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours-dark.png"
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect12620-6-6-9-4-0-0-1-5-0"
@@ -11521,7 +11521,7 @@
     <rect
        inkscape:export-ydpi="96.000092"
        inkscape:export-xdpi="96.000092"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\directory-collated-tours-dark.png"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\collated-tours-dark.png"
        y="269"
        x="100.00002"
        height="15.999999"

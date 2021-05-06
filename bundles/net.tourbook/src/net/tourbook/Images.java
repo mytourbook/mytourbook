@@ -46,11 +46,11 @@ public class Images {
    public static final String App_Copy_Disabled                         = "app-copy-disabled.png";                           //$NON-NLS-1$
    public static final String App_Delete                                = "delete.png";                                      //$NON-NLS-1$
    public static final String App_Delete_Disabled                       = "delete-disabled.png";                             //$NON-NLS-1$
-   public static final String App_Directory_CollatedTours               = "directory-collated-tours.png";                    //$NON-NLS-1$
-   public static final String App_Directory_ReferenceTours              = "directory-reference-tours.png";                   //$NON-NLS-1$
-   public static final String App_Directory_TaggedTours                 = "directory-tagged-tours.png";                      //$NON-NLS-1$
-   public static final String App_Directory_TourBook                    = "directory-tour-book.png";                         //$NON-NLS-1$
-   public static final String App_Directory_TourImport                  = "directory-tour-import.png";                       //$NON-NLS-1$
+   public static final String App_Directory_CollatedTours               = "collated-tours.png";                              // "directory-collated-tours.png";   //$NON-NLS-1$
+   public static final String App_Directory_ReferenceTours              = "reference-tours.png";                             // "directory-reference-tours.png";  //$NON-NLS-1$
+   public static final String App_Directory_TaggedTours                 = "tagged-tours.png";                                // "directory-tagged-tours.png";     //$NON-NLS-1$
+   public static final String App_Directory_TourBook                    = "tourbook-tours.png";                              // "directory-tour-book.png";        //$NON-NLS-1$
+   public static final String App_Directory_TourImport                  = "imported-tours.png";                              // "directory-tour-import.png";      //$NON-NLS-1$
    public static final String App_Edit                                  = "quick-edit.png";                                  //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                 = "icon-placeholder.gif";                            //$NON-NLS-1$
    public static final String App_ExpandAll                             = "expandall.png";                                   //$NON-NLS-1$
