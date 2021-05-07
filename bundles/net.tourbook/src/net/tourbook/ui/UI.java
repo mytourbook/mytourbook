@@ -33,6 +33,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -250,8 +251,10 @@ public class UI {
             Images.Graph_Temperature_Disabled);
 
       // tour type images
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin.getImageDescriptor(Images.TourType_Filter));
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin.getImageDescriptor(Images.TourType_Filter_System));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
+            TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourType_Filter)));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
+            TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourType_Filter_System)));
 
       // photo
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));

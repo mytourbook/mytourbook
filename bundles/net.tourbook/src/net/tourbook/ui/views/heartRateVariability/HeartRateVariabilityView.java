@@ -31,6 +31,7 @@ import net.tourbook.chart.MinMaxKeeper_XData;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -199,7 +200,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
          setToolTipText(Messages.HRV_View_Action_SynchChartScale);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.SyncStatistics)));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
       }
 
