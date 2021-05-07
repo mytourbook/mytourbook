@@ -15,9 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25.action;
 
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.UI;
 import net.tourbook.map2.Messages;
 import net.tourbook.preferences.PrefPage_Map25Provider;
 
@@ -31,7 +30,7 @@ public class ActionManageMap25Providers extends Action {
 
       super(Messages.Map_Action_ManageMapProviders, AS_PUSH_BUTTON);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)));
+      setImageDescriptor(UI.getThemedImageDescriptor(CommonImages.App_Options));
    }
 
    @Override

@@ -15,10 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.action;
 
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.Action;
 
@@ -38,7 +37,7 @@ public class ActionResetToDefaults extends Action {
       _restoreAction = restoreAction;
 
       setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_ResetToDefault)));
+      setImageDescriptor(UI.getThemedImageDescriptor(CommonImages.App_ResetToDefault));
    }
 
    @Override

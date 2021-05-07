@@ -257,16 +257,19 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       GRAPH_CONTRIBUTION_ID_SWIM_SWOLF
    };
 
+
 //SET_FORMATTING_ON
 
-   public static final PulseGraph PULSE_GRAPH_DEFAULT = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
+   private static ImageDescriptor                           _imagePhoto;
+   private static ImageDescriptor                           _imagePhotoTooltip;
+
+   public static final PulseGraph                           PULSE_GRAPH_DEFAULT          = PulseGraph.DEVICE_BPM___2ND_RR_AVERAGE;
 
    /**
     * 1e-5 is too small for the min value, it do not correct the graph.
     */
-   public static final double     MIN_ADJUSTMENT      = 1e-3;
-   public static final double     MAX_ADJUSTMENT      = 1e-5;
-   //
+   public static final double                               MIN_ADJUSTMENT               = 1e-3;
+   public static final double                               MAX_ADJUSTMENT               = 1e-5;
    //
    private final IDialogSettings                            _state;
    private final IPreferenceStore                           _prefStore                   = TourbookPlugin.getPrefStore();
@@ -319,9 +322,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private TourMarker                                       _selectedTourMarker;
 
    //
-   private ImageDescriptor               _imagePhoto                     = TourbookPlugin.getImageDescriptor(Images.PhotoPhotos);
-   private ImageDescriptor               _imagePhotoTooltip              = TourbookPlugin.getImageDescriptor(Images.PhotoImage);
-
    private IFillPainter                  _customBackgroundPainter;
 
    private OpenDialogManager             _openDlgMgr                     = new OpenDialogManager();
@@ -806,12 +806,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
-      _photoOverlayBGColorLink = new Color(
-            getDisplay(), //
+      _photoOverlayBGColorLink = new Color(getDisplay(),
             colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor_Active());
-      _photoOverlayBGColorTour = new Color(
-            getDisplay(), //
+      _photoOverlayBGColorTour = new Color(getDisplay(),
             colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active());
+
+      _imagePhoto = TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.PhotoPhotos));
+      _imagePhotoTooltip = TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.PhotoImage));
 
       setupChartConfig();
 

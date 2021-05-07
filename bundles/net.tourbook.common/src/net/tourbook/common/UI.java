@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -104,6 +105,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
@@ -1577,6 +1579,15 @@ public class UI {
    }
 
    /**
+    * @param imageName
+    * @return Returns the themed image descriptor from {@link CommonActivator} plugin images
+    */
+   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
+
+      return CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+   }
+
+   /**
     * @param event
     * @return Returns <code>true</code> when <Ctrl> key is pressed.
     */
@@ -2243,6 +2254,18 @@ public class UI {
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
       _isDarkThemeSelected = isDarkThemeSelected;
+   }
+
+   /**
+    * Set the themed image descriptor for a {@link UIElement} with images from the
+    * {@link TourbookPlugin} plugin
+    *
+    * @param uiElement
+    * @param imageName
+    */
+   public static void setThemedIcon(final UIElement uiElement, final String imageName) {
+
+      uiElement.setIcon(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
    }
 
    private static boolean setupUI_FontMetrics() {
