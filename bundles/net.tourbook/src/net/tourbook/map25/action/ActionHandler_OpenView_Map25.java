@@ -18,10 +18,9 @@ package net.tourbook.map25.action;
 import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25View;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -44,8 +43,6 @@ public class ActionHandler_OpenView_Map25 extends AbstractHandler implements IEl
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
       // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.Map25)));
+      UI.setThemedIcon(uiElement, Images.Map25);
    }
 }

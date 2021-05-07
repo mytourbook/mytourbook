@@ -18,10 +18,9 @@ package net.tourbook.ui.views;
 import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.statistic.StatisticValuesView;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -43,9 +42,6 @@ public class ActionHandler_OpenView_StatisticValues extends AbstractHandler impl
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.StatisticValues)));
+      UI.setThemedIcon(uiElement, Images.StatisticValues);
    }
 }

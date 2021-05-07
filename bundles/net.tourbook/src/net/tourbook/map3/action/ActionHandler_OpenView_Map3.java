@@ -18,10 +18,9 @@ package net.tourbook.map3.action;
 import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.view.Map3View;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -43,9 +42,6 @@ public class ActionHandler_OpenView_Map3 extends AbstractHandler implements IEle
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.Map3)));
+      UI.setThemedIcon(uiElement, Images.Map3);
    }
 }

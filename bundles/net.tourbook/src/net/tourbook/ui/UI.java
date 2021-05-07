@@ -92,6 +92,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
@@ -963,6 +964,18 @@ public class UI {
             event.detail &= ~SWT.SELECTED;
          }
       });
+   }
+
+   /**
+    * Set the themed image descriptor for a {@link UIElement} with images from the
+    * {@link TourbookPlugin} plugin
+    *
+    * @param uiElement
+    * @param icon
+    */
+   public static void setThemedIcon(final UIElement uiElement, final String icon) {
+
+      uiElement.setIcon(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(icon)));
    }
 
    private static void setupFonts() {

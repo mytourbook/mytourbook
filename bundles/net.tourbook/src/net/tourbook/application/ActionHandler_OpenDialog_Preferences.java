@@ -17,9 +17,8 @@ package net.tourbook.application;
 
 import java.util.Map;
 
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -44,9 +43,6 @@ public class ActionHandler_OpenDialog_Preferences extends AbstractHandler implem
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(CommonActivator.getImageDescriptor(
-            ThemeUtil.getThemedImageName(CommonImages.App_Options)));
+      UI.setThemedIcon(uiElement, CommonImages.App_Options);
    }
 }

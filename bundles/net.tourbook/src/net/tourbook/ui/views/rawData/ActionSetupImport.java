@@ -18,7 +18,7 @@ package net.tourbook.ui.views.rawData;
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.Action;
 
@@ -32,7 +32,7 @@ public class ActionSetupImport extends Action {
 
       setToolTipText(Messages.Import_Data_Action_SetupEasyImport_Tooltip);
 
-      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.TourOptions)));
+      setImageDescriptor(UI.getThemedImageDescriptor(CommonImages.TourOptions));
       setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
    }
 

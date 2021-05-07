@@ -18,9 +18,8 @@ package net.tourbook.ui.action;
 import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -43,9 +42,6 @@ public class ActionHandler_OpenView_TourChart extends AbstractHandler implements
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.TourChart)));
+      UI.setThemedIcon(uiElement, Images.TourChart);
    }
 }

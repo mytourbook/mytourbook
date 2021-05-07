@@ -19,8 +19,8 @@ import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
@@ -85,10 +85,7 @@ public class ActionHandler_TourFilter_TourWithPhotos extends AbstractHandler imp
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.TourFilter_TourWithPhotos)));
+      UI.setThemedIcon(uiElement, Images.TourFilter_TourWithPhotos);
    }
 
 }
