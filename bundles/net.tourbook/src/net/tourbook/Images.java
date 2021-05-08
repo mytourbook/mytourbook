@@ -42,8 +42,6 @@ public class Images {
    public static final String App_Cancel_Disabled                       = "cancel_disabled.png";                             //$NON-NLS-1$
    public static final String App_Cancel_2                              = "16px-Crystal_Clear_action_button_cancel.png";     //$NON-NLS-1$
    public static final String App_Close                                 = "app-close.png";                                   //$NON-NLS-1$
-   public static final String App_Copy                                  = "app-copy.png";                                    //$NON-NLS-1$
-   public static final String App_Copy_Disabled                         = "app-copy-disabled.png";                           //$NON-NLS-1$
    public static final String App_Delete                                = "delete.png";                                      //$NON-NLS-1$
    public static final String App_Delete_Disabled                       = "delete-disabled.png";                             //$NON-NLS-1$
    public static final String App_Directory_CollatedTours               = "collated-tours.png";                              // "directory-collated-tours.png";   //$NON-NLS-1$
@@ -349,6 +347,7 @@ public class Images {
    public static final String ZeroValues                                = "app-zero-values.png";                             //$NON-NLS-1$
    public static final String ZeroValues_Disabled                       = "app-zero-values-disabled.png";                    //$NON-NLS-1$
    public static final String Zoom_CenterTour                           = "zoom-center-tour.png";                            //$NON-NLS-1$
+   public static final String Zoom_CenterTour_Disabled                  = "zoom-center-tour-disabled.png";                   //$NON-NLS-1$
    public static final String Zoom_FitGraph                             = "zoom-fit-graph.gif";                              //$NON-NLS-1$
    public static final String Zoom_In                                   = "zoom-in.png";                                     //$NON-NLS-1$
    public static final String Zoom_In_Disabled                          = "zoom-in-disabled.png";                            //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapProvider);
+   private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.MapProvider);
 
    private IDialogSettings              _state;
 

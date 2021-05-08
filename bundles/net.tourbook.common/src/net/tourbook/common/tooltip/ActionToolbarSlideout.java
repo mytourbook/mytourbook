@@ -80,7 +80,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    public ActionToolbarSlideout() {
 
-      _imageEnabled = UI.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+      _imageEnabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
       _imageDisabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 

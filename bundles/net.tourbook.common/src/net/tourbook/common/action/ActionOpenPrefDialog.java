@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.action;
 
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 
@@ -42,7 +42,7 @@ public class ActionOpenPrefDialog extends Action {
    public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
       setText(text);
-      setImageDescriptor(UI.getThemedImageDescriptor(CommonImages.App_Options));
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _prefPageId = prefPageId;
    }

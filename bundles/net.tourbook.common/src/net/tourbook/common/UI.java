@@ -1579,15 +1579,6 @@ public class UI {
    }
 
    /**
-    * @param imageName
-    * @return Returns the themed image descriptor from {@link CommonActivator} plugin images
-    */
-   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
-
-      return CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
-   }
-
-   /**
     * @param event
     * @return Returns <code>true</code> when <Ctrl> key is pressed.
     */

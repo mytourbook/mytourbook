@@ -22,6 +22,8 @@ public class CommonImages {
 
    public static final String App_Close                    = "app-close.png";                             //$NON-NLS-1$
    public static final String App_Close_Themed             = "app-close-blue.png";                        //$NON-NLS-1$
+   public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
+   public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$

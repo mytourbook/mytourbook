@@ -74,8 +74,7 @@
    </extension>
 -->
    
-   <extension
-         point="org.eclipse.ui.editors">
+   <extension	point="org.eclipse.ui.editors">
       <editor
             class="net.tourbook.tour.TourEditor"
             icon="icons/tour-viewer.png"
@@ -83,8 +82,8 @@
             name="%command_view_tourViewer">
       </editor>
    </extension>
-   <extension
-         point="org.eclipse.ui.elementFactories">
+
+   <extension	point="org.eclipse.ui.elementFactories">
       <factory
             class="net.tourbook.tour.TourEditorInputFactory"
             id="net.tourbook.tour.TourEditorInputFactory">
@@ -92,40 +91,46 @@
    </extension>
 
 
-   <extension
-         point="org.eclipse.ui.perspectives">
+   <extension	point="org.eclipse.ui.perspectives">
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryRawData"
             icon="icons/imported-tours-perspective.png"
             id="net.tourbook.perspective.RawData"
             name="%perspective_name_RawData"/>
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourBook"
             icon="icons/tourbook-tours-perspective.png"
             id="net.tourbook.perspective.TourBook"
             name="%perspective_name_TourBook"/>
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourCatalog"
             icon="icons/reference-tours-perspective.png"
             id="net.tourbook.perspective.TourCatalog"
             name="%perspective_name_ReferenceTours"/>
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
             icon="icons/statistics-perspective.png"
             id="net.tourbook.perspective.Statistic"
             name="%perspective_name_Statistics"/>
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryCompareTours"
             icon="icons/tour-map-compare-result-perspective.png"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
+
       <perspective
             class="net.tourbook.application.PerspectiveFactoryPhoto"
             icon="icons/photo-merge-perspective.png"
             id="net.tourbook.perspective.TourPhotoLinks"
             name="%Perspective_Name_ToursAndPhotos"/>
+
    </extension>
-   
+
    <extension point="org.eclipse.ui.perspectiveExtensions">
 
       <perspectiveExtension targetID="*">
@@ -157,6 +162,7 @@
       </perspectiveExtension>
 
    </extension>
+
 
    <!-- PREF PAGES   -->
 
