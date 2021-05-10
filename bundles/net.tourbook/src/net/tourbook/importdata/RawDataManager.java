@@ -38,6 +38,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -840,7 +841,7 @@ public class RawDataManager {
 
             final File[] reimportedFile = new File[1];
             //TODO FB to rename to reimport, did I mix it up with the delete task ?
-            int deleted = 0;
+            final int deleted = 0;
             final int numberOfTours = selectedTourIds.length;
 
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
@@ -872,7 +873,8 @@ public class RawDataManager {
                final Runnable executorTask = () -> {
 
                   // get last added item
-                  final Long queueItem_TourId = _dbUpdateQueue.poll();
+                  Long queueItem_TourId;
+                     queueItem_TourId = _dbUpdateQueue.poll();
 
                   if (queueItem_TourId == null) {
                      return;
@@ -911,23 +913,20 @@ public class RawDataManager {
 //               }
             }
 
-            int toto = _dbUpdateExecutor.getActiveCount();
-            while (_dbUpdateExecutor.getActiveCount() > 0) {
+            // All tasks have been submitted, wen can begin the shutdown of our executor
+            System.out.println("Starting shutdown...");
+            _dbUpdateExecutor.shutdown();
 
-               final int currentActiveCount = _dbUpdateExecutor.getActiveCount();
+            // Every second we print our progress
+            while (!_dbUpdateExecutor.isTerminated()) {
+               _dbUpdateExecutor.awaitTermination(1, TimeUnit.SECONDS);
+               final int progress = Math.round((_dbUpdateExecutor.getCompletedTaskCount() * 100) /
+                     _dbUpdateExecutor.getTaskCount());
 
-               if (toto > currentActiveCount) {
-
-                  System.out.println(currentActiveCount);
-                  final int difference = toto - currentActiveCount;
-                  monitor.worked(difference);
-                  monitor.subTask(NLS.bind(
-                        Messages.Import_Data_Dialog_Reimport_SubTask,
-                        new Object[] { deleted += difference, numberOfTours }));
-
-                  toto = currentActiveCount;
-               }
+               System.out.println(progress + "% done (" + _dbUpdateExecutor.getCompletedTaskCount() +
+                     " emails have been sent).");
             }
+
 
             if (reImportStatus.isReImported) {
 
