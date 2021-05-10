@@ -38,7 +38,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -841,7 +840,7 @@ public class RawDataManager {
 
             final File[] reimportedFile = new File[1];
             //TODO FB to rename to reimport, did I mix it up with the delete task ?
-            final int deleted = 0;
+            int deleted = 0;
             final int numberOfTours = selectedTourIds.length;
 
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, numberOfTours);
@@ -913,18 +912,28 @@ public class RawDataManager {
 //               }
             }
 
-            // All tasks have been submitted, wen can begin the shutdown of our executor
+            // All tasks have been submitted, we can begin the shutdown of our executor
+            //(preventing new tasks from being submitted)
             System.out.println("Starting shutdown...");
             _dbUpdateExecutor.shutdown();
 
-            // Every second we print our progress
+            long toto = 0;
             while (!_dbUpdateExecutor.isTerminated()) {
-               _dbUpdateExecutor.awaitTermination(1, TimeUnit.SECONDS);
-               final int progress = Math.round((_dbUpdateExecutor.getCompletedTaskCount() * 100) /
-                     _dbUpdateExecutor.getTaskCount());
 
-               System.out.println(progress + "% done (" + _dbUpdateExecutor.getCompletedTaskCount() +
-                     " emails have been sent).");
+               final long currentActiveCount = _dbUpdateExecutor.getCompletedTaskCount();
+
+               if (currentActiveCount > toto) {
+
+                  System.out.println(currentActiveCount);
+                  final long difference = currentActiveCount - toto;
+                  monitor.worked((int) difference);
+                  monitor.subTask(NLS.bind(
+                        Messages.Import_Data_Dialog_Reimport_SubTask,
+                        new Object[] { deleted = (int) difference, numberOfTours }));
+
+                  toto = currentActiveCount;
+
+               }
             }
 
 
