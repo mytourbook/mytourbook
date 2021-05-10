@@ -126,31 +126,28 @@ public class RawDataManager {
 
 // SET_FORMATTING_ON
 
-   private static final String             RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
-   private static final String             TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
+   private static final String           RAW_DATA_LAST_SELECTED_PATH           = "raw-data-view.last-selected-import-path";              //$NON-NLS-1$
+   private static final String           TEMP_IMPORTED_FILE                    = "received-device-data.txt";                             //$NON-NLS-1$
 
-   private static final String             FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
+   private static final String           FILE_EXTENSION_FIT                    = ".fit";                                                 //$NON-NLS-1$
 
-   private static final IPreferenceStore   _prefStore                            = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings    _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
+   private static final IPreferenceStore _prefStore                            = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _stateRawDataView                     = TourbookPlugin.getState(RawDataView.ID);
 
-   private static final String             INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
+   private static final String           INVALIDFILES_TO_IGNORE                = "invalidfiles_to_ignore.txt";                           //$NON-NLS-1$
 
-   public static final int                 ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
+   public static final int               ADJUST_IMPORT_YEAR_IS_DISABLED        = -1;
 
-   static final ComboEnumEntry<?>[]        ALL_IMPORT_TOUR_TYPE_CONFIG;
+   static final ComboEnumEntry<?>[]      ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean                  _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean                  _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean                  _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static CadenceMultiplier        _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
+   private static boolean                _importState_IsAutoOpenImportLog      = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean                _importState_IsIgnoreInvalidFile      = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   private static boolean                _importState_IsSetBodyWeight          = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static CadenceMultiplier      _importState_DefaultCadenceMultiplier = (CadenceMultiplier) Util.getStateEnum(_stateRawDataView,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER,
          RawDataView.STATE_DEFAULT_CADENCE_MULTIPLIER_DEFAULT);
 
-   private static ThreadPoolExecutor       _dbUpdateExecutor;
-   private static ArrayBlockingQueue<Long> _dbUpdateQueue                        = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-   private static final ReentrantLock      DATABASE_LOCK                         = new ReentrantLock();
-
+   private static final ReentrantLock    DATABASE_LOCK                         = new ReentrantLock();
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -160,66 +157,59 @@ public class RawDataManager {
 
       };
 
-      final ThreadFactory threadFactory = runnable -> {
-
-         final Thread thread = new Thread(runnable, "Saving database entities");//$NON-NLS-1$
-
-         thread.setPriority(Thread.MIN_PRIORITY);
-         thread.setDaemon(true);
-
-         return thread;
-      };
-
-      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, threadFactory);
-
    }
-
-   private static RawDataManager           _instance                           = null;
-
-   private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
+   private static RawDataManager     _instance                   = null;
+   private static ArrayList<String>  _invalidFilesList           = new ArrayList<>();
 
    /**
     * Alternative filepaths from previous re-imported tours
     */
-   private static HashSet<IPath>           _allPreviousReimportFolders         = new HashSet<>();
-   private static IPath                    _previousReimportFolder;
+   private static HashSet<IPath>     _allPreviousReimportFolders = new HashSet<>();
+
+   private static IPath              _previousReimportFolder;
 
    /**
     * Is <code>true</code> when currently a re-importing is running
     */
-   private static boolean                  _isReimportingActive;
+   private static boolean            _isReimportingActive;
 
    /**
     * Is <code>true</code> when deleting values from tour(s) is happening
     */
-   private static boolean                  _isDeleteValuesActive;
+   private static boolean            _isDeleteValuesActive;
+
+   private ThreadPoolExecutor        _dbUpdateExecutor;
+   private ArrayBlockingQueue<Long>  _dbUpdateQueue;
+
+   private ThreadFactory             _threadFactory;
 
    /**
     * contains the device data imported from the device/file
     */
-   private final DeviceData                _deviceData                         = new DeviceData();
+   private final DeviceData          _deviceData                 = new DeviceData();
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private final Map<Long, TourData>       _toursInImportView                  = new HashMap<>();
+   private final Map<Long, TourData> _toursInImportView          = new HashMap<>();
 
    /**
     * Contains tours which are imported from the last file name.
     */
-   private final Map<Long, TourData>       _newlyImportedTours                 = new HashMap<>();
+   private final Map<Long, TourData> _newlyImportedTours         = new HashMap<>();
 
-   private String                          _lastImportedFileName;
+   private String                    _lastImportedFileName;
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private final HashSet<String>           _importedFileNames                  = new HashSet<>();
+   private final HashSet<String>     _importedFileNames          = new HashSet<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private final HashSet<String>           _importedFileNamesChildren          = new HashSet<>();
+   private final HashSet<String>     _importedFileNamesChildren  = new HashSet<>();
+
    //
    private boolean                         _isImported;
    private boolean                         _isImportCanceled;
@@ -828,6 +818,8 @@ public class RawDataManager {
       setImportId();
       setImportCanceled(false);
 
+      initializeThreadPoolExecutor();
+
       final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
 
          Display display = Display.getDefault();
@@ -873,7 +865,7 @@ public class RawDataManager {
 
                   // get last added item
                   Long queueItem_TourId;
-                     queueItem_TourId = _dbUpdateQueue.poll();
+                  queueItem_TourId = _dbUpdateQueue.poll();
 
                   if (queueItem_TourId == null) {
                      return;
@@ -916,7 +908,6 @@ public class RawDataManager {
             //(preventing new tasks from being submitted)
             System.out.println("Starting shutdown...");
             _dbUpdateExecutor.shutdown();
-
             long toto = 0;
             while (!_dbUpdateExecutor.isTerminated()) {
 
@@ -935,7 +926,6 @@ public class RawDataManager {
 
                }
             }
-
 
             if (reImportStatus.isReImported) {
 
@@ -2312,6 +2302,30 @@ public class RawDataManager {
       fileIn.delete();
 
       return newFile.getAbsolutePath();
+   }
+
+   private void initializeThreadPoolExecutor() {
+
+      if (_threadFactory == null) {
+
+         _threadFactory = runnable -> {
+
+            //TODO FB
+            final Thread thread = new Thread(runnable, "Modifying tours");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         };
+      }
+
+      _dbUpdateExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, _threadFactory);
+      _dbUpdateExecutor.prestartAllCoreThreads();
+
+      if (_dbUpdateQueue == null) {
+         _dbUpdateQueue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+      }
    }
 
    /**
