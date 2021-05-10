@@ -16,8 +16,8 @@
 package net.tourbook.ui.views.tourMarker;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
-import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -57,7 +57,7 @@ public class ActionTourMarkerFilter extends ContributionItem {
       _tourMarkerAllView = tourMarkerAllView;
       _parent = parent;
 
-      _actionImage = UI.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+      _actionImage = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
    }
 
    @Override

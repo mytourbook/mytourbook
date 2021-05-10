@@ -39,6 +39,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
@@ -514,6 +515,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       FormatManager.updateDisplayFormats();
 
       ThemeUtil.setupTheme();
+
+      // this MUST be called AFTER the theme is set, otherwise static images are not from a theme !!!
+      UI.setupThemedImages();
+      PhotoUI.setupThemedImages();
    }
 
    @Override

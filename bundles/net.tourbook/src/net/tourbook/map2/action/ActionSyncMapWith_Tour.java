@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSyncMapWith_Tour extends Action {
 
-	private Map2View	fMapView;
+   private Map2View _map2View;
 
-	public ActionSyncMapWith_Tour(final Map2View mapView) {
+   public ActionSyncMapWith_Tour(final Map2View mapView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		fMapView = mapView;
+      _map2View = mapView;
 
-		setToolTipText(Messages.map_action_synch_with_tour);
+      setToolTipText(Messages.map_action_synch_with_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Tour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncWith_Tour_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Tour_Disabled));
+   }
 
-	@Override
-	public void run() {
-		fMapView.action_SyncWith_Tour();
-	}
+   @Override
+   public void run() {
+      _map2View.action_SyncWith_Tour();
+   }
 
 }

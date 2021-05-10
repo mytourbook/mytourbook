@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,21 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomCentered extends Action {
 
-	private Map2View _mapView;
+   private Map2View _mapView;
 
-	public ActionZoomCentered(final Map2View mapView) {
+   public ActionZoomCentered(final Map2View mapView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		_mapView = mapView;
+      _mapView = mapView;
 
-		setToolTipText(Messages.map_action_zoom_centered);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_CenterTour));
-	}
+      setToolTipText(Messages.map_action_zoom_centered);
 
-	@Override
-	public void run() {
-		_mapView.actionSetZoomCentered();
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterTour));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_CenterTour_Disabled));
+   }
+
+   @Override
+   public void run() {
+      _mapView.actionSetZoomCentered();
+   }
 
 }
