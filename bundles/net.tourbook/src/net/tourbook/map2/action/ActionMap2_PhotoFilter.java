@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,9 +36,10 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
 // SET_FORMATTING_OFF
 
    private static Image _imageEnabled              = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER);
+   private static Image _imageDisabled             = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
+
    private static Image _imageEnabled_NoPhotos     = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS);
    private static Image _imageEnabled_WithPhotos   = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS);
-   private static Image _imageDisabled             = UI.IMAGE_REGISTRY.get(UI.IMAGE_ACTION_PHOTO_FILTER_DISABLED);
 
 // SET_FORMATTING_ON
 
@@ -94,8 +95,10 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
       getActionToolItem().setImage(
 
             numAllPhotos == 0
+
                   ? _imageEnabled
                   : numFilteredPhotos == 0
+
                         ? _imageEnabled_NoPhotos
                         : _imageEnabled_WithPhotos);
    }

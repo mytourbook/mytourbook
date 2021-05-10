@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -104,6 +105,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
@@ -612,11 +614,6 @@ public class UI {
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
 // SET_FORMATTING_OFF
-
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getImageDescriptor(CommonImages.PhotoFilter));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getImageDescriptor(CommonImages.PhotoFilter_Disabled));
 
       IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
       IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
@@ -2243,6 +2240,30 @@ public class UI {
 
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
       _isDarkThemeSelected = isDarkThemeSelected;
+   }
+
+   /**
+    * Set the themed image descriptor for a {@link UIElement} with images from the
+    * {@link TourbookPlugin} plugin
+    *
+    * @param uiElement
+    * @param imageName
+    */
+   public static void setThemedIcon(final UIElement uiElement, final String imageName) {
+
+      uiElement.setIcon(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
+   }
+
+   public static void setupThemedImages() {
+
+// SET_FORMATTING_OFF
+
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,               CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,     CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,   CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
+
+// SET_FORMATTING_ON
    }
 
    private static boolean setupUI_FontMetrics() {

@@ -32,7 +32,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -607,7 +606,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _imageAppOptions = CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_Options)).createImage();
+      _imageAppOptions = CommonActivator.getThemedImageDescriptor(CommonImages.App_Options).createImage();
       setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);

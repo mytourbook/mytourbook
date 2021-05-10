@@ -18,9 +18,8 @@ package net.tourbook.map.bookmark;
 import java.util.Map;
 
 import net.tourbook.Images;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -30,21 +29,18 @@ import org.eclipse.ui.menus.UIElement;
 
 public class ActionHandler_OpenView_MapBookmarks extends AbstractHandler implements IElementUpdater {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(MapBookmarkView.ID, true);
+      Util.showView(MapBookmarkView.ID, true);
 
-		return null;
-	}
+      return null;
+   }
 
    @SuppressWarnings("rawtypes")
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(TourbookPlugin.getImageDescriptor(
-            ThemeUtil.getThemedImageName(Images.MapBookmark)));
+      UI.setThemedIcon(uiElement, Images.MapBookmark);
    }
 }

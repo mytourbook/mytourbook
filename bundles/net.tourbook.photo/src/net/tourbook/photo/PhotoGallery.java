@@ -488,10 +488,7 @@ public class PhotoGallery extends ImageGallery {
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateUI_GalleryType(final GalleryType galleryType) {
 

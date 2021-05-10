@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.training;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -34,7 +35,7 @@ public class ActionSynchChartScale extends Action {
 
       setToolTipText(Messages.Training_View_Action_SynchChartScale);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.SyncStatistics)));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
    }
 

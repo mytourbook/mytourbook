@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourCatalog;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -32,7 +33,7 @@ public class ActionSynchYearScale extends Action {
 
       _yearStatisticView = yearStatisticView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.SyncStatistics)));
       setToolTipText(Messages.tourCatalog_view_action_synch_chart_years_tooltip);
    }
 
