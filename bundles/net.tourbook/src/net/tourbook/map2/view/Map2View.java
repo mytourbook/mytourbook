@@ -527,8 +527,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowPhotos() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap),
-               TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
+               TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;

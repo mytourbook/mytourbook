@@ -765,12 +765,12 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       if (_isVerticalGallery) {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Horizontal));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Horizontal));
 
       } else {
 
          _actionToggleGalleryOrientation.setToolTipText(Messages.Photo_Gallery_Action_ToggleGalleryVertical_ToolTip);
-         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoGallery_Vertical));
+         _actionToggleGalleryOrientation.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PhotoGallery_Vertical));
       }
    }
 }
