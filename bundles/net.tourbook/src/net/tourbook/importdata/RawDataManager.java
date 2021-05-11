@@ -64,7 +64,6 @@ import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -267,106 +266,78 @@ public class RawDataManager {
    public static void displayTourModifiedDataDifferences(final TourValueType tourValueType,
                                                          final TourData oldTourData,
                                                          final TourData newTourData) {
-      //Print the old vs new data comparison
-      String previousData = UI.EMPTY_STRING;
-      String newData = UI.EMPTY_STRING;
+      final List<String> previousData = new ArrayList<>();
+      final List<String> newData = new ArrayList<>();
 
       if (tourValueType == TourValueType.TIME_SLICES_ELEVATION ||
+            tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
          final String heightLabel = UI.UNIT_IS_ELEVATION_METER ? UI.UNIT_METER : UI.UNIT_HEIGHT_FT;
+
          final int oldAltitudeUp = Math.round(oldTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
-         final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
          final int oldAltitudeDown = Math.round(oldTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
-         final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
-         previousData = StringUtils.join(
-               previousData,
+         previousData.add(
                UI.SYMBOL_PLUS + oldAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
                      + UI.DASH
                      + oldAltitudeDown
-                     + heightLabel,
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
+                     + heightLabel);
+
+         final int newAltitudeUp = Math.round(newTourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION);
+         final int newAltitudeDown = Math.round(newTourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION);
+         newData.add(
                UI.SYMBOL_PLUS + newAltitudeUp + heightLabel + UI.SLASH_WITH_SPACE
                      + UI.DASH + newAltitudeDown
-                     + heightLabel,
-               UI.COMMA_SPACE);
-
+                     + heightLabel);
       }
       if (tourValueType == TourValueType.TIME_SLICES_TIMER_PAUSES ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
-               UI.format_hhh_mm_ss(oldTourData.getTourDeviceTime_Paused()),
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
-               UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused()),
-               UI.COMMA_SPACE);
+         previousData.add(UI.format_hhh_mm_ss(oldTourData.getTourDeviceTime_Paused()));
+         newData.add(UI.format_hhh_mm_ss(newTourData.getTourDeviceTime_Paused()));
       }
       if (tourValueType == TourValueType.TIME_SLICES_CADENCE ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
+         previousData.add(
                Math.round(oldTourData.getAvgCadence()) + (oldTourData.isCadenceSpm()
                      ? VALUE_UNIT_CADENCE_SPM
-                     : VALUE_UNIT_CADENCE),
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
+                     : VALUE_UNIT_CADENCE));
+         newData.add(
                Math.round(newTourData.getAvgCadence()) + (newTourData.isCadenceSpm()
                      ? VALUE_UNIT_CADENCE_SPM
-                     : VALUE_UNIT_CADENCE),
-               UI.COMMA_SPACE);
+                     : VALUE_UNIT_CADENCE));
       }
       if (tourValueType == TourValueType.TIME_SLICES_GEAR ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
+         previousData.add(
                oldTourData.getFrontShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + oldTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL,
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
+                     + UI.COMMA_SPACE + oldTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
+         newData.add(
                newTourData.getFrontShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_FRONT_SHIFT_COUNT_LABEL
-                     + UI.COMMA_SPACE + newTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL,
-               UI.COMMA_SPACE);
+                     + UI.COMMA_SPACE + newTourData.getRearShiftCount() + UI.SPACE1 + COLUMN_FACTORY_GEAR_REAR_SHIFT_COUNT_LABEL);
       }
       if (tourValueType == TourValueType.TIME_SLICES_POWER_AND_PULSE ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
+         previousData.add(
                Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE,
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
+                     + Math.round(oldTourData.getAvgPulse()) + VALUE_UNIT_PULSE);
+         newData.add(
                Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT + UI.COMMA_SPACE
-                     + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE,
-               UI.COMMA_SPACE);
+                     + Math.round(newTourData.getAvgPulse()) + VALUE_UNIT_PULSE);
       }
       if (tourValueType == TourValueType.TIME_SLICES_POWER_AND_SPEED ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
-               Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT,
-               UI.COMMA_SPACE);
-
-         newData = StringUtils.join(
-               newData,
-               Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT,
-               UI.COMMA_SPACE);
+         previousData.add(Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
+         newData.add(Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
       }
       if (tourValueType == TourValueType.TIME_SLICES_TEMPERATURE ||
             tourValueType == TourValueType.ALL_TIME_SLICES ||
@@ -378,12 +349,10 @@ public class RawDataManager {
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
-         previousData = StringUtils.join(
-               previousData,
+         previousData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                      ? UI.SYMBOL_TEMPERATURE_CELCIUS
-                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT),
-               UI.COMMA_SPACE);
+                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
 
          avgTemperature = newTourData.getAvgTemperature();
          if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
@@ -391,45 +360,43 @@ public class RawDataManager {
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
-         newData = StringUtils.join(
-               newData,
+         newData.add(
                Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                      ? UI.SYMBOL_TEMPERATURE_CELCIUS
-                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT),
-               UI.COMMA_SPACE);
+                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
       }
       if (tourValueType == TourValueType.TOUR_MARKER ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
-               oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER,
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
-               newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER,
-               UI.COMMA_SPACE);
-
+         previousData.add(
+               oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
+         newData.add(
+               newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
       }
       if (tourValueType == TourValueType.TOUR_CALORIES ||
             tourValueType == TourValueType.ENTIRE_TOUR) {
 
-         previousData = StringUtils.join(
-               previousData,
-               newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES,
-               UI.COMMA_SPACE);
-         newData = StringUtils.join(
-               newData,
-               newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES,
-               UI.COMMA_SPACE);
+         previousData.add(oldTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
+         newData.add(newTourData.getCalories() / 1000f + VALUE_UNIT_K_CALORIES);
+      }
+      if (tourValueType == TourValueType.IMPORT_FILE_LOCATION ||
+            tourValueType == TourValueType.ENTIRE_TOUR) {
+
+         previousData.add(oldTourData.getImportFilePathName());
+         newData.add(newTourData.getImportFilePathName());
       }
 
-      if (net.tourbook.common.util.StringUtils.isNullOrEmpty(previousData + newData)) {
+      if (previousData.isEmpty() && newData.isEmpty()) {
          return;
       }
 
-      TourLogManager.addSubLog(TourLogState.INFO,
-            NLS.bind(LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA, previousData, newData));
+      for (int index = 0; index < previousData.size(); ++index) {
+         TourLogManager.addSubLog(TourLogState.INFO,
+               NLS.bind(
+                     LOG_MODIFIEDTOUR_OLD_DATA_VS_NEW_DATA,
+                     previousData.get(index),
+                     newData.get(index)));
+      }
    }
 
    public static boolean doesInvalidFileExist(final String fileName) {
@@ -1218,6 +1185,12 @@ public class RawDataManager {
                   clonedTourData.setCalories(oldTourData.getCalories());
 
                }
+               if (tourValueType == TourValueType.ENTIRE_TOUR ||
+                     tourValueType == TourValueType.IMPORT_FILE_LOCATION) {
+
+                  clonedTourData.setImportFilePath(oldTourData.getImportFilePathName());
+
+               }
             }
          } catch (final CloneNotSupportedException e) {
             StatusUtil.log(e);
@@ -1844,9 +1817,12 @@ public class RawDataManager {
                tourData.setCalories(0);
                break;
 
+            case IMPORT_FILE_LOCATION:
+               clonedTourData.setImportFilePath(tourData.getImportFilePathName());
+               break;
+
             case ALL_TIME_SLICES:
             case ENTIRE_TOUR:
-            case IMPORT_FILE_LOCATION:
             default:
                break;
             }
@@ -1856,6 +1832,7 @@ public class RawDataManager {
       }
       TourManager.saveModifiedTour(tourData, false);
 
+      TourLogManager.showLogView();
       TourLogManager.addSubLog(TourLogState.IMPORT_OK,
             tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S));
 
