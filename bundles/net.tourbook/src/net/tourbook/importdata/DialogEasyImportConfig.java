@@ -75,6 +75,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -113,8 +115,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -312,7 +312,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
    private Spinner[]            _spinnerTT_Speed_AvgSpeed;
    //
-   private TabFolder            _tabFolderEasy;
+   private CTabFolder           _tabFolderEasy;
    //
    private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_ConfigName;
@@ -778,29 +778,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void createUI(final Composite parent) {
 
-      TabItem tabDashboard;
+      CTabItem tabDashboard;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
-         _tabFolderEasy = new TabFolder(container, SWT.NONE);
+         _tabFolderEasy = new CTabFolder(container, SWT.NONE);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolderEasy);
          {
             // tab: config
-            final TabItem tabConfig = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
             tabConfig.setControl(createUI_200_ImportActions(_tabFolderEasy));
 
             // tab: launcher
-            final TabItem tabLauncher = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
             tabLauncher.setControl(createUI_500_IL_ImportLauncher(_tabFolderEasy));
 
             // tab: dashboard
-            tabDashboard = new TabItem(_tabFolderEasy, SWT.NONE);
+            tabDashboard = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabDashboard.setText(Messages.Dialog_ImportConfig_Tab_Dashboard);
             tabDashboard.setControl(createUI_900_Dashboard(_tabFolderEasy));
          }

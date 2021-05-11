@@ -20,16 +20,22 @@ package net.tourbook.common;
  */
 public class CommonImages {
 
-   public static final String App_Close                    = "app-close.png";                             //$NON-NLS-1$
+   public static final String App_Cancel                   = "app-cancel.png";                            //$NON-NLS-1$
+   public static final String App_Cancel_Disabled          = "app-cancel-disabled.png";                   //$NON-NLS-1$
    public static final String App_Close_Themed             = "app-close-blue.png";                        //$NON-NLS-1$
+   public static final String App_Close_Tooltip            = "app-close-tooltip.png";                     //$NON-NLS-1$
    public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";
-   public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
-   public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
+   public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
+   public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
    public static final String App_Pin_Themed               = "pin-blue.png";                              //$NON-NLS-1$
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
+   public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
+   public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
+   public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
+   public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
 
    public static final String BookOpen_Themed              = "book-open-blue.png";                        //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$

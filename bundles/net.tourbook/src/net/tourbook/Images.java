@@ -38,10 +38,7 @@ public class Images {
     */
    public static final String App_Add                                   = "app-add.png";                                     //$NON-NLS-1$
    public static final String App_Add_2x                                = "app-add-2x.png";                                  //$NON-NLS-1$
-   public static final String App_Cancel                                = "cancel.png";                                      //$NON-NLS-1$
-   public static final String App_Cancel_Disabled                       = "cancel_disabled.png";                             //$NON-NLS-1$
    public static final String App_Cancel_2                              = "16px-Crystal_Clear_action_button_cancel.png";     //$NON-NLS-1$
-   public static final String App_Close                                 = "app-close.png";                                   //$NON-NLS-1$
    public static final String App_Delete                                = "delete.png";                                      //$NON-NLS-1$
    public static final String App_Delete_Disabled                       = "delete-disabled.png";                             //$NON-NLS-1$
    public static final String App_Directory_CollatedTours               = "collated-tours.png";                              // "directory-collated-tours.png";   //$NON-NLS-1$
@@ -52,8 +49,6 @@ public class Images {
    public static final String App_Edit                                  = "quick-edit.png";                                  //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                 = "icon-placeholder.gif";                            //$NON-NLS-1$
    public static final String App_ExpandAll                             = "expandall.png";                                   //$NON-NLS-1$
-   public static final String App_Filter                                = "app-filter.png";                                  //$NON-NLS-1$
-   public static final String App_Filter_Disabled                       = "app-filter-disabled.png";                         //$NON-NLS-1$
    public static final String App_Navigate_Next                         = "backward_nav.gif";                                //$NON-NLS-1$
    public static final String App_Navigate_Previous                     = "forward_nav.gif";                                 //$NON-NLS-1$
    public static final String App_OK                                    = "16px-Crystal_Clear_action_apply.png";             //$NON-NLS-1$
@@ -82,8 +77,6 @@ public class Images {
    public static final String App_Trash                                 = "trash.png";                                       //$NON-NLS-1$
    public static final String App_Trash_Disabled                        = "trash-disabled.png";                              //$NON-NLS-1$
    public static final String App_Trash_Themed                          = "trash-blue.png";                                  //$NON-NLS-1$
-   public static final String App_Turn_Off                              = "app-turn-off.png";                                //$NON-NLS-1$
-   public static final String App_Turn_On                               = "app-turn-on.png";                                 //$NON-NLS-1$
    public static final String App_UndoEdit                              = "undo_edit.gif";                                   //$NON-NLS-1$
    public static final String App_UndoEdit_Disabled                     = "undo_edit_disabled.gif";                          //$NON-NLS-1$
 
