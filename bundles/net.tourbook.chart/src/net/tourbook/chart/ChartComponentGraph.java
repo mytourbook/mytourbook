@@ -85,9 +85,6 @@ public class ChartComponentGraph extends Canvas {
 
    private static final NumberFormat _nf               = NumberFormat.getNumberInstance();
 
-   private static final RGB          _gridRGB          = new RGB(230, 230, 230);
-   private static final RGB          _gridRGBMajor     = new RGB(220, 220, 220);
-
    private static final int[][]      _leftAccelerator  = new int[][] {
          { -40, -200 },
          { -30, -50 },
@@ -468,15 +465,17 @@ public class ChartComponentGraph extends Canvas {
       // create composite with horizontal scrollbars
       super(parent, SWT.H_SCROLL | SWT.NO_BACKGROUND);
 
+      final Display display = getDisplay();
+
       _chart = chartWidget;
       _uiFont = _chart.getFont();
 
       _pc = new PixelConverter(_chart);
 
-      _cursorResizeLeftRight = new Cursor(getDisplay(), SWT.CURSOR_SIZEWE);
-      _cursorResizeTopDown = new Cursor(getDisplay(), SWT.CURSOR_SIZENS);
-      _cursorDragged = new Cursor(getDisplay(), SWT.CURSOR_SIZEALL);
-      _cursorArrow = new Cursor(getDisplay(), SWT.CURSOR_ARROW);
+      _cursorResizeLeftRight = new Cursor(display, SWT.CURSOR_SIZEWE);
+      _cursorResizeTopDown = new Cursor(display, SWT.CURSOR_SIZENS);
+      _cursorDragged = new Cursor(display, SWT.CURSOR_SIZEALL);
+      _cursorArrow = new Cursor(display, SWT.CURSOR_ARROW);
 
       _cursorModeSlider = createCursorFromImage(ChartImages.CursorMode_Slider);
       _cursorModeZoom = createCursorFromImage(ChartImages.CursorMode_Zoom);
@@ -494,8 +493,8 @@ public class ChartComponentGraph extends Canvas {
       _cursorXSliderLeft = createCursorFromImage(ChartImages.Cursor_X_Slider_Left);
       _cursorXSliderRight = createCursorFromImage(ChartImages.Cursor_X_Slider_Right);
 
-      _gridColor = new Color(getDisplay(), _gridRGB);
-      _gridColorMajor = new Color(getDisplay(), _gridRGBMajor);
+      _gridColor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+      _gridColorMajor = display.getSystemColor(SWT.COLOR_DARK_GRAY);
 
       _chartComponents = (ChartComponents) parent;
 
@@ -511,12 +510,12 @@ public class ChartComponentGraph extends Canvas {
       addListener();
       createContextMenu();
 
-      final Point devMouse = this.toControl(getDisplay().getCursorLocation());
+      final Point devMouse = this.toControl(display.getCursorLocation());
       setCursorStyle(devMouse.y);
    }
 
    /**
-    * execute the action which is defined when a bar is selected with the left mouse button
+    * Execute the action which is defined when a bar is selected with the left mouse button
     */
    private void actionSelectBars() {
 
@@ -1190,6 +1189,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    void disposeColors() {
+
       _colorCache.dispose();
    }
 
@@ -2312,15 +2312,19 @@ public class ChartComponentGraph extends Canvas {
          if (devXUnitTick > 0 && isDrawVerticalGrid) {
 
             if (xUnit.isMajorValue) {
+
                gcGraph.setLineStyle(SWT.LINE_SOLID);
                gcGraph.setForeground(_gridColorMajor);
+
             } else {
+
                /*
-                * line width is a complicated topic, when it's not set the gridlines of the first
-                * graph is different than the subsequent graphs, but setting it globally degrades
-                * performance dramatically
+                * The line width is a complicated topic, when it's not set the gridlines of the
+                * first graph is different than the subsequent graphs, but setting it globally
+                * degrades performance dramatically
                 */
 //               gcGraph.setLineWidth(0);
+
                gcGraph.setLineDash(DOT_DASHES);
                gcGraph.setForeground(_gridColor);
             }
@@ -5628,8 +5632,8 @@ public class ChartComponentGraph extends Canvas {
 
       final int devSliderLinePos = (int) (slider.getXXDevSliderLinePos() - _xxDevViewPortLeftBorder);
 
-      final int grayColorIndex = 60;
-      final Color colorTxt = new Color(grayColorIndex, grayColorIndex, grayColorIndex);
+//      final int grayColorIndex = 60;
+//      final Color colorTxt = new Color(grayColorIndex, grayColorIndex, grayColorIndex);
 
       int graphNo = 0;
 
@@ -7197,9 +7201,6 @@ public class ChartComponentGraph extends Canvas {
       _chartImage_10_Graphs = Util.disposeResource(_chartImage_10_Graphs);
       _chartImage_40_Overlay = Util.disposeResource(_chartImage_40_Overlay);
       _chartImage_30_Custom = Util.disposeResource(_chartImage_30_Custom);
-
-      _gridColor = Util.disposeResource(_gridColor);
-      _gridColorMajor = Util.disposeResource(_gridColorMajor);
 
       _colorCache.dispose();
    }

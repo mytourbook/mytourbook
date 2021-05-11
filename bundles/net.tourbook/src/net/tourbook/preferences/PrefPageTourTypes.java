@@ -74,6 +74,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -1210,24 +1211,27 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          return;
       }
 
-      for (final TourTypeColorDefinition selectedColorDefinition : selectedColorDefinitions) {
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-         final TourType selectedTourType = selectedColorDefinition.getTourType();
+         for (final TourTypeColorDefinition selectedColorDefinition : selectedColorDefinitions) {
 
-         // remove entity from the db
-         if (deleteTourType(selectedTourType)) {
+            final TourType selectedTourType = selectedColorDefinition.getTourType();
 
-            // update model
-            _dbTourTypes.remove(selectedTourType);
+            // remove entity from the db
+            if (deleteTourType(selectedTourType)) {
 
-            _colorDefinitions.remove(selectedColorDefinition);
+               // update model
+               _dbTourTypes.remove(selectedTourType);
 
-            // update UI
-            _tourTypeViewer.remove(selectedColorDefinition);
+               _colorDefinitions.remove(selectedColorDefinition);
 
-            _isModified = true;
+               // update UI
+               _tourTypeViewer.remove(selectedColorDefinition);
+
+               _isModified = true;
+            }
          }
-      }
+      });
 
       setFocusToViewer();
    }

@@ -24,6 +24,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,8 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.joda.time.Period;
@@ -101,7 +101,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Spinner   _spinnerExceededDuration;
    private Spinner   _spinnerTemperatureAdjustment;
 
-   private TabFolder _tabFolder;
+   private CTabFolder _tabFolder;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -121,34 +121,34 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       GridLayoutFactory.fillDefaults().applyTo(parent);
       {
 
-         _tabFolder = new TabFolder(parent, SWT.TOP);
+         _tabFolder = new CTabFolder(parent, SWT.TOP);
          GridDataFactory
                .fillDefaults()//
                .grab(true, true)
                .applyTo(_tabFolder);
          {
 
-            final TabItem tabMeasurementSystem = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabMeasurementSystem = new CTabItem(_tabFolder, SWT.NONE);
             tabMeasurementSystem.setControl(createUI_20_Speed(_tabFolder));
             tabMeasurementSystem.setText(Messages.PrefPage_Fit_Group_Speed);
 
-            final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
             tabBreakTime.setControl(createUI_30_Temperature(_tabFolder));
             tabBreakTime.setText(Messages.PrefPage_Fit_Group_AdjustTemperature);
 
-            final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
             tabElevation.setControl(createUI_50_IgnoreLastMarker(_tabFolder));
             tabElevation.setText(Messages.PrefPage_Fit_Group_IgnoreLastMarker);
 
-            final TabItem tabNotes = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabNotes = new CTabItem(_tabFolder, SWT.NONE);
             tabNotes.setControl(createUI_70_SplitTour(_tabFolder));
             tabNotes.setText(Messages.PrefPage_Fit_Group_ReplaceTimeSlice);
 
-            final TabItem tabPower = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabPower = new CTabItem(_tabFolder, SWT.NONE);
             tabPower.setControl(createUI_80_Power(_tabFolder));
             tabPower.setText(Messages.PrefPage_Fit_Group_Power);
 
-            final TabItem tabTourType = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabTourType = new CTabItem(_tabFolder, SWT.NONE);
             tabTourType.setControl(createUI_90_TourType(_tabFolder));
             tabTourType.setText(Messages.PrefPage_Fit_Group_TourType);
          }

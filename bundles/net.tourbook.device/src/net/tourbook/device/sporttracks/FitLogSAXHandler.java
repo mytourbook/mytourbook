@@ -332,7 +332,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          _customDataFieldDefinitions = saxHandler.getCustomDataFieldDefinitions();
-         if (!isReimport) {
+         if (!_isReimport) {
             _equipments = saxHandler.getEquipments();
             saveEquipmentsAsTags();
          }
