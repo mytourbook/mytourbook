@@ -175,6 +175,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -273,6 +274,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
    private static final boolean          IS_OSX                                    = UI.IS_OSX;
+   private static final boolean          IS_DARK_THEME                             = UI.isDarkTheme();
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -527,6 +529,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
 
    private TourData                         _tourData;
+
+   private Color                            _foregroundColor_Default;
+   private Color                            _backgroundColor_Default;
+   private Color                            _foregroundColor_1stColumn_RefTour;
+   private Color                            _backgroundColor_1stColumn_RefTour;
+   private Color                            _foregroundColor_1stColumn_NoRefTour;
+   private Color                            _backgroundColor_1stColumn_NoRefTour;
 
    //
    // ################################################## UI controls ##################################################
@@ -2456,6 +2465,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                // updateUITab4Info(); do NOT work
                //
                // tour data must be reloaded
+
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+               _swimSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _swimSlice_Viewer.refresh();
+
+               _timeSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _timeSlice_Viewer.refresh();
             }
          }
       };
@@ -3200,11 +3217,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI(final Composite parent) {
 
+      final Display display = parent.getDisplay();
+
       _pageBook = new PageBook(parent, SWT.NONE);
 
       _page_NoTourData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-      _tk = new FormToolkit(parent.getDisplay());
+      _tk = new FormToolkit(display);
 
       _page_EditorForm = _tk.createForm(_pageBook);
       MTFont.setHeaderFont(_page_EditorForm);
@@ -3238,6 +3257,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tab_30_SwimSlices.setText(Messages.Tour_Editor_TabLabel_SwimSlices);
          _tab_30_SwimSlices.setControl(createUI_Tab_30_SwimSlices(_tabFolder));
       }
+
+      _foregroundColor_Default = parent.getForeground(); // Color {0, 0, 0, 255}
+      _backgroundColor_Default = parent.getBackground(); // Color {41, 41, 41, 255}
+
+      display.asyncExec(() -> {
+
+         _foregroundColor_Default = parent.getForeground(); // Color {170, 170, 170, 255}    with dark mode
+         _backgroundColor_Default = parent.getBackground(); // Color {47, 47, 47, 255}       with dark mode
+
+         if (IS_DARK_THEME) {
+
+            _foregroundColor_1stColumn_RefTour = display.getSystemColor(SWT.COLOR_YELLOW);
+            _backgroundColor_1stColumn_RefTour = _backgroundColor_Default;
+
+            _foregroundColor_1stColumn_NoRefTour = _foregroundColor_Default;
+            _backgroundColor_1stColumn_NoRefTour = _backgroundColor_Default;
+
+         } else {
+
+            _foregroundColor_1stColumn_RefTour = _foregroundColor_Default;
+            _backgroundColor_1stColumn_RefTour = display.getSystemColor(SWT.COLOR_YELLOW);
+
+            _foregroundColor_1stColumn_NoRefTour = _foregroundColor_Default;
+            _backgroundColor_1stColumn_NoRefTour = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+
+         }
+      });
    }
 
    private Label createUI_LabelSeparator(final Composite parent) {
@@ -4706,7 +4752,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
       // Table: right-aligned column header with own background color lacks margin
 //    table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-      table.setLinesVisible(true);
+
+      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 //    table.addTraverseListener(new TraverseListener() {
@@ -4824,7 +4871,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 // table header is disabled because of https://bugs.eclipse.org/bugs/show_bug.cgi?id=536021
 // Table: right-aligned column header with own background color lacks margin
 //    table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-      table.setLinesVisible(true);
+
+      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 //    table.addKeyListener(new KeyAdapter() {
@@ -4988,9 +5037,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             final int logIndex = ((SwimSlice) cell.getElement()).uniqueCreateIndex;
 
+            cell.setForeground(_foregroundColor_1stColumn_NoRefTour);
+            cell.setBackground(_backgroundColor_1stColumn_NoRefTour);
+
             // the UI shows the time slice number starting with 1 and not with 0
             cell.setText(Integer.toString(logIndex + 1));
-            cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
          }
       });
    }
@@ -5323,25 +5374,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
             final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
 
-            // the UI shows the time slice number starting with 1 and not with 0
-            cell.setText(Integer.toString(logIndex + 1));
-
             // mark reference tour with a different background color
-            boolean isBgSet = false;
+            boolean isColorSet = false;
 
             if (_refTourRange != null) {
                for (final int[] oneRange : _refTourRange) {
                   if ((serieIndex >= oneRange[0]) && (serieIndex <= oneRange[1])) {
-                     cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-                     isBgSet = true;
+
+                     cell.setForeground(_foregroundColor_1stColumn_RefTour);
+                     cell.setBackground(_backgroundColor_1stColumn_RefTour);
+
+                     isColorSet = true;
+
                      break;
                   }
                }
             }
 
-            if (isBgSet == false) {
-               cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+            if (isColorSet == false) {
+
+               cell.setForeground(_foregroundColor_1stColumn_NoRefTour);
+               cell.setBackground(_backgroundColor_1stColumn_NoRefTour);
             }
+
+            // the UI shows the time slice number starting with 1 and not with 0
+            cell.setText(Integer.toString(logIndex + 1));
          }
       });
    }

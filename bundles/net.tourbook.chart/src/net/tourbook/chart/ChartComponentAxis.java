@@ -410,6 +410,8 @@ public class ChartComponentAxis extends Canvas {
          /*
           * Draw y units
           */
+         gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
+
          int devY;
 
          for (final ChartUnit yUnit : yUnits) {
@@ -423,7 +425,6 @@ public class ChartComponentAxis extends Canvas {
                devY = devYTop + (int) devYUnit;
             }
 
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
 
             final String valueLabel = yUnit.valueLabel;
 
@@ -452,7 +453,6 @@ public class ChartComponentAxis extends Canvas {
 
             // draw unit line only when units are available
 
-            gc.setForeground(_display.getSystemColor(SWT.COLOR_DARK_GRAY));
             gc.drawLine(devX, devYBottom, devX, devYTop);
          }
       }

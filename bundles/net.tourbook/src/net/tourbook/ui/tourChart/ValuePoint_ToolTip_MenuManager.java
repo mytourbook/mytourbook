@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@ package net.tourbook.ui.tourChart;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.tooltip.Pinned_ToolTip_PinLocation;
 import net.tourbook.data.TourData;
 
@@ -130,8 +132,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private final class ActionCloseTTContextMenu extends Action {
 
       public ActionCloseTTContextMenu() {
+
          super(Messages.Tooltip_ValuePoint_Action_CloseContextMenu);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
       }
 
       @Override
@@ -143,8 +147,10 @@ public class ValuePoint_ToolTip_MenuManager {
    private class ActionHideToolTip extends Action {
 
       public ActionHideToolTip() {
+
          setText(Messages.Action_ToolTip_Hide);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Cancel));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
       }
 
       @Override

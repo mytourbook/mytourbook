@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ import java.util.Collection;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 import net.tourbook.common.util.Util;
@@ -125,7 +127,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Close));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
       }
 
       @Override

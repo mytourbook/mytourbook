@@ -35,6 +35,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,8 +48,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
@@ -101,10 +101,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    /*
     * UI controls
     */
-   private TabFolder           _tabFolder;
-   private TabItem             _tab1_Graphs;
-   private TabItem             _tab2_Grid;
-   private TabItem             _tab3_Options;
+   private CTabFolder          _tabFolder;
+   private CTabItem            _tab1_Graphs;
+   private CTabItem            _tab2_Grid;
+   private CTabItem            _tab3_Options;
 
    private CheckboxTableViewer _graphCheckboxList;
 
@@ -180,18 +180,18 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
       {
-         _tabFolder = new TabFolder(container, SWT.NONE);
+         _tabFolder = new CTabFolder(container, SWT.NONE);
          _tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
          {
-            _tab1_Graphs = new TabItem(_tabFolder, SWT.NONE);
+            _tab1_Graphs = new CTabItem(_tabFolder, SWT.NONE);
             _tab1_Graphs.setText(Messages.Pref_Graphs_Tab_graph_defaults);
             _tab1_Graphs.setControl(createUI_10_Tab_1_Graphs(_tabFolder));
 
-            _tab2_Grid = new TabItem(_tabFolder, SWT.NONE);
+            _tab2_Grid = new CTabItem(_tabFolder, SWT.NONE);
             _tab2_Grid.setText(Messages.Pref_Graphs_Tab_Grid);
             _tab2_Grid.setControl(createUI_70_Tab_2_Grid(_tabFolder));
 
-            _tab3_Options = new TabItem(_tabFolder, SWT.NONE);
+            _tab3_Options = new CTabItem(_tabFolder, SWT.NONE);
             _tab3_Options.setText(Messages.Pref_Graphs_Tab_zoom_options);
             _tab3_Options.setControl(createUI_80_Tab_3_Options(_tabFolder));
          }
@@ -846,7 +846,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * perform defaults for the currently selected tab
        */
-      final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+      final CTabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
       if (selectedTab == _tab1_Graphs) {
 
@@ -876,7 +876,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       /*
        * perform defaults for the currently selected tab
        */
-      final TabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
+      final CTabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
       if (selectedTab == _tab1_Graphs) {
 
