@@ -319,8 +319,13 @@ public class RawDataManager {
       }
       if (tourValueType == TourValueType.TIME_SLICES_POWER_AND_SPEED) {
 
-         previousData = Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
-         newData = Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT;
+         previousData = String.join(UI.COMMA_SPACE,
+               previousData,
+               Math.round(oldTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
+
+         newData = String.join(UI.COMMA_SPACE,
+               newData,
+               Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
       }
       if (tourValueType == TourValueType.TIME_SLICES_TEMPERATURE) {
 
@@ -330,23 +335,28 @@ public class RawDataManager {
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
-         previousData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
+         previousData = String.join(UI.COMMA_SPACE,
+               previousData,
+               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS
-               : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
+                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
+
          avgTemperature = newTourData.getAvgTemperature();
          if (!UI.UNIT_IS_TEMPERATURE_CELCIUS) {
             avgTemperature = avgTemperature
                   * UI.UNIT_FAHRENHEIT_MULTI
                   + UI.UNIT_FAHRENHEIT_ADD;
          }
-         newData = Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
+         newData = String.join(UI.COMMA_SPACE,
+               newData,
+               Math.round(avgTemperature) + (UI.UNIT_IS_TEMPERATURE_CELCIUS
                ? UI.SYMBOL_TEMPERATURE_CELCIUS
-               : UI.SYMBOL_TEMPERATURE_FAHRENHEIT);
+                     : UI.SYMBOL_TEMPERATURE_FAHRENHEIT));
       }
       if (tourValueType == TourValueType.TOUR_MARKER) {
 
-         previousData = oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER;
-         newData = newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER;
+         previousData = String.join(UI.COMMA_SPACE, previousData, oldTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
+         newData = String.join(UI.COMMA_SPACE, newData, newTourData.getTourMarkers().size() + UI.SPACE1 + COLUMN_FACTORY_CATEGORY_MARKER);
 
       }
       if (tourValueType == TourValueType.TOUR_CALORIES ||
