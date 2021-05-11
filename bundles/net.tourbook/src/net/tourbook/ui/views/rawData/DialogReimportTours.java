@@ -724,10 +724,10 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_AllTimeSlices.setEnabled(!isReimport_EntireTour);
       _chkData_ImportFileLocation.setEnabled(!isReimport_EntireTour);
       _chkData_TourMarkers.setEnabled(!isReimport_EntireTour);
+      _chkData_Calories.setEnabled(!isReimport_EntireTour);
 
       _chkData_Elevation.setEnabled(isTimeSlice);
       _chkData_Cadence.setEnabled(isTimeSlice);
-      _chkData_Calories.setEnabled(isTimeSlice);
       _chkData_Gear.setEnabled(isTimeSlice);
       _chkData_PowerAndPulse.setEnabled(isTimeSlice);
       _chkData_PowerAndSpeed.setEnabled(isTimeSlice);
@@ -832,7 +832,6 @@ public class DialogReimportTours extends TitleAreaDialog {
             } else {
 
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_Cadence, TourValueType.TIME_SLICES_CADENCE, tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_Calories, TourValueType.TOUR_CALORIES, tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_Elevation, TourValueType.TIME_SLICES_ELEVATION, tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_Gear, TourValueType.TIME_SLICES_GEAR, tourValueTypes);
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_PowerAndPulse, TourValueType.TIME_SLICES_POWER_AND_PULSE, tourValueTypes);
@@ -844,6 +843,7 @@ public class DialogReimportTours extends TitleAreaDialog {
                DialogUtils.addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES_TRAINING, tourValueTypes);
             }
 
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Calories, TourValueType.TOUR_CALORIES, tourValueTypes);
             DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR_MARKER, tourValueTypes);
             DialogUtils.addTourValueTypeFromCheckbox(_chkData_ImportFileLocation, TourValueType.IMPORT_FILE_LOCATION, tourValueTypes);
          }
