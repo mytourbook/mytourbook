@@ -48,7 +48,7 @@ public class ActionOpenMarkerDialog extends Action {
       setText(Messages.app_action_edit_tour_marker);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker));
-//      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled));
 
       setEnabled(false);
    }

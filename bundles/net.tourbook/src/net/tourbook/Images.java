@@ -47,6 +47,7 @@ public class Images {
    public static final String App_Directory_TourBook                    = "tourbook-tours.png";                              // "directory-tour-book.png";        //$NON-NLS-1$
    public static final String App_Directory_TourImport                  = "imported-tours.png";                              // "directory-tour-import.png";      //$NON-NLS-1$
    public static final String App_Edit                                  = "quick-edit.png";                                  //$NON-NLS-1$
+   public static final String App_Edit_Disabled                         = "quick-edit-disabled.png";                         //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                 = "icon-placeholder.gif";                            //$NON-NLS-1$
    public static final String App_ExpandAll                             = "expandall.png";                                   //$NON-NLS-1$
    public static final String App_Navigate_Next                         = "backward_nav.gif";                                //$NON-NLS-1$
@@ -98,7 +99,8 @@ public class Images {
    public static final String CollapseAll                               = "collapseall.png";                                 //$NON-NLS-1$
    public static final String ConconiChart                              = "conconi-chart.png";                               //$NON-NLS-1$
    public static final String EasyImport_Harddrive                      = "hard-drive.png";                                  //$NON-NLS-1$
-   public static final String EditRow                                   = "edit_row.png";                                    //$NON-NLS-1$
+   public static final String EditRow                                   = "edit-row.png";                                    //$NON-NLS-1$
+   public static final String EditRow_Disabled                          = "edit-row-disabled.png";                           //$NON-NLS-1$
    public static final String EditTour                                  = "tour-editor.png";                                 //$NON-NLS-1$
    public static final String EditTour_Disabled                         = "write_obj_disabled.gif";                          //$NON-NLS-1$
    public static final String Eye                                       = "eye.png";                                         //$NON-NLS-1$
@@ -213,6 +215,8 @@ public class Images {
    public static final String RawData_TransferDirect                    = "device-synchronize-direct.png";                   //$NON-NLS-1$
    public static final String RestoreTags                               = "restore-tour.png";                                //$NON-NLS-1$
    public static final String RestoreTags_Disabled                      = "restore-tour-disabled.png";                       //$NON-NLS-1$
+   public static final String RestoreTour                               = "restore-tour.png";                                //$NON-NLS-1$
+   public static final String RestoreTour_Disabled                      = "restore-tour-disabled.png";                       //$NON-NLS-1$
    public static final String SaveTags                                  = "save-tags.png";                                   //$NON-NLS-1$
    public static final String SaveTags_Disabled                         = "save-tags-disabled.png";                          //$NON-NLS-1$
    public static final String SaveTour                                  = "save-tour.png";                                   //$NON-NLS-1$

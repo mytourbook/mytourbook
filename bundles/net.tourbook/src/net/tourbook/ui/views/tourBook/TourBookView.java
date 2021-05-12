@@ -361,7 +361,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       public ActionLinkWithOtherViews() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.SyncViews), null);
+         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncViews), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Calendar_View_Action_LinkWithOtherViews;
