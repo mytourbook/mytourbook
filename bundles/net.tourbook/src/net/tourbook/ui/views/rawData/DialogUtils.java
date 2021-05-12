@@ -19,9 +19,13 @@ import java.util.List;
 
 import net.tourbook.importdata.RawDataManager.TourValueType;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 
 public class DialogUtils {
+
+   static final Color LOCK_COLOR_DARK  = new Color(0x0, 0xff, 0x0);
+   static final Color LOCK_COLOR_LIGHT = new Color(0x0, 0xb0, 0x0);
 
    public static void addTourValueTypeFromCheckbox(final Button checkButton,
                                                    final TourValueType tourValueType,

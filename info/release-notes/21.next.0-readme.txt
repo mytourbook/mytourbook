@@ -71,7 +71,7 @@ Changes
   - The download of SRTM data files is still free but it requires that a user is authenticated. Username and password can be entered in the SRTM data preferences page which also contains information how to request a SRTM server account 
 
 * Fitlog/FitlogEx import (Frederic)
-  - When re-importing tours, the tour types and tags are not re-imported anymore
+  - When re-importing tours, the complete list of tour types and tags are not re-imported anymore
     
 
 Bugfix
