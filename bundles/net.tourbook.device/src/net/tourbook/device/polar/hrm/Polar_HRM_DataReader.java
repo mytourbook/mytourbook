@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -445,8 +445,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       }
    }
 
-   private void createTourData(final HashMap<Long, TourData> alreadyImportedTours,
-                               final HashMap<Long, TourData> newlyImportedTours) {
+   private void createTourData(final Map<Long, TourData> alreadyImportedTours,
+                               final Map<Long, TourData> newlyImportedTours) {
 
       // create data object for each tour
       final TourData tourData = new TourData();
@@ -478,7 +478,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       }
 
       final ArrayList<TimeData> timeSeries = createTourData_10_CreateTimeSeries(dtTourStart);
-      createTourData_20_SetTemperature(tourData, timeSeries);
+      createTourData_20_SetTemperature(timeSeries);
 
       tourData.setDeviceId(deviceId);
       tourData.setDeviceName(_sectionParams.monitorName);
@@ -566,7 +566,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       return timeDataList;
    }
 
-   private void createTourData_20_SetTemperature(final TourData tourData, final ArrayList<TimeData> timeSeries) {
+   private void createTourData_20_SetTemperature(final ArrayList<TimeData> timeSeries) {
 
       if (_sectionLapData.isEmpty()) {
          return;
@@ -849,9 +849,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    }
 
    private boolean parseSection(final String importFileName,
-                                final DeviceData deviceData,
-                                final HashMap<Long, TourData> alreadyImportedTours,
-                                final HashMap<Long, TourData> newlyImportedTours) {
+                                final Map<Long, TourData> alreadyImportedTours,
+                                final Map<Long, TourData> newlyImportedTours) {
 
       boolean returnValue = false;
 
@@ -866,7 +865,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             if (line.startsWith(SECTION_PARAMS)) {
 
-               isValid = parseSection_10_Params(bufferedReader, deviceData);
+               isValid = parseSection_10_Params(bufferedReader);
 
             } else if (line.startsWith(SECTION_NOTE)) {
 
@@ -940,7 +939,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       return returnValue;
    }
 
-   private boolean parseSection_10_Params(final BufferedReader fileReader, final DeviceData deviceData)
+   private boolean parseSection_10_Params(final BufferedReader fileReader)
          throws IOException {
 
       _sectionParams = new SectionParams();
@@ -1597,8 +1596,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       _importFilePath = importFilePath;
       _deviceData = deviceData;
@@ -1607,7 +1607,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          System.out.println(importFilePath);
       }
 
-      return parseSection(importFilePath, deviceData, alreadyImportedTours, newlyImportedTours);
+      return parseSection(importFilePath, alreadyImportedTours, newlyImportedTours);
    }
 
    protected void showError(final String message) {
@@ -1620,16 +1620,10 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
          _lastUsedImportId = _deviceData.importId;
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-
-               MessageDialog.openError(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.Import_Error_DialogTitle,
-                     message);
-            }
-         });
+         Display.getDefault().syncExec(() -> MessageDialog.openError(
+               Display.getCurrent().getActiveShell(),
+               Messages.Import_Error_DialogTitle,
+               message));
       }
    }
 

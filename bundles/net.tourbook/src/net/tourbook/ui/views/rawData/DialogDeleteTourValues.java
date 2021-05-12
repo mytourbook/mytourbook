@@ -58,33 +58,32 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogDeleteTourValues extends TitleAreaDialog {
 
-   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM  = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM";        //$NON-NLS-1$
-   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL";       //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM  = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_FROM";      //$NON-NLS-1$
+   private static final String          STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL = "STATE_DELETE_TOURVALUES_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
 
-   private static final String          STATE_IS_DELETE_CADENCE                     = "STATE_IS_DELETE_CADENCE";                           //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_CALORIES                    = "STATE_IS_DELETE_CALORIES";                          //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_ELEVATION                   = "STATE_IS_DELETE_ELEVATION";                         //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_GEAR                        = "STATE_IS_DELETE_GEAR";                              //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_PULSE             = "STATE_IS_DELETE_POWER_AND_PULSE";                   //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                   //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                  //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                          //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                       //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                              //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                      //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                      //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                          //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_CADENCE                     = "STATE_IS_DELETE_CADENCE";                         //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_CALORIES                    = "STATE_IS_DELETE_CALORIES";                        //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_ELEVATION                   = "STATE_IS_DELETE_ELEVATION";                       //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_GEAR                        = "STATE_IS_DELETE_GEAR";                            //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_PULSE             = "STATE_IS_DELETE_POWER_AND_PULSE";                 //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                 //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TEMPERATURE                 = "STATE_IS_DELETE_TEMPERATURE";                     //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                        //$NON-NLS-1$
 
-   private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues");   //$NON-NLS-1$
+   private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues"); //$NON-NLS-1$
 
    private final ITourViewer3           _tourViewer;
 
    private SelectionAdapter             _defaultListener;
 
-   private Image                        _imageLockClosed                            = TourbookPlugin.getImageDescriptor(Images.Lock_Closed)
-         .createImage();
-   private Image                        _imageLockOpen                              = TourbookPlugin.getImageDescriptor(Images.Lock_Open)
-         .createImage();
+   //
+   private Image _imageLockClosed = TourbookPlugin.getImageDescriptor(Images.Lock_Closed).createImage();
+   private Image _imageLockOpen   = TourbookPlugin.getImageDescriptor(Images.Lock_Open).createImage();
 
    /*
     * UI controls

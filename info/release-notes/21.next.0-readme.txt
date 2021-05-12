@@ -69,6 +69,9 @@ Changes
 
 * SRTM Download
   - The download of SRTM data files is still free but it requires that a user is authenticated. Username and password can be entered in the SRTM data preferences page which also contains information how to request a SRTM server account 
+
+* Fitlog/FitlogEx import (Frederic)
+  - When re-importing tours, the complete list of tour types and tags are not re-imported anymore
     
 
 Bugfix
@@ -97,6 +100,10 @@ Bugfix
 
 * FIT File: Pause Re-Import (Frederic)
   - In some scenarii, the pause import could be erroneous and lead to negative paused time values
+
+* Tour Type Preference page (Frederic)
+  - Fixed a bug in the tour type viewer when selecting several tour types and only the first one was deleted.
+  - Disabling the "Rename" button when more than 1 tour type is selected
 
 Translation    
 ===========

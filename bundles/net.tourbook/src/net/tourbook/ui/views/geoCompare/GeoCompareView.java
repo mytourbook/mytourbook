@@ -18,7 +18,7 @@ package net.tourbook.ui.views.geoCompare;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -2159,7 +2159,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                      // tour is not in the database, try to get it from the raw data manager
 
-                     final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+                     final Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
                      tourData = rawData.get(tourId);
                   }
                }

@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -7023,7 +7024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // tour is not in the database, try to get it from the raw data manager
 
-         final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+         final Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
          tourData = rawData.get(tourId);
       }
 

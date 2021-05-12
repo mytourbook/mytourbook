@@ -70,6 +70,7 @@ public class FitLogTester {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
+				false,
             false);
 
       parser.parse(fitLogFile, handler);
