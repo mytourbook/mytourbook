@@ -647,58 +647,47 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * currently read.
     */
    private void switchSection(final String line) {
-      if (line.equals("[FILE]")) {
-//$NON-NLS-0$
+      if (line.equals("[FILE]")) { //$NON-NLS-1$
          m_section = Section.SECTION_FILE;
          return;
       }
-      if (line.equals("[INFORMATION]")) {
-//$NON-NLS-0$
+      if (line.equals("[INFORMATION]")) { //$NON-NLS-1$
          m_section = Section.SECTION_INFO;
          return;
       }
-      if (line.equals("[NOTES]")) {
-//$NON-NLS-0$
+      if (line.equals("[NOTES]")) { //$NON-NLS-1$
          m_section = Section.SECTION_NOTES;
          return;
       }
-      if (line.equals("[FRIENDS]")) {
-//$NON-NLS-0$
+      if (line.equals("[FRIENDS]")) { //$NON-NLS-1$
          m_section = Section.SECTION_FRIENDS;
          return;
       }
-      if (line.equals("[PERSON]")) {
-//$NON-NLS-0$
+      if (line.equals("[PERSON]")) { //$NON-NLS-1$
          m_section = Section.SECTION_PERSON;
          return;
       }
-      if (line.equals("[STATISTICS]")) {
-//$NON-NLS-0$
+      if (line.equals("[STATISTICS]")) { //$NON-NLS-1$
          m_section = Section.SECTION_STATISTICS;
          return;
       }
-      if (line.equals("[SETTINGS]")) {
-//$NON-NLS-0$
+      if (line.equals("[SETTINGS]")) { //$NON-NLS-1$
          m_section = Section.SECTION_SETTINGS;
          return;
       }
-      if (line.equals("[POLAR-EXTENSION]")) {
-//$NON-NLS-0$
+      if (line.equals("[POLAR-EXTENSION]")) { //$NON-NLS-1$
          m_section = Section.SECTION_POLAREXTS;
          return;
       }
-      if (line.equals("[COACH-PARAMETER]")) {
-//$NON-NLS-0$
+      if (line.equals("[COACH-PARAMETER]")) { //$NON-NLS-1$
          m_section = Section.SECTION_COACH;
          return;
       }
-      if (line.equals("[TOUR-DATA]")) {
-//$NON-NLS-0$
+      if (line.equals("[TOUR-DATA]")) { //$NON-NLS-1$
          m_section = Section.SECTION_TOURDATA;
          return;
       }
-      if (line.equals("[MARKING-DATA]")) {
-//$NON-NLS-0$
+      if (line.equals("[MARKING-DATA]")) { //$NON-NLS-1$
          m_section = Section.SECTION_MARKS;
          return;
       }
