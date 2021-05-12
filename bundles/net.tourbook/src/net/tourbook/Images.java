@@ -150,8 +150,6 @@ public class Images {
    public static final String GroupValues                               = "app-group-values.png";                            //$NON-NLS-1$
    public static final String GroupValues_Disabled                      = "app-group-values-disabled.png";                   //$NON-NLS-1$
    public static final String HeartRateVariability                      = "heart-rate-variability.png";                      //$NON-NLS-1$
-   public static final String Lock_Closed                               = "lock-closed.png";                                 //$NON-NLS-1$
-   public static final String Lock_Open                                 = "lock-open.png";                                   //$NON-NLS-1$
    public static final String Map                                       = "map.png";                                         //$NON-NLS-1$
    public static final String Map2                                      = "map2-view.png";                                   //$NON-NLS-1$
    public static final String Map25                                     = "map25-view.png";                                  //$NON-NLS-1$

@@ -40,6 +40,8 @@ public class CommonImages {
    public static final String BookOpen_Themed              = "book-open-blue.png";                        //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$
    public static final String CustomizeProfilesColumns     = "customize-profiles-columns.png";            //$NON-NLS-1$
+   public static final String Lock_Closed                  = "lock-closed.png";                           //$NON-NLS-1$
+   public static final String Lock_Open                    = "lock-open.png";                             //$NON-NLS-1$
 
    public static final String MapProvider_Custom           = "map-provider-custom.png";                   //$NON-NLS-1$
    public static final String MapProvider_Custom_Hill      = "map-provider-custom-hill.png";              //$NON-NLS-1$
