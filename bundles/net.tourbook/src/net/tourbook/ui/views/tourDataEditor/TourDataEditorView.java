@@ -3991,6 +3991,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                setTourDirty();
             });
             _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
