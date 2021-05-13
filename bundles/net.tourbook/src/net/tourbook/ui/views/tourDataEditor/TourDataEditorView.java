@@ -3166,12 +3166,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
 
-      _tabFolder.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectTab();
-         }
-      });
+      _tabFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTab()));
+
       {
          _tab_10_Tour = new CTabItem(_tabFolder, SWT.FLAT);
          _tab_10_Tour.setText(Messages.tour_editor_tabLabel_tour);
@@ -3406,21 +3402,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
          _tk.adapt(_dtTourDate, true, false);
-         _dtTourDate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _dtTourDate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-                  return;
-               }
-
-               setTourDirty();
-
-               updateUI_Title();
-
-//             onModifyContent();
+            if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+               return;
             }
-         });
+
+            setTourDirty();
+
+            updateUI_Title();
+
+//          onModifyContent();
+
+         }));
 
          //////////////////////////////////////
          createUI_LabelSeparator(container);
@@ -3445,21 +3439,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _tk.adapt(_dtStartTime, true, false);
-            _dtStartTime.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _dtStartTime.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-                     return;
-                  }
-
-                  setTourDirty();
-
-                  updateUI_Title();
-
-//                onModifyContent();
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+
+               setTourDirty();
+
+               updateUI_Title();
+
+//             onModifyContent();
+
+            }));
          }
       }
    }
@@ -3651,18 +3643,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // combo
             _comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
             _comboTimeZone.setVisibleItemCount(50);
-            _comboTimeZone.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  _isTimeZoneManuallyModified = true;
+               _isTimeZoneManuallyModified = true;
 
-                  updateModel_FromUI();
-                  setTourDirty();
+               updateModel_FromUI();
+               setTourDirty();
 
-                  updateUI_TimeZone();
-               }
-            });
+               updateUI_TimeZone();
+
+            }));
 
             _tk.adapt(_comboTimeZone, true, false);
 
@@ -3707,13 +3697,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
-                  _linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
-
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_SetDefault();
-                     }
-                  });
+                  _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetDefault()));
                   _tk.adapt(_linkDefaultTimeZone, true, true);
                }
                {
@@ -3722,12 +3706,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkGeoTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkGeoTimeZone.setText(Messages.Tour_Editor_Link_SetGeoTimeZone);
                   _linkGeoTimeZone.setToolTipText(Messages.Tour_Editor_Link_SetGeoTimeZone_Tooltip);
-                  _linkGeoTimeZone.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_SetFromGeo();
-                     }
-                  });
+                  _linkGeoTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetFromGeo()));
                   _tk.adapt(_linkGeoTimeZone, true, true);
                }
                {
@@ -3736,14 +3715,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkRemoveTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkRemoveTimeZone.setText(Messages.Tour_Editor_Link_RemoveTimeZone);
                   _linkRemoveTimeZone.setToolTipText(Messages.Tour_Editor_Link_RemoveTimeZone_Tooltip);
-                  _linkRemoveTimeZone.addSelectionListener(new SelectionAdapter() {
-
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_Remove();
-                     }
-
-                  });
+                  _linkRemoveTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_Remove()));
                   _tk.adapt(_linkRemoveTimeZone, true, true);
                }
             }
@@ -3955,18 +3927,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _linkWeather.setText(Messages.Tour_Editor_Link_RetrieveWeather);
          _linkWeather.setToolTipText(Messages.Tour_Editor_Link_RetrieveWeather_Tooltip);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_linkWeather);
-         _linkWeather.addSelectionListener(new SelectionAdapter() {
+         _linkWeather.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            //Retrieve the weather
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               //Retrieve the weather
-
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-               onSelect_Weather_Text();
+            if (_isSetField || _isSavingInProgress) {
+               return;
             }
-         });
+            onSelect_Weather_Text();
+         }));
          _tk.adapt(_linkWeather, true, true);
          _firstColumnControls.add(_linkWeather);
 
@@ -4022,16 +3990,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                onSelectWindSpeedValue();
                setTourDirty();
             });
-            _spinWeather_Wind_SpeedValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedValue();
-                  setTourDirty();
+            _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindSpeedValue();
+               setTourDirty();
+            }));
             _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                if (_isSetField || _isSavingInProgress) {
@@ -4064,17 +4029,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_comboWeather_WindDirectionText);
             _comboWeather_WindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
             _comboWeather_WindDirectionText.setVisibleItemCount(16);
-            _comboWeather_WindDirectionText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboWeather_WindDirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionText();
-                  setTourDirty();
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindDirectionText();
+               setTourDirty();
+            }));
 
             // fill combobox
             for (final String windDirText : IWeather.windDirectionText) {
@@ -4108,17 +4070,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tk.adapt(_comboWeather_WindSpeedText, true, false);
             _comboWeather_WindSpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_WindSpeedText.setVisibleItemCount(20);
-            _comboWeather_WindSpeedText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboWeather_WindSpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedText();
-                  setTourDirty();
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindSpeedText();
+               setTourDirty();
+            }));
 
             // fill combobox
             for (final String speedText : IWeather.windSpeedText) {
@@ -4148,16 +4107,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                onSelectWindDirectionValue();
                setTourDirty();
             });
-            _spinWeather_Wind_DirectionValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionValue();
-                  setTourDirty();
+            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindDirectionValue();
+               setTourDirty();
+            }));
+
             _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                if (_isSetField || _isSavingInProgress) {
@@ -4376,12 +4334,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
          _comboWeather_Clouds.setVisibleItemCount(10);
          _comboWeather_Clouds.addModifyListener(_modifyListener);
-         _comboWeather_Clouds.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               displayCloudIcon();
-            }
-         });
+         _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
 
          // fill combobox
          for (final String cloudText : IWeather.cloudText) {
@@ -4473,12 +4426,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .fillDefaults()//
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_linkTag);
-            _linkTag.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  UI.openControlMenu(_linkTag);
-               }
-            });
+            _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTag)));
             _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
 
@@ -4500,13 +4448,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
             _linkTourType = new Link(container, SWT.NONE);
             _linkTourType.setText(Messages.tour_editor_label_tour_type);
-            _linkTourType.addSelectionListener(new SelectionAdapter() {
-
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  UI.openControlMenu(_linkTourType);
-               }
-            });
+            _linkTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTourType)));
             _tk.adapt(_linkTourType, true, true);
             _firstColumnControls.add(_linkTourType);
 
