@@ -30,7 +30,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_LinkPhotoWithTourInFolder extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -39,8 +39,7 @@ public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler 
 
       if (activePart instanceof PicDirView) {
 
-         final PicDirView picDirView = (PicDirView) activePart;
-         final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(true);
+         final PhotosWithExifSelection selectedPhotosWithExif = ((PicDirView) activePart).getSelectedPhotosWithExif(true);
 
          if (selectedPhotosWithExif != null) {
             TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);

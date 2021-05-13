@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -470,8 +470,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Dark_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowDown_Blue_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -485,8 +485,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Dark_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ArrowUp_Blue_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }
