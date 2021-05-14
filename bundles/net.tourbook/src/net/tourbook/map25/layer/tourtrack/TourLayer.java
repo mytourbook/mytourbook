@@ -7,22 +7,30 @@ import gnu.trove.list.array.TIntArrayList;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.marker.MarkerShape;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
 
+import org.oscim.backend.CanvasAdapter;
+import org.oscim.backend.canvas.Bitmap;
+import org.oscim.backend.canvas.Paint;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
+//import org.oscim.layers.vector.
 import org.oscim.map.Map;
 import org.oscim.renderer.BucketRenderer;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.bucket.LineBucket;
 import org.oscim.renderer.bucket.RenderBuckets;
+import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.async.SimpleWorker;
 import org.oscim.utils.geom.LineClipper;
+
 
 /**
  * This class draws a path line in given color or texture.
@@ -40,6 +48,13 @@ public class TourLayer extends Layer {
 	protected TIntArrayList		_tourStarts;
 
 	protected boolean			_isUpdatePoints;
+
+   private Bitmap           _bitmapArrow;
+   private TextureItem      _tex;
+   private MarkerToolkit    _markertoolkit;
+   protected Paint          _linePainter    = CanvasAdapter.newPaint();
+   protected int            _fgColor        = 0xFFFF0000;              // 100 percent red. AARRGGBB
+   protected int            _bgColor        = 0x80FF69B4;              // 50 percent pink. AARRGGBB
 
 	/**
 	 * Line style
@@ -354,20 +369,65 @@ public class TourLayer extends Layer {
 
 	private LineStyle createLineStyle() {
 
-		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      _markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
 
-		return LineStyle
+      //_bitmapArrow = _markertoolkit.drawCircle(10);
 
-				.builder()//
+      _bitmapArrow = CanvasAdapter.newBitmap(10, 10, 0);
+      final org.oscim.backend.canvas.Canvas arrowCanvas = CanvasAdapter.newCanvas();
 
-				.strokeWidth(trackConfig.outlineWidth)
-				.color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
-				.cap(Cap.BUTT)
+      arrowCanvas.setBitmap(_bitmapArrow);
+      final int bitmapArrowSize = 10;
+      //final float half = bitmapArrowSize / 2;
+      _linePainter.setStyle(Paint.Style.STROKE);
+      _linePainter.setStrokeWidth(3);
+      _linePainter.setColor(_fgColor);
 
-				// this is not yet working
-				// .isOutline(true)
+      arrowCanvas.drawLine(1f, 1f, 9f, 5f, _linePainter);
+      arrowCanvas.drawLine(9f, 5f, 1f, 9f, _linePainter);
+      arrowCanvas.drawLine(1f, 9f, 1f, 1f, _linePainter);
+//      arrowCanvas.fillColor(_fgColor);
 
-				.build();
+      _tex = new TextureItem(_bitmapArrow);
+
+      /* i dont know how to access icon resources */
+//      try {
+//         _tex = new TextureItem(CanvasAdapter.getBitmapAsset("", "/net.tourbook/icons/arrow-up.png"));
+//         // tex.mipmap = true;
+//      } catch (final IOException e) {
+//         e.printStackTrace();
+//      }
+
+      final int c = _bgColor;
+
+      final LineStyle style = LineStyle.builder()
+            .stippleColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+            .stipple(10)
+            .strokeWidth(trackConfig.outlineWidth)
+            .strokeColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+            .fixed(true)
+            .texture(_tex)
+            .randomOffset(false)
+            .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+            .cap(Cap.BUTT)
+
+            .build();
+      return style;
+
+//		return LineStyle
+//
+//				.builder()//
+//
+//				.strokeWidth(trackConfig.outlineWidth)
+//				.color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+//				.cap(Cap.BUTT)
+//            // this is not yet working
+//            .texture(_tex)
+//				// this is not yet working
+//				// .isOutline(true)
+//
+//				.build();
 	}
 
 	public void onModifyConfig() {
