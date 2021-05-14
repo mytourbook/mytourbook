@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITreeViewer;
 
@@ -39,7 +39,9 @@ public class ActionCollapseAll extends Action {
 
       setText(Messages.App_Action_CollapseAll);
       setToolTipText(Messages.App_Action_CollapseAll_Tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemeImageName(Images.CollapseAll)));
+
+      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_CollapseAll)));
+      setDisabledImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_CollapseAll_Disabled)));
    }
 
    @Override

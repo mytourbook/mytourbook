@@ -30,7 +30,8 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
@@ -74,6 +75,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
@@ -112,8 +115,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -126,7 +127,7 @@ import org.joda.time.PeriodType;
 /**
  * Dialog to configure the device import.
  */
-public class DialogEasyImportConfig extends TitleAreaDialog {
+public class DialogEasyImportConfig extends TitleAreaDialog implements IActionResetToDefault {
 
    public static final String           ID                                = "DialogEasyImportConfig";               //$NON-NLS-1$
    //
@@ -168,7 +169,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private SelectionAdapter             _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
-   private Action                       _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
    private ActionSpeedTourType_Add      _actionTTSpeed_Add;
    private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
@@ -311,7 +312,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Spinner              _spinnerIL_TemperatureAdjustmentDuration;
    private Spinner[]            _spinnerTT_Speed_AvgSpeed;
    //
-   private TabFolder            _tabFolderEasy;
+   private CTabFolder           _tabFolderEasy;
    //
    private Text                 _txtIC_DeviceFiles;
    private Text                 _txtIC_ConfigName;
@@ -605,7 +606,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _imageAppOptions = CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)).createImage();
+      _imageAppOptions = CommonActivator.getThemedImageDescriptor(CommonImages.App_Options).createImage();
       setDefaultImage(_imageAppOptions);
 
       cloneEasyConfig(easyConfig);
@@ -735,18 +736,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetDashboardToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
    }
 
    @Override
@@ -788,29 +778,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI(final Composite parent) {
 
-      TabItem tabDashboard;
+      CTabItem tabDashboard;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
-         _tabFolderEasy = new TabFolder(container, SWT.NONE);
+         _tabFolderEasy = new CTabFolder(container, SWT.NONE);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolderEasy);
          {
             // tab: config
-            final TabItem tabConfig = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabConfig = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabConfig.setText(Messages.Dialog_ImportConfig_Tab_Configuration);
             tabConfig.setControl(createUI_200_ImportActions(_tabFolderEasy));
 
             // tab: launcher
-            final TabItem tabLauncher = new TabItem(_tabFolderEasy, SWT.NONE);
+            final CTabItem tabLauncher = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabLauncher.setText(Messages.Dialog_ImportConfig_Tab_Launcher);
             tabLauncher.setControl(createUI_500_IL_ImportLauncher(_tabFolderEasy));
 
             // tab: dashboard
-            tabDashboard = new TabItem(_tabFolderEasy, SWT.NONE);
+            tabDashboard = new CTabItem(_tabFolderEasy, SWT.NONE);
             tabDashboard.setText(Messages.Dialog_ImportConfig_Tab_Dashboard);
             tabDashboard.setControl(createUI_900_Dashboard(_tabFolderEasy));
          }
@@ -4229,7 +4219,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _ilViewer.getTable().redraw();
    }
 
-   private void resetDashboardToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       _chkDash_LiveUpdate.setSelection(EasyConfig.LIVE_UPDATE_DEFAULT);
 

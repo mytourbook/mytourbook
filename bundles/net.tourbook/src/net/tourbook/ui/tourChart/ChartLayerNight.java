@@ -21,6 +21,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -28,13 +29,17 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class ChartLayerNight implements IChartLayer, IChartOverlay {
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore            = TourbookPlugin.getPrefStore();
 
    private ChartNightConfig              _chartNightConfig;
+
+   private RGB                           _lightThemeNightColor = new RGB(0x8c, 0x8c, 0x8c);
+   private RGB                           _darkThemeNightColor  = new RGB(0x0, 0x27, 0x75);
 
    public ChartLayerNight() {
       //Nothing to do
@@ -57,7 +62,12 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
       final int devGraphHeight = graphDrawingData.devGraphHeight;
 
       gc.setClipping(0, devYTop, gc.getClipping().width, devGraphHeight);
-      gc.setBackground(new Color(0x8c, 0x8c, 0x8c, opacity));
+      final Color color = new Color(
+            UI.isDarkTheme()
+                  ? _darkThemeNightColor
+                  : _lightThemeNightColor,
+            opacity);
+      gc.setBackground(color);
       gc.setAlpha(opacity);
 
       final double scaleX = graphDrawingData.getScaleX();

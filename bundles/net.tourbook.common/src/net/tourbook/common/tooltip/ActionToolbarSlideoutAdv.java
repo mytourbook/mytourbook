@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,8 +65,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
    public ActionToolbarSlideoutAdv() {
 
-      _image_Enabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions).createImage();
-      _image_Disabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+      _image_Enabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+      _image_Disabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
    }
 
    public ActionToolbarSlideoutAdv(final Image actionImage, final Image actionImageDisabled) {

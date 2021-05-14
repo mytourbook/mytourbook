@@ -18,6 +18,7 @@ package importdata.sporttracks.fitlogex;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 
@@ -38,8 +39,8 @@ class FitLogExTester {
    private static final String            IMPORT_PATH = "/importdata/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
    private static SAXParser               parser;
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
+	private static Map<Long, TourData> newlyImportedTours;
+	private static Map<Long, TourData> alreadyImportedTours;
    private static FitLogDeviceDataReader  deviceDataReader;
 
    @BeforeAll
@@ -78,7 +79,7 @@ class FitLogExTester {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
-            true);
+				true, false);
 
       parser.parse(fitLogExFile, handler);
 
@@ -99,7 +100,7 @@ class FitLogExTester {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
-            true);
+				true, false);
 
       parser.parse(fitLogExFile, handler);
 

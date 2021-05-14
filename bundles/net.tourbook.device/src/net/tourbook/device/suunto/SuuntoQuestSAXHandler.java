@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.stream.Stream;
@@ -91,8 +91,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       TIME_FORMAT_SSS.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private Map<Long, TourData>     _alreadyImportedTours;
+   private Map<Long, TourData>     _newlyImportedTours;
    private TourbookDevice          _device;
 
    private String                  _importFilePath;
@@ -158,8 +158,9 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
-                                final HashMap<Long, TourData> alreadyImportedTours,
-                                final HashMap<Long, TourData> newlyImportedTours) {
+                                final Map<Long, TourData> alreadyImportedTours,
+                                final Map<Long, TourData> newlyImportedTours,
+                                final boolean isReimport) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -186,7 +187,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       }
 
       final TourType tourType = _allTourTypes.stream()
-            .filter((t) -> t.getName().equalsIgnoreCase(exerciseMode.name))
+            .filter(t -> t.getName().equalsIgnoreCase(exerciseMode.name))
             .findFirst()
             .orElse(null);
 
@@ -489,7 +490,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     * @param tourStartTime
     *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
     */
-   private void finalizeSamples(final ZonedDateTime tourStartTime) {
+   private void finalizeSamples() {
 
       //Inserting
       int relativeTime = 0;
@@ -554,7 +555,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             TimeTools.UTC);
       tourData.setTourStartTime(tourStartTime);
 
-      finalizeSamples(tourStartTime);
+      finalizeSamples();
 
       assignAdditionalData(tourData);
 

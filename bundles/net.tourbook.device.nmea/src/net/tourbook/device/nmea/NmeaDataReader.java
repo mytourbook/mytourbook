@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
@@ -38,23 +38,25 @@ import org.opengts.util.Nmea0183;
 
 public class NmeaDataReader extends TourbookDevice {
 
-   private static final String     FILE_HEADER   = "$GP";                          //$NON-NLS-1$
+   private static final String   FILE_HEADER   = "$GP";                          //$NON-NLS-1$
 
-   private static final Calendar   _calendar     = GregorianCalendar.getInstance();
+   private static final Calendar _calendar     = GregorianCalendar.getInstance();
 
-   private ArrayList<TimeData>     _timeDataList = new ArrayList<>();
-   private TimeData                _prevTimeData;
+   private ArrayList<TimeData>   _timeDataList = new ArrayList<>();
+   private TimeData              _prevTimeData;
 
-   private float                   _absoluteDistance;
+   private float                 _absoluteDistance;
 
-   private String                  _importFilePath;
+   private String                _importFilePath;
 
-   private boolean                 _isNullCoordinates;
+   private boolean               _isNullCoordinates;
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private Map<Long, TourData>   _alreadyImportedTours;
+   private Map<Long, TourData>   _newlyImportedTours;
 
-   public NmeaDataReader() {}
+   public NmeaDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -162,8 +164,9 @@ public class NmeaDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       // immediately bail out if the file format is not correct.
       if (!validateRawData(importFilePath)) {

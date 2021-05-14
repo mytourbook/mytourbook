@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,11 @@ package net.tourbook.ui.views.geoCompare;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -31,6 +30,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
@@ -78,6 +78,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -280,8 +281,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          super(null, AS_CHECK_BOX);
 
          setToolTipText(Messages.GeoCompare_View_Action_AppFilter_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Filter));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Filter_Disabled));
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
       }
 
       @Override
@@ -310,12 +312,16 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    private class ActionOnOff extends Action {
 
+      private ImageDescriptor _imageDescriptor_AppOn  = CommonActivator.getThemedImageDescriptor(CommonImages.App_Turn_On);
+      private ImageDescriptor _imageDescriptor_AppOff = CommonActivator.getThemedImageDescriptor(CommonImages.App_Turn_Off);
+
       public ActionOnOff() {
 
          super(null, AS_CHECK_BOX);
 
          setToolTipText(Messages.GeoCompare_View_Action_OnOff_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_On));
+
+         setImageDescriptor(_imageDescriptor_AppOn);
       }
 
       @Override
@@ -327,9 +333,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          // switch icon
          if (isSelected) {
-            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_On));
+            setImageDescriptor(_imageDescriptor_AppOn);
          } else {
-            setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Turn_Off));
+            setImageDescriptor(_imageDescriptor_AppOff);
          }
       }
    }
@@ -2153,7 +2159,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
                      // tour is not in the database, try to get it from the raw data manager
 
-                     final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+                     final Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
                      tourData = rawData.get(tourId);
                   }
                }

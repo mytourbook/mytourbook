@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,35 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeBorder;
+import net.tourbook.tourType.TourTypeColor;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeImageConfig;
+import net.tourbook.tourType.TourTypeLayout;
+import net.tourbook.tourType.TourTypeManager;
+import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
+import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
+import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -32,18 +56,13 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
@@ -55,10 +74,11 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
@@ -75,1311 +95,1320 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeBorder;
-import net.tourbook.tourType.TourTypeColor;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.tourType.TourTypeImageConfig;
-import net.tourbook.tourType.TourTypeLayout;
-import net.tourbook.tourType.TourTypeManager;
-import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
-import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
-import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
-
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final String						COLOR_UNIQUE_ID_PREFIX	= "crId";																		//$NON-NLS-1$
+   private static final String                COLOR_UNIQUE_ID_PREFIX = "crId";                                                     //$NON-NLS-1$
 
-	private static final String[]						SORT_PROPERTY				= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
+   private static final String[]              SORT_PROPERTY          = new String[] { "this property is needed for sorting !!!" }; //$NON-NLS-1$
 
-	private final IPreferenceStore					_prefStore					= TourbookPlugin.getPrefStore();
+   private final IPreferenceStore             _prefStore             = TourbookPlugin.getPrefStore();
 
-	private GraphColorPainter							_graphColorPainter;
+   private GraphColorPainter                  _graphColorPainter;
 
-	private ColorDefinition								_expandedItem;
+   private ColorDefinition                    _expandedItem;
 
-	private GraphColorItem								_selectedGraphColor;
-	private ArrayList<TourType>						_dbTourTypes;
+   private GraphColorItem                     _selectedGraphColor;
+   private ArrayList<TourType>                _dbTourTypes;
 
-	/**
-	 * This is the model of the tour type viewer.
-	 */
-	private ArrayList<TourTypeColorDefinition>	_colorDefinitions;
+   /**
+    * This is the model of the tour type viewer.
+    */
+   private ArrayList<TourTypeColorDefinition> _colorDefinitions;
 
-	private boolean										_isModified					= false;
-	private boolean										_isRecreateTourTypeImages;
+   private boolean                            _isModified;
+   private boolean                            _isRecreateTourTypeImages;
 
-	private boolean										_isUIEmpty;
+   private boolean                            _isUIEmpty;
 
-	/*
-	 * UI controls
-	 */
-	private TreeViewer									_tourTypeViewer;
+   /*
+    * UI controls
+    */
+   private TreeViewer    _tourTypeViewer;
 
-	private Button											_btnAdd;
-	private Button											_btnDelete;
-	private Button											_btnRename;
+   private Button        _btnAdd;
+   private Button        _btnDelete;
+   private Button        _btnRename;
 
-	private ColorSelector								_colorSelector;
+   private ColorSelector _colorSelector;
 
-	private Combo											_comboFillColor1;
-	private Combo											_comboFillColor2;
-	private Combo											_comboFillLayout;
-	private Combo											_comboBorderColor;
-	private Combo											_comboBorderLayout;
+   private Combo         _comboFillColor1;
+   private Combo         _comboFillColor2;
+   private Combo         _comboFillLayout;
+   private Combo         _comboBorderColor;
+   private Combo         _comboBorderLayout;
 
-	private Spinner										_spinnerBorder;
+   private Spinner       _spinnerBorder;
 
-	private class ColorDefinitionContentProvider implements ITreeContentProvider {
+   private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
-		@Override
-		public void dispose() {}
+      @Override
+      public void dispose() {}
 
-		@Override
-		public Object[] getChildren(final Object parentElement) {
+      @Override
+      public Object[] getChildren(final Object parentElement) {
 
-			if (parentElement instanceof ColorDefinition) {
+         if (parentElement instanceof ColorDefinition) {
 
-				return ((ColorDefinition) parentElement).getGraphColorItems();
-			}
+            return ((ColorDefinition) parentElement).getGraphColorItems();
+         }
 
-			return null;
-		}
+         return null;
+      }
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			return _colorDefinitions.toArray(new Object[_colorDefinitions.size()]);
-		}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _colorDefinitions.toArray(new Object[_colorDefinitions.size()]);
+      }
 
-		@Override
-		public Object getParent(final Object element) {
-			return null;
-		}
+      @Override
+      public Object getParent(final Object element) {
+         return null;
+      }
 
-		@Override
-		public boolean hasChildren(final Object element) {
-			if (element instanceof ColorDefinition) {
-				return true;
-			}
-			return false;
-		}
+      @Override
+      public boolean hasChildren(final Object element) {
+         if (element instanceof ColorDefinition) {
+            return true;
+         }
+         return false;
+      }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
-	}
+   }
 
-	private static final class TourTypeComparator extends ViewerComparator {
+   private static final class TourTypeComparator extends ViewerComparator {
 
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			if (e1 instanceof TourTypeColorDefinition && e2 instanceof TourTypeColorDefinition) {
+         if (e1 instanceof TourTypeColorDefinition && e2 instanceof TourTypeColorDefinition) {
 
-				final TourTypeColorDefinition ttcDef1 = (TourTypeColorDefinition) e1;
-				final TourTypeColorDefinition ttcDef2 = (TourTypeColorDefinition) e2;
+            final TourTypeColorDefinition ttcDef1 = (TourTypeColorDefinition) e1;
+            final TourTypeColorDefinition ttcDef2 = (TourTypeColorDefinition) e2;
 
-				return ttcDef1.compareTo(ttcDef2);
-			}
+            return ttcDef1.compareTo(ttcDef2);
+         }
 
-			return 0;
-		}
+         return 0;
+      }
 
-		@Override
-		public boolean isSorterProperty(final Object element, final String property) {
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
 
-			// sort when the name has changed
-			return true;
-		}
-	}
+         // sort when the name has changed
+         return true;
+      }
+   }
 
-	public class TourTypeComparer implements IElementComparer {
+   public class TourTypeComparer implements IElementComparer {
 
-		@Override
-		public boolean equals(final Object a, final Object b) {
+      @Override
+      public boolean equals(final Object a, final Object b) {
 
-			if (a == b) {
-				return true;
-			}
+         if (a == b) {
+            return true;
+         }
 
-			return false;
-		}
+         return false;
+      }
 
-		@Override
-		public int hashCode(final Object element) {
-			return 0;
-		}
-	}
+      @Override
+      public int hashCode(final Object element) {
+         return 0;
+      }
+   }
 
-	@Override
-	protected Control createContents(final Composite parent) {
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		/*
-		 * Ensure that a tour is NOT modified because changing the tour type needs an app restart
-		 * because the tour type images are DISPOSED
-		 */
-		if (_isUIEmpty) {
+      /*
+       * Ensure that a tour is NOT modified because changing the tour type needs an app restart
+       * because the tour type images are DISPOSED
+       */
+      if (_isUIEmpty) {
 
-			final Label label = new Label(parent, SWT.WRAP);
-			label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
-			GridDataFactory.fillDefaults().applyTo(label);
+         final Label label = new Label(parent, SWT.WRAP);
+         label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
+         GridDataFactory.fillDefaults().applyTo(label);
 
-			return label;
-		}
+         return label;
+      }
 
-		final Composite ui = createUI(parent);
+      final Composite ui = createUI(parent);
 
-		fillUI();
+      fillUI();
 
-		// read tour types from the database
-		_dbTourTypes = TourDatabase.getAllTourTypes();
+      // read tour types from the database
+      _dbTourTypes = TourDatabase.getAllTourTypes();
 
-		/*
-		 * create color definitions for all tour types
-		 */
-		_colorDefinitions = new ArrayList<>();
+      /*
+       * create color definitions for all tour types
+       */
+      _colorDefinitions = new ArrayList<>();
 
-		if (_dbTourTypes != null) {
+      if (_dbTourTypes != null) {
 
-			for (final TourType tourType : _dbTourTypes) {
+         for (final TourType tourType : _dbTourTypes) {
 
-				final long typeId = tourType.getTypeId();
+            final long typeId = tourType.getTypeId();
 
-				// create a unique name for each tour type
-				final Object colorId = typeId == TourDatabase.ENTITY_IS_NOT_SAVED //
-						? COLOR_UNIQUE_ID_PREFIX + tourType.getCreateId()
-						: typeId;
+            // create a unique name for each tour type
+            final Object colorId = typeId == TourDatabase.ENTITY_IS_NOT_SAVED //
+                  ? COLOR_UNIQUE_ID_PREFIX + tourType.getCreateId()
+                  : typeId;
 
-				final String colorName = "tourtype." + colorId; //$NON-NLS-1$
+            final String colorName = "tourtype." + colorId; //$NON-NLS-1$
 
-				final TourTypeColorDefinition colorDefinition = new TourTypeColorDefinition(
-						tourType,
-						colorName,
-						tourType.getName(),
-						tourType.getRGBBright(),
-						tourType.getRGBDark(),
-						tourType.getRGBLine(),
-						tourType.getRGBText());
+            final TourTypeColorDefinition colorDefinition = new TourTypeColorDefinition(
+                  tourType,
+                  colorName,
+                  tourType.getName(),
+                  tourType.getRGBBright(),
+                  tourType.getRGBDark(),
+                  tourType.getRGBLine(),
+                  tourType.getRGBText());
 
-				_colorDefinitions.add(colorDefinition);
+            _colorDefinitions.add(colorDefinition);
 
-				createGraphColorItems(colorDefinition);
-			}
-		}
+            createGraphColorItems(colorDefinition);
+         }
+      }
 
-		restoreState();
-		enableActions();
+      restoreState();
+      enableActions();
 
-		_tourTypeViewer.setInput(this);
+      /*
+       * MUST be run async otherwise the background color is NOT themed !!!
+       */
+      ui.getDisplay().asyncExec(() -> _tourTypeViewer.setInput(this));
 
-		return ui;
-	}
+      return ui;
+   }
 
-	/**
-	 * Create the different color names (childs) for the color definition.
-	 */
-	private void createGraphColorItems(final ColorDefinition colorDefinition) {
+   /**
+    * Create the different color names (childs) for the color definition.
+    */
+   private void createGraphColorItems(final ColorDefinition colorDefinition) {
 
-		// use the first 4 color, the mapping color is not used in tour types
-		final int graphNamesLength = GraphColorManager.colorNames.length - 1;
+      // use the first 4 color, the mapping color is not used in tour types
+      final int graphNamesLength = GraphColorManager.colorNames.length - 1;
 
-		final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
+      final GraphColorItem[] graphColors = new GraphColorItem[graphNamesLength];
 
-		for (int nameIndex = 0; nameIndex < graphNamesLength; nameIndex++) {
+      for (int nameIndex = 0; nameIndex < graphNamesLength; nameIndex++) {
 
-			graphColors[nameIndex] = new GraphColorItem(
-					colorDefinition,
-					GraphColorManager.colorNames[nameIndex][0],
-					GraphColorManager.colorNames[nameIndex][1],
-					false);
-		}
+         graphColors[nameIndex] = new GraphColorItem(
+               colorDefinition,
+               GraphColorManager.colorNames[nameIndex][0],
+               GraphColorManager.colorNames[nameIndex][1],
+               false);
+      }
 
-		colorDefinition.setColorNames(graphColors);
-	}
+      colorDefinition.setColorNames(graphColors);
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.WRAP);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-		label.setText(Messages.Pref_TourTypes_Title);
+      final Label label = new Label(parent, SWT.WRAP);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      label.setText(Messages.Pref_TourTypes_Title);
 
-		// container
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      // container
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			createUI_10_ColorViewer(container);
-			createUI_20_Actions(container);
-			createUI_30_ImageLayout(container);
-		}
+      {
+         createUI_10_ColorViewer(container);
+         createUI_20_Actions(container);
+         createUI_30_ImageLayout(container);
+      }
 
-		// must be set after the viewer is created
-		_graphColorPainter = new GraphColorPainter(this);
+      // must be set after the viewer is created
+      _graphColorPainter = new GraphColorPainter(this);
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_10_ColorViewer(final Composite parent) {
+   private void createUI_10_ColorViewer(final Composite parent) {
 
-		/*
-		 * create tree layout
-		 */
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, true)
-				.hint(200, 100)
-				.applyTo(layoutContainer);
+      /*
+       * create tree layout
+       */
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, true)
+            .hint(200, 100)
+            .applyTo(layoutContainer);
 
-		final TreeColumnLayout treeLayout = new TreeColumnLayout();
-		layoutContainer.setLayout(treeLayout);
+      final TreeColumnLayout treeLayout = new TreeColumnLayout();
+      layoutContainer.setLayout(treeLayout);
 
-		/*
-		 * create viewer
-		 */
-		final Tree tree = new Tree(
-				layoutContainer,
-				SWT.H_SCROLL
-						| SWT.V_SCROLL
-						| SWT.BORDER
-						| SWT.MULTI
-						| SWT.FULL_SELECTION);
+      /*
+       * create viewer
+       */
+      final Tree tree = new Tree(
+            layoutContainer,
+            SWT.H_SCROLL
+                  | SWT.V_SCROLL
+                  | SWT.BORDER
+                  | SWT.MULTI
+                  | SWT.FULL_SELECTION);
 
-		tree.setHeaderVisible(false);
-		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      tree.setHeaderVisible(false);
+      tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		_tourTypeViewer = new TreeViewer(tree);
-		defineAllColumns(treeLayout, tree);
+      _tourTypeViewer = new TreeViewer(tree);
+      defineAllColumns(treeLayout, tree);
 
-		_tourTypeViewer.setContentProvider(new ColorDefinitionContentProvider());
+      _tourTypeViewer.setContentProvider(new ColorDefinitionContentProvider());
 
-		_tourTypeViewer.setComparator(new TourTypeComparator());
-		_tourTypeViewer.setComparer(new TourTypeComparer());
+      _tourTypeViewer.setComparator(new TourTypeComparator());
+      _tourTypeViewer.setComparer(new TourTypeComparer());
 
-		_tourTypeViewer.setUseHashlookup(true);
+      _tourTypeViewer.setUseHashlookup(true);
 
-		_tourTypeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectColor();
-				enableActions();
-			}
-		});
+      _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> {
+         onSelectColor();
+         enableActions();
+      });
 
-		_tourTypeViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _tourTypeViewer.addDoubleClickListener(doubleClickEvent -> {
 
-				final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
+         final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
 
-				if (selection instanceof ColorDefinition) {
+         if (selection instanceof ColorDefinition) {
 
-					// expand/collapse current item
-					final ColorDefinition treeItem = (ColorDefinition) selection;
+            // expand/collapse current item
+            final ColorDefinition treeItem = (ColorDefinition) selection;
 
-					if (_tourTypeViewer.getExpandedState(treeItem)) {
+            if (_tourTypeViewer.getExpandedState(treeItem)) {
 
-						_tourTypeViewer.collapseToLevel(treeItem, 1);
+               _tourTypeViewer.collapseToLevel(treeItem, 1);
 
-					} else {
+            } else {
 
-						if (_expandedItem != null) {
-							_tourTypeViewer.collapseToLevel(_expandedItem, 1);
-						}
+               if (_expandedItem != null) {
+                  _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+               }
 
-						_tourTypeViewer.expandToLevel(treeItem, 1);
-						_expandedItem = treeItem;
+               _tourTypeViewer.expandToLevel(treeItem, 1);
+               _expandedItem = treeItem;
 
-						// expanding the treeangle, the layout is correctly done but not with double click
-						layoutContainer.layout(true, true);
-					}
+               // expanding the triangle, the layout is correctly done but not with double click
+               layoutContainer.layout(true, true);
+            }
 
-				} else if (selection instanceof GraphColorItem) {
+         } else if (selection instanceof GraphColorItem) {
 
-					// open color dialog
-					_colorSelector.open();
-				}
-			}
-		});
+            // open color dialog
+            _colorSelector.open();
+         }
+      });
 
-		_tourTypeViewer.addTreeListener(new ITreeViewerListener() {
+      _tourTypeViewer.addTreeListener(new ITreeViewerListener() {
 
-			@Override
-			public void treeCollapsed(final TreeExpansionEvent event) {
+         @Override
+         public void treeCollapsed(final TreeExpansionEvent event) {
 
-				if (event.getElement() instanceof ColorDefinition) {
-					_expandedItem = null;
-				}
-			}
+            if (event.getElement() instanceof ColorDefinition) {
+               _expandedItem = null;
+            }
+         }
 
-			@Override
-			public void treeExpanded(final TreeExpansionEvent event) {
+         @Override
+         public void treeExpanded(final TreeExpansionEvent event) {
 
-				final Object element = event.getElement();
+            final Object element = event.getElement();
 
-				if (element instanceof ColorDefinition) {
-					final ColorDefinition treeItem = (ColorDefinition) element;
+            if (element instanceof ColorDefinition) {
+               final ColorDefinition treeItem = (ColorDefinition) element;
 
-					/*
-					 * run not in the treeExpand method, this is blocked by the viewer with the message:
-					 * Ignored reentrant call while viewer is busy
-					 */
-					Display.getCurrent().asyncExec(new Runnable() {
-						@Override
-						public void run() {
+               /*
+                * run not in the treeExpand method, this is blocked by the viewer with the message:
+                * Ignored reentrant call while viewer is busy
+                */
+               Display.getCurrent().asyncExec(() -> {
 
-							if (_expandedItem != null) {
-								_tourTypeViewer.collapseToLevel(_expandedItem, 1);
-							}
+                  if (_expandedItem != null) {
+                     _tourTypeViewer.collapseToLevel(_expandedItem, 1);
+                  }
 
-							_tourTypeViewer.expandToLevel(treeItem, 1);
-							_expandedItem = treeItem;
-						}
-					});
-				}
-			}
-		});
-	}
+                  _tourTypeViewer.expandToLevel(treeItem, 1);
+                  _expandedItem = treeItem;
+               });
+            }
+         }
+      });
+   }
 
-	private void createUI_20_Actions(final Composite parent) {
+   private void createUI_20_Actions(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			/*
-			 * Color selector
-			 */
-			{
-				_colorSelector = new ColorSelector(container);
-				_colorSelector.getButton().setLayoutData(new GridData());
-				_colorSelector.setEnabled(false);
-				_colorSelector.addListener(new IPropertyChangeListener() {
-					@Override
-					public void propertyChange(final PropertyChangeEvent event) {
-						onChangeGraphColor(event);
-					}
-				});
-				setButtonLayoutData(_colorSelector.getButton());
-			}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         /*
+          * Color selector
+          */
+         {
+            _colorSelector = new ColorSelector(container);
+            _colorSelector.getButton().setLayoutData(new GridData());
+            _colorSelector.setEnabled(false);
+            _colorSelector.addListener(this::onChangeGraphColor);
+            setButtonLayoutData(_colorSelector.getButton());
+         }
 
-			/*
-			 * Add
-			 */
-			{
-				_btnAdd = new Button(container, SWT.NONE);
-				_btnAdd.setText(Messages.Pref_TourTypes_Button_add);
-				_btnAdd.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onAddTourType();
-						enableActions();
-					}
-				});
-				setButtonLayoutData(_btnAdd);
-			}
+         /*
+          * Add
+          */
+         {
+            _btnAdd = new Button(container, SWT.NONE);
+            _btnAdd.setText(Messages.Pref_TourTypes_Button_add);
+            _btnAdd.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAddTourType();
+                  enableActions();
+               }
+            });
+            setButtonLayoutData(_btnAdd);
+         }
 
-			/*
-			 * Rename
-			 */
-			{
-				_btnRename = new Button(container, SWT.NONE);
-				_btnRename.setText(Messages.Pref_TourTypes_Button_rename);
-				_btnRename.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onRenameTourType();
-					}
-				});
-				setButtonLayoutData(_btnRename);
-			}
+         /*
+          * Rename
+          */
+         {
+            _btnRename = new Button(container, SWT.NONE);
+            _btnRename.setText(Messages.Pref_TourTypes_Button_rename);
+            _btnRename.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onRenameTourType();
+               }
+            });
+            setButtonLayoutData(_btnRename);
+         }
 
-			/*
-			 * Delete
-			 */
-			{
+         /*
+          * Delete
+          */
+         {
 // 2009-01-02 disabled because the tour data cache was cleared
 // button: delete
-				_btnDelete = new Button(container, SWT.NONE);
-				_btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
-				_btnDelete.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onDeleteTourType();
-						enableActions();
-					}
-				});
-				setButtonLayoutData(_btnDelete);
-			}
-		}
-	}
-
-	private void createUI_30_ImageLayout(final Composite parent) {
-
-		final SelectionAdapter selectionListener = new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectImageLayout();
-			}
-		};
-
-		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
-				onSelectImageLayout();
-			}
-		};
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Image layout
-				 */
-
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-
-				final Composite containerImage = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
-				GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerImage);
-				{
-					// combo fill layout
-					_comboFillLayout = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboFillLayout.setVisibleItemCount(20);
-					_comboFillLayout.addSelectionListener(selectionListener);
-
-					// combo color 1
-					_comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboFillColor1.setVisibleItemCount(20);
-					_comboFillColor1.addSelectionListener(selectionListener);
-
-					// combo color 2
-					_comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboFillColor2.setVisibleItemCount(20);
-					_comboFillColor2.addSelectionListener(selectionListener);
-				}
-			}
-			{
-				/*
-				 * Border layout
-				 */
-
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
-
-				final Composite containerBorder = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
-				{
-					// combo
-					_comboBorderLayout = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboBorderLayout.setVisibleItemCount(20);
-					_comboBorderLayout.addSelectionListener(selectionListener);
-
-					// combo color
-					_comboBorderColor = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboBorderColor.setVisibleItemCount(20);
-					_comboBorderColor.addSelectionListener(selectionListener);
-				}
-			}
-			{
-				/*
-				 * Border width
-				 */
+            _btnDelete = new Button(container, SWT.NONE);
+            _btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
+            _btnDelete.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onDeleteTourType();
+                  enableActions();
+               }
+            });
+            setButtonLayoutData(_btnDelete);
+         }
+      }
+   }
+
+   private void createUI_30_ImageLayout(final Composite parent) {
+
+      final SelectionAdapter selectionListener = new SelectionAdapter() {
+
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onSelectImageLayout();
+         }
+      };
+
+      final MouseWheelListener mouseWheelListener = mouseEvent -> {
+         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onSelectImageLayout();
+      };
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Image layout
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
+            GridDataFactory
+                  .fillDefaults()//
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+
+            final Composite containerImage = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerImage);
+            {
+               // combo fill layout
+               _comboFillLayout = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboFillLayout.setVisibleItemCount(20);
+               _comboFillLayout.addSelectionListener(selectionListener);
+
+               // combo color 1
+               _comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboFillColor1.setVisibleItemCount(20);
+               _comboFillColor1.addSelectionListener(selectionListener);
+
+               // combo color 2
+               _comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboFillColor2.setVisibleItemCount(20);
+               _comboFillColor2.addSelectionListener(selectionListener);
+            }
+         }
+         {
+            /*
+             * Border layout
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
+            GridDataFactory
+                  .fillDefaults()//
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
+
+            final Composite containerBorder = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
+            {
+               // combo
+               _comboBorderLayout = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboBorderLayout.setVisibleItemCount(20);
+               _comboBorderLayout.addSelectionListener(selectionListener);
+
+               // combo color
+               _comboBorderColor = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
+               _comboBorderColor.setVisibleItemCount(20);
+               _comboBorderColor.addSelectionListener(selectionListener);
+            }
+         }
+         {
+            /*
+             * Border width
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_TourTypes_Label_BorderWidth);
+            GridDataFactory
+                  .fillDefaults()//
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(label);
 
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_TourTypes_Label_BorderWidth);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(label);
+            // spinner
+            _spinnerBorder = new Spinner(container, SWT.BORDER);
+            _spinnerBorder.setMinimum(0);
+            _spinnerBorder.setMaximum(10);
+            _spinnerBorder.addSelectionListener(selectionListener);
+            _spinnerBorder.addMouseWheelListener(mouseWheelListener);
+         }
+      }
 
-				// spinner
-				_spinnerBorder = new Spinner(container, SWT.BORDER);
-				_spinnerBorder.setMinimum(0);
-				_spinnerBorder.setMaximum(10);
-				_spinnerBorder.addSelectionListener(selectionListener);
-				_spinnerBorder.addMouseWheelListener(mouseWheelListener);
-			}
-		}
+   }
 
-	}
+   /**
+    * create columns
+    */
+   private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
 
-	/**
-	 * create columns
-	 */
-	private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
+      final int numberOfHorizontalImages = 4;
+      final int trailingOffset = 10;
 
-		final int numberOfHorizontalImages = 4;
-		final int trailingOffset = 10;
+      final int itemHeight = tree.getItemHeight();
+      final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
 
-		final int itemHeight = tree.getItemHeight();
-		final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
+      final int colorImageWidth = (oneColorWidth * numberOfHorizontalImages) + trailingOffset;
 
-		final int colorImageWidth = (oneColorWidth * numberOfHorizontalImages) + trailingOffset;
+      TreeColumn tc;
+      TreeViewerColumn tvc;
 
-		TreeColumn tc;
-		TreeViewerColumn tvc;
+      {
+         /*
+          * 1. column: color item/color definition
+          */
 
-		{
-			/*
-			 * 1. column: color item/color definition
-			 */
+         tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tvc.setLabelProvider(new StyledCellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+               final Object element = cell.getElement();
 
-					final Object element = cell.getElement();
+               if (element instanceof TourTypeColorDefinition) {
 
-					if (element instanceof TourTypeColorDefinition) {
+                  cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
 
-						cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
+                  final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
+                  final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId(), true);
 
-						final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-						final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId(), true);
+                  cell.setImage(tourTypeImage);
 
-						cell.setImage(tourTypeImage);
+               } else if (element instanceof GraphColorItem) {
 
-					} else if (element instanceof GraphColorItem) {
+                  cell.setText(((GraphColorItem) (element)).getName());
+                  cell.setImage(null);
 
-						cell.setText(((GraphColorItem) (element)).getName());
-						cell.setImage(null);
+               } else {
 
-					} else {
+                  cell.setText(UI.EMPTY_STRING);
+                  cell.setImage(null);
+               }
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
+      }
 
-						cell.setText(UI.EMPTY_STRING);
-						cell.setImage(null);
-					}
-				}
-			});
-			treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
-		}
+      {
+         /*
+          * 2. column: color for definition/item
+          */
 
-		{
-			/*
-			 * 2. column: color for definition/item
-			 */
+         tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
-			tc = tvc.getColumn();
-			tvc.setLabelProvider(new StyledCellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+               final Object element = cell.getElement();
 
-					final Object element = cell.getElement();
+               if (element instanceof ColorDefinition) {
 
-					if (element instanceof ColorDefinition) {
+                  final Color backgroundColor = _tourTypeViewer.getTree().getBackground();
 
-						final Image image = _graphColorPainter.drawColorDefinitionImage(
-								(ColorDefinition) element,
-								numberOfHorizontalImages,
-								_isRecreateTourTypeImages);
+                  final Image image = _graphColorPainter.drawColorDefinitionImage(
+                        (ColorDefinition) element,
+                        numberOfHorizontalImages,
+                        _isRecreateTourTypeImages,
+                        backgroundColor);
 
-						cell.setImage(image);
+                  cell.setImage(image);
 
-					} else if (element instanceof GraphColorItem) {
+               } else if (element instanceof GraphColorItem) {
 
-						final Image image = _graphColorPainter.drawGraphColorImage(//
-								(GraphColorItem) element,
-								numberOfHorizontalImages,
-								_isRecreateTourTypeImages);
+                  final Image image = _graphColorPainter.drawGraphColorImage(
+                        (GraphColorItem) element,
+                        numberOfHorizontalImages,
+                        _isRecreateTourTypeImages);
 
-						cell.setImage(image);
+                  cell.setImage(image);
 
-					} else {
+               } else {
 
-						cell.setImage(null);
-					}
-				}
-			});
-			treeLayout.setColumnData(tc, new ColumnPixelData(colorImageWidth, true));
-		}
+                  cell.setImage(null);
+               }
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnPixelData(colorImageWidth, true));
+      }
 
-	}
+   }
 
-	private boolean deleteTourType(final TourType tourType) {
+   private boolean deleteTourType(final TourType tourType) {
 
-		if (deleteTourType_10_FromTourData(tourType)) {
-			if (deleteTourType_20_FromDb(tourType)) {
-				return true;
-			}
-		}
+      if (deleteTourType_10_FromTourData(tourType)) {
+         if (deleteTourType_20_FromDb(tourType)) {
+            return true;
+         }
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	private boolean deleteTourType_10_FromTourData(final TourType tourType) {
+   private boolean deleteTourType_10_FromTourData(final TourType tourType) {
 
-		boolean returnResult = false;
+      boolean returnResult = false;
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-		if (em != null) {
+      if (em != null) {
 
-			final Query query = em.createQuery(//
-					//
-					"SELECT tourData" //$NON-NLS-1$
-							+ (" FROM TourData AS tourData") //$NON-NLS-1$
-							+ (" WHERE tourData.tourType.typeId=" + tourType.getTypeId())); //$NON-NLS-1$
+         final Query query = em.createQuery(UI.EMPTY_STRING
 
-			final List<?> tourDataList = query.getResultList();
-			if (tourDataList.size() > 0) {
+               + "SELECT tourData" //$NON-NLS-1$
+               + " FROM TourData AS tourData" //$NON-NLS-1$
+               + " WHERE tourData.tourType.typeId=" + tourType.getTypeId()); //$NON-NLS-1$
 
-				final EntityTransaction ts = em.getTransaction();
+         final List<?> tourDataList = query.getResultList();
+         if (tourDataList.size() > 0) {
 
-				try {
+            final EntityTransaction ts = em.getTransaction();
 
-					ts.begin();
+            try {
 
-					// remove tour type from all tour data
-					for (final Object listItem : tourDataList) {
+               ts.begin();
 
-						if (listItem instanceof TourData) {
+               // remove tour type from all tour data
+               for (final Object listItem : tourDataList) {
 
-							final TourData tourData = (TourData) listItem;
+                  if (listItem instanceof TourData) {
 
-							tourData.setTourType(null);
-							em.merge(tourData);
-						}
-					}
+                     final TourData tourData = (TourData) listItem;
 
-					ts.commit();
+                     tourData.setTourType(null);
+                     em.merge(tourData);
+                  }
+               }
 
-				} catch (final Exception e) {
-					StatusUtil.showStatus(e);
-				} finally {
-					if (ts.isActive()) {
-						ts.rollback();
-					}
-				}
-			}
+               ts.commit();
 
-			returnResult = true;
-			em.close();
-		}
+            } catch (final Exception e) {
+               StatusUtil.showStatus(e);
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               }
+            }
+         }
 
-		return returnResult;
-	}
+         returnResult = true;
+         em.close();
+      }
 
-	private boolean deleteTourType_20_FromDb(final TourType tourType) {
+      return returnResult;
+   }
 
-		boolean returnResult = false;
+   private boolean deleteTourType_20_FromDb(final TourType tourType) {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
+      boolean returnResult = false;
 
-		try {
-			final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
 
-			if (tourTypeEntity != null) {
+      try {
+         final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
 
-				ts.begin();
+         if (tourTypeEntity != null) {
 
-				em.remove(tourTypeEntity);
+            ts.begin();
 
-				ts.commit();
-			}
+            em.remove(tourTypeEntity);
 
-		} catch (final Exception e) {
-			StatusUtil.showStatus(e);
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				returnResult = true;
-			}
-			em.close();
-		}
+            ts.commit();
+         }
 
-		return returnResult;
-	}
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         } else {
+            returnResult = true;
+         }
+         em.close();
+      }
 
-	@Override
-	public void dispose() {
+      return returnResult;
+   }
 
-		if (_graphColorPainter != null) {
-			_graphColorPainter.disposeAllResources();
-		}
+   @Override
+   public void dispose() {
 
-		super.dispose();
-	}
+      if (_graphColorPainter != null) {
+         _graphColorPainter.disposeAllResources();
+      }
 
-	private void enableActions() {
+      super.dispose();
+   }
 
-		final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
-		final Object selectedItem = selection.getFirstElement();
+   private void enableActions() {
 
-		boolean isSelected = false;
-		boolean isGraphSelected = false;
+      final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
+      final int selectedItemsSize = selectedItems.size();
+      final Object firstSelectedColorDefinition = selectedItems.getFirstElement();
 
-		if (selectedItem instanceof GraphColorItem) {
+      boolean isSelected = false;
+      boolean isGraphSelected = false;
 
-			isGraphSelected = true;
-			isSelected = true;
+      if (firstSelectedColorDefinition instanceof GraphColorItem) {
 
-		} else if (selectedItem instanceof TourTypeColorDefinition) {
+         isGraphSelected = true;
+         isSelected = true;
 
-			isSelected = true;
-		}
+      } else if (firstSelectedColorDefinition instanceof TourTypeColorDefinition) {
 
-		_btnDelete.setEnabled(isSelected);
-		_btnRename.setEnabled(isSelected);
+         isSelected = true;
+      }
 
-		_colorSelector.setEnabled(isGraphSelected);
-	}
+      _btnDelete.setEnabled(isSelected);
+      _btnRename.setEnabled(selectedItemsSize == 1);
 
-	private void enableLayoutControls() {
+      _colorSelector.setEnabled(isGraphSelected);
+   }
 
-		final TourTypeLayoutData layoutData = getSelectedTourTypeLayoutData();
+   private void enableLayoutControls() {
 
-		_comboFillColor1.setEnabled(layoutData.isColor1);
-		_comboFillColor2.setEnabled(layoutData.isColor2);
-	}
+      final TourTypeLayoutData layoutData = getSelectedTourTypeLayoutData();
 
-	private void fillUI() {
+      _comboFillColor1.setEnabled(layoutData.isColor1);
+      _comboFillColor2.setEnabled(layoutData.isColor2);
+   }
 
-		/*
-		 * Image layout
-		 */
-		for (final TourTypeLayoutData data : TourTypeManager.getAllTourTypeLayoutData()) {
-			_comboFillLayout.add(data.label);
-		}
-		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-			_comboFillColor1.add(data.label);
-		}
-		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-			_comboFillColor2.add(data.label);
-		}
+   private void fillUI() {
 
-		/*
-		 * Border layout
-		 */
-		for (final TourTypeBorderData data : TourTypeManager.getAllTourTypeBorderData()) {
-			_comboBorderLayout.add(data.label);
-		}
-		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
-			_comboBorderColor.add(data.label);
-		}
-	}
+      /*
+       * Image layout
+       */
+      for (final TourTypeLayoutData data : TourTypeManager.getAllTourTypeLayoutData()) {
+         _comboFillLayout.add(data.label);
+      }
+      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+         _comboFillColor1.add(data.label);
+      }
+      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+         _comboFillColor2.add(data.label);
+      }
 
-	private void fireModifyEvent() {
+      /*
+       * Border layout
+       */
+      for (final TourTypeBorderData data : TourTypeManager.getAllTourTypeBorderData()) {
+         _comboBorderLayout.add(data.label);
+      }
+      for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+         _comboBorderColor.add(data.label);
+      }
+   }
 
-		if (_isModified) {
+   private void fireModifyEvent() {
 
-			_isModified = false;
+      if (_isModified) {
+
+         _isModified = false;
 //
 //			TourManager.getInstance().clearTourDataCache();
 //
 //			// fire modify event
 //			_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 
-			TourTypeManager.saveState();
+         TourTypeManager.saveState();
 
-			// show restart info
-			new MessageDialog(
-					this.getShell(),
-					Messages.Pref_TourTypes_Dialog_Restart_Title,
-					null,
-					Messages.Pref_TourTypes_Dialog_Restart_Message,
-					MessageDialog.INFORMATION,
-					new String[] { Messages.App_Action_RestartApp },
-					1).open();
+         // show restart info
+         new MessageDialog(
+               this.getShell(),
+               Messages.Pref_TourTypes_Dialog_Restart_Title,
+               null,
+               Messages.Pref_TourTypes_Dialog_Restart_Message,
+               MessageDialog.INFORMATION,
+               new String[] { Messages.App_Action_RestartApp },
+               1).open();
 
-			Display.getCurrent().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					PlatformUI.getWorkbench().restart();
-				}
-			});
-		}
-	}
+         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
+   }
 
-	@Override
-	public IGradientColorProvider getMapLegendColorProvider() {
-		return null;
-	}
+   /**
+    * @return Returns the first selected color definition in the color viewer
+    */
+   private TourTypeColorDefinition getFirstSelectedColorDefinition() {
 
-	/**
-	 * @return Returns the selected color definition in the color viewer
-	 */
-	private TourTypeColorDefinition getSelectedColorDefinition() {
+      TourTypeColorDefinition selectedColorDefinition = null;
 
-		TourTypeColorDefinition selectedColorDefinition = null;
+      final Object selectedItem = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
 
-		final Object selectedItem = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
+      if (selectedItem instanceof GraphColorItem) {
 
-		if (selectedItem instanceof GraphColorItem) {
+         final GraphColorItem graphColor = (GraphColorItem) selectedItem;
 
-			final GraphColorItem graphColor = (GraphColorItem) selectedItem;
+         selectedColorDefinition = (TourTypeColorDefinition) graphColor.getColorDefinition();
 
-			selectedColorDefinition = (TourTypeColorDefinition) graphColor.getColorDefinition();
+      } else if (selectedItem instanceof TourTypeColorDefinition) {
 
-		} else if (selectedItem instanceof TourTypeColorDefinition) {
+         selectedColorDefinition = (TourTypeColorDefinition) selectedItem;
+      }
 
-			selectedColorDefinition = (TourTypeColorDefinition) selectedItem;
-		}
+      return selectedColorDefinition;
+   }
 
-		return selectedColorDefinition;
-	}
+   @Override
+   public IGradientColorProvider getMapLegendColorProvider() {
+      return null;
+   }
 
-	private TourTypeBorder getSelectedTourTypeBorderLayout() {
+   /**
+    * @return Returns the selected color definitions in the color viewer
+    */
+   private List<TourTypeColorDefinition> getSelectedColorDefinitions() {
 
-		final int selectedIndex = _comboBorderLayout.getSelectionIndex();
+      final List<TourTypeColorDefinition> selectedColorDefinitions = new ArrayList<>();
 
-		if (selectedIndex < 0) {
-			return TourTypeManager.DEFAULT_BORDER_LAYOUT;
-		}
+      final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
 
-		return TourTypeManager.getAllTourTypeBorderData()[selectedIndex].tourTypeBorder;
-	}
+      final Iterator<?> selectedItemsIterator = selectedItems.iterator();
+      while (selectedItemsIterator.hasNext()) {
 
-	private TourTypeColor getSelectedTourTypeColor(final Combo comboColor) {
+         final Object selectedItem = selectedItemsIterator.next();
+         if (selectedItem instanceof GraphColorItem) {
 
-		final int selectedIndex = comboColor.getSelectionIndex();
+            final GraphColorItem graphColor = (GraphColorItem) selectedItem;
 
-		if (selectedIndex < 0) {
-			return TourTypeManager.DEFAULT_BORDER_COLOR;
-		}
+            selectedColorDefinitions.add((TourTypeColorDefinition) graphColor.getColorDefinition());
 
-		return TourTypeManager.getAllTourTypeColorData()[selectedIndex].tourTypeColor;
-	}
+         } else if (selectedItem instanceof TourTypeColorDefinition) {
 
-	private TourTypeLayout getSelectedTourTypeLayout() {
+            selectedColorDefinitions.add((TourTypeColorDefinition) selectedItem);
+         }
+      }
 
-		final int selectedIndex = _comboFillLayout.getSelectionIndex();
+      return selectedColorDefinitions;
+   }
 
-		if (selectedIndex < 0) {
-			return TourTypeManager.DEFAULT_IMAGE_LAYOUT;
-		}
+   private TourTypeBorder getSelectedTourTypeBorderLayout() {
 
-		return TourTypeManager.getAllTourTypeLayoutData()[selectedIndex].tourTypeLayout;
-	}
+      final int selectedIndex = _comboBorderLayout.getSelectionIndex();
 
-	private TourTypeLayoutData getSelectedTourTypeLayoutData() {
+      if (selectedIndex < 0) {
+         return TourTypeManager.DEFAULT_BORDER_LAYOUT;
+      }
 
-		final TourTypeLayoutData[] allTourTypeLayoutData = TourTypeManager.getAllTourTypeLayoutData();
+      return TourTypeManager.getAllTourTypeBorderData()[selectedIndex].tourTypeBorder;
+   }
 
-		final int selectedIndex = _comboFillLayout.getSelectionIndex();
+   private TourTypeColor getSelectedTourTypeColor(final Combo comboColor) {
 
-		if (selectedIndex < 0) {
-			return allTourTypeLayoutData[0];
-		}
+      final int selectedIndex = comboColor.getSelectionIndex();
 
-		return allTourTypeLayoutData[selectedIndex];
-	}
+      if (selectedIndex < 0) {
+         return TourTypeManager.DEFAULT_BORDER_COLOR;
+      }
 
-	@Override
-	public TreeViewer getTreeViewer() {
-		return _tourTypeViewer;
-	}
+      return TourTypeManager.getAllTourTypeColorData()[selectedIndex].tourTypeColor;
+   }
 
-	@Override
-	public void init(final IWorkbench workbench) {
+   private TourTypeLayout getSelectedTourTypeLayout() {
 
-		setPreferenceStore(_prefStore);
+      final int selectedIndex = _comboFillLayout.getSelectionIndex();
 
-		/*
-		 * Ensure that a tour is NOT modified because changing the tour type needs an app restart
-		 * because the tour type images are DISPOSED
-		 */
-		if (TourManager.isTourEditorModified(false)) {
+      if (selectedIndex < 0) {
+         return TourTypeManager.DEFAULT_IMAGE_LAYOUT;
+      }
 
-			_isUIEmpty = true;
+      return TourTypeManager.getAllTourTypeLayoutData()[selectedIndex].tourTypeLayout;
+   }
 
-			noDefaultAndApplyButton();
-		}
+   private TourTypeLayoutData getSelectedTourTypeLayoutData() {
 
-	}
+      final TourTypeLayoutData[] allTourTypeLayoutData = TourTypeManager.getAllTourTypeLayoutData();
 
-	@Override
-	public boolean okToLeave() {
+      final int selectedIndex = _comboFillLayout.getSelectionIndex();
 
-		if (!_isUIEmpty) {
+      if (selectedIndex < 0) {
+         return allTourTypeLayoutData[0];
+      }
 
-			fireModifyEvent();
-		}
+      return allTourTypeLayoutData[selectedIndex];
+   }
 
-		return super.okToLeave();
-	}
+   @Override
+   public TreeViewer getTreeViewer() {
+      return _tourTypeViewer;
+   }
 
-	private void onAddTourType() {
+   @Override
+   public void init(final IWorkbench workbench) {
 
-		// ask for the tour type name
-		final InputDialog inputDialog = new InputDialog(
-				this.getShell(),
-				Messages.Pref_TourTypes_Dlg_new_tour_type_title,
-				Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
-				UI.EMPTY_STRING,
-				null);
+      setPreferenceStore(_prefStore);
 
-		if (inputDialog.open() != Window.OK) {
-			setFocusToViewer();
-			return;
-		}
+      /*
+       * Ensure that a tour is NOT modified because changing the tour type needs an app restart
+       * because the tour type images are DISPOSED
+       */
+      if (TourManager.isTourEditorModified(false)) {
 
-		final String tourTypeName = inputDialog.getValue();
+         _isUIEmpty = true;
 
-		// create new tour type
-		final TourType newTourType = new TourType(tourTypeName);
+         noDefaultAndApplyButton();
+      }
 
-		/*
-		 * Create a dummy definition to get the default colors
-		 */
-		final TourTypeColorDefinition dummyColorDefinition = new TourTypeColorDefinition(
-				newTourType,
-				UI.EMPTY_STRING,
-				UI.EMPTY_STRING);
+   }
 
-		newTourType.setColorBright(dummyColorDefinition.getGradientBright_Default());
-		newTourType.setColorDark(dummyColorDefinition.getGradientDark_Default());
-		newTourType.setColorLine(dummyColorDefinition.getLineColor_Default());
-		newTourType.setColorText(dummyColorDefinition.getTextColor_Default());
+   @Override
+   public boolean okToLeave() {
 
-		// add new entity to db
-		final TourType savedTourType = saveTourType(newTourType);
+      if (!_isUIEmpty) {
 
-		if (savedTourType != null) {
+         fireModifyEvent();
+      }
 
-			/*
-			 * Create a color definition WITH THE SAVED tour type, this fixes a VEEEEEEEEEEERY long
-			 * existing bug that a new tour type is initially not displayed correctly in the color
-			 * definition image.
-			 */
-			// create the same color definition but with the correct id's
-			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
-					savedTourType,
-					"tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
-					tourTypeName);
+      return super.okToLeave();
+   }
 
-			// overwrite tour type object
-			newColorDefinition.setTourType(savedTourType);
+   private void onAddTourType() {
 
-			createGraphColorItems(newColorDefinition);
+      // ask for the tour type name
+      final InputDialog inputDialog = new InputDialog(
+            this.getShell(),
+            Messages.Pref_TourTypes_Dlg_new_tour_type_title,
+            Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
+            UI.EMPTY_STRING,
+            null);
 
-			// update model
-			_colorDefinitions.add(newColorDefinition);
+      if (inputDialog.open() != Window.OK) {
+         setFocusToViewer();
+         return;
+      }
 
-			// update internal tour type list
-			_dbTourTypes.add(savedTourType);
-			Collections.sort(_dbTourTypes);
+      final String tourTypeName = inputDialog.getValue();
 
-			// update UI
-			_tourTypeViewer.add(this, newColorDefinition);
+      // create new tour type
+      final TourType newTourType = new TourType(tourTypeName);
 
-			_tourTypeViewer.setSelection(new StructuredSelection(newColorDefinition), true);
+      /*
+       * Create a dummy definition to get the default colors
+       */
+      final TourTypeColorDefinition dummyColorDefinition = new TourTypeColorDefinition(
+            newTourType,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING);
 
-			_tourTypeViewer.collapseAll();
-			_tourTypeViewer.expandToLevel(newColorDefinition, 1);
+      newTourType.setColorBright(dummyColorDefinition.getGradientBright_Default());
+      newTourType.setColorDark(dummyColorDefinition.getGradientDark_Default());
+      newTourType.setColorLine(dummyColorDefinition.getLineColor_Default());
+      newTourType.setColorText(dummyColorDefinition.getTextColor_Default());
 
-			_isModified = true;
+      // add new entity to db
+      final TourType savedTourType = saveTourType(newTourType);
 
-			setFocusToViewer();
-		}
+      if (savedTourType != null) {
 
-		return;
-	}
+         /*
+          * Create a color definition WITH THE SAVED tour type, this fixes a VEEEEEEEEEEERY long
+          * existing bug that a new tour type is initially not displayed correctly in the color
+          * definition image.
+          */
+         // create the same color definition but with the correct id's
+         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
+               savedTourType,
+               "tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
+               tourTypeName);
 
-	/**
-	 * Is called when the color in the color selector has changed
-	 *
-	 * @param event
-	 */
-	private void onChangeGraphColor(final PropertyChangeEvent event) {
+         // overwrite tour type object
+         newColorDefinition.setTourType(savedTourType);
 
-		final RGB oldRGB = (RGB) event.getOldValue();
-		final RGB newRGB = (RGB) event.getNewValue();
+         createGraphColorItems(newColorDefinition);
 
-		if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
-			return;
-		}
+         // update model
+         _colorDefinitions.add(newColorDefinition);
 
-		// color has changed
+         // update internal tour type list
+         _dbTourTypes.add(savedTourType);
+         Collections.sort(_dbTourTypes);
 
-		// update model
-		_selectedGraphColor.setRGB(newRGB);
+         // update UI
+         _tourTypeViewer.add(this, newColorDefinition);
 
-		final TourTypeColorDefinition selectedColorDefinition = (TourTypeColorDefinition) _selectedGraphColor
-				.getColorDefinition();
+         _tourTypeViewer.setSelection(new StructuredSelection(newColorDefinition), true);
 
-		/*
-		 * update tour type in the db
-		 */
-		final TourType oldTourType = selectedColorDefinition.getTourType();
+         _tourTypeViewer.collapseAll();
+         _tourTypeViewer.expandToLevel(newColorDefinition, 1);
 
-		oldTourType.setColorBright(selectedColorDefinition.getGradientBright_New());
-		oldTourType.setColorDark(selectedColorDefinition.getGradientDark_New());
-		oldTourType.setColorLine(selectedColorDefinition.getLineColor_New());
-		oldTourType.setColorText(selectedColorDefinition.getTextColor_New());
+         _isModified = true;
 
-		final TourType savedTourType = saveTourType(oldTourType);
+         setFocusToViewer();
+      }
+   }
 
-		selectedColorDefinition.setTourType(savedTourType);
+   /**
+    * Is called when the color in the color selector has changed
+    *
+    * @param event
+    */
+   private void onChangeGraphColor(final PropertyChangeEvent event) {
 
-		// replace tour type with new one
-		_dbTourTypes.remove(oldTourType);
-		_dbTourTypes.add(savedTourType);
-		Collections.sort(_dbTourTypes);
+      final RGB oldRGB = (RGB) event.getOldValue();
+      final RGB newRGB = (RGB) event.getNewValue();
 
-		/*
-		 * Update UI
-		 */
-		// invalidate old color/image from the graph and color definition to force the recreation
-		_graphColorPainter.invalidateResources(//
-				_selectedGraphColor.getColorId(),
-				selectedColorDefinition.getColorDefinitionId());
+      if (_selectedGraphColor == null || oldRGB.equals(newRGB)) {
+         return;
+      }
 
-		// update UI
-		TourTypeImage.setTourTypeImagesDirty();
+      // color has changed
 
-		/*
-		 * update the tree viewer, the color images will be recreated in the label provider
-		 */
-		_tourTypeViewer.update(_selectedGraphColor, null);
-		_tourTypeViewer.update(selectedColorDefinition, null);
+      // update model
+      _selectedGraphColor.setRGB(newRGB);
 
-		// without a repaint the color def image is not updated
-		_tourTypeViewer.getTree().redraw();
+      final TourTypeColorDefinition selectedColorDefinition = (TourTypeColorDefinition) _selectedGraphColor
+            .getColorDefinition();
 
-		_isModified = true;
-	}
+      /*
+       * update tour type in the db
+       */
+      final TourType oldTourType = selectedColorDefinition.getTourType();
 
-	private void onDeleteTourType() {
+      oldTourType.setColorBright(selectedColorDefinition.getGradientBright_New());
+      oldTourType.setColorDark(selectedColorDefinition.getGradientDark_New());
+      oldTourType.setColorLine(selectedColorDefinition.getLineColor_New());
+      oldTourType.setColorText(selectedColorDefinition.getTextColor_New());
 
-		final TourTypeColorDefinition selectedColorDefinition = getSelectedColorDefinition();
-		final TourType selectedTourType = selectedColorDefinition.getTourType();
+      final TourType savedTourType = saveTourType(oldTourType);
 
-		// confirm deletion
-		final MessageDialog dialog = new MessageDialog(
-				this.getShell(),
-				Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
-				null,
-				NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, selectedTourType.getName()),
-				MessageDialog.QUESTION,
-				new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
-				1);
+      selectedColorDefinition.setTourType(savedTourType);
 
-		if (dialog.open() != Window.OK) {
-			setFocusToViewer();
-			return;
-		}
+      // replace tour type with new one
+      _dbTourTypes.remove(oldTourType);
+      _dbTourTypes.add(savedTourType);
+      Collections.sort(_dbTourTypes);
 
-		// remove entity from the db
-		if (deleteTourType(selectedTourType)) {
+      /*
+       * Update UI
+       */
+      // invalidate old color/image from the graph and color definition to force the recreation
+      _graphColorPainter.invalidateResources(//
+            _selectedGraphColor.getColorId(),
+            selectedColorDefinition.getColorDefinitionId());
 
-			// update model
-			_dbTourTypes.remove(selectedTourType);
+      // update UI
+      TourTypeImage.setTourTypeImagesDirty();
 
-			_colorDefinitions.remove(selectedColorDefinition);
+      /*
+       * update the tree viewer, the color images will be recreated in the label provider
+       */
+      _tourTypeViewer.update(_selectedGraphColor, null);
+      _tourTypeViewer.update(selectedColorDefinition, null);
 
-			// update UI
-			_tourTypeViewer.remove(selectedColorDefinition);
+      // without a repaint the color def image is not updated
+      _tourTypeViewer.getTree().redraw();
 
-			_isModified = true;
-		}
+      _isModified = true;
+   }
 
-		setFocusToViewer();
-	}
+   private void onDeleteTourType() {
 
-	private void onRenameTourType() {
+      final List<TourTypeColorDefinition> selectedColorDefinitions = getSelectedColorDefinitions();
+      final List<TourType> selectedTourTypes = new ArrayList<>();
 
-		final TourTypeColorDefinition selectedColorDefinition = getSelectedColorDefinition();
-		final TourType selectedTourType = selectedColorDefinition.getTourType();
+      selectedColorDefinitions.stream().forEach(
+            colorDefinition -> selectedTourTypes.add(colorDefinition.getTourType()));
 
-		// ask for the tour type name
-		final InputDialog dialog = new InputDialog(
-				getShell(),
-				Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
-				NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
-				selectedTourType.getName(),
-				null);
+      final List<String> tourTypeNames = new ArrayList<>();
+      selectedTourTypes.stream().forEach(tourType -> tourTypeNames.add(tourType.getName()));
 
-		if (dialog.open() != Window.OK) {
-			setFocusToViewer();
-			return;
-		}
+      // confirm deletion
+      final MessageDialog dialog = new MessageDialog(
+            this.getShell(),
+            Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
+            null,
+            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg,
+                  StringUtils.join(tourTypeNames.stream()
+                        .toArray(String[]::new), UI.COMMA_SPACE)),
+            MessageDialog.QUESTION,
+            new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
+            1);
 
-		// update tour type name
-		final String newTourTypeName = dialog.getValue();
+      if (dialog.open() != Window.OK) {
+         setFocusToViewer();
+         return;
+      }
 
-		selectedTourType.setName(newTourTypeName);
-		selectedColorDefinition.setVisibleName(newTourTypeName);
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-		// update entity in the db
-		final TourType savedTourType = saveTourType(selectedTourType);
+         for (final TourTypeColorDefinition selectedColorDefinition : selectedColorDefinitions) {
 
-		if (savedTourType != null) {
+            final TourType selectedTourType = selectedColorDefinition.getTourType();
 
-			// update model
-			selectedColorDefinition.setTourType(savedTourType);
+            // remove entity from the db
+            if (deleteTourType(selectedTourType)) {
 
-			// replace tour type with new one
-			_dbTourTypes.remove(selectedTourType);
-			_dbTourTypes.add(savedTourType);
-			Collections.sort(_dbTourTypes);
+               // update model
+               _dbTourTypes.remove(selectedTourType);
 
-			// update viewer, resort types when necessary
-			_tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
+               _colorDefinitions.remove(selectedColorDefinition);
 
-			_isModified = true;
-		}
+               // update UI
+               _tourTypeViewer.remove(selectedColorDefinition);
 
-		setFocusToViewer();
-	}
+               _isModified = true;
+            }
+         }
+      });
 
-	/**
-	 * Is called when a color in the color viewer is selected.
-	 */
-	private void onSelectColor() {
+      setFocusToViewer();
+   }
 
-		_selectedGraphColor = null;
+   private void onRenameTourType() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
-		final Object firstElement = selection.getFirstElement();
+      final TourTypeColorDefinition selectedColorDefinition = getFirstSelectedColorDefinition();
+      if (selectedColorDefinition == null) {
+         return;
+      }
 
-		if (firstElement instanceof GraphColorItem) {
+      final TourType selectedTourType = selectedColorDefinition.getTourType();
 
-			final GraphColorItem graphColor = (GraphColorItem) firstElement;
+      // ask for the tour type name
+      final InputDialog dialog = new InputDialog(
+            getShell(),
+            Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
+            NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
+            selectedTourType.getName(),
+            null);
 
-			_selectedGraphColor = graphColor;
+      if (dialog.open() != Window.OK) {
+         setFocusToViewer();
+         return;
+      }
 
-			_colorSelector.setColorValue(graphColor.getRGB());
-			_colorSelector.setEnabled(true);
+      // update tour type name
+      final String newTourTypeName = dialog.getValue();
 
-		} else {
+      selectedTourType.setName(newTourTypeName);
+      selectedColorDefinition.setVisibleName(newTourTypeName);
 
-			_colorSelector.setEnabled(false);
-		}
+      // update entity in the db
+      final TourType savedTourType = saveTourType(selectedTourType);
 
-		setFocusToViewer();
-	}
+      if (savedTourType != null) {
 
-	private void onSelectImageLayout() {
+         // update model
+         selectedColorDefinition.setTourType(savedTourType);
 
-		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+         // replace tour type with new one
+         _dbTourTypes.remove(selectedTourType);
+         _dbTourTypes.add(savedTourType);
+         Collections.sort(_dbTourTypes);
 
-		imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
-		imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
-		imageConfig.imageLayout = getSelectedTourTypeLayout();
+         // update viewer, resort types when necessary
+         _tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
 
-		imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
-		imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
-		imageConfig.borderWidth = _spinnerBorder.getSelection();
+         _isModified = true;
+      }
 
-		// set tour type images dirty
-		TourTypeImage.setTourTypeImagesDirty();
+      setFocusToViewer();
+   }
 
-		_isRecreateTourTypeImages = true;
-		{
-			_tourTypeViewer.refresh(true);
+   /**
+    * Is called when a color in the color viewer is selected.
+    */
+   private void onSelectColor() {
 
-			// do a redraw in the tree viewer, the color images will be recreated in the label provider
-			_tourTypeViewer.getTree().redraw();
-		}
-		_isRecreateTourTypeImages = false;
+      _selectedGraphColor = null;
 
-		_isModified = true;
+      final IStructuredSelection selection = (IStructuredSelection) _tourTypeViewer.getSelection();
+      final Object firstElement = selection.getFirstElement();
 
-		enableLayoutControls();
-	}
+      if (firstElement instanceof GraphColorItem) {
 
-	@Override
-	public boolean performCancel() {
+         final GraphColorItem graphColor = (GraphColorItem) firstElement;
 
-		if (!_isUIEmpty) {
+         _selectedGraphColor = graphColor;
 
-			fireModifyEvent();
-		}
+         _colorSelector.setColorValue(graphColor.getRGB());
+         _colorSelector.setEnabled(true);
 
-		return super.performCancel();
-	}
+      } else {
 
-	@Override
-	protected void performDefaults() {
+         _colorSelector.setEnabled(false);
+      }
 
-		if (!_isUIEmpty) {
+      setFocusToViewer();
+   }
 
-			_comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_BORDER_COLOR));
-			_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
-			_spinnerBorder.setSelection(TourTypeManager.DEFAULT_BORDER_WIDTH);
+   private void onSelectImageLayout() {
 
-			_comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR1));
-			_comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR2));
-			_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-			onSelectImageLayout();
-		}
+      imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
+      imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
+      imageConfig.imageLayout = getSelectedTourTypeLayout();
 
-		super.performDefaults();
-	}
+      imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
+      imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
+      imageConfig.borderWidth = _spinnerBorder.getSelection();
 
-	@Override
-	public boolean performOk() {
+      // set tour type images dirty
+      TourTypeImage.setTourTypeImagesDirty();
 
-		if (!_isUIEmpty) {
+      _isRecreateTourTypeImages = true;
+      {
+         _tourTypeViewer.refresh(true);
 
-			fireModifyEvent();
-		}
+         // do a redraw in the tree viewer, the color images will be recreated in the label provider
+         _tourTypeViewer.getTree().redraw();
+      }
+      _isRecreateTourTypeImages = false;
 
-		return super.performOk();
-	}
+      _isModified = true;
 
-	private void restoreState() {
+      enableLayoutControls();
+   }
 
-		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+   @Override
+   public boolean performCancel() {
 
-		_comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(imageConfig.borderColor));
-		_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(imageConfig.borderLayout));
-		_spinnerBorder.setSelection(imageConfig.borderWidth);
+      if (!_isUIEmpty) {
 
-		_comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
-		_comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
-		_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
+         fireModifyEvent();
+      }
 
-		enableLayoutControls();
-	}
+      return super.performCancel();
+   }
 
-	private TourType saveTourType(final TourType tourType) {
+   @Override
+   protected void performDefaults() {
 
-		return TourDatabase.saveEntity(//
-				tourType,
-				tourType.getTypeId(),
-				TourType.class);
-	}
+      if (!_isUIEmpty) {
 
-	private void setFocusToViewer() {
+         _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_BORDER_COLOR));
+         _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
+         _spinnerBorder.setSelection(TourTypeManager.DEFAULT_BORDER_WIDTH);
 
-		// set focus back to the tree
-		_tourTypeViewer.getTree().setFocus();
-	}
+         _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR1));
+         _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR2));
+         _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
+
+         onSelectImageLayout();
+      }
+
+      super.performDefaults();
+   }
+
+   @Override
+   public boolean performOk() {
+
+      if (!_isUIEmpty) {
+
+         fireModifyEvent();
+      }
+
+      return super.performOk();
+   }
+
+   private void restoreState() {
+
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+      _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(imageConfig.borderColor));
+      _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(imageConfig.borderLayout));
+      _spinnerBorder.setSelection(imageConfig.borderWidth);
+
+      _comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
+      _comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
+      _comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
+
+      enableLayoutControls();
+   }
+
+   private TourType saveTourType(final TourType tourType) {
+
+      return TourDatabase.saveEntity(//
+            tourType,
+            tourType.getTypeId(),
+            TourType.class);
+   }
+
+   private void setFocusToViewer() {
+
+      // set focus back to the tree
+      _tourTypeViewer.getTree().setFocus();
+   }
 }

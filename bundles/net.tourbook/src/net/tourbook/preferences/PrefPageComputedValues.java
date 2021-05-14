@@ -44,6 +44,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -59,8 +61,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
@@ -125,7 +125,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    /*
     * UI controls
     */
-   private TabFolder         _tabFolder;
+   private CTabFolder        _tabFolder;
 
    private Combo             _comboBreakMethod;
 
@@ -198,33 +198,33 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          /*
           * tab folder: computed values
           */
-         _tabFolder = new TabFolder(container, SWT.TOP);
+         _tabFolder = new CTabFolder(container, SWT.TOP);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolder);
          {
 
-            final TabItem tabSmoothing = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabSmoothing = new CTabItem(_tabFolder, SWT.NONE);
             tabSmoothing.setControl(createUI_10_Smoothing(_tabFolder));
             tabSmoothing.setText(Messages.Compute_Values_Group_Smoothing);
 
-            final TabItem tabBreakTime = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabBreakTime = new CTabItem(_tabFolder, SWT.NONE);
             tabBreakTime.setControl(createUI_50_BreakTime(_tabFolder));
             tabBreakTime.setText(Messages.Compute_BreakTime_Group_BreakTime);
 
-            final TabItem tabPaceSpeed = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabPaceSpeed = new CTabItem(_tabFolder, SWT.NONE);
             tabPaceSpeed.setControl(createUI_60_PaceSpeed(_tabFolder));
             tabPaceSpeed.setText(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay);
 
-            final TabItem tabElevation = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabElevation = new CTabItem(_tabFolder, SWT.NONE);
             tabElevation.setControl(createUI_70_ElevationGain(_tabFolder));
             tabElevation.setText(Messages.compute_tourValueElevation_group_computeTourAltitude);
 
-            final TabItem tabItemCadenceZones = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabItemCadenceZones = new CTabItem(_tabFolder, SWT.NONE);
             tabItemCadenceZones.setControl(createUI_80_CadenceZones(_tabFolder));
             tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
 
-            final TabItem tabHrZone = new TabItem(_tabFolder, SWT.NONE);
+            final CTabItem tabHrZone = new CTabItem(_tabFolder, SWT.NONE);
             tabHrZone.setControl(createUI_90_HrZone(_tabFolder));
             tabHrZone.setText(Messages.Compute_HrZone_Group);
 
@@ -1281,7 +1281,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          final boolean isPaceAndSpeedFromRecordedTime = _prefStore.getDefaultBoolean(
                ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME);
-         
+
          _rdoDeviceTime_Recorded.setSelection(isPaceAndSpeedFromRecordedTime);
          _rdoComputedTime_Moving.setSelection(!isPaceAndSpeedFromRecordedTime);
 

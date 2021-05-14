@@ -218,9 +218,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_ON
    //
-   public static final String ID = "net.tourbook.views.tourListView"; //$NON-NLS-1$
-
-//
+   public static final String              ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
+   //
    private static final IPreferenceStore   _prefStore                                      = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore   _prefStore_Common                               = CommonActivator.getPrefStore();
    //
@@ -362,7 +361,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       public ActionLinkWithOtherViews() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.SyncViews), null);
+         super(TourbookPlugin.getThemedImageDescriptor(Images.SyncViews), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Calendar_View_Action_LinkWithOtherViews;

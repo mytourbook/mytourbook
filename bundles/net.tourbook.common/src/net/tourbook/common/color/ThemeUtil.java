@@ -1,7 +1,5 @@
-package net.tourbook.common.color;
-
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +13,11 @@ package net.tourbook.common.color;
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package net.tourbook.common.color;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -37,7 +36,7 @@ public class ThemeUtil {
    private static final String IMAGE_NAME_EXTENSION_PNG = ".png";
 
    /**
-    * All images for the dark theme should have this postfix.
+    * All images for the dark theme should have this postfix before the file extension
     */
    private static final String DARK_THEME_POSTFIX       = "-dark"; //$NON-NLS-1$
 
@@ -103,20 +102,13 @@ public class ThemeUtil {
       return allThemes;
    }
 
-   public static IThemeEngine getThemeEngine() {
-
-      setupTheme();
-
-      return _themeEngine;
-   }
-
    /**
     * @param imageName
-    * @return Returns the themed image name. The postfix {@value CommonImages#DARK_THEME_POSTFIX} is
+    * @return Returns the themed image name. The postfix {@value #DARK_THEME_POSTFIX} is
     *         appended to
     *         the image name when the dark theme image name is returned.
     */
-   public static String getThemeImageName(final String imageName) {
+   public static String getThemedImageName(final String imageName) {
 
       String imageNameThemed;
 
@@ -129,6 +121,13 @@ public class ThemeUtil {
       }
 
       return imageNameThemed;
+   }
+
+   public static IThemeEngine getThemeEngine() {
+
+      setupTheme();
+
+      return _themeEngine;
    }
 
    /**

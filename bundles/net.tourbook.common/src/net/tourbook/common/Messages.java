@@ -25,8 +25,17 @@ public class Messages extends NLS {
    public static String        App_Action_New_WithConfirm;
    public static String        App_Action_Remove_NoConfirm;
    public static String        App_Action_Rename_WithConfirm;
+   public static String        App_Action_RestoreDefault;
+   public static String        App_Action_RestoreDefault_Tooltip;
 
    public static String        App_Error_NotSupportedValueFormatter;
+
+   public static String        App_Theme_BackgroundColor_Light_Tooltip;
+   public static String        App_Theme_BackgroundColor_Dark_Tooltip;
+   public static String        App_Theme_ForegroundColor_Light_Tooltip;
+   public static String        App_Theme_ForegroundColor_Dark_Tooltip;
+   public static String        App_Theme_ValueFor_Light_Tooltip;
+   public static String        App_Theme_ValueFor_Dark_Tooltip;
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
    public static String        Action_App_SizeAllColumnsToFit;

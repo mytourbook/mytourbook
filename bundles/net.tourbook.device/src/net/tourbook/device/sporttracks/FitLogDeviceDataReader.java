@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.sporttracks;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -82,8 +82,9 @@ public class FitLogDeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       final boolean isFitLogExFile = isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) ||
             isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
@@ -98,7 +99,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
             importFilePath,
             alreadyImportedTours,
             newlyImportedTours,
-            isFitLogExFile);
+            isFitLogExFile,
+            isReimport);
 
       try {
 

@@ -563,8 +563,6 @@ public class Messages extends NLS {
    public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Rename;
    public static String        App_Action_RestartApp;
-   public static String        App_Action_RestoreDefault;
-   public static String        App_Action_RestoreDefault_Tooltip;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
    public static String        App_Action_SetPerson;
@@ -1428,8 +1426,6 @@ public class Messages extends NLS {
    public static String        Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip;
    public static String        Pref_Graphs_Checkbox_ShowHorizontalGrid;
    public static String        Pref_Graphs_Checkbox_ShowVerticalGrid;
-   public static String        Pref_Graphs_ColorSelector_DarkTheme_Tooltip;
-   public static String        Pref_Graphs_ColorSelector_LightTheme_Tooltip;
    public static String        Pref_Graphs_Dialog_GridLine_Warning_Message;
    public static String        Pref_Graphs_Error_one_graph_must_be_selected;
    public static String        Pref_Graphs_grid_horizontal_distance;

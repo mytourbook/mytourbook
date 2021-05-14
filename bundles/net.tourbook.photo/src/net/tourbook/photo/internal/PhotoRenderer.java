@@ -1169,6 +1169,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       gc.setForeground(_fgColor);
       gc.setBackground(_fullsizeBgColor);
 
+      /*
+       * With a dark theme, the background is painted not with a black color -> force black background
+       */
+      gc.fillRectangle(0, 0, canvasWidth, canvasHeight);
+
       boolean isPainted = true;
 
       /*

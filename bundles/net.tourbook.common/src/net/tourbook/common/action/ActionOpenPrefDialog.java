@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,9 @@ public class ActionOpenPrefDialog extends Action {
    public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
       setText(text);
-      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options));
+
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options_Disabled));
 
       _prefPageId = prefPageId;
    }
@@ -101,23 +103,6 @@ public class ActionOpenPrefDialog extends Action {
             _prefPageId,
             null,
             _prefDialogData).open();
-   }
-
-   /**
-    * Set dark mode for the action image
-    *
-    * @param isDarkMode
-    * @return
-    */
-   public ActionOpenPrefDialog setDarkMode(final boolean isDarkMode) {
-
-      if (isDarkMode) {
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options_Dark));
-      } else {
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options));
-      }
-
-      return this;
    }
 
    public ActionOpenPrefDialog setPrefData(final Object data) {

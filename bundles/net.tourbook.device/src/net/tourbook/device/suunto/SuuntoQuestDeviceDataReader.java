@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard and Contributors
+ * Copyright (C) 2021 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.device.suunto;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -38,7 +38,9 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    private static final String MOVESCOUNT_TAG     = "<movescount";    //$NON-NLS-1$
    private static final String SUUNTO_TAG_SAMPLES = "<samples>";      //$NON-NLS-1$
 
-   public SuuntoQuestDeviceDataReader() {}
+   public SuuntoQuestDeviceDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -114,8 +116,9 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       if (isValidSuuntoXMLFile(importFilePath) == false) {
          return false;
@@ -126,7 +129,8 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
                   this,
                   importFilePath,
                   alreadyImportedTours,
-                  newlyImportedTours);
+                  newlyImportedTours,
+                  isReimport);
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 

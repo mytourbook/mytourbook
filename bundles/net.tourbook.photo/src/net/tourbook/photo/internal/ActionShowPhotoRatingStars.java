@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,27 +16,29 @@
 package net.tourbook.photo.internal;
 
 import net.tourbook.common.UI;
-import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
 public class ActionShowPhotoRatingStars extends Action {
 
-	private PhotoGallery	_photoGallery;
+   private PhotoGallery _photoGallery;
 
-	public ActionShowPhotoRatingStars(final PhotoGallery photoGallery) {
+   public ActionShowPhotoRatingStars(final PhotoGallery photoGallery) {
 
-		super(UI.EMPTY_STRING, AS_CHECK_BOX);
+      super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-		_photoGallery = photoGallery;
+      _photoGallery = photoGallery;
 
-		setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
+      setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
+
       setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoRatingStar));
-	}
+      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoRatingStarAction_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_photoGallery.actionShowPhotoRatingStars();
-	}
+   @Override
+   public void run() {
+      _photoGallery.actionShowPhotoRatingStars();
+   }
 }

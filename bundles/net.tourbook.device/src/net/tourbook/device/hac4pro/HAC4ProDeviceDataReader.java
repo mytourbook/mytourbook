@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.Map;
 
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -62,15 +62,16 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
       public int minute;
    }
 
-   // plugin constructor
-   public HAC4ProDeviceDataReader() {}
+   public HAC4ProDeviceDataReader() {
+      // plugin constructor
+   }
 
    /**
     * @param timeData
     * @param rawData
     * @throws IOException
     */
-   public static void readTimeSlice(final int data, final TimeData timeData) throws IOException {
+   public static void readTimeSlice(final int data, final TimeData timeData) {
 
       // pulse (4 bits)
       if ((data & 0x8000) != 0) {
@@ -257,8 +258,9 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       boolean returnValue = false;
 
