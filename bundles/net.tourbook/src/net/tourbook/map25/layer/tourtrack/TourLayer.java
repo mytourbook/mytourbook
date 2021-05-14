@@ -370,24 +370,27 @@ public class TourLayer extends Layer {
 	private LineStyle createLineStyle() {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      _markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
+      _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
-      //_bitmapArrow = _markertoolkit.drawCircle(10);
+      _bitmapArrow = _markertoolkit.drawTrackArrow(10,
+            ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
 
-      _bitmapArrow = CanvasAdapter.newBitmap(10, 10, 0);
-      final org.oscim.backend.canvas.Canvas arrowCanvas = CanvasAdapter.newCanvas();
-
-      arrowCanvas.setBitmap(_bitmapArrow);
-      final int bitmapArrowSize = 10;
-      //final float half = bitmapArrowSize / 2;
-      _linePainter.setStyle(Paint.Style.STROKE);
-      _linePainter.setStrokeWidth(3);
-      _linePainter.setColor(_fgColor);
-
-      arrowCanvas.drawLine(1f, 1f, 9f, 5f, _linePainter);
-      arrowCanvas.drawLine(9f, 5f, 1f, 9f, _linePainter);
-      arrowCanvas.drawLine(1f, 9f, 1f, 1f, _linePainter);
-//      arrowCanvas.fillColor(_fgColor);
+      //_bitmapArrow = _markertoolkit.drawTrackArrow(trackConfig.outlineWidth,
+      //      ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
+//
+//      _bitmapArrow = CanvasAdapter.newBitmap(10, 10, 0);
+//      final org.oscim.backend.canvas.Canvas arrowCanvas = CanvasAdapter.newCanvas();
+//
+//      arrowCanvas.setBitmap(_bitmapArrow);
+//      final int bitmapArrowSize = 10;
+//      //final float half = bitmapArrowSize / 2;
+//      _linePainter.setStyle(Paint.Style.STROKE);
+//      _linePainter.setStrokeWidth(3);
+//      _linePainter.setColor(_fgColor);
+//
+//      arrowCanvas.drawLine(1f, 1f, 9f, 5f, _linePainter);
+//      arrowCanvas.drawLine(9f, 5f, 1f, 9f, _linePainter);
+//      arrowCanvas.drawLine(1f, 9f, 1f, 1f, _linePainter);
 
       _tex = new TextureItem(_bitmapArrow);
 

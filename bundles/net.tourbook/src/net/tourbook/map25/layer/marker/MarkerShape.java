@@ -18,9 +18,6 @@
 package net.tourbook.map25.layer.marker;
 
 import net.tourbook.map25.Map25App;
-import net.tourbook.map25.layer.marker.MarkerRenderer;
-import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.PhotoToolkit;
 
 /**
  * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRenderer} and {@link PhotoToolkit} depends on this.
@@ -36,5 +33,10 @@ public enum MarkerShape {
     * using circle fo photomarker
     */
    CIRCLE,
+
+   /**
+    * using arrow for track direction arrows
+    */
+   ARROW,
 
 }
