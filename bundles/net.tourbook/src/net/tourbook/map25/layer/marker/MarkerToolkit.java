@@ -352,19 +352,22 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return _bitmapStar;
    }
 
-   public Bitmap drawTrackArrow(final float bitmapStarSize, final int starColor) {
+   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int starColor) {
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      final Bitmap bitmapTrackArrow = CanvasAdapter.newBitmap((int) bitmapStarSize, (int) bitmapStarSize, 0);
+      final Bitmap bitmapTrackArrow = CanvasAdapter.newBitmap(bitmapArrowSize, bitmapArrowSize, 0);
+      final float bitmapArrowSizeF = bitmapArrowSize - 1;
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(bitmapTrackArrow);
       final Paint trackArrowPainter = CanvasAdapter.newPaint();
       trackArrowPainter.setStyle(Paint.Style.STROKE);
-      trackArrowPainter.setStrokeWidth(2);
+      trackArrowPainter.setStrokeWidth(6);
       trackArrowPainter.setColor(starColor);
 
-      defaultMarkerCanvas.drawLine(1f, 1f, 9f, 5f, trackArrowPainter);
-      defaultMarkerCanvas.drawLine(9f, 5f, 1f, 9f, trackArrowPainter);
-      defaultMarkerCanvas.drawLine(1f, 9f, 1f, 1f, trackArrowPainter);
+      defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1f, bitmapArrowSizeF, trackArrowPainter);
+      defaultMarkerCanvas.drawLine(1f, bitmapArrowSizeF, 1f, 1f, trackArrowPainter);
+      defaultMarkerCanvas.drawLine(1f, 1f, bitmapArrowSizeF, bitmapArrowSizeF / 2, trackArrowPainter);
+      defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1, bitmapArrowSizeF / 2, trackArrowPainter);
+
 
       return bitmapTrackArrow;
    }

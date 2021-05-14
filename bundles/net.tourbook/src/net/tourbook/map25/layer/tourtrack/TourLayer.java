@@ -372,41 +372,18 @@ public class TourLayer extends Layer {
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
       _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
-      _bitmapArrow = _markertoolkit.drawTrackArrow(10,
+      _bitmapArrow = _markertoolkit.drawTrackArrow(40,
             ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
+      System.out.println("2* trackConfig.outlineWidth: " + (int) (trackConfig.outlineWidth * 2));
+//      _bitmapArrow = _markertoolkit.drawTrackArrow((int) (trackConfig.outlineWidth * 2),
+//            ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
 
-      //_bitmapArrow = _markertoolkit.drawTrackArrow(trackConfig.outlineWidth,
-      //      ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));//  drawCircle(10);
-//
-//      _bitmapArrow = CanvasAdapter.newBitmap(10, 10, 0);
-//      final org.oscim.backend.canvas.Canvas arrowCanvas = CanvasAdapter.newCanvas();
-//
-//      arrowCanvas.setBitmap(_bitmapArrow);
-//      final int bitmapArrowSize = 10;
-//      //final float half = bitmapArrowSize / 2;
-//      _linePainter.setStyle(Paint.Style.STROKE);
-//      _linePainter.setStrokeWidth(3);
-//      _linePainter.setColor(_fgColor);
-//
-//      arrowCanvas.drawLine(1f, 1f, 9f, 5f, _linePainter);
-//      arrowCanvas.drawLine(9f, 5f, 1f, 9f, _linePainter);
-//      arrowCanvas.drawLine(1f, 9f, 1f, 1f, _linePainter);
 
       _tex = new TextureItem(_bitmapArrow);
 
-      /* i dont know how to access icon resources */
-//      try {
-//         _tex = new TextureItem(CanvasAdapter.getBitmapAsset("", "/net.tourbook/icons/arrow-up.png"));
-//         // tex.mipmap = true;
-//      } catch (final IOException e) {
-//         e.printStackTrace();
-//      }
-
-      final int c = _bgColor;
-
       final LineStyle style = LineStyle.builder()
             .stippleColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
-            .stipple(10)
+            .stipple(20)
             .strokeWidth(trackConfig.outlineWidth)
             .strokeColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
             .fixed(true)
