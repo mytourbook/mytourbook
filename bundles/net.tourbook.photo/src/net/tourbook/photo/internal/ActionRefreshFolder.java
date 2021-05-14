@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,19 +21,19 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshFolder extends Action {
 
-	private PicDirFolder	_picDirFolder;
+   private PicDirFolder _picDirFolder;
 
-	public ActionRefreshFolder(final PicDirFolder picDirFolder) {
+   public ActionRefreshFolder(final PicDirFolder picDirFolder) {
 
-		super(Messages.Pic_Dir_Action_Refresh, AS_PUSH_BUTTON);
+      super(Messages.Pic_Dir_Action_Refresh, AS_PUSH_BUTTON);
 
-		_picDirFolder = picDirFolder;
+      _picDirFolder = picDirFolder;
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Refresh));
-	}
+      setImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.App_Refresh));
+   }
 
-	@Override
-	public void run() {
-		_picDirFolder.actionRefreshFolder();
-	}
+   @Override
+   public void run() {
+      _picDirFolder.actionRefreshFolder();
+   }
 }

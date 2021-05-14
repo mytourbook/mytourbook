@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.ITreeViewer;
 
@@ -43,7 +43,8 @@ public class ActionExpandSelection extends Action {
       setText(Messages.app_action_expand_selection_tooltip);
       setToolTipText(Messages.app_action_expand_selection_tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemeImageName(Images.App_ExpandAll)));
+      setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_ExpandAll)));
+      setDisabledImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(CommonImages.App_ExpandAll_Disabled)));
    }
 
    /**

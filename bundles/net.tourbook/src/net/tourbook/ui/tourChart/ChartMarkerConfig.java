@@ -44,9 +44,12 @@ public class ChartMarkerConfig {
    public int                         markerSignImageSize;
    public int                         markerTooltipPosition;
 
-   public RGB                         markerColorDefault;
-   public RGB                         markerColorDevice;
-   public RGB                         markerColorHidden;
+   public RGB                         markerColorDefault_Light;
+   public RGB                         markerColorDefault_Dark;
+   public RGB                         markerColorDevice_Light;
+   public RGB                         markerColorDevice_Dark;
+   public RGB                         markerColorHidden_Light;
+   public RGB                         markerColorHidden_Dark;
 
    public final ArrayList<ChartLabel> chartLabels = new ArrayList<>();
 

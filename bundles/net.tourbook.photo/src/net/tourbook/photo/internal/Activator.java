@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.photo.internal;
 
 import java.util.Optional;
 
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoUI;
@@ -63,6 +64,15 @@ public class Activator extends AbstractUIPlugin {
       final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
 
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
+   }
+
+   /**
+    * @param imageName
+    * @return Returns the themed image descriptor from the photo {@link Activator} plugin images
+    */
+   public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
+
+      return getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
    }
 
    /**

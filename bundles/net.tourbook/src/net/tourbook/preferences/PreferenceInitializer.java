@@ -157,9 +157,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             + (Integer.toString(TourManager.GRAPH_GRADIENT)    + separator)
             + Integer.toString(TourManager.GRAPH_POWER));
 
-      store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING, true);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, 100);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING, 50);
+      store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING,               true);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,          100);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING,       50);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK,  70);
 
       // chart/tour segment alternate color
       store.setDefault(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR, false);
@@ -205,9 +206,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       //tour pauses
       store.setDefault(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE,      true);
 
-      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, new RGB(0x60, 0x60, 0x60));
-      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,  new RGB(0xff, 0x0, 0x80));
-      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,  new RGB(0x24, 0x9C, 0xFF));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,       new RGB(0x60, 0x60, 0x60));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK,  new RGB(0xd0, 0xd0, 0xd0));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,        new RGB(0xff, 0x0,  0x80));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE_DARK,   new RGB(0xFF, 0x3C, 0x9D));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,        new RGB(0x24, 0x9C, 0xFF));
+      PreferenceConverter.setDefault(store, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN_DARK,   new RGB(0x6F, 0xBE, 0xFF));
 
       // tour info
       store.setDefault(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, true);

@@ -15,11 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
@@ -27,7 +28,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -51,9 +51,12 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private static final String     APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
+   private static final String     APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
+
+   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
 
    private IPropertyChangeListener _defaultChangePropertyListener;
    private SelectionAdapter        _defaultSelectionListener;
@@ -83,10 +86,10 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
       };
    }
 
-   private PixelConverter       _pc;
+   private PixelConverter        _pc;
 
-   private ActionOpenPrefDialog _actionPrefDialog;
-   private Action               _actionRestoreDefaults;
+   private ActionOpenPrefDialog  _actionPrefDialog;
+   private ActionResetToDefaults _actionRestoreDefaults;
 
    /*
     * UI controls
@@ -104,7 +107,6 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
 
    private ColorSelectorExtended _colorSegmentAlternateColor_Dark;
    private ColorSelectorExtended _colorSegmentAlternateColor_Light;
-
 
    public SlideoutTourChartInfo(final Control ownerControl,
                                 final ToolBar toolBar,
@@ -138,18 +140,7 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
 
    private void createActions() {
 
-      /*
-       * Action: Restore default
-       */
-      _actionRestoreDefaults = new Action() {
-         @Override
-         public void run() {
-            resetToDefaults();
-         }
-      };
-
-      _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_RestoreDefault));
-      _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionPrefDialog = new ActionOpenPrefDialog(Messages.Tour_Action_EditChartPreferences, PrefPageAppearanceTourChart.ID);
       _actionPrefDialog.closeThisTooltip(this);
@@ -266,13 +257,13 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
             {
                // light color
                _colorSegmentAlternateColor_Light = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Light.getButton().setToolTipText(Messages.Pref_Graphs_ColorSelector_LightTheme_Tooltip);
+               _colorSegmentAlternateColor_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmentAlternateColor_Light.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Light.addOpenListener(this);
 
                // dark color
                _colorSegmentAlternateColor_Dark = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(Messages.Pref_Graphs_ColorSelector_DarkTheme_Tooltip);
+               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmentAlternateColor_Dark.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Dark.addOpenListener(this);
             }
@@ -340,7 +331,8 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
       enableControls();
    }
 
-   private void resetToDefaults() {
+   @Override
+   public void resetToDefaults() {
 
       /*
        * Update UI with defaults from pref store

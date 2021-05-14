@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,35 +24,35 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionCalendarOptions extends ActionToolbarSlideoutAdv {
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState("SlideoutCalendarOptions");	//$NON-NLS-1$
+   private static final IDialogSettings _state = TourbookPlugin.getState("SlideoutCalendarOptions"); //$NON-NLS-1$
 
-	private CalendarView					_calendarView;
-	private SlideoutCalendarOptions			_slideoutCalendarOptions;
+   private CalendarView                 _calendarView;
+   private SlideoutCalendarOptions      _slideoutCalendarOptions;
 
-	public ActionCalendarOptions(final CalendarView calendarView) {
+   public ActionCalendarOptions(final CalendarView calendarView) {
 
-		super();
+      super();
 
-		_calendarView = calendarView;
-	}
+      _calendarView = calendarView;
+   }
 
-	@Override
-	protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+   @Override
+   protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-		_slideoutCalendarOptions = new SlideoutCalendarOptions(toolItem, _state, _calendarView);
+      _slideoutCalendarOptions = new SlideoutCalendarOptions(toolItem, _state, _calendarView);
 
-		return _slideoutCalendarOptions;
-	}
+      return _slideoutCalendarOptions;
+   }
 
-	SlideoutCalendarOptions getSlideout() {
-		return _slideoutCalendarOptions;
-	}
+   SlideoutCalendarOptions getSlideout() {
+      return _slideoutCalendarOptions;
+   }
 
-	@Override
-	protected void onBeforeOpenSlideout() {
+   @Override
+   protected void onBeforeOpenSlideout() {
 
-		// ensure other dialogs are closed
-		_calendarView.closeOpenedDialogs(this);
-	}
+      // ensure other dialogs are closed
+      _calendarView.closeOpenedDialogs(this);
+   }
 
 }

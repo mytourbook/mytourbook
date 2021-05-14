@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,20 +15,32 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import java.util.Map;
+
+import net.tourbook.Images;
+import net.tourbook.common.util.Util;
+import net.tourbook.ui.UI;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.commands.IElementUpdater;
+import org.eclipse.ui.menus.UIElement;
 
-import net.tourbook.common.util.Util;
+public class ActionHandler_OpenView_TourData extends AbstractHandler implements IElementUpdater {
 
-public class ActionHandler_OpenView_TourData extends AbstractHandler {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+      Util.showView(TourData_View.ID, true);
 
-		Util.showView(TourData_View.ID, true);
+      return null;
+   }
 
-		return null;
-	}
+   @SuppressWarnings("rawtypes")
+   @Override
+   public void updateElement(final UIElement uiElement, final Map parameters) {
 
+      UI.setThemedIcon(uiElement, Images.TourData);
+   }
 }

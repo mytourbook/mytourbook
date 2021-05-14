@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  * Copyright (C) 2019 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -25,25 +25,24 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowPhotos extends Action {
 
-   private Map25View   _map25View;
+   private Map25View _map25View;
 
-	public ActionShowPhotos(final Map25View map25View) {
+   public ActionShowPhotos(final Map25View map25View) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		_map25View = map25View;
+      _map25View = map25View;
 
-		setToolTipText(Messages.Map_Action_ShowPhotos_Tooltip);
+      setToolTipText(Messages.Map_Action_ShowPhotos_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowPhotos_InMap));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-	   _map25View.actionShowPhotos(isChecked());
-
-	}
+      _map25View.actionShowPhotos(isChecked());
+   }
 
 }

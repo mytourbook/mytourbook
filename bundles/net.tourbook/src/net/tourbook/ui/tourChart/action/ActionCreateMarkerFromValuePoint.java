@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.IChartContextProvider;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
@@ -44,7 +45,7 @@ public class ActionCreateMarkerFromValuePoint extends Action {
 
       super(text);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourMarker_New)));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New_Disabled));
 
       _chartContextProvider = chartContextProvider;

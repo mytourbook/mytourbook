@@ -27,6 +27,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -34,8 +36,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -52,77 +52,77 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
    /*
     * UI controls
     */
-   private TabFolder _tabFolder;
-   private TabItem   _tab1_OneTour;
-   private TabItem   _tab2_MultipleTours;
+   private CTabFolder _tabFolder;
+   private CTabItem   _tab1_OneTour;
+   private CTabItem   _tab2_MultipleTours;
 
-   private Button    _chkLiveUpdate;
+   private Button     _chkLiveUpdate;
 
-   private Button    _rdoCadence_1_0;
-   private Button    _rdoCadence_1_1;
-   private Button    _rdoCadence_1_2;
-   private Button    _rdoDistance_1_0;
-   private Button    _rdoDistance_1_1;
-   private Button    _rdoDistance_1_2;
-   private Button    _rdoDistance_1_3;
-   private Button    _rdoElevation_1_0;
-   private Button    _rdoElevation_1_1;
-   private Button    _rdoPower_1_0;
-   private Button    _rdoPower_1_1;
-   private Button    _rdoPulse_1_0;
-   private Button    _rdoPulse_1_1;
-   private Button    _rdoSpeed_1_0;
-   private Button    _rdoSpeed_1_1;
-   private Button    _rdoSpeed_1_2;
+   private Button     _rdoCadence_1_0;
+   private Button     _rdoCadence_1_1;
+   private Button     _rdoCadence_1_2;
+   private Button     _rdoDistance_1_0;
+   private Button     _rdoDistance_1_1;
+   private Button     _rdoDistance_1_2;
+   private Button     _rdoDistance_1_3;
+   private Button     _rdoElevation_1_0;
+   private Button     _rdoElevation_1_1;
+   private Button     _rdoPower_1_0;
+   private Button     _rdoPower_1_1;
+   private Button     _rdoPulse_1_0;
+   private Button     _rdoPulse_1_1;
+   private Button     _rdoSpeed_1_0;
+   private Button     _rdoSpeed_1_1;
+   private Button     _rdoSpeed_1_2;
 
-   private Button    _rdoTime_Elapsed_HH;
-   private Button    _rdoTime_Elapsed_HH_MM;
-   private Button    _rdoTime_Elapsed_HH_MM_SS;
-   private Button    _rdoTime_Recorded_HH;
-   private Button    _rdoTime_Recorded_HH_MM;
-   private Button    _rdoTime_Recorded_HH_MM_SS;
-   private Button    _rdoTime_Paused_HH;
-   private Button    _rdoTime_Paused_HH_MM;
-   private Button    _rdoTime_Paused_HH_MM_SS;
-   private Button    _rdoTime_Moving_HH;
-   private Button    _rdoTime_Moving_HH_MM;
-   private Button    _rdoTime_Moving_HH_MM_SS;
-   private Button    _rdoTime_Break_HH;
-   private Button    _rdoTime_Break_HH_MM;
-   private Button    _rdoTime_Break_HH_MM_SS;
+   private Button     _rdoTime_Elapsed_HH;
+   private Button     _rdoTime_Elapsed_HH_MM;
+   private Button     _rdoTime_Elapsed_HH_MM_SS;
+   private Button     _rdoTime_Recorded_HH;
+   private Button     _rdoTime_Recorded_HH_MM;
+   private Button     _rdoTime_Recorded_HH_MM_SS;
+   private Button     _rdoTime_Paused_HH;
+   private Button     _rdoTime_Paused_HH_MM;
+   private Button     _rdoTime_Paused_HH_MM_SS;
+   private Button     _rdoTime_Moving_HH;
+   private Button     _rdoTime_Moving_HH_MM;
+   private Button     _rdoTime_Moving_HH_MM_SS;
+   private Button     _rdoTime_Break_HH;
+   private Button     _rdoTime_Break_HH_MM;
+   private Button     _rdoTime_Break_HH_MM_SS;
 
-   private Button    _rdoCadence_1_0_Summary;
-   private Button    _rdoCadence_1_1_Summary;
-   private Button    _rdoCadence_1_2_Summary;
-   private Button    _rdoDistance_1_0_Summary;
-   private Button    _rdoDistance_1_1_Summary;
-   private Button    _rdoDistance_1_2_Summary;
-   private Button    _rdoDistance_1_3_Summary;
-   private Button    _rdoElevation_1_0_Summary;
-   private Button    _rdoElevation_1_1_Summary;
-   private Button    _rdoPower_1_0_Summary;
-   private Button    _rdoPower_1_1_Summary;
-   private Button    _rdoPulse_1_0_Summary;
-   private Button    _rdoPulse_1_1_Summary;
-   private Button    _rdoSpeed_1_0_Summary;
-   private Button    _rdoSpeed_1_1_Summary;
-   private Button    _rdoSpeed_1_2_Summary;
+   private Button     _rdoCadence_1_0_Summary;
+   private Button     _rdoCadence_1_1_Summary;
+   private Button     _rdoCadence_1_2_Summary;
+   private Button     _rdoDistance_1_0_Summary;
+   private Button     _rdoDistance_1_1_Summary;
+   private Button     _rdoDistance_1_2_Summary;
+   private Button     _rdoDistance_1_3_Summary;
+   private Button     _rdoElevation_1_0_Summary;
+   private Button     _rdoElevation_1_1_Summary;
+   private Button     _rdoPower_1_0_Summary;
+   private Button     _rdoPower_1_1_Summary;
+   private Button     _rdoPulse_1_0_Summary;
+   private Button     _rdoPulse_1_1_Summary;
+   private Button     _rdoSpeed_1_0_Summary;
+   private Button     _rdoSpeed_1_1_Summary;
+   private Button     _rdoSpeed_1_2_Summary;
 
-   private Button    _rdoTime_Elapsed_HH_Summary;
-   private Button    _rdoTime_Elapsed_HH_MM_Summary;
-   private Button    _rdoTime_Elapsed_HH_MM_SS_Summary;
-   private Button    _rdoTime_Recorded_HH_Summary;
-   private Button    _rdoTime_Recorded_HH_MM_Summary;
-   private Button    _rdoTime_Recorded_HH_MM_SS_Summary;
-   private Button    _rdoTime_Paused_HH_Summary;
-   private Button    _rdoTime_Paused_HH_MM_Summary;
-   private Button    _rdoTime_Paused_HH_MM_SS_Summary;
-   private Button    _rdoTime_Moving_HH_Summary;
-   private Button    _rdoTime_Moving_HH_MM_Summary;
-   private Button    _rdoTime_Moving_HH_MM_SS_Summary;
-   private Button    _rdoTime_Break_HH_Summary;
-   private Button    _rdoTime_Break_HH_MM_Summary;
-   private Button    _rdoTime_Break_HH_MM_SS_Summary;
+   private Button     _rdoTime_Elapsed_HH_Summary;
+   private Button     _rdoTime_Elapsed_HH_MM_Summary;
+   private Button     _rdoTime_Elapsed_HH_MM_SS_Summary;
+   private Button     _rdoTime_Recorded_HH_Summary;
+   private Button     _rdoTime_Recorded_HH_MM_Summary;
+   private Button     _rdoTime_Recorded_HH_MM_SS_Summary;
+   private Button     _rdoTime_Paused_HH_Summary;
+   private Button     _rdoTime_Paused_HH_MM_Summary;
+   private Button     _rdoTime_Paused_HH_MM_SS_Summary;
+   private Button     _rdoTime_Moving_HH_Summary;
+   private Button     _rdoTime_Moving_HH_MM_Summary;
+   private Button     _rdoTime_Moving_HH_MM_SS_Summary;
+   private Button     _rdoTime_Break_HH_Summary;
+   private Button     _rdoTime_Break_HH_MM_Summary;
+   private Button     _rdoTime_Break_HH_MM_SS_Summary;
 
    /*
     * UI controls
@@ -171,15 +171,15 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
                   .applyTo(label);
          }
 
-         _tabFolder = new TabFolder(container, SWT.NONE);
+         _tabFolder = new CTabFolder(container, SWT.NONE);
          _tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
          {
-            _tab1_OneTour = new TabItem(_tabFolder, SWT.NONE);
+            _tab1_OneTour = new CTabItem(_tabFolder, SWT.NONE);
             _tab1_OneTour.setText(Messages.Pref_DisplayFormat_Tab_OneTour);
             _tab1_OneTour.setToolTipText(Messages.Pref_DisplayFormat_Tab_OneTour_Tooltip);
             _tab1_OneTour.setControl(createUI_20_Formats_Tour(_tabFolder));
 
-            _tab2_MultipleTours = new TabItem(_tabFolder, SWT.NONE);
+            _tab2_MultipleTours = new CTabItem(_tabFolder, SWT.NONE);
             _tab2_MultipleTours.setText(Messages.Pref_DisplayFormat_Tab_MultipleTours);
             _tab2_MultipleTours.setToolTipText(Messages.Pref_DisplayFormat_Tab_MultipleTours_Tooltip);
             _tab2_MultipleTours.setControl(createUI_30_Formats_Summary(_tabFolder));

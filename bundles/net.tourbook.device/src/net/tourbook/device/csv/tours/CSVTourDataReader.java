@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -86,8 +87,9 @@ public class CSVTourDataReader extends TourbookDevice {
       public int minute;
    }
 
-   // plugin constructor
-   public CSVTourDataReader() {}
+   public CSVTourDataReader() {
+      // plugin constructor
+   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -292,8 +294,9 @@ public class CSVTourDataReader extends TourbookDevice {
    @Override
    public boolean processDeviceData(final String importFilePath,
                                     final DeviceData deviceData,
-                                    final HashMap<Long, TourData> alreadyImportedTours,
-                                    final HashMap<Long, TourData> newlyImportedTours) {
+                                    final Map<Long, TourData> alreadyImportedTours,
+                                    final Map<Long, TourData> newlyImportedTours,
+                                    final boolean isReimport) {
 
       boolean returnValue = false;
 
@@ -403,27 +406,17 @@ public class CSVTourDataReader extends TourbookDevice {
 
                // fire modify event
 
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
-                  }
-               });
+               Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED));
             }
 
             if (isNewTourType) {
 
                // fire modify event
 
-               Display.getDefault().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     TourbookPlugin
-                           .getDefault()
-                           .getPreferenceStore()
-                           .setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-                  }
-               });
+               Display.getDefault().syncExec(() -> TourbookPlugin
+                     .getDefault()
+                     .getPreferenceStore()
+                     .setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random()));
             }
 
          } catch (final Exception e) {

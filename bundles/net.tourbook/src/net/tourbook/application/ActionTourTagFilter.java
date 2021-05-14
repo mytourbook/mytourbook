@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
@@ -35,7 +36,7 @@ public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 
    public ActionTourTagFilter() {
 
-      super(TourbookPlugin.getImageDescriptor(Images.TourTagFilter),
+      super(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourTagFilter)),
             TourbookPlugin.getImageDescriptor(Images.TourTagFilter_Disabled));
 
       isToggleAction = true;

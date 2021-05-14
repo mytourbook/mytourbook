@@ -67,7 +67,7 @@ public class ActionXAxisDistance extends Action {
          disabledImageName = Images.XAxis_ShowDistance_Disabled;
       }
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemeImageName(imageName)));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImageName));
    }
 }

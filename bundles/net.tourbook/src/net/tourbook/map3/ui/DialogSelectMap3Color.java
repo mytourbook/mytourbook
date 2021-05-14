@@ -31,7 +31,6 @@ import net.tourbook.common.color.Map3ProfileComparator;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.TourMapPainter;
@@ -294,7 +293,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             actionEditAllColors();
          }
       };
-      _actionEditAllColors.setImageDescriptor(CommonActivator.getImageDescriptor(ThemeUtil.getThemeImageName(CommonImages.App_Options)));
+      _actionEditAllColors.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
       _actionEditAllColors.setToolTipText(Messages.Map3SelectColor_Dialog_Action_EditAllColors);
    }
 

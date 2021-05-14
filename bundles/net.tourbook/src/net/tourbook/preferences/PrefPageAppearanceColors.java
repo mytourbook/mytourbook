@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,8 +47,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -61,8 +59,11 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -117,6 +118,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
    private boolean                   _isColorChanged;
 
    private ColorDefinition           _expandedItem;
+   private boolean                   _isNavigationKeyPressed;
 
    private IGradientColorProvider    _legendImageColorProvider;
    private DialogMap2ColorEditor     _dialogMappingColor;
@@ -258,7 +260,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       restoreState();
 
-      _colorViewer.setInput(this);
+      /*
+       * MUST be run async otherwise the background color is NOT themed !!!
+       */
+      ui.getDisplay().asyncExec(() -> {
+
+         _colorViewer.setInput(this);
+      });
 
       return ui;
    }
@@ -311,18 +319,35 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       _graphColorPainter = new GraphColorPainter(this);
 
+      _colorViewer.getTree().addKeyListener(new KeyListener() {
+
+         @Override
+         public void keyPressed(final KeyEvent keyEvent) {
+
+            if (keyEvent.keyCode == SWT.ARROW_UP || keyEvent.keyCode == SWT.ARROW_DOWN) {
+               _isNavigationKeyPressed = true;
+            } else {
+               _isNavigationKeyPressed = false;
+            }
+         }
+
+         @Override
+         public void keyReleased(final KeyEvent keyEvent) {}
+      });
+
       _colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectColorInColorViewer();
-         }
-      });
-
-      _colorViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
 
             final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+
+            // don't expand when navigation key is pressed
+            if (_isNavigationKeyPressed) {
+
+               _isNavigationKeyPressed = false;
+
+               return;
+            }
 
             if (selection instanceof ColorDefinition) {
 
@@ -330,8 +355,15 @@ public class PrefPageAppearanceColors extends PreferencePage implements
                final ColorDefinition treeItem = (ColorDefinition) selection;
 
                if (_colorViewer.getExpandedState(treeItem)) {
+
+                  // item is expanded -> collapse
+
                   _colorViewer.collapseToLevel(treeItem, 1);
+
                } else {
+
+                  // item is collapsed -> expand
+
                   if (_expandedItem != null) {
                      _colorViewer.collapseToLevel(_expandedItem, 1);
                   }
@@ -341,20 +373,28 @@ public class PrefPageAppearanceColors extends PreferencePage implements
                   // expanding the treeangle, the layout is correctly done but not with double click
                   layoutContainer.layout(true, true);
                }
+
             } else if (selection instanceof GraphColorItem) {
 
-               final GraphColorItem graphColor = (GraphColorItem) selection;
+               onSelectColorInColorViewer();
 
-               if (graphColor.isMapColor()) {
+               // run async that the UI do display the selected color in the color button
+               _colorViewer.getTree().getDisplay().asyncExec(() -> {
 
-                  // legend color is selected
+                  final GraphColorItem graphColor = (GraphColorItem) selection;
 
-                  onSelectMappingColor();
+                  if (graphColor.isMapColor()) {
 
-               } else {
-                  // open color selection dialog
-                  _colorSelector.open();
-               }
+                     // legend color is selected
+
+                     onSelectMappingColor();
+
+                  } else {
+
+                     // open color selection dialog
+                     _colorSelector.open();
+                  }
+               });
             }
          }
       });
@@ -508,10 +548,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
             if (element instanceof ColorDefinition) {
 
+               final Color backgroundColor = _colorViewer.getTree().getBackground();
+
                cell.setImage(_graphColorPainter.drawColorDefinitionImage(
                      (ColorDefinition) element,
                      numberOfHorizontalImages,
-                     false));
+                     false,
+                     backgroundColor));
 
             } else if (element instanceof GraphColorItem) {
 
