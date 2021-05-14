@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -76,6 +76,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 	private Button					_chkShowSliderLocation;
 	private Button					_chkShowSliderPath;
+   private Button                _chkShowOutline_Direction;
 
 	private Combo					_comboName;
 
@@ -264,6 +265,16 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 						_spinnerOutline_Opacity.addSelectionListener(_defaultSelectionListener);
 						_spinnerOutline_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
 					}
+
+               {
+                  /*
+                   * Text label
+                   */
+                  _chkShowOutline_Direction = new Button(group, SWT.CHECK);
+                  _chkShowOutline_Direction.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
+                  _chkShowOutline_Direction.addSelectionListener(_defaultSelectionListener);
+               }
+
 				}
 			}
 		}
@@ -358,7 +369,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 * Slider path
 			 */
 			// checkbox
-				_chkShowSliderPath = new Button(container, SWT.CHECK);
+         _chkShowSliderPath = new Button(container, SWT.CHECK);
 			_chkShowSliderPath.setText(Messages.Slideout_Map_Options_Checkbox_SliderPath);
 			_chkShowSliderPath.setToolTipText(Messages.Slideout_Map_Options_Checkbox_SliderPath_Tooltip);
 			_chkShowSliderPath.addSelectionListener(_defaultSelectionListener);
@@ -603,6 +614,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_colorOutline_Color.setColorValue(config.outlineColor);
 		_spinnerOutline_Width.setSelection((int) (config.outlineWidth * 10));
 		_spinnerOutline_Opacity.setSelection(config.outlineOpacity);
+      _chkShowOutline_Direction.setSelection(config.outlineShowDirectionArrow);
 
 		// slider location
 		_chkShowSliderLocation.setSelection(config.isShowSliderLocation);
@@ -632,6 +644,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		config.outlineColor = _colorOutline_Color.getColorValue();
 		config.outlineWidth = _spinnerOutline_Width.getSelection() / 10.0f;
 		config.outlineOpacity = _spinnerOutline_Opacity.getSelection();
+      config.outlineShowDirectionArrow = _chkShowOutline_Direction.getSelection();
 
 		// slider location
 		config.isShowSliderLocation = _chkShowSliderLocation.getSelection();
