@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -222,7 +222,7 @@ public class ColumnManager {
          }
       };
 
-      _profileSorter = new Comparator<ColumnProfile>() {
+      _profileSorter = new Comparator<>() {
          @Override
          public int compare(final ColumnProfile colProfile1, final ColumnProfile colProfile2) {
             return colProfile1.name.compareTo(colProfile2.name);
@@ -1673,6 +1673,10 @@ public class ColumnManager {
       }
 
       return orderedColumnIds.toArray(new String[orderedColumnIds.size()]);
+   }
+
+   ColumnViewer getColumnViewer() {
+      return _columnViewer;
    }
 
    private int getColumnWidth(final String columnWidthId) {

@@ -42,7 +42,9 @@ public class ActionOpenPrefDialog extends Action {
    public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
       setText(text);
+
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options_Disabled));
 
       _prefPageId = prefPageId;
    }

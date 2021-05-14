@@ -27,12 +27,14 @@ public class ActionPreferences extends Action {
 
    public ActionPreferences() {
 
-		setText(Messages.Pic_Dir_Action_Preferences);
-      setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Options));
-	}
+      setText(Messages.Pic_Dir_Action_Preferences);
+
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
+   }
 
    @Override
    public void run() {
+
       PreferencesUtil.createPreferenceDialogOn(
             Display.getCurrent().getActiveShell(),
             PrefPagePhotoDirectory.ID,

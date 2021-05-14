@@ -26,10 +26,15 @@ public class CommonImages {
    public static final String App_Close_Tooltip            = "app-close-tooltip.png";                     //$NON-NLS-1$
    public static final String App_Copy                     = "app-copy.png";                              //$NON-NLS-1$
    public static final String App_Copy_Disabled            = "app-copy-disabled.png";                     //$NON-NLS-1$
+   public static final String App_CollapseAll              = "collapseall.png";                           //$NON-NLS-1$
+   public static final String App_CollapseAll_Disabled     = "collapseall-disabled.png";                  //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder    = "_empty16.png";
+   public static final String App_ExpandAll                = "expandall.png";                             //$NON-NLS-1$
+   public static final String App_ExpandAll_Disabled       = "expandall-disabled.png";                    //$NON-NLS-1$
    public static final String App_Filter                   = "app-filter.png";                            //$NON-NLS-1$
    public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
+   public static final String App_Options_Disabled         = "options-disabled.png";                      //$NON-NLS-1$
    public static final String App_Pin_Themed               = "pin-blue.png";                              //$NON-NLS-1$
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
    public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$

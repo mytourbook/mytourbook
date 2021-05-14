@@ -32,7 +32,7 @@ public class ActionSetupImport extends Action {
       setToolTipText(Messages.Import_Data_Action_SetupEasyImport_Tooltip);
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
-      setDisabledImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions_Disabled));
    }
 
    @Override
