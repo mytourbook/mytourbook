@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -46,8 +48,6 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -162,12 +162,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
          final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
          setButtonLayoutData(btnAuthorizeConnection);
          btnAuthorizeConnection.setText(PREFPAGE_CLOUDCONNECTIVITY_BUTTON_AUTHORIZE);
-         btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onClickAuthorize();
-            }
-         });
+         btnAuthorizeConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
          GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(btnAuthorizeConnection);
       }
    }
@@ -189,12 +184,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             final Link linkWebPage = new Link(_group, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
-            linkWebPage.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage);
-               }
-            });
+            linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+                  Messages.PrefPage_AccountInformation_Link_SuuntoApp_WebPage)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
@@ -247,12 +238,7 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _btnSelectFolder = new Button(container, SWT.PUSH);
             _btnSelectFolder.setText(APP_BTN_BROWSE);
             _btnSelectFolder.setToolTipText(Messages.PrefPage_SuuntoWorkouts_FolderPath_Tooltip);
-            _btnSelectFolder.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectBrowseDirectory();
-               }
-            });
+            _btnSelectFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectBrowseDirectory()));
             setButtonLayoutData(_btnSelectFolder);
          }
 
@@ -264,12 +250,8 @@ public class PrefPageSuunto extends FieldEditorPreferencePage implements IWorkbe
             _chkUseDateFilter.setText(Messages.PrefPage_SuuntoWorkouts_Checkbox_SinceDateFilter);
             _chkUseDateFilter.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(_chkUseDateFilter);
-            _chkUseDateFilter.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  _dtFilterSince.setEnabled(_chkUseDateFilter.getSelection());
-               }
-            });
+            _chkUseDateFilter.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _dtFilterSince.setEnabled(_chkUseDateFilter
+                  .getSelection())));
 
             _dtFilterSince = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
             _dtFilterSince.setToolTipText(Messages.PrefPage_SuuntoWorkouts_SinceDateFilter_Tooltip);
