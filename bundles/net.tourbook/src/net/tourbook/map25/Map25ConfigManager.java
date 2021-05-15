@@ -724,7 +724,7 @@ public class Map25ConfigManager {
 
          case TAG_OUTLINE:
 
-            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, true);
+            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW);
             config.outlineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
             config.outlineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
             config.outlineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
