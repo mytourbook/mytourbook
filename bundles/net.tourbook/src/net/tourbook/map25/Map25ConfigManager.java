@@ -126,7 +126,7 @@ public class Map25ConfigManager {
    public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
    public static final int     DEFAULT_OUTLINE_OPACITY                 = 70;
    public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
-   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = true;
+   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
    public static final int     OUTLINE_OPACITY_MIN                     = 1;
    public static final int     OUTLINE_OPACITY_MAX                     = 100;
    public static final float   OUTLINE_WIDTH_MIN                       = 0.1f;
