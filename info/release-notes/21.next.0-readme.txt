@@ -59,6 +59,7 @@ Improvements
 * 2.5D Map (Thomas):
   - Upgrading VTM lib to 0.15
   - Size of photothumbnails can be changed via slideout
+  - Show direction arrows on the tourpath, controlled via slideout
 
 * 3D Map & Tour Chart Preferences (Frederic)
  - "Squeezed" several transparency values to be in between 0 and 100 instead of 0 & 255 or 0.0 and 1.0
