@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImages;
 
@@ -30,8 +31,8 @@ public class ActionPhotoFilterTour extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_PhotoFilter_Tour_Tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour));
-      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_Tour_Disabled));
 
       _photoGallery = photoGallery;
    }

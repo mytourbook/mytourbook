@@ -42,6 +42,10 @@ public class CommonImages {
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
 
+   public static final String Arrow_Left                   = "arrow-left.png";                            //$NON-NLS-1$
+   public static final String Arrow_Left_Disabled          = "arrow-left-disabled.png";                   //$NON-NLS-1$
+   public static final String Arrow_Right                  = "arrow-right.png";                           //$NON-NLS-1$
+   public static final String Arrow_Right_Disabled         = "arrow-right-disabled.png";                  //$NON-NLS-1$
    public static final String BookOpen_Themed              = "book-open-blue.png";                        //$NON-NLS-1$
    public static final String ColumnCategory               = "column-category.png";                       //$NON-NLS-1$
    public static final String CustomizeProfilesColumns     = "customize-profiles-columns.png";            //$NON-NLS-1$

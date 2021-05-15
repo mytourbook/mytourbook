@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImages;
 
@@ -32,8 +33,8 @@ public class ActionSortByFileName extends Action {
 
       setToolTipText(Messages.Pic_Dir_Action_SortByName_Tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByName));
-      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByName_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByName));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoSort_ByName_Disabled));
    }
 
    @Override

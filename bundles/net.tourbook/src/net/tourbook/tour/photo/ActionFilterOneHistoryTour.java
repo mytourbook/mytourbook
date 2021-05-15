@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.photo.PhotoActivator;
+import net.tourbook.photo.PhotoImages;
 
 import org.eclipse.jface.action.Action;
 
@@ -33,8 +33,8 @@ public class ActionFilterOneHistoryTour extends Action {
 
       setToolTipText(Messages.Action_PhotosAndTours_FilterNoTours_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_OneHistoryTour));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.PhotoFilter_OneHistoryTour_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_OneHistoryTour));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoFilter_OneHistoryTour_Disabled));
    }
 
    @Override
