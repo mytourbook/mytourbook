@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImages;
 
@@ -32,8 +33,8 @@ public class ActionShowAnnotations extends Action {
 
       setToolTipText(Messages.Pic_Dir_Action_ShowAnnotations_Tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation));
-      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.Photo_ShowAnnotation_Disabled));
    }
 
    @Override

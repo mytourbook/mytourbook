@@ -21,8 +21,6 @@ package net.tourbook.photo;
 public class PhotoImages {
 
    public static final String App_Delete                          = "delete.png";                                   //$NON-NLS-1$
-   public static final String App_Navigate_Backward               = "backward_nav.gif";                             //$NON-NLS-1$
-   public static final String App_Navigate_Forward                = "forward_nav.gif";                              //$NON-NLS-1$
    public static final String App_Refresh                         = "refresh.png";                                  //$NON-NLS-1$
 
    public static final String Photo_ShowAnnotation                = "photo-action-show-annotation.png";             //$NON-NLS-1$
@@ -40,6 +38,8 @@ public class PhotoImages {
    public static final String PhotoFilter_Tour_Disabled           = "photo-filter-photo-with-tour-disabled.png";    //$NON-NLS-1$
    public static final String PhotoFilter_NoTour                  = "photo-filter-photo-without-tour.png";          //$NON-NLS-1$
    public static final String PhotoFilter_NoTour_Disabled         = "photo-filter-photo-without-tour-disabled.png"; //$NON-NLS-1$
+   public static final String PhotoFilter_OneHistoryTour          = "photo-filter-one-history-tour.png";            //$NON-NLS-1$
+   public static final String PhotoFilter_OneHistoryTour_Disabled = "photo-filter-one-history-tour-disabled.png";   //$NON-NLS-1$
    public static final String PhotoFolderGallery                  = "photo-folder-gallery.png";                     //$NON-NLS-1$
    public static final String PhotoFolderGallery_OnlyPhotos       = "photo-folder-gallery-only-photos.png";         //$NON-NLS-1$
    public static final String PhotoFullsize_ShellImage128         = "photo-shell-128.png";                          //$NON-NLS-1$

@@ -21,9 +21,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.Messages;
 import net.tourbook.photo.internal.preferences.PrefPagePhotoFullsizeViewer;
 
@@ -72,9 +72,7 @@ public class FullScreenImageViewer {
 //	private static double					MIN_ZOOM								= 1.0 / 50;
 //	private static double					MAX_ZOOM								= 50;
 
-   private final IPreferenceStore          _prefStore             = Activator
-         .getDefault()
-         .getPreferenceStore();
+   private final IPreferenceStore          _prefStore             = PhotoActivator.getPrefStore();
 
    private GalleryMT20                     _sourceGallery;
    private AbstractGalleryMT20ItemRenderer _itemRenderer;
@@ -287,7 +285,7 @@ public class FullScreenImageViewer {
 
       _shell.setLayout(new FillLayout());
 
-      _shellImage = new Image[] { Activator.getImageDescriptor(PhotoImages.PhotoFullsize_ShellImage128).createImage() };
+      _shellImage = new Image[] { PhotoActivator.getImageDescriptor(PhotoImages.PhotoFullsize_ShellImage128).createImage() };
       _shell.setImages(_shellImage);
       {
          createUI_10_Canvas(_shell);

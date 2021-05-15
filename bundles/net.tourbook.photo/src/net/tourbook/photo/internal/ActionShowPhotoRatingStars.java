@@ -16,6 +16,7 @@
 package net.tourbook.photo.internal;
 
 import net.tourbook.common.UI;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImages;
 
@@ -33,8 +34,8 @@ public class ActionShowPhotoRatingStars extends Action {
 
       setToolTipText(Messages.Photo_Gallery_Action_ShowPhotoRatingStars_Tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.PhotoRatingStar));
-      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoRatingStarAction_Disabled));
+      setImageDescriptor(PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoRatingStarAction_Disabled));
    }
 
    @Override
