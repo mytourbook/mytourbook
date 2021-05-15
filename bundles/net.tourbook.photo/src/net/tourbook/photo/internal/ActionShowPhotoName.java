@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImages;
 
@@ -32,8 +33,8 @@ public class ActionShowPhotoName extends Action {
 
       setToolTipText(Messages.Pic_Dir_Action_ShowPhotoFileName_Tooltip);
 
-      setImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name));
-      setDisabledImageDescriptor(Activator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name_Disabled));
+      setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name));
+      setDisabledImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoInfo_Name_Disabled));
    }
 
    @Override

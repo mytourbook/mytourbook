@@ -17,9 +17,9 @@ package net.tourbook.photo.internal;
 
 import java.util.Map;
 
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.PhotoImages;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -42,9 +42,6 @@ public class ActionHandler_OpenView_PhotoDirectory extends AbstractHandler imple
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      // set themed icon
-
-      uiElement.setIcon(Activator.getImageDescriptor(
-            ThemeUtil.getThemedImageName(PhotoImages.PhotoDirectoryView)));
+      PhotoUI.setThemedIcon(uiElement, PhotoImages.PhotoDirectoryView);
    }
 }

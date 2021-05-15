@@ -13,14 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour.photo;
+package net.tourbook.photo.internal;
 
 import java.util.Map;
 
-import net.tourbook.Images;
-import net.tourbook.photo.PhotosWithExifSelection;
+import net.tourbook.photo.PhotoImages;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.PicDirView;
-import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -30,7 +29,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_RefreshFolder extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -38,13 +37,7 @@ public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler 
       final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 
       if (activePart instanceof PicDirView) {
-
-         final PicDirView picDirView = (PicDirView) activePart;
-         final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(true);
-
-         if (selectedPhotosWithExif != null) {
-            TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
-         }
+         ((PicDirView) activePart).actionRefreshFolder();
       }
 
       return null;
@@ -54,6 +47,6 @@ public class ActionHandlerLinkPhotoWithTourInGalleryAll extends AbstractHandler 
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.PhotoLinkWithTour);
+      PhotoUI.setThemedIcon(uiElement, PhotoImages.App_Refresh);
    }
 }

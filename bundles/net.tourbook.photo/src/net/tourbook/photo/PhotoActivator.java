@@ -13,16 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo.internal;
+package net.tourbook.photo;
 
 import java.util.Optional;
 
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -31,25 +29,25 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class PhotoActivator extends AbstractUIPlugin {
 
    // The plug-in ID
    public static final String PLUGIN_ID = "net.tourbook.photo"; //$NON-NLS-1$
 
    // The shared instance
-   private static Activator plugin;
+   private static PhotoActivator plugin;
 
    /**
     * The constructor
     */
-   public Activator() {}
+   public PhotoActivator() {}
 
    /**
     * Returns the shared instance
     *
     * @return the shared instance
     */
-   public static Activator getDefault() {
+   public static PhotoActivator getDefault() {
       return plugin;
    }
 
@@ -66,9 +64,14 @@ public class Activator extends AbstractUIPlugin {
       return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
    }
 
+   public static IPreferenceStore getPrefStore() {
+      return getDefault().getPreferenceStore();
+   }
+
    /**
     * @param imageName
-    * @return Returns the themed image descriptor from the photo {@link Activator} plugin images
+    * @return Returns the themed image descriptor from the photo {@link PhotoActivator} plugin
+    *         images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 

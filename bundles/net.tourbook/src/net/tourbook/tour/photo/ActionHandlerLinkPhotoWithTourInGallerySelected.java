@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,32 +15,45 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
+import java.util.Map;
+
+import net.tourbook.Images;
 import net.tourbook.photo.PhotosWithExifSelection;
 import net.tourbook.photo.PicDirView;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandlerLinkPhotoWithTourInGallerySelected extends AbstractHandler {
+public class ActionHandlerLinkPhotoWithTourInGallerySelected extends AbstractHandler implements IElementUpdater {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
+      final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 
-		if (activePart instanceof PicDirView) {
+      if (activePart instanceof PicDirView) {
 
-			final PicDirView picDirView = (PicDirView) activePart;
-			final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
+         final PicDirView picDirView = (PicDirView) activePart;
+         final PhotosWithExifSelection selectedPhotosWithExif = picDirView.getSelectedPhotosWithExif(false);
 
-			if (selectedPhotosWithExif != null) {
-				TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
-			}
-		}
+         if (selectedPhotosWithExif != null) {
+            TourPhotoManager.getInstance().linkPhotosWithTours(selectedPhotosWithExif);
+         }
+      }
 
-		return null;
-	}
+      return null;
+   }
+
+   @SuppressWarnings("rawtypes")
+   @Override
+   public void updateElement(final UIElement uiElement, final Map parameters) {
+
+      UI.setThemedIcon(uiElement, Images.PhotoLinkWithTour);
+   }
 }

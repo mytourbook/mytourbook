@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8902,12 +8901,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // sort markers by serie index
       _sortedMarkers = new ArrayList<>(tourMarkers);
 
-      Collections.sort(_sortedMarkers, new Comparator<TourMarker>() {
-         @Override
-         public int compare(final TourMarker marker1, final TourMarker marker2) {
-            return marker1.getSerieIndex() - marker2.getSerieIndex();
-         }
-      });
+      Collections.sort(
+            _sortedMarkers,
+            (tourMarker1, tourMarker2) -> tourMarker1.getSerieIndex() - tourMarker2.getSerieIndex());
 
       return _sortedMarkers;
    }

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +120,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -138,16 +136,13 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -169,9 +164,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -1266,12 +1259,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                         && (_tourData.timeSerie.length > BUSY_INDICATOR_ITEMS))
                         || (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
 
-                     BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-                        @Override
-                        public void run() {
-                           _swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
-                           _swimSlice_Viewer.setInput(_swimSlice_ViewerItems);
-                        }
+                     BusyIndicator.showWhile(Display.getCurrent(), () -> {
+                        _swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
+                        _swimSlice_Viewer.setInput(_swimSlice_ViewerItems);
                      });
                   } else {
                      _swimSlice_ViewerItems = getSliceViewerItems().__swimSlice_ViewerItems;
@@ -1622,12 +1612,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                         && (_tourData.timeSerie.length > BUSY_INDICATOR_ITEMS))
                         || (table.getItemCount() > BUSY_INDICATOR_ITEMS)) {
 
-                     BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-                        @Override
-                        public void run() {
-                           _timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
-                           _timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
-                        }
+                     BusyIndicator.showWhile(Display.getCurrent(), () -> {
+                        _timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
+                        _timeSlice_Viewer.setInput(_timeSlice_ViewerItems);
                      });
                   } else {
                      _timeSlice_ViewerItems = getSliceViewerItems().__timeSlice_ViewerItems;
@@ -2403,12 +2390,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                _isPartVisible = true;
 
-               Display.getCurrent().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     updateUI_FromModelRunnable();
-                  }
-               });
+               Display.getCurrent().asyncExec(() -> updateUI_FromModelRunnable());
             }
          }
       };
@@ -2419,123 +2401,117 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            if (_tourData == null) {
-               return;
-            }
+         if (_tourData == null) {
+            return;
+         }
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-               /*
-                * Tour data could have been modified but the changes are not reflected in the data
-                * model, the model needs to be updated from the UI
-                */
-               if (isTourValid()) {
+            /*
+             * Tour data could have been modified but the changes are not reflected in the data
+             * model, the model needs to be updated from the UI
+             */
+            if (isTourValid()) {
 
 // this has been disabled because the measurement has changed and it would update from the wrong measurement system
 // it was also prevented that the measurement can be changed when the tour is modified
 //
 //                  updateModel_FromUI();
 
-               } else {
+            } else {
 
-                  MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
-                        Messages.tour_editor_dlg_discard_tour_title,
-                        Messages.tour_editor_dlg_discard_tour_message);
+               MessageDialog.openInformation(
+                     Display.getCurrent().getActiveShell(),
+                     Messages.tour_editor_dlg_discard_tour_title,
+                     Messages.tour_editor_dlg_discard_tour_message);
 
-                  discardModifications();
-               }
-
-               if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-
-                  // reload tour data
-
-                  updateUI_FromModel(_tourData, false, true);
-               }
-
-            } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
-
-               // display renamed person
-
-               // updateUITab4Info(); do NOT work
-               //
-               // tour data must be reloaded
-
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
-               _swimSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-               _swimSlice_Viewer.refresh();
-
-               _timeSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-               _timeSlice_Viewer.refresh();
+               discardModifications();
             }
+
+            if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+               // reload tour data
+
+               updateUI_FromModel(_tourData, false, true);
+            }
+
+         } else if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+
+            // display renamed person
+
+            // updateUITab4Info(); do NOT work
+            //
+            // tour data must be reloaded
+
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+
+            _swimSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _swimSlice_Viewer.refresh();
+
+            _timeSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _timeSlice_Viewer.refresh();
          }
       };
 
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            if (_tourData == null) {
-               return;
-            }
+         if (_tourData == null) {
+            return;
+         }
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-               // reload tour data
+            // reload tour data
 
-               updateUI_FromModel(_tourData, false, true);
+            updateUI_FromModel(_tourData, false, true);
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               /*
-                * Tour data could have been modified but the changes are not reflected in the data
-                * model, the model needs to be updated from the UI
-                */
-               if (isTourValid()) {
+            /*
+             * Tour data could have been modified but the changes are not reflected in the data
+             * model, the model needs to be updated from the UI
+             */
+            if (isTourValid()) {
 
 // this has been disabled because the measurement has changed and it would update from the wrong measurement system
 // it was also prevented that the measurement can be changed when the tour is modified
 //
 //                  updateModel_FromUI();
 
-               } else {
+            } else {
 
-                  MessageDialog.openInformation(
-                        Display.getCurrent().getActiveShell(),
-                        Messages.tour_editor_dlg_discard_tour_title,
-                        Messages.tour_editor_dlg_discard_tour_message);
+               MessageDialog.openInformation(
+                     Display.getCurrent().getActiveShell(),
+                     Messages.tour_editor_dlg_discard_tour_title,
+                     Messages.tour_editor_dlg_discard_tour_message);
 
-                  discardModifications();
-               }
+               discardModifications();
+            }
 
-               if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-                  // measurement system has changed
+               // measurement system has changed
 
-                  /*
-                   * It is possible that the unit values in the UI class have been updated before
-                   * the model was saved, this can happen when another view called the method
-                   * UI.updateUnits(). Because of this race condition, only the internal units are
-                   * used to calculate values which depend on the measurement system
-                   */
-                  updateInternalUnitValues();
+               /*
+                * It is possible that the unit values in the UI class have been updated before
+                * the model was saved, this can happen when another view called the method
+                * UI.updateUnits(). Because of this race condition, only the internal units are
+                * used to calculate values which depend on the measurement system
+                */
+               updateInternalUnitValues();
 
-                  recreateViewer();
+               recreateViewer();
 
-                  updateUI_FromModel(_tourData, false, true);
-               }
+               updateUI_FromModel(_tourData, false, true);
             }
          }
       };
@@ -2550,140 +2526,134 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-            if (part == TourDataEditorView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (workbenchPart == TourDataEditorView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == TourDataEditorView.this) {
+         if (workbenchPart == TourDataEditorView.this) {
+            return;
+         }
+
+         if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else {
+
+            if (_tourData == null) {
                return;
             }
 
-            if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+            final long tourDataEditorTourId = _tourData.getTourId();
 
-               onSelectionChanged((ISelection) eventData);
+            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-            } else {
+               final TourEvent tourEvent = (TourEvent) eventData;
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
-               if (_tourData == null) {
+               if (modifiedTours == null) {
                   return;
                }
 
-               final long tourDataEditorTourId = _tourData.getTourId();
+               for (final TourData tourData : modifiedTours) {
+                  if (tourData.getTourId() == tourDataEditorTourId) {
 
-               if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+                     // update modified tour
 
-                  final TourEvent tourEvent = (TourEvent) eventData;
-                  final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
+                     if (tourEvent.tourDataEditorSavedTour == _tourData) {
 
-                  if (modifiedTours == null) {
-                     return;
-                  }
-
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == tourDataEditorTourId) {
-
-                        // update modified tour
-
-                        if (tourEvent.tourDataEditorSavedTour == _tourData) {
-
-                           /*
-                            * nothing to do because the tour is already saved (it was not modified
-                            * before) and the UI is already updated
-                            */
-                           return;
-                        }
-
-                        if (tourEvent.isReverted) {
-                           setTourClean();
-                        } else {
-                           setTourDirty();
-                        }
-
-                        updateUI_FromModel(tourData, true, tourEvent.isReverted);
-
-                        // nothing more to do, the editor contains only one tour
+                        /*
+                         * nothing to do because the tour is already saved (it was not modified
+                         * before) and the UI is already updated
+                         */
                         return;
                      }
+
+                     if (tourEvent.isReverted) {
+                        setTourClean();
+                     } else {
+                        setTourDirty();
+                     }
+
+                     updateUI_FromModel(tourData, true, tourEvent.isReverted);
+
+                     // nothing more to do, the editor contains only one tour
+                     return;
                   }
-
-                  // removed old tour data from the selection provider
-                  _postSelectionProvider.clearSelection();
-
-               } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
-
-                  if (_isTourDirty) {
-
-                     updateUI_FromModel(_tourData, false, true);
-
-                  } else {
-
-                     /**
-                      * When tags are deleted, then the tour editor is not be dirty (this is
-                      * previously checked)
-                      * <p>
-                      * -> reload tour with removed tags
-                      */
-
-                     reloadTourData();
-                  }
-
-               } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
-
-                  // ensure that the tour is displayed
-                  onSelectionChanged((ISelection) eventData);
-
-                  final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
-
-                  onSelectionChanged_TourMarker(tourMarkerSelection);
-
-               } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-                  clearEditorContent();
-
-               } else if (eventId == TourEventId.SEGMENT_LAYER_CHANGED) {
-
-                  updateUI_FromModel(_tourData, true, true);
-
-               } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-                  updateUI_FromModel(_tourData, true, true);
-
-               } else if (eventId == TourEventId.UPDATE_UI) {
-
-                  // check if this tour data editor contains a tour which must be updated
-
-                  // update editor
-                  if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
-
-                     // reload tour data
-                     _tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
-
-                     updateUI_FromModel(_tourData, false, true);
-                  }
-
-               } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
-
-                  onSelectionChanged((ISelection) eventData);
                }
-            }
 
+               // removed old tour data from the selection provider
+               _postSelectionProvider.clearSelection();
+
+            } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
+               if (_isTourDirty) {
+
+                  updateUI_FromModel(_tourData, false, true);
+
+               } else {
+
+                  /**
+                   * When tags are deleted, then the tour editor is not be dirty (this is
+                   * previously checked)
+                   * <p>
+                   * -> reload tour with removed tags
+                   */
+
+                  reloadTourData();
+               }
+
+            } else if (tourEventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+
+               // ensure that the tour is displayed
+               onSelectionChanged((ISelection) eventData);
+
+               final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
+
+               onSelectionChanged_TourMarker(tourMarkerSelection);
+
+            } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               clearEditorContent();
+
+            } else if (tourEventId == TourEventId.SEGMENT_LAYER_CHANGED) {
+
+               updateUI_FromModel(_tourData, true, true);
+
+            } else if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+
+               updateUI_FromModel(_tourData, true, true);
+
+            } else if (tourEventId == TourEventId.UPDATE_UI) {
+
+               // check if this tour data editor contains a tour which must be updated
+
+               // update editor
+               if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
+
+                  // reload tour data
+                  _tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
+
+                  updateUI_FromModel(_tourData, false, true);
+               }
+
+            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+
+               onSelectionChanged((ISelection) eventData);
+            }
          }
+
       };
 
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -2691,20 +2661,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void addTourSaveListener() {
 
-      _tourSaveListener = new ITourSaveListener() {
-         @Override
-         public boolean saveTour() {
+      _tourSaveListener = () -> {
 
-            boolean isTourSaved;
+         boolean isTourSaved;
 
-            _isSavingInProgress = true;
-            {
-               isTourSaved = saveTourWithValidation();
-            }
-            _isSavingInProgress = false;
-
-            return isTourSaved;
+         _isSavingInProgress = true;
+         {
+            isTourSaved = saveTourWithValidation();
          }
+         _isSavingInProgress = false;
+
+         return isTourSaved;
       };
 
       TourManager.getInstance().addTourSaveListener(_tourSaveListener);
@@ -2833,62 +2800,50 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createFieldListener() {
 
-      _modifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
+      _modifyListener = modifyEvent -> {
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            updateModel_FromUI();
-            setTourDirty();
+         if (_isSetField || _isSavingInProgress) {
+            return;
          }
+
+         updateModel_FromUI();
+         setTourDirty();
       };
 
-      _modifyListener_Temperature = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
+      _modifyListener_Temperature = modifyEvent -> {
 
-            if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            _isTemperatureManuallyModified = true;
-            setTourDirty();
+         if (UI.isLinuxAsyncEvent(modifyEvent.widget) || _isSetField || _isSavingInProgress) {
+            return;
          }
+
+         _isTemperatureManuallyModified = true;
+         setTourDirty();
       };
 
-      _mouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+      _mouseWheelListener = mouseEvent -> {
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            Util.adjustSpinnerValueOnMouseScroll(event);
-
-            updateModel_FromUI();
-            setTourDirty();
-
-            updateUI_Time(event.widget);
+         if (_isSetField || _isSavingInProgress) {
+            return;
          }
+
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+
+         updateModel_FromUI();
+         setTourDirty();
+
+         updateUI_Time(mouseEvent.widget);
       };
 
-      _mouseWheelListener_Temperature = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+      _mouseWheelListener_Temperature = mouseEvent -> {
 
-            Util.adjustSpinnerValueOnMouseScroll(event);
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            _isTemperatureManuallyModified = true;
-            setTourDirty();
+         if (_isSetField || _isSavingInProgress) {
+            return;
          }
+
+         _isTemperatureManuallyModified = true;
+         setTourDirty();
       };
 
       _selectionListener = new SelectionAdapter() {
@@ -2935,113 +2890,105 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       };
 
-      _verifyFloatValue = new ModifyListener() {
+      _verifyFloatValue = modifyEvent -> {
 
-         @Override
-         public void modifyText(final ModifyEvent event) {
+         if (_isSetField || _isSavingInProgress) {
+            return;
+         }
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
+         final Text widget = (Text) modifyEvent.widget;
+         final String valueText = widget.getText().trim();
+
+         if (valueText.length() > 0) {
+            try {
+
+               // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+               //
+               // Float.parseFloat() ignores localized strings therefore the databinding converter is used
+               // which provides also a good error message
+               //
+               // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+               StringToNumberConverter.toFloat(true).convert(valueText);
+
+               _messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
+
+            } catch (final IllegalArgumentException e) {
+
+               // wrong characters are entered, display an error message
+
+               _messageManager.addMessage(
+                     widget.getData(WIDGET_KEY),
+                     e.getLocalizedMessage(),
+                     null,
+                     IMessageProvider.ERROR,
+                     widget);
             }
+         }
 
-            final Text widget = (Text) event.widget;
-            final String valueText = widget.getText().trim();
-
-            if (valueText.length() > 0) {
-               try {
-
-                  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                  //
-                  // Float.parseFloat() ignores localized strings therefore the databinding converter is used
-                  // which provides also a good error message
-                  //
-                  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                  StringToNumberConverter.toFloat(true).convert(valueText);
-
-                  _messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
-
-               } catch (final IllegalArgumentException e) {
-
-                  // wrong characters are entered, display an error message
-
-                  _messageManager.addMessage(
-                        widget.getData(WIDGET_KEY),
-                        e.getLocalizedMessage(),
-                        null,
-                        IMessageProvider.ERROR,
-                        widget);
-               }
-            }
-
+         /*
+          * tour dirty must be set after validation because an error can occur which enables
+          * actions
+          */
+         if (_isTourDirty) {
             /*
-             * tour dirty must be set after validation because an error can occur which enables
-             * actions
+             * when an error occurred previously and is now solved, the save action must be
+             * enabled
              */
-            if (_isTourDirty) {
-               /*
-                * when an error occurred previously and is now solved, the save action must be
-                * enabled
-                */
-               enableActions();
-            } else {
-               setTourDirty();
-            }
+            enableActions();
+         } else {
+            setTourDirty();
          }
       };
 
-      _verifyIntValue = new ModifyListener() {
+      _verifyIntValue = modifyEvent -> {
 
-         @Override
-         public void modifyText(final ModifyEvent event) {
+         if (_isSetField || _isSavingInProgress) {
+            return;
+         }
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
+         final Text widget = (Text) modifyEvent.widget;
+         final String valueText = widget.getText().trim();
+
+         if (valueText.length() > 0) {
+            try {
+
+               // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+               //
+               // Float.parseFloat() ignores localized strings therefore the databinding converter is used
+               // which provides also a good error message
+               //
+               // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+               StringToNumberConverter.toInteger(true).convert(valueText);
+
+               _messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
+
+            } catch (final IllegalArgumentException e) {
+
+               // wrong characters are entered, display an error message
+
+               _messageManager.addMessage(
+                     widget.getData(WIDGET_KEY),
+                     e.getLocalizedMessage(),
+                     null,
+                     IMessageProvider.ERROR,
+                     widget);
             }
+         }
 
-            final Text widget = (Text) event.widget;
-            final String valueText = widget.getText().trim();
-
-            if (valueText.length() > 0) {
-               try {
-
-                  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                  //
-                  // Float.parseFloat() ignores localized strings therefore the databinding converter is used
-                  // which provides also a good error message
-                  //
-                  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                  StringToNumberConverter.toInteger(true).convert(valueText);
-
-                  _messageManager.removeMessage(widget.getData(WIDGET_KEY), widget);
-
-               } catch (final IllegalArgumentException e) {
-
-                  // wrong characters are entered, display an error message
-
-                  _messageManager.addMessage(
-                        widget.getData(WIDGET_KEY),
-                        e.getLocalizedMessage(),
-                        null,
-                        IMessageProvider.ERROR,
-                        widget);
-               }
-            }
-
+         /*
+          * tour dirty must be set after validation because an error can occur which enables
+          * actions
+          */
+         if (_isTourDirty) {
             /*
-             * tour dirty must be set after validation because an error can occur which enables
-             * actions
+             * when an error occurred previously and is now solved, the save action must be
+             * enabled
              */
-            if (_isTourDirty) {
-               /*
-                * when an error occurred previously and is now solved, the save action must be
-                * enabled
-                */
-               enableActions();
-            } else {
-               setTourDirty();
-            }
+            enableActions();
+         } else {
+            setTourDirty();
          }
       };
    }
@@ -3054,12 +3001,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _swimViewer_MenuManager = new MenuManager();
 
       _swimViewer_MenuManager.setRemoveAllWhenShown(true);
-      _swimViewer_MenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu_SwimSlice(manager);
-         }
-      });
+      _swimViewer_MenuManager.addMenuListener(this::fillContextMenu_SwimSlice);
 
       /*
        * Time slice viewer
@@ -3067,12 +3009,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeViewer_MenuManager = new MenuManager();
 
       _timeViewer_MenuManager.setRemoveAllWhenShown(true);
-      _timeViewer_MenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu_TimeSlice(manager);
-         }
-      });
+      _timeViewer_MenuManager.addMenuListener(this::fillContextMenu_TimeSlice);
    }
 
    /**
@@ -3088,15 +3025,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-
-            // set menu items
-
-            ActionSetTourTypeMenu.fillMenu(menuMgr, TourDataEditorView.this, false);
-         }
-      });
+      // set menu items
+      menuMgr.addMenuListener(menuManager -> ActionSetTourTypeMenu.fillMenu(menuManager, TourDataEditorView.this, false));
 
       // set menu for the tour type link
       _linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
@@ -3107,16 +3037,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            final Set<TourTag> tourTags = _tourData.getTourTags();
-            final boolean isTagInTour = tourTags.size() > 0;
+         final Set<TourTag> tourTags = _tourData.getTourTags();
+         final boolean isTagInTour = tourTags.size() > 0;
 
-            _tagMenuMgr.fillTagMenu(menuMgr, false);
-            _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
-         }
+         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
       });
 
       // set menu for the tag item
@@ -3239,12 +3166,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
 
-      _tabFolder.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectTab();
-         }
-      });
+      _tabFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTab()));
+
       {
          _tab_10_Tour = new CTabItem(_tabFolder, SWT.FLAT);
          _tab_10_Tour.setText(Messages.tour_editor_tabLabel_tour);
@@ -3316,20 +3239,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboTitle);
 
-            _comboTitle.addModifyListener(new ModifyListener() {
+            _comboTitle.addModifyListener(modifyEvent -> {
 
-               @Override
-               public void modifyText(final ModifyEvent e) {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-
-                  _isTitleModified = true;
-                  setTourDirty();
+               _isTitleModified = true;
+               setTourDirty();
 
 //                onModifyContent();
-               }
             });
 
             // fill combobox
@@ -3385,15 +3304,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboLocation_Start);
 
-            _comboLocation_Start.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  _isLocationStartModified = true;
-                  setTourDirty();
+            _comboLocation_Start.addModifyListener(modifyEvent -> {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               _isLocationStartModified = true;
+               setTourDirty();
             });
 
             // fill combobox
@@ -3422,15 +3338,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboLocation_End);
 
-            _comboLocation_End.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  _isLocationEndModified = true;
-                  setTourDirty();
+            _comboLocation_End.addModifyListener(modifyEvent -> {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               _isLocationEndModified = true;
+               setTourDirty();
             });
 
             // fill combobox
@@ -3489,21 +3402,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
          _tk.adapt(_dtTourDate, true, false);
-         _dtTourDate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _dtTourDate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-                  return;
-               }
-
-               setTourDirty();
-
-               updateUI_Title();
-
-//             onModifyContent();
+            if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+               return;
             }
-         });
+
+            setTourDirty();
+
+            updateUI_Title();
+
+//          onModifyContent();
+
+         }));
 
          //////////////////////////////////////
          createUI_LabelSeparator(container);
@@ -3528,21 +3439,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _tk.adapt(_dtStartTime, true, false);
-            _dtStartTime.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _dtStartTime.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (UI.isLinuxAsyncEvent(e.widget) || _isSetField || _isSavingInProgress) {
-                     return;
-                  }
-
-                  setTourDirty();
-
-                  updateUI_Title();
-
-//                onModifyContent();
+               if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+
+               setTourDirty();
+
+               updateUI_Title();
+
+//             onModifyContent();
+
+            }));
          }
       }
    }
@@ -3734,18 +3643,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // combo
             _comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
             _comboTimeZone.setVisibleItemCount(50);
-            _comboTimeZone.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  _isTimeZoneManuallyModified = true;
+               _isTimeZoneManuallyModified = true;
 
-                  updateModel_FromUI();
-                  setTourDirty();
+               updateModel_FromUI();
+               setTourDirty();
 
-                  updateUI_TimeZone();
-               }
-            });
+               updateUI_TimeZone();
+
+            }));
 
             _tk.adapt(_comboTimeZone, true, false);
 
@@ -3790,13 +3697,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
-                  _linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
-
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_SetDefault();
-                     }
-                  });
+                  _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetDefault()));
                   _tk.adapt(_linkDefaultTimeZone, true, true);
                }
                {
@@ -3805,12 +3706,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkGeoTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkGeoTimeZone.setText(Messages.Tour_Editor_Link_SetGeoTimeZone);
                   _linkGeoTimeZone.setToolTipText(Messages.Tour_Editor_Link_SetGeoTimeZone_Tooltip);
-                  _linkGeoTimeZone.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_SetFromGeo();
-                     }
-                  });
+                  _linkGeoTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetFromGeo()));
                   _tk.adapt(_linkGeoTimeZone, true, true);
                }
                {
@@ -3819,14 +3715,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkRemoveTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkRemoveTimeZone.setText(Messages.Tour_Editor_Link_RemoveTimeZone);
                   _linkRemoveTimeZone.setToolTipText(Messages.Tour_Editor_Link_RemoveTimeZone_Tooltip);
-                  _linkRemoveTimeZone.addSelectionListener(new SelectionAdapter() {
-
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        actionTimeZone_Remove();
-                     }
-
-                  });
+                  _linkRemoveTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_Remove()));
                   _tk.adapt(_linkRemoveTimeZone, true, true);
                }
             }
@@ -4038,18 +3927,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _linkWeather.setText(Messages.Tour_Editor_Link_RetrieveWeather);
          _linkWeather.setToolTipText(Messages.Tour_Editor_Link_RetrieveWeather_Tooltip);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_linkWeather);
-         _linkWeather.addSelectionListener(new SelectionAdapter() {
+         _linkWeather.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            //Retrieve the weather
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               //Retrieve the weather
-
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-               onSelect_Weather_Text();
+            if (_isSetField || _isSavingInProgress) {
+               return;
             }
-         });
+            onSelect_Weather_Text();
+         }));
          _tk.adapt(_linkWeather, true, true);
          _firstColumnControls.add(_linkWeather);
 
@@ -4098,36 +3983,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Wind_SpeedValue.setMaximum(120);
             _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
-            _spinWeather_Wind_SpeedValue.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedValue();
-                  setTourDirty();
+            _spinWeather_Wind_SpeedValue.addModifyListener(modifyEvent -> {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               onSelectWindSpeedValue();
+               setTourDirty();
             });
-            _spinWeather_Wind_SpeedValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedValue();
-                  setTourDirty();
+            _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
-            _spinWeather_Wind_SpeedValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedValue();
-                  setTourDirty();
+               onSelectWindSpeedValue();
+               setTourDirty();
+            }));
+            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               onSelectWindSpeedValue();
+               setTourDirty();
             });
 
             // label: km/h, mi/h
@@ -4153,17 +4030,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_comboWeather_WindDirectionText);
             _comboWeather_WindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
             _comboWeather_WindDirectionText.setVisibleItemCount(16);
-            _comboWeather_WindDirectionText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboWeather_WindDirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionText();
-                  setTourDirty();
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindDirectionText();
+               setTourDirty();
+            }));
 
             // fill combobox
             for (final String windDirText : IWeather.windDirectionText) {
@@ -4197,17 +4071,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tk.adapt(_comboWeather_WindSpeedText, true, false);
             _comboWeather_WindSpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_WindSpeedText.setVisibleItemCount(20);
-            _comboWeather_WindSpeedText.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
+            _comboWeather_WindSpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindSpeedText();
-                  setTourDirty();
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
+               onSelectWindSpeedText();
+               setTourDirty();
+            }));
 
             // fill combobox
             for (final String speedText : IWeather.windSpeedText) {
@@ -4230,36 +4101,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Wind_DirectionValue.setDigits(1);
             _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
-            _spinWeather_Wind_DirectionValue.addModifyListener(new ModifyListener() {
-               @Override
-               public void modifyText(final ModifyEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionValue();
-                  setTourDirty();
+            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               onSelectWindDirectionValue();
+               setTourDirty();
             });
-            _spinWeather_Wind_DirectionValue.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionValue();
-                  setTourDirty();
+            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
-            });
-            _spinWeather_Wind_DirectionValue.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-                  onSelectWindDirectionValue();
-                  setTourDirty();
+               onSelectWindDirectionValue();
+               setTourDirty();
+            }));
+
+            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+               onSelectWindDirectionValue();
+               setTourDirty();
             });
 
             // label: direction unit = degree
@@ -4471,12 +4335,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
          _comboWeather_Clouds.setVisibleItemCount(10);
          _comboWeather_Clouds.addModifyListener(_modifyListener);
-         _comboWeather_Clouds.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               displayCloudIcon();
-            }
-         });
+         _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
 
          // fill combobox
          for (final String cloudText : IWeather.cloudText) {
@@ -4568,12 +4427,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .fillDefaults()//
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_linkTag);
-            _linkTag.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  UI.openControlMenu(_linkTag);
-               }
-            });
+            _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTag)));
             _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
 
@@ -4595,13 +4449,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
             _linkTourType = new Link(container, SWT.NONE);
             _linkTourType.setText(Messages.tour_editor_label_tour_type);
-            _linkTourType.addSelectionListener(new SelectionAdapter() {
-
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  UI.openControlMenu(_linkTourType);
-               }
-            });
+            _linkTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTourType)));
             _tk.adapt(_linkTourType, true, true);
             _firstColumnControls.add(_linkTourType);
 
@@ -4624,17 +4472,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(label);
 
             _comboCadence = new ComboViewerCadence(container);
-            _comboCadence.addSelectionChangedListener(new ISelectionChangedListener() {
-               @Override
-               public void selectionChanged(final SelectionChangedEvent event) {
+            _comboCadence.addSelectionChangedListener(selectionChangedEvent -> {
 
-                  if (_isSetField || _isSavingInProgress) {
-                     return;
-                  }
-
-                  updateModel_FromUI();
-                  setTourDirty();
+               if (_isSetField || _isSavingInProgress) {
+                  return;
                }
+
+               updateModel_FromUI();
+               setTourDirty();
             });
          }
       }
@@ -4808,13 +4653,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_Viewer.setComparator(_timeSlice_Comparator);
       _timeSlice_Viewer.setUseHashlookup(true);
 
-      _timeSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            final StructuredSelection selection = (StructuredSelection) event.getSelection();
-            if (selection != null) {
-               fireSliderPosition(selection);
-            }
+      _timeSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> {
+         final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
+         if (selection != null) {
+            fireSliderPosition(selection);
          }
       });
 
@@ -4918,13 +4760,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _swimSlice_Viewer.setContentProvider(new SwimSlice_ViewerContentProvider());
       _swimSlice_Viewer.setUseHashlookup(true);
 
-      _swimSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            final StructuredSelection selection = (StructuredSelection) event.getSelection();
-            if (selection != null) {
-               fireSliderPosition(selection);
-            }
+      _swimSlice_Viewer.addSelectionChangedListener(selectionChangedEvent -> {
+         final StructuredSelection selection = (StructuredSelection) selectionChangedEvent.getSelection();
+         if (selection != null) {
+            fireSliderPosition(selection);
          }
       });
 
@@ -5987,29 +5826,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (_tourData == null) {
 
-         Display.getCurrent().asyncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getCurrent().asyncExec(() -> {
 
-               if (_pageBook.isDisposed()) {
-                  return;
-               }
+            if (_pageBook.isDisposed()) {
+               return;
+            }
 
-               /*
-                * check if tour is set from a selection provider
-                */
-               if (_tourData != null) {
-                  return;
-               }
+            /*
+             * check if tour is set from a selection provider
+             */
+            if (_tourData != null) {
+               return;
+            }
 
-               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-               if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            if ((selectedTours != null) && (selectedTours.size() > 0)) {
 
-                  // get first tour, this view shows only one tour
-                  displayTour(selectedTours.get(0));
+               // get first tour, this view shows only one tour
+               displayTour(selectedTours.get(0));
 
-                  setTourClean();
-               }
+               setTourClean();
             }
          });
       }
@@ -6158,124 +5994,121 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (dialogEditTimeSlicesValues.open() == Window.OK) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-            @Override
-            public void run() {
+         BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
-               final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
-               final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
-               final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
-               final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
+            final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
+            final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
+            final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
+            final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
 
-               final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
-               final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
-               final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
-               final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
+            final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
+            final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
+            final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
+            final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
 
-               final int[] selectedRows = new int[selectedTimeSlices.length];
-               boolean tourDataModified = false;
-               for (int index = 0; index < selectedTimeSlices.length; ++index) {
+            final int[] selectedRows = new int[selectedTimeSlices.length];
+            boolean tourDataModified = false;
+            for (int index = 0; index < selectedTimeSlices.length; ++index) {
 
-                  final int currentTimeSliceIndex = ((TimeSlice) selectedTimeSlices[index]).serieIndex;
+               final int currentTimeSliceIndex = ((TimeSlice) selectedTimeSlices[index]).serieIndex;
 
-                  selectedRows[index] = currentTimeSliceIndex;
+               selectedRows[index] = currentTimeSliceIndex;
 
-                  if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
+               if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
 
-                     if (isAltitudeValueOffset) {
-                        _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
-                     } else {
-                        _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
-                     }
-
-                     tourDataModified = true;
+                  if (isAltitudeValueOffset) {
+                     _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
+                  } else {
+                     _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
                   }
 
-                  if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
-
-                     if (isPulseValueOffset) {
-                        _seriePulse[currentTimeSliceIndex] += newPulseValue;
-                     } else {
-                        _seriePulse[currentTimeSliceIndex] = newPulseValue;
-                     }
-
-                     tourDataModified = true;
-                  }
-
-                  if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
-
-                     if (isCadenceValueOffset) {
-                        _serieCadence[currentTimeSliceIndex] += newCadenceValue;
-                     } else {
-                        _serieCadence[currentTimeSliceIndex] = newCadenceValue;
-                     }
-
-                     _tourData.setCadenceSerie(_serieCadence);
-                     tourDataModified = true;
-                  }
-
-                  if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
-                     if (isTemperatureValueOffset) {
-
-                        //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
-                        // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
-
-                        if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-
-                           final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
-                           float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
-
-                           currentTemperatureFahrenheit += newTemperatureValue;
-                           final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
-
-                           _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
-
-                        } else {
-                           _serieTemperature[currentTimeSliceIndex] += newTemperatureValue;
-                        }
-
-                     } else {
-                        _serieTemperature[currentTimeSliceIndex] = newTemperatureValue;
-                     }
-                     tourDataModified = true;
-                  }
+                  tourDataModified = true;
                }
 
-               if (!tourDataModified) {
-                  return;
+               if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
+
+                  if (isPulseValueOffset) {
+                     _seriePulse[currentTimeSliceIndex] += newPulseValue;
+                  } else {
+                     _seriePulse[currentTimeSliceIndex] = newPulseValue;
+                  }
+
+                  tourDataModified = true;
                }
 
-               // force recompute values, e.g. gradient
-               _tourData.clearComputedSeries();
+               if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
 
-               // recompute min/max values
-               getDataSeriesFromTourData();
+                  if (isCadenceValueOffset) {
+                     _serieCadence[currentTimeSliceIndex] += newCadenceValue;
+                  } else {
+                     _serieCadence[currentTimeSliceIndex] = newCadenceValue;
+                  }
 
-               // update UI
-               updateUI_Tab_1_Tour();
-               updateUI_ReferenceTourRanges();
-
-               _timeSlice_Viewer.getControl().setRedraw(false);
-               {
-                  _timeSlice_Viewer.refresh(true);
+                  _tourData.setCadenceSerie(_serieCadence);
+                  tourDataModified = true;
                }
-               _timeSlice_Viewer.getControl().setRedraw(true);
 
-               setTourDirty();
+               if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
+                  if (isTemperatureValueOffset) {
 
-               // notify other viewers
-               fireModifyNotification();
+                     //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
+                     // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
 
-               /*
-                * Select back the previously selected indices
-                */
-               final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
-               final Table table = (Table) _timeSlice_Viewer.getControl();
+                     if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
 
-               table.setSelection(mappedTimeSlicesIndices);
-               table.showSelection();
+                        final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
+                        float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
 
+                        currentTemperatureFahrenheit += newTemperatureValue;
+                        final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
+
+                        _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
+
+                     } else {
+                        _serieTemperature[currentTimeSliceIndex] += newTemperatureValue;
+                     }
+
+                  } else {
+                     _serieTemperature[currentTimeSliceIndex] = newTemperatureValue;
+                  }
+                  tourDataModified = true;
+               }
             }
+
+            if (!tourDataModified) {
+               return;
+            }
+
+            // force recompute values, e.g. gradient
+            _tourData.clearComputedSeries();
+
+            // recompute min/max values
+            getDataSeriesFromTourData();
+
+            // update UI
+            updateUI_Tab_1_Tour();
+            updateUI_ReferenceTourRanges();
+
+            _timeSlice_Viewer.getControl().setRedraw(false);
+            {
+               _timeSlice_Viewer.refresh(true);
+            }
+            _timeSlice_Viewer.getControl().setRedraw(true);
+
+            setTourDirty();
+
+            // notify other viewers
+            fireModifyNotification();
+
+            /*
+             * Select back the previously selected indices
+             */
+            final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
+            final Table table = (Table) _timeSlice_Viewer.getControl();
+
+            table.setSelection(mappedTimeSlicesIndices);
+            table.showSelection();
+
          });
 
       }
@@ -7087,7 +6920,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
-      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
    }
 
    private void invalidateSliceViewers() {
@@ -7328,22 +7161,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    private void onSelect_Weather_Text() {
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            final boolean isDataRetrieved = TourManager.retrieveWeatherData(_tourData);
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+         final boolean isDataRetrieved = TourManager.retrieveWeatherData(_tourData);
 
-            if (isDataRetrieved) {
-               setTourDirty();
-               updateUI_FromModel(_tourData, false, true);
-            } else {
-               MessageDialog.openInformation(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.Dialog_RetrieveWeather_Dialog_Title,
-                     Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
-            }
-
+         if (isDataRetrieved) {
+            setTourDirty();
+            updateUI_FromModel(_tourData, false, true);
+         } else {
+            MessageDialog.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Dialog_RetrieveWeather_Dialog_Title,
+                  Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
          }
+
       });
 
    }
@@ -7734,16 +7564,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             updateStatusLine();
 
             // run async because reloadViewer is also running async
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getCurrent().asyncExec(() -> {
 
-                  if (_timeSlice_Viewer.getTable().isDisposed()) {
-                     return;
-                  }
-
-                  _timeSlice_Viewer.getTable().setFocus();
+               if (_timeSlice_Viewer.getTable().isDisposed()) {
+                  return;
                }
+
+               _timeSlice_Viewer.getTable().setFocus();
             });
          }
 
@@ -7758,18 +7585,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //          updateStatusLine();
 
             // run async because relaodViewer is also running async
-            Display.getCurrent().asyncExec(new Runnable() {
+            Display.getCurrent().asyncExec(() -> {
 
-               @Override
-               public void run() {
-
-                  if (_swimSlice_Viewer.getTable().isDisposed()) {
-                     return;
-                  }
-
-                  _swimSlice_Viewer.getTable().setFocus();
+               if (_swimSlice_Viewer.getTable().isDisposed()) {
+                  return;
                }
 
+               _swimSlice_Viewer.getTable().setFocus();
             });
          }
 
@@ -8876,12 +8698,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          final ArrayList<TourReference> refTourList = new ArrayList<>(refTours);
 
          // sort reference tours by start index
-         Collections.sort(refTourList, new Comparator<TourReference>() {
-            @Override
-            public int compare(final TourReference refTour1, final TourReference refTour2) {
-               return refTour1.getStartValueIndex() - refTour2.getStartValueIndex();
-            }
-         });
+         Collections.sort(refTourList, (refTour1, refTour2) -> refTour1.getStartValueIndex() - refTour2.getStartValueIndex());
 
          final StringBuilder sb = new StringBuilder();
          int refCounter = 0;

@@ -38,7 +38,6 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.internal.Activator;
 import net.tourbook.photo.internal.GalleryActionBar;
 import net.tourbook.photo.internal.GalleryType;
 import net.tourbook.photo.internal.Messages;
@@ -142,7 +141,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                         //$NON-NLS-1$
 
    private IDialogSettings        _state;
-   private final IPreferenceStore _prefStore                   = Activator.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore                   = PhotoActivator.getPrefStore();
 
    /*
     * worker thread management
