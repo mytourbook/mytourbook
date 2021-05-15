@@ -524,9 +524,9 @@ public class Map25ConfigManager {
          // <Outline>
          final IMemento xmlOutline = Util.setXmlRgb(xmlConfig, TAG_OUTLINE, config.outlineColor);
          {
+            xmlOutline.putBoolean(     ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, config.isShowDirectionArrow);
             xmlOutline.putFloat(       ATTR_OUTLINE_WIDTH,                   config.outlineWidth);
             xmlOutline.putInteger(     ATTR_OUTLINE_OPACITY,                 config.outlineOpacity);
-            xmlOutline.putBoolean(     ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, config.outlineShowDirectionArrow);
          }
 
          // <SliderPath>
@@ -724,10 +724,10 @@ public class Map25ConfigManager {
 
          case TAG_OUTLINE:
 
+            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, true);
             config.outlineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
             config.outlineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
             config.outlineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
-            config.outlineShowDirectionArrow = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, true);
             break;
 
          case TAG_SLIDER_PATH:

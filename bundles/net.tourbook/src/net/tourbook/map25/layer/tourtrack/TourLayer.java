@@ -18,7 +18,6 @@
 /*
  * Original: org.oscim.layers.PathLayer
  */
-
 package net.tourbook.map25.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -389,7 +388,8 @@ public class TourLayer extends Layer {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      if (trackConfig.outlineShowDirectionArrow) {
+      if (trackConfig.isShowDirectionArrow) {
+
          _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
          _bitmapArrow = _markertoolkit.drawTrackArrow(40,
