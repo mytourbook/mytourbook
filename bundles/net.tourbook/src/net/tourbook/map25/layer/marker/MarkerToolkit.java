@@ -352,7 +352,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return _bitmapStar;
    }
 
-   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int starColor) {
+   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int arrowColor) {
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
       final Bitmap bitmapTrackArrow = CanvasAdapter.newBitmap(bitmapArrowSize, bitmapArrowSize, 0);
       final float bitmapArrowSizeF = bitmapArrowSize - 1;
@@ -361,7 +361,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final Paint trackArrowPainter = CanvasAdapter.newPaint();
       trackArrowPainter.setStyle(Paint.Style.STROKE);
       trackArrowPainter.setStrokeWidth(6);
-      trackArrowPainter.setColor(starColor);
+      trackArrowPainter.setColor(arrowColor);
 
       defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1f, bitmapArrowSizeF, trackArrowPainter);
       defaultMarkerCanvas.drawLine(1f, bitmapArrowSizeF, 1f, 1f, trackArrowPainter);
