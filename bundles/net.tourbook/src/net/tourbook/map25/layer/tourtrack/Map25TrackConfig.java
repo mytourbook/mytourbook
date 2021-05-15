@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -31,9 +31,10 @@ public class Map25TrackConfig {
 	public String	name						= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
 	// outline
-	public float	outlineWidth				= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
-	public RGB		outlineColor				= Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
-	public int		outlineOpacity				= Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
+   public float   outlineWidth              = Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
+   public RGB     outlineColor              = Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
+   public int     outlineOpacity            = Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
+   public boolean outlineShowDirectionArrow = Map25ConfigManager.DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW;
 
 	// slider location
 	public boolean	isShowSliderLocation		= Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;
@@ -48,6 +49,7 @@ public class Map25TrackConfig {
 	public float	sliderPath_LineWidth		= Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
 	public int		sliderPath_Opacity			= Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
 
+
 	/**
 	 * Animation time in milli seconds when a tour is synched with the map, default is 2000 ms
 	 */
@@ -57,7 +59,7 @@ public class Map25TrackConfig {
 
 	/**
 	 * Create a copy of this object.
-	 * 
+	 *
 	 * @return a copy of this <code>Insets</code> object.
 	 */
 	@Override
