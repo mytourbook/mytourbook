@@ -106,6 +106,9 @@ Bugfix
   - Fixed a bug in the tour type viewer when selecting several tour types and only the first one was deleted.
   - Disabling the "Rename" button when more than 1 tour type is selected
 
+* Map25 Mapprovider (Thomas)
+  - map25 was not displayed correctly at the very first start of Mytourbook 343
+
 Translation    
 ===========
 
