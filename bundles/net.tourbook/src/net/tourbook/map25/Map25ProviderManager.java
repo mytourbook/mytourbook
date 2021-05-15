@@ -113,24 +113,6 @@ public class Map25ProviderManager {
    }
 
    /**
-    * mapilion.com/
-    */
-//   private static Map25Provider createMapProvider_Mapilion() {
-//
-//      final Map25Provider mapProvider = new Map25Provider();
-//
-//      mapProvider.isEnabled = true;
-//      mapProvider.name = Messages.Map25_Provider_Mapilion_Name;
-//      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
-//      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
-//      mapProvider.tileEncoding = TileEncoding.MP;
-//      mapProvider.theme = VtmThemes.OPENMAPTILES;
-//      mapProvider.description = Messages.Map25_Provider_Mapilion_Description;
-//
-//      return mapProvider;
-//   }
-
-   /**
     * Mapsforge
     */
    private static Map25Provider createMapProvider_Mapsforge() {
