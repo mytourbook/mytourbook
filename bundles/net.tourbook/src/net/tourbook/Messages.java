@@ -1939,6 +1939,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25TrackOptions_Label_OutlineColor;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
+   public static String Slideout_Map25TrackOptions_Label_DirectionArrows;
 
    public static String Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
