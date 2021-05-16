@@ -27,7 +27,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -352,8 +351,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return _bitmapStar;
    }
 
-   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int starColor) {
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+   public Bitmap drawTrackArrow(final int bitmapArrowSize, final int arrowColor) {
+      //final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
       final Bitmap bitmapTrackArrow = CanvasAdapter.newBitmap(bitmapArrowSize, bitmapArrowSize, 0);
       final float bitmapArrowSizeF = bitmapArrowSize - 1;
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
@@ -361,7 +360,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final Paint trackArrowPainter = CanvasAdapter.newPaint();
       trackArrowPainter.setStyle(Paint.Style.STROKE);
       trackArrowPainter.setStrokeWidth(6);
-      trackArrowPainter.setColor(starColor);
+      trackArrowPainter.setColor(arrowColor);
 
       defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1f, bitmapArrowSizeF, trackArrowPainter);
       defaultMarkerCanvas.drawLine(1f, bitmapArrowSizeF, 1f, 1f, trackArrowPainter);
