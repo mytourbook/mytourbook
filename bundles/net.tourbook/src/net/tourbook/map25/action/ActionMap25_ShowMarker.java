@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,10 +27,7 @@ import net.tourbook.map25.ui.SlideoutMap25_MarkerOptions;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -66,16 +63,10 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
       _map25View = map25View;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled).createImage();
+      _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker).createImage();
+      _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled).createImage();
 
-      parent.addDisposeListener(new DisposeListener() {
-
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> onDispose());
    }
 
    @Override
@@ -83,12 +74,9 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
       if (_actionToolItem == null && toolbar != null) {
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               _actionToolItem.dispose();
-               _actionToolItem = null;
-            }
+         toolbar.addDisposeListener(disposeEvent -> {
+            _actionToolItem.dispose();
+            _actionToolItem = null;
          });
 
          _toolBar = toolbar;
@@ -103,15 +91,12 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
             }
          });
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem, e);
-            }
+            onMouseMove(hoveredItem, mouseEvent);
          });
 
          _slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
