@@ -29,6 +29,8 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.IChartListener;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
@@ -203,8 +205,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_UndoEdit_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Undo_Disabled));
 
          setEnabled(false);
       }

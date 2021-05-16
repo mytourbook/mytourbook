@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import net.tourbook.common.color.ThemeUtil;
-
 import org.eclipse.jface.action.Action;
 
 public class ActionZoomOut extends Action {
@@ -30,8 +28,8 @@ public class ActionZoomOut extends Action {
       setText(Messages.Action_zoom_out);
       setToolTipText(Messages.Action_zoom_out_tooltip);
 
-      setImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_Out)));
-      setDisabledImageDescriptor(Activator.getImageDescriptor(ThemeUtil.getThemedImageName(ChartImages.Zoom_Out_Disabled)));
+      setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_Out));
+      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_Out_Disabled));
    }
 
    @Override

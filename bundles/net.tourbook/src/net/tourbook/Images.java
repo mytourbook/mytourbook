@@ -77,8 +77,6 @@ public class Images {
    public static final String App_Trash                                  = "trash.png";                                           //$NON-NLS-1$
    public static final String App_Trash_Disabled                         = "trash-disabled.png";                                  //$NON-NLS-1$
    public static final String App_Trash_Themed                           = "trash-blue.png";                                      //$NON-NLS-1$
-   public static final String App_UndoEdit                               = "undo_edit.gif";                                       //$NON-NLS-1$
-   public static final String App_UndoEdit_Disabled                      = "undo_edit_disabled.gif";                              //$NON-NLS-1$
 
    public static final String AdjustElevation                            = "adjust-altitude.png";                                 //$NON-NLS-1$
    public static final String AdjustElevation_Disabled                   = "adjust-altitude-disabled.png";                        //$NON-NLS-1$
@@ -193,7 +191,6 @@ public class Images {
    public static final String PhotoLinkWithTour                          = "photo-link-photo-with-tour.png";                      //$NON-NLS-1$
    public static final String PhotoSyncTour                              = "photo-sync-tour.png";                                 //$NON-NLS-1$
    public static final String PhotoTourPhotos                            = "photo-tour-photos.png";                               //$NON-NLS-1$
-   public static final String Pin_Blue                                   = "pin-blue.png";                                        //$NON-NLS-1$
    public static final String PulseZones                                 = "pulse-zones.png";                                     //$NON-NLS-1$
    public static final String PulseZones_Disabled                        = "pulse-zones-disabled.png";                            //$NON-NLS-1$
    public static final String RawData_DashboardUI                        = "import-dashboard.png";                                //$NON-NLS-1$

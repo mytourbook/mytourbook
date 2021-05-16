@@ -35,10 +35,12 @@ public class CommonImages {
    public static final String App_Filter_Disabled          = "app-filter-disabled.png";                   //$NON-NLS-1$
    public static final String App_Options                  = "options.png";                               //$NON-NLS-1$
    public static final String App_Options_Disabled         = "options-disabled.png";                      //$NON-NLS-1$
-   public static final String App_Pin_Themed               = "pin-blue.png";                              //$NON-NLS-1$
+   public static final String App_Pin                      = "app-pin.png";                               //$NON-NLS-1$
    public static final String App_ResetToDefault           = "app-default.png";                           //$NON-NLS-1$
    public static final String App_Turn_On                  = "app-turn-on.png";                           //$NON-NLS-1$
    public static final String App_Turn_Off                 = "app-turn-off.png";                          //$NON-NLS-1$
+   public static final String App_Undo                     = "app-undo.png";                              //$NON-NLS-1$
+   public static final String App_Undo_Disabled            = "app-undo-disabled.png";                     //$NON-NLS-1$
    public static final String App_Yes                      = "app-yes.png";                               //$NON-NLS-1$
    public static final String App_No                       = "app-no.png";                                //$NON-NLS-1$
 

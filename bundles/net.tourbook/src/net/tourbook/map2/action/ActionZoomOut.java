@@ -17,7 +17,6 @@ package net.tourbook.map2.action;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
@@ -35,8 +34,8 @@ public class ActionZoomOut extends Action {
 
       setToolTipText(Messages.map_action_zoom_out);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out)));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_Out_Disabled)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_Out_Disabled));
    }
 
    @Override

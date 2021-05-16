@@ -21,7 +21,6 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
@@ -45,7 +44,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourMarker_New)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
    }
 
    @Override

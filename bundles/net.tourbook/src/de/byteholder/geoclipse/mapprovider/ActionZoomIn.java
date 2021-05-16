@@ -19,7 +19,6 @@ import de.byteholder.geoclipse.Messages;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 
 import org.eclipse.jface.action.Action;
 
@@ -35,8 +34,8 @@ public class ActionZoomIn extends Action {
 
       setToolTipText(Messages.Map_Action_ZoomIn_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_In)));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_In_Disabled)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In_Disabled));
    }
 
    @Override

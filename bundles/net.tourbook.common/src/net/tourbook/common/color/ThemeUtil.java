@@ -170,6 +170,20 @@ public class ThemeUtil {
       return imageNameThemed;
    }
 
+   /**
+    * In the dark theme the right aligned text in a tree control is just left of the column
+    * separator which cannot be set hidden, it looks just awful
+    */
+   public static String getThemedTreeHeaderLabel(final String headerLabel) {
+
+      if (UI.isDarkTheme()) {
+
+         return headerLabel + UI.SPACE2;
+      }
+
+      return headerLabel;
+   }
+
    public static IThemeEngine getThemeEngine() {
 
       setupTheme();

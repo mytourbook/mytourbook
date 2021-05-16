@@ -21,7 +21,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartXSlider;
 import net.tourbook.chart.IChartContextProvider;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
@@ -48,7 +47,7 @@ public class ActionCreateMarkerFromSlider extends Action {
 
       super(text);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourMarker_New)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_New_Disabled));
 
       _chartContextProvider = chartContextProvider;
