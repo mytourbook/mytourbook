@@ -223,11 +223,11 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
             // spinner
             _spinnerOutline_Width = new Spinner(group, SWT.BORDER);
-            _spinnerOutline_Width.setDigits(1);
+            _spinnerOutline_Width.setDigits(1); //affects the increments !!!
             _spinnerOutline_Width.setMinimum((int) (Map25ConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
             _spinnerOutline_Width.setMaximum((int) (Map25ConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
-            _spinnerOutline_Width.setIncrement(1);
-            _spinnerOutline_Width.setPageIncrement(10);
+            _spinnerOutline_Width.setIncrement(5); // due setDigit(1) 5 results in 0.5 stepwidth
+            _spinnerOutline_Width.setPageIncrement(10); // 10 gives stepwidth 1
             _spinnerOutline_Width.addSelectionListener(_defaultSelectionListener);
             _spinnerOutline_Width.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
@@ -242,6 +242,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
             // label
             final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineColor);
+            label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             final Composite container = new Composite(group, SWT.NONE);
@@ -270,6 +271,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                    */
                   _chkShowDirectionArrows = new Button(group, SWT.CHECK);
                   _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
+                  _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
                   _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
                   GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
                }
@@ -389,11 +391,11 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
             // spinner
             _spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
-            _spinnerSliderPath_LineWidth.setDigits(1);
+            _spinnerSliderPath_LineWidth.setDigits(1); //affects the increments !!!
             _spinnerSliderPath_LineWidth.setMinimum((int) (Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_MIN * 10.0f));
             _spinnerSliderPath_LineWidth.setMaximum((int) (Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_MAX * 10.0f));
-            _spinnerSliderPath_LineWidth.setIncrement(1);
-            _spinnerSliderPath_LineWidth.setPageIncrement(10);
+            _spinnerSliderPath_LineWidth.setIncrement(5); // due setDigit(1) 5 results in 0.5 stepwidth
+            _spinnerSliderPath_LineWidth.setPageIncrement(10); // 10 gives stepwidth 1
             _spinnerSliderPath_LineWidth.addSelectionListener(_defaultSelectionListener);
             _spinnerSliderPath_LineWidth.addMouseWheelListener(_defaultMouseWheelListener);
          }
@@ -405,6 +407,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
             // label
             _lblSliderPath_Color = new Label(container, SWT.NONE);
             _lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
+            _lblSliderPath_Color.setToolTipText(Messages.Slideout_Map_Options_Label_SliderPath_Color_Tooltip);
             GridDataFactory.fillDefaults()
                   .indent(_firstColumnIndent, SWT.DEFAULT)
                   .align(SWT.FILL, SWT.CENTER)
