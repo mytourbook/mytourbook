@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,8 +30,8 @@ public class ActionShowMarker extends Action {
 
       super(Messages.Map3_Action_ShowMarker, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourMarker_Disabled));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled));
 
       _mapView = mapView;
    }

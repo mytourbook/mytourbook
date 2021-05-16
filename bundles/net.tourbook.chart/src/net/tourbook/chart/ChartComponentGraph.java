@@ -25,6 +25,7 @@ import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -1567,6 +1568,7 @@ public class ChartComponentGraph extends Canvas {
          } else {
             gcChart.setBackground(_backgroundColor);
          }
+
          gcChart.fillRectangle(_chartImage_20_Chart.getBounds());
 
          if (_chartComponents.errorMessage == null) {
@@ -5274,6 +5276,7 @@ public class ChartComponentGraph extends Canvas {
          if (_backgroundColor == null) {
             setupColors();
          }
+
          gc.setBackground(_backgroundColor);
          gc.fillRectangle(_clientArea);
 
@@ -9023,13 +9026,15 @@ public class ChartComponentGraph extends Canvas {
 
    private void setupColors() {
 
-      _backgroundColor = UI.isDarkTheme()
-            ? _chart.getBackground() // this is the theme background color
-            : _chart.getBackgroundColor();
+      final boolean isDarkTheme = UI.isDarkTheme();
 
-      _foregroundColor = UI.isDarkTheme()
-            ? _chart.getForeground() // this is the theme foreground color
+      _foregroundColor = isDarkTheme
+            ? ThemeUtil.getDarkestForegroundColor()
             : _chart.getForeground();
+
+      _backgroundColor = isDarkTheme
+            ? ThemeUtil.getDarkestBackgroundColor()
+            : _chart.getBackgroundColor();
    }
 
    void setXSliderAreaVisible(final boolean isXSliderAreaVisible) {
