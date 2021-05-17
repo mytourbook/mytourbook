@@ -135,7 +135,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
          super(Messages.Tooltip_ValuePoint_Action_CloseContextMenu);
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -150,7 +150,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
          setText(Messages.Action_ToolTip_Hide);
 
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

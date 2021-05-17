@@ -127,7 +127,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
          super(null, Action.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.App_Action_Close_ToolTip);
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close_Tooltip));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override

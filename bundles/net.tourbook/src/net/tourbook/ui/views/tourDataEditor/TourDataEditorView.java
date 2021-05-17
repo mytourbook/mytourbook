@@ -102,7 +102,6 @@ import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionExtractTour;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.ActionSplitTour;
 import net.tourbook.ui.tourChart.ChartLabel;
@@ -496,8 +495,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ActionEditTimeSlicesValues       _actionEditTimeSlicesValues;
    private ActionExport                     _actionExportTour;
    private ActionExtractTour                _actionExtractTour;
-   private ActionModifyColumns              _actionModify_TimeSliceColumns;
-   private ActionModifyColumns              _actionModify_SwimSliceColumns;
    private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
    private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
@@ -2783,8 +2780,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _actionViewSettings = new ActionViewSettings();
 
-      _actionModify_TimeSliceColumns = new ActionModifyColumns(_timeSlice_TourViewer);
-      _actionModify_SwimSliceColumns = new ActionModifyColumns(_swimSlice_TourViewer);
 
       _tagMenuMgr = new TagMenuManager(this, false);
 
@@ -6154,8 +6149,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   && (_isManualTour == false));
       _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-      _actionModify_TimeSliceColumns.setEnabled(isCellEditorInactive && isTimeSlice_ViewerTab);
-      _actionModify_SwimSliceColumns.setEnabled(isCellEditorInactive && isSwimSlice_ViewerTab);
 
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
       _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
@@ -6431,10 +6424,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * fill toolbar view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
-      menuMgr.add(_actionModify_TimeSliceColumns);
-      menuMgr.add(_actionModify_SwimSliceColumns);
    }
 
    /**

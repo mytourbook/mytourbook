@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
-import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -149,8 +148,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Navigate_Previous));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Right_Disabled));
       }
 
       @Override
@@ -167,8 +166,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Navigate_Next));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
       }
 
       @Override
@@ -185,8 +184,8 @@ public class TourCatalogView_ComparedTour extends TourChartViewPart implements I
 
          setToolTipText(Messages.tourCatalog_view_action_save_marker);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Save_Disabled));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save_Disabled));
 
          setEnabled(false);
       }

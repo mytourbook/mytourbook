@@ -84,7 +84,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
          setToolTipText(Messages.App_Action_Close_Tooltip);
 
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.App_Close_Themed));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
       @Override
@@ -118,7 +118,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
          setToolTipText(Messages.Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip);
 
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.BookOpen_Themed));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_KeepOpen));
       }
 
       @Override

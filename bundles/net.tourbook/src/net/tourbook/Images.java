@@ -49,8 +49,6 @@ public class Images {
    public static final String App_Edit                                   = "quick-edit.png";                                      //$NON-NLS-1$
    public static final String App_Edit_Disabled                          = "quick-edit-disabled.png";                             //$NON-NLS-1$
    public static final String App_EmptyIcon_Placeholder                  = "icon-placeholder.gif";                                //$NON-NLS-1$
-   public static final String App_Navigate_Next                          = "backward_nav.gif";                                    //$NON-NLS-1$
-   public static final String App_Navigate_Previous                      = "forward_nav.gif";                                     //$NON-NLS-1$
    public static final String App_OK                                     = "16px-Crystal_Clear_action_apply.png";                 //$NON-NLS-1$
    public static final String App_Paste                                  = "paste_edit.png";                                      //$NON-NLS-1$
    public static final String App_Placeholder16                          = "placeholder16.png";                                   //$NON-NLS-1$
@@ -65,9 +63,6 @@ public class Images {
    public static final String App_Remove_Disabled                        = "remove-disabled.png";                                 //$NON-NLS-1$
    public static final String App_RemoveAll                              = "remove-all.png";                                      //$NON-NLS-1$
    public static final String App_RemoveAll_Disabled                     = "remove-all-disabled.png";                             //$NON-NLS-1$
-   public static final String App_Save                                   = "floppy_disc.png";                                     //$NON-NLS-1$
-   public static final String App_Save_Disabled                          = "floppy_disc_disabled.png";                            //$NON-NLS-1$
-   public static final String App_Save_File                              = "floppy_disc2.png";                                    //$NON-NLS-1$
    public static final String App_SequenceNumber                         = "app-sequence-number.png";                             //$NON-NLS-1$
    public static final String App_SequenceNumber_Disabled                = "app-sequence-number-disabled.png";                    //$NON-NLS-1$
    public static final String App_Sort                                   = "app-sort.png";                                        //$NON-NLS-1$

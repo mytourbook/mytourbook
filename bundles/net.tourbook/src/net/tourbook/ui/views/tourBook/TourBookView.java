@@ -80,7 +80,6 @@ import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionJoinTours;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
@@ -330,7 +329,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionJoinTours                 _actionJoinTours;
    private ActionLinkWithOtherViews        _actionLinkWithOtherViews;
    private ActionMergeTour                 _actionMergeTour;
-   private ActionModifyColumns             _actionModifyColumns;
    private ActionOpenTour                  _actionOpenTour;
    private ActionOpenMarkerDialog          _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
@@ -1157,7 +1155,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
       _actionMergeTour = new ActionMergeTour(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
@@ -1817,8 +1814,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
       menuMgr.add(_actionRefreshView);
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
 
       /*
        * fill view toolbar
