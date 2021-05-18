@@ -26,6 +26,7 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -71,7 +72,8 @@ public class ThemeUtil {
     * table.getBackground()   Color {47, 47, 47, 255}
     * </pre>
     */
-   private static Color        _darkestBackgroundColor;
+   private static Color        _defaultBackgroundColor_Table;
+   private static Color        _defaultBackgroundColor_TableHeader;
 
    /**
     * <pre>
@@ -81,7 +83,11 @@ public class ThemeUtil {
     * table.getForeground() Color {238, 238, 238, 255}
     * </pre>
     */
-   private static Color        _darkestForegroundColor;
+   private static Color        _defaultForegroundColor_Table;
+   private static Color        _defaultForegroundColor_TableHeader;
+
+   private static Color        _defaultForegroundColor_Combo;
+   private static Color        _defaultBackgroundColor_Combo;
 
    /**
     * These are all Eclipse themes when using W10:
@@ -141,12 +147,48 @@ public class ThemeUtil {
     */
    public static Color getDarkestBackgroundColor() {
 
-      return _darkestBackgroundColor;
+      return _defaultBackgroundColor_Table;
    }
 
    public static Color getDarkestForegroundColor() {
 
-      return _darkestForegroundColor;
+      return _defaultForegroundColor_Table;
+   }
+
+   public static Color getDefaultBackgroundColor_Combo() {
+      return _defaultBackgroundColor_Combo;
+   }
+
+   /**
+    * @return Returns the table default background color for light or dark theme
+    */
+   public static Color getDefaultBackgroundColor_Table() {
+      return _defaultBackgroundColor_Table;
+   }
+
+   /**
+    * @return Returns the table header default background color for light or dark theme
+    */
+   public static Color getDefaultBackgroundColor_TableHeader() {
+      return _defaultBackgroundColor_TableHeader;
+   }
+
+   public static Color getDefaultForegroundColor_Combo() {
+      return _defaultForegroundColor_Combo;
+   }
+
+   /**
+    * @return Returns the table default foreground color for light or dark theme
+    */
+   public static Color getDefaultForegroundColor_Table() {
+      return _defaultForegroundColor_Table;
+   }
+
+   /**
+    * @return Returns the table header default foreground color for light or dark theme
+    */
+   public static Color getDefaultForegroundColor_TableHeader() {
+      return _defaultForegroundColor_TableHeader;
    }
 
    /**
@@ -270,6 +312,8 @@ public class ThemeUtil {
       }
 
       final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+      final Combo combo = new Combo(shell, SWT.READ_ONLY);
       final Table table = new Table(shell, SWT.BORDER);
 
 //      System.out.println((System.currentTimeMillis() + " shell.getBackground()      1 " + shell.getBackground()));
@@ -284,10 +328,19 @@ public class ThemeUtil {
 //         System.out.println((System.currentTimeMillis() + " shell.getForeground()      2 " + shell.getForeground()));
 //         System.out.println((System.currentTimeMillis() + " table.getForeground()      2 " + table.getForeground()));
 
+         _defaultForegroundColor_Combo = combo.getForeground();
+         _defaultBackgroundColor_Combo = combo.getBackground();
+
          // I found, that a table do have a darker background color than the shell
 
-         _darkestForegroundColor = table.getForeground();
-         _darkestBackgroundColor = table.getBackground();
+         _defaultForegroundColor_Table = table.getForeground();
+         _defaultBackgroundColor_Table = table.getBackground();
+
+         _defaultForegroundColor_TableHeader = table.getHeaderForeground();
+         _defaultBackgroundColor_TableHeader = table.getHeaderBackground();
+
+         combo.dispose();
+         table.dispose();
       });
 
    }
