@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -39,434 +39,441 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class TourTypeImage {
 
-	private static final String								TOUR_TYPE_PREFIX		= "tourType";						//$NON-NLS-1$
+   private static final String                           TOUR_TYPE_PREFIX      = "tourType";     //$NON-NLS-1$
 
-// SET_FORMATTING_OFF
-	
-	private final static HashMap<String, Image>				_imageCache				= new HashMap<String, Image>();
-	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor	= new HashMap<String, ImageDescriptor>();
-	private final static HashMap<String, Boolean>			_dirtyImages			= new HashMap<String, Boolean>();
-	
-// SET_FORMATTING_ON
+   private final static HashMap<String, Image>           _imageCache           = new HashMap<>();
+   private final static HashMap<String, ImageDescriptor> _imageCacheDescriptor = new HashMap<>();
+   private final static HashMap<String, Boolean>         _dirtyImages          = new HashMap<>();
 
-	private static Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
+   private static Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
 
-		final Image swtTourTypeImage = createTourTypeImage_Create(typeId, existingImage);
+      final Image swtTourTypeImage = createTourTypeImage_Create(typeId, existingImage);
 
-		// keep image in cache
-		_imageCache.put(colorId, swtTourTypeImage);
+      // keep image in cache
+      _imageCache.put(colorId, swtTourTypeImage);
 
-		return swtTourTypeImage;
-	}
+      return swtTourTypeImage;
+   }
 
-	private static Image createTourTypeImage_Create(final long typeId, final Image existingImageSWT) {
+   private static Image createTourTypeImage_Create(final long typeId, final Image existingImageSWT) {
 
-		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
+      final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 
-		final BufferedImage awtImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_4BYTE_ABGR);
+      final BufferedImage awtImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_4BYTE_ABGR);
 
-		final Graphics2D g2d = awtImage.createGraphics();
+      final Graphics2D g2d = awtImage.createGraphics();
 
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 100);
-		g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-		g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-		g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+      g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 100);
+      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
-		try {
+      try {
 
-			drawTourTypeImage(typeId, g2d);
+         drawTourTypeImage(typeId, g2d);
 
-			final Image newImageSWT = ImageConverter.convertIntoSWT(awtImage);
+         final Image newImageSWT = ImageConverter.convertIntoSWT(awtImage);
 
-			if (existingImageSWT == null) {
+         if (existingImageSWT == null) {
 
-				return newImageSWT;
+            return newImageSWT;
 
-			} else {
+         } else {
 
-				// draw into existing image
+            // draw into existing image -> return old SWT image
 
-				final GC gc = new GC(existingImageSWT);
-				{
-					gc.drawImage(newImageSWT, 0, 0);
-				}
-				gc.dispose();
+//            existingImageSWT.setBackground();
 
-				return existingImageSWT;
-			}
+            final GC gc = new GC(existingImageSWT);
+            {
+               // cleanup old image
 
-		} finally {
-			g2d.dispose();
-		}
-	}
 
-	/**
-	 * Dispose images
-	 */
-	public static void dispose() {
+//               // set all transparent
+//               gc.setAlpha(0xff);
+//               gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//               gc.fillRectangle(existingImageSWT.getBounds());
+//
+//               gc.setAlpha(0xff);
+               gc.drawImage(newImageSWT, 0, 0);
+            }
+            newImageSWT.dispose();
+            gc.dispose();
 
-		for (final Image image : _imageCache.values()) {
-			image.dispose();
-		}
+            return existingImageSWT;
+         }
 
-		_imageCache.clear();
-		_imageCacheDescriptor.clear();
-	}
+      } finally {
+         g2d.dispose();
+      }
+   }
 
-	private static void drawTourTypeImage(final long typeId, final Graphics2D g2d) {
+   /**
+    * Dispose images
+    */
+   public static void dispose() {
 
-		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
+      for (final Image image : _imageCache.values()) {
+         image.dispose();
+      }
 
-			// create a default image
+      _imageCache.clear();
+      _imageCacheDescriptor.clear();
+   }
 
-		} else if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+   private static void drawTourTypeImage(final long typeId, final Graphics2D g2d) {
 
-			// make the image invisible
-			return;
-		}
+      if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
 
-		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
-		final DrawingColorsAWT drawingColors = getTourTypeColors(typeId);
+         // create a default image
 
-		drawTourTypeImage_Background(g2d, imageSize, drawingColors);
-		drawTourTypeImage_Border(g2d, imageSize, drawingColors);
-	}
+      } else if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-	private static void drawTourTypeImage_Background(	final Graphics2D g2d,
-														final int imageSize,
-														final DrawingColorsAWT drawingColors) {
+         // make the image invisible
+         return;
+      }
 
-		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+      final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
+      final DrawingColorsAWT drawingColors = getTourTypeColors(typeId);
 
-		if (imageConfig.imageLayout == TourTypeLayout.NOTHING) {
-			// nothing to do
-			return;
-		}
+      drawTourTypeImage_Background(g2d, imageSize, drawingColors);
+      drawTourTypeImage_Border(g2d, imageSize, drawingColors);
+   }
 
-		final int imageSize2 = imageSize / 2;
+   private static void drawTourTypeImage_Background(final Graphics2D g2d,
+                                                    final int imageSize,
+                                                    final DrawingColorsAWT drawingColors) {
 
-		boolean isRectangle = false;
-		boolean isOval = false;
-		boolean isGradient = false;
-		boolean isHorizontal = false;
-		boolean isVertical = false;
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-		switch (imageConfig.imageLayout) {
+      if (imageConfig.imageLayout == TourTypeLayout.NOTHING) {
+         // nothing to do
+         return;
+      }
 
-		case RECTANGLE:
-			isRectangle = true;
-			break;
+      final int imageSize2 = imageSize / 2;
 
-		case CIRCLE:
-			isOval = true;
-			break;
+      boolean isRectangle = false;
+      boolean isOval = false;
+      boolean isGradient = false;
+      boolean isHorizontal = false;
+      boolean isVertical = false;
 
-		case GRADIENT_HORIZONTAL:
-			isRectangle = true;
-			isGradient = true;
-			isHorizontal = true;
-			break;
+      switch (imageConfig.imageLayout) {
 
-		case GRADIENT_VERTICAL:
-			isRectangle = true;
-			isGradient = true;
-			isVertical = true;
-			break;
+      case RECTANGLE:
+         isRectangle = true;
+         break;
 
-		case NOTHING:
-			break;
-		}
+      case CIRCLE:
+         isOval = true;
+         break;
 
-		if (isGradient) {
+      case GRADIENT_HORIZONTAL:
+         isRectangle = true;
+         isGradient = true;
+         isHorizontal = true;
+         break;
 
-			final Color color1 = getColor(imageConfig.imageColor1, drawingColors);
-			final Color color2 = getColor(imageConfig.imageColor2, drawingColors);
+      case GRADIENT_VERTICAL:
+         isRectangle = true;
+         isGradient = true;
+         isVertical = true;
+         break;
 
-			if (isHorizontal) {
+      case NOTHING:
+         break;
+      }
 
-				g2d.setPaint(new GradientPaint(0, imageSize2, color1, imageSize, imageSize2, color2));
+      if (isGradient) {
 
-			} else if (isVertical) {
+         final Color color1 = getColor(imageConfig.imageColor1, drawingColors);
+         final Color color2 = getColor(imageConfig.imageColor2, drawingColors);
 
-				g2d.setPaint(new GradientPaint(imageSize2, 0, color1, imageSize2, imageSize, color2));
-			}
+         if (isHorizontal) {
 
-		} else {
+            g2d.setPaint(new GradientPaint(0, imageSize2, color1, imageSize, imageSize2, color2));
 
-			// no gradient
+         } else if (isVertical) {
 
-			final Color color = getColor(imageConfig.imageColor1, drawingColors);
-			g2d.setColor(color);
-		}
+            g2d.setPaint(new GradientPaint(imageSize2, 0, color1, imageSize2, imageSize, color2));
+         }
 
-		if (isRectangle) {
+      } else {
 
-			g2d.fillRect(0, 0, imageSize, imageSize);
+         // no gradient
 
-		} else if (isOval) {
+         final Color color = getColor(imageConfig.imageColor1, drawingColors);
+         g2d.setColor(color);
+      }
 
-			g2d.fillOval(0, 0, imageSize, imageSize);
-		}
-	}
+      if (isRectangle) {
 
-	private static void drawTourTypeImage_Border(	final Graphics2D g2d,
-													final int imageSize,
-													final DrawingColorsAWT drawingColors) {
+         g2d.fillRect(0, 0, imageSize, imageSize);
 
-		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
-		final int borderWidth = imageConfig.borderWidth;
+      } else if (isOval) {
 
-		if (borderWidth == 0) {
-			// nothing to do
-			return;
-		}
+         g2d.fillOval(0, 0, imageSize, imageSize);
+      }
+   }
 
+   private static void drawTourTypeImage_Border(final Graphics2D g2d,
+                                                final int imageSize,
+                                                final DrawingColorsAWT drawingColors) {
 
-		boolean isCircle = false;
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+      final int borderWidth = imageConfig.borderWidth;
 
-		boolean isLeft = false;
-		boolean isRight = false;
-		boolean isTop = false;
-		boolean isBottom = false;
+      if (borderWidth == 0) {
+         // nothing to do
+         return;
+      }
 
-		switch (imageConfig.borderLayout) {
+      boolean isCircle = false;
 
-		case BORDER_RECTANGLE:
-			isLeft = true;
-			isRight = true;
-			isTop = true;
-			isBottom = true;
-			break;
+      boolean isLeft = false;
+      boolean isRight = false;
+      boolean isTop = false;
+      boolean isBottom = false;
 
-		case BORDER_CIRCLE:
-			isCircle = true;
-			break;
+      switch (imageConfig.borderLayout) {
 
-		case BORDER_LEFT:
-			isLeft = true;
-			break;
-		case BORDER_RIGHT:
-			isRight = true;
-			break;
-		case BORDER_LEFT_RIGHT:
-			isLeft = true;
-			isRight = true;
-			break;
+      case BORDER_RECTANGLE:
+         isLeft = true;
+         isRight = true;
+         isTop = true;
+         isBottom = true;
+         break;
 
-		case BORDER_TOP:
-			isTop = true;
-			break;
-		case BORDER_BOTTOM:
-			isBottom = true;
-			break;
-		case BORDER_TOP_BOTTOM:
-			isTop = true;
-			isBottom = true;
-			break;
+      case BORDER_CIRCLE:
+         isCircle = true;
+         break;
 
-		default:
-			break;
-		}
+      case BORDER_LEFT:
+         isLeft = true;
+         break;
+      case BORDER_RIGHT:
+         isRight = true;
+         break;
+      case BORDER_LEFT_RIGHT:
+         isLeft = true;
+         isRight = true;
+         break;
 
-		final Color color1 = getColor(imageConfig.borderColor, drawingColors);
+      case BORDER_TOP:
+         isTop = true;
+         break;
+      case BORDER_BOTTOM:
+         isBottom = true;
+         break;
+      case BORDER_TOP_BOTTOM:
+         isTop = true;
+         isBottom = true;
+         break;
 
-		if (isCircle) {
+      default:
+         break;
+      }
 
-			g2d.setStroke(new BasicStroke(borderWidth));
-			g2d.setColor(color1);
+      final Color color1 = getColor(imageConfig.borderColor, drawingColors);
 
-			/*
-			 * Highly complicated formula that the oval outline has the correct size, needed some
-			 * experimenting time to get it.
-			 */
-			final float ovalPos = (borderWidth / 2f) + 0.5f;
-			final int ovalPosInt = (int) ovalPos;
-			final float ovalSize = imageSize - ovalPosInt - borderWidth / 2f;
-			final int ovalSizeInt = (int) ovalSize;
+      if (isCircle) {
 
-			g2d.drawOval(//
-					ovalPosInt,
-					ovalPosInt,
-					ovalSizeInt,
-					ovalSizeInt);
+         g2d.setStroke(new BasicStroke(borderWidth));
+         g2d.setColor(color1);
 
-		} else if (isLeft || isRight || isTop || isBottom) {
+         /*
+          * Highly complicated formula that the oval outline has the correct size, needed some
+          * experimenting time to get it.
+          */
+         final float ovalPos = (borderWidth / 2f) + 0.5f;
+         final int ovalPosInt = (int) ovalPos;
+         final float ovalSize = imageSize - ovalPosInt - borderWidth / 2f;
+         final int ovalSizeInt = (int) ovalSize;
 
-			g2d.setColor(color1);
+         g2d.drawOval(//
+               ovalPosInt,
+               ovalPosInt,
+               ovalSizeInt,
+               ovalSizeInt);
 
-			if (isLeft) {
+      } else if (isLeft || isRight || isTop || isBottom) {
 
-				g2d.fillRect(0, 0, borderWidth, imageSize);
-			}
+         g2d.setColor(color1);
 
-			if (isRight) {
+         if (isLeft) {
 
-				g2d.fillRect(imageSize - borderWidth, 0, borderWidth, imageSize);
-			}
+            g2d.fillRect(0, 0, borderWidth, imageSize);
+         }
 
-			if (isTop) {
+         if (isRight) {
 
-				g2d.fillRect(0, 0, imageSize, borderWidth);
-			}
+            g2d.fillRect(imageSize - borderWidth, 0, borderWidth, imageSize);
+         }
 
-			if (isBottom) {
+         if (isTop) {
 
-				g2d.fillRect(0, imageSize - borderWidth, imageSize, borderWidth);
-			}
-		}
+            g2d.fillRect(0, 0, imageSize, borderWidth);
+         }
 
-	}
+         if (isBottom) {
 
-	private static Color getColor(final TourTypeColor imageColor, final DrawingColorsAWT drawingColors) {
+            g2d.fillRect(0, imageSize - borderWidth, imageSize, borderWidth);
+         }
+      }
 
-		switch (imageColor) {
-		case COLOR_BRIGHT:
-			return drawingColors.colorBright;
+   }
 
-		case COLOR_LINE:
-			return drawingColors.colorLine;
+   private static Color getColor(final TourTypeColor imageColor, final DrawingColorsAWT drawingColors) {
 
-		case COLOR_DARK:
-		default:
-			return drawingColors.colorDark;
-		}
-	}
+      switch (imageColor) {
+      case COLOR_BRIGHT:
+         return drawingColors.colorBright;
 
-	/**
-	 * @param graphColor
-	 * @return return the color for the graph
-	 */
-	private static DrawingColorsAWT getTourTypeColors(final long tourTypeId) {
+      case COLOR_LINE:
+         return drawingColors.colorLine;
 
-		final DrawingColorsAWT drawingColors = new DrawingColorsAWT();
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+      case COLOR_DARK:
+      default:
+         return drawingColors.colorDark;
+      }
+   }
 
-		TourType colorTourType = null;
+   /**
+    * @param graphColor
+    * @return return the color for the graph
+    */
+   private static DrawingColorsAWT getTourTypeColors(final long tourTypeId) {
 
-		for (final TourType tourType : tourTypes) {
-			if (tourType.getTypeId() == tourTypeId) {
-				colorTourType = tourType;
-				break;
-			}
-		}
+      final DrawingColorsAWT drawingColors = new DrawingColorsAWT();
+      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
-		if (tourTypeId == TourType.IMAGE_KEY_DIALOG_SELECTION
-				|| colorTourType == null
-				|| colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+      TourType colorTourType = null;
 
-			// tour type was not found use default color
+      for (final TourType tourType : tourTypes) {
+         if (tourType.getTypeId() == tourTypeId) {
+            colorTourType = tourType;
+            break;
+         }
+      }
 
-			drawingColors.colorBright = java.awt.Color.YELLOW;
-			drawingColors.colorDark = java.awt.Color.PINK;
-			drawingColors.colorLine = java.awt.Color.DARK_GRAY;
+      if (tourTypeId == TourType.IMAGE_KEY_DIALOG_SELECTION
+            || colorTourType == null
+            || colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-		} else {
+         // tour type was not found use default color
 
-			final RGB rgbBright = colorTourType.getRGBBright();
-			final RGB rgbDark = colorTourType.getRGBDark();
-			final RGB rgbLine = colorTourType.getRGBLine();
+         drawingColors.colorBright = java.awt.Color.YELLOW;
+         drawingColors.colorDark = java.awt.Color.PINK;
+         drawingColors.colorLine = java.awt.Color.DARK_GRAY;
 
-			drawingColors.colorBright = new java.awt.Color(rgbBright.red, rgbBright.green, rgbBright.blue);
-			drawingColors.colorDark = new java.awt.Color(rgbDark.red, rgbDark.green, rgbDark.blue);
-			drawingColors.colorLine = new java.awt.Color(rgbLine.red, rgbLine.green, rgbLine.blue);
-		}
+      } else {
 
-		return drawingColors;
-	}
+         final RGB rgbBright = colorTourType.getRGBBright();
+         final RGB rgbDark = colorTourType.getRGBDark();
+         final RGB rgbLine = colorTourType.getRGBLine();
 
-	/**
-	 * @param typeId
-	 * @return Returns an image which represents the tour type. This image must not be disposed,
-	 *         this is done when the app closes.
-	 */
-	public static Image getTourTypeImage(final long typeId) {
+         drawingColors.colorBright = new java.awt.Color(rgbBright.red, rgbBright.green, rgbBright.blue);
+         drawingColors.colorDark = new java.awt.Color(rgbDark.red, rgbDark.green, rgbDark.blue);
+         drawingColors.colorLine = new java.awt.Color(rgbLine.red, rgbLine.green, rgbLine.blue);
+      }
 
-		return getTourTypeImage(typeId, false);
-	}
+      return drawingColors;
+   }
 
-	public static Image getTourTypeImage(final long typeId, final boolean canDisposeOldImage) {
+   /**
+    * @param typeId
+    * @return Returns an image which represents the tour type. This image must not be disposed,
+    *         this is done when the app closes.
+    */
+   public static Image getTourTypeImage(final long typeId) {
 
-		final String keyColorId = TOUR_TYPE_PREFIX + typeId;
-		final Image existingImage = _imageCache.get(keyColorId);
+      return getTourTypeImage(typeId, false);
+   }
 
-		// check if image is available
-		if (existingImage != null && existingImage.isDisposed() == false) {
+   public static Image getTourTypeImage(final long typeId, final boolean canDisposeOldImage) {
 
-			// check if the image is dirty
-			if (_dirtyImages.containsKey(keyColorId) == false) {
+      final String keyColorId = TOUR_TYPE_PREFIX + typeId;
+      final Image existingImage = _imageCache.get(keyColorId);
 
-				// image is available and not dirty
-				return existingImage;
+      // check if image is available
+      if (existingImage != null && existingImage.isDisposed() == false) {
 
-			} else {
+         // check if the image is dirty
+         if (_dirtyImages.containsKey(keyColorId) == false) {
 
-				// image is available and dirty
+            // image is available and not dirty
+            return existingImage;
 
-				if (canDisposeOldImage) {
+         } else {
 
-					existingImage.dispose();
-				}
-			}
-		}
+            // image is available and dirty
 
-		// create image for the tour type
+            if (canDisposeOldImage) {
 
-		if (existingImage == null || existingImage.isDisposed()) {
+               existingImage.dispose();
+            }
+         }
+      }
 
-			return createTourTypeImage(typeId, keyColorId, null);
+      // create image for the tour type
 
-		} else {
+      if (existingImage == null || existingImage.isDisposed()) {
 
-			// old tour type image is available and not disposed but needs to be updated
+         return createTourTypeImage(typeId, keyColorId, null);
 
-			return createTourTypeImage(typeId, keyColorId, existingImage);
-		}
-	}
+      } else {
 
-	/**
-	 * The image descriptor is cached because the creation takes system resources and it's called
-	 * very often
-	 * 
-	 * @param tourTypeId
-	 *            Tour type id
-	 * @return Returns image descriptor for the tour type id
-	 */
-	public static ImageDescriptor getTourTypeImageDescriptor(final long tourTypeId) {
+         // old tour type image is available and not disposed but needs to be updated
 
-		final String keyColorId = TOUR_TYPE_PREFIX + tourTypeId;
-		final ImageDescriptor existingDescriptor = _imageCacheDescriptor.get(keyColorId);
+         return createTourTypeImage(typeId, keyColorId, existingImage);
+      }
+   }
 
-		if (existingDescriptor != null) {
-			return existingDescriptor;
-		}
+   /**
+    * The image descriptor is cached because the creation takes system resources and it's called
+    * very often
+    *
+    * @param tourTypeId
+    *           Tour type id
+    * @return Returns image descriptor for the tour type id
+    */
+   public static ImageDescriptor getTourTypeImageDescriptor(final long tourTypeId) {
 
-		final Image tourTypeImage = getTourTypeImage(tourTypeId);
-		final ImageDescriptor newImageDesc = ImageDescriptor.createFromImage(tourTypeImage);
+      final String keyColorId = TOUR_TYPE_PREFIX + tourTypeId;
+      final ImageDescriptor existingDescriptor = _imageCacheDescriptor.get(keyColorId);
 
-		_imageCacheDescriptor.put(keyColorId, newImageDesc);
+      if (existingDescriptor != null) {
+         return existingDescriptor;
+      }
 
-		return newImageDesc;
-	}
+      final Image tourTypeImage = getTourTypeImage(tourTypeId);
+      final ImageDescriptor newImageDesc = ImageDescriptor.createFromImage(tourTypeImage);
 
-	/**
-	 * Set dirty state for all tour type images, images cannot be disposed because they are
-	 * displayed in the UI
-	 */
-	public static void setTourTypeImagesDirty() {
+      _imageCacheDescriptor.put(keyColorId, newImageDesc);
 
-		for (final String imageId : _imageCache.keySet()) {
+      return newImageDesc;
+   }
 
-			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
-				_dirtyImages.put(imageId, true);
-			}
-		}
+   /**
+    * Set dirty state for all tour type images, images cannot be disposed because they are
+    * displayed in the UI
+    */
+   public static void setTourTypeImagesDirty() {
 
-		_imageCacheDescriptor.clear();
-	}
+      for (final String imageId : _imageCache.keySet()) {
+
+         if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
+            _dirtyImages.put(imageId, true);
+         }
+      }
+
+      _imageCacheDescriptor.clear();
+   }
 
 }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -78,6 +80,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -93,7 +96,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PlatformUI;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
@@ -338,8 +340,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
        * create tree layout
        */
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(200, 100)
             .applyTo(layoutContainer);
@@ -515,18 +516,21 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
    private void createUI_30_ImageLayout(final Composite parent) {
 
-      final SelectionAdapter selectionListener = new SelectionAdapter() {
+      final SelectionListener selectionListener = widgetSelectedAdapter(selectionEvent -> {
+         onSelectImageLayout();
+      });
 
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectImageLayout();
-         }
-      };
-
-      final MouseWheelListener mouseWheelListener = mouseEvent -> {
-         net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+      final MouseWheelListener mouseWheelListener_Spinner = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onSelectImageLayout();
       };
+
+      final MouseWheelListener mouseWheelListener_Combo = mouseEvent -> {
+         onSelectImageLayout();
+      };
+
+      final GridDataFactory gridData_AlignVerticalCenter = GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.CENTER);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -540,10 +544,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             // label
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
+            gridData_AlignVerticalCenter.applyTo(label);
 
             final Composite containerImage = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
@@ -553,16 +554,19 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                _comboFillLayout = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboFillLayout.setVisibleItemCount(20);
                _comboFillLayout.addSelectionListener(selectionListener);
+               _comboFillLayout.addMouseWheelListener(mouseWheelListener_Combo);
 
                // combo color 1
                _comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboFillColor1.setVisibleItemCount(20);
                _comboFillColor1.addSelectionListener(selectionListener);
+               _comboFillColor1.addMouseWheelListener(mouseWheelListener_Combo);
 
                // combo color 2
                _comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboFillColor2.setVisibleItemCount(20);
                _comboFillColor2.addSelectionListener(selectionListener);
+               _comboFillColor2.addMouseWheelListener(mouseWheelListener_Combo);
             }
          }
          {
@@ -573,10 +577,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             // label
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
+            gridData_AlignVerticalCenter.applyTo(label);
 
             final Composite containerBorder = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
@@ -586,11 +587,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                _comboBorderLayout = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboBorderLayout.setVisibleItemCount(20);
                _comboBorderLayout.addSelectionListener(selectionListener);
+               _comboBorderLayout.addMouseWheelListener(mouseWheelListener_Combo);
 
                // combo color
                _comboBorderColor = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
                _comboBorderColor.setVisibleItemCount(20);
                _comboBorderColor.addSelectionListener(selectionListener);
+               _comboBorderColor.addMouseWheelListener(mouseWheelListener_Combo);
             }
          }
          {
@@ -601,17 +604,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             // label
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_BorderWidth);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
+            gridData_AlignVerticalCenter.applyTo(label);
 
             // spinner
             _spinnerBorder = new Spinner(container, SWT.BORDER);
             _spinnerBorder.setMinimum(0);
             _spinnerBorder.setMaximum(10);
             _spinnerBorder.addSelectionListener(selectionListener);
-            _spinnerBorder.addMouseWheelListener(mouseWheelListener);
+            _spinnerBorder.addMouseWheelListener(mouseWheelListener_Spinner);
          }
       }
 
@@ -651,7 +651,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                   cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
 
                   final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-                  final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId(), true);
+                  final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId(), false);
 
                   cell.setImage(tourTypeImage);
 
@@ -886,25 +886,25 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       if (_isModified) {
 
          _isModified = false;
-//
-//			TourManager.getInstance().clearTourDataCache();
-//
-//			// fire modify event
-//			_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 
          TourTypeManager.saveState();
 
-         // show restart info
-         new MessageDialog(
-               this.getShell(),
-               Messages.Pref_TourTypes_Dialog_Restart_Title,
-               null,
-               Messages.Pref_TourTypes_Dialog_Restart_Message,
-               MessageDialog.INFORMATION,
-               new String[] { Messages.App_Action_RestartApp },
-               1).open();
+         TourManager.getInstance().clearTourDataCache();
 
-         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+         // fire modify event
+         _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+
+//         // show restart info
+//         new MessageDialog(
+//               this.getShell(),
+//               Messages.Pref_TourTypes_Dialog_Restart_Title,
+//               null,
+//               Messages.Pref_TourTypes_Dialog_Restart_Message,
+//               MessageDialog.INFORMATION,
+//               new String[] { Messages.App_Action_RestartApp },
+//               1).open();
+
+//         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
       }
    }
 
@@ -1088,7 +1088,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
           * definition image.
           */
          // create the same color definition but with the correct id's
-         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
+         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
                savedTourType,
                "tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
                tourTypeName);
@@ -1164,7 +1164,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
        * Update UI
        */
       // invalidate old color/image from the graph and color definition to force the recreation
-      _graphColorPainter.invalidateResources(//
+      _graphColorPainter.invalidateResources(
             _selectedGraphColor.getColorId(),
             selectedColorDefinition.getColorDefinitionId());
 
@@ -1400,7 +1400,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
    private TourType saveTourType(final TourType tourType) {
 
-      return TourDatabase.saveEntity(//
+      return TourDatabase.saveEntity(
             tourType,
             tourType.getTypeId(),
             TourType.class);
