@@ -21,7 +21,7 @@
 
       <command id="command.net.tourbook.photo.RefreshFolder"
          name="%Action_PhotoDirectory_RefreshFolder"
-         defaultHandler="net.tourbook.photo.internal.ActionHandlerRefreshFolder"
+         defaultHandler="net.tourbook.photo.internal.ActionHandler_RefreshFolder"
          />
       
    </extension>

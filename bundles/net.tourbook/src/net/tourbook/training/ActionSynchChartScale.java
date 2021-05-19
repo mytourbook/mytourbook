@@ -18,7 +18,6 @@ package net.tourbook.training;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
@@ -35,7 +34,7 @@ public class ActionSynchChartScale extends Action {
 
       setToolTipText(Messages.Training_View_Action_SynchChartScale);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.SyncStatistics)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
    }
 

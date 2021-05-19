@@ -17,7 +17,6 @@ package net.tourbook.map25.action;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.map2.Messages;
 import net.tourbook.map25.Map25View;
 
@@ -35,8 +34,8 @@ public class ActionZoomIn extends Action {
 
       setToolTipText(Messages.map_action_zoom_in);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_In)));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.Zoom_In_Disabled)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_In_Disabled));
    }
 
    @Override

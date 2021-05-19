@@ -47,11 +47,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -291,7 +289,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
        * create tree layout
        */
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(400, 100)
             .applyTo(layoutContainer);
@@ -335,67 +333,64 @@ public class PrefPageAppearanceColors extends PreferencePage implements
          public void keyReleased(final KeyEvent keyEvent) {}
       });
 
-      _colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
+      _colorViewer.addSelectionChangedListener(selectionChangedEvent -> {
 
-            final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+         final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
 
-            // don't expand when navigation key is pressed
-            if (_isNavigationKeyPressed) {
+         // don't expand when navigation key is pressed
+         if (_isNavigationKeyPressed) {
 
-               _isNavigationKeyPressed = false;
+            _isNavigationKeyPressed = false;
 
-               return;
+            return;
+         }
+
+         if (selection instanceof ColorDefinition) {
+
+            // expand/collapse current item
+            final ColorDefinition treeItem = (ColorDefinition) selection;
+
+            if (_colorViewer.getExpandedState(treeItem)) {
+
+               // item is expanded -> collapse
+
+               _colorViewer.collapseToLevel(treeItem, 1);
+
+            } else {
+
+               // item is collapsed -> expand
+
+               if (_expandedItem != null) {
+                  _colorViewer.collapseToLevel(_expandedItem, 1);
+               }
+               _colorViewer.expandToLevel(treeItem, 1);
+               _expandedItem = treeItem;
+
+               // expanding the treeangle, the layout is correctly done but not with double click
+               layoutContainer.layout(true, true);
             }
 
-            if (selection instanceof ColorDefinition) {
+         } else if (selection instanceof GraphColorItem) {
 
-               // expand/collapse current item
-               final ColorDefinition treeItem = (ColorDefinition) selection;
+            onSelectColorInColorViewer();
 
-               if (_colorViewer.getExpandedState(treeItem)) {
+            // run async that the UI do display the selected color in the color button
+            _colorViewer.getTree().getDisplay().asyncExec(() -> {
 
-                  // item is expanded -> collapse
+               final GraphColorItem graphColor = (GraphColorItem) selection;
 
-                  _colorViewer.collapseToLevel(treeItem, 1);
+               if (graphColor.isMapColor()) {
+
+                  // legend color is selected
+
+                  onSelectMappingColor();
 
                } else {
 
-                  // item is collapsed -> expand
-
-                  if (_expandedItem != null) {
-                     _colorViewer.collapseToLevel(_expandedItem, 1);
-                  }
-                  _colorViewer.expandToLevel(treeItem, 1);
-                  _expandedItem = treeItem;
-
-                  // expanding the treeangle, the layout is correctly done but not with double click
-                  layoutContainer.layout(true, true);
+                  // open color selection dialog
+                  _colorSelector.open();
                }
-
-            } else if (selection instanceof GraphColorItem) {
-
-               onSelectColorInColorViewer();
-
-               // run async that the UI do display the selected color in the color button
-               _colorViewer.getTree().getDisplay().asyncExec(() -> {
-
-                  final GraphColorItem graphColor = (GraphColorItem) selection;
-
-                  if (graphColor.isMapColor()) {
-
-                     // legend color is selected
-
-                     onSelectMappingColor();
-
-                  } else {
-
-                     // open color selection dialog
-                     _colorSelector.open();
-                  }
-               });
-            }
+            });
          }
       });
 
@@ -506,70 +501,74 @@ public class PrefPageAppearanceColors extends PreferencePage implements
     */
    private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
 
-      final int numberOfHorizontalImages = 5;
+      final int numHorizontalImages = 5;
       final int trailingOffset = 10;
 
       final int itemHeight = tree.getItemHeight();
-      final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING)
-            * numberOfHorizontalImages
+      final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING) * numHorizontalImages
             + trailingOffset;
 
-      TreeColumn tc;
-      TreeViewerColumn tvc;
+      {
+         /*
+          * 1. column: color item/color definition
+          */
+         final TreeViewerColumn tvc = new TreeViewerColumn(_colorViewer, SWT.LEAD);
+         final TreeColumn tc = tvc.getColumn();
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-      // 1. column: color item/color definition
-      tvc = new TreeViewerColumn(_colorViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
+               final Object element = cell.getElement();
 
-            final Object element = cell.getElement();
-
-            if (element instanceof ColorDefinition) {
-               cell.setText(((ColorDefinition) (element)).getVisibleName());
-            } else if (element instanceof GraphColorItem) {
-               cell.setText(((GraphColorItem) (element)).getName());
-            } else {
-               cell.setText(UI.EMPTY_STRING);
+               if (element instanceof ColorDefinition) {
+                  cell.setText(((ColorDefinition) (element)).getVisibleName());
+               } else if (element instanceof GraphColorItem) {
+                  cell.setText(((GraphColorItem) (element)).getName());
+               } else {
+                  cell.setText(UI.EMPTY_STRING);
+               }
             }
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
+         });
+         treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
+      }
+      {
+         /*
+          * 2. column: color for definition/item
+          */
+         final TreeViewerColumn tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
+         final TreeColumn tc = tvc.getColumn();
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-      // 2. column: color for definition/item
-      tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
-      tc = tvc.getColumn();
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof ColorDefinition) {
+               final Object element = cell.getElement();
 
                final Color backgroundColor = _colorViewer.getTree().getBackground();
 
-               cell.setImage(_graphColorPainter.drawColorDefinitionImage(
-                     (ColorDefinition) element,
-                     numberOfHorizontalImages,
-                     false,
-                     backgroundColor));
+               if (element instanceof ColorDefinition) {
 
-            } else if (element instanceof GraphColorItem) {
+                  cell.setImage(_graphColorPainter.drawColorDefinitionImage(
+                        (ColorDefinition) element,
+                        numHorizontalImages,
+                        false,
+                        backgroundColor));
 
-               cell.setImage(_graphColorPainter.drawGraphColorImage(//
-                     (GraphColorItem) element,
-                     numberOfHorizontalImages,
-                     false));
+               } else if (element instanceof GraphColorItem) {
 
-            } else {
+                  cell.setImage(_graphColorPainter.drawGraphColorImage(
+                        (GraphColorItem) element,
+                        numHorizontalImages,
+                        false,
+                        backgroundColor));
 
-               cell.setImage(null);
+               } else {
+
+                  cell.setImage(null);
+               }
             }
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
+         });
+         treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
+      }
    }
 
    private void doLiveUpdate() {
@@ -791,7 +790,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements
 
       // force to change the status
       TourbookPlugin.getDefault()
-            .getPreferenceStore()//
+            .getPreferenceStore()
             .setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
    }
 

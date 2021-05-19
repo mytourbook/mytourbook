@@ -17,7 +17,6 @@ package net.tourbook.application;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
@@ -36,7 +35,7 @@ public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
    public ActionTourDataFilter() {
 
-      super(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourFilter)),
+      super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter),
             TourbookPlugin.getImageDescriptor(Images.TourFilter_Disabled));
 
       isToggleAction = true;

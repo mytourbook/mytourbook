@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Random;
 
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -2251,7 +2250,7 @@ public class UI {
     */
    public static void setThemedIcon(final UIElement uiElement, final String imageName) {
 
-      uiElement.setIcon(CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName)));
+      uiElement.setIcon(CommonActivator.getThemedImageDescriptor(imageName));
    }
 
    public static void setupThemedImages() {

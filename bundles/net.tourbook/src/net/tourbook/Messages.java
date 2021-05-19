@@ -1707,7 +1707,7 @@ public class Messages extends NLS {
    public static String Pref_TourTypes_Button_add;
    public static String Pref_TourTypes_Button_delete;
    public static String Pref_TourTypes_Button_rename;
-   public static String Pref_TourTypes_Dialog_Restart_Message;
+   public static String Pref_TourTypes_Dialog_Restart_Message_2;
    public static String Pref_TourTypes_Dialog_Restart_Title;
    public static String Pref_TourTypes_Dlg_delete_tour_type_msg;
    public static String Pref_TourTypes_Dlg_delete_tour_type_title;
@@ -1939,6 +1939,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25TrackOptions_Label_OutlineColor;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth;
    public static String Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
+   public static String Slideout_Map25TrackOptions_Label_DirectionArrows;
 
    public static String Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography;

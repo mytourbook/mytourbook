@@ -70,7 +70,6 @@ import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
-import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
@@ -225,7 +224,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionExport                        _actionExportTour;
    private ActionMenuSetAllTagStructures       _actionSetAllTagStructures;
    private ActionMenuSetTagStructure           _actionSetTagStructure;
-   private ActionModifyColumns                 _actionModifyColumns;
    private ActionOpenTour                      _actionOpenTour;
    private ActionOpenPrefDialog                _actionOpenTagPrefs;
    private ActionRefreshView                   _actionRefreshView;
@@ -673,7 +671,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionEditTour = new ActionEditTour(this);
       _actionExpandSelection = new ActionExpandSelection(this);
       _actionExportTour = new ActionExport(this);
-      _actionModifyColumns = new ActionModifyColumns(this);
       _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
@@ -1695,10 +1692,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       /*
        * fill view menu
        */
-      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionModifyColumns);
+//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
    }
 

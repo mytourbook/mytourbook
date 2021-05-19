@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -36,7 +35,7 @@ public class ActionEditTour extends Action {
 
       setText(Messages.App_Action_edit_tour);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.EditTour)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.EditTour));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled));
 
       setEnabled(false);

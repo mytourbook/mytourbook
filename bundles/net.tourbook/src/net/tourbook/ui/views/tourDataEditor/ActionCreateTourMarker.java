@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourDataEditor;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.DialogMarker;
@@ -39,7 +38,7 @@ public class ActionCreateTourMarker extends Action {
    public ActionCreateTourMarker(final TourDataEditorView tourDataEditorView) {
 
       super(Messages.tourCatalog_view_action_create_marker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(ThemeUtil.getThemedImageName(Images.TourMarker_New)));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
 
       _tourDataEditor = tourDataEditorView;
    }

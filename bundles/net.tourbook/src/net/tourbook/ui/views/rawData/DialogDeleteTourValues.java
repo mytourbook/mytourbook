@@ -185,10 +185,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
 
       createUI(dlgContainer);
 
-      // must be run async because the dark theme is overwriting colors after this method call
-      _parent.getDisplay().asyncExec(() -> {
-         updateUI_LockUnlockButtons();
-      });
+      // must be run async because the dark theme is overwriting colors after calling createDialogArea()
+      _parent.getDisplay().asyncExec(this::updateUI_LockUnlockButtons);
 
       return dlgContainer;
    }
@@ -848,6 +846,10 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
       _state.put(STATE_IS_DELETE_TIMER_PAUSES, _chkData_TourTimerPauses.getSelection());
    }
 
+   /**
+    * The relayout is needed because when setting a text for a button to "Lock" or "Unlock" an the
+    * initial text was "Lock", when setting "Unlock", it will be truncate.
+    */
    private void updateUI_LockUnlockButtons() {
 
       final boolean isDarkTheme = net.tourbook.common.UI.isDarkTheme();

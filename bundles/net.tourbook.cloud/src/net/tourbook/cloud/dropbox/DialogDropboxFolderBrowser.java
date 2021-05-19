@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.dropbox;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
@@ -49,8 +51,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -199,12 +199,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
          _buttonParentFolder.setToolTipText(Messages.Dialog_DropboxBrowser_Button_ParentFolder_Tooltip);
          _buttonParentFolder.setImage(_imageDropboxParentFolder);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_buttonParentFolder);
-         _buttonParentFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-               onClickParentFolder();
-            }
-         });
+         _buttonParentFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickParentFolder()));
          _buttonParentFolder.setEnabled(false);
 
          /*

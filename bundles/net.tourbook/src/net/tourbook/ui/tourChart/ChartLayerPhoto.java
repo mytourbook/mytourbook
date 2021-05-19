@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -169,6 +169,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
                final Point photoPosition = photoPositions[photoIndex];
 
                if (photoPosition == null) {
+
                   // photo is not in the graph viewport
                   continue;
                }
@@ -210,6 +211,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
       _hoveredPaintGroup = null;
 
       if (_photoCategories == null || _photoCategories.isEmpty()) {
+
          // photo positions are not initialized
          return;
       }
@@ -433,14 +435,14 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
             groupHGrid);
 
       // convert all photo positions into grouped photo positions
-      createGroupPositions(//
+      createGroupPositions(
             graphDrawingData,
             devGraphImageOffset);
 
       gc.setClipping(0, devYTop, devVisibleChartWidth, devGraphHeight);
       gc.setAntialias(SWT.ON);
 
-      draw_10( //
+      draw_10(
             gc,
             devYTop,
             devGraphHeight,
@@ -532,7 +534,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
             drawPhotoAndGroup(gc, paintGroup, photoCategory);
 
 //				/*
-//				 * debug: draw grid
+//				 * Debug: draw grid
 //				 */
 //				final int yHitHeight = groupY + groupHeight;// + 2 * GROUP_Y_HIT_BORDER;
 //				gc.setLineWidth(1);
@@ -585,7 +587,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
             continue;
          }
 
-         gc.fillRectangle(//
+         gc.fillRectangle(
                devXPhoto - (PHOTO_ICON_SIZE / 2),
                devYPhoto,
                PHOTO_ICON_SIZE,
@@ -676,6 +678,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
    }
 
    public void setBackgroundColor(final Color bgColorLink, final Color bgColorTour) {
+
       _bgColorLink = bgColorLink;
       _bgColorTour = bgColorTour;
    }

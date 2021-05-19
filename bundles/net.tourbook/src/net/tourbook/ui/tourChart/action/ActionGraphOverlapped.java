@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,19 +24,19 @@ import org.eclipse.jface.action.Action;
 
 public class ActionGraphOverlapped extends Action {
 
-	private TourChart	_tourChart;
+   private TourChart _tourChart;
 
-	public ActionGraphOverlapped(final TourChart tourChart) {
+   public ActionGraphOverlapped(final TourChart tourChart) {
 
-		super(Messages.Tour_Action_GraphOverlapped, AS_CHECK_BOX);
+      super(Messages.Tour_Action_GraphOverlapped, AS_CHECK_BOX);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Graph_Overlapped));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Graph_Overlapped));
 
-		_tourChart = tourChart;
-	}
+      _tourChart = tourChart;
+   }
 
-	@Override
-	public void run() {
-		_tourChart.actionGraphOverlapped(isChecked());
-	}
+   @Override
+   public void run() {
+      _tourChart.actionGraphOverlapped(isChecked());
+   }
 }

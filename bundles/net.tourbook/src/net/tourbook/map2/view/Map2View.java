@@ -400,7 +400,7 @@ public class Map2View extends ViewPart implements
    private boolean                           _isMapSyncWith_ValuePoint;
    //
    private HashMap<MapGraphId, Action>       _allTourColor_Actions = new HashMap<>();
-   private ActionTourColor                   _actionTourColor_Altitude;
+   private ActionTourColor                   _actionTourColor_Elevation;
    private ActionTourColor                   _actionTourColor_Gradient;
    private ActionTourColor                   _actionTourColor_Pulse;
    private ActionTourColor                   _actionTourColor_Speed;
@@ -557,8 +557,8 @@ public class Map2View extends ViewPart implements
 
       public ActionShowTour() {
 
-         super(TourbookPlugin.getImageDescriptor(Images.TourChart),
-               TourbookPlugin.getImageDescriptor(Images.TourChart_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourChart),
+               TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
 
          isToggleAction = true;
          notSelectedTooltip = Messages.map_action_show_tour_in_map;
@@ -1514,7 +1514,7 @@ public class Map2View extends ViewPart implements
 
    private void createActions() {
 
-      _actionTourColor_Altitude = new ActionTourColor(
+      _actionTourColor_Elevation = new ActionTourColor(
             this,
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
@@ -1565,13 +1565,13 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _allTourColor_Actions.put(MapGraphId.Altitude, _actionTourColor_Altitude);
-      _allTourColor_Actions.put(MapGraphId.Gradient, _actionTourColor_Gradient);
-      _allTourColor_Actions.put(MapGraphId.Pulse, _actionTourColor_Pulse);
-      _allTourColor_Actions.put(MapGraphId.Speed, _actionTourColor_Speed);
-      _allTourColor_Actions.put(MapGraphId.Pace, _actionTourColor_Pace);
-      _allTourColor_Actions.put(MapGraphId.HrZone, _actionTourColor_HrZone);
-      _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength, _actionTourColor_RunDyn_StepLength);
+      _allTourColor_Actions.put(MapGraphId.Altitude,           _actionTourColor_Elevation);
+      _allTourColor_Actions.put(MapGraphId.Gradient,           _actionTourColor_Gradient);
+      _allTourColor_Actions.put(MapGraphId.Pulse,              _actionTourColor_Pulse);
+      _allTourColor_Actions.put(MapGraphId.Speed,              _actionTourColor_Speed);
+      _allTourColor_Actions.put(MapGraphId.Pace,               _actionTourColor_Pace);
+      _allTourColor_Actions.put(MapGraphId.HrZone,             _actionTourColor_HrZone);
+      _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
       // map2 slideouts
       _actionMap2_Bookmarks               = new ActionMapBookmarks(this._parent, this);
@@ -1980,7 +1980,7 @@ public class Map2View extends ViewPart implements
 
       if (numberOfTours == 0) {
 
-         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Elevation.setEnabled(false);
          _actionTourColor_Gradient.setEnabled(false);
          _actionTourColor_Pulse.setEnabled(false);
          _actionTourColor_Speed.setEnabled(false);
@@ -1990,7 +1990,7 @@ public class Map2View extends ViewPart implements
 
       } else if (isForceTourColor) {
 
-         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Elevation.setEnabled(true);
          _actionTourColor_Gradient.setEnabled(true);
          _actionTourColor_Pulse.setEnabled(true);
          _actionTourColor_Speed.setEnabled(true);
@@ -2004,7 +2004,7 @@ public class Map2View extends ViewPart implements
          final boolean isPulse = oneTourData.pulseSerie != null;
          final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
-         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Elevation.setEnabled(true);
          _actionTourColor_Gradient.setEnabled(oneTourData.getGradientSerie() != null);
          _actionTourColor_Pulse.setEnabled(isPulse);
          _actionTourColor_Speed.setEnabled(oneTourData.getSpeedSerie() != null);
@@ -2014,7 +2014,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Elevation.setEnabled(false);
          _actionTourColor_Gradient.setEnabled(false);
          _actionTourColor_Pulse.setEnabled(false);
          _actionTourColor_Speed.setEnabled(false);
@@ -3690,7 +3690,7 @@ public class Map2View extends ViewPart implements
 
          switch (colorId) {
          case Altitude:
-            _actionTourColor_Altitude.setChecked(true);
+            _actionTourColor_Elevation.setChecked(true);
             break;
 
          case Gradient:
@@ -3718,14 +3718,14 @@ public class Map2View extends ViewPart implements
             break;
 
          default:
-            _actionTourColor_Altitude.setChecked(true);
+            _actionTourColor_Elevation.setChecked(true);
             break;
          }
 
          setTourPainterColorProvider(colorId);
 
       } catch (final NumberFormatException e) {
-         _actionTourColor_Altitude.setChecked(true);
+         _actionTourColor_Elevation.setChecked(true);
       }
 
       // draw tour with default color

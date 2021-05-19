@@ -92,30 +92,9 @@ public class Map25ProviderManager {
    }
 
    /**
-    * opensciencemap.org, server seems to be down since 2019-12
-    */
-   private static Map25Provider createMapProvider_Default() {
-
-      final Map25Provider mapProvider = new Map25Provider();
-
-      //mapProvider.isDefault = true;
-      mapProvider.isEnabled = false;
-      mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
-      mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
-      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
-      mapProvider.tileEncoding = TileEncoding.VTM;
-      mapProvider.theme = VtmThemes.DEFAULT;
-      mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
-
-      //_defaultMapProvider = mapProvider;
-
-      return mapProvider;
-   }
-
-   /**
     * mapilion.com/
     */
-   private static Map25Provider createMapProvider_Mapilion() {
+   private static Map25Provider createMapProvider_Default() {
 
       final Map25Provider mapProvider = new Map25Provider();
 
@@ -372,7 +351,7 @@ public class Map25ProviderManager {
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
-         allMapProvider.add(createMapProvider_Mapilion());
+         //allMapProvider.add(createMapProvider_Mapilion());
          allMapProvider.add(createMapProvider_Mapzen());
          allMapProvider.add(createMapProvider_Mapsforge());
          allMapProvider.add(createMapProvider_MyTileServer());

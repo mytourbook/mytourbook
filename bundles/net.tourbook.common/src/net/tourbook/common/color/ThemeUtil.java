@@ -24,8 +24,12 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.PlatformUI;
 
 public class ThemeUtil {
@@ -52,6 +56,38 @@ public class ThemeUtil {
    public static final String  E4_DARK_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_dark"; //$NON-NLS-1$
 
    private static IThemeEngine _themeEngine;
+
+   /**
+    * The tour chart do not show a dark background color when displayed in a dialog, it shows the
+    * background color from the shell.
+    * <p>
+    * This color is used to show the tour chart with a dark background color, to have a contrast to
+    * the dialog background.
+    *
+    * <pre>
+    *
+    * W10 dark colors
+    *
+    * shell.getBackground()   Color {81, 86, 88, 255}
+    * table.getBackground()   Color {47, 47, 47, 255}
+    * </pre>
+    */
+   private static Color        _defaultBackgroundColor_Table;
+   private static Color        _defaultBackgroundColor_TableHeader;
+
+   /**
+    * <pre>
+    * W10 dark colors
+    *
+    * shell.getForeground() Color {238, 238, 238, 255}
+    * table.getForeground() Color {238, 238, 238, 255}
+    * </pre>
+    */
+   private static Color        _defaultForegroundColor_Table;
+   private static Color        _defaultForegroundColor_TableHeader;
+
+   private static Color        _defaultForegroundColor_Combo;
+   private static Color        _defaultBackgroundColor_Combo;
 
    /**
     * These are all Eclipse themes when using W10:
@@ -103,6 +139,59 @@ public class ThemeUtil {
    }
 
    /**
+    * @return The tour chart do not show a dark background color when displayed in a dialog, it
+    *         shows the background color from the shell.
+    *         <p>
+    *         Returns a color which is used to show the tour chart with a dark background color, to
+    *         have a contrast to the dialog background.
+    */
+   public static Color getDarkestBackgroundColor() {
+
+      return _defaultBackgroundColor_Table;
+   }
+
+   public static Color getDarkestForegroundColor() {
+
+      return _defaultForegroundColor_Table;
+   }
+
+   public static Color getDefaultBackgroundColor_Combo() {
+      return _defaultBackgroundColor_Combo;
+   }
+
+   /**
+    * @return Returns the table default background color for light or dark theme
+    */
+   public static Color getDefaultBackgroundColor_Table() {
+      return _defaultBackgroundColor_Table;
+   }
+
+   /**
+    * @return Returns the table header default background color for light or dark theme
+    */
+   public static Color getDefaultBackgroundColor_TableHeader() {
+      return _defaultBackgroundColor_TableHeader;
+   }
+
+   public static Color getDefaultForegroundColor_Combo() {
+      return _defaultForegroundColor_Combo;
+   }
+
+   /**
+    * @return Returns the table default foreground color for light or dark theme
+    */
+   public static Color getDefaultForegroundColor_Table() {
+      return _defaultForegroundColor_Table;
+   }
+
+   /**
+    * @return Returns the table header default foreground color for light or dark theme
+    */
+   public static Color getDefaultForegroundColor_TableHeader() {
+      return _defaultForegroundColor_TableHeader;
+   }
+
+   /**
     * @param imageName
     * @return Returns the themed image name. The postfix {@value #DARK_THEME_POSTFIX} is
     *         appended to
@@ -121,6 +210,20 @@ public class ThemeUtil {
       }
 
       return imageNameThemed;
+   }
+
+   /**
+    * In the dark theme the right aligned text in a tree control is just left of the column
+    * separator which cannot be set hidden, it looks just awful
+    */
+   public static String getThemedTreeHeaderLabel(final String headerLabel) {
+
+      if (UI.isDarkTheme()) {
+
+         return headerLabel + UI.SPACE2;
+      }
+
+      return headerLabel;
    }
 
    public static IThemeEngine getThemeEngine() {
@@ -207,5 +310,38 @@ public class ThemeUtil {
 
          setDarkTheme(isDarkThemeSelected);
       }
+
+      final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+      final Combo combo = new Combo(shell, SWT.READ_ONLY);
+      final Table table = new Table(shell, SWT.BORDER);
+
+//      System.out.println((System.currentTimeMillis() + " shell.getBackground()      1 " + shell.getBackground()));
+//      System.out.println((System.currentTimeMillis() + " table.getBackground()      1 " + table.getBackground()));
+//      System.out.println((System.currentTimeMillis() + " shell.getForeground()      1 " + shell.getForeground()));
+//      System.out.println((System.currentTimeMillis() + " table.getForeground()      1 " + table.getForeground()));
+
+      Display.getDefault().asyncExec(() -> {
+
+//         System.out.println((System.currentTimeMillis() + " shell.getBackground()      2 " + shell.getBackground()));
+//         System.out.println((System.currentTimeMillis() + " table.getBackground()      2 " + table.getBackground()));
+//         System.out.println((System.currentTimeMillis() + " shell.getForeground()      2 " + shell.getForeground()));
+//         System.out.println((System.currentTimeMillis() + " table.getForeground()      2 " + table.getForeground()));
+
+         _defaultForegroundColor_Combo = combo.getForeground();
+         _defaultBackgroundColor_Combo = combo.getBackground();
+
+         // I found, that a table do have a darker background color than the shell
+
+         _defaultForegroundColor_Table = table.getForeground();
+         _defaultBackgroundColor_Table = table.getBackground();
+
+         _defaultForegroundColor_TableHeader = table.getHeaderForeground();
+         _defaultBackgroundColor_TableHeader = table.getHeaderBackground();
+
+         combo.dispose();
+         table.dispose();
+      });
+
    }
 }

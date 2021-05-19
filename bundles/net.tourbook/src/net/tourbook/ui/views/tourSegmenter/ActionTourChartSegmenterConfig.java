@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,8 +59,8 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
       _tourSegmenterView = tourSegmenterView;
       _parent = parent;
 
-      _imageEnabled = TourbookPlugin.getImageDescriptor(Images.TourSegments).createImage();
-      _imageDisabled = TourbookPlugin.getImageDescriptor(Images.TourSegments_Disabled).createImage();
+      _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments).createImage();
+      _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments_Disabled).createImage();
 
       _parent.addDisposeListener(new DisposeListener() {
 

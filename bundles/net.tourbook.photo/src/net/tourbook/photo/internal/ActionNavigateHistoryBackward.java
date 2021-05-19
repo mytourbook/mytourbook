@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import net.tourbook.photo.PhotoImages;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.photo.PicDirView;
 
 import org.eclipse.jface.action.Action;
@@ -29,7 +30,9 @@ public class ActionNavigateHistoryBackward extends Action {
    public ActionNavigateHistoryBackward(final PicDirImages picDirImages, final PicDirView picDirView) {
 
       setToolTipText(Messages.Pic_Dir_Action_NavigateHistoryBackward_Tooltip);
-      setImageDescriptor(Activator.getImageDescriptor(PhotoImages.App_Navigate_Backward));
+
+      setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left));
+      setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.Arrow_Left_Disabled));
 
       setActionDefinitionId(ACTION_ID);
 

@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageGallery;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoLoadManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -37,7 +38,7 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class GalleryActionBar {
 
-   private static final IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
 
    private ImageGallery                  _imageGallery;
 
