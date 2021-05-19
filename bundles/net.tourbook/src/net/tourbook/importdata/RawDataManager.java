@@ -2663,8 +2663,8 @@ public class RawDataManager {
                File importFile = new File(osFilePath);
 
                if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
-                  importFile = FileSystemManager.CopyLocally(osFilePath);
 
+                  importFile = FileSystemManager.CopyLocally(osFilePath);
                }
 
                if (importRawData(importFile, null, false, null, true, false)) {
