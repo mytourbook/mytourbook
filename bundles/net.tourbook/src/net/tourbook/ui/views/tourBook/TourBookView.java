@@ -32,6 +32,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -190,6 +191,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -692,7 +694,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          Style style;
 
          style = new Style();
-         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
+         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR,
+               UI.isDarkTheme()
+                     ? Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW)
+                     : GUIHelper.COLOR_YELLOW);
 
          configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
 
@@ -712,6 +717,28 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          /*
           * Overwrite default modern theme
           */
+
+         final Color defaultBackgroundColor_Table = ThemeUtil.getDefaultBackgroundColor_Table();
+         final Color defaultBackgroundColor_TableHeader = ThemeUtil.getDefaultBackgroundColor_TableHeader();
+
+         this.evenRowBgColor = defaultBackgroundColor_Table;
+         this.oddRowBgColor = defaultBackgroundColor_Table;
+
+         // column header styling
+         this.cHeaderGradientBgColor = defaultBackgroundColor_TableHeader;
+         this.cHeaderGradientFgColor = defaultBackgroundColor_TableHeader;
+
+         // column header selection style
+         this.cHeaderSelectionGradientBgColor = defaultBackgroundColor_TableHeader;
+         this.cHeaderSelectionGradientFgColor = defaultBackgroundColor_TableHeader;
+
+         // row header styling
+         this.rHeaderGradientBgColor = defaultBackgroundColor_TableHeader;
+         this.rHeaderGradientFgColor = defaultBackgroundColor_TableHeader;
+
+         // row header selection style
+         this.rHeaderSelectionGradientBgColor = defaultBackgroundColor_TableHeader;
+         this.rHeaderSelectionGradientFgColor = defaultBackgroundColor_TableHeader;
 
          // hide grid lines
          this.renderBodyGridLines = false;
@@ -1440,13 +1467,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _tourViewer_NatTable.configure();
 
-      // overwrite theme with MT's own theme, which is based on the modern or dark theme
-      final ThemeConfiguration themeConfiguration = UI.isDarkTheme()
-            ? new NatTable_Configuration_Theme_Dark()
-            : new NatTable_Configuration_Theme_Light();
-
-      _tourViewer_NatTable.setTheme(themeConfiguration);
-
       // set header tooltip
       _natTable_Tooltip = new NatTable_Header_Tooltip(_tourViewer_NatTable, this);
       _natTable_Tooltip.setPopupDelay(0);
@@ -1457,6 +1477,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourInfoToolTip_NatTable = new NatTableViewer_TourInfo_ToolTip(this, ToolTip.NO_RECREATE);
 
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
+
+      // this must be run async otherwise the dark theme is not yet initialized !!!
+      _parent.getDisplay().asyncExec(() -> {
+
+         // overwrite theme with MT's own theme, which is based on the modern or dark theme
+         final ThemeConfiguration themeConfiguration = UI.isDarkTheme()
+               ? new NatTable_Configuration_Theme_Dark()
+               : new NatTable_Configuration_Theme_Light();
+
+         _tourViewer_NatTable.setTheme(themeConfiguration);
+      });
    }
 
    /**

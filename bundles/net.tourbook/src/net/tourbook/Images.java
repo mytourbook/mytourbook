@@ -286,6 +286,7 @@ public class Images {
    public static final String TourBook_Month                             = "tourbook-month.png";                                  //$NON-NLS-1$
    public static final String TourBook_NatTable                          = "tourbook-nattable.png";                               //$NON-NLS-1$
    public static final String TourBook_SelectAll                         = "tourbook-select-all.png";                             //$NON-NLS-1$
+   public static final String TourBook_SelectAll_Disabled                = "tourbook-select-all-disabled.png";                    //$NON-NLS-1$
    public static final String TourBook_Week                              = "tourbook-week.png";                                   //$NON-NLS-1$
    public static final String TourCatalog_CompareWizard                  = "tour-map-compare-wizard.png";                         //$NON-NLS-1$
    public static final String TourCatalog_RefTour_New                    = "tour-map-reftour-new.png";                            //$NON-NLS-1$

@@ -4189,9 +4189,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="182.85767"
-     inkscape:cx="499.92402"
-     inkscape:zoom="22.627417"
+     inkscape:cy="274.58149"
+     inkscape:cx="270.14205"
+     inkscape:zoom="11.313709"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -15091,15 +15091,7 @@
        width="16"
        height="16"
        preserveAspectRatio="none"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABf0lEQVQo
-kZWQP2tUURDFf+e+vYlREQIp/FOoSJoUdkEI8rASWQtRsJR0AUsbv4D7Cj+A+AXsRAmCoJAUYmUs
-RDuxsLFYJEjQbHLv23fvWLzNQ0mxOsVwznDmHGYYDAZmZmYdOEz/1MjM+J9yVVW1qAOH6V8a+4e6
-+myvw0y9YW0jvB82996Edjg94f7b8GUn3d0MLZ1yw9pGvHKm2IlcOuna4ZQv3XkVVpc84MTjT+On
-148U3vuyLNvtR7vLtxd9l1CW5ecf+ahXnRSSjca29eThJKG/Hvrni2+/8ofv+fWtuXanv75/80JP
-QoAYJ15+bQrv/WB7+eKCA2YLd+qYHryrV5d8VVX1uZXjMy4mQiYmGmM4MpnZjRf7i/OFAJAM4+N2
-/lnb5dPFTCEZCCeA3doK7304u9J6xERoiFnzszrhHSI0hEydFBIxmQlde7435yWQEHIyQEgYwkmY
-SRKT3otZMZrgYAdkAgcSKMsOXJRBveEotz/ppABMLNAEd4LfgbRGhqcuVocAAAAASUVORK5CYII=
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABf0lEQVQo kZWQP2tUURDFf+e+vYlREQIp/FOoSJoUdkEI8rASWQtRsJR0AUsbv4D7Cj+A+AXsRAmCoJAUYmUs RDuxsLFYJEjQbHLv23fvWLzNQ0mxOsVwznDmHGYYDAZmZmYdOEz/1MjM+J9yVVW1qAOH6V8a+4e6 +myvw0y9YW0jvB82996Edjg94f7b8GUn3d0MLZ1yw9pGvHKm2IlcOuna4ZQv3XkVVpc84MTjT+On 148U3vuyLNvtR7vLtxd9l1CW5ecf+ahXnRSSjca29eThJKG/Hvrni2+/8ofv+fWtuXanv75/80JP QoAYJ15+bQrv/WB7+eKCA2YLd+qYHryrV5d8VVX1uZXjMy4mQiYmGmM4MpnZjRf7i/OFAJAM4+N2 /lnb5dPFTCEZCCeA3doK7304u9J6xERoiFnzszrhHSI0hEydFBIxmQlde7435yWQEHIyQEgYwkmY SRKT3otZMZrgYAdkAgcSKMsOXJRBveEotz/ppABMLNAEd4LfgbRGhqcuVocAAAAASUVORK5CYII= "
        id="image3098"
        x="495"
        y="119" />
@@ -15247,5 +15239,42 @@ SRKT3otZMZrgYAdkAgcSKMsOXJRBveEotz/ppABMLNAEd4LfgbRGhqcuVocAAAAASUVORK5CYII=
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-segments-disabled-dark.png"
        inkscape:export-xdpi="96.000092"
        inkscape:export-ydpi="96.000092" />
+    <rect
+       transform="scale(1,-1)"
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-select-all-disabled-dark.png"
+       y="-280"
+       x="285"
+       height="16.000015"
+       width="16"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-5-8-7-3-1-8-76-1-2"
+       style="opacity:0.99;fill:none;stroke:none" />
+    <rect
+       style="opacity:0.99;fill:none;stroke:none"
+       id="rect6999-1-5-7-2"
+       width="16"
+       height="16.000015"
+       x="285"
+       y="-280"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-select-all-disabled-dark.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1,-1)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24.6407px;line-height:46.2015px;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono Bold';letter-spacing:0px;word-spacing:0px;fill:#656565;fill-opacity:1;stroke:none;stroke-width:1;"
+       x="280.94983"
+       y="284.03653"
+       id="text11384-5-1"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tourbook-select-all-disabled-dark.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1.0144161,0.98578879)"><tspan
+         sodipodi:role="line"
+         id="tspan11382-9-0"
+         x="280.94983"
+         y="284.03653"
+         style="fill:#656565;fill-opacity:1;stroke-width:1;">A</tspan></text>
   </g>
 </svg>
